@@ -33,7 +33,17 @@ public record FullTableQuery
 
     [NotMapped]
     [JsonIgnore]
-    public bool EnableCropping { get; set; }
+    public bool AllowCropping { get; set; }
+
+    /// <summary>
+    /// Determines whether the query should be cropped if the resulting table is expected to exceed the maximum allowable size.
+    /// </summary>
+    /// <remarks>
+    /// Ignoring the maximum table size is required for full data exports, but may be undesirable for table previews.
+    /// </remarks>
+    [NotMapped]
+    [JsonIgnore]
+    public bool IgnoreMaxTableSize { get; set; }
 
     public List<Guid> GetFilterItemIds()
     {

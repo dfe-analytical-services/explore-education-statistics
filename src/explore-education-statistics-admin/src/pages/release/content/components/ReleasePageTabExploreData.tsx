@@ -14,6 +14,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -36,13 +37,11 @@ import React, { useMemo } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface Props {
-  hidden: boolean;
   isPra?: boolean;
   handleFeaturedTableItemClick?: (id: string) => void;
 }
 
 const ReleasePageTabExploreData = ({
-  hidden,
   isPra = false,
   handleFeaturedTableItemClick,
 }: Props) => {
@@ -59,6 +58,7 @@ const ReleasePageTabExploreData = ({
     isLoading: isLoadingDataContent,
   } = useQuery(releaseContentQueries.getDataContent(release.id));
 
+  const hasDataSets = dataContent && dataContent.dataSets.length > 0;
   const hasSupportingFiles =
     dataContent && dataContent.supportingFiles.length > 0;
   const hasFeaturedTables =
@@ -130,7 +130,7 @@ const ReleasePageTabExploreData = ({
     </ReleaseDataList>
   ) : undefined;
 
-  const dataSetsContent = (
+  const dataSetsContent = hasDataSets ? (
     <ReleaseDataList
       heading={`${dataContent?.dataSets.length || 0} data set${
         dataContent?.dataSets?.length === 1 ? '' : 's'
@@ -166,7 +166,8 @@ const ReleasePageTabExploreData = ({
             <>
               <span>
                 Create table{' '}
-                <VisuallyHidden>using {dataset.title}</VisuallyHidden>
+                <VisuallyHidden>using {dataset.title}</VisuallyHidden> (public
+                site only)
               </span>
               <ButtonText
                 onClick={() => {
@@ -186,13 +187,16 @@ const ReleasePageTabExploreData = ({
             renderLink={
               <span>
                 Data set information page{' '}
-                <VisuallyHidden>for {dataset.title}</VisuallyHidden>
+                <VisuallyHidden>for {dataset.title}</VisuallyHidden> (public
+                site only)
               </span>
             }
           />
         </ReleaseDataListItem>
       ))}
     </ReleaseDataList>
+  ) : (
+    <InsetText>No data sets added for this release yet.</InsetText>
   );
 
   const supportingFilesContent = (
@@ -226,7 +230,7 @@ const ReleasePageTabExploreData = ({
   );
 
   const dataGuidanceContent = !dataContent?.dataGuidance ? (
-    <p>No data guidance available for this release yet.</p>
+    <InsetText>No data guidance available for this release yet.</InsetText>
   ) : (
     <ContentHtml
       html={dataContent?.dataGuidance}
@@ -235,7 +239,7 @@ const ReleasePageTabExploreData = ({
   );
 
   return (
-    <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="explore">
       <ReleasePageLayout navItems={navItems}>
         <LoadingSpinner loading={isLoadingDataContent}>
           {isErrorDataContent ? (

@@ -8,9 +8,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleaseChecklistService
 {
-    Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId);
+    Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    );
 
-    Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion);
+    Task<List<ReleaseChecklistIssue>> GetErrors(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken = default
+    );
 
-    Task<List<ReleaseChecklistIssue>> GetWarnings(ReleaseVersion releaseVersion);
+    Task<List<ReleaseChecklistIssue>> GetWarnings(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken = default
+    );
 }

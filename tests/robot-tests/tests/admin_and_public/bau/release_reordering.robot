@@ -231,6 +231,7 @@ Validate reordered publication releases
     user checks table cell contains    3    1    ${RELEASE_1_NAME}
     user checks table cell contains    3    2    ${PUBLIC_RELEASE_1_URL}
     user checks table cell contains    3    3    Latest release
+    user waits for caches to expire
 
 Navigate to first published release on public frontend after reordering
     user navigates to    ${PUBLIC_RELEASE_1_URL}

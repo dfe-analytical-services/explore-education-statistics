@@ -49,8 +49,7 @@ public static class DateTimeOffsetExtensions
 
     /// <summary>
     /// <para>
-    /// Adjusts the provided <paramref name="dateTimeOffset"/> to the UK time zone and returns a
-    /// <see cref="DateTimeOffset"/>.
+    /// Adjusts the provided <paramref name="dateTimeOffset"/> to the UK time zone and returns a <see cref="DateOnly"/>.
     /// </para>
     /// <para>
     /// For example, if the DateTimeOffset is "2025-05-31T23:00:00 +00:00",

@@ -127,6 +127,10 @@ const FootnotesList = ({
               className="govuk-!-margin-0"
             >
               <table className={styles.footnoteSelectionTable}>
+                <caption className="govuk-visually-hidden">
+                  Table showing the subjects, indicators and filters that this
+                  footnote applies to.
+                </caption>
                 <thead>
                   <tr>
                     <th>Subjects</th>

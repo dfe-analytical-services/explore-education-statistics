@@ -41,14 +41,9 @@ export interface ContentBlockAttachRequest {
   order: number;
 }
 
-export interface DataContent
-  extends Omit<ReleaseVersionDataContent, 'dataGuidance'> {
-  dataGuidance?: string;
-}
-
 const releaseContentService = {
-  getDataContent(releaseVersionId: string): Promise<DataContent> {
-    return client.get<DataContent>(
+  getDataContent(releaseVersionId: string): Promise<ReleaseVersionDataContent> {
+    return client.get<ReleaseVersionDataContent>(
       `/releaseVersions/${releaseVersionId}/data-content`,
     );
   },

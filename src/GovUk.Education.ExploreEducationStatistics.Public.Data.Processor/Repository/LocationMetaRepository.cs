@@ -100,7 +100,7 @@ public class LocationMetaRepository(
                             + (o.Ukprn ?? "null")
                     );
 
-                var existingRowKeys = (await optionTable.Where(hasBatchRowKey).ToListAsync(token: cancellationToken))
+                var existingRowKeys = (await optionTable.Where(hasBatchRowKey).ToListAsync(cancellationToken))
                     .Select(o => o.GetRowKey())
                     .ToHashSet();
 
@@ -142,7 +142,7 @@ public class LocationMetaRepository(
                                 OptionId = option.Id,
                             }
                     )
-                    .ToListAsync(token: cancellationToken);
+                    .ToListAsync(cancellationToken);
 
                 publicDataDbContext.LocationOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);

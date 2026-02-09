@@ -27,8 +27,7 @@ const PreReleaseContentPage = ({
   );
 
   const previewRedesign =
-    new URLSearchParams(window.location.search).get('redesign') === 'true' &&
-    !window.location.href.includes('admin.explore');
+    new URLSearchParams(window.location.search).get('redesign') === 'true';
 
   const { data: featuredTables = [], isLoading: isLoadingFeaturedTables } =
     useQuery(featuredTableQueries.list(releaseVersionId));

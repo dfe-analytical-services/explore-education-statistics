@@ -119,7 +119,7 @@ public class FilterMetaRepository(
                 var filterOptionMeta = await optionTable
                     .Where(o => batchRowKeys.Contains(o.Label))
                     .OrderBy(o => o.Label)
-                    .ToListAsync(token: cancellationToken);
+                    .ToListAsync(cancellationToken);
 
                 var links = filterOptionMeta
                     .Select(option => new FilterOptionMetaLink
@@ -242,7 +242,7 @@ public class FilterMetaRepository(
     {
         var mappings = await publicDataDbContext
             .DataSetVersionMappings.Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
-            .SingleOrDefaultAsync(token: cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (mappings is null)
         {

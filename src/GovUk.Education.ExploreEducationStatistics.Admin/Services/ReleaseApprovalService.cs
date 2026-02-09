@@ -2,6 +2,7 @@
 using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -30,12 +32,13 @@ public class ReleaseApprovalService(
     IPublishingService publishingService,
     IReleaseChecklistService releaseChecklistService,
     IContentService contentService,
-    IPreReleaseUserService preReleaseUserService,
     IUserResourceRoleNotificationService userResourceRoleNotificationService,
     IReleaseFileRepository releaseFileRepository,
     IReleaseFileService releaseFileService,
     IOptions<ReleaseApprovalOptions> options,
     IUserReleaseRoleService userReleaseRoleService,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     IEmailTemplateService emailTemplateService
 ) : IReleaseApprovalService
 {
@@ -87,7 +90,7 @@ public class ReleaseApprovalService(
                 releaseVersion.ApprovalStatus = request.ApprovalStatus;
                 releaseVersion.NextReleaseDate = request.NextReleaseDate;
                 releaseVersion.NotifySubscribers = releaseVersion.Version == 0 || (request.NotifySubscribers ?? false);
-                releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
+                releaseVersion.UpdatePublishedDisplayDate = request.UpdatePublishedDisplayDate ?? false;
                 releaseVersion.PublishScheduled =
                     request.PublishMethod == PublishMethod.Immediate
                         ? timeProvider.GetUtcNow()
@@ -106,14 +109,17 @@ public class ReleaseApprovalService(
 
                 return await ValidateReleaseWithChecklist(releaseVersion)
                     .OnSuccess(() =>
-                        SendEmailNotificationsAndInvites(request, releaseVersion)
-                            .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
-                            .OnSuccessDo(async () =>
-                            {
-                                context.ReleaseVersions.Update(releaseVersion);
-                                await context.AddAsync(releaseStatus);
-                                await context.SaveChangesAsync();
-                            })
+                        context.RequireTransaction(async () =>
+                        {
+                            return await SendEmailNotificationsAndInvites(request, releaseVersion)
+                                .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
+                                .OnSuccessDo(async () =>
+                                {
+                                    context.ReleaseVersions.Update(releaseVersion);
+                                    context.ReleaseStatus.Add(releaseStatus);
+                                    await context.SaveChangesAsync();
+                                });
+                        })
                     );
             });
     }
@@ -163,37 +169,37 @@ public class ReleaseApprovalService(
         ReleaseVersion releaseVersion
     )
     {
-        var userReleaseRoles = await userReleaseRoleService.ListUserReleaseRolesByPublication(
-            ReleaseRole.Approver,
-            releaseVersion.Publication.Id
-        );
+        var userReleaseRoleEmails = (
+            await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: ReleaseRole.Approver
+            )
+        )
+            .Select(urr => urr.User.Email)
+            .ToList();
 
-        var userPublicationRoles = await context
-            .UserPublicationRoles.Include(upr => upr.User)
-            .Where(upr => upr.PublicationId == releaseVersion.PublicationId && upr.Role == PublicationRole.Allower)
+        var userPublicationRoleEmails = await userPublicationRoleRepository
+            .Query()
+            .WhereForPublication(releaseVersion.Release.PublicationId)
+            .WhereRolesIn(PublicationRole.Allower)
+            .Select(upr => upr.User.Email)
             .ToListAsync();
 
-        var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
-
-        if (notifyHigherReviewers)
-        {
-            return userReleaseRoles
-                .Select(urr => urr.User.Email)
-                .Concat(userPublicationRoles.Select(upr => upr.User.Email))
-                .Distinct()
-                .Select(email => emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
-                .OnSuccessAllReturnVoid();
-        }
-
-        return Unit.Instance;
+        return userReleaseRoleEmails
+            .Concat(userPublicationRoleEmails)
+            .Distinct()
+            .Select(email => emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
+            .OnSuccessAllReturnVoid();
     }
 
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
-        var unsentUserReleaseInvites = await context
-            .UserReleaseInvites.Where(i =>
-                i.ReleaseVersionId == releaseVersion.Id && i.Role == ReleaseRole.PrereleaseViewer && !i.EmailSent
-            )
+        var unsentUserReleaseRoleInvites = await userReleaseRoleRepository
+            .Query(ResourceRoleFilter.AllButExpired)
+            .AsNoTracking()
+            .WhereForReleaseVersion(releaseVersion.Id)
+            .WhereRolesIn(ReleaseRole.PrereleaseViewer)
+            .WhereEmailNotSent()
             .ToListAsync();
 
         // This isn't ideal currently.
@@ -202,17 +208,11 @@ public class ReleaseApprovalService(
         // now have pre-release access to a Release which isn't approved yet.
         // On the other hand, if we skip over failed emails and continue sending the rest, some people will not get notified
         // of their access even when the Release is now approved. This makes them hard to detect.
-        await unsentUserReleaseInvites
+        await unsentUserReleaseRoleInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async invite =>
-            {
-                await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(
-                    userEmail: invite.Email,
-                    releaseVersionId: releaseVersion.Id
-                );
-
-                await preReleaseUserService.MarkInviteEmailAsSent(invite);
-            });
+                await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(invite.Id)
+            );
     }
 
     private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid releaseVersionId)

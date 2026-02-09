@@ -3,7 +3,6 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleasePageTabExploreData from '@admin/pages/release/content/components/ReleasePageTabExploreData';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import _releaseContentService, {
-  DataContent,
   ReleaseContent as ReleaseContentType,
 } from '@admin/services/releaseContentService';
 import render from '@common-test/render';
@@ -12,6 +11,7 @@ import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { noop } from 'lodash';
+import { ReleaseVersionDataContent } from '@common/services/publicationService';
 
 let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
@@ -56,7 +56,7 @@ const renderWithContext = (
   );
 
 describe('ReleasePageTabExploreData', () => {
-  const testReleaseDataContent: DataContent = {
+  const testReleaseDataContent: ReleaseVersionDataContent = {
     releaseId: 'test-release-id',
     releaseVersionId: 'test-release-version-id',
     dataDashboards: '<h3>Data dashboard text</h3>',
@@ -135,14 +135,12 @@ describe('ReleasePageTabExploreData', () => {
     ],
   };
 
-  beforeEach(() => {});
-
   test('renders correctly with all content sections', async () => {
     releaseContentService.getDataContent.mockResolvedValue(
       testReleaseDataContent,
     );
 
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
 
     await waitFor(() => {
       expect(
@@ -305,7 +303,7 @@ describe('ReleasePageTabExploreData', () => {
     ).toBeInTheDocument();
     expect(
       within(dataGuidanceSection).getByText(
-        'Description of the data included in this release, this is a methodology document, providing information on data sources, their coverage and quality and how the data is produced.',
+        'Description of the data sets included in this release, including information on data sources, coverage, quality and any data conventions used.',
       ),
     ).toBeInTheDocument();
   });
@@ -314,7 +312,7 @@ describe('ReleasePageTabExploreData', () => {
     releaseContentService.getDataContent.mockResolvedValue(
       testReleaseDataContent,
     );
-    renderWithContext(<ReleasePageTabExploreData hidden={false} isPra />);
+    renderWithContext(<ReleasePageTabExploreData isPra />);
 
     await waitFor(() => {
       expect(
@@ -341,11 +339,7 @@ describe('ReleasePageTabExploreData', () => {
       testReleaseDataContent,
     );
     renderWithContext(
-      <ReleasePageTabExploreData
-        hidden={false}
-        isPra
-        handleFeaturedTableItemClick={noop}
-      />,
+      <ReleasePageTabExploreData isPra handleFeaturedTableItemClick={noop} />,
     );
 
     await waitFor(() => {
@@ -378,7 +372,7 @@ describe('ReleasePageTabExploreData', () => {
       dataDashboards: undefined,
     });
 
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
 
     await waitFor(() => {
       expect(
@@ -424,12 +418,45 @@ describe('ReleasePageTabExploreData', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders inset text in sections when data sets or guidance not present', async () => {
+    releaseContentService.getDataContent.mockResolvedValue({
+      ...testReleaseDataContent,
+      dataSets: [],
+      dataGuidance: undefined,
+    });
+
+    renderWithContext(<ReleasePageTabExploreData />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
+
+    const datasetsSection = screen.getByTestId('datasets-section');
+    expect(
+      within(datasetsSection).getByText(
+        'No data sets added for this release yet.',
+      ),
+    ).toBeInTheDocument();
+
+    const dataGuidanceSection = screen.getByTestId('data-guidance-section');
+    expect(
+      within(dataGuidanceSection).getByText(
+        'No data guidance available for this release yet.',
+      ),
+    ).toBeInTheDocument();
+  });
+
   test('does not render links grid on mobile', async () => {
     releaseContentService.getDataContent.mockResolvedValue(
       testReleaseDataContent,
     );
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
     await waitFor(() => {
       expect(
         screen.getByRole('heading', {
@@ -447,7 +474,7 @@ describe('ReleasePageTabExploreData', () => {
     releaseContentService.getDataContent.mockResolvedValue(
       testReleaseDataContent,
     );
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
     await waitFor(() => {
       expect(
         screen.getByRole('heading', {
@@ -465,7 +492,7 @@ describe('ReleasePageTabExploreData', () => {
       testReleaseDataContent,
     );
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
     await waitFor(() => {
       expect(
         screen.getByRole('heading', {

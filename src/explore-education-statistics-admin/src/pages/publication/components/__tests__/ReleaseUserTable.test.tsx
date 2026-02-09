@@ -55,6 +55,8 @@ describe('ReleaseUserTable', () => {
       />,
     );
 
+    expect(screen.queryByRole('caption')).not.toBeInTheDocument();
+
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(6);
 
@@ -213,5 +215,23 @@ describe('ReleaseUserTable', () => {
       expect(onUserInvitesRemove).toHaveBeenCalledWith('user4@test.com');
       expect(onUserRemove).not.toBeCalled();
     });
+  });
+
+  test('renders captions correctly', async () => {
+    const onUserRemove = jest.fn();
+    const onUserInvitesRemove = jest.fn();
+    const captionText = 'test caption';
+    render(
+      <ReleaseUserTable
+        users={testReleaseContributors}
+        invites={testInvites}
+        onUserRemove={onUserRemove}
+        onUserInvitesRemove={onUserInvitesRemove}
+        caption={captionText}
+      />,
+    );
+
+    const caption = screen.getByRole('caption');
+    expect(caption).toHaveTextContent(captionText);
   });
 });

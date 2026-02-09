@@ -61,8 +61,7 @@ public abstract class ReleaseVersionsServiceTests
                     Assert.True(result.IsLatestRelease);
                     Assert.Equal(release.Label, result.Label);
                     Assert.Equal(releaseVersion.Published, result.LastUpdated);
-                    // TODO EES-6414 'Published' should be the published display date
-                    Assert.Equal(releaseVersion.Published, result.Published);
+                    Assert.Equal(releaseVersion.PublishedDisplayDate, result.Published);
                     Assert.Empty(result.PublishingOrganisations);
                     Assert.Equal(release.Slug, result.Slug);
                     Assert.Equal(release.Title, result.Title);
@@ -161,14 +160,24 @@ public abstract class ReleaseVersionsServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 2)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 3, draftVersion: true)]);
             var release = publication.Releases[0];
 
             // Ensure the generated release versions have different published dates
             Assert.True(
                 release.Versions[0].Published < release.Versions[1].Published,
-                "The first version should have an earlier published date than the second version"
+                "Version 0 should be published before version 1"
             );
+
+            Assert.True(
+                release.Versions[1].Published < release.Versions[2].Published,
+                "Version 1 should be published before version 2"
+            );
+
+            release.Versions[2].Updates = _dataFixture
+                .DefaultUpdate()
+                .WithReleaseVersionId(release.Versions[2].Id)
+                .GenerateList(2);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -189,11 +198,65 @@ public abstract class ReleaseVersionsServiceTests
 
                 // Assert
                 var result = outcome.AssertRight();
-                Assert.Multiple(() =>
-                {
-                    Assert.Equal(release.Versions[1].Id, result.Id);
-                    Assert.Equal(release.Versions[1].Published, result.LastUpdated);
-                });
+                Assert.Equal(release.Versions[2].Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseHasMultiplePublishedVersions_ReturnsLastUpdatedFromLatestReleaseUpdate()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 3)]);
+            var release = publication.Releases[0];
+
+            // Ensure the generated release versions have different published dates
+            Assert.True(
+                release.Versions[0].Published < release.Versions[1].Published,
+                "Version 0 should be published before version 1"
+            );
+
+            Assert.True(
+                release.Versions[1].Published < release.Versions[2].Published,
+                "Version 1 should be published before version 2"
+            );
+
+            release.Versions[1].Updates = _dataFixture
+                .DefaultUpdate()
+                .WithReleaseVersionId(release.Versions[1].Id)
+                .GenerateList(1);
+
+            release.Versions[2].Updates = _dataFixture
+                .DefaultUpdate()
+                .WithReleaseVersionId(release.Versions[2].Id)
+                .ForIndex(0, s => s.SetOn(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Local)))
+                .ForIndex(1, s => s.SetOn(new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Local)))
+                .GenerateList(2);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseVersionSummary(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                // Expect last updated to be mapped from the latest release update on the latest published release version
+                Assert.Equal(new DateTimeOffset(release.Versions[2].Updates[1].On), result.LastUpdated);
+                Assert.Equal(TimeSpan.Zero, result.LastUpdated.Offset);
             }
         }
 

@@ -9,16 +9,16 @@ public static class CollectionUtils
 
     public static List<T> ListOf<T>(params T[] objects)
     {
-        return new List<T>(objects);
+        return [.. objects];
     }
 
     public static HashSet<T> SetOf<T>(params T[] objects)
     {
-        return new HashSet<T>(objects);
+        return [.. objects];
     }
 
-    public static Tuple<T1, T2> TupleOf<T1, T2>(T1 obj1, T2? obj2)
+    public static Tuple<T1, T2> TupleOf<T1, T2>(T1 obj1, T2 obj2)
     {
-        return new Tuple<T1, T2>(obj1, obj2!);
+        return new Tuple<T1, T2>(obj1, obj2);
     }
 }

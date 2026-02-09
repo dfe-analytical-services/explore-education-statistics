@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -29,7 +30,7 @@ public class TableBuilderControllerIntegrationTestsFixture()
         modifications.ReplaceServiceWithMock<ITableBuilderService>();
     }
 
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         await base.AfterFactoryConstructed(lookups);
         TableBuilderServiceMock = lookups.GetMockService<ITableBuilderService>();
@@ -64,6 +65,11 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
     };
 
     private static readonly FullTableQuery FullTableQuery = FullTableQueryRequest.AsFullTableQuery();
+
+    private static readonly FullTableQuery UnrestrictedFullTableQuery = FullTableQuery with
+    {
+        IgnoreMaxTableSize = true,
+    };
 
     private readonly TableBuilderResultViewModel _tableBuilderResults = new()
     {
@@ -110,7 +116,7 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
             .TableBuilderServiceMock.Setup(s =>
                 s.QueryToCsvStream(
                     ReleaseVersionId,
-                    ItIs.DeepEqualTo(FullTableQuery),
+                    ItIs.DeepEqualTo(UnrestrictedFullTableQuery),
                     It.IsAny<Stream>(),
                     It.IsAny<CancellationToken>()
                 )
@@ -127,7 +133,7 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
 
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",
-            content: new JsonNetContent(FullTableQueryRequest),
+            content: new JsonNetContent(UnrestrictedFullTableQuery),
             headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
         );
 

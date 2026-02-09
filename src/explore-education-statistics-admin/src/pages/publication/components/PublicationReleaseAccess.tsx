@@ -94,6 +94,7 @@ const PublicationReleaseAccess = ({
           data-testid="releaseApprovers"
           users={approvers}
           invites={approverInvites}
+          caption="Shows the approvers or pending approver invites for this release."
         />
       )}
 
@@ -110,6 +111,7 @@ const PublicationReleaseAccess = ({
           invites={contributorInvites}
           onUserRemove={handleUserRemove}
           onUserInvitesRemove={handleUserInvitesRemove}
+          caption="Shows the contributors or pending contributor invites for this release."
         />
       )}
       {hasReleaseTeamManagementPermission && (

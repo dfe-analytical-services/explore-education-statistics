@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -21,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
@@ -161,30 +163,45 @@ public class TableBuilderService : ITableBuilderService
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccessVoid(async releaseSubject =>
             {
-                var (observations, _) = await ListQueryObservations(query, cancellationToken);
+                await ListQueryObservations(query, cancellationToken)
+                    .OnSuccessVoid(
+                        async (result) =>
+                        {
+                            var (observations, _) = result;
 
-                await _subjectCsvMetaService
-                    .GetSubjectCsvMeta(releaseSubject, query, observations, cancellationToken)
-                    .OnSuccessVoid(async meta =>
-                    {
-                        await using var writer = new StreamWriter(stream, leaveOpen: true);
-                        await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
+                            await _subjectCsvMetaService
+                                .GetSubjectCsvMeta(releaseSubject, query, observations, cancellationToken)
+                                .OnSuccessVoid(async meta =>
+                                {
+                                    await using var writer = new StreamWriter(stream, leaveOpen: true);
+                                    await using var csv = new CsvWriter(
+                                        writer,
+                                        CultureInfo.InvariantCulture,
+                                        leaveOpen: true
+                                    );
 
-                        await WriteCsvHeaderRow(csv, meta);
-                        await WriteCsvRows(csv, observations, meta, cancellationToken);
-                    });
+                                    await WriteCsvHeaderRow(csv, meta);
+                                    await WriteCsvRows(csv, observations, meta, cancellationToken);
+                                });
+                        }
+                    );
             });
     }
 
-    private async Task<(List<Observation>, bool)> ListQueryObservations(
+    private async Task<Either<ActionResult, (List<Observation>, bool)>> ListQueryObservations(
         FullTableQuery query,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
-        var requiresCropping = query.EnableCropping && await _tableBuilderQueryOptimiser.IsCroppingRequired(query);
+        var requiresCropping = await _tableBuilderQueryOptimiser.IsCroppingRequired(query);
 
-        if (requiresCropping)
+        if (requiresCropping && !query.IgnoreMaxTableSize)
         {
+            if (!query.AllowCropping)
+            {
+                return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
+            }
+
             query = await _tableBuilderQueryOptimiser.CropQuery(query, cancellationToken);
         }
 
@@ -193,7 +210,7 @@ public class TableBuilderService : ITableBuilderService
         var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
 
         if (
-            query.EnableCropping
+            query.AllowCropping
             && await matchedObservationIds.CountAsync(cancellationToken) > _options.CroppedTableMaxRows
         )
         {

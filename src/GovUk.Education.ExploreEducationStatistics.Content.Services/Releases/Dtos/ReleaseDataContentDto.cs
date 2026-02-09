@@ -11,7 +11,7 @@ public record ReleaseDataContentDto
     public required Guid ReleaseId { get; init; }
     public required Guid ReleaseVersionId { get; init; }
     public required string? DataDashboards { get; init; }
-    public required string DataGuidance { get; init; }
+    public required string? DataGuidance { get; init; }
     public required ReleaseDataContentDataSetDto[] DataSets { get; init; }
     public required ReleaseDataContentFeaturedTableDto[] FeaturedTables { get; init; }
     public required ReleaseDataContentSupportingFileDto[] SupportingFiles { get; init; } = [];
@@ -27,8 +27,7 @@ public record ReleaseDataContentDto
             ReleaseId = releaseVersion.ReleaseId,
             ReleaseVersionId = releaseVersion.Id,
             DataDashboards = releaseVersion.RelatedDashboardsSection?.FindSingleContentBlockOfType<HtmlBlock>()?.Body,
-            DataGuidance =
-                releaseVersion.DataGuidance ?? throw new ArgumentException("ReleaseVersion must have Data guidance"),
+            DataGuidance = releaseVersion.DataGuidance,
             DataSets = dataSets,
             FeaturedTables = featuredTables,
             SupportingFiles = supportingFiles,
@@ -54,9 +53,8 @@ public record ReleaseDataContentDataSetDto
             Meta = ReleaseDataContentDataSetMetaDto.FromReleaseFile(releaseFile),
             // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
             // TODO: Remove HtmlToText after migrating all summaries to plain text.
-            Summary = HtmlToTextUtils.HtmlToText(
-                releaseFile.Summary ?? throw new ArgumentException("ReleaseFile must have Summary")
-            ),
+            // Default to an empty summary for older data sets that predate the summary requirement.
+            Summary = releaseFile.Summary != null ? HtmlToTextUtils.HtmlToText(releaseFile.Summary) : "",
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
         };
 }
@@ -172,7 +170,8 @@ public record ReleaseDataContentSupportingFileDto
             Extension = releaseFile.File.Extension,
             Filename = releaseFile.File.Filename,
             Size = releaseFile.File.DisplaySize(),
-            Summary = releaseFile.Summary ?? throw new ArgumentException("ReleaseFile must have Summary"),
+            // Default to an empty summary for older supporting files that predate the summary requirement.
+            Summary = releaseFile.Summary ?? "",
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
         };
 }

@@ -144,7 +144,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
 
     const queryClient = new QueryClient();
 
-    if ((redesign === 'true' || tab) && process.env.APP_ENV !== 'Production') {
+    if (redesign === 'true' || tab) {
       try {
         const publicationSummary = await queryClient.fetchQuery(
           publicationQueries.getPublicationSummaryRedesign(publicationSlug),
@@ -213,10 +213,13 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
               ),
             );
 
+            const hasDataSets = dataContent.dataSets.length;
             const hasSupportingFiles = dataContent.supportingFiles.length;
             const hasFeaturedTables = dataContent.featuredTables.length;
             const hasDataDashboards =
               dataContent.dataDashboards && dataContent.dataDashboards.length;
+            const hasDataGuidance =
+              dataContent.dataGuidance && dataContent.dataGuidance.length;
 
             return {
               props: {
@@ -226,10 +229,10 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                 inPageNavItems: [
                   exploreDataPageSections.explore,
                   hasFeaturedTables && exploreDataPageSections.featuredTables,
-                  exploreDataPageSections.datasets,
+                  hasDataSets && exploreDataPageSections.datasets,
                   hasSupportingFiles && exploreDataPageSections.supportingFiles,
                   hasDataDashboards && exploreDataPageSections.dataDashboards,
-                  exploreDataPageSections.dataGuidance,
+                  hasDataGuidance && exploreDataPageSections.dataGuidance,
                   contactUsNavItem,
                 ].filter(item => !!item),
               },

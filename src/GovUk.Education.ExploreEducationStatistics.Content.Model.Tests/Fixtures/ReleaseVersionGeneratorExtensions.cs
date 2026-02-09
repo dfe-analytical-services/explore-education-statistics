@@ -43,12 +43,17 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static Generator<ReleaseVersion> WithPublished(
         this Generator<ReleaseVersion> generator,
-        DateTimeOffset published
+        DateTimeOffset? published
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublished(published));
+
+    public static Generator<ReleaseVersion> WithPublishedDisplayDate(
+        this Generator<ReleaseVersion> generator,
+        DateTimeOffset? publishedDisplayDate
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublishedDisplayDate(publishedDisplayDate));
 
     public static Generator<ReleaseVersion> WithPublishScheduled(
         this Generator<ReleaseVersion> generator,
-        DateTimeOffset publishScheduled
+        DateTimeOffset? publishScheduled
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublishScheduled(publishScheduled));
 
     public static Generator<ReleaseVersion> WithPublishingOrganisations(
@@ -110,8 +115,10 @@ public static class ReleaseVersionGeneratorExtensions
         Guid previousVersionId
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPreviousVersionId(previousVersionId));
 
-    public static Generator<ReleaseVersion> WithSoftDeleted(this Generator<ReleaseVersion> generator) =>
-        generator.ForInstance(releaseVersion => releaseVersion.SetSoftDeleted());
+    public static Generator<ReleaseVersion> WithSoftDeleted(
+        this Generator<ReleaseVersion> generator,
+        bool softDeleted = true
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetSoftDeleted(softDeleted));
 
     public static Generator<ReleaseVersion> WithType(this Generator<ReleaseVersion> generator, ReleaseType type) =>
         generator.ForInstance(releaseVersion => releaseVersion.SetType(type));
@@ -129,10 +136,13 @@ public static class ReleaseVersionGeneratorExtensions
         bool notifySubscribers
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetNotifySubscribers(notifySubscribers));
 
-    public static Generator<ReleaseVersion> WithUpdatePublishedDate(
+    public static Generator<ReleaseVersion> WithUpdatePublishedDisplayDate(
         this Generator<ReleaseVersion> generator,
-        bool updatePublishedDate
-    ) => generator.ForInstance(releaseVersion => releaseVersion.SetUpdatePublishedDate(updatePublishedDate));
+        bool updatePublishedDisplayDate
+    ) =>
+        generator.ForInstance(releaseVersion =>
+            releaseVersion.SetUpdatePublishedDisplayDate(updatePublishedDisplayDate)
+        );
 
     public static Generator<ReleaseVersion> WithPreReleaseAccessList(
         this Generator<ReleaseVersion> generator,
@@ -291,12 +301,17 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static InstanceSetters<ReleaseVersion> SetPublished(
         this InstanceSetters<ReleaseVersion> setters,
-        DateTimeOffset published
+        DateTimeOffset? published
     ) => setters.Set(releaseVersion => releaseVersion.Published, published);
+
+    public static InstanceSetters<ReleaseVersion> SetPublishedDisplayDate(
+        this InstanceSetters<ReleaseVersion> setters,
+        DateTimeOffset? publishedDisplayDate
+    ) => setters.Set(releaseVersion => releaseVersion.PublishedDisplayDate, publishedDisplayDate);
 
     public static InstanceSetters<ReleaseVersion> SetPublishScheduled(
         this InstanceSetters<ReleaseVersion> setters,
-        DateTimeOffset publishScheduled
+        DateTimeOffset? publishScheduled
     ) => setters.Set(releaseVersion => releaseVersion.PublishScheduled, publishScheduled);
 
     public static InstanceSetters<ReleaseVersion> SetPublishingOrganisations(
@@ -341,8 +356,10 @@ public static class ReleaseVersionGeneratorExtensions
         Guid? previousVersionId
     ) => setters.Set(releaseVersion => releaseVersion.PreviousVersionId, previousVersionId);
 
-    public static InstanceSetters<ReleaseVersion> SetSoftDeleted(this InstanceSetters<ReleaseVersion> setters) =>
-        setters.Set(releaseVersion => releaseVersion.SoftDeleted, true);
+    public static InstanceSetters<ReleaseVersion> SetSoftDeleted(
+        this InstanceSetters<ReleaseVersion> setters,
+        bool softDeleted = true
+    ) => setters.Set(releaseVersion => releaseVersion.SoftDeleted, softDeleted);
 
     public static InstanceSetters<ReleaseVersion> SetType(
         this InstanceSetters<ReleaseVersion> setters,
@@ -364,10 +381,10 @@ public static class ReleaseVersionGeneratorExtensions
         DateTime notifiedOn
     ) => setters.Set(releaseVersion => releaseVersion.NotifiedOn, notifiedOn);
 
-    public static InstanceSetters<ReleaseVersion> SetUpdatePublishedDate(
+    public static InstanceSetters<ReleaseVersion> SetUpdatePublishedDisplayDate(
         this InstanceSetters<ReleaseVersion> setters,
-        bool updatePublishedDate
-    ) => setters.Set(releaseVersion => releaseVersion.UpdatePublishedDate, updatePublishedDate);
+        bool updatePublishedDisplayDate
+    ) => setters.Set(releaseVersion => releaseVersion.UpdatePublishedDisplayDate, updatePublishedDisplayDate);
 
     public static InstanceSetters<ReleaseVersion> SetPreReleaseAccessList(
         this InstanceSetters<ReleaseVersion> setters,

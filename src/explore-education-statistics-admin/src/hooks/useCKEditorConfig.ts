@@ -28,6 +28,7 @@ const useCKEditorConfig = ({
   allowedHeadings,
   editorInstance,
   includePlugins,
+  label,
   toolbarConfig = toolbarConfigFull,
   onAutoSave,
   onCancelComment,
@@ -36,7 +37,6 @@ const useCKEditorConfig = ({
   onClickAddGlossaryItem,
   onImageUpload,
   onImageUploadCancel,
-  label,
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
@@ -47,6 +47,7 @@ const useCKEditorConfig = ({
     body: string;
   }[];
   includePlugins?: ReadonlySet<PluginName> | Set<PluginName>;
+  label: string;
   toolbarConfig?:
     | ReadonlyArray<ToolbarOption | ToolbarGroup>
     | Array<ToolbarOption | ToolbarGroup>;
@@ -58,7 +59,6 @@ const useCKEditorConfig = ({
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onRemoveCommentMarker?: (commentId: string) => void;
-  label: string;
 }) => {
   const {
     removeComment,
@@ -226,6 +226,7 @@ const useCKEditorConfig = ({
     editorInstance,
     hasImageUpload,
     includePlugins,
+    label,
     onAutoSave,
     onCancelComment,
     onClickAddComment,

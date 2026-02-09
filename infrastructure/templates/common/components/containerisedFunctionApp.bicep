@@ -181,7 +181,7 @@ module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
   }
 }
 
-module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
+module keyVaultRoleAssignmentModule 'key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
     principalIds: userAssignedManagedIdentityParams != null

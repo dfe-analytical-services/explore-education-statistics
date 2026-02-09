@@ -65,7 +65,7 @@ public record ReleaseSummaryViewModel
         Slug = releaseVersion.Release.Slug;
         YearTitle = releaseVersion.Release.YearTitle;
         CoverageTitle = releaseVersion.Release.TimePeriodCoverage.GetEnumLabel();
-        Published = releaseVersion.Published;
+        Published = releaseVersion.PublishedDisplayDate;
         NextReleaseDate = releaseVersion.NextReleaseDate;
         Type = releaseVersion.Type;
         LatestRelease = latestPublishedRelease;

@@ -85,8 +85,6 @@ public class ContentDbContext : DbContext
     public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
     public virtual DbSet<GlossaryEntry> GlossaryEntries { get; set; }
     public virtual DbSet<Comment> Comment { get; set; }
-    public virtual DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
-    public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
     public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
     public virtual DbSet<EducationInNumbersPage> EducationInNumbersPages { get; set; }
@@ -128,8 +126,6 @@ public class ContentDbContext : DbContext
         ConfigureUser(modelBuilder);
         ConfigureUserPublicationRole(modelBuilder);
         ConfigureUserReleaseRole(modelBuilder);
-        ConfigureUserReleaseInvite(modelBuilder);
-        ConfigureUserPublicationInvite(modelBuilder);
         ConfigureGlossaryEntry(modelBuilder);
         ConfigureKeyStatisticsDataBlock(modelBuilder);
         ConfigureKeyStatisticsText(modelBuilder);
@@ -644,8 +640,18 @@ public class ContentDbContext : DbContext
     {
         modelBuilder
             .Entity<UserPublicationRole>()
+            .HasIndex(upr => new
+            {
+                upr.UserId,
+                upr.PublicationId,
+                upr.Role,
+            })
+            .IsUnique();
+
+        modelBuilder
+            .Entity<UserPublicationRole>()
             .Property(upr => upr.Created)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<UserPublicationRole>()
@@ -656,7 +662,8 @@ public class ContentDbContext : DbContext
         modelBuilder
             .Entity<UserPublicationRole>()
             .Property(upr => upr.Role)
-            .HasConversion(new EnumToStringConverter<PublicationRole>());
+            .HasConversion(new EnumToStringConverter<PublicationRole>())
+            .HasMaxLength(20);
 
         // This will be changed when we start introducing the use of the NEW publication roles in the
         // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
@@ -670,64 +677,24 @@ public class ContentDbContext : DbContext
     {
         modelBuilder
             .Entity<UserReleaseRole>()
+            .HasIndex(urr => new
+            {
+                urr.UserId,
+                urr.ReleaseVersionId,
+                urr.Role,
+            })
+            .IsUnique();
+
+        modelBuilder
+            .Entity<UserReleaseRole>()
             .Property(userReleaseRole => userReleaseRole.Created)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<UserReleaseRole>()
             .Property(r => r.Role)
-            .HasConversion(new EnumToStringConverter<ReleaseRole>());
-    }
-
-    private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .Entity<UserReleaseInvite>()
-            .Property(uri => uri.Role)
-            .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
-        modelBuilder
-            .Entity<UserReleaseInvite>()
-            .Property(invite => invite.Created)
-            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        modelBuilder
-            .Entity<UserReleaseInvite>()
-            .Property(invite => invite.Updated)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-
-        modelBuilder
-            .Entity<UserReleaseInvite>()
-            .HasIndex(uri => new
-            {
-                uri.ReleaseVersionId,
-                uri.Email,
-                uri.Role,
-            })
-            .IsUnique();
-    }
-
-    private static void ConfigureUserPublicationInvite(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .Entity<UserPublicationInvite>()
-            .Property(upi => upi.Role)
-            .HasConversion(new EnumToStringConverter<PublicationRole>());
-
-        modelBuilder
-            .Entity<UserPublicationInvite>()
-            .Property(invite => invite.Created)
-            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        modelBuilder
-            .Entity<UserPublicationInvite>()
-            .HasIndex(upi => new
-            {
-                upi.PublicationId,
-                upi.Email,
-                upi.Role,
-            })
-            .IsUnique();
+            .HasConversion(new EnumToStringConverter<ReleaseRole>())
+            .HasMaxLength(20);
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)

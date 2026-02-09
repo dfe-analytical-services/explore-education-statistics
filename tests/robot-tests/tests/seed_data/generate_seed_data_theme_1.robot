@@ -41,6 +41,7 @@ Create test theme
 Create ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${THEME_ID}
     Set Suite Variable    ${PUBLICATION_ID}
 
     user navigates to publication page from dashboard
@@ -327,7 +328,7 @@ Add content sections to ${RELEASE_1_NAME}
 
 Add release notes to ${RELEASE_1_NAME}
     user adds a release note
-    ...    First published.
+    ...    First published on GOV.UK.
     ...    22
     ...    03
     ...    2018
@@ -351,9 +352,9 @@ Amend ${RELEASE_1_NAME}
     user clicks link    Content
     user waits until page finishes loading
     user adds a release note
-    ...    Updating LAD map
-    ...    22
-    ...    08
+    ...    Updated boundary file on LAD map of absence rates.
+    ...    09
+    ...    03
     ...    2022
 
 Approve ${RELEASE_1_NAME} amendment
@@ -361,7 +362,7 @@ Approve ${RELEASE_1_NAME} amendment
 
 Backdate ${RELEASE_1_NAME} published date
     ${release_id}=    get release id from url
-    ${published_override}=    Convert Date    2018-04-25 00:00:00    datetime
+    ${published_override}=    Convert Date    2020-03-26 09:30:00    datetime
     user updates release published date via api    ${release_id}    ${published_override}
 
 Create methodology ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
@@ -505,6 +506,7 @@ Give Analyst1 Contributor access to ${RELEASE_1_NAME}
 Create ${EXCLUSIONS_PUBLICATION_TITLE}
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${THEME_ID}
 
     Set Suite Variable    ${PUBLICATION_ID}
 
@@ -781,7 +783,7 @@ Add content sections to ${RELEASE_2_NAME}
 
 Add release notes to ${RELEASE_2_NAME}
     user adds a release note
-    ...    First published.
+    ...    First published on GOV.UK.
     ...    19
     ...    07
     ...    2018
@@ -797,7 +799,7 @@ Approve ${RELEASE_2_NAME}
 
 Backdate ${RELEASE_2_NAME} published date
     ${release_id}=    get release id from url
-    ${published_override}=    Convert Date    2018-07-19 00:00:00    datetime
+    ${published_override}=    Convert Date    2020-03-26 09:30:00    datetime
     user updates release published date via api    ${release_id}    ${published_override}
 
 Create methodology ${EXCLUSIONS_METHODOLOGY_TITLE}

@@ -24,6 +24,10 @@
   // Provide space for nav item border to display
   margin-left: -14px;
   padding-left: 14px;
+
+  @media print {
+    display: none !important;
+  }
 }
 
 .content {

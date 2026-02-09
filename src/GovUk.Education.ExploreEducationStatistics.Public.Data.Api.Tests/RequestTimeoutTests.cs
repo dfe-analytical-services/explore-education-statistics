@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;

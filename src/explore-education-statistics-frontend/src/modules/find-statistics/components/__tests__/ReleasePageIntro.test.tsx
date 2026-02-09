@@ -142,7 +142,7 @@ describe('ReleasePageIntro', () => {
         releaseVersionSummary={testReleaseVersionSummary}
       />,
     );
-    const nextUpdateValue = screen.getByTestId('Next update');
+    const nextUpdateValue = screen.getByTestId('Next release');
     expect(nextUpdateValue.textContent).toEqual('March 2026');
   });
 
@@ -160,7 +160,7 @@ describe('ReleasePageIntro', () => {
       />,
     );
 
-    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('Next release')).not.toBeInTheDocument();
   });
 
   test(`doesn't render "Next release" section if the Release is not the latest Release for the Publication`, () => {
@@ -174,7 +174,7 @@ describe('ReleasePageIntro', () => {
       />,
     );
 
-    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('Next release')).not.toBeInTheDocument();
   });
 
   test('does not render ReleaseSummaryBlock on small screens', () => {
@@ -303,13 +303,15 @@ describe('ReleasePageIntro', () => {
     ).toHaveAttribute('href', 'https://example.com');
   });
 
-  test('renders updates link when there are at least 2 updates', () => {
+  test('renders updates info when there are at least 2 updates', () => {
     render(
       <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
     );
+
+    expect(screen.getByTestId('Last updated-value')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -321,7 +323,7 @@ describe('ReleasePageIntro', () => {
     );
   });
 
-  test('does not render updates link when there are less than 2 updates', () => {
+  test('does not render updates info when there are less than 2 updates', () => {
     render(
       <ReleasePageIntro
         publicationSummary={testPublicationSummary}
@@ -329,6 +331,7 @@ describe('ReleasePageIntro', () => {
       />,
     );
 
+    expect(screen.queryByTestId('Last updated-value')).not.toBeInTheDocument();
     expect(screen.queryByTestId('updates-link')).not.toBeInTheDocument();
   });
 });

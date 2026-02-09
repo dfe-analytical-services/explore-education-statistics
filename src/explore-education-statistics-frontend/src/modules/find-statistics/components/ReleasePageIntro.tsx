@@ -41,6 +41,8 @@ const ReleasePageIntro = ({
   // Update count includes 'first published' by default, but we only
   // want to show 'actual' update number.
   const updateCountExcludingFirstPublished = updateCount - 1;
+  // We only want to show 'updated at' and updates link if there are updates.
+  const showUpdatesInfo = updateCountExcludingFirstPublished > 0;
 
   return (
     <>
@@ -82,7 +84,7 @@ const ReleasePageIntro = ({
               Next release{' '}
               <time
                 className="govuk-!-font-weight-bold"
-                data-testid="Next update"
+                data-testid="Next release"
               >
                 {formatPartialDate(nextReleaseDate)}
               </time>
@@ -92,6 +94,7 @@ const ReleasePageIntro = ({
         <Link
           to={`/find-statistics/${publicationSummary.slug}/releases`}
           className="govuk-!-display-none-print"
+          prefetch={false}
         >
           All releases in this series
         </Link>
@@ -99,7 +102,7 @@ const ReleasePageIntro = ({
 
       {!isMobileMedia && (
         <ReleaseSummaryBlock
-          lastUpdated={lastUpdated}
+          lastUpdated={showUpdatesInfo ? lastUpdated : undefined}
           publishingOrganisations={publishingOrganisations}
           releaseDate={published}
           releaseType={type}
@@ -130,10 +133,11 @@ const ReleasePageIntro = ({
             )
           }
           renderUpdatesLink={
-            updateCountExcludingFirstPublished > 0 ? (
+            showUpdatesInfo ? (
               <Link
-                to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}/updates`}
+                to={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}/updates`}
                 data-testid="updates-link"
+                prefetch={false}
               >
                 {updateCountExcludingFirstPublished} update
                 {updateCountExcludingFirstPublished === 1 ? '' : 's'}

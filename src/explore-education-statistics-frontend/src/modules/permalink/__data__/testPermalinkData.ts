@@ -6,6 +6,8 @@ const testPermalinkSnapshot: PermalinkSnapshot = {
   id: 'permalink-1',
   publicationTitle: 'Publication 1',
   status: 'Current',
+  dataSetFileId: 'data-set-id',
+  tableIsCropped: false,
   table: {
     caption: 'Test table caption 1',
     footnotes: [

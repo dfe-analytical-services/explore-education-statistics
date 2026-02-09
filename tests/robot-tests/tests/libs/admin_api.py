@@ -67,13 +67,13 @@ def user_deletes_theme_via_api(theme_id: str):
     assert resp.status_code == 204, f"Could not delete theme! Responded with {resp.status_code} and {resp.text}"
 
 
-def user_creates_test_publication_via_api(publication_name: str):
+def user_creates_test_publication_via_api(publication_name: str, theme_id: str = None):
     response = admin_client.post(
         "/api/publications",
         {
             "title": publication_name,
             "summary": f"{publication_name} summary",
-            "themeId": os.getenv("TEST_THEME_ID"),
+            "themeId": theme_id or os.getenv("TEST_THEME_ID"),
             "contact": {
                 "contactName": "UI test contact name",
                 "contactTelNo": "0123 4567",
@@ -192,10 +192,12 @@ def user_creates_test_release_via_api(
 
 
 def user_updates_release_published_date_via_api(release_id: str, published: datetime) -> None:
-    response = admin_client.patch(f"/api/releases/{release_id}/published", {"published": published.isoformat()})
+    response = admin_client.patch(
+        f"/api/releaseVersions/{release_id}/published-display-date", {"publishedDisplayDate": published.isoformat()}
+    )
     assert (
         response.status_code < 300
-    ), f"Updating release published date failed with {response.status_code} and {response.text}"
+    ), f"Updating release published display date failed with {response.status_code} and {response.text}"
 
 
 def delete_test_user(email: str):

@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 

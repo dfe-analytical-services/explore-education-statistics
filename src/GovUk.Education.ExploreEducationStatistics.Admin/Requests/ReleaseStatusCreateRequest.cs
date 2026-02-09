@@ -25,5 +25,5 @@ public record ReleaseStatusCreateRequest
     [PartialDateValidator]
     public PartialDate? NextReleaseDate { get; init; }
 
-    public bool? UpdatePublishedDate { get; init; }
+    public bool? UpdatePublishedDisplayDate { get; init; }
 }

@@ -121,7 +121,7 @@ Validate error summary for major versions is displayed on Api Data Set Details p
 Cancel data replacement which results in major API version
     user clicks link    Data and files
     user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user clicks link    View details    testId:Actions
+    user clicks link containing text    View details    testId:Actions
     user waits until h2 is visible    Pending data replacement    %{WAIT_MEDIUM}
     user clicks button    Cancel data replacement
     ${modal}=    user waits until modal is visible    Cancel data replacement and remove draft API
@@ -304,7 +304,7 @@ Confirm finalization of this API data set version
 Verify that API summary tags have status OK and then press 'confirm data replacement'
     user clicks link    Back to API data sets
     user clicks link    Data uploads
-    user clicks link    View details    testId:Actions
+    user clicks link containing text    View details    testId:Actions
     user waits until h3 is visible    API data set Locations: OK
     user waits until h3 is visible    API data set Filters: OK
     user waits until h3 is visible    API data set has to be finalized: OK

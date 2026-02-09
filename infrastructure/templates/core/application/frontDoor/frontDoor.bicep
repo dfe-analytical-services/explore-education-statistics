@@ -1,4 +1,5 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
+import { replaceMultiple } from '../../../common/functions.bicep'  
 
 @description('Environment: Subscription name. Used as a prefix for created resources.')
 @allowed([
@@ -15,13 +16,31 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('A set of tags with which to tag the resource in Azure.')
-param tagValues object
+@description('Resource prefix for legacy resources.')
+param legacyResourcePrefix string
+
+@description('URL of the public site.')
+param publicSiteUrl string
+
+@description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
+param certificateType 'Provisioned' | 'BringYourOwn'
 
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
+@description('A set of tags with which to tag the resource in Azure.')
+param tagValues object
+
 var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
+
+// TODO EES-6883 - remove the "afd.explore-education" line below once we are ready to switch the public site DNS
+// over to Azure Front Door properly.  In the meantime, we will host the site through AFD on a temporary
+// https://<env name>afd.explore-education-statistics.service.gov.uk with an associated certificate so as
+// not to break the use of the environment for others.
+var publicSiteHostName = replaceMultiple(publicSiteUrl, {
+  'https://': ''
+  '.explore-education': 'afd.explore-education'
+})
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
   name: frontDoorName
@@ -30,8 +49,11 @@ resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
   sku: {
     name: 'Standard_AzureFrontDoor'
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
-    originResponseTimeoutSeconds: 60 // @MarkFix maybe want longer - for table tool exclusively?
+    originResponseTimeoutSeconds: 220 // Timeout set to just under Azure's standard App Service timeout of 3.8 minutes.
   }
 }
 
@@ -76,6 +98,35 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
     weight: 1000
     enabledState: 'Enabled'
     enforceCertificateNameCheck: true
+  }
+}
+
+module publicSiteCertificateModule 'publicSiteCertificate.bicep' = if (certificateType == 'BringYourOwn') {
+  name: 'publicSiteCertificateModuleDeploy'
+  params: {
+    legacyResourcePrefix: legacyResourcePrefix
+    frontDoorName: frontDoorName
+    publicSiteHostName: publicSiteHostName
+  }
+}
+
+resource customDomain 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
+  parent: frontDoor
+  name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+  properties: {
+    hostName: publicSiteHostName
+    tlsSettings: publicSiteCertificateModule != null ? {
+      certificateType: 'CustomerCertificate'
+      minimumTlsVersion: 'TLS12'
+      cipherSuiteSetType: 'TLS12_2023'
+      secret: {
+        id: publicSiteCertificateModule!.outputs.certificateSecretId
+      }
+    } : {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+      cipherSuiteSetType: 'TLS12_2023'
+    }
   }
 }
 
@@ -135,9 +186,13 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
           'font/woff2'
         ]
       }
-      queryStringCachingBehavior: 'IgnoreQueryString'
+      queryStringCachingBehavior: 'UseQueryString'
     }
-    customDomains: []
+    customDomains: [
+      {
+        id: customDomain.id
+      }
+    ]
     originGroup: {
       id: originGroup.id
     }

@@ -81,7 +81,7 @@ Continue the import
     user checks table cell contains    1    4    Delete files    testid:Data files table
 
 Change data file title
-    user clicks link    Edit title
+    user clicks link containing text    Edit title
 
     user waits until h2 is visible    Edit data file details
     user clears element text    label:Title

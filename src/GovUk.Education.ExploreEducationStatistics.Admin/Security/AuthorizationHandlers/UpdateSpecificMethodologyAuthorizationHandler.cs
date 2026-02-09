@@ -46,10 +46,10 @@ public class UpdateSpecificMethodologyAuthorizationHandler
         var owningPublication = await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrAnyReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
                 context.User.GetUserId(),
                 owningPublication.Id,
-                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                SetOf(PublicationRole.Owner, PublicationRole.Allower),
                 ReleaseEditorAndApproverRoles
             )
         )

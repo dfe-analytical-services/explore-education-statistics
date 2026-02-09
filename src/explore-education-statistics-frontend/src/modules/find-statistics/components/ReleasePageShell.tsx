@@ -1,9 +1,11 @@
+import NotificationBanner from '@common/components/NotificationBanner';
 import { NavItem } from '@common/components/PageNavExpandable';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import {
   PublicationSummaryRedesign,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import ReleasePageIntro from '@frontend/modules/find-statistics/components/ReleasePageIntro';
 import ReleasePageTabNav, {
@@ -14,6 +16,7 @@ import {
   releasePageTabRouteItems,
   ReleasePageTabRouteKey,
 } from '@frontend/modules/find-statistics/PublicationReleasePage';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { NextPage } from 'next';
 import React, { ReactNode } from 'react';
 
@@ -48,6 +51,25 @@ const ReleasePageShell: NextPage<Props> = ({
           releaseTitle={releaseVersionSummary.title}
         />
       }
+      customBannerContent={
+        <NotificationBanner
+          className="govuk-!-margin-top-6"
+          fullWidthContent
+          title="New release page"
+        >
+          <p>
+            You are viewing the new design of the Release page - if you would
+            like to provide feedback, please complete{' '}
+            <Link
+              to="https://forms.office.com/e/sBRKZgs6zB"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+            >
+              our feedback form (opens in new window)
+            </Link>
+          </p>
+        </NotificationBanner>
+      }
       width="wide"
     >
       <ReleasePageIntro
@@ -59,7 +81,16 @@ const ReleasePageShell: NextPage<Props> = ({
         releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
         tabNavItems={tabNavItems}
       />
-      <ReleasePageLayout navItems={inPageNavItems}>
+      <ReleasePageLayout
+        navItems={inPageNavItems}
+        onClickNavItem={(title: string) => {
+          logEvent({
+            category: `${publicationSummary.title} release page - ${activePage}`,
+            action: `In page nav item clicked`,
+            label: `${title}`,
+          });
+        }}
+      >
         {children}
       </ReleasePageLayout>
     </Page>

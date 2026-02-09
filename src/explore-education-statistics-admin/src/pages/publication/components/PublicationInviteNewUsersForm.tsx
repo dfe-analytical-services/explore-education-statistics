@@ -32,7 +32,6 @@ export const errorMappings = [
         "Some of the releases don't belong to the publication",
       UserAlreadyHasReleaseRoleInvites:
         'The user has already been invited with these permissions',
-      UserAlreadyHasReleaseRoles: 'The user already has these permissions',
     },
   }),
 ];

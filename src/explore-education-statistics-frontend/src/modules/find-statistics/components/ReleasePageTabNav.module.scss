@@ -7,6 +7,10 @@
     z-index: 1001; // Above chart tooltip z-index of 1000
     background-color: govuk-colour('white');
   }
+
+  @media print {
+    display: none !important;
+  }
 }
 
 .navList {

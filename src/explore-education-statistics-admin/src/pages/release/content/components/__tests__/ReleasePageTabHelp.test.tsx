@@ -32,7 +32,7 @@ const renderWithContext = (
 describe('ReleasePageTabHelp', () => {
   test('renders help tab content when all section content exists', () => {
     renderWithContext(
-      <ReleasePageTabHelp hidden={false} />,
+      <ReleasePageTabHelp />,
       generateReleaseContent({
         release: generateEditableRelease({
           hasPreReleaseAccessList: true,
@@ -81,7 +81,7 @@ describe('ReleasePageTabHelp', () => {
 
   test('renders help tab content without optional sections', () => {
     renderWithContext(
-      <ReleasePageTabHelp hidden={false} />,
+      <ReleasePageTabHelp />,
       generateReleaseContent({
         release: generateEditableRelease({
           relatedInformation: [],

@@ -2,10 +2,11 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -18,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
 {
+    private static readonly DataFixture _dataFixture = new();
+
     public class ClaimsTests
     {
         [Fact]
@@ -48,22 +51,15 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_NotApproved()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication { Id = Guid.NewGuid() },
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
             // Assert that users with the Publication Owner role can assign pre release contacts to a release
             // that's unapproved
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Add(releaseVersion);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
+                CreateHandler,
                 releaseVersion,
                 PublicationRole.Owner,
                 PublicationRole.Allower
@@ -73,22 +69,15 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_Approved()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication { Id = Guid.NewGuid() },
-                ApprovalStatus = ReleaseApprovalStatus.Approved,
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
             // Assert that users with the Publication Owner role can assign pre release contacts to a release
             // that's approved
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Add(releaseVersion);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
+                CreateHandler,
                 releaseVersion,
                 PublicationRole.Owner,
                 PublicationRole.Allower
@@ -101,11 +90,16 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_NotApproved()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that users with an editor User Release role can assign pre release contacts to a release
             // that's unapproved
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = ReleaseApprovalStatus.Draft },
+                releaseVersion,
                 ReleaseRole.Approver,
                 ReleaseRole.Contributor
             );
@@ -114,11 +108,16 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_Approved()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that users with an editor User Release role can assign pre release contacts to a release
             // that's approved
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<AssignPrereleaseContactsToSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion { Id = Guid.NewGuid(), ApprovalStatus = ReleaseApprovalStatus.Approved },
+                releaseVersion,
                 ReleaseRole.Approver,
                 ReleaseRole.Contributor
             );
@@ -127,11 +126,7 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
 
     private static IAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(
-            contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-        );
-
+        var userReleaseRoleRepository = new UserReleaseRoleRepository(contentDbContext);
         var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 
         return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(

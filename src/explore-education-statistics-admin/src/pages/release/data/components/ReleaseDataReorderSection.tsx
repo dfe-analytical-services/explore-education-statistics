@@ -66,9 +66,12 @@ const ReleaseDataReorderSection = ({
       <InsetText>
         <h3>Before you start</h3>
         <p>
-          Reorder the groups and options for filters and indicators on this
-          page. This order will be reflected in the table tool on the public
-          website.
+          Reorder the groups and options for filters and indicators on this page
+          by using drag and drop or by pressing the up and down arrows next to
+          each item.
+        </p>
+        <p>
+          This order will be reflected in the table tool on the public website.
         </p>
       </InsetText>
 
@@ -86,6 +89,10 @@ const ReleaseDataReorderSection = ({
                 !reorderingFilters &&
                 !reorderingIndicators && (
                   <table className={styles.table}>
+                    <caption className="govuk-visually-hidden">
+                      Table showing data files in this release and buttons for
+                      reordering data file filters and indicators.
+                    </caption>
                     <thead>
                       <tr>
                         <th>Data file</th>

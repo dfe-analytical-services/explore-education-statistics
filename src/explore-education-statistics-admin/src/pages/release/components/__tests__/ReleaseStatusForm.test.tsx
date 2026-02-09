@@ -210,7 +210,7 @@ describe('ReleaseStatusForm', () => {
         notifySubscribers: undefined,
         publishMethod: undefined,
         publishScheduled: undefined,
-        updatePublishedDate: undefined,
+        updatePublishedDisplayDate: undefined,
       };
 
       await waitFor(() => {
@@ -981,7 +981,7 @@ describe('ReleaseStatusForm', () => {
     });
 
     describe('amendments', () => {
-      test('renders with `notifySubscribers` and `updatePublishedDate` options', async () => {
+      test('renders with `notifySubscribers` and `updatePublishedDisplayDate` options', async () => {
         const handleSubmit = jest.fn();
 
         render(
@@ -991,7 +991,7 @@ describe('ReleaseStatusForm', () => {
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: true,
-              updatePublishedDate: true,
+              updatePublishedDisplayDate: true,
             }}
             statusPermissions={testStatusPermissions}
             onCancel={noop}
@@ -1008,7 +1008,7 @@ describe('ReleaseStatusForm', () => {
         expect(screen.getByLabelText('Update published date')).toBeChecked();
       });
 
-      test('renders default values for `notifySubscribers` and `updatePublishedDate` options when status is changed to Approved', async () => {
+      test('renders default values for `notifySubscribers` and `updatePublishedDisplayDate` options when status is changed to Approved', async () => {
         const handleSubmit = jest.fn();
 
         const { user } = render(
@@ -1018,7 +1018,7 @@ describe('ReleaseStatusForm', () => {
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: false,
-              updatePublishedDate: true,
+              updatePublishedDisplayDate: true,
             }}
             statusPermissions={testStatusPermissions}
             onCancel={noop}
@@ -1058,7 +1058,7 @@ describe('ReleaseStatusForm', () => {
         ).not.toBeChecked();
       });
 
-      test('shows warning message when `updatePublishedDate` is selected', async () => {
+      test('shows warning message when `updatePublishedDisplayDate` is selected', async () => {
         const handleSubmit = jest.fn();
 
         const { user } = render(
@@ -1068,7 +1068,7 @@ describe('ReleaseStatusForm', () => {
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: false,
-              updatePublishedDate: false,
+              updatePublishedDisplayDate: false,
             }}
             statusPermissions={testStatusPermissions}
             onCancel={noop}
@@ -1111,7 +1111,7 @@ describe('ReleaseStatusForm', () => {
               approvalStatus: 'Approved',
               amendment: true,
               notifySubscribers: true,
-              updatePublishedDate: false,
+              updatePublishedDisplayDate: false,
             }}
             statusPermissions={testStatusPermissions}
             onCancel={noop}
@@ -1139,7 +1139,7 @@ describe('ReleaseStatusForm', () => {
           approvalStatus: 'Approved',
           publishMethod: 'Immediate',
           notifySubscribers: false,
-          updatePublishedDate: true,
+          updatePublishedDisplayDate: true,
         };
 
         await waitFor(() => {

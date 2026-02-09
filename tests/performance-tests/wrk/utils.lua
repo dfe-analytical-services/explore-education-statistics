@@ -1,0 +1,27 @@
+function base64_encode(data)
+    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    return ((data:gsub('.', function(x) 
+        local r,b='',x:byte()
+        for i=8,1,-1 do r=r..(b%2^i-b%2^(i-1)>0 and '1' or '0') end
+        return r;
+    end)..'0000'):gsub('%d%d%d?%d?%d?%d?', function(x)
+        if (#x < 6) then return '' end
+        local c=0
+        for i=1,6 do c=c+(x:sub(i,i)=='1' and 2^(6-i) or 0) end
+        return b:sub(c+1,c+1)
+    end)..({ '', '==', '=' })[#data%3+1])
+end
+
+table.filter_array = function(t, filterIter)
+    local out = {}
+    local filteredTableIndex = 1
+
+    for _, v in pairs(t) do
+        if filterIter(v) then
+            out[filteredTableIndex] = v
+            filteredTableIndex = filteredTableIndex + 1
+        end
+    end
+
+    return out
+end

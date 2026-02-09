@@ -1,8 +1,10 @@
 #nullable enable
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -12,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public static class PublicationAuthorizationHandlersTestUtil
 {
-    private static readonly DataFixture DataFixture = new();
+    private static readonly DataFixture _fixture = new();
 
     public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
@@ -20,7 +22,8 @@ public static class PublicationAuthorizationHandlersTestUtil
     )
         where TRequirement : IAuthorizationRequirement
     {
-        var publication = new Publication();
+        Publication publication = _fixture.DefaultPublication();
+
         await AssertHandlerSucceedsWithPublicationRoles<Publication, TRequirement>(
             handlerSupplier: handlerSupplier,
             entity: publication,
@@ -35,7 +38,7 @@ public static class PublicationAuthorizationHandlersTestUtil
     }
 
     public static async Task AssertHandlerOnlySucceedsWithPublicationRoles<TRequirement, TEntity>(
-        Guid publicationId,
+        Publication publication,
         TEntity handleRequirementArgument,
         Action<ContentDbContext> addToDbHandler,
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
@@ -44,7 +47,8 @@ public static class PublicationAuthorizationHandlersTestUtil
         where TRequirement : IAuthorizationRequirement
     {
         var allPublicationRoles = GetEnums<PublicationRole>();
-        var userId = Guid.NewGuid();
+        User internalUser = _fixture.DefaultUser();
+        ClaimsPrincipal identityUser = _fixture.AuthenticatedUser(userId: internalUser.Id);
 
         await allPublicationRoles
             .ToAsyncEnumerable()
@@ -54,23 +58,22 @@ public static class PublicationAuthorizationHandlersTestUtil
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     addToDbHandler(contentDbContext);
-                    await contentDbContext.AddAsync(
-                        new UserPublicationRole
-                        {
-                            UserId = userId,
-                            Role = role,
-                            PublicationId = publicationId,
-                        }
+                    contentDbContext.Add(
+                        _fixture
+                            .DefaultUserPublicationRole()
+                            .WithUser(internalUser)
+                            .WithPublication(publication)
+                            .WithRole(role)
+                            .Generate()
                     );
                     await contentDbContext.SaveChangesAsync();
                 }
 
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    var user = DataFixture.AuthenticatedUser(userId: userId);
                     var authContext = new AuthorizationHandlerContext(
-                        new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                        user,
+                        [Activator.CreateInstance<TRequirement>()],
+                        identityUser,
                         handleRequirementArgument
                     );
 
@@ -96,10 +99,9 @@ public static class PublicationAuthorizationHandlersTestUtil
 
         await using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
         {
-            var user = DataFixture.AuthenticatedUser(userId: userId);
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                user,
+                [Activator.CreateInstance<TRequirement>()],
+                identityUser,
                 handleRequirementArgument
             );
 

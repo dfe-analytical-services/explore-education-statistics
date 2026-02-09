@@ -489,7 +489,7 @@ public abstract class ReleaseDataContentServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Data set has no summary (override the default value set by the fixture) to test that an empty summary is handled correctly.
+            // Data set has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
             // The summary is set only if provided in the Data Guidance section of the UI.
             ReleaseFile dataSet = _dataFixture
                 .DefaultReleaseFile()
@@ -664,7 +664,7 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
-        public async Task WhenReleaseVersionHasNoDataGuidance_ReturnsNullDataGuidance()
+        public async Task WhenSupportingFileHasNoSummary_ReturnsEmptySummary()
         {
             // Arrange
             Publication publication = _dataFixture
@@ -673,13 +673,19 @@ public abstract class ReleaseDataContentServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Release version has no data guidance (override the default value set by the fixture)
-            releaseVersion.DataGuidance = null;
+            // Supporting file has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
+            // Some older supporting files predate the summary requirement and may not have summaries.
+            var supportingFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Ancillary))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(null);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 context.Publications.Add(publication);
+                context.ReleaseFiles.Add(supportingFile);
                 await context.SaveChangesAsync();
             }
 
@@ -693,22 +699,28 @@ public abstract class ReleaseDataContentServiceTests
                 // Assert
                 var result = outcome.AssertRight();
 
-                Assert.Null(result.DataGuidance);
+                Assert.Empty(result.SupportingFiles[0].Summary);
             }
         }
 
         [Fact]
-        public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
+        public async Task WhenReleaseVersionHasNoAssociatedData_ReturnsEmptyDataContent()
         {
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ => [_dataFixture.DefaultReleaseVersion().WithDataGuidance(null)]),
+                    ]
+                );
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Release version has no content assigned to test that empty/optional properties are handled correctly
-            releaseVersion.DataGuidance = null;
+            // Release version has no associated data sets, supporting files, featured tables, related dashboards,
+            // or data guidance, to test that empty/optional properties are handled correctly
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -728,7 +740,7 @@ public abstract class ReleaseDataContentServiceTests
                 var result = outcome.AssertRight();
 
                 Assert.Null(result.DataDashboards);
-                Assert.Equal(releaseVersion.DataGuidance, result.DataGuidance);
+                Assert.Null(result.DataGuidance);
                 Assert.Empty(result.DataSets);
                 Assert.Empty(result.FeaturedTables);
                 Assert.Empty(result.SupportingFiles);

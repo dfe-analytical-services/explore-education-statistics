@@ -1,0 +1,822 @@
+*** Settings ***
+Library             ../../libs/admin_api.py
+Resource            ../../libs/admin-common.robot
+Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
+
+Suite Setup         user signs in as bau1
+Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
+
+Force Tags          Admin    Local    Dev    AltersData    ReleaseRedesign
+
+
+*** Variables ***
+${PUBLICATION_NAME}=                    Publish data %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_LOWER_CASE}=         publish data %{RUN_IDENTIFIER}
+${RELEASE_1_NAME}=                      Financial year 3000-01
+${RELEASE_2_NAME}=                      Financial year 3001-02 provisional
+${SUBJECT_1_NAME}=                      UI test subject 1
+${SUBJECT_2_NAME}=                      UI test subject 2
+${FOOTNOTE_ALL}=                        Footnote for all subjects
+${FOOTNOTE_ALL_INDICATOR}=              Footnote for all subjects - indicator
+${FOOTNOTE_ALL_INDICATOR_UPDATED}=      Footnote for all subjects - updated indicator
+${FOOTNOTE_ALL_FILTER}=                 Footnote for all subjects - filters
+${FOOTNOTE_SUBJECT_1}=                  Footnote for subject 1
+${FOOTNOTE_SUBJECT_1_INDICATOR}=        Footnote for subject 1 - indicator
+${FOOTNOTE_SUBJECT_1_FILTER}=           Footnote for subject 1 - filter
+${FOOTNOTE_SUBJECT_1_FILTER_GROUP}=     Footnote for subject 1 - filter group
+${FOOTNOTE_SUBJECT_1_FILTER_ITEM}=      Footnote for subject 1 - filter item
+${FOOTNOTE_SUBJECT_1_MIXTURE}=          Footnote for subject 1 - mixture of all
+
+
+*** Test Cases ***
+Create new publication and release via API
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
+
+Navigate to release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_1_NAME}
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Add public prerelease access list
+    user clicks link    Pre-release access
+    user waits until h2 is visible    Manage pre-release user access
+
+    user clicks link    Public access list
+    user waits until h2 is visible    Public pre-release access list
+    user clicks button    Create public pre-release access list
+    user presses keys    CTRL+a+BACKSPACE
+    user presses keys    Test public access list
+    user clicks button    Save access list
+    user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
+    ...    Test public access list
+
+Go to "Sign off" page and approve release
+    user approves original release for immediate publication
+
+Create another release for the same publication
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Financial year    3001    provisional
+
+Verify new release summary
+    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
+    user verifies release summary    Financial year
+    ...    3001-02    Accredited official statistics    provisional
+
+Upload subjects to release
+    user uploads subject and waits until complete    ${SUBJECT_1_NAME}    tiny-two-filters.csv
+    ...    tiny-two-filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_2_NAME}    upload-file-test.csv
+    ...    upload-file-test-with-filter.meta.csv
+
+Navigate to Footnotes page
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Create footnote for both subjects
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
+    user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to all data
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for both subject indicators
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Authorised absence rate
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Number of persistent absentees
+
+    user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Indicators    Admission Numbers
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_INDICATOR}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for both subject filters
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Select all
+
+    user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Random Filter
+    user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Random Filter    Select all
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_FILTER}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 indicators
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Authorised absence rate
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Number of persistent absentees
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 filters
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Select all
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Select all
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 filter groups
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Combined
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Individual
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 filter items
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded primary and secondary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded primary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Total
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Create footnote for subject 1 with mixture of indicators and filters
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+
+    user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to specific data
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Indicators
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Percentage of persistent absentees
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Unauthorised absence rate
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    School type
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Combined
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded primary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    State-funded secondary
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Total
+
+    user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
+    user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
+
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_MIXTURE}
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Confirm created footnotes
+    user waits until h2 is visible    Footnotes
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_ALL_FILTER}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_MIXTURE}
+
+Add data guidance to subjects
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
+
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${SUBJECT_1_NAME}
+    user enters text into data guidance data file content editor    ${SUBJECT_1_NAME}
+    ...    ${SUBJECT_1_NAME} data guidance content
+
+    user waits until page contains accordion section    ${SUBJECT_2_NAME}
+    user enters text into data guidance data file content editor    ${SUBJECT_2_NAME}
+    ...    ${SUBJECT_2_NAME} data guidance content
+
+Validate data guidance variables and descriptions
+    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
+    ...    id:dataGuidance-dataFiles
+    user opens details dropdown    Variable names and descriptions    ${subject_1_content}
+
+    ${subject_1_variables}=    get child element    ${subject_1_content}    testid:Variables
+    user checks table body has x rows    9    ${subject_1_variables}
+
+    user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
+    user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
+
+    user checks table cell contains    1    1    colour    ${subject_1_variables}
+    user checks table cell contains    1    2    Colour    ${subject_1_variables}
+
+    user checks table cell contains    2    1    enrolments    ${subject_1_variables}
+    user checks table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
+    user checks table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+
+    user checks table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
+    user checks table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+
+    user checks table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
+    user checks table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+
+    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
+    ...    id:dataGuidance-dataFiles
+    user opens details dropdown    Variable names and descriptions    ${subject_2_content}
+
+    ${subject_2_variables}=    get child element    ${subject_2_content}    testid:Variables
+    user checks table body has x rows    2    ${subject_2_variables}
+
+    user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
+    user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
+
+    user checks table cell contains    1    1    admission_numbers    ${subject_2_variables}
+    user checks table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+
+    user checks table cell contains    2    1    some_filter    ${subject_2_variables}
+    user checks table cell contains    2    2    Random Filter    ${subject_2_variables}
+
+Validate data guidance footnotes
+    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
+    ...    id:dataGuidance-dataFiles
+    user opens details dropdown    Footnotes    ${subject_1_content}
+
+    user checks list has x items    testid:Footnotes    9    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    4    ${FOOTNOTE_SUBJECT_1}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    5    ${FOOTNOTE_SUBJECT_1_INDICATOR}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    6    ${FOOTNOTE_SUBJECT_1_FILTER}    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    7    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    8    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    9    ${FOOTNOTE_SUBJECT_1_MIXTURE}    ${subject_1_content}
+
+    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
+    ...    id:dataGuidance-dataFiles
+    user opens details dropdown    Footnotes    ${subject_2_content}
+
+    user checks list has x items    testid:Footnotes    3    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR}    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
+
+Save data guidance
+    user clicks button    Save guidance
+
+Navigate to Data blocks page
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_MEDIUM}
+
+Create new data block
+    user clicks link    Create data block
+    user waits until h2 is visible    Create data block
+    user waits until table tool wizard step is available    1    Select a data set
+
+Select subject "${SUBJECT_2_NAME}"
+    user waits until page contains    ${SUBJECT_2_NAME}
+    user clicks radio    ${SUBJECT_2_NAME}
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Select locations
+    user waits until table tool wizard step is available    2    Choose locations
+    user clicks button    Opportunity area
+    user clicks checkbox    Bolton 001
+    user clicks checkbox    Bolton 004
+    user clicks button    Ward
+    user clicks checkbox    Nailsea Youngwood
+    user clicks checkbox    Syon
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Select time period
+    user waits until table tool wizard step is available    3    Choose time period
+    user chooses select option    id:timePeriodForm-start    2005
+    user chooses select option    id:timePeriodForm-end    2017
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Create table
+    user waits until button is enabled    Create table
+    user clicks button    Create table
+
+Check created table has footnotes
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR}
+
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+Save data block as a featured table
+    user enters text into element    label:Data block name    UI Test data block name 1
+    user enters text into element    label:Table title    UI Test table title 1
+    user enters text into element    label:Data source    UI Test source 1
+
+    user clicks checkbox    Set as a featured table for this publication
+    user waits until page contains element    label:Featured table name
+    user enters text into element    label:Featured table name    Test highlight name 1
+    user enters text into element    label:Featured table description    Test highlight description 1
+
+    user clicks button    Save data block
+    user waits until page contains    Delete this data block
+
+Create another new data block
+    user clicks link    Create another data block
+    user waits until h2 is visible    Create data block
+    user waits until table tool wizard step is available    1    Select a data set
+
+Select subject "${SUBJECT_2_NAME}" again
+    user waits until page contains    ${SUBJECT_2_NAME}
+    user clicks radio    ${SUBJECT_2_NAME}
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Select locations again
+    user waits until table tool wizard step is available    2    Choose locations
+    user clicks button    Opportunity area
+    user clicks checkbox    Bolton 001
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Select time period again
+    user waits until table tool wizard step is available    3    Choose time period
+    user chooses select option    id:timePeriodForm-start    2009
+    user chooses select option    id:timePeriodForm-end    2017
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Create table again
+    user waits until button is enabled    Create table
+    user clicks button    Create table
+
+Save data block as a featured table again
+    user enters text into element    label:Data block name    UI Test data block name 2
+    user enters text into element    label:Table title    UI Test table title 2
+    user enters text into element    label:Data source    UI Test source 2
+
+    user clicks checkbox    Set as a featured table for this publication
+    user waits until page contains element    label:Featured table name
+    user enters text into element    label:Featured table name    Test highlight name 2
+    user enters text into element    label:Featured table description    Test highlight description 2
+
+    user clicks button    Save data block
+    user waits until page contains    Delete this data block
+
+Check data blocks are shown in the featured tables table
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_MEDIUM}
+
+    user checks table cell contains    1    1    UI Test data block name 1    testid:featuredTables
+    user checks table cell contains    2    1    UI Test data block name 2    testid:featuredTables
+
+Reorder featured tables
+    user clicks button    Reorder featured tables
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+    user clicks button    Confirm order
+
+Check featured tables were reordered
+    user checks table cell contains    1    1    UI Test data block name 2    testid:featuredTables
+    user checks table cell contains    2    1    UI Test data block name 1    testid:featuredTables
+
+Edit footnote
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+    user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
+
+    user waits until h2 is visible    Edit footnote
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user clicks button    Save footnote
+    user waits until page contains    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks page does not contain    ${FOOTNOTE_ALL_INDICATOR}
+
+Check footnote was updated on data block
+    # set focus to 'data blocks' link to ensure the click doesn't set focus to the data blocks link
+    # This results in a failure whereby the tests stay on the footnote page
+    user sets focus to element    link:Data blocks    xpath://*[@aria-label="Release"]
+    user clicks link    Data blocks
+
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
+
+    user clicks edit data block link    UI Test data block name 2
+
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+Reorder footnotes
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+    user clicks button    Reorder footnotes
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+    user clicks button    Confirm order
+
+Check footnotes were reordered on data block
+    user sets focus to element    link:Data blocks    xpath://*[@aria-label="Release"]
+    user clicks link    Data blocks
+
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
+
+    user clicks edit data block link    UI Test data block name 2
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
+
+Add headline text block to Content page again
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Add an accordion section to release content
+    user clicks button    Add new section
+    user changes accordion section title    1    Test section
+
+Add text block with link to a featured table to accordion section
+    user adds text block to editable accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${block}=    user starts editing accordion section text block    Test section    1
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${toolbar}=    get editor toolbar    ${block}
+    ${insert}=    get child element    parent_locator=${toolbar}
+    ...    child_locator=css:[data-cke-tooltip-text="Insert"]
+    user clicks element    ${insert}
+    ${button}=    user gets button element    Insert featured table link    ${toolbar}
+    user clicks element    ${button}
+    ${modal}=    user waits until modal is visible    Insert featured table link
+    user enters text into element    id:featuredTablesSearch-input    tes
+    user waits until page contains element    id:featuredTablesSearch-options
+    user clicks element    id:featuredTablesSearch-option-0
+    user clicks button    Insert    ${modal}
+    user waits until modal is not visible    Insert featured table link
+    user saves autosaving text block    ${block}
+    user waits until element contains link    ${block}    Test highlight name 2
+
+Add public prerelease access list again
+    user clicks link    Pre-release access
+    user creates public prerelease access list    Test public access list
+
+Approve release
+    user approves original release for immediate publication
+
+Get public release link
+    ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
+
+Check latest release is correct and the other releases are correct
+    user checks page contains    Latest release
+    user clicks link    All releases in this series
+    user waits until page finishes loading
+
+    user checks table body has x rows    2    testid:release-updates-table
+    user checks table cell contains    1    1    ${RELEASE_2_NAME}    testid:release-updates-table
+    user checks table cell contains    2    1    ${RELEASE_1_NAME}    testid:release-updates-table
+
+    user clicks link in table cell    2    1    ${RELEASE_1_NAME}    testid:release-updates-table
+
+Check other release is correct
+    user waits until page contains title caption    ${RELEASE_1_NAME}
+    user checks page contains    Not the latest release
+
+    user waits until page contains link    View latest release: ${RELEASE_2_NAME}
+    user clicks link    View latest release: ${RELEASE_2_NAME}
+    user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_SMALL}
+
+Go to Table Tool page
+    user navigates to data tables page on public frontend
+
+Select publication in table tool
+    user clicks radio    %{TEST_THEME_NAME}
+    user clicks radio    ${PUBLICATION_NAME}
+    user clicks element    id:publicationForm-submit
+    user waits until table tool wizard step is available    2    Select a data set or featured table
+    user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
+
+Select subject "${SUBJECT_2_NAME}" in table tool
+    user waits until table tool wizard step is available    2    Select a data set or featured table
+    user waits until page contains    ${SUBJECT_2_NAME}
+    user clicks radio    ${SUBJECT_2_NAME}
+    user waits until button is enabled    Create your own table    %{WAIT_SMALL}
+    user clicks button    Create your own table
+    user waits until table tool wizard step is available    3    Choose locations
+    user checks previous table tool step contains    2    Data set    ${SUBJECT_2_NAME}
+
+Select locations in table tool
+    user clicks button    Local authority    testid:locations-localAuthority-accordion
+    user clicks checkbox    Barnsley
+    user clicks checkbox    Birmingham
+
+    user clicks element    id:locationFiltersForm-submit
+
+    user waits until table tool wizard step is available    4    Choose time period
+    user checks previous table tool step contains    3    Local authority    Barnsley
+    user checks previous table tool step contains    3    Local authority    Birmingham
+
+    user waits until table tool wizard step is available    4    Choose time period
+
+Select time period in table tool
+    user chooses select option    id:timePeriodForm-start    2014
+    user chooses select option    id:timePeriodForm-end    2018
+    user clicks element    id:timePeriodForm-submit
+
+Select indicators and filters in table tool
+    user waits until table tool wizard step is available    5    Choose your filters
+    user checks indicator checkbox is checked    Admission Numbers
+    user checks category checkbox is checked    Random Filter    Not specified
+    user clicks element    id:filtersForm-submit
+
+Validate table
+    user waits until results table appears    %{WAIT_LONG}
+    user checks table column heading contains    1    1    2018
+    user checks table column heading contains    1    2    2017
+    user checks table column heading contains    1    3    2016
+    user checks table column heading contains    1    4    2015
+    user checks table column heading contains    1    5    2014
+
+    ${row}=    user gets row number with heading    Barnsley
+    user checks table cell in offset row contains    ${row}    0    1    8,123
+    user checks table cell in offset row contains    ${row}    0    2    5,032
+    user checks table cell in offset row contains    ${row}    0    3    7,419
+    user checks table cell in offset row contains    ${row}    0    4    1,134
+    user checks table cell in offset row contains    ${row}    0    5    9,854
+
+    ${row}=    user gets row number with heading    Birmingham
+    user checks table cell in offset row contains    ${row}    0    1    3,962
+    user checks table cell in offset row contains    ${row}    0    2    8,530
+    user checks table cell in offset row contains    ${row}    0    3    8,856
+    user checks table cell in offset row contains    ${row}    0    4    9,303
+    user checks table cell in offset row contains    ${row}    0    5    3,708
+
+Validate table has footnotes
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
+
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+Validate featured tables are reordered
+    user clicks element    testid:wizardStep-2-goToButton
+    user waits until h2 is visible    Go back to previous step
+    user clicks button    Confirm
+    user waits until page does not contain button    Confirm
+
+    user waits until table tool wizard step is available    2    Select a data set or featured table
+
+    user clicks radio    ${SUBJECT_2_NAME}
+
+    user checks element count is x    css:[data-testid="featuredTables"] li    2
+
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child a    Test highlight name 2
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child p
+    ...    Test highlight description 2
+
+    user checks element should contain    css:[data-testid="featuredTables"] li:nth-child(2) a    Test highlight name 1
+    user checks element should contain    css:[data-testid="featuredTables"] li:nth-child(2) p
+    ...    Test highlight description 1
+
+Select featured table from subjects step
+    user clicks link    Test highlight name 1
+    user waits until results table appears    %{WAIT_LONG}
+    user waits until page contains element
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]
+
+Validate table column headings for featured table
+    user checks table column heading contains    1    1    Not specified
+
+Validate table rows for featured table
+    ${row}=    user gets row number with heading    Bolton 001
+    user checks table heading in offset row contains    ${row}    0    3    2009
+    user checks table heading in offset row contains    ${row}    1    1    2010
+    user checks table heading in offset row contains    ${row}    2    1    2017
+
+    user checks table cell in offset row contains    ${row}    0    1    5,815
+    user checks table cell in offset row contains    ${row}    1    1    5,595
+    user checks table cell in offset row contains    ${row}    2    1    6,373
+
+    ${row}=    user gets row number with heading    Bolton 004
+    user checks table heading in offset row contains    ${row}    0    2    2005
+    user checks table heading in offset row contains    ${row}    1    1    2017
+
+    user checks table cell in offset row contains    ${row}    0    1    8,557
+    user checks table cell in offset row contains    ${row}    1    1    3,481
+
+    ${row}=    user gets row number with heading    Nailsea Youngwood
+    user checks table heading in offset row contains    ${row}    0    2    2005
+    user checks table heading in offset row contains    ${row}    1    1    2010
+    user checks table heading in offset row contains    ${row}    2    1    2011
+    user checks table heading in offset row contains    ${row}    3    1    2012
+    user checks table heading in offset row contains    ${row}    4    1    2016
+
+    user checks table cell in offset row contains    ${row}    0    1    3,612
+    user checks table cell in offset row contains    ${row}    1    1    9,304
+    user checks table cell in offset row contains    ${row}    2    1    9,603
+    user checks table cell in offset row contains    ${row}    3    1    8,150
+    user checks table cell in offset row contains    ${row}    4    1    4,198
+
+    ${row}=    user gets row number with heading    Syon
+    user checks table heading in offset row contains    ${row}    0    2    2007
+    user checks table heading in offset row contains    ${row}    1    1    2008
+    user checks table heading in offset row contains    ${row}    2    1    2010
+    user checks table heading in offset row contains    ${row}    3    1    2012
+    user checks table heading in offset row contains    ${row}    4    1    2017
+
+    user checks table cell in offset row contains    ${row}    0    1    9,914
+    user checks table cell in offset row contains    ${row}    1    1    5,505
+    user checks table cell in offset row contains    ${row}    2    1    6,060
+    user checks table cell in offset row contains    ${row}    3    1    1,109
+    user checks table cell in offset row contains    ${row}    4    1    1,959
+
+Validate featured table has footnotes
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
+
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+Go to release page
+    user clicks link    ${PUBLICATION_NAME}, ${RELEASE_2_NAME}
+
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until page contains title caption    ${RELEASE_2_NAME}
+
+Validate data guidance data set details variables and footnotes
+    user goes to explore and download data and navigates to data set details page    ${SUBJECT_1_NAME}
+    Page Should Contain    UI test subject 1 data guidance content
+    user checks summary list contains    Geographic levels
+    ...    National
+    ...    id:dataSetDetails
+
+    user checks summary list contains    Time period
+    ...    2017/18
+    ...    id:dataSetDetails
+
+    user clicks button    Show all 9 variables
+    user checks table body has x rows    9    testid:variables-table
+
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
+
+    user checks table cell contains    1    1    colour    testid:variables-table
+    user checks table cell contains    1    2    Colour    testid:variables-table
+
+    user checks table cell contains    2    1    enrolments    testid:variables-table
+    user checks table cell contains    2    2    Number of pupil enrolments    testid:variables-table
+
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    testid:variables-table
+    user checks table cell contains    4    2    Percentage of persistent absentees    testid:variables-table
+
+    user checks table cell contains    8    1    sess_overall_percent    testid:variables-table
+    user checks table cell contains    8    2    Overall absence rate    testid:variables-table
+
+    user checks table cell contains    9    1    sess_unauthorised_percent    testid:variables-table
+    user checks table cell contains    9    2    Unauthorised absence rate    testid:variables-table
+
+    user scrolls to element    id:dataSetFootnotes
+    Footnotes Should Equal    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    ...    ${FOOTNOTE_ALL}
+    ...    ${FOOTNOTE_ALL_FILTER}
+    ...    ${FOOTNOTE_SUBJECT_1}
+    ...    ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    ...    ${FOOTNOTE_SUBJECT_1_FILTER}
+    ...    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    ...    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    ...    ${FOOTNOTE_SUBJECT_1_MIXTURE}
+
+    user goes back
+    user waits until h2 is visible    Explore data used in this release
+
+    user opens data set details for subject    ${SUBJECT_2_NAME}
+    Page Should Contain Link    Data set information page
+    user clicks element
+    ...    xpath://li[.//h4[normalize-space()='${SUBJECT_2_NAME}']]//a[starts-with(normalize-space(.), 'Data set information page')]
+
+    user waits until h1 is visible    ${SUBJECT_2_NAME}
+
+    user checks table body has x rows    2    testid:variables-table
+
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
+
+    user checks table cell contains    1    1    admission_numbers    testid:variables-table
+    user checks table cell contains    1    2    Admission Numbers    testid:variables-table
+
+    user checks table cell contains    2    1    some_filter    testid:variables-table
+    user checks table cell contains    2    2    Random Filter    testid:variables-table
+
+    user scrolls to element    id:dataSetFootnotes
+    Footnotes Should Equal    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    ...    ${FOOTNOTE_ALL}
+    ...    ${FOOTNOTE_ALL_FILTER}
+
+Validate the number of featured tables and featured table link
+    user goes back
+    user waits until h2 is visible    Explore data used in this release
+
+    user waits until h3 is visible    2 featured tables
+    user waits until parent contains element    id:featured-tables-section
+    ...    css:[data-testid="release-data-list-item"]    count=2
+
+    user clicks element
+    ...    xpath://li[.//h4[normalize-space()='Test highlight name 1']]//a[starts-with(normalize-space(.), 'View, edit or download')]
+    user waits until h1 is visible    Create your own tables on ${PUBLICATION_NAME_LOWER_CASE}
+    user waits until results table appears    %{WAIT_LONG}
+    user waits until page contains element
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for 'UI test subject 2' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]
+
+    user goes back
+    user waits until h2 is visible    Explore data used in this release
+
+    user clicks element
+    ...    xpath://li[.//h4[normalize-space()='Test highlight name 2']]//a[starts-with(normalize-space(.), 'View, edit or download')]
+    user waits until h1 is visible    Create your own tables on ${PUBLICATION_NAME_LOWER_CASE}
+    user waits until results table appears    %{WAIT_LONG}
+    user waits until page contains element
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for 'UI test subject 2' for Not specified in Bolton 001 between 2009 and 2017"]
+
+
+*** Keywords ***
+Footnotes Should Equal
+    [Arguments]    @{expected}
+    @{items}=    Get WebElements
+    ...    xpath=//section[@id='dataSetFootnotes']//div[contains(@class,'dfe-content')]
+    @{item_texts}=    Create List
+    FOR    ${item}    IN    @{items}
+        ${text}=    Get Text    ${item}
+        Append To List    ${item_texts}    ${text}
+    END
+    ${expected_length}=    Get Length    ${expected}
+    Length Should Be    ${item_texts}    ${expected_length}
+
+    FOR    ${i}    ${value}    IN ENUMERATE    @{expected}
+        Should Be Equal    ${item_texts}[${i}]    ${value}
+    END

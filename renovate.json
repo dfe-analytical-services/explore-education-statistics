@@ -53,10 +53,10 @@
       "schedule": ["every 3 months"]
     },
     {
-      "description": "Disable MicroElements.Swashbuckle.FluentValidation which requires major update to Swashbuckle",
+      "description": "Disable Swashbuckle.AspNetCore.* packages which requires Microsoft.OpenApi / .NET 10 update",
       "matchDatasources": ["nuget"],
-      "matchPackageNames": ["MicroElements.Swashbuckle.FluentValidation"],
-      "matchCurrentVersion": "6.1.0",
+      "matchPackageNames": ["Swashbuckle.AspNetCore","Swashbuckle.AspNetCore.Annotations", "Swashbuckle.AspNetCore.Cli", "Swashbuckle.AspNetCore.SwaggerGen"],
+      "matchCurrentVersion": "9.0.6",
       "enabled": false
     },
     {
@@ -79,6 +79,7 @@
         "Microsoft.EntityFrameworkCore",
         "Microsoft.Extensions",
         "Moq.EntityFrameworkCore",
+        "MockQueryable.EntityFrameworkCore",
         "MockQueryable.Moq",
         "Npgsql.EntityFrameworkCore.PostgreSQL",
         "Thinktecture.EntityFrameworkCore",

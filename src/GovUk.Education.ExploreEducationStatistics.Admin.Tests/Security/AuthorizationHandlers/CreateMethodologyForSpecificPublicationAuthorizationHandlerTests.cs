@@ -1,6 +1,7 @@
 #nullable enable
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -14,7 +15,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
@@ -24,11 +24,7 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 {
     private static readonly Guid UserId = Guid.NewGuid();
 
-    private static readonly Publication Publication = new()
-    {
-        Id = Guid.NewGuid(),
-        Methodologies = new List<PublicationMethodology>(),
-    };
+    private static readonly Publication Publication = new() { Id = Guid.NewGuid(), Methodologies = [] };
 
     private static readonly Publication PublicationArchived = new()
     {
@@ -85,7 +81,7 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
+                ClaimsPrincipal user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, publication);
 
@@ -94,8 +90,16 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, publication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
+                                UserId,
+                                publication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 await handler.HandleAsync(authContext);
@@ -158,13 +162,21 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 
             var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-            var user = DataFixture.AuthenticatedUser(userId: UserId);
+            ClaimsPrincipal user = DataFixture.AuthenticatedUser(userId: UserId);
 
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
+                        UserId,
+                        Publication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .ReturnsAsync(false);
 
             await handler.HandleAsync(authContext);
             VerifyAllMocks(userPublicationRoleRepository);
@@ -187,13 +199,21 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 
             var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-            var user = DataFixture.AuthenticatedUser(userId: UserId);
+            ClaimsPrincipal user = DataFixture.AuthenticatedUser(userId: UserId);
 
             var authContext = CreateAuthContext(user, publication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, publication.Id))
-                .ReturnsAsync(ListOf(Owner));
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
+                        UserId,
+                        publication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .ReturnsAsync(true);
 
             await handler.HandleAsync(authContext);
             VerifyAllMocks(userPublicationRoleRepository);

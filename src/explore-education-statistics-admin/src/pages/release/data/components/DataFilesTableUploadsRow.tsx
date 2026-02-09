@@ -29,6 +29,7 @@ interface Props {
   releaseVersionId: string;
   onConfirmDelete: (deletedUploadId: string) => void;
   onConfirmImport: (uploadIds: string[]) => void;
+  testId?: string;
 }
 
 export default function DataFilesTableUploadRow({
@@ -37,6 +38,7 @@ export default function DataFilesTableUploadRow({
   releaseVersionId,
   onConfirmDelete,
   onConfirmImport,
+  testId,
 }: Props) {
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
   const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
@@ -165,7 +167,10 @@ export default function DataFilesTableUploadRow({
             onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}
             triggerButton={
-              <ButtonText onClick={toggleOpenImportConfirm.on}>
+              <ButtonText
+                testId={testId && `${testId}-view-details`}
+                onClick={toggleOpenImportConfirm.on}
+              >
                 View details
                 <VisuallyHidden>{` for ${dataSetUpload.dataSetTitle}`}</VisuallyHidden>
               </ButtonText>

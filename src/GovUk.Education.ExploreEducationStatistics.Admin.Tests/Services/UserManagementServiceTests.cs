@@ -1,7 +1,9 @@
 #nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -14,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
+using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
@@ -164,51 +167,34 @@ public abstract class UserManagementServiceTests
         {
             var identityRole = new IdentityRole { Name = GlobalRoles.RoleNames.Analyst };
 
-            var pendingUserInvites = _dataFixture.DefaultUserWithPendingInvite().WithRole(identityRole).GenerateList(3);
-
-            User activeUser = _dataFixture.DefaultUser();
-
-            User softDeletedUser = _dataFixture.DefaultSoftDeletedUser();
-
-            User expiredUser = _dataFixture.DefaultUserWithExpiredInvite();
+            // The last pending user invite will have no associated roles
+            var pendingUserInvites = _dataFixture.DefaultUserWithPendingInvite().WithRole(identityRole).GenerateList(4);
 
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var userReleaseInvites = _dataFixture
-                .DefaultUserReleaseInvite()
+            var userReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .ForIndex(0, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(ReleaseRole.Contributor))
-                .ForIndex(1, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(ReleaseRole.Approver))
-                .ForIndex(2, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(ReleaseRole.Contributor))
-                .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(ReleaseRole.Approver))
-                .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(ReleaseRole.Contributor))
-                .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(ReleaseRole.Approver))
-                .ForIndex(6, s => s.SetEmail(activeUser.Email).SetRole(ReleaseRole.Contributor))
-                .ForIndex(7, s => s.SetEmail(activeUser.Email).SetRole(ReleaseRole.Approver))
-                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email).SetRole(ReleaseRole.Contributor))
-                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email).SetRole(ReleaseRole.Approver))
-                .ForIndex(10, s => s.SetEmail(expiredUser.Email).SetRole(ReleaseRole.Contributor))
-                .ForIndex(11, s => s.SetEmail(expiredUser.Email).SetRole(ReleaseRole.Approver))
-                .GenerateList(12);
+                .ForIndex(0, s => s.SetUser(pendingUserInvites[0]).SetRole(ReleaseRole.Contributor))
+                .ForIndex(1, s => s.SetUser(pendingUserInvites[0]).SetRole(ReleaseRole.Approver))
+                .ForIndex(2, s => s.SetUser(pendingUserInvites[1]).SetRole(ReleaseRole.Contributor))
+                .ForIndex(3, s => s.SetUser(pendingUserInvites[1]).SetRole(ReleaseRole.Approver))
+                .ForIndex(4, s => s.SetUser(pendingUserInvites[2]).SetRole(ReleaseRole.Contributor))
+                .ForIndex(5, s => s.SetUser(pendingUserInvites[2]).SetRole(ReleaseRole.Approver))
+                .GenerateList(6);
 
-            var userPublicationInvites = _dataFixture
-                .DefaultUserPublicationInvite()
+            var userPublicationRoles = _dataFixture
+                .DefaultUserPublicationRole()
                 .WithPublication(publication)
-                .ForIndex(0, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(PublicationRole.Owner))
-                .ForIndex(1, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(PublicationRole.Allower))
-                .ForIndex(2, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(PublicationRole.Owner))
-                .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(PublicationRole.Allower))
-                .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(PublicationRole.Owner))
-                .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(PublicationRole.Allower))
-                .ForIndex(6, s => s.SetEmail(activeUser.Email).SetRole(PublicationRole.Owner))
-                .ForIndex(7, s => s.SetEmail(activeUser.Email).SetRole(PublicationRole.Allower))
-                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email).SetRole(PublicationRole.Owner))
-                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email).SetRole(PublicationRole.Allower))
-                .ForIndex(10, s => s.SetEmail(expiredUser.Email).SetRole(PublicationRole.Owner))
-                .ForIndex(11, s => s.SetEmail(expiredUser.Email).SetRole(PublicationRole.Allower))
-                .GenerateList(12);
+                .ForIndex(0, s => s.SetUser(pendingUserInvites[0]).SetRole(PublicationRole.Owner))
+                .ForIndex(1, s => s.SetUser(pendingUserInvites[0]).SetRole(PublicationRole.Allower))
+                .ForIndex(2, s => s.SetUser(pendingUserInvites[1]).SetRole(PublicationRole.Owner))
+                .ForIndex(3, s => s.SetUser(pendingUserInvites[1]).SetRole(PublicationRole.Allower))
+                .ForIndex(4, s => s.SetUser(pendingUserInvites[2]).SetRole(PublicationRole.Owner))
+                .ForIndex(5, s => s.SetUser(pendingUserInvites[2]).SetRole(PublicationRole.Allower))
+                .GenerateList(6);
 
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -222,25 +208,34 @@ public abstract class UserManagementServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Users.AddRange(pendingUserInvites);
-                contentDbContext.UserReleaseInvites.AddRange(userReleaseInvites);
-                contentDbContext.UserPublicationInvites.AddRange(userPublicationInvites);
                 await contentDbContext.SaveChangesAsync();
             }
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository
+                .Setup(m => m.Query(ResourceRoleFilter.PendingOnly))
+                .Returns(userReleaseRoles.BuildMock());
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(m => m.Query(ResourceRoleFilter.PendingOnly))
+                .Returns(userPublicationRoles.BuildMock());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext())
             {
                 var service = SetupUserManagementService(
                     contentDbContext: contentDbContext,
-                    usersAndRolesDbContext: usersAndRolesDbContext
+                    usersAndRolesDbContext: usersAndRolesDbContext,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object
                 );
 
                 var result = await service.ListPendingInvites();
 
                 var pendingInvites = result.AssertRight();
 
-                // Only the genuinely pending invites should be returned
-                Assert.Equal(3, pendingInvites.Count);
+                Assert.Equal(4, pendingInvites.Count);
 
                 // Check they are ordered by email
                 Assert.True(
@@ -250,8 +245,8 @@ public abstract class UserManagementServiceTests
                 var expectedUserInvite1 = pendingUserInvites[0];
                 var pendingInvite1 = pendingInvites.Single(pi => pi.Email == expectedUserInvite1.Email);
 
-                var expectedUserPublicationRoles1 = CreateUserPublicationRoleViewModels(userPublicationInvites[..2]);
-                var expectedUserReleaseRoles1 = CreateUserReleaseRoleViewModels(userReleaseInvites[..2]);
+                var expectedUserPublicationRoles1 = CreateUserPublicationRoleViewModels(userPublicationRoles[..2]);
+                var expectedUserReleaseRoles1 = CreateUserReleaseRoleViewModels(userReleaseRoles[..2]);
 
                 Assert.Equal(expectedUserInvite1.Email, pendingInvite1.Email);
                 Assert.Equal(expectedUserInvite1.Role!.Name, pendingInvite1.Role);
@@ -261,8 +256,8 @@ public abstract class UserManagementServiceTests
                 var expectedUserInvite2 = pendingUserInvites[1];
                 var pendingInvite2 = pendingInvites.Single(pi => pi.Email == expectedUserInvite2.Email);
 
-                var expectedUserPublicationRoles2 = CreateUserPublicationRoleViewModels(userPublicationInvites[2..4]);
-                var expectedUserReleaseRoles2 = CreateUserReleaseRoleViewModels(userReleaseInvites[2..4]);
+                var expectedUserPublicationRoles2 = CreateUserPublicationRoleViewModels(userPublicationRoles[2..4]);
+                var expectedUserReleaseRoles2 = CreateUserReleaseRoleViewModels(userReleaseRoles[2..4]);
 
                 Assert.Equal(expectedUserInvite2.Email, pendingInvite2.Email);
                 Assert.Equal(expectedUserInvite2.Role!.Name, pendingInvite2.Role);
@@ -272,43 +267,54 @@ public abstract class UserManagementServiceTests
                 var expectedUserInvite3 = pendingUserInvites[2];
                 var pendingInvite3 = pendingInvites.Single(pi => pi.Email == expectedUserInvite3.Email);
 
-                var expectedUserPublicationRoles3 = CreateUserPublicationRoleViewModels(userPublicationInvites[4..6]);
-                var expectedUserReleaseRoles3 = CreateUserReleaseRoleViewModels(userReleaseInvites[4..6]);
+                var expectedUserPublicationRoles3 = CreateUserPublicationRoleViewModels(userPublicationRoles[4..6]);
+                var expectedUserReleaseRoles3 = CreateUserReleaseRoleViewModels(userReleaseRoles[4..6]);
 
                 Assert.Equal(expectedUserInvite3.Email, pendingInvite3.Email);
                 Assert.Equal(expectedUserInvite3.Role!.Name, pendingInvite3.Role);
                 Assert.Equal(expectedUserPublicationRoles3, pendingInvite3.UserPublicationRoles);
                 Assert.Equal(expectedUserReleaseRoles3, pendingInvite3.UserReleaseRoles);
+
+                // This user has no associated roles
+                var expectedUserInvite4 = pendingUserInvites[3];
+                var pendingInvite4 = pendingInvites.Single(pi => pi.Email == expectedUserInvite4.Email);
+
+                Assert.Equal(expectedUserInvite4.Email, pendingInvite4.Email);
+                Assert.Equal(expectedUserInvite4.Role!.Name, pendingInvite4.Role);
+                Assert.Empty(pendingInvite4.UserPublicationRoles);
+                Assert.Empty(pendingInvite4.UserReleaseRoles);
             }
+
+            VerifyAllMocks(userReleaseRoleRepository, userPublicationRoleRepository);
         }
 
         private static List<UserPublicationRoleViewModel> CreateUserPublicationRoleViewModels(
-            List<UserPublicationInvite> userPublicationInvites
+            List<UserPublicationRole> userPublicationRoles
         )
         {
             return
             [
-                .. userPublicationInvites.Select(upi => new UserPublicationRoleViewModel
+                .. userPublicationRoles.Select(upr => new UserPublicationRoleViewModel
                 {
-                    Id = upi.Id,
-                    Publication = upi.Publication.Title,
-                    Role = upi.Role,
+                    Id = upr.Id,
+                    Publication = upr.Publication.Title,
+                    Role = upr.Role,
                 }),
             ];
         }
 
         private static List<UserReleaseRoleViewModel> CreateUserReleaseRoleViewModels(
-            List<UserReleaseInvite> userReleaseInvites
+            List<UserReleaseRole> userReleaseRoles
         )
         {
             return
             [
-                .. userReleaseInvites.Select(uri => new UserReleaseRoleViewModel
+                .. userReleaseRoles.Select(urr => new UserReleaseRoleViewModel
                 {
-                    Id = uri.Id,
-                    Publication = uri.ReleaseVersion.Release.Publication.Title,
-                    Release = uri.ReleaseVersion.Release.Title,
-                    Role = uri.Role,
+                    Id = urr.Id,
+                    Publication = urr.ReleaseVersion.Release.Publication.Title,
+                    Release = urr.ReleaseVersion.Release.Title,
+                    Role = urr.Role,
                 }),
             ];
         }
@@ -374,6 +380,13 @@ public abstract class UserManagementServiceTests
                 NormalizedName = "ROLE 1",
             };
 
+            User userToCreate = _dataFixture
+                .DefaultUserWithPendingInvite()
+                .WithEmail(email.ToLower())
+                .WithCreated(createdDate ?? DateTimeOffset.UtcNow)
+                .WithCreatedById(CreatedById)
+                .WithRoleId(role.Id);
+
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
@@ -397,79 +410,10 @@ public abstract class UserManagementServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
-            emailTemplateService
-                .Setup(mock =>
-                    mock.SendInviteEmail(
-                        email.ToLower(),
-                        It.Is<List<UserReleaseInvite>>(invites =>
-                            invites.Count == 1
-                            && invites[0].ReleaseVersionId == releaseVersion.Id
-                            && invites[0].Role == releaseRole
-                        ),
-                        It.Is<List<UserPublicationInvite>>(invites =>
-                            invites.Count == 1
-                            && invites[0].PublicationId == publication.Id
-                            && invites[0].Role == publicationRole
-                        )
-                    )
-                )
-                .Returns(Unit.Instance);
-
-            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
-            userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(email.ToLower(), It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-            userReleaseInviteRepository
-                .Setup(mock =>
-                    mock.Create(releaseVersion.Id, email.ToLower(), releaseRole, true, CreatedById, createdDate)
-                )
-                .Returns(Task.CompletedTask)
-                .Callback(async () =>
-                {
-                    await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-
-                    contentDbContext.Add(
-                        new UserReleaseInvite
-                        {
-                            Email = email.ToLower(),
-                            ReleaseVersionId = releaseVersion.Id,
-                            Role = releaseRole,
-                            EmailSent = true,
-                            Created = createdDate ?? DateTime.UtcNow,
-                            CreatedById = CreatedById,
-                        }
-                    );
-                    await contentDbContext.SaveChangesAsync();
-                });
-
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
-            userPublicationInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(email.ToLower(), It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-            userPublicationInviteRepository
-                .Setup(mock =>
-                    mock.CreateManyIfNotExists(userPublicationRoles, email.ToLower(), CreatedById, createdDate)
-                )
-                .Returns(Task.CompletedTask)
-                .Callback(async () =>
-                {
-                    await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-
-                    contentDbContext.Add(
-                        new UserPublicationInvite
-                        {
-                            Email = email.ToLower(),
-                            PublicationId = publication.Id,
-                            Role = publicationRole,
-                            Created = createdDate ?? DateTime.UtcNow,
-                            CreatedById = CreatedById,
-                        }
-                    );
-                    await contentDbContext.SaveChangesAsync();
-                });
-
             var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindActiveUserByEmail(email.ToLower(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
             userRepository
                 .Setup(mock =>
                     mock.CreateOrUpdate(
@@ -480,16 +424,52 @@ public abstract class UserManagementServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(
-                    new User
-                    {
-                        Email = email.ToLower(),
-                        RoleId = role.Id,
-                        Active = false,
-                        CreatedById = CreatedById,
-                        Created = createdDate ?? DateTimeOffset.UtcNow,
-                    }
-                );
+                .ReturnsAsync(userToCreate);
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            userReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository
+                .Setup(mock =>
+                    mock.Create(
+                        userToCreate.Id,
+                        releaseVersion.Id,
+                        releaseRole,
+                        CreatedById,
+                        createdDate,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(It.IsAny<UserReleaseRole>());
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            userPublicationRoleRepository
+                .Setup(mock =>
+                    mock.CreateManyIfNotExists(
+                        It.Is<List<UserPublicationRole>>(l =>
+                            l.Count == 1
+                            && l[0].UserId == userToCreate.Id
+                            && l[0].PublicationId == publication.Id
+                            && l[0].Role == publicationRole
+                            && createdDate.HasValue
+                                ? l[0].Created == createdDate
+                                : Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
+                                    <= AssertExtensions.TimeWithinMillis
+                                    && l[0].CreatedById == CreatedById
+                        ),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
+
+            var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
+            userResourceRoleNotificationService
+                .Setup(mock => mock.NotifyUserOfInvite(userToCreate.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
@@ -509,10 +489,10 @@ public abstract class UserManagementServiceTests
                 var service = SetupUserManagementService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    emailTemplateService: emailTemplateService.Object,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object,
-                    userRepository: userRepository.Object
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userRepository: userRepository.Object,
+                    userResourceRoleNotificationService: userResourceRoleNotificationService.Object
                 );
 
                 var inviteRequest = new UserInviteCreateRequest
@@ -540,10 +520,10 @@ public abstract class UserManagementServiceTests
             }
 
             VerifyAllMocks(
-                emailTemplateService,
-                userReleaseInviteRepository,
-                userPublicationInviteRepository,
-                userRepository
+                userReleaseRoleRepository,
+                userPublicationRoleRepository,
+                userRepository,
+                userResourceRoleNotificationService
             );
         }
 
@@ -559,6 +539,12 @@ public abstract class UserManagementServiceTests
                 NormalizedName = "ROLE 1",
             };
 
+            User userToCreate = _dataFixture
+                .DefaultUserWithPendingInvite()
+                .WithEmail(email.ToLower())
+                .WithCreatedById(CreatedById)
+                .WithRoleId(role.Id);
+
             var publications = _dataFixture
                 .DefaultPublication()
                 .ForRange(..2, s => s.SetReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]))
@@ -570,15 +556,20 @@ public abstract class UserManagementServiceTests
             var release2 = publications[1].Releases.Single();
             var releaseVersion2 = release2.Versions.Single();
 
+            var releaseRole1 = ReleaseRole.Approver;
+            var releaseRole2 = ReleaseRole.Contributor;
+            var publicationRole1 = PublicationRole.Owner;
+            var publicationRole2 = PublicationRole.Allower;
+
             var userReleaseRoles = new List<UserReleaseRoleCreateRequest>()
             {
-                new() { ReleaseId = release1.Id, ReleaseRole = ReleaseRole.Approver },
-                new() { ReleaseId = release2.Id, ReleaseRole = ReleaseRole.Contributor },
+                new() { ReleaseId = release1.Id, ReleaseRole = releaseRole1 },
+                new() { ReleaseId = release2.Id, ReleaseRole = releaseRole2 },
             };
             var userPublicationRoles = new List<UserPublicationRoleCreateRequest>()
             {
-                new() { PublicationId = publications[2].Id, PublicationRole = PublicationRole.Owner },
-                new() { PublicationId = publications[3].Id, PublicationRole = PublicationRole.Allower },
+                new() { PublicationId = publications[2].Id, PublicationRole = publicationRole1 },
+                new() { PublicationId = publications[3].Id, PublicationRole = publicationRole2 },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -596,119 +587,73 @@ public abstract class UserManagementServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
-            userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-            userReleaseInviteRepository
-                .Setup(mock => mock.Create(releaseVersion1.Id, email, ReleaseRole.Approver, true, CreatedById, null))
-                .Returns(Task.CompletedTask)
-                .Callback(async () =>
-                {
-                    await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-
-                    contentDbContext.Add(
-                        new UserReleaseInvite
-                        {
-                            Email = email.ToLower(),
-                            ReleaseVersionId = releaseVersion1.Id,
-                            Role = ReleaseRole.Approver,
-                            EmailSent = true,
-                            Created = DateTime.UtcNow,
-                            CreatedById = CreatedById,
-                        }
-                    );
-                    await contentDbContext.SaveChangesAsync();
-                });
-            userReleaseInviteRepository
-                .Setup(mock => mock.Create(releaseVersion2.Id, email, ReleaseRole.Contributor, true, CreatedById, null))
-                .Returns(Task.CompletedTask)
-                .Callback(async () =>
-                {
-                    await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-
-                    contentDbContext.Add(
-                        new UserReleaseInvite
-                        {
-                            Email = email.ToLower(),
-                            ReleaseVersionId = releaseVersion2.Id,
-                            Role = ReleaseRole.Contributor,
-                            EmailSent = true,
-                            Created = DateTime.UtcNow,
-                            CreatedById = CreatedById,
-                        }
-                    );
-                    await contentDbContext.SaveChangesAsync();
-                });
-
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
-            userPublicationInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-            userPublicationInviteRepository
-                .Setup(mock => mock.CreateManyIfNotExists(userPublicationRoles, email, CreatedById, null))
-                .Returns(Task.CompletedTask)
-                .Callback(async () =>
-                {
-                    await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-
-                    contentDbContext.AddRange(
-                        new UserPublicationInvite
-                        {
-                            Email = email.ToLower(),
-                            PublicationId = publications[3].Id,
-                            Role = PublicationRole.Allower,
-                            Created = DateTime.UtcNow,
-                            CreatedById = CreatedById,
-                        },
-                        new UserPublicationInvite
-                        {
-                            Email = email.ToLower(),
-                            PublicationId = publications[2].Id,
-                            Role = PublicationRole.Owner,
-                            Created = DateTime.UtcNow,
-                            CreatedById = CreatedById,
-                        }
-                    );
-                    await contentDbContext.SaveChangesAsync();
-                });
-
-            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
-            emailTemplateService
-                .Setup(mock =>
-                    mock.SendInviteEmail(
-                        email,
-                        It.Is<List<UserReleaseInvite>>(invites =>
-                            invites.Count == 2
-                            && invites[0].ReleaseVersionId == releaseVersion1.Id
-                            && invites[0].Role == ReleaseRole.Approver
-                            && invites[1].ReleaseVersionId == releaseVersion2.Id
-                            && invites[1].Role == ReleaseRole.Contributor
-                        ),
-                        It.Is<List<UserPublicationInvite>>(invites =>
-                            invites.Count == 2
-                            && invites[0].PublicationId == publications[3].Id
-                            && invites[0].Role == PublicationRole.Allower
-                            && invites[1].PublicationId == publications[2].Id
-                            && invites[1].Role == PublicationRole.Owner
-                        )
-                    )
-                )
-                .Returns(Unit.Instance);
-
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.CreateOrUpdate(email, role.Id, CreatedById, null, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(
-                    new User
-                    {
-                        Email = email.ToLower(),
-                        RoleId = role.Id,
-                        Active = false,
-                        CreatedById = CreatedById,
-                        Created = DateTimeOffset.UtcNow,
-                    }
-                );
+                .Setup(mock => mock.FindActiveUserByEmail(email.ToLower(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
+            userRepository
+                .Setup(mock =>
+                    mock.CreateOrUpdate(email.ToLower(), role.Id, CreatedById, null, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(userToCreate);
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            userReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository
+                .Setup(mock =>
+                    mock.Create(
+                        userToCreate.Id,
+                        releaseVersion1.Id,
+                        releaseRole1,
+                        CreatedById,
+                        null,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(It.IsAny<UserReleaseRole>());
+            userReleaseRoleRepository
+                .Setup(mock =>
+                    mock.Create(
+                        userToCreate.Id,
+                        releaseVersion2.Id,
+                        releaseRole2,
+                        CreatedById,
+                        null,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(It.IsAny<UserReleaseRole>());
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            userPublicationRoleRepository
+                .Setup(mock =>
+                    mock.CreateManyIfNotExists(
+                        It.Is<List<UserPublicationRole>>(l =>
+                            l.Count == 2
+                            && l.All(r => r.UserId == userToCreate.Id && r.CreatedById == CreatedById)
+                            && l[0].PublicationId == publications[2].Id
+                            && l[0].Role == publicationRole1
+                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
+                                <= AssertExtensions.TimeWithinMillis
+                            && l[1].PublicationId == publications[3].Id
+                            && l[1].Role == publicationRole2
+                            && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
+                                <= AssertExtensions.TimeWithinMillis
+                        ),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
+
+            var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
+            userResourceRoleNotificationService
+                .Setup(mock => mock.NotifyUserOfInvite(userToCreate.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -716,10 +661,10 @@ public abstract class UserManagementServiceTests
                 var service = SetupUserManagementService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    emailTemplateService: emailTemplateService.Object,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object,
-                    userRepository: userRepository.Object
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userRepository: userRepository.Object,
+                    userResourceRoleNotificationService: userResourceRoleNotificationService.Object
                 );
 
                 var inviteRequest = new UserInviteCreateRequest
@@ -746,58 +691,55 @@ public abstract class UserManagementServiceTests
             }
 
             VerifyAllMocks(
-                emailTemplateService,
-                userReleaseInviteRepository,
-                userPublicationInviteRepository,
-                userRepository
+                userReleaseRoleRepository,
+                userPublicationRoleRepository,
+                userRepository,
+                userResourceRoleNotificationService
             );
         }
 
-        [Theory]
-        [InlineData("test@test.com", "test@test.com")]
-        [InlineData("test@test.com", "TEST@test.com")]
-        [InlineData("TEST@test.com", "test@test.com")]
-        [InlineData("TEST@test.com", "TEST@test.com")]
-        public async Task IdentityUserAlreadyExists_ReturnsBadRequest(
-            string identityUserEmailStored,
-            string emailToCheck
-        )
+        [Fact]
+        public async Task ActiveUserAlreadyExists_ReturnsBadRequest()
         {
-            var user = new ApplicationUser { Id = Guid.NewGuid().ToString(), Email = identityUserEmailStored };
+            User activeUser = _dataFixture.DefaultUser();
 
-            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindActiveUserByEmail(activeUser.Email, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(activeUser);
+
+            var service = SetupUserManagementService(userRepository: userRepository.Object);
+
+            var inviteRequest = new UserInviteCreateRequest
             {
-                usersAndRolesDbContext.Users.Add(user);
-                await usersAndRolesDbContext.SaveChangesAsync();
-            }
+                Email = activeUser.Email,
+                RoleId = Guid.NewGuid().ToString(),
+                UserReleaseRoles = [],
+                UserPublicationRoles = [],
+            };
 
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
-            {
-                var service = SetupUserManagementService(usersAndRolesDbContext: userAndRolesDbContext);
+            var result = await service.InviteUser(inviteRequest);
 
-                var inviteRequest = new UserInviteCreateRequest
-                {
-                    Email = emailToCheck,
-                    RoleId = Guid.NewGuid().ToString(),
-                    UserReleaseRoles = [],
-                    UserPublicationRoles = [],
-                };
+            result.AssertBadRequest(ValidationErrorMessages.UserAlreadyExists);
 
-                var result = await service.InviteUser(inviteRequest);
-
-                result.AssertBadRequest(ValidationErrorMessages.UserAlreadyExists);
-            }
+            VerifyAllMocks(userRepository);
         }
 
         [Fact]
         public async Task InvalidUserRole_ReturnsBadRequest()
         {
-            var service = SetupUserManagementService();
+            var email = "test@test.com";
+
+            var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
+
+            var service = SetupUserManagementService(userRepository: userRepository.Object);
 
             var inviteRequest = new UserInviteCreateRequest
             {
-                Email = "test@test.com",
+                Email = email,
                 RoleId = Guid.NewGuid().ToString(),
                 UserReleaseRoles = [],
                 UserPublicationRoles = [],
@@ -806,6 +748,8 @@ public abstract class UserManagementServiceTests
             var result = await service.InviteUser(inviteRequest);
 
             result.AssertBadRequest(ValidationErrorMessages.InvalidUserRole);
+
+            VerifyAllMocks(userRepository);
         }
     }
 
@@ -819,14 +763,14 @@ public abstract class UserManagementServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
-            userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(userToCancelInvitesFor.Email, It.IsAny<CancellationToken>()))
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            userReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(userToCancelInvitesFor.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
-            userPublicationInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(userToCancelInvitesFor.Email, It.IsAny<CancellationToken>()))
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(userToCancelInvitesFor.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var userRepository = new Mock<IUserRepository>(Strict);
@@ -847,8 +791,8 @@ public abstract class UserManagementServiceTests
                 var service = SetupUserManagementService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object,
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -857,7 +801,7 @@ public abstract class UserManagementServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userReleaseInviteRepository, userPublicationInviteRepository, userRepository);
+            VerifyAllMocks(userReleaseRoleRepository, userPublicationRoleRepository, userRepository);
         }
 
         [Fact]
@@ -912,19 +856,9 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.SoftDeleteUser(internalUser.Id, CreatedById, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
-            userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(internalUser.Email, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(mock => mock.RemoveForUser(internalUser.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
-            var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
-            userPublicationInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(internalUser.Email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -938,9 +872,7 @@ public abstract class UserManagementServiceTests
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userManager: userManager.Object,
                     userRepository: userRepository.Object,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
@@ -948,14 +880,7 @@ public abstract class UserManagementServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(
-                userManager,
-                userRepository,
-                userReleaseInviteRepository,
-                userReleaseRoleRepository,
-                userPublicationInviteRepository,
-                userPublicationRoleRepository
-            );
+            VerifyAllMocks(userManager, userRepository, userReleaseRoleRepository, userPublicationRoleRepository);
         }
 
         [Fact]
@@ -1009,14 +934,12 @@ public abstract class UserManagementServiceTests
         ContentDbContext? contentDbContext = null,
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
-        IEmailTemplateService? emailTemplateService = null,
         IUserRoleService? userRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
-        IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-        IUserPublicationInviteRepository? userPublicationInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         UserManager<ApplicationUser>? userManager = null
     )
     {
@@ -1027,14 +950,12 @@ public abstract class UserManagementServiceTests
             usersAndRolesDbContext,
             contentDbContext,
             usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-            emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
-            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
-            userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>(Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict),
             userManager ?? MockUserManager().Object
         );
     }

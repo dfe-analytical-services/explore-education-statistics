@@ -10,7 +10,8 @@ public class PublishImmediateReleaseContentFunction(
     ILogger<PublishImmediateReleaseContentFunction> logger,
     IContentService contentService,
     IReleasePublishingStatusService releasePublishingStatusService,
-    IPublishingCompletionService publishingCompletionService
+    IPublishingCompletionService publishingCompletionService,
+    TimeProvider timeProvider
 )
 {
     /// <summary>
@@ -38,7 +39,11 @@ public class PublishImmediateReleaseContentFunction(
                 ReleasePublishingStatusContentStage.Started
             );
 
-            await contentService.UpdateContent(message.ReleasePublishingKey.ReleaseVersionId);
+            // Cache the release version
+            await contentService.UpdateContent(
+                message.ReleasePublishingKey.ReleaseVersionId,
+                expectedPublishDate: timeProvider.GetUtcNow()
+            );
 
             await releasePublishingStatusService.UpdateContentStage(
                 message.ReleasePublishingKey,

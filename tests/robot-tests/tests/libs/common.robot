@@ -1184,3 +1184,23 @@ check option exist in dropdown
         Log to console    \n\tAvailable options were: ${all_texts}
     END
     [Return]    ${matched}
+
+Get Texts From Elements
+    [Arguments]    ${locator}
+    ${elements}=    Get WebElements    ${locator}
+    ${texts}=    Create List
+    FOR    ${element}    IN    @{elements}
+        ${text}=    Get Text    ${element}
+        Append To List    ${texts}    ${text}
+    END
+    [Return]    ${texts}
+
+user checks section is in position
+    [Arguments]
+    ...    ${section_text}
+    ...    ${position}
+    ...    ${parent}=css:[data-testid="home-content"]
+    ...    ${exact_match}=${False}
+    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
+    user waits until parent contains element    ${parent}
+    ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]

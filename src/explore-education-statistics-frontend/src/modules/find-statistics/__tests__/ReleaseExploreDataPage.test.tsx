@@ -211,12 +211,12 @@ describe('ReleaseExploreDataPage', () => {
     ).toBeInTheDocument();
     expect(
       within(dataGuidanceSection).getByText(
-        'Description of the data included in this release, this is a methodology document, providing information on data sources, their coverage and quality and how the data is produced.',
+        'Description of the data sets included in this release, including information on data sources, coverage, quality and any data conventions used.',
       ),
     ).toBeInTheDocument();
   });
 
-  test('does not render optional content sections or links when not present', () => {
+  test('does not render some optional content sections or links when not present', () => {
     render(
       <ReleaseExploreDataPage
         releaseVersionSummary={testReleaseVersionSummary}
@@ -272,6 +272,42 @@ describe('ReleaseExploreDataPage', () => {
     ).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('data-dashboards-section'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows warning text and does not render data-related content sections if no data sets or guidance', () => {
+    render(
+      <ReleaseExploreDataPage
+        releaseVersionSummary={testReleaseVersionSummary}
+        publicationSummary={testPublicationSummary}
+        dataContent={{
+          ...testReleaseDataContent,
+          supportingFiles: [],
+          dataSets: [],
+          featuredTables: [],
+          dataGuidance: undefined,
+          dataDashboards: undefined,
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Explore data used in this release',
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('no-data-warning')).toHaveTextContent(
+      /This release does not have any interactive data sets associated with it./,
+    );
+
+    expect(screen.queryByTestId('links-grid')).not.toBeInTheDocument();
+
+    expect(screen.queryByTestId('datasets-section')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByTestId('data-guidance-section'),
     ).not.toBeInTheDocument();
   });
 

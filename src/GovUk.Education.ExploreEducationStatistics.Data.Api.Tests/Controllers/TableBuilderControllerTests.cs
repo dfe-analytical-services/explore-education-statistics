@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -137,7 +138,12 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
         },
     };
 
-    private static readonly FullTableQuery CroppedTableQuery = FullTableQuery with { EnableCropping = true };
+    private static readonly FullTableQuery CroppedTableQuery = FullTableQuery with { AllowCropping = true };
+
+    private static readonly FullTableQuery UnrestrictedFullTableQuery = FullTableQuery with
+    {
+        IgnoreMaxTableSize = true,
+    };
 
     private static readonly TableBuilderConfiguration TableConfiguration = new()
     {
@@ -184,7 +190,11 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
     {
         fixture
             .TableBuilderServiceMock.Setup(s =>
-                s.QueryToCsvStream(ItIs.DeepEqualTo(FullTableQuery), It.IsAny<Stream>(), It.IsAny<CancellationToken>())
+                s.QueryToCsvStream(
+                    ItIs.DeepEqualTo(UnrestrictedFullTableQuery),
+                    It.IsAny<Stream>(),
+                    It.IsAny<CancellationToken>()
+                )
             )
             .ReturnsAsync(Unit.Instance)
             .Callback<FullTableQuery, Stream, CancellationToken>((_, stream, _) => stream.WriteText("Test csv"));
@@ -193,7 +203,7 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
             .CreateClient()
             .PostAsync(
                 "/api/tablebuilder",
-                content: new JsonNetContent(ToRequest(FullTableQuery)),
+                content: new JsonNetContent(ToRequest(UnrestrictedFullTableQuery)),
                 headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
             );
 
@@ -247,7 +257,7 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
             .TableBuilderServiceMock.Setup(s =>
                 s.QueryToCsvStream(
                     releaseVersion.Id,
-                    ItIs.DeepEqualTo(FullTableQuery),
+                    ItIs.DeepEqualTo(UnrestrictedFullTableQuery),
                     It.IsAny<Stream>(),
                     It.IsAny<CancellationToken>()
                 )
@@ -261,7 +271,7 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
             .CreateClient()
             .PostAsync(
                 $"/api/tablebuilder/release/{releaseVersion.Id}",
-                content: new JsonNetContent(ToRequest(FullTableQuery)),
+                content: new JsonNetContent(ToRequest(UnrestrictedFullTableQuery)),
                 headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
             );
 

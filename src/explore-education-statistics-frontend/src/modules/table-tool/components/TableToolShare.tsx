@@ -12,6 +12,7 @@ import permalinkService from '@common/services/permalinkService';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import React, { useEffect, useState } from 'react';
+import WarningMessage from '@common/components/WarningMessage';
 
 const linkInstructions =
   'Use the link below to see a version of this page that you can bookmark for future reference, or copy the link to send on to somebody else to view.';
@@ -19,9 +20,10 @@ const linkInstructions =
 interface Props {
   tableHeaders?: TableHeadersConfig;
   query: ReleaseTableDataQuery;
+  isCropped?: boolean;
 }
 
-const TableToolShare = ({ tableHeaders, query }: Props) => {
+const TableToolShare = ({ tableHeaders, query, isCropped }: Props) => {
   const [permalinkUrl, setPermalinkUrl] = useState('');
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
   const [permalinkError, setPermalinkError] = useState<string>();
@@ -82,9 +84,19 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
             {permalinkError ? (
               <ErrorMessage>{permalinkError}</ErrorMessage>
             ) : (
-              <ButtonText onClick={handlePermalinkClick}>
-                Generate shareable link
-              </ButtonText>
+              <>
+                <ButtonText onClick={handlePermalinkClick}>
+                  Generate shareable link
+                </ButtonText>
+
+                {isCropped && (
+                  <WarningMessage>
+                    The table and file downloads provided by this permalink will
+                    contain only the subset of data displayed above, rather than
+                    data based on the full selection.
+                  </WarningMessage>
+                )}
+              </>
             )}
           </LoadingSpinner>
         </>

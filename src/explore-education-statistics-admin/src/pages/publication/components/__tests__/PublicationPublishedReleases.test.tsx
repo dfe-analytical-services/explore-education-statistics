@@ -178,6 +178,10 @@ describe('PublicationPublishedReleases', () => {
         screen.queryByText('Loading published releases'),
       ).not.toBeInTheDocument();
     });
+    const caption = screen.getByRole('caption');
+    expect(caption).toHaveTextContent(
+      'Table showing the published releases for this publication.',
+    );
 
     expect(screen.getByText('Published releases (5 of 7)')).toBeInTheDocument();
     expect(
@@ -539,6 +543,45 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(rows[1]).queryByRole('button', { name: 'Amend Release 1' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('hows Back to top link when showBackToTopLink prop is true', async () => {
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+          showBackToTopLink
+        />
+      </TestConfigContextProvider>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Back to top' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('does not show Back to top link when showBackToTopLink prop is not provided', async () => {
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+      </TestConfigContextProvider>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('link', { name: 'Back to top' }),
+      ).not.toBeInTheDocument();
+    });
   });
 });
 

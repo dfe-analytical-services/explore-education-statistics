@@ -85,7 +85,7 @@ public record ReleaseVersionViewModel
 
     public ReleasePermissions? Permissions { get; set; }
 
-    public bool UpdatePublishedDate { get; set; }
+    public bool UpdatePublishedDisplayDate { get; set; }
 }
 
 public record ReleasePermissions

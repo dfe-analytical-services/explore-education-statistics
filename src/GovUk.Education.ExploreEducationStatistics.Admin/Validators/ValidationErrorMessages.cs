@@ -28,14 +28,11 @@ public enum ValidationErrorMessages
     UserAlreadyHasResourceRole,
 
     // Invite
-    InviteAlreadyAccepted,
     InviteNotFound,
     InvalidEmailAddress,
     InvalidUserRole,
     NoInvitableEmails,
     NotAllReleasesBelongToPublication,
-    UserAlreadyHasReleaseRoleInvites,
-    UserAlreadyHasReleaseRoles,
 
     // Methodology
     MethodologyCannotDependOnPublishedRelease,
@@ -62,10 +59,6 @@ public enum ValidationErrorMessages
     FileIdsShouldBeDistinct,
     IncorrectNumberOfFileIds,
 
-    // Data zip file
-    DataZipFileCanOnlyContainTwoFiles,
-    DataZipFileDoesNotContainCsvFiles,
-
     // Meta file
     UnableToFindMetadataFileToDelete,
 
@@ -82,9 +75,8 @@ public enum ValidationErrorMessages
     PublishDateCannotBeEmpty,
     PublishDateCannotBeScheduled,
 
-    // Release update
-    ReleasePublishedCannotBeFutureDate,
-    ReleaseNotPublished,
+    // Release version update
+    ReleaseVersionNotPublished,
     UpdateRequestForPublishedReleaseVersionInvalid,
     ReleaseUndergoingPublishing,
 
@@ -115,6 +107,7 @@ public enum ValidationErrorMessages
     NoPublicPreReleaseAccessList,
     MethodologyNotApproved,
     UnresolvedComments,
+    MissingUpdatedApiDataSet,
 
     // Footnotes
     FootnotesDifferFromReleaseFootnotes,

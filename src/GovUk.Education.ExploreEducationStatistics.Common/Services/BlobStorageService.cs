@@ -109,7 +109,7 @@ public abstract partial class BlobStorageService(
         if (!directoryPath.IsNullOrEmpty())
         {
             // Forcefully add a trailing slash to prevent deleting blobs whose names begin with that string
-            directoryPath = directoryPath?.AppendTrailingSlash();
+            directoryPath = directoryPath.AppendTrailingSlash();
         }
 
         var blobContainer = await GetBlobContainer(containerName);
@@ -120,7 +120,9 @@ public abstract partial class BlobStorageService(
 
         do
         {
-            var blobPages = blobContainer.GetBlobsAsync(prefix: directoryPath).AsPages(continuationToken);
+            var blobPages = blobContainer
+                .GetBlobsAsync(new GetBlobsOptions { Prefix = directoryPath })
+                .AsPages(continuationToken);
 
             var deleteTasks = new List<Task>();
 
