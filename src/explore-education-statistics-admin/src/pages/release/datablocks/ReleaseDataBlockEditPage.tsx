@@ -8,6 +8,8 @@ import DataBlockSelector from '@admin/pages/release/datablocks/components/DataBl
 import {
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataBlocksService, {
@@ -21,6 +23,7 @@ import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import checkStringIsGuidShape from '@admin/pages/release/utils/checkStringIsGuidShape';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
@@ -35,9 +38,9 @@ const ReleaseDataBlockEditPage = ({
     params: { publicationId, releaseVersionId, dataBlockId },
   } = match;
 
-  const useBrowserBackNav =
-    new URLSearchParams(window.location.search).get('backToReplacement') ===
-    'true';
+  const fileId = new URLSearchParams(window.location.search).get(
+    'fromFileReplacementId',
+  );
 
   const config = useConfig();
   const pageRef = useRef<HTMLDivElement>(null);
@@ -99,20 +102,25 @@ const ReleaseDataBlockEditPage = ({
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
-          publicationId,
-          releaseVersionId,
-        })}
-        onClick={
-          useBrowserBackNav
-            ? e => {
-                e.preventDefault();
-                history.goBack();
-              }
-            : undefined
+        to={
+          fileId && checkStringIsGuidShape(fileId)
+            ? generatePath<ReleaseDataFileReplaceRouteParams>(
+                releaseDataFileReplaceRoute.path,
+                {
+                  publicationId,
+                  releaseVersionId,
+                  fileId,
+                },
+              )
+            : generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
+                publicationId,
+                releaseVersionId,
+              })
         }
       >
-        {useBrowserBackNav ? 'Back to data replacement page' : 'Back'}
+        {checkStringIsGuidShape(fileId)
+          ? 'Back to data replacement page'
+          : 'Back'}
       </Link>
 
       <LoadingSpinner loading={isLoading}>

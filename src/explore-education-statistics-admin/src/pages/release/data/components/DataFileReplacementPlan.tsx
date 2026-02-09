@@ -380,10 +380,10 @@ const DataFileReplacementPlan = ({
                           releaseVersionId,
                           dataBlockId: dataBlock.id,
                         },
-                      )}?backToReplacement=true`}
+                      )}?fromFileReplacementId=${fileId}`}
                     >
                       Edit data block{' '}
-                      <VisuallyHidden>for {dataBlock.name}</VisuallyHidden>
+                      <VisuallyHidden>- {dataBlock.name}</VisuallyHidden>
                     </ButtonLink>
 
                     <ModalConfirm
@@ -391,7 +391,7 @@ const DataFileReplacementPlan = ({
                       triggerButton={
                         <Button variant="warning">
                           Delete data block{' '}
-                          <VisuallyHidden>for {dataBlock.name}</VisuallyHidden>
+                          <VisuallyHidden>- {dataBlock.name}</VisuallyHidden>
                         </Button>
                       }
                       onConfirm={async () => {

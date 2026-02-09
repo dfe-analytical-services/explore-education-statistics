@@ -410,6 +410,46 @@ describe('ReleaseDataBlockEditPage', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  test.each([
+    { containsFileId: false, backButtonLabel: 'Back' },
+    { containsFileId: true, backButtonLabel: 'Back to data replacement page' },
+  ])(
+    "page contains ($backButtonLabel) button depending on if the page has file ID in it's query parameters",
+    async ({ containsFileId, backButtonLabel }) => {
+      renderPage();
+
+      if (containsFileId) {
+        window.history.pushState(
+          {},
+          '',
+          '?fromFileReplacementId=123e4567-e89b-12d3-a456-426614174000',
+        );
+      }
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('link', { name: backButtonLabel }),
+        ).toBeInTheDocument();
+      });
+
+      if (containsFileId) {
+        expect(
+          screen.getByRole('link', { name: backButtonLabel }),
+        ).toHaveAttribute(
+          'href',
+          '/publication/publication-1/release/release-1/data/123e4567-e89b-12d3-a456-426614174000/replace',
+        );
+      } else {
+        expect(
+          screen.getByRole('link', { name: backButtonLabel }),
+        ).toHaveAttribute(
+          'href',
+          '/publication/publication-1/release/release-1/data-blocks',
+        );
+      }
+    },
+  );
+
   describe('read-only view', () => {
     beforeEach(() => {
       permissionService.canUpdateRelease.mockResolvedValue(false);
