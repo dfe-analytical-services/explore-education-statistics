@@ -10,7 +10,7 @@ import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 import React, { createContext, ReactNode, useContext } from 'react';
-import { Reducer } from 'use-immer';
+import { ImmerReducer } from 'use-immer';
 
 export type ReleaseContentContextDispatch = (
   action: ReleaseDispatchAction,
@@ -31,7 +31,7 @@ const ReleaseContentDispatchContext = createContext<
   ReleaseContentContextDispatch | undefined
 >(undefined);
 
-export const releaseReducer: Reducer<
+export const releaseReducer: ImmerReducer<
   ReleaseContentContextState,
   ReleaseDispatchAction
 > = (draft, action) => {

@@ -1,7 +1,7 @@
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
-import { Reducer } from 'use-immer';
+import { ImmerReducer } from 'use-immer';
 import { EinContent } from '@admin/services/educationInNumbersContentService';
 import { EinSummary } from '@admin/services/educationInNumbersService';
 import { EducationInNumbersPageDispatchAction } from './EducationInNumbersPageContentContextActionTypes';
@@ -22,7 +22,7 @@ const EducationInNumbersPageDispatchContext = createContext<
   EducationInNumbersPageContextDispatch | undefined
 >(undefined);
 
-export const educationInNumbersPageReducer: Reducer<
+export const educationInNumbersPageReducer: ImmerReducer<
   EducationInNumbersPageContextState,
   EducationInNumbersPageDispatchAction
 > = (draft, action) => {
