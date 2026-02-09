@@ -23,7 +23,7 @@ param legacyResourcePrefix string
 param publicSiteUrl string
 
 @description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
-param certificateType 'Provisioned' | 'BringYourOwn'
+param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
 
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
