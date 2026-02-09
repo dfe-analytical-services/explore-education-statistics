@@ -89,9 +89,9 @@ describe('PendingDataReplacementSection', () => {
   test('cancelling as an analyst when there is a public API linked to the data file is not possible', async () => {
     render(
       <TestConfigContextProvider>
-        <AuthContext.Provider value={{ user: analyst }}>
+        <AuthContext value={{ user: analyst }}>
           <PendingDataReplacementSection {...defaultProps} />,
-        </AuthContext.Provider>
+        </AuthContext>
       </TestConfigContextProvider>,
     );
 
@@ -125,9 +125,9 @@ describe('PendingDataReplacementSection', () => {
   test('cancelling as an bau when there is a public API linked to the data file is not possible', async () => {
     render(
       <TestConfigContextProvider>
-        <AuthContext.Provider value={{ user: bau }}>
+        <AuthContext value={{ user: bau }}>
           <PendingDataReplacementSection {...defaultProps} />
-        </AuthContext.Provider>
+        </AuthContext>
       </TestConfigContextProvider>,
     );
 

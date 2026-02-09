@@ -249,9 +249,9 @@ export const PrototypeNextSubjectContextProvider = ({
   ]);
 
   return (
-    <PrototypeNextSubjectContext.Provider value={value}>
+    <PrototypeNextSubjectContext value={value}>
       {typeof children === 'function' ? children(value) : children}
-    </PrototypeNextSubjectContext.Provider>
+    </PrototypeNextSubjectContext>
   );
 };
 

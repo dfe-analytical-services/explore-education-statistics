@@ -16,9 +16,7 @@ export const LastLocationContextProvider = ({
   const lastLocation = usePrevious(location);
 
   return (
-    <LastLocationContext.Provider value={lastLocation}>
-      {children}
-    </LastLocationContext.Provider>
+    <LastLocationContext value={lastLocation}>{children}</LastLocationContext>
   );
 };
 

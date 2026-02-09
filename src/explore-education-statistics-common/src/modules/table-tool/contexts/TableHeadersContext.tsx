@@ -102,9 +102,9 @@ export const TableHeadersContextProvider = ({
   ]);
 
   return (
-    <TableHeadersContext.Provider value={state}>
+    <TableHeadersContext value={state}>
       {typeof children === 'function' ? children(state) : children}
-    </TableHeadersContext.Provider>
+    </TableHeadersContext>
   );
 };
 

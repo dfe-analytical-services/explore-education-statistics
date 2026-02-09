@@ -239,11 +239,11 @@ function EducationInNumbersPageContentProvider({
   );
 
   return (
-    <EducationInNumbersPageStateContext.Provider value={state}>
-      <EducationInNumbersPageDispatchContext.Provider value={dispatch}>
+    <EducationInNumbersPageStateContext value={state}>
+      <EducationInNumbersPageDispatchContext value={dispatch}>
         {children}
-      </EducationInNumbersPageDispatchContext.Provider>
-    </EducationInNumbersPageStateContext.Provider>
+      </EducationInNumbersPageDispatchContext>
+    </EducationInNumbersPageStateContext>
   );
 }
 

@@ -237,12 +237,12 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
     const { user } = render(
       <TestConfigContextProvider>
-        <AuthContext.Provider value={{ user: analyst }}>
+        <AuthContext value={{ user: analyst }}>
           <ApiDataSetPreviewTokenCreateForm
             onCancel={noop}
             onSubmit={handleSubmit}
           />
-        </AuthContext.Provider>
+        </AuthContext>
       </TestConfigContextProvider>,
     );
     await user.type(screen.getByLabelText('Token name'), 'Test label');
@@ -268,12 +268,12 @@ async function renderWithCustomDatesSelected(
 ) {
   const { user } = render(
     <TestConfigContextProvider>
-      <AuthContext.Provider value={{ user: bau }}>
+      <AuthContext value={{ user: bau }}>
         <ApiDataSetPreviewTokenCreateForm
           onCancel={noop}
           onSubmit={handleSubmit}
         />
-      </AuthContext.Provider>
+      </AuthContext>
     </TestConfigContextProvider>,
   );
 

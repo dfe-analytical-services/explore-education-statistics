@@ -261,11 +261,11 @@ export function ReleaseContentProvider({
   );
 
   return (
-    <ReleaseContentStateContext.Provider value={state}>
-      <ReleaseContentDispatchContext.Provider value={dispatch}>
+    <ReleaseContentStateContext value={state}>
+      <ReleaseContentDispatchContext value={dispatch}>
         {children}
-      </ReleaseContentDispatchContext.Provider>
-    </ReleaseContentStateContext.Provider>
+      </ReleaseContentDispatchContext>
+    </ReleaseContentStateContext>
   );
 }
 

@@ -40,13 +40,13 @@ describe('Comment', () => {
 
     test('renders the edit and delete buttons if the user created the comment', () => {
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser2,
           }}
         >
           <Comment type="inline" comment={testComments[2]} />,
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
@@ -57,13 +57,13 @@ describe('Comment', () => {
 
     test('does not render the edit and delete buttons if the user did not create the comment', () => {
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
         >
           <Comment type="inline" comment={testComments[2]} />,
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(
@@ -89,13 +89,13 @@ describe('Comment', () => {
 
     test('renders a resolved comment correctly', () => {
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
         >
           <Comment type="inline" comment={testComments[0]} />
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       const comment = screen.getByTestId('comment');
@@ -140,13 +140,13 @@ describe('Comment', () => {
 
     test('renders the edit and delete buttons if the user created the comment', () => {
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser2,
           }}
         >
           <Comment type="block" comment={testComments[2]} />,
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
@@ -157,13 +157,13 @@ describe('Comment', () => {
 
     test('does not render the edit and delete buttons if the user did not create the comment', () => {
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
         >
           <Comment type="block" comment={testComments[2]} />,
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(
@@ -189,13 +189,13 @@ describe('Comment', () => {
 
     test('renders a resolved comment correctly', () => {
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
         >
           <Comment type="block" comment={testComments[0]} />
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       const comment = screen.getByTestId('comment');

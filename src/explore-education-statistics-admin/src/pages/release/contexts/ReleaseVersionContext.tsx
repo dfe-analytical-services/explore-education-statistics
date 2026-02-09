@@ -32,9 +32,7 @@ export const ReleaseVersionContextProvider = ({
   }, [onReleaseChange, releaseVersion]);
 
   return (
-    <ReleaseVersionContext.Provider value={value}>
-      {children}
-    </ReleaseVersionContext.Provider>
+    <ReleaseVersionContext value={value}>{children}</ReleaseVersionContext>
   );
 };
 

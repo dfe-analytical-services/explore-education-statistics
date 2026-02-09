@@ -57,9 +57,9 @@ export const ConfirmContextProvider = ({ children }: Props) => {
   }, [isConfirming, toggleConfirming]);
 
   return (
-    <ConfirmContext.Provider value={value}>
+    <ConfirmContext value={value}>
       {typeof children === 'function' ? children(value) : children}
-    </ConfirmContext.Provider>
+    </ConfirmContext>
   );
 };
 

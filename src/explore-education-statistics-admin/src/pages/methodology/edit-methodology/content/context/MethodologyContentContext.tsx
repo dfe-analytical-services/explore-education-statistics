@@ -149,11 +149,11 @@ function MethodologyContentProvider({
   );
 
   return (
-    <MethodologyStateContext.Provider value={state}>
-      <MethodologyDispatchContext.Provider value={dispatch}>
+    <MethodologyStateContext value={state}>
+      <MethodologyDispatchContext value={dispatch}>
         {children}
-      </MethodologyDispatchContext.Provider>
-    </MethodologyStateContext.Provider>
+      </MethodologyDispatchContext>
+    </MethodologyStateContext>
   );
 }
 

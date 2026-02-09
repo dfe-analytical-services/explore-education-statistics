@@ -229,7 +229,7 @@ describe('DataFilesReplacementTableRow', () => {
       <MemoryRouter>
         <table>
           <tbody>
-            <AuthContext.Provider
+            <AuthContext
               value={{
                 user: {
                   ...user,
@@ -246,7 +246,7 @@ describe('DataFilesReplacementTableRow', () => {
                 releaseVersionId="test-release-version"
                 onReplacementStatusChange={() => {}}
               />
-            </AuthContext.Provider>
+            </AuthContext>
           </tbody>
         </table>
       </MemoryRouter>,
@@ -288,7 +288,7 @@ describe('DataFilesReplacementTableRow', () => {
       <MemoryRouter>
         <table>
           <tbody>
-            <AuthContext.Provider
+            <AuthContext
               value={{
                 user: {
                   ...user,
@@ -305,7 +305,7 @@ describe('DataFilesReplacementTableRow', () => {
                 releaseVersionId="test-release-version"
                 onReplacementStatusChange={() => {}}
               />
-            </AuthContext.Provider>
+            </AuthContext>
           </tbody>
         </table>
       </MemoryRouter>,
@@ -345,7 +345,7 @@ describe('DataFilesReplacementTableRow', () => {
 
     render(
       <MemoryRouter>
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: {
               ...user,
@@ -366,7 +366,7 @@ describe('DataFilesReplacementTableRow', () => {
               />
             </tbody>
           </table>
-        </AuthContext.Provider>
+        </AuthContext>
       </MemoryRouter>,
     );
 

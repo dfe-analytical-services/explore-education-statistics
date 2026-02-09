@@ -28,11 +28,7 @@ export const ErrorControlContextProvider = ({
   children,
   value,
 }: ProviderProps) => {
-  return (
-    <ErrorControlContext.Provider value={value}>
-      {children}
-    </ErrorControlContext.Provider>
-  );
+  return <ErrorControlContext value={value}>{children}</ErrorControlContext>;
 };
 
 export function useErrorControl(): ErrorControlState {

@@ -62,9 +62,9 @@ export function ReleaseContentHubContextProvider({
   }
 
   return (
-    <ReleaseContentHubContext.Provider value={hubState}>
+    <ReleaseContentHubContext value={hubState}>
       {typeof children === 'function' ? children(hubState) : children}
-    </ReleaseContentHubContext.Provider>
+    </ReleaseContentHubContext>
   );
 }
 

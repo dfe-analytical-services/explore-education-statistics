@@ -343,7 +343,7 @@ describe('ReleaseDataFileReplacePage', () => {
           ),
         ]}
       >
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: {
               ...user,
@@ -355,7 +355,7 @@ describe('ReleaseDataFileReplacePage', () => {
             path={releaseDataFileReplaceRoute.path}
             component={ReleaseDataFileReplacePage}
           />
-        </AuthContext.Provider>
+        </AuthContext>
       </MemoryRouter>,
     );
 

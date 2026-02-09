@@ -200,8 +200,8 @@ export const EditingContextProvider = ({
   ]);
 
   return (
-    <EditingContext.Provider value={state}>
+    <EditingContext value={state}>
       {typeof children === 'function' ? children(state) : children}
-    </EditingContext.Provider>
+    </EditingContext>
   );
 };

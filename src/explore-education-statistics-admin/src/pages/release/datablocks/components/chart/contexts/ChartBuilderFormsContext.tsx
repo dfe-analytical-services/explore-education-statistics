@@ -220,9 +220,9 @@ export const ChartBuilderFormsContextProvider = ({
   }, [forms, isSubmitting, submitForms, updateForm]);
 
   return (
-    <ChartBuilderFormsContext.Provider value={value}>
+    <ChartBuilderFormsContext value={value}>
       {typeof children === 'function' ? children(value) : children}
-    </ChartBuilderFormsContext.Provider>
+    </ChartBuilderFormsContext>
   );
 };
 

@@ -36,9 +36,9 @@ export const EducationInNumbersPageContextProvider = ({
   }, [onEducationInNumbersPageChange, educationInNumbersPage]);
 
   return (
-    <EducationInNumbersPageContext.Provider value={value}>
+    <EducationInNumbersPageContext value={value}>
       {children}
-    </EducationInNumbersPageContext.Provider>
+    </EducationInNumbersPageContext>
   );
 };
 
