@@ -91,13 +91,6 @@ const ReleaseDataBlockEditPage = ({
   }, [history, publicationId, releaseVersionId]);
 
   const { canUpdateRelease, dataBlock } = model ?? {};
-  const backLink = generatePath<ReleaseRouteParams>(
-    releaseDataBlocksRoute.path,
-    {
-      publicationId,
-      releaseVersionId,
-    },
-  );
 
   const pageTitle = canUpdateRelease ? 'Edit data block' : 'View data block';
   return (
@@ -106,8 +99,18 @@ const ReleaseDataBlockEditPage = ({
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={useBrowserBackNav ? '' : backLink}
-        onClick={useBrowserBackNav ? () => history.goBack() : undefined}
+        to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
+          publicationId,
+          releaseVersionId,
+        })}
+        onClick={
+          useBrowserBackNav
+            ? e => {
+                e.preventDefault();
+                history.goBack();
+              }
+            : undefined
+        }
       >
         {useBrowserBackNav ? 'Back to data replacement page' : 'Back'}
       </Link>
