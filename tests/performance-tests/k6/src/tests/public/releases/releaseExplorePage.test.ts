@@ -3,8 +3,8 @@ import testPageAndDataUrls, {
   getPrefetchRequestConfig,
   PublicPageSetupData,
   setupPublicPageTest,
-} from './utils/publicPageTest';
-import getStandardOptions from '../../configuration/options';
+} from '../utils/publicPageTest';
+import getStandardOptions from '../../../configuration/options';
 
 const name = 'releaseExplorePage.test.ts';
 

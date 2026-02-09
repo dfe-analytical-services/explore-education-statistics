@@ -1,12 +1,12 @@
-import getOptions from '../../configuration/options';
+import getOptions from '../../../configuration/options';
 import testPageAndDataUrls, {
   getPagePropsRequestConfig,
   getPrefetchRequestConfig,
   PublicPageSetupData,
   setupPublicPageTest,
-} from './utils/publicPageTest';
+} from '../utils/publicPageTest';
 
-const name = 'releaseMethodologyPage.test.ts';
+const name = 'releaseHelpPage.test.ts';
 
 const releasePageUrl =
   __ENV.URL ??
@@ -26,14 +26,14 @@ const performTest = ({ buildId }: PublicPageSetupData) =>
   testPageAndDataUrls({
     buildId,
     dataUrls: [
-      // This request occurs on hover-over of the navigation link to the Methodology tab.
+      // This request occurs on hover-over of the navigation link to the Help tab.
       getPrefetchRequestConfig(
-        `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
+        `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
       ),
 
-      // This request occurs when actually navigating to the Methodology tab.
+      // This request occurs when actually navigating to the Help tab.
       getPagePropsRequestConfig(
-        `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
+        `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
       ),
     ],
   });
