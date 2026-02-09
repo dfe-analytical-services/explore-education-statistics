@@ -9,18 +9,18 @@ import loggingUtils from '../../../utils/loggingUtils';
 import grafanaService from '../../../utils/grafanaService';
 import { stringifyWithoutNulls } from '../../../utils/utils';
 import {
-  getPublicPageDataRequestFailureCount,
-  getPublicPageDataRequestDuration,
-  getPublicPageDataRequestSuccessCount,
-  getPublicPageMainRequestDuration,
-  getPublicPageMainRequestFailureCount,
-  getPublicPageMainRequestSuccessCount,
-  getPublicPageOverallRequestsDuration,
-  getPublicPageOverallRequestsSuccessCount,
-  getPublicPageOverallRequestsFailureCount,
-  getPublicPageOverallDataRequestsSuccessCount,
-  getPublicPageOverallDataRequestsDuration,
-} from '../publicPageMetrics';
+  publicPageDataRequestFailureCount,
+  publicPageDataRequestDuration,
+  publicPageDataRequestSuccessCount,
+  publicPageMainRequestDuration,
+  publicPageMainRequestFailureCount,
+  publicPageMainRequestSuccessCount,
+  publicPageOverallRequestsDuration,
+  publicPageOverallRequestsSuccessCount,
+  publicPageOverallRequestsFailureCount,
+  publicPageOverallDataRequestsSuccessCount,
+  publicPageOverallDataRequestsDuration,
+} from './publicPageMetrics';
 import { errorRate } from '../../../configuration/commonMetrics';
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
@@ -87,9 +87,9 @@ const testPageAndDataUrls = ({
     if (mainPageUrl) {
       testRequest({
         ...mainPageUrl,
-        successCounter: getPublicPageMainRequestSuccessCount,
-        failureCounter: getPublicPageMainRequestFailureCount,
-        durationTrend: getPublicPageMainRequestDuration,
+        successCounter: publicPageMainRequestSuccessCount,
+        failureCounter: publicPageMainRequestFailureCount,
+        durationTrend: publicPageMainRequestDuration,
       });
     }
 
@@ -100,22 +100,22 @@ const testPageAndDataUrls = ({
         testRequest({
           ...dataUrl,
           url: `/_next/data/${buildId}${dataUrl.url}`,
-          successCounter: getPublicPageDataRequestSuccessCount,
-          failureCounter: getPublicPageDataRequestFailureCount,
-          durationTrend: getPublicPageDataRequestDuration,
+          successCounter: publicPageDataRequestSuccessCount,
+          failureCounter: publicPageDataRequestFailureCount,
+          durationTrend: publicPageDataRequestDuration,
         });
       });
 
-      getPublicPageOverallDataRequestsDuration.add(
+      publicPageOverallDataRequestsDuration.add(
         Date.now() - dataRequestsStartTime,
       );
-      getPublicPageOverallDataRequestsSuccessCount.add(1);
+      publicPageOverallDataRequestsSuccessCount.add(1);
     }
 
-    getPublicPageOverallRequestsDuration.add(Date.now() - overallStartTime);
-    getPublicPageOverallRequestsSuccessCount.add(1);
+    publicPageOverallRequestsDuration.add(Date.now() - overallStartTime);
+    publicPageOverallRequestsSuccessCount.add(1);
   } catch (error) {
-    getPublicPageOverallRequestsFailureCount.add(1);
+    publicPageOverallRequestsFailureCount.add(1);
     throw error;
   }
 };
