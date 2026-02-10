@@ -55,6 +55,7 @@ export default function DeleteDataFileModal({
         </ButtonText>
       }
       onConfirm={handleDeleteConfirm}
+      onCancel={toggleOpen.off}
     >
       <p>
         Are you sure you want to delete <strong>{dataFile.title}</strong>?
