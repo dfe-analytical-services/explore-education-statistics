@@ -54,7 +54,42 @@ Upload original file and add data guidance
     user clicks button    Save guidance
 
 Create data block table
-    user creates data block for subject
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+
+    user clicks link    Create data block
+    user waits until h2 is visible    Create data block
+
+    user waits until table tool wizard step is available    1    Select a data set
+    user waits until page contains    ${SUBJECT_NAME}
+    user clicks radio    ${SUBJECT_NAME}
+    user clicks element    id:publicationDataStepForm-submit
+
+    user waits until table tool wizard step is available    2    Choose locations
+    user clicks button    National
+
+    user clicks checkbox    England
+    user checks location checkbox is checked    England
+
+    user clicks element    id:locationFiltersForm-submit
+
+    user waits until table tool wizard step is available    3    Choose time period
+    user chooses select option    id:timePeriodForm-start    2017/18
+    user chooses select option    id:timePeriodForm-end    2017/18
+    user clicks element    id:timePeriodForm-submit
+
+    user waits until table tool wizard step is available    4    Choose your filters
+    user clicks checkbox    Authorised absence rate
+    user checks checkbox is checked    Authorised absence rate
+    user clicks button    Colour
+    user clicks checkbox    Blue
+    user checks checkbox is checked    Blue
+
+    user clicks element    id:filtersForm-submit
+
+    user enters text into element    label:Data block name    ${DATABLOCK_NAME}
+
+    user clicks button    Save data block
 
 Navigate to 'Content' page
     user clicks link    Content
@@ -96,43 +131,3 @@ Edit data block from the pending data replacement page
     user waits until h2 is visible    Edit data block
     user clicks link    Back to data replacement page
     user waits until h2 is visible    Pending data replacement
-
-
-*** Keywords ***
-user creates data block for subject
-    user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
-
-    user clicks link    Create data block
-    user waits until h2 is visible    Create data block
-
-    user waits until table tool wizard step is available    1    Select a data set
-    user waits until page contains    ${SUBJECT_NAME}
-    user clicks radio    ${SUBJECT_NAME}
-    user clicks element    id:publicationDataStepForm-submit
-
-    user waits until table tool wizard step is available    2    Choose locations
-    user clicks button    National
-
-    user clicks checkbox    England
-    user checks location checkbox is checked    England
-
-    user clicks element    id:locationFiltersForm-submit
-
-    user waits until table tool wizard step is available    3    Choose time period
-    user chooses select option    id:timePeriodForm-start    2017/18
-    user chooses select option    id:timePeriodForm-end    2017/18
-    user clicks element    id:timePeriodForm-submit
-
-    user waits until table tool wizard step is available    4    Choose your filters
-    user clicks checkbox    Authorised absence rate
-    user checks checkbox is checked    Authorised absence rate
-    user clicks button    Colour
-    user clicks checkbox    Blue
-    user checks checkbox is checked    Blue
-
-    user clicks element    id:filtersForm-submit
-
-    user enters text into element    label:Data block name    ${DATABLOCK_NAME}
-
-    user clicks button    Save data block

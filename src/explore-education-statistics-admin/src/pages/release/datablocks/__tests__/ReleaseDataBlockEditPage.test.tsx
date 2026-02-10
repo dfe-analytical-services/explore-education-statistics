@@ -425,24 +425,15 @@ describe('ReleaseDataBlockEditPage', () => {
           '?fromFileReplacementId=123e4567-e89b-12d3-a456-426614174000',
         );
       }
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole('link', { name: backButtonLabel }),
-        ).toBeInTheDocument();
-      });
+      const backButton = await screen.findByText(backButtonLabel);
 
       if (containsFileId) {
-        expect(
-          screen.getByRole('link', { name: backButtonLabel }),
-        ).toHaveAttribute(
+        expect(backButton).toHaveAttribute(
           'href',
           '/publication/publication-1/release/release-1/data/123e4567-e89b-12d3-a456-426614174000/replace',
         );
       } else {
-        expect(
-          screen.getByRole('link', { name: backButtonLabel }),
-        ).toHaveAttribute(
+        expect(backButton).toHaveAttribute(
           'href',
           '/publication/publication-1/release/release-1/data-blocks',
         );

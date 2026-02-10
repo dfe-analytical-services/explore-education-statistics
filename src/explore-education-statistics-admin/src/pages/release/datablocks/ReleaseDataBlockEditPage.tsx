@@ -21,9 +21,9 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import isGuid from '@common/utils/string/isGuid';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
-import checkStringIsGuidShape from '@admin/pages/release/utils/checkStringIsGuidShape';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
@@ -38,9 +38,9 @@ const ReleaseDataBlockEditPage = ({
     params: { publicationId, releaseVersionId, dataBlockId },
   } = match;
 
-  const fileId = new URLSearchParams(window.location.search).get(
-    'fromFileReplacementId',
-  );
+  const replacementFileId =
+    new URLSearchParams(window.location.search).get('fromFileReplacementId') ??
+    '';
 
   const config = useConfig();
   const pageRef = useRef<HTMLDivElement>(null);
@@ -103,13 +103,13 @@ const ReleaseDataBlockEditPage = ({
         back
         className="govuk-!-margin-bottom-6"
         to={
-          fileId && checkStringIsGuidShape(fileId)
+          replacementFileId && isGuid(replacementFileId)
             ? generatePath<ReleaseDataFileReplaceRouteParams>(
                 releaseDataFileReplaceRoute.path,
                 {
                   publicationId,
                   releaseVersionId,
-                  fileId,
+                  fileId: replacementFileId,
                 },
               )
             : generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
@@ -118,9 +118,7 @@ const ReleaseDataBlockEditPage = ({
               })
         }
       >
-        {checkStringIsGuidShape(fileId)
-          ? 'Back to data replacement page'
-          : 'Back'}
+        {isGuid(replacementFileId) ? 'Back to data replacement page' : 'Back'}
       </Link>
 
       <LoadingSpinner loading={isLoading}>
