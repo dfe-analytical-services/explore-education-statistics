@@ -73,11 +73,6 @@ public class DataBlockReplacementPlanViewModel
         && Locations.Values.All(model => model.Valid)
         && (TimePeriods?.Valid ?? true);
 
-    // As of fixing EES-2087, we will prevent users from attempting to fix Data Blocks which are invalid due to
-    // new Filters being introduced in a replacement Subject.  When taking on EES-2096, we can remove this flag.
-    public bool Fixable =>
-        !Valid && NewlyIntroducedFilters.IsNullOrEmpty() && Filters.All(model => model.Value.Fixable);
-
     public DataBlockReplacementPlanViewModel ToSummary()
     {
         return Valid ? new DataBlockReplacementPlanViewModel(Id, Name) : this;
@@ -172,35 +167,21 @@ public class FootnoteFilterItemReplacementViewModel : TargetableReplacementViewM
     }
 }
 
-public class FilterReplacementViewModel
+public class FilterReplacementViewModel(
+    Guid id,
+    Guid? target,
+    string label,
+    string name,
+    Dictionary<Guid, FilterGroupReplacementViewModel> groups
+)
 {
-    public Guid Id { get; }
-    public Guid? Target { get; }
-    public string Label { get; }
-    public string Name { get; }
-    public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; }
+    public Guid Id { get; } = id;
+    public Guid? Target { get; } = target;
+    public string Label { get; } = label;
+    public string Name { get; } = name;
+    public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; } = groups;
 
     public bool Valid => Groups.All(group => group.Value.Valid);
-
-    // Temporary flag to indicate that a user can potentially edit a data block to be valid during replacement
-    // so long as each Filter Group has at least one remaining candidate Filter Item to choose from in the
-    // replacement file's metadata - can be removed during work on EES-2096.
-    public bool Fixable => Groups.All(group => group.Value.Fixable);
-
-    public FilterReplacementViewModel(
-        Guid id,
-        Guid? target,
-        string label,
-        string name,
-        Dictionary<Guid, FilterGroupReplacementViewModel> groups
-    )
-    {
-        Id = id;
-        Target = target;
-        Label = label;
-        Name = name;
-        Groups = groups;
-    }
 }
 
 public class FilterGroupReplacementViewModel
@@ -210,11 +191,6 @@ public class FilterGroupReplacementViewModel
     public IEnumerable<FilterItemReplacementViewModel> Filters { get; }
 
     public bool Valid => Filters.All(filter => filter.Valid);
-
-    // Temporary flag to indicate that a user can potentially edit a data block to be valid during replacement
-    // so long as each Filter Group has at least one remaining candidate Filter Item to choose from in the
-    // replacement file's metadata - can be removed during work on EES-2096.
-    public bool Fixable => !Valid && Filters.Any(filter => filter.Valid);
 
     public FilterGroupReplacementViewModel(Guid id, string label, IEnumerable<FilterItemReplacementViewModel> filters)
     {

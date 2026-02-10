@@ -84,7 +84,6 @@ export interface DataBlockReplacementPlan {
   id: string;
   name: string;
   valid: boolean;
-  fixable: boolean;
   filters: Dictionary<FilterReplacement>;
   indicatorGroups: Dictionary<IndicatorGroupReplacement>;
   locations: Dictionary<LocationReplacement>;
