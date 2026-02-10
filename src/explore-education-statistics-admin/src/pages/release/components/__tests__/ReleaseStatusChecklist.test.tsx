@@ -195,8 +195,13 @@ describe('ReleaseStatusChecklist', () => {
       } as GlobalPermissions,
     };
 
+    const testChecklistWithMissingUpdatedApiDataSet = {
+      ...testChecklist,
+      warnings: [{ code: 'MissingUpdatedApiDataSet' }],
+    } as ReleaseVersionChecklist;
+
     releaseVersionService.getReleaseVersionChecklist.mockResolvedValue(
-      testChecklist,
+      testChecklistWithMissingUpdatedApiDataSet,
     );
 
     render(
@@ -252,6 +257,18 @@ describe('ReleaseStatusChecklist', () => {
         name: 'All public API data set mappings must be completed',
       }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', {
+        name: 'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders correctly with warnings', async () => {
@@ -274,6 +291,7 @@ describe('ReleaseStatusChecklist', () => {
         { code: 'NoPublicPreReleaseAccessList' },
         { code: 'UnresolvedComments' },
         { code: 'MissingUpdatedApiDataSet' },
+        { code: 'ReleaseSummarySectionContainsHtmlBlock' },
       ],
       errors: [],
     };
@@ -282,10 +300,21 @@ describe('ReleaseStatusChecklist', () => {
       testChecklistWithWarnings,
     );
 
+    const bauUser: User = {
+      id: 'user-id',
+      name: 'BAU',
+      permissions: {
+        isBauUser: true,
+      } as GlobalPermissions,
+    };
+
     render(
-      <MemoryRouter>
-        <ReleaseStatusChecklist releaseVersion={testRelease} />
-      </MemoryRouter>,
+      <AuthContextTestProvider user={bauUser}>
+        <MemoryRouter>
+          <ReleaseStatusChecklist releaseVersion={testRelease} />
+        </MemoryRouter>
+        ,
+      </AuthContextTestProvider>,
     );
 
     expect(await screen.findByText('Warnings')).toBeInTheDocument();
@@ -300,7 +329,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('heading', { name: 'Warnings' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('10 things')).toBeInTheDocument();
+    expect(screen.getByText('11 things')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -375,10 +404,22 @@ describe('ReleaseStatusChecklist', () => {
     );
 
     expect(
-      screen.getByText(
-        'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
-      ),
-    ).toBeInTheDocument();
+      screen.getByRole('link', {
+        name: 'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
   });
 
   test('renders correctly with both warnings and errors', async () => {
