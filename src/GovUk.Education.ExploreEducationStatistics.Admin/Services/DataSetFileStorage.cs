@@ -1,9 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -39,70 +37,6 @@ public class DataSetFileStorage(
     ILogger<DataSetFileStorage> logger
 ) : IDataSetFileStorage
 {
-    // TODO (EES-6176): Remove once manual replacement processes have been consolidated to use Upload* methods.
-    public async Task<DataFileInfo> UploadDataSet(
-        Guid releaseVersionId,
-        DataSet dataSet,
-        CancellationToken cancellationToken
-    )
-    {
-        var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
-
-        ReleaseFile? replacedReleaseDataFile = null;
-
-        if (dataSet.ReplacingFile is not null)
-        {
-            replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, dataSet.ReplacingFile.Id);
-
-            if (replacedReleaseDataFile is not null)
-            {
-                replacedReleaseDataFile.File.ReplacedById = dataSet.ReplacingFile.Id;
-                await contentDbContext.SaveChangesAsync(cancellationToken);
-            }
-        }
-
-        var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile?.File.Id);
-
-        var dataFile = await releaseDataFileRepository.Create(
-            releaseVersionId,
-            subjectId,
-            dataSet.DataFile.FileName,
-            contentLength: dataSet.DataFile.FileSize,
-            type: FileType.Data,
-            createdById: userService.GetUserId(),
-            name: dataSet.Title,
-            replacingDataFile: dataSet.ReplacingFile,
-            order: releaseDataFileOrder
-        );
-
-        var dataReleaseFile = await contentDbContext
-            .ReleaseFiles.Include(rf => rf.File)
-                .ThenInclude(f => f.CreatedBy)
-            .SingleAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == dataFile.Id, cancellationToken);
-
-        var metaFile = await releaseDataFileRepository.Create(
-            releaseVersionId,
-            subjectId,
-            dataSet.MetaFile.FileName,
-            contentLength: dataSet.MetaFile.FileSize,
-            type: FileType.Metadata,
-            createdById: userService.GetUserId()
-        );
-
-        await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-
-        if (dataSet.ReplacingFile is not null && replacedReleaseDataFile!.PublicApiDataSetId != null)
-        {
-            await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
-        }
-
-        var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
-
-        var permissions = await userService.GetDataFilePermissions(dataFile);
-
-        return new DataFileInfo(dataReleaseFile, dataImport, permissions) { Name = dataSet.Title };
-    }
-
     private async Task CreateDraftDataSetVersion(
         Guid dataReleaseFileId,
         ReleaseFile replacedReleaseDataFile,
@@ -250,36 +184,6 @@ public class DataSetFileStorage(
                 logger.LogError(errorMessage);
                 throw new InvalidOperationException("Failed whilst deleting initial the draft version.");
             });
-    }
-
-    private async Task UploadDataSetToReleaseStorage(
-        Guid releaseVersionId,
-        Guid dataFileId,
-        Guid metaFileId,
-        DataSet dataSet,
-        CancellationToken cancellationToken
-    )
-    {
-        var dataFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{dataFileId}";
-        var metaFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{metaFileId}";
-
-        await privateBlobStorageService.UploadStream(
-            containerName: PrivateReleaseFiles,
-            dataFilePath,
-            dataSet.DataFile.FileStreamProvider(),
-            contentType: ContentTypes.Csv,
-            contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken
-        );
-
-        await privateBlobStorageService.UploadStream(
-            containerName: PrivateReleaseFiles,
-            metaFilePath,
-            dataSet.MetaFile.FileStreamProvider(),
-            contentType: ContentTypes.Csv,
-            contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken
-        );
     }
 
     public async Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
