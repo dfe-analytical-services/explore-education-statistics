@@ -238,7 +238,7 @@ const ReleaseContent = ({
 
           <div id="releaseSummary" data-testid="release-summary">
             {editingMode === 'edit' && (
-              <WarningMessage>
+              <WarningMessage testId="release-summary-deprecated-warning">
                 <p className="govuk-!-font-weight-bold">
                   Warning: As part of the redesign of the EES release pages, the
                   summary text block functionality will be removed.

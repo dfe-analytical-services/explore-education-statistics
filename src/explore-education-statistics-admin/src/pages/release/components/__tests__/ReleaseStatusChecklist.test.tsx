@@ -52,7 +52,6 @@ describe('ReleaseStatusChecklist', () => {
         <MemoryRouter>
           <ReleaseStatusChecklist releaseVersion={testRelease} />
         </MemoryRouter>
-        ,
       </AuthContextTestProvider>,
     );
 
@@ -313,7 +312,6 @@ describe('ReleaseStatusChecklist', () => {
         <MemoryRouter>
           <ReleaseStatusChecklist releaseVersion={testRelease} />
         </MemoryRouter>
-        ,
       </AuthContextTestProvider>,
     );
 
