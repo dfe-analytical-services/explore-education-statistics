@@ -12,28 +12,42 @@ public static class FileValidators
             .NotNull()
             .WithMessage(ValidationMessages.FileIsNull)
             .MustHaveAValidFileName()
-            .Must(file => file.Length > 0)
-            .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{PropertyName}");
+            .Must(
+                (_, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", file.FileName);
+                    return file.Length > 0;
+                }
+            )
+            .WithMessage(ValidationMessages.FileSizeMustNotBeZero, "{FileName}");
     }
 
     public static IRuleBuilderOptions<T, IFormFile> MustBeValidCsvFile<T>(this IRuleBuilder<T, IFormFile> ruleBuilder)
     {
         return ruleBuilder
             .MustBeValidFile()
-            .Must(file => file.FileName.ToLower().EndsWith(Constants.DataSet.DataFileExtension))
-            .WithMessage(
-                ValidationMessages.FileNameMustEndDotCsv,
-                "{PropertyName}",
-                Constants.DataSet.DataFileExtension
-            );
+            .Must(
+                (_, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", file.FileName);
+                    return file.FileName.ToLower().EndsWith(Constants.DataSet.DataFileExtension);
+                }
+            )
+            .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{FileName}", Constants.DataSet.DataFileExtension);
     }
 
     public static IRuleBuilderOptions<T, IFormFile> MustBeValidZipFile<T>(this IRuleBuilder<T, IFormFile> ruleBuilder)
     {
         return ruleBuilder
             .MustBeValidFile()
-            .Must(file => file.FileName.ToLower().EndsWith(".zip"))
-            .WithMessage(ValidationMessages.ZipFileNameMustEndDotZip, "{PropertyName}");
+            .Must(
+                (_, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", file.FileName);
+                    return file.FileName.ToLower().EndsWith(".zip");
+                }
+            )
+            .WithMessage(ValidationMessages.ZipFileNameMustEndDotZip, "{FileName}");
     }
 
     public static IRuleBuilderOptions<T, IFormFile> MustHaveAValidFileName<T>(
@@ -41,15 +55,33 @@ public static class FileValidators
     )
     {
         return ruleBuilder
-            .Must(file => FileNameValidators.MeetsLengthRequirements(file.FileName))
+            .Must(
+                (_, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", file.FileName);
+                    return FileNameValidators.MeetsLengthRequirements(file.FileName);
+                }
+            )
             .WithMessage(
                 ValidationMessages.FileNameLengthInvalid,
-                "{PropertyValue}",
+                "{FileName}",
                 FileNameValidators.MaxFileNameSize.ToString()
             )
-            .Must(file => !FileNameValidators.ContainsSpaces(file.FileName))
-            .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{PropertyValue}")
-            .Must(file => !FileNameValidators.ContainsSpecialChars(file.FileName))
-            .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{PropertyValue}");
+            .Must(
+                (_, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", file.FileName);
+                    return !FileNameValidators.ContainsSpaces(file.FileName);
+                }
+            )
+            .WithMessage(ValidationMessages.FileNameCannotContainSpaces, "{FileName}")
+            .Must(
+                (_, file, context) =>
+                {
+                    context.MessageFormatter.AppendArgument("FileName", file.FileName);
+                    return !FileNameValidators.ContainsSpecialChars(file.FileName);
+                }
+            )
+            .WithMessage(ValidationMessages.FileNameCannotContainSpecialCharacters, "{FileName}");
     }
 }
