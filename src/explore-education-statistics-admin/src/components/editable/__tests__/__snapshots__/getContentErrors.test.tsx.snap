@@ -3,16 +3,16 @@
 exports[`getContentErrors content validation matches snapshot for content error details 1`] = `
 <div>
   <div
-    class="govuk-warning-text warning govuk-!-margin-bottom-1"
+    class="govuk-warning-text govuk-!-margin-bottom-1"
   >
     <span
       aria-hidden="true"
-      class="govuk-warning-text__icon icon"
+      class="govuk-warning-text__icon"
     >
       !
     </span>
     <strong
-      class="govuk-warning-text__text text"
+      class="govuk-warning-text__text"
     >
       <span
         class="govuk-visually-hidden"
@@ -62,16 +62,16 @@ exports[`getContentErrors content validation matches snapshot for content error 
 exports[`getContentErrors image validation matches snapshot for image error details 1`] = `
 <div>
   <div
-    class="govuk-warning-text warning govuk-!-margin-bottom-1"
+    class="govuk-warning-text govuk-!-margin-bottom-1"
   >
     <span
       aria-hidden="true"
-      class="govuk-warning-text__icon icon"
+      class="govuk-warning-text__icon"
     >
       !
     </span>
     <strong
-      class="govuk-warning-text__text text"
+      class="govuk-warning-text__text"
     >
       <span
         class="govuk-visually-hidden"
@@ -107,16 +107,16 @@ exports[`getContentErrors image validation matches snapshot for image error deta
 exports[`getContentErrors link validation matches snapshot for link error details 1`] = `
 <div>
   <div
-    class="govuk-warning-text warning govuk-!-margin-bottom-1"
+    class="govuk-warning-text govuk-!-margin-bottom-1"
   >
     <span
       aria-hidden="true"
-      class="govuk-warning-text__icon icon"
+      class="govuk-warning-text__icon"
     >
       !
     </span>
     <strong
-      class="govuk-warning-text__text text"
+      class="govuk-warning-text__text"
     >
       <span
         class="govuk-visually-hidden"

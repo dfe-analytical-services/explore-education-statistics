@@ -592,6 +592,10 @@ describe('ReleaseContentPage', () => {
           name: 'Add new section',
         }),
       ).toBeInTheDocument();
+
+      expect(
+        screen.getByTestId('release-summary-deprecated-warning'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -681,6 +685,10 @@ describe('ReleaseContentPage', () => {
         screen.queryByRole('button', {
           name: 'Add new section',
         }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByTestId('release-summary-deprecated-warning'),
       ).not.toBeInTheDocument();
     });
 

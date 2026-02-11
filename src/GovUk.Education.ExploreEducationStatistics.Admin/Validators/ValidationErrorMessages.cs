@@ -108,6 +108,7 @@ public enum ValidationErrorMessages
     MethodologyNotApproved,
     UnresolvedComments,
     MissingUpdatedApiDataSet,
+    ReleaseSummarySectionContainsHtmlBlock,
 
     // Footnotes
     FootnotesDifferFromReleaseFootnotes,

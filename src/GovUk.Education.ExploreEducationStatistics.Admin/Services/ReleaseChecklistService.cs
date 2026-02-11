@@ -271,6 +271,11 @@ public class ReleaseChecklistService : IReleaseChecklistService
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.MissingUpdatedApiDataSet));
         }
 
+        if (await ReleaseSectionHasNonEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.ReleaseSummary))
+        {
+            warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseSummarySectionContainsHtmlBlock));
+        }
+
         return warnings;
     }
 

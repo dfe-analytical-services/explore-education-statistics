@@ -171,7 +171,7 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           };
       }
     });
-  }, [errors, releaseRouteParams, user?.permissions.isBauUser]);
+  }, [errors, releaseRouteParams, apiDataSetsTabRoute]);
 
   const warningDetails = useMemo<ChecklistMessage[]>(() => {
     return warnings.map(warning => {
@@ -253,6 +253,15 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
               'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
             link: apiDataSetsTabRoute,
           };
+        case 'ReleaseSummarySectionContainsHtmlBlock':
+          return {
+            message:
+              'A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         default:
           // Show warning code, even if there is no mapping,
           // as this is better than having invisible warnings.
@@ -261,7 +270,12 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           };
       }
     });
-  }, [warnings, releaseVersion.publicationId, releaseRouteParams]);
+  }, [
+    warnings,
+    releaseVersion.publicationId,
+    releaseRouteParams,
+    apiDataSetsTabRoute,
+  ]);
 
   return (
     <div className="govuk-!-width-two-thirds">
