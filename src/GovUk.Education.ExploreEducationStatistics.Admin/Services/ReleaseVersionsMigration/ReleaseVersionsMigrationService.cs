@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionsMigration.Dtos;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionsMigration;
 
@@ -19,14 +21,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersi
 /// </summary>
 public class ReleaseVersionsMigrationService(
     ContentDbContext contentDbContext,
+    IOptions<AppOptions> appOptions,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
     IUserService userService
 ) : IReleaseVersionsMigrationService
 {
+    private readonly AppEnvironment _appEnvironment = GetAppEnvironment(appOptions.Value.Url);
+
     private readonly ComparerUtils.NullSafePropertyComparer<Publication> _publicationIdComparer =
         ComparerUtils.CreateComparerByProperty<Publication>(p => p.Id);
     private readonly ComparerUtils.NullSafePropertyComparer<Release> _releaseIdComparer =
         ComparerUtils.CreateComparerByProperty<Release>(r => r.Id);
+
+    // Tolerances for determining whether the proposed new published date is reasonably similar to the scheduled trigger
+    // date, used in generating warnings:
+
+    /// <summary>
+    /// For the 'Immediate' method all stages run together.
+    /// A generous tolerance (6 hours) allows for the long-running 'Data' stage for historical releases published before
+    /// that stage was removed.
+    /// </summary>
+    private static readonly TimeSpan PublishingToleranceImmediate = TimeSpan.FromHours(6);
+
+    /// <summary>
+    /// For method 'Scheduled', a small tolerance (5 minutes) covers the minor timing variation between the final stage
+    /// triggering and completing at 09:30.
+    /// </summary>
+    private static readonly TimeSpan PublishingToleranceScheduled = TimeSpan.FromMinutes(5);
 
     public async Task<Either<ActionResult, ReleaseVersionsMigrationReportDto>> MigrateReleaseVersionsPublishedDate(
         bool dryRun = true,
@@ -90,6 +111,7 @@ public class ReleaseVersionsMigrationService(
 
                 var report = new ReleaseVersionsMigrationReportDto
                 {
+                    AppEnvironment = _appEnvironment,
                     DryRun = dryRun,
                     ReleaseVersionsWithWarnings = releaseVersionsWithWarnings,
                     TotalReleaseVersionsWithWarnings = releaseVersionsWithWarnings.Count,
@@ -152,7 +174,7 @@ public class ReleaseVersionsMigrationService(
             };
         };
 
-    private static Func<IGrouping<Release, ReleaseVersion>, ReleaseVersionsMigrationReportReleaseDto> MapRelease(
+    private Func<IGrouping<Release, ReleaseVersion>, ReleaseVersionsMigrationReportReleaseDto> MapRelease(
         IReadOnlyDictionary<Guid, ReleaseVersionPublishingInfo> releaseVersionPublishingInfos
     ) =>
         releaseGroup =>
@@ -172,7 +194,7 @@ public class ReleaseVersionsMigrationService(
             };
         };
 
-    private static Func<ReleaseVersion, ReleaseVersionsMigrationReportReleaseVersionDto> MapReleaseVersion(
+    private Func<ReleaseVersion, ReleaseVersionsMigrationReportReleaseVersionDto> MapReleaseVersion(
         IReadOnlyDictionary<Guid, ReleaseVersionPublishingInfo> releaseVersionPublishingInfos
     ) =>
         releaseVersion =>
@@ -191,7 +213,7 @@ public class ReleaseVersionsMigrationService(
                 // which reached overall stage 'Complete'. If this doesn't exist, the release version won't be updated.
                 PublishedProposed = publishingInfo.LatestAttemptTimestamp,
                 PublishedOriginalUkDateOnly = releaseVersion.Published?.ToUkDateOnly(),
-                PublishedProposedUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly(),
+                PublishedProposedUkDateOnly = publishingInfo.LatestAttemptTimestampUkDateOnly,
                 UpdateNotes = updateNotes,
                 Warnings = warnings,
             };
@@ -202,6 +224,13 @@ public class ReleaseVersionsMigrationService(
         ReleaseVersionPublishingInfo publishingInfo
     )
     {
+        // Determine the final stage trigger date.
+        // For method 'Scheduled', ReleaseVersion.PublishScheduled represents the
+        // first stage trigger at midnight UK local time and needs adjusting to the final stage at 09:30 UK local time.
+        // If the value isn't at midnight UK local time, leave it unchanged. Rather than throwing an exception,
+        // the warning 'ScheduledTriggerDateIsNotMidnightUkLocalTime' will be added to the report, allowing a 'dry run'
+        // to proceed.
+        // For method 'Immediate', ReleaseVersion.PublishScheduled needs no adjustment because all stages trigger together.
         var scheduledPublishFinalStageTrigger =
             publishingInfo.LatestAttemptMethod == ReleasePublishingMethod.Scheduled
                 ? releaseVersion.PublishScheduled.AdjustUkLocalMidnightTo0930()
@@ -219,6 +248,7 @@ public class ReleaseVersionsMigrationService(
         {
             PublishMethod = publishingInfo.LatestAttemptMethod,
             LatestAttemptTimestamp = publishingInfo.LatestAttemptTimestamp,
+            LatestAttemptTimestampUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly(),
             ScheduledPublishTrigger = releaseVersion.PublishScheduled,
             ScheduledPublishFinalStageTrigger = scheduledPublishFinalStageTrigger,
             SuccessfulPublishingAttempts = publishingInfo.SuccessfulPublishingAttempts,
@@ -239,7 +269,7 @@ public class ReleaseVersionsMigrationService(
         };
     }
 
-    private static ReleaseVersionsMigrationReportWarningsDto GetWarnings(
+    private ReleaseVersionsMigrationReportWarningsDto GetWarnings(
         ReleaseVersion releaseVersion,
         ReleaseVersionsMigrationReportUpdateNotesDto updateNotes,
         ReleaseVersionsMigrationReportPublishingInfoDto publishingInfo
@@ -251,19 +281,18 @@ public class ReleaseVersionsMigrationService(
         var multipleSuccessfulPublishingAttempts = publishingInfo.SuccessfulPublishingAttempts > 1;
         var updatesCountDoesNotMatchVersion = releaseVersion.Updates.Count != releaseVersion.Version;
 
-        var proposedPublishedUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly();
-        var latestUpdateNoteUkDateOnly = updateNotes.LatestUpdateNoteUkDateOnly;
-        var proposedPublishedDateDoesNotMatchLatestUpdateNote =
-            proposedPublishedUkDateOnly.HasValue
-            && latestUpdateNoteUkDateOnly.HasValue
-            && proposedPublishedUkDateOnly.Value != latestUpdateNoteUkDateOnly.Value;
+        var proposedPublishedDateDoesNotMatchLatestUpdateNoteDate =
+            publishingInfo.LatestAttemptTimestampUkDateOnly.HasValue
+            && updateNotes.LatestUpdateNoteUkDateOnly.HasValue
+            && publishingInfo.LatestAttemptTimestampUkDateOnly.Value != updateNotes.LatestUpdateNoteUkDateOnly.Value;
 
-        var publishingTolerance =
-            publishingInfo.PublishMethod == ReleasePublishingMethod.Immediate
-                ? TimeSpan.FromHours(6)
-                : TimeSpan.FromMinutes(5);
         var proposedPublishedDateIsNotSimilarToScheduledTriggerDate =
-            publishingInfo.TimeSinceScheduledTriggerToCompletion > publishingTolerance;
+            !IsProposedPublishedDateSimilarToScheduledTriggerDate(_appEnvironment, publishingInfo);
+
+        var scheduledTriggerDateIsNotMidnightUkLocalTime =
+            publishingInfo.PublishMethod == ReleasePublishingMethod.Scheduled
+            // Note, publishingInfo.ScheduledPublishTrigger is interchangeable with releaseVersion.PublishScheduled here
+            && !publishingInfo.ScheduledPublishTrigger.IsUkLocalMidnight();
 
         // Use nullable flags with null values to represent absent warnings.
         // The JSON serializer is configured to ignore nulls and omitting these fields produces a more compact report.
@@ -272,11 +301,11 @@ public class ReleaseVersionsMigrationService(
             NoSuccessfulPublishingAttempts = noSuccessfulPublishingAttempts ? true : null,
             MultipleSuccessfulPublishingAttempts = multipleSuccessfulPublishingAttempts ? true : null,
             UpdatesCountDoesNotMatchVersion = updatesCountDoesNotMatchVersion ? true : null,
-            ProposedPublishedDateDoesNotMatchLatestUpdateNote = proposedPublishedDateDoesNotMatchLatestUpdateNote
-                ? true
-                : null,
+            ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate =
+                proposedPublishedDateDoesNotMatchLatestUpdateNoteDate ? true : null,
             ProposedPublishedDateIsNotSimilarToScheduledTriggerDate =
                 proposedPublishedDateIsNotSimilarToScheduledTriggerDate ? true : null,
+            ScheduledTriggerDateIsNotMidnightUkLocalTime = scheduledTriggerDateIsNotMidnightUkLocalTime ? true : null,
         };
     }
 
@@ -305,6 +334,21 @@ public class ReleaseVersionsMigrationService(
         };
     }
 
+    private static AppEnvironment GetAppEnvironment(string appUrl) =>
+        appUrl switch
+        {
+            AppEnvironmentUrls.AppEnvironmentUrlLocal => AppEnvironment.Local,
+            AppEnvironmentUrls.AppEnvironmentUrlDev => AppEnvironment.Dev,
+            AppEnvironmentUrls.AppEnvironmentUrlTest => AppEnvironment.Test,
+            AppEnvironmentUrls.AppEnvironmentUrlPreProd => AppEnvironment.PreProd,
+            AppEnvironmentUrls.AppEnvironmentUrlProd => AppEnvironment.Prod,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(appUrl),
+                appUrl,
+                "Unable to determine environment from app URL."
+            ),
+        };
+
     private static DateOnly? GetLatestUpdateNoteUkDateOnly(ReleaseVersion releaseVersion)
     {
         var latestUpdateNote = releaseVersion.Updates.MaxBy(u => u.On);
@@ -320,6 +364,41 @@ public class ReleaseVersionsMigrationService(
         );
 
         return lastUpdateNoteDateTimeOffset.ToUkDateOnly();
+    }
+
+    private static bool IsProposedPublishedDateSimilarToScheduledTriggerDate(
+        AppEnvironment appEnvironment,
+        ReleaseVersionsMigrationReportPublishingInfoDto publishingInfo
+    )
+    {
+        // The proposed published date based on the last updated timestamp of the latest 'Complete' publishing attempt
+        // 'LatestAttemptTimestamp', can be compared with the scheduled trigger date 'ScheduledPublishFinalStageTrigger',
+        // to see whether the duration is within a reasonable tolerance. The tolerance depends on the publishing method.
+        // For the 'Scheduled' method the calculation also depends on the environment due to the Publisher function app's Cron
+        // triggers which differ between environments.
+
+        // The duration between the ScheduledPublishFinalStageTrigger and the LatestAttemptTimestamp
+        var duration = publishingInfo.TimeSinceScheduledTriggerToCompletion;
+
+        if (publishingInfo.PublishMethod == ReleasePublishingMethod.Immediate)
+        {
+            return duration <= PublishingToleranceImmediate;
+        }
+
+        // For the 'Scheduled' method, the Publisher publishes all release versions that are due to trigger on the same day
+        // that it is running, and the time element of the scheduled trigger value is ignored when the versions are determined.
+        // The function is triggered by a Cron trigger and the time element of 09:30 is only true in the Pre-Prod and
+        // Prod environments where the Publisher function's final stage Cron expression is 09:30.
+        if (appEnvironment is AppEnvironment.PreProd or AppEnvironment.Prod)
+        {
+            return duration <= PublishingToleranceScheduled;
+        }
+
+        // In the Local, Dev and Test environments the functions are triggered multiple times a day.
+        // The time element of the scheduled trigger value is irrelevant because it doesn't represent the actual scheduled trigger time.
+        // Instead, a simple comparison is made to check if the proposed published date is on the same day as the scheduled trigger.
+        return publishingInfo.LatestAttemptTimestampUkDateOnly
+            == publishingInfo.ScheduledPublishFinalStageTrigger?.ToUkDateOnly();
     }
 
     /// <summary>
