@@ -47,7 +47,7 @@ public class ReleaseVersionsMigrationService(
     /// For method 'Scheduled', a small tolerance (5 minutes) covers the minor timing variation between the final stage
     /// triggering and completing at 09:30.
     /// </summary>
-    private static readonly TimeSpan PublishingToleranceScheduled = TimeSpan.FromMinutes(5);
+    internal static readonly TimeSpan PublishingToleranceScheduled = TimeSpan.FromMinutes(5);
 
     public async Task<Either<ActionResult, ReleaseVersionsMigrationReportDto>> MigrateReleaseVersionsPublishedDate(
         bool dryRun = true,
@@ -358,10 +358,30 @@ public class ReleaseVersionsMigrationService(
             return null;
         }
 
-        var lastUpdateNoteDateTimeOffset = new DateTimeOffset(
-            latestUpdateNote.On,
-            TimeZoneInfo.Local.GetUtcOffset(latestUpdateNote.On)
-        );
+        // Ignore the DateTimeKind.Local of the 'On' value and always treat the value as UTC.
+        // Release update notes are created in Admin with DateTime.Now which has DateTimeKind.Local,
+        // and read from the database in Admin and the Content API with that same DateTimeKind.Local.
+        // However, in Azure environments the local timezone is UTC, so the DateTime values are effectively in UTC,
+        // even though they have DateTimeKind.Local.
+        // After reading them from the database the values are still effectively UTC (same number of ticks),
+        // but the DateTimeKind is always Local.
+
+        // Without making the adjustment here it causes a problem for unit tests running in environments
+        // with a local timezone different to UTC, e.g. our local environments running in UK local time.
+        // The test data is written as though the DateTime values are UTC, not in UK local time, to match
+        // the Azure environments which created them.
+
+        // E.g. there is a test in 'WhenProposedPublishedDateDoesNotMatchLatestUpdateNoteDate_ReportIncludesWarning'
+        // which saves a release update note with DateTime "2025-05-31T23:00:00" and checks that a proposed publish date
+        // of "2025-06-01T08:30:25 +00:00" has the same date-only element when both are converted to UK local time,
+        // so that the warning 'ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate' is not included in the report.
+        // However, without treating the DateTime values as if they are UTC, the test fails because
+        // the DateTime value of "2025-05-31T23:00:00" is treated as already being UK local time,
+        // i.e. 31/05/2025 23:00:00 +01:00 (same as 31/05/2025 22:00:00 +00:00),
+        // and the date only element of that in UK local time is 2025-05-31, not 2025-06-01.
+
+        var releaseUpdateNoteOnUtc = DateTime.SpecifyKind(latestUpdateNote.On, DateTimeKind.Utc);
+        var lastUpdateNoteDateTimeOffset = new DateTimeOffset(releaseUpdateNoteOnUtc, TimeSpan.Zero);
 
         return lastUpdateNoteDateTimeOffset.ToUkDateOnly();
     }
