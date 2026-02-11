@@ -148,6 +148,8 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
 
     private static UpdateSpecificReleaseVersionAuthorizationHandler HandlerSupplier(ContentDbContext contentDbContext)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
         var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
 
         var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(contentDbContext);
@@ -155,14 +157,16 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         var userPublicationRoleRepository = new UserPublicationRoleRepository(
             contentDbContext: contentDbContext,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+            userRepository: userRepository
         );
 
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext: contentDbContext,
             userPublicationRoleRepository: userPublicationRoleRepository,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+            userRepository: userRepository
         );
 
         return new UpdateSpecificReleaseVersionAuthorizationHandler(

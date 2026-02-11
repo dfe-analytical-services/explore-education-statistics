@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -60,7 +61,7 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemChanges(
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
                         CollectionUtils.SetOf(newSystemPublicationRoleToRemain),
                         oldSystemPublicationRoleToCreate
                     )
@@ -126,7 +127,7 @@ public abstract class UserPublicationRoleRepositoryTests
         }
 
         [Fact]
-        public async Task OldRole_NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+        public async Task OldRole_NewPermissionsSystemPublicationRolesToRemoveAndCreate()
         {
             var oldSystemPublicationRoleToCreate = PublicationRole.Allower;
             var newSystemPublicationRoleToCreate = PublicationRole.Approver;
@@ -152,7 +153,7 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemChanges(
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
                         CollectionUtils.SetOf(newSystemPublicationRoleToRemove),
                         oldSystemPublicationRoleToCreate
                     )
@@ -247,7 +248,7 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemChanges(
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
                         new HashSet<PublicationRole>(),
                         oldSystemPublicationRoleToCreate
                     )
@@ -346,7 +347,7 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemChanges(
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
                         CollectionUtils.SetOf(newSystemPublicationRoleToRemain),
                         newSystemPublicationRoleToCreate
                     )
@@ -390,7 +391,7 @@ public abstract class UserPublicationRoleRepositoryTests
         }
 
         [Fact]
-        public async Task NewRole_NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+        public async Task NewRole_NewPermissionsSystemPublicationRolesToRemoveAndCreate()
         {
             var newSystemPublicationRoleToCreate = PublicationRole.Approver;
             var newSystemPublicationRoleToRemove = PublicationRole.Drafter;
@@ -415,9 +416,9 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemChanges(
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
                         CollectionUtils.SetOf(newSystemPublicationRoleToRemove),
-                        newSystemPublicationRoleToRemove
+                        newSystemPublicationRoleToCreate
                     )
                 )
                 .Returns((newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate));
@@ -429,7 +430,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 var result = await repository.Create(
                     user.Id,
                     publication.Id,
-                    newSystemPublicationRoleToRemove,
+                    newSystemPublicationRoleToCreate,
                     createdBy.Id
                 );
 
@@ -491,7 +492,7 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemChanges(
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
                         new HashSet<PublicationRole>(),
                         newSystemPublicationRoleToCreate
                     )
@@ -591,8 +592,11 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemChanges(
-                        CollectionUtils.SetOf(PublicationRole.Allower, PublicationRole.Approver), // Checking correct set of roles were considered
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        // Checking correct set of roles were considered
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
                         publicationRoleToCreate
                     )
                 )
@@ -620,120 +624,1181 @@ public abstract class UserPublicationRoleRepositoryTests
     public class CreateManyIfNotExistsTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task Success()
+        public async Task ManyRoles_CreatesExpectedOldAndNewPermissionsSystemRoles_WhenNewPermissionsSystemRoleUpgradeNotRequired()
         {
-            User user = _fixture.DefaultUser();
+            var createdDate = DateTime.UtcNow;
             User createdBy = _fixture.DefaultUser();
 
-            var existingRoleCreatedDate = DateTime.UtcNow.AddDays(-2);
-            var newRolesCreatedDate = DateTime.UtcNow;
-
+            // Test across multiple User/Publication combinations
+            User user1 = _fixture.DefaultUser();
+            User user2 = _fixture.DefaultUser();
             Publication publication1 = _fixture.DefaultPublication();
             Publication publication2 = _fixture.DefaultPublication();
 
-            UserPublicationRole existingUserPublicationRole = _fixture
+            var newUserPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
-                .WithUserId(user.Id)
-                .WithPublicationId(publication1.Id)
+                .WithCreated(createdDate)
+                .WithCreatedById(createdBy.Id)
                 .WithRole(PublicationRole.Owner)
-                .WithCreated(existingRoleCreatedDate)
-                .WithCreatedById(createdBy.Id);
+                // One 'Owner' role for each User/Publication combination.
+                // We expect a NEW permissions system 'Drafter' role to be created each of these,
+                // in addition to these roles themselves.
+                .ForIndex(0, s => s.SetUser(user1).SetPublication(publication1))
+                .ForIndex(1, s => s.SetUser(user1).SetPublication(publication2))
+                .ForIndex(2, s => s.SetUser(user2).SetPublication(publication1))
+                .ForIndex(3, s => s.SetUser(user2).SetPublication(publication2))
+                .GenerateList(4);
+
+            var userPublicationRolesCreateDtos = newUserPublicationRoles
+                .Select(upr => new UserPublicationRoleCreateDto(
+                    UserId: upr.UserId,
+                    PublicationId: upr.PublicationId,
+                    Role: upr.Role,
+                    CreatedById: upr.CreatedById!.Value,
+                    CreatedDate: upr.Created
+                ))
+                .ToHashSet();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(user1, user2);
+                contentDbContext.Publications.AddRange(publication1, publication2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelper = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .Returns((null, PublicationRole.Drafter));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelper.Object);
+
+                var results = await repository.CreateManyIfNotExists(userPublicationRolesCreateDtos);
+
+                // Should have created 4 new OLD roles, and 4 new NEW roles.
+                // But only expect the 4 OLD roles to be returned in the result. The NEW roles are
+                // created quietly in the background.
+                Assert.Equal(4, results.Count);
+
+                Assert.All(
+                    results,
+                    upr =>
+                    {
+                        Assert.Equal(PublicationRole.Owner, upr.Role);
+                        Assert.Equal(createdDate, upr.Created);
+                        Assert.Equal(createdBy.Id, upr.CreatedById);
+                        Assert.Null(upr.EmailSent);
+                    }
+                );
+
+                var resultsUserPublicationIdPairs = results.Select(upr => (upr.UserId, upr.PublicationId)).ToHashSet();
+
+                Assert.Equal(
+                    new HashSet<(Guid, Guid)>
+                    {
+                        (user1.Id, publication1.Id),
+                        (user1.Id, publication2.Id),
+                        (user2.Id, publication1.Id),
+                        (user2.Id, publication2.Id),
+                    },
+                    resultsUserPublicationIdPairs
+                );
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelper);
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        PublicationRole.Owner
+                    ),
+                Times.Exactly(4)
+            );
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should have 8 roles in total: 4 'Owner' + 4 'Drafter'
+                Assert.Equal(8, userPublicationRoles.Count);
+
+                Assert.All(
+                    userPublicationRoles,
+                    upr =>
+                    {
+                        Assert.Equal(createdDate, upr.Created);
+                        Assert.Equal(createdBy.Id, upr.CreatedById);
+                        Assert.Null(upr.EmailSent);
+                    }
+                );
+
+                var actual = userPublicationRoles.Select(upr => (upr.UserId, upr.PublicationId, upr.Role)).ToHashSet();
+
+                var expected = new HashSet<(Guid UserId, Guid PublicationId, PublicationRole Role)>
+                {
+                    // New OLD system roles
+                    (user1.Id, publication1.Id, PublicationRole.Owner),
+                    (user1.Id, publication2.Id, PublicationRole.Owner),
+                    (user2.Id, publication1.Id, PublicationRole.Owner),
+                    (user2.Id, publication2.Id, PublicationRole.Owner),
+                    // New NEW system roles
+                    (user1.Id, publication1.Id, PublicationRole.Drafter),
+                    (user1.Id, publication2.Id, PublicationRole.Drafter),
+                    (user2.Id, publication1.Id, PublicationRole.Drafter),
+                    (user2.Id, publication2.Id, PublicationRole.Drafter),
+                };
+
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Fact]
+        public async Task ManyRoles_CreatesExpectedOldAndNewPermissionsSystemRoles_WhenNewPermissionsSystemRoleUpgradeRequired()
+        {
+            var createdDate = DateTime.UtcNow;
+            User createdBy = _fixture.DefaultUser();
+
+            // Test across multiple User/Publication combinations
+            User user1 = _fixture.DefaultUser();
+            User user2 = _fixture.DefaultUser();
+            User user3 = _fixture.DefaultUser();
+            User user4 = _fixture.DefaultUser();
+            Publication publication1 = _fixture.DefaultPublication();
+            Publication publication2 = _fixture.DefaultPublication();
+            Publication publication3 = _fixture.DefaultPublication();
+            Publication publication4 = _fixture.DefaultPublication();
 
             var newUserPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
-                .WithUserId(user.Id)
+                .WithCreated(createdDate)
+                .WithCreatedById(createdBy.Id)
+                // One 'Owner' role for each User/Publication combination (Users 1/2 & Publications 1/2).
+                // We would normally expect a NEW permissions system 'Drafter' role to be created each of these,
+                // in addition to these roles themselves. However, in this case, each User/Publication combination
+                // also has a new 'Allower' role which needs creating, meaning that the 'Drafter' role is upgraded to 'Approver'.
+                .ForIndex(0, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Owner))
+                .ForIndex(1, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Owner))
+                .ForIndex(2, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Owner))
+                .ForIndex(3, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Owner))
+                // One 'Allower' role for each User/Publication combination (Users 1/2 & Publications 1/2).
+                .ForIndex(4, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Allower))
+                .ForIndex(5, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Allower))
+                .ForIndex(6, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Allower))
+                .ForIndex(7, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Allower))
+                // Here, we switch the order of creation of the 'Owner' and 'Allower' roles, to check that the order of these
+                // doesn't affect the outcome. In this case, the 'Owner' role is created after the 'Allower' role, nut we
+                // should still see the same upgrade of 'Drafter' to 'Approver'.
+                // One 'Allower' role for each User/Publication combination (Users 3/4 & Publications 3/4).
+                .ForIndex(8, s => s.SetUser(user3).SetPublication(publication3).SetRole(PublicationRole.Allower))
+                .ForIndex(9, s => s.SetUser(user3).SetPublication(publication4).SetRole(PublicationRole.Allower))
+                .ForIndex(10, s => s.SetUser(user4).SetPublication(publication3).SetRole(PublicationRole.Allower))
+                .ForIndex(11, s => s.SetUser(user4).SetPublication(publication4).SetRole(PublicationRole.Allower))
+                // One 'Owner' role for each User/Publication combination (Users 3/4 & Publications 3/4).
+                .ForIndex(12, s => s.SetUser(user3).SetPublication(publication3).SetRole(PublicationRole.Owner))
+                .ForIndex(13, s => s.SetUser(user3).SetPublication(publication4).SetRole(PublicationRole.Owner))
+                .ForIndex(14, s => s.SetUser(user4).SetPublication(publication3).SetRole(PublicationRole.Owner))
+                .ForIndex(15, s => s.SetUser(user4).SetPublication(publication4).SetRole(PublicationRole.Owner))
+                .GenerateList(16);
+
+            var userPublicationRolesCreateDtos = newUserPublicationRoles
+                .Select(upr => new UserPublicationRoleCreateDto(
+                    UserId: upr.UserId,
+                    PublicationId: upr.PublicationId,
+                    Role: upr.Role,
+                    CreatedById: upr.CreatedById!.Value,
+                    CreatedDate: upr.Created
+                ))
+                .ToHashSet();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(user1, user2, user3, user4);
+                contentDbContext.Publications.AddRange(publication1, publication2, publication3, publication4);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelper = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            // This is the call that's expected for the first 'Owner' role being created for User 1/2 & Publication 1/2 pairs.
+            // This should return that a 'Drafter' role needs to be created, which then gets upgraded to 'Approver' when the
+            // 'Allower' role is created.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .Returns((null, PublicationRole.Drafter));
+            // This is the call that's expected for the second 'Allower' role being created for User 1/2 & Publication 1/2 pairs.
+            // This should return that the 'Drafter' role that was just created needs to be deleted, but also that this 'Drafter'
+            // role needs to be upgraded to 'Approver'.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Drafter })
+                        ),
+                        PublicationRole.Allower
+                    )
+                )
+                .Returns((PublicationRole.Drafter, PublicationRole.Approver));
+            // This is the call that's expected for the first 'Allower' role being created for User 3/4 & Publication 3/4 pairs.
+            // This should return that a 'Approver' role needs to be created.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        PublicationRole.Allower
+                    )
+                )
+                .Returns((null, PublicationRole.Approver));
+            // This is the call that's expected for the second 'Owner' role being created for User 3/4 & Publication 3/4 pairs.
+            // This should return that no changes to the NEW permissions system are needed. We already have a 'Approver' role,
+            // which is more powerful than the 'Drafter' role.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
+                        PublicationRole.Owner
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelper.Object);
+
+                var results = await repository.CreateManyIfNotExists(userPublicationRolesCreateDtos);
+
+                // Should have created 16 new OLD roles, and 8 new NEW roles.
+                // But only expect the 16 OLD roles to be returned in the result. The NEW roles are
+                // created quietly in the background.
+                Assert.Equal(16, results.Count);
+
+                Assert.All(
+                    results,
+                    upr =>
+                    {
+                        Assert.Equal(createdDate, upr.Created);
+                        Assert.Equal(createdBy.Id, upr.CreatedById);
+                        Assert.Null(upr.EmailSent);
+                    }
+                );
+
+                var resultsUserPublicationIdPairs = results
+                    .Select(upr => (upr.UserId, upr.PublicationId, upr.Role))
+                    .ToHashSet();
+
+                Assert.Equal(
+                    new HashSet<(Guid, Guid, PublicationRole)>
+                    {
+                        (user1.Id, publication1.Id, PublicationRole.Owner),
+                        (user1.Id, publication2.Id, PublicationRole.Owner),
+                        (user2.Id, publication1.Id, PublicationRole.Owner),
+                        (user2.Id, publication2.Id, PublicationRole.Owner),
+                        (user1.Id, publication1.Id, PublicationRole.Allower),
+                        (user1.Id, publication2.Id, PublicationRole.Allower),
+                        (user2.Id, publication1.Id, PublicationRole.Allower),
+                        (user2.Id, publication2.Id, PublicationRole.Allower),
+                        (user3.Id, publication3.Id, PublicationRole.Owner),
+                        (user3.Id, publication4.Id, PublicationRole.Owner),
+                        (user4.Id, publication3.Id, PublicationRole.Owner),
+                        (user4.Id, publication4.Id, PublicationRole.Owner),
+                        (user3.Id, publication3.Id, PublicationRole.Allower),
+                        (user3.Id, publication4.Id, PublicationRole.Allower),
+                        (user4.Id, publication3.Id, PublicationRole.Allower),
+                        (user4.Id, publication4.Id, PublicationRole.Allower),
+                    },
+                    resultsUserPublicationIdPairs
+                );
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelper);
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        PublicationRole.Owner
+                    ),
+                Times.Exactly(4)
+            );
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Drafter })
+                        ),
+                        PublicationRole.Allower
+                    ),
+                Times.Exactly(4)
+            );
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        PublicationRole.Allower
+                    ),
+                Times.Exactly(4)
+            );
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
+                        PublicationRole.Owner
+                    ),
+                Times.Exactly(4)
+            );
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should have 24 roles in total: The 16 OLD roles + the 8 NEW ones
+                Assert.Equal(24, userPublicationRoles.Count);
+
+                Assert.All(
+                    userPublicationRoles,
+                    upr =>
+                    {
+                        Assert.Equal(createdDate, upr.Created);
+                        Assert.Equal(createdBy.Id, upr.CreatedById);
+                        Assert.Null(upr.EmailSent);
+                    }
+                );
+
+                var actual = userPublicationRoles.Select(upr => (upr.UserId, upr.PublicationId, upr.Role)).ToHashSet();
+
+                var expected = new HashSet<(Guid UserId, Guid PublicationId, PublicationRole Role)>
+                {
+                    // New OLD system roles
+                    (user1.Id, publication1.Id, PublicationRole.Owner),
+                    (user1.Id, publication2.Id, PublicationRole.Owner),
+                    (user2.Id, publication1.Id, PublicationRole.Owner),
+                    (user2.Id, publication2.Id, PublicationRole.Owner),
+                    (user1.Id, publication1.Id, PublicationRole.Allower),
+                    (user1.Id, publication2.Id, PublicationRole.Allower),
+                    (user2.Id, publication1.Id, PublicationRole.Allower),
+                    (user2.Id, publication2.Id, PublicationRole.Allower),
+                    (user3.Id, publication3.Id, PublicationRole.Owner),
+                    (user3.Id, publication4.Id, PublicationRole.Owner),
+                    (user4.Id, publication3.Id, PublicationRole.Owner),
+                    (user4.Id, publication4.Id, PublicationRole.Owner),
+                    (user3.Id, publication3.Id, PublicationRole.Allower),
+                    (user3.Id, publication4.Id, PublicationRole.Allower),
+                    (user4.Id, publication3.Id, PublicationRole.Allower),
+                    (user4.Id, publication4.Id, PublicationRole.Allower),
+                    // New NEW system roles
+                    (user1.Id, publication1.Id, PublicationRole.Approver),
+                    (user1.Id, publication2.Id, PublicationRole.Approver),
+                    (user2.Id, publication1.Id, PublicationRole.Approver),
+                    (user2.Id, publication2.Id, PublicationRole.Approver),
+                    (user3.Id, publication3.Id, PublicationRole.Approver),
+                    (user3.Id, publication4.Id, PublicationRole.Approver),
+                    (user4.Id, publication3.Id, PublicationRole.Approver),
+                    (user4.Id, publication4.Id, PublicationRole.Approver),
+                };
+
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Fact]
+        public async Task ManyRoles_IgnoresRolesThatAlreadyExist()
+        {
+            var existingRoleCreatedDate = DateTime.UtcNow.AddDays(-2);
+            var newRolesCreatedDate = DateTime.UtcNow;
+            User createdBy = _fixture.DefaultUser();
+
+            // Test across multiple User/Publication combinations
+            User user1 = _fixture.DefaultUser();
+            User user2 = _fixture.DefaultUser();
+            Publication publication1 = _fixture.DefaultPublication();
+            Publication publication2 = _fixture.DefaultPublication();
+
+            var existingUserPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithCreated(existingRoleCreatedDate)
+                .WithCreatedById(createdBy.Id)
+                // One 'Allower' role for each User/Publication combination
+                .ForIndex(0, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Allower))
+                .ForIndex(1, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Allower))
+                .ForIndex(2, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Allower))
+                .ForIndex(3, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Allower))
+                // One 'Approver' role for each User/Publication combination
+                .ForIndex(4, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Approver))
+                .ForIndex(5, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Approver))
+                .ForIndex(6, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Approver))
+                .ForIndex(7, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Approver))
+                .GenerateList(8);
+
+            var newUserPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
                 .WithCreated(newRolesCreatedDate)
                 .WithCreatedById(createdBy.Id)
-                .ForIndex(0, s => s.SetPublicationId(publication1.Id).SetRole(PublicationRole.Allower))
-                .ForIndex(1, s => s.SetPublicationId(publication2.Id).SetRole(PublicationRole.Owner))
-                .GenerateList(2);
+                .WithRole(PublicationRole.Owner)
+                // One 'Owner' role for each User/Publication combination
+                // Don't expect a NEW permissions system role to be created for any of these, as they already have a
+                // more powerful 'Approver' role.
+                .ForIndex(0, s => s.SetUser(user1).SetPublication(publication1))
+                .ForIndex(1, s => s.SetUser(user1).SetPublication(publication2))
+                .ForIndex(2, s => s.SetUser(user2).SetPublication(publication1))
+                .ForIndex(3, s => s.SetUser(user2).SetPublication(publication2))
+                .GenerateList(4);
 
-            UserPublicationRole[] allUserPublicationRoles = [.. newUserPublicationRoles, existingUserPublicationRole];
+            UserPublicationRole[] allUserPublicationRoles =
+            [
+                .. newUserPublicationRoles,
+                .. existingUserPublicationRoles,
+            ];
+            var allUserPublicationRolesCreateDtos = allUserPublicationRoles
+                .Select(upr => new UserPublicationRoleCreateDto(
+                    UserId: upr.UserId,
+                    PublicationId: upr.PublicationId,
+                    Role: upr.Role,
+                    CreatedById: upr.CreatedById!.Value,
+                    CreatedDate: upr.Created
+                ))
+                .ToHashSet();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(existingUserPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelper = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
+                        PublicationRole.Owner
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelper.Object);
+
+                // Pass ALL roles (existing + new) to CreateManyIfNotExists. We want to test that
+                // it only creates the new ones, and the existing ones are ignored/untouched.
+                var results = await repository.CreateManyIfNotExists(allUserPublicationRolesCreateDtos);
+
+                // Should only have created 4 new roles, as the others already existed
+                Assert.Equal(4, results.Count);
+
+                Assert.All(
+                    results,
+                    upr =>
+                    {
+                        Assert.Equal(PublicationRole.Owner, upr.Role);
+                        Assert.Equal(newRolesCreatedDate, upr.Created);
+                        Assert.Equal(createdBy.Id, upr.CreatedById);
+                        Assert.Null(upr.EmailSent);
+                    }
+                );
+
+                var resultsUserPublicationIdPairs = results.Select(upr => (upr.UserId, upr.PublicationId)).ToHashSet();
+
+                Assert.Equal(
+                    new HashSet<(Guid, Guid)>
+                    {
+                        (user1.Id, publication1.Id),
+                        (user1.Id, publication2.Id),
+                        (user2.Id, publication1.Id),
+                        (user2.Id, publication2.Id),
+                    },
+                    resultsUserPublicationIdPairs
+                );
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelper);
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
+                        PublicationRole.Owner
+                    ),
+                Times.Exactly(4)
+            );
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should have 12 roles in total: 8 existing + 4 new
+                // The existing roles should be unchanged
+                Assert.Equal(12, userPublicationRoles.Count);
+
+                Assert.All(
+                    userPublicationRoles,
+                    upr =>
+                    {
+                        Assert.Equal(createdBy.Id, upr.CreatedById);
+                        Assert.Null(upr.EmailSent);
+                    }
+                );
+
+                var actual = userPublicationRoles
+                    .Select(upr => (upr.UserId, upr.PublicationId, upr.Role, upr.Created))
+                    .ToHashSet();
+
+                var expected = new HashSet<(Guid UserId, Guid PublicationId, PublicationRole Role, DateTime Created)>
+                {
+                    // New roles
+                    (user1.Id, publication1.Id, PublicationRole.Owner, newRolesCreatedDate),
+                    (user1.Id, publication2.Id, PublicationRole.Owner, newRolesCreatedDate),
+                    (user2.Id, publication1.Id, PublicationRole.Owner, newRolesCreatedDate),
+                    (user2.Id, publication2.Id, PublicationRole.Owner, newRolesCreatedDate),
+                    // Existing roles
+                    (user1.Id, publication1.Id, PublicationRole.Allower, existingRoleCreatedDate),
+                    (user2.Id, publication1.Id, PublicationRole.Allower, existingRoleCreatedDate),
+                    (user1.Id, publication2.Id, PublicationRole.Allower, existingRoleCreatedDate),
+                    (user2.Id, publication2.Id, PublicationRole.Allower, existingRoleCreatedDate),
+                    (user1.Id, publication1.Id, PublicationRole.Approver, existingRoleCreatedDate),
+                    (user2.Id, publication1.Id, PublicationRole.Approver, existingRoleCreatedDate),
+                    (user1.Id, publication2.Id, PublicationRole.Approver, existingRoleCreatedDate),
+                    (user2.Id, publication2.Id, PublicationRole.Approver, existingRoleCreatedDate),
+                };
+
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Fact]
+        public async Task EmptySet_DoesNothing()
+        {
+            var repository = CreateRepository();
+
+            var results = await repository.CreateManyIfNotExists([]);
+
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public async Task OldRole_NoNewPermissionsSystemPublicationRoleChanges()
+        {
+            var oldSystemPublicationRoleToCreate = PublicationRole.Allower;
+            var newSystemPublicationRoleToRemain = PublicationRole.Approver;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(newSystemPublicationRoleToRemain);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        CollectionUtils.SetOf(newSystemPublicationRoleToRemain),
+                        oldSystemPublicationRoleToCreate
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var results = await repository.CreateManyIfNotExists([
+                    new(
+                        UserId: user.Id,
+                        PublicationId: publication.Id,
+                        Role: oldSystemPublicationRoleToCreate,
+                        CreatedById: createdBy.Id
+                    ),
+                ]);
+
+                // Should be the OLD `Allower` role which has been created that is returned
+                var result = Assert.Single(results);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(oldSystemPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should be 2 as the 'Approver` role should be untouched,
+                // and the `Owner` role has been created.
+                Assert.Equal(2, userPublicationRoles.Count);
+
+                var createdOldPublicationRole = Assert.Single(
+                    userPublicationRoles,
+                    upr => upr.Role == oldSystemPublicationRoleToCreate
+                );
+
+                Assert.NotEqual(Guid.Empty, createdOldPublicationRole.Id);
+                Assert.Equal(user.Id, createdOldPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdOldPublicationRole.PublicationId);
+                Assert.Equal(oldSystemPublicationRoleToCreate, createdOldPublicationRole.Role);
+                createdOldPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdOldPublicationRole.CreatedById);
+                Assert.Null(createdOldPublicationRole.EmailSent);
+
+                var existingNewPublicationRole = Assert.Single(
+                    userPublicationRoles,
+                    upr => upr.Role == newSystemPublicationRoleToRemain && upr.Id == existingPublicationRole.Id
+                );
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Fact]
+        public async Task OldRole_NewPermissionsSystemPublicationRolesToRemoveAndCreate()
+        {
+            var oldSystemPublicationRoleToCreate = PublicationRole.Allower;
+            var newSystemPublicationRoleToCreate = PublicationRole.Approver;
+            var newSystemPublicationRoleToRemove = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(newSystemPublicationRoleToRemove);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        CollectionUtils.SetOf(newSystemPublicationRoleToRemove),
+                        oldSystemPublicationRoleToCreate
+                    )
+                )
+                .Returns((newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var results = await repository.CreateManyIfNotExists([
+                    new(
+                        UserId: user.Id,
+                        PublicationId: publication.Id,
+                        Role: oldSystemPublicationRoleToCreate,
+                        CreatedById: createdBy.Id
+                    ),
+                ]);
+
+                // Should be the OLD `Owner` role which has been created that is returned
+                var result = Assert.Single(results);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(oldSystemPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should be 2 as the 'Drafter` role has been removed and replaced with the `Approver` role,
+                // and the `Owner` role has been created.
+                Assert.Equal(2, userPublicationRoles.Count);
+
+                var createdOldPublicationRole = Assert.Single(
+                    userPublicationRoles,
+                    upr => upr.Role == oldSystemPublicationRoleToCreate
+                );
+
+                Assert.NotEqual(Guid.Empty, createdOldPublicationRole.Id);
+                Assert.Equal(user.Id, createdOldPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdOldPublicationRole.PublicationId);
+                Assert.Equal(oldSystemPublicationRoleToCreate, createdOldPublicationRole.Role);
+                createdOldPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdOldPublicationRole.CreatedById);
+                Assert.Null(createdOldPublicationRole.EmailSent);
+
+                var createdNewPublicationRole = Assert.Single(
+                    userPublicationRoles,
+                    upr => upr.Role == newSystemPublicationRoleToCreate
+                );
+
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newSystemPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Fact]
+        public async Task OldRole_NewPermissionsSystemPublicationRoleToCreate()
+        {
+            var oldSystemPublicationRoleToCreate = PublicationRole.Owner;
+            var newSystemPublicationRoleToCreate = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Users.AddRange(user, createdBy);
-                contentDbContext.Publications.AddRange(publication1, publication2);
-                contentDbContext.UserPublicationRoles.Add(existingUserPublicationRole);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        oldSystemPublicationRoleToCreate
+                    )
+                )
+                .Returns((null, newSystemPublicationRoleToCreate));
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = CreateRepository(contentDbContext);
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
 
-                var result = await repository.CreateManyIfNotExists(allUserPublicationRoles);
+                var results = await repository.CreateManyIfNotExists([
+                    new(
+                        UserId: user.Id,
+                        PublicationId: publication.Id,
+                        Role: oldSystemPublicationRoleToCreate,
+                        CreatedById: createdBy.Id
+                    ),
+                ]);
 
-                // Should only have created 2 new roles, as one already existed
-                Assert.Equal(2, result.Count);
+                // Should be the OLD `Owner` role which has been created that is returned
+                var result = Assert.Single(results);
 
-                Assert.Contains(
-                    result,
-                    upr =>
-                        upr.UserId == user.Id
-                        && upr.PublicationId == publication1.Id
-                        && upr.Role == PublicationRole.Allower
-                        && upr.Created == newRolesCreatedDate
-                        && upr.CreatedById == createdBy.Id
-                        && upr.EmailSent == null
-                );
-
-                Assert.Contains(
-                    result,
-                    upr =>
-                        upr.UserId == user.Id
-                        && upr.PublicationId == publication2.Id
-                        && upr.Role == PublicationRole.Owner
-                        && upr.Created == newRolesCreatedDate
-                        && upr.CreatedById == createdBy.Id
-                        && upr.EmailSent == null
-                );
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(oldSystemPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
 
-                // Should only have created 2 new roles, as one already existed
-                Assert.Equal(3, userPublicationRoles.Count);
+                // Should be 2 as the 'Drafter` role has been created,
+                // and the `Owner` role has been created.
+                Assert.Equal(2, userPublicationRoles.Count);
 
-                // Existing role should be unchanged
-                Assert.Contains(
+                var createdOldPublicationRole = Assert.Single(
                     userPublicationRoles,
-                    upr =>
-                        upr.Id == existingUserPublicationRole.Id
-                        && upr.UserId == user.Id
-                        && upr.PublicationId == publication1.Id
-                        && upr.Role == PublicationRole.Owner
-                        && upr.Created == existingRoleCreatedDate
-                        && upr.CreatedById == createdBy.Id
-                        && upr.EmailSent == null
+                    upr => upr.Role == oldSystemPublicationRoleToCreate
                 );
 
-                Assert.Contains(
+                Assert.NotEqual(Guid.Empty, createdOldPublicationRole.Id);
+                Assert.Equal(user.Id, createdOldPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdOldPublicationRole.PublicationId);
+                Assert.Equal(oldSystemPublicationRoleToCreate, createdOldPublicationRole.Role);
+                createdOldPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdOldPublicationRole.CreatedById);
+                Assert.Null(createdOldPublicationRole.EmailSent);
+
+                var createdNewPublicationRole = Assert.Single(
                     userPublicationRoles,
-                    upr =>
-                        upr.UserId == user.Id
-                        && upr.PublicationId == publication1.Id
-                        && upr.Role == PublicationRole.Allower
-                        && upr.Created == newRolesCreatedDate
-                        && upr.CreatedById == createdBy.Id
-                        && upr.EmailSent == null
+                    upr => upr.Role == newSystemPublicationRoleToCreate
                 );
 
-                Assert.Contains(
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newSystemPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Fact]
+        public async Task NewRole_NoNewPermissionsSystemPublicationRoleChanges()
+        {
+            var newSystemPublicationRoleToCreate = PublicationRole.Drafter;
+            var newSystemPublicationRoleToRemain = PublicationRole.Approver;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(newSystemPublicationRoleToRemain);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        CollectionUtils.SetOf(newSystemPublicationRoleToRemain),
+                        newSystemPublicationRoleToCreate
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var results = await repository.CreateManyIfNotExists([
+                    new(
+                        UserId: user.Id,
+                        PublicationId: publication.Id,
+                        Role: newSystemPublicationRoleToCreate,
+                        CreatedById: createdBy.Id
+                    ),
+                ]);
+
+                // Should not return anything, as no OLD should be created,
+                // AND no NEW role should be created.
+                Assert.Empty(results);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should only be the 'Approver` role which remains,
+                // and the `Drafter` role should NOT be created (i.e. NO changes).
+                Assert.Single(
                     userPublicationRoles,
-                    upr =>
-                        upr.UserId == user.Id
-                        && upr.PublicationId == publication2.Id
-                        && upr.Role == PublicationRole.Owner
-                        && upr.Created == newRolesCreatedDate
-                        && upr.CreatedById == createdBy.Id
-                        && upr.EmailSent == null
+                    upr => upr.Role == newSystemPublicationRoleToRemain && upr.Id == existingPublicationRole.Id
                 );
             }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Fact]
+        public async Task NewRole_NewPermissionsSystemPublicationRolesToRemoveAndCreate()
+        {
+            var newSystemPublicationRoleToCreate = PublicationRole.Approver;
+            var newSystemPublicationRoleToRemove = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole existingPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(newSystemPublicationRoleToRemove);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        CollectionUtils.SetOf(newSystemPublicationRoleToRemove),
+                        newSystemPublicationRoleToCreate
+                    )
+                )
+                .Returns((newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var results = await repository.CreateManyIfNotExists([
+                    new(
+                        UserId: user.Id,
+                        PublicationId: publication.Id,
+                        Role: newSystemPublicationRoleToCreate,
+                        CreatedById: createdBy.Id
+                    ),
+                ]);
+
+                var result = Assert.Single(results);
+
+                // Should be the NEW `Approver` role which has been created that is returned
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(newSystemPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should only be the 'Approver` role that exists, as the `Drafter` role should be removed,
+                // and the `Approver` should be created.
+                var createdNewPublicationRole = Assert.Single(userPublicationRoles);
+
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newSystemPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Fact]
+        public async Task NewRole_NewPermissionsSystemPublicationRoleToCreate()
+        {
+            var newSystemPublicationRoleToCreate = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.AddRange(user, createdBy);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        new HashSet<PublicationRole>(),
+                        newSystemPublicationRoleToCreate
+                    )
+                )
+                .Returns((null, newSystemPublicationRoleToCreate));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+
+                var results = await repository.CreateManyIfNotExists([
+                    new(
+                        UserId: user.Id,
+                        PublicationId: publication.Id,
+                        Role: newSystemPublicationRoleToCreate,
+                        CreatedById: createdBy.Id
+                    ),
+                ]);
+
+                // Should be the NEW `Drafter` role which has been created that is returned
+                var result = Assert.Single(results);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(user.Id, result.UserId);
+                Assert.Equal(publication.Id, result.PublicationId);
+                Assert.Equal(newSystemPublicationRoleToCreate, result.Role);
+                result.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should only be the 'Drafter` role which has been created.
+                // No other role should exist.
+                Assert.Single(userPublicationRoles);
+
+                var createdNewPublicationRole = Assert.Single(
+                    userPublicationRoles,
+                    upr => upr.Role == newSystemPublicationRoleToCreate
+                );
+
+                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
+                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
+                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
+                Assert.Equal(newSystemPublicationRoleToCreate, createdNewPublicationRole.Role);
+                createdNewPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
+                Assert.Null(createdNewPublicationRole.EmailSent);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        // Checking all types of user ensures that we are correctly considering roles for any user state
+        // (e.g. active, pending invite, expired invite, soft deleted)
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task OnlyRolesForSpecifiedUserAndPublicationAreCheckedWhenDeterminingChanges(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            const PublicationRole publicationRoleToCreate = PublicationRole.Owner;
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            // Checking both NEW and OLD permissions system roles ensures we are correctly considering both types when determining changes
+            var existingPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .ForIndex(0, s => s.SetUser(user).SetPublication(publication).SetRole(PublicationRole.Allower)) // OLD system role
+                .ForIndex(1, s => s.SetUser(user).SetPublication(publication).SetRole(PublicationRole.Approver)) // NEW system role
+                // Should not be considered when determining changes, as different user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(publication).SetRole(PublicationRole.Owner)
+                ) // different OLD system role
+                // Should not be considered when determining changes, as different publication
+                .ForIndex(
+                    3,
+                    s => s.SetUser(user).SetPublication(_fixture.DefaultPublication()).SetRole(PublicationRole.Drafter)
+                ) // different NEW system role
+                .GenerateList(4);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(existingPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleCreation(
+                        // Checking correct set of roles were considered
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
+                        publicationRoleToCreate
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object
+                );
+
+                await repository.CreateManyIfNotExists([
+                    new(
+                        UserId: user.Id,
+                        PublicationId: publication.Id,
+                        Role: publicationRoleToCreate,
+                        CreatedById: createdBy.Id
+                    ),
+                ]);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
         }
     }
 
@@ -1297,10 +2362,10 @@ public abstract class UserPublicationRoleRepositoryTests
         }
     }
 
-    public class RemoveTests : UserPublicationRoleRepositoryTests
+    public class RemoveByIdTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task OldRole_NoNewPermissionsSystemPublicationRoleToRemove()
+        public async Task OldRole_NoNewPermissionsSystemPublicationRoleChanges()
         {
             var oldPublicationRoleToRemove = PublicationRole.Owner;
 
@@ -1316,25 +2381,39 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithRole(PublicationRole.Allower)
                 .WithUser(user)
                 .WithPublication(publication);
+            var userReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
+                )
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Approver))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.UserPublicationRoles.AddRange(oldSystemUserPublicationRole, otherUserPublicationRole);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemRoleToRemove(
-                        CollectionUtils.SetOf(oldPublicationRoleToRemove, otherUserPublicationRole.Role),
-                        new HashSet<ReleaseRole>(),
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { oldPublicationRoleToRemove, otherUserPublicationRole.Role })
+                        ),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
                         oldPublicationRoleToRemove
                     )
                 )
-                .Returns((PublicationRole?)null);
+                .Returns((null, null));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1343,11 +2422,7 @@ public abstract class UserPublicationRoleRepositoryTests
                     newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object
                 );
 
-                var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles.SingleAsync(upr =>
-                    upr.Id == oldSystemUserPublicationRole.Id
-                );
-
-                await repository.Remove(userPublicationRoleToRemove);
+                await repository.RemoveById(oldSystemUserPublicationRole.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1366,6 +2441,121 @@ public abstract class UserPublicationRoleRepositoryTests
             }
 
             MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Fact]
+        public async Task OldRole_NewPermissionsSystemPublicationRoleToRemoveAndCreate()
+        {
+            User deletedUserPlaceholder = _fixture.DefaultDeletedUserPlaceholder().WithId(Guid.NewGuid());
+
+            var oldPublicationRoleToRemove = PublicationRole.Allower;
+            var newPublicationRoleToRemove = PublicationRole.Approver;
+
+            User user = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole oldSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(oldPublicationRoleToRemove)
+                .WithUser(user)
+                .WithPublication(publication);
+            UserPublicationRole newSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(newPublicationRoleToRemove)
+                .WithUser(user)
+                .WithPublication(publication);
+            UserPublicationRole otherUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(PublicationRole.Owner)
+                .WithUser(user)
+                .WithPublication(publication);
+            var userReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
+                )
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Approver))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(
+                    oldSystemUserPublicationRole,
+                    newSystemUserPublicationRole,
+                    otherUserPublicationRole
+                );
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[]
+                                {
+                                    oldPublicationRoleToRemove,
+                                    newPublicationRoleToRemove,
+                                    otherUserPublicationRole.Role,
+                                }
+                            )
+                        ),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
+                        oldPublicationRoleToRemove
+                    )
+                )
+                .Returns((newPublicationRoleToRemove, PublicationRole.Drafter));
+
+            var userRepositoryMock = new Mock<IUserRepository>(MockBehavior.Strict);
+            userRepositoryMock
+                .Setup(m => m.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(deletedUserPlaceholder);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userRepository: userRepositoryMock.Object
+                );
+
+                await repository.RemoveById(oldSystemUserPublicationRole.Id);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var updatedPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // The existing 'Allower' & 'Approver' roles should have been deleted, but the other 'Owner' role should remain,
+                // and the 'Approve' role should have been DOWNGRADED to a new 'Drafter' role. So there should be 2 remaining roles.
+                Assert.Equal(2, updatedPublicationRoles.Count);
+
+                Assert.Contains(updatedPublicationRoles, upr => upr.Role == otherUserPublicationRole.Role);
+
+                // The new Drafter role should have been created with the correct values.
+                var newlyCreatedDrafterRole = Assert.Single(
+                    updatedPublicationRoles,
+                    upr => upr.Role == PublicationRole.Drafter
+                );
+                Assert.Equal(user.Id, newlyCreatedDrafterRole.UserId);
+                Assert.Equal(publication.Id, newlyCreatedDrafterRole.PublicationId);
+                Assert.Equal(deletedUserPlaceholder.Id, newlyCreatedDrafterRole.CreatedById);
+                newlyCreatedDrafterRole.Created.AssertUtcNow();
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userRepositoryMock);
         }
 
         [Fact]
@@ -1391,6 +2581,15 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithRole(PublicationRole.Allower)
                 .WithUser(user)
                 .WithPublication(publication);
+            var userReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
+                )
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Approver))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1401,23 +2600,31 @@ public abstract class UserPublicationRoleRepositoryTests
                     newSystemUserPublicationRole,
                     otherUserPublicationRole
                 );
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemRoleToRemove(
-                        CollectionUtils.SetOf(
-                            oldPublicationRoleToRemove,
-                            newPublicationRoleToRemove,
-                            otherUserPublicationRole.Role
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[]
+                                {
+                                    oldPublicationRoleToRemove,
+                                    newPublicationRoleToRemove,
+                                    otherUserPublicationRole.Role,
+                                }
+                            )
                         ),
-                        new HashSet<ReleaseRole>(),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
                         oldPublicationRoleToRemove
                     )
                 )
-                .Returns(newPublicationRoleToRemove);
+                .Returns((newPublicationRoleToRemove, null));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1426,11 +2633,7 @@ public abstract class UserPublicationRoleRepositoryTests
                     newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object
                 );
 
-                var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles.SingleAsync(upr =>
-                    upr.Id == oldSystemUserPublicationRole.Id
-                );
-
-                await repository.Remove(userPublicationRoleToRemove);
+                await repository.RemoveById(oldSystemUserPublicationRole.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1454,7 +2657,7 @@ public abstract class UserPublicationRoleRepositoryTests
         [Theory]
         [InlineData(PublicationRole.Drafter)]
         [InlineData(PublicationRole.Approver)]
-        public async Task NewRole(PublicationRole newPublicationRoleToRemove)
+        public async Task NewRole_Throws(PublicationRole newPublicationRoleToRemove)
         {
             UserPublicationRole newSystemUserPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -1474,7 +2677,516 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext: contentDbContext);
 
-                await repository.Remove(newSystemUserPublicationRole);
+                await Assert.ThrowsAsync<ArgumentException>(async () =>
+                    await repository.RemoveById(newSystemUserPublicationRole.Id)
+                );
+            }
+        }
+
+        // Checking all types of user ensures that we are correctly considering roles for any user state
+        // (e.g. active, pending invite, expired invite, soft deleted)
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task OnlyRolesForSpecifiedUserAndPublicationAreCheckedWhenDeterminingChanges(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            var oldPublicationRoleToRemove = PublicationRole.Owner;
+
+            var user = userFactory(_fixture);
+            Publication publication = _fixture.DefaultPublication();
+            ReleaseVersion releaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
+            ReleaseVersion releaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
+            // Checking both NEW and OLD permissions system roles ensures we are correctly considering both types when determining changes
+            var existingPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .ForIndex(0, s => s.SetUser(user).SetPublication(publication).SetRole(oldPublicationRoleToRemove)) // OLD system role
+                .ForIndex(1, s => s.SetUser(user).SetPublication(publication).SetRole(PublicationRole.Approver)) // NEW system role
+                // Should not be considered when determining changes, as different user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(publication).SetRole(PublicationRole.Allower)
+                ) // different OLD system role
+                // Should not be considered when determining changes, as different publication
+                .ForIndex(
+                    3,
+                    s => s.SetUser(user).SetPublication(_fixture.DefaultPublication()).SetRole(PublicationRole.Drafter)
+                ) // different NEW system role
+                .GenerateList(4);
+            var existingReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .ForIndex(
+                    0,
+                    s => s.SetUser(user).SetReleaseVersion(releaseVersion1).SetRole(ReleaseRole.PrereleaseViewer)
+                )
+                // Different release version, but same publication - so should still be considered
+                .ForIndex(1, s => s.SetUser(user).SetReleaseVersion(releaseVersion2).SetRole(ReleaseRole.Approver))
+                // Should not be considered when determining changes, as different user
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_fixture.DefaultUser())
+                            .SetReleaseVersion(releaseVersion1)
+                            .SetRole(ReleaseRole.Contributor)
+                )
+                // Should not be considered when determining changes, as different publication
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(user)
+                            .SetReleaseVersion(
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication())
+                                    )
+                            )
+                            .SetRole(ReleaseRole.Contributor)
+                )
+                .GenerateList(4);
+
+            var userPublicationRoleToRemove = existingPublicationRoles[0];
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(existingPublicationRoles);
+                contentDbContext.UserReleaseRoles.AddRange(existingReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        // Checking correct set of roles were considered
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Approver })
+                        ),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
+                        oldPublicationRoleToRemove
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object
+                );
+
+                await repository.RemoveById(userPublicationRoleToRemove.Id);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+    }
+
+    public class RemoveManyTests : UserPublicationRoleRepositoryTests
+    {
+        [Fact]
+        public async Task ManyRoles_CreatesExpectedOldAndNewPermissionsSystemRoles_WhenSingleNewPermissionsSystemRoleDowngradeRequired()
+        {
+            // Test across multiple User/Publication combinations
+            User user1 = _fixture.DefaultUser();
+            User user2 = _fixture.DefaultUser();
+            Publication publication1 = _fixture.DefaultPublication();
+            Publication publication2 = _fixture.DefaultPublication();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // One 'Owner' role for each User/Publication combination.
+                // We exoect these to be removed.
+                .ForIndex(0, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Owner))
+                .ForIndex(1, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Owner))
+                .ForIndex(2, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Owner))
+                .ForIndex(3, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Owner))
+                // One 'Drafter' role for each User/Publication combination.
+                // We expect these to be removed too.
+                .ForIndex(4, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Drafter))
+                .ForIndex(5, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Drafter))
+                .ForIndex(6, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Drafter))
+                .ForIndex(7, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Drafter))
+                // Adding an additional role that should be left untouched by the removals
+                .ForIndex(8, s => s.SetUser(_fixture.DefaultUser()).SetPublication(_fixture.DefaultPublication()))
+                .GenerateList(9);
+
+            var userPublicationRoleIdsToRemove = userPublicationRoles[..4].Select(upr => upr.Id).ToHashSet();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelper = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Drafter })
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .Returns((PublicationRole.Drafter, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelper.Object);
+
+                await repository.RemoveMany(userPublicationRoleIdsToRemove);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelper);
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Drafter })
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Owner
+                    ),
+                Times.Exactly(4)
+            );
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingUserPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should have removed ALL roles except 1
+                var remainingUserPublicationRole = Assert.Single(remainingUserPublicationRoles);
+                Assert.Equal(userPublicationRoles[8].Id, remainingUserPublicationRole.Id);
+                Assert.Equal(userPublicationRoles[8].Role, remainingUserPublicationRole.Role);
+            }
+        }
+
+        [Fact]
+        public async Task ManyRoles_RemovesAndCreatesExpectedOldAndNewPermissionsSystemRoles_WhenMultipleNewPermissionsSystemRoleDowngradesRequired()
+        {
+            User deletedUserPlaceholder = _fixture.DefaultDeletedUserPlaceholder();
+
+            // Test across multiple User/Publication combinations
+            User user1 = _fixture.DefaultUser();
+            User user2 = _fixture.DefaultUser();
+            User user3 = _fixture.DefaultUser();
+            User user4 = _fixture.DefaultUser();
+            Publication publication1 = _fixture.DefaultPublication();
+            Publication publication2 = _fixture.DefaultPublication();
+            Publication publication3 = _fixture.DefaultPublication();
+            Publication publication4 = _fixture.DefaultPublication();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // One 'Owner' role for each User/Publication combination (Users 1/2 & Publications 1/2).
+                // We would normally expect the equivalent NEW permissions system 'Drafter' role to be removed each of these,
+                // but it's the more powerful role 'Approver' that exists. So removing 'Owner' alone won't remove this
+                .ForIndex(0, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Owner))
+                .ForIndex(1, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Owner))
+                .ForIndex(2, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Owner))
+                .ForIndex(3, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Owner))
+                // One 'Allower' role for each User/Publication combination (Users 1/2 & Publications 1/2).
+                // We expect removing these will cause the 'Approver' role to be removed too.
+                .ForIndex(4, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Allower))
+                .ForIndex(5, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Allower))
+                .ForIndex(6, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Allower))
+                .ForIndex(7, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Allower))
+                // One 'Approver' role for each User/Publication combination (Users 1/2 & Publications 1/2).
+                .ForIndex(8, s => s.SetUser(user1).SetPublication(publication1).SetRole(PublicationRole.Approver))
+                .ForIndex(9, s => s.SetUser(user1).SetPublication(publication2).SetRole(PublicationRole.Approver))
+                .ForIndex(10, s => s.SetUser(user2).SetPublication(publication1).SetRole(PublicationRole.Approver))
+                .ForIndex(11, s => s.SetUser(user2).SetPublication(publication2).SetRole(PublicationRole.Approver))
+                // Here, we switch the order of the 'Owner' and 'Allower' roles, to check that the removal order of these
+                // doesn't affect the outcome. In this case, the 'Owner' role is removed AFTER the 'Allower' role, so
+                // we expect the 'Approver' role to be removed first, and DOWNGRADED to a 'Drafter' role. Then, once
+                // the 'Owner' role is removed we expect the 'Drafter` role to removed.
+                // One 'Allower' role for each User/Publication combination (Users 3/4 & Publications 3/4).
+                .ForIndex(12, s => s.SetUser(user3).SetPublication(publication3).SetRole(PublicationRole.Allower))
+                .ForIndex(13, s => s.SetUser(user3).SetPublication(publication4).SetRole(PublicationRole.Allower))
+                .ForIndex(14, s => s.SetUser(user4).SetPublication(publication3).SetRole(PublicationRole.Allower))
+                .ForIndex(15, s => s.SetUser(user4).SetPublication(publication4).SetRole(PublicationRole.Allower))
+                // One 'Owner' role for each User/Publication combination (Users 3/4 & Publications 3/4).
+                .ForIndex(16, s => s.SetUser(user3).SetPublication(publication3).SetRole(PublicationRole.Owner))
+                .ForIndex(17, s => s.SetUser(user3).SetPublication(publication4).SetRole(PublicationRole.Owner))
+                .ForIndex(18, s => s.SetUser(user4).SetPublication(publication3).SetRole(PublicationRole.Owner))
+                .ForIndex(19, s => s.SetUser(user4).SetPublication(publication4).SetRole(PublicationRole.Owner))
+                // One 'Approver' role for each User/Publication combination (Users 3/4 & Publications 3/4).
+                .ForIndex(20, s => s.SetUser(user3).SetPublication(publication3).SetRole(PublicationRole.Approver))
+                .ForIndex(21, s => s.SetUser(user3).SetPublication(publication4).SetRole(PublicationRole.Approver))
+                .ForIndex(22, s => s.SetUser(user4).SetPublication(publication3).SetRole(PublicationRole.Approver))
+                .ForIndex(23, s => s.SetUser(user4).SetPublication(publication4).SetRole(PublicationRole.Approver))
+                // Adding an additional role that should be left untouched by the removals
+                .ForIndex(24, s => s.SetUser(_fixture.DefaultUser()).SetPublication(_fixture.DefaultPublication()))
+                .GenerateList(25);
+
+            // Try removing the 'Owner' and THEN the 'Allower' roles for the User 1/2 & Publication 1/2 pairs.
+            // Also try removing the 'Allower' and THEN the 'Owner' roles for the User 3/4 & Publication 3/4 pairs,
+            // to check that the order of removal doesn't affect the expected outcome.
+            var userPublicationRoleIdsToRemove = userPublicationRoles[..8]
+                .Concat(userPublicationRoles[12..20])
+                .Select(upr => upr.Id)
+                .ToHashSet();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            userRepository
+                .Setup(m => m.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(deletedUserPlaceholder);
+
+            var newPermissionsSystemHelper = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            // This is the call that's expected for the first 'Owner' role being removed for User 1/2 & Publication 1/2 pairs.
+            // This should return that no NEW system roles need removing or creating. The 'Approver' role is more powerful
+            // than the 'Drafter' role, so doesn't need to be removed or downgraded.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[] { PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver }
+                            )
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .Returns((null, null));
+            // This is the call that's expected for the second 'Allower' role being removed for User 1/2 & Publication 1/2 pairs.
+            // This should return that the 'Approver' role needs to be deleted.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Allower
+                    )
+                )
+                .Returns((PublicationRole.Approver, null));
+            // This is the call that's expected for the first 'Allower' role being removed for User 3/4 & Publication 3/4 pairs.
+            // This should return that a 'Approver' role needs to be removed, and DOWNGRADED to 'Drafter'.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[] { PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver }
+                            )
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Allower
+                    )
+                )
+                .Returns((PublicationRole.Approver, PublicationRole.Drafter));
+            // This is the call that's expected for the second 'Owner' role being removed for User 3/4 & Publication 3/4 pairs.
+            // This should return that the 'Drafter' role needs to be removed.
+            // The 'Approver' role has already been removed, so doesn't need to be removed or downgraded.
+            newPermissionsSystemHelper
+                .Setup(m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Drafter })
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .Returns((PublicationRole.Drafter, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelper.Object,
+                    userRepository: userRepository.Object
+                );
+
+                await repository.RemoveMany(userPublicationRoleIdsToRemove);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelper, userRepository);
+
+            userRepository.Verify(m => m.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()), Times.Exactly(4));
+
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[] { PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver }
+                            )
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Owner
+                    ),
+                Times.Exactly(4)
+            );
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Allower, PublicationRole.Approver })
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Allower
+                    ),
+                Times.Exactly(4)
+            );
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[] { PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver }
+                            )
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Allower
+                    ),
+                Times.Exactly(4)
+            );
+            newPermissionsSystemHelper.Verify(
+                m =>
+                    m.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Drafter })
+                        ),
+                        new HashSet<ReleaseRole>(),
+                        PublicationRole.Owner
+                    ),
+                Times.Exactly(4)
+            );
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingUserPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // Should have removed ALL roles except 1
+                var remainingUserPublicationRole = Assert.Single(remainingUserPublicationRoles);
+                Assert.Equal(userPublicationRoles[24].Id, remainingUserPublicationRole.Id);
+                Assert.Equal(userPublicationRoles[24].Role, remainingUserPublicationRole.Role);
+            }
+        }
+
+        [Fact]
+        public async Task EmptyList_DoesNothing()
+        {
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(_fixture.DefaultUser())
+                .WithPublication(_fixture.DefaultPublication())
+                .WithRole(PublicationRole.Allower);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                await repository.RemoveMany([]);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var remainingUserPublicationRole = await contentDbContext.UserPublicationRoles.SingleAsync();
+
+                // Existing role should remain. Nothing should have happened.
+                Assert.Equal(remainingUserPublicationRole.Id, userPublicationRole.Id);
+            }
+        }
+
+        [Fact]
+        public async Task OldRole_NoNewPermissionsSystemPublicationRoleChanges()
+        {
+            var oldPublicationRoleToRemove = PublicationRole.Owner;
+
+            User user = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole oldSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(oldPublicationRoleToRemove)
+                .WithUser(user)
+                .WithPublication(publication);
+            UserPublicationRole otherUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(PublicationRole.Allower)
+                .WithUser(user)
+                .WithPublication(publication);
+            var userReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
+                )
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Approver))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(oldSystemUserPublicationRole, otherUserPublicationRole);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { oldPublicationRoleToRemove, otherUserPublicationRole.Role })
+                        ),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
+                        oldPublicationRoleToRemove
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object
+                );
+
+                var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles.SingleAsync(upr =>
+                    upr.Id == oldSystemUserPublicationRole.Id
+                );
+
+                await repository.RemoveMany([userPublicationRoleToRemove.Id]);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1486,8 +3198,260 @@ public abstract class UserPublicationRoleRepositoryTests
                     .UserPublicationRoles.IgnoreQueryFilters()
                     .ToListAsync();
 
-                // The existing new role should have been deleted
-                Assert.Empty(updatedPublicationRoles);
+                // The existing 'Owner' role should have been deleted, but the other role should remain
+                var remainingUserPublicationRole = Assert.Single(updatedPublicationRoles);
+                Assert.Equal(otherUserPublicationRole.Role, remainingUserPublicationRole.Role);
+                Assert.Equal(otherUserPublicationRole.Id, remainingUserPublicationRole.Id);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Fact]
+        public async Task OldRole_NewPermissionsSystemPublicationRoleToRemoveAndCreate()
+        {
+            User deletedUserPlaceholder = _fixture.DefaultDeletedUserPlaceholder();
+
+            var oldPublicationRoleToRemove = PublicationRole.Allower;
+            var newPublicationRoleToRemove = PublicationRole.Approver;
+
+            User user = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole oldSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(oldPublicationRoleToRemove)
+                .WithUser(user)
+                .WithPublication(publication);
+            UserPublicationRole newSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(newPublicationRoleToRemove)
+                .WithUser(user)
+                .WithPublication(publication);
+            UserPublicationRole otherUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(PublicationRole.Owner)
+                .WithUser(user)
+                .WithPublication(publication);
+            var userReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
+                )
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Approver))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(
+                    oldSystemUserPublicationRole,
+                    newSystemUserPublicationRole,
+                    otherUserPublicationRole
+                );
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[]
+                                {
+                                    oldPublicationRoleToRemove,
+                                    newPublicationRoleToRemove,
+                                    otherUserPublicationRole.Role,
+                                }
+                            )
+                        ),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
+                        oldPublicationRoleToRemove
+                    )
+                )
+                .Returns((newPublicationRoleToRemove, PublicationRole.Drafter));
+
+            var userRepositoryMock = new Mock<IUserRepository>(MockBehavior.Strict);
+            userRepositoryMock
+                .Setup(m => m.FindDeletedUserPlaceholder(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(deletedUserPlaceholder);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userRepository: userRepositoryMock.Object
+                );
+
+                var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles.SingleAsync(upr =>
+                    upr.Id == oldSystemUserPublicationRole.Id
+                );
+
+                await repository.RemoveMany([userPublicationRoleToRemove.Id]);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var updatedPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // The existing 'Allower' & 'Approver' roles should have been deleted, but the other 'Owner' role should remain,
+                // and the 'Approve' role should have been DOWNGRADED to a new 'Drafter' role. So there should be 2 remaining roles.
+                Assert.Equal(2, updatedPublicationRoles.Count);
+
+                Assert.Contains(updatedPublicationRoles, upr => upr.Role == otherUserPublicationRole.Role);
+
+                // The new Drafter role should have been created with the correct values.
+                var newlyCreatedDrafterRole = Assert.Single(
+                    updatedPublicationRoles,
+                    upr => upr.Role == PublicationRole.Drafter
+                );
+                Assert.Equal(user.Id, newlyCreatedDrafterRole.UserId);
+                Assert.Equal(publication.Id, newlyCreatedDrafterRole.PublicationId);
+                Assert.Equal(deletedUserPlaceholder.Id, newlyCreatedDrafterRole.CreatedById);
+                newlyCreatedDrafterRole.Created.AssertUtcNow();
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userRepositoryMock);
+        }
+
+        [Fact]
+        public async Task OldRole_NewPermissionsSystemPublicationRoleToRemove()
+        {
+            var oldPublicationRoleToRemove = PublicationRole.Owner;
+            var newPublicationRoleToRemove = PublicationRole.Drafter;
+
+            User user = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            UserPublicationRole oldSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(oldPublicationRoleToRemove)
+                .WithUser(user)
+                .WithPublication(publication);
+            UserPublicationRole newSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(newPublicationRoleToRemove)
+                .WithUser(user)
+                .WithPublication(publication);
+            UserPublicationRole otherUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(PublicationRole.Allower)
+                .WithUser(user)
+                .WithPublication(publication);
+            var userReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
+                )
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Approver))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(
+                    oldSystemUserPublicationRole,
+                    newSystemUserPublicationRole,
+                    otherUserPublicationRole
+                );
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(
+                                new[]
+                                {
+                                    oldPublicationRoleToRemove,
+                                    newPublicationRoleToRemove,
+                                    otherUserPublicationRole.Role,
+                                }
+                            )
+                        ),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
+                        oldPublicationRoleToRemove
+                    )
+                )
+                .Returns((newPublicationRoleToRemove, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object
+                );
+
+                var userPublicationRoleToRemove = await contentDbContext.UserPublicationRoles.SingleAsync(upr =>
+                    upr.Id == oldSystemUserPublicationRole.Id
+                );
+
+                await repository.RemoveMany([userPublicationRoleToRemove.Id]);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Checking ALL UserPublicationRoles, which includes the NEW and OLD permissions system
+                // publication roles. The 'IgnoreQueryFilters' will likely be removed in EES-6196
+                // once we stop using the OLD roles.
+                var updatedPublicationRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .ToListAsync();
+
+                // The existing 'Owner' & 'Drafter' roles should have been deleted, but the other role should remain
+                var remainingUserPublicationRole = Assert.Single(updatedPublicationRoles);
+                Assert.Equal(otherUserPublicationRole.Role, remainingUserPublicationRole.Role);
+                Assert.Equal(otherUserPublicationRole.Id, remainingUserPublicationRole.Id);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Drafter)]
+        [InlineData(PublicationRole.Approver)]
+        public async Task NewRole_Throws(PublicationRole newPublicationRoleToRemove)
+        {
+            UserPublicationRole newSystemUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithRole(newPublicationRoleToRemove)
+                .WithUser(_fixture.DefaultUser())
+                .WithPublication(_fixture.DefaultPublication());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(newSystemUserPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext: contentDbContext);
+
+                await Assert.ThrowsAsync<ArgumentException>(async () =>
+                    await repository.RemoveMany([newSystemUserPublicationRole.Id])
+                );
             }
         }
 
@@ -1569,14 +3533,18 @@ public abstract class UserPublicationRoleRepositoryTests
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
-                    rvr.DetermineNewPermissionsSystemRoleToRemove(
+                    rvr.DetermineNewPermissionsSystemChangesForRoleRemoval(
                         // Checking correct set of roles were considered
-                        CollectionUtils.SetOf(PublicationRole.Owner, PublicationRole.Approver),
-                        CollectionUtils.SetOf(ReleaseRole.PrereleaseViewer, ReleaseRole.Approver),
+                        It.Is<HashSet<PublicationRole>>(roles =>
+                            roles.SetEquals(new[] { PublicationRole.Owner, PublicationRole.Approver })
+                        ),
+                        It.Is<HashSet<ReleaseRole>>(roles =>
+                            roles.SetEquals(new[] { ReleaseRole.Approver, ReleaseRole.PrereleaseViewer })
+                        ),
                         oldPublicationRoleToRemove
                     )
                 )
-                .Returns((PublicationRole?)null);
+                .Returns((null, null));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1589,67 +3557,10 @@ public abstract class UserPublicationRoleRepositoryTests
                     upr.Role == oldPublicationRoleToRemove
                 );
 
-                await repository.Remove(userPublicationRoleToRemove);
+                await repository.RemoveMany([userPublicationRoleToRemove.Id]);
             }
 
             MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock);
-        }
-    }
-
-    public class RemoveManyTests : UserPublicationRoleRepositoryTests
-    {
-        [Fact]
-        public async Task Success()
-        {
-            User user1 = _fixture.DefaultUser().WithEmail("test1@test.com");
-            Publication publication1 = _fixture.DefaultPublication();
-            UserPublicationRole userPublicationRole1 = _fixture
-                .DefaultUserPublicationRole()
-                .WithUser(user1)
-                .WithPublication(publication1)
-                .WithRole(PublicationRole.Allower);
-
-            User user2 = _fixture.DefaultUser().WithEmail("test2@test.com");
-            Publication publication2 = _fixture.DefaultPublication();
-            UserPublicationRole userPublicationRole2 = _fixture
-                .DefaultUserPublicationRole()
-                .WithUser(user2)
-                .WithPublication(publication2)
-                .WithRole(PublicationRole.Owner);
-
-            User user3 = _fixture.DefaultUser().WithEmail("test3@test.com");
-            Publication publication3 = _fixture.DefaultPublication();
-            UserPublicationRole userPublicationRole3 = _fixture
-                .DefaultUserPublicationRole()
-                .WithUser(user3)
-                .WithPublication(publication3)
-                .WithRole(PublicationRole.Allower);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.UserPublicationRoles.AddRange(
-                    userPublicationRole1,
-                    userPublicationRole2,
-                    userPublicationRole3
-                );
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                await repository.RemoveMany([userPublicationRole1, userPublicationRole2]);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userPublicationRole = await contentDbContext.UserPublicationRoles.SingleAsync();
-
-                Assert.Equal(userPublicationRole3.Id, userPublicationRole.Id);
-            }
         }
     }
 
@@ -3327,7 +5238,8 @@ public abstract class UserPublicationRoleRepositoryTests
 
     private static UserPublicationRoleRepository CreateRepository(
         ContentDbContext? contentDbContext = null,
-        INewPermissionsSystemHelper? newPermissionsSystemHelper = null
+        INewPermissionsSystemHelper? newPermissionsSystemHelper = null,
+        IUserRepository? userRepository = null
     )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
@@ -3336,7 +5248,8 @@ public abstract class UserPublicationRoleRepositoryTests
             contentDbContext: contentDbContext,
             newPermissionsSystemHelper: newPermissionsSystemHelper
                 ?? Mock.Of<INewPermissionsSystemHelper>(MockBehavior.Strict),
-            userReleaseRoleQueryRepository: new UserReleaseRoleQueryRepository(contentDbContext)
+            userReleaseRoleQueryRepository: new UserReleaseRoleQueryRepository(contentDbContext),
+            userRepository: userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict)
         );
     }
 }

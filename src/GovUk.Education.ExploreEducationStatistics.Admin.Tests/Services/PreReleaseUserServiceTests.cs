@@ -1047,17 +1047,14 @@ public abstract class PreReleaseUserServiceTests
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             userReleaseRoleRepository
                 .Setup(m =>
-                    m.GetByCompositeKey(
-                        user.Id,
-                        releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
+                    m.RemoveByCompositeKey(
+                        userReleaseRole.UserId,
+                        userReleaseRole.ReleaseVersionId,
+                        userReleaseRole.Role,
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(userReleaseRole);
-            userReleaseRoleRepository
-                .Setup(m => m.Remove(userReleaseRole, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(true);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1070,6 +1067,58 @@ public abstract class PreReleaseUserServiceTests
                 var result = await service.RemovePreReleaseUser(releaseVersion.Id, user.Email);
 
                 result.AssertRight();
+            }
+
+            VerifyAllMocks(userReleaseRoleRepository, userRepository);
+        }
+
+        [Fact]
+        public async Task RoleRemovalFails_ReturnsNotFound()
+        {
+            User user = _dataFixture.DefaultUser();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion)
+                .WithRole(ReleaseRole.PrereleaseViewer);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            userRepository.Setup(m => m.FindUserByEmail(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository
+                .Setup(m =>
+                    m.RemoveByCompositeKey(
+                        userReleaseRole.UserId,
+                        userReleaseRole.ReleaseVersionId,
+                        userReleaseRole.Role,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(false);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupPreReleaseUserService(
+                    contentDbContext,
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userRepository: userRepository.Object
+                );
+
+                var result = await service.RemovePreReleaseUser(releaseVersion.Id, user.Email);
+
+                result.AssertNotFound();
             }
 
             VerifyAllMocks(userReleaseRoleRepository, userRepository);

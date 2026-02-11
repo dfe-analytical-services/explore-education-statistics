@@ -16,7 +16,7 @@ public interface IUserReleaseRoleRepository
     );
 
     Task<List<UserReleaseRole>> CreateManyIfNotExists(
-        IReadOnlyList<UserReleaseRole> userReleaseRoles,
+        IReadOnlyList<UserReleaseRole> userReleaseRolesToCreate,
         CancellationToken cancellationToken = default
     );
 
@@ -32,9 +32,16 @@ public interface IUserReleaseRoleRepository
     /// <param name="resourceRoleFilter">Filter resource roles by their status (see <see cref="ResourceRoleFilter"/>).</param>
     IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
 
-    Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default);
+    Task<bool> RemoveById(Guid userReleaseRoleId, CancellationToken cancellationToken = default);
 
-    Task RemoveMany(IReadOnlyList<UserReleaseRole> userReleaseRoles, CancellationToken cancellationToken = default);
+    Task<bool> RemoveByCompositeKey(
+        Guid userId,
+        Guid releaseVersionId,
+        ReleaseRole role,
+        CancellationToken cancellationToken = default
+    );
+
+    Task RemoveMany(HashSet<Guid> userReleaseRoleIds, CancellationToken cancellationToken = default);
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 

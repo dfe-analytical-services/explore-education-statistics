@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -17,8 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
-using MockQueryable;
 using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -447,16 +446,18 @@ public abstract class UserManagementServiceTests
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
-                        It.Is<List<UserPublicationRole>>(l =>
+                        It.Is<HashSet<UserPublicationRoleCreateDto>>(l =>
                             l.Count == 1
-                            && l[0].UserId == userToCreate.Id
-                            && l[0].PublicationId == publication.Id
-                            && l[0].Role == publicationRole
-                            && createdDate.HasValue
-                                ? l[0].Created == createdDate
-                                : Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
-                                    <= AssertExtensions.TimeWithinMillis
-                                    && l[0].CreatedById == CreatedById
+                            && l.Any(upr =>
+                                upr.UserId == userToCreate.Id
+                                && upr.PublicationId == publication.Id
+                                && upr.Role == publicationRole
+                                && createdDate.HasValue
+                                    ? upr.CreatedDate == createdDate
+                                    : Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
+                                        <= AssertExtensions.TimeWithinMillis
+                                        && upr.CreatedById == CreatedById
+                            )
                         ),
                         It.IsAny<CancellationToken>()
                     )
@@ -630,17 +631,21 @@ public abstract class UserManagementServiceTests
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
-                        It.Is<List<UserPublicationRole>>(l =>
+                        It.Is<HashSet<UserPublicationRoleCreateDto>>(l =>
                             l.Count == 2
-                            && l.All(r => r.UserId == userToCreate.Id && r.CreatedById == CreatedById)
-                            && l[0].PublicationId == publications[2].Id
-                            && l[0].Role == publicationRole1
-                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
-                                <= AssertExtensions.TimeWithinMillis
-                            && l[1].PublicationId == publications[3].Id
-                            && l[1].Role == publicationRole2
-                            && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
-                                <= AssertExtensions.TimeWithinMillis
+                            && l.All(upr => upr.UserId == userToCreate.Id && upr.CreatedById == CreatedById)
+                            && l.Any(upr =>
+                                upr.PublicationId == publications[2].Id
+                                && upr.Role == publicationRole1
+                                && Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
+                                    <= AssertExtensions.TimeWithinMillis
+                            )
+                            && l.Any(upr =>
+                                upr.PublicationId == publications[3].Id
+                                && upr.Role == publicationRole2
+                                && Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
+                                    <= AssertExtensions.TimeWithinMillis
+                            )
                         ),
                         It.IsAny<CancellationToken>()
                     )

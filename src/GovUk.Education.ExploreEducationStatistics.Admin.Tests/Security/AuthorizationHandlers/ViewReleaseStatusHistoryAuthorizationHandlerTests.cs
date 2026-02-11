@@ -65,6 +65,8 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
 
     private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
         var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
 
         var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(contentDbContext);
@@ -72,14 +74,16 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
         var userPublicationRoleRepository = new UserPublicationRoleRepository(
             contentDbContext: contentDbContext,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+            userRepository: userRepository
         );
 
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext: contentDbContext,
             userPublicationRoleRepository: userPublicationRoleRepository,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+            userRepository: userRepository
         );
 
         return new ViewReleaseStatusHistoryAuthorizationHandler(

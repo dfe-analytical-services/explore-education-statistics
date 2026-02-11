@@ -56,137 +56,197 @@ public class NewPermissionsSystemHelperTests
             { ReleaseRole.Approver, [PublicationRole.Drafter], PublicationRole.Drafter, PublicationRole.Approver },
         };
 
-    // (oldPublicationRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove)
+    // (oldPublicationRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         PublicationRole,
         HashSet<PublicationRole>,
         HashSet<ReleaseRole>,
+        PublicationRole?,
         PublicationRole?
     > PublicationRoleRemovalData =>
         new()
         {
             // Tests for the NEW `Drafter` publication role
-            // old role, role exists, no release role for same publication maps to same role, the NEW publication role does NOT exist => Does NOTHING
+            // no release role for same publication maps to 'Drafter' + the NEW publication role does NOT exist => Does NOTHING
             {
                 PublicationRole.Owner,
                 [PublicationRole.Owner, PublicationRole.Allower],
                 [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver],
+                null,
                 null
             },
-            // old role, role exists, 1 release role for same publication maps to same role, the NEW publication role does NOT exist => Does NOTHING
+            // 1 release role for same publication maps to 'Drafter' + the NEW publication role does NOT exist => Does NOTHING
             {
                 PublicationRole.Owner,
                 [PublicationRole.Owner, PublicationRole.Allower],
                 [ReleaseRole.Contributor],
+                null,
                 null
             },
-            // old role, role exists, no release role for same publication maps to same role, the NEW publication role DOES exist => Deletes NEW role
+            // no release role for same publication maps to 'Drafter' + the NEW publication role DOES exist => Deletes 'Drafter' role
             {
                 PublicationRole.Owner,
                 [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter],
                 [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver],
-                PublicationRole.Drafter
+                PublicationRole.Drafter,
+                null
             },
-            // old role, role exists, 1 release role for same publication maps to same role, the NEW publication role DOES exist => Does NOTHING
+            // 1 release role for same publication maps to 'Drafter' + the NEW publication role DOES exist => Does NOTHING
             {
                 PublicationRole.Owner,
                 [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter],
                 [ReleaseRole.Contributor],
+                null,
                 null
             },
             // Tests for the NEW `Approver` publication role
-            // old role, role exists, no release role for same publication maps to same role, the NEW publication role does NOT exist => Does NOTHING
+            // no release role for same publication maps to 'Approver' + the NEW publication role does NOT exist => Does NOTHING
             {
                 PublicationRole.Allower,
                 [PublicationRole.Allower, PublicationRole.Owner],
                 [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor],
+                null,
                 null
             },
-            // old role, role exists, 1 release role for same publication maps to same role, the NEW publication role does NOT exist => Does NOTHING
+            // 1 release role for same publication maps to 'Approver' + the NEW publication role does NOT exist => Does NOTHING
             {
                 PublicationRole.Allower,
                 [PublicationRole.Allower, PublicationRole.Owner],
                 [ReleaseRole.Approver],
+                null,
                 null
             },
-            // old role, role exists, no release role for same publication maps to same role, the NEW publication role DOES exist => Deletes NEW role
+            // no other role maps to 'Drafter' + no release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Deletes 'Approver' role
+            {
+                PublicationRole.Allower,
+                [PublicationRole.Allower, PublicationRole.Approver],
+                [ReleaseRole.PrereleaseViewer],
+                PublicationRole.Approver,
+                null
+            },
+            // 1 publication role maps to 'Drafter' + no release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
             {
                 PublicationRole.Allower,
                 [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver],
-                [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor],
-                PublicationRole.Approver
+                [ReleaseRole.PrereleaseViewer],
+                PublicationRole.Approver,
+                PublicationRole.Drafter
             },
-            // old role, role exists, 1 release role for same publication maps to same role, the NEW publication role DOES exist => Does NOTHING
+            // 1 release role maps to 'Drafter' + no release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
+            {
+                PublicationRole.Allower,
+                [PublicationRole.Allower, PublicationRole.Approver],
+                [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor],
+                PublicationRole.Approver,
+                PublicationRole.Drafter
+            },
+            // 1 release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Does NOTHING
             {
                 PublicationRole.Allower,
                 [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver],
                 [ReleaseRole.Approver],
+                null,
                 null
             },
         };
 
-    // (releaseRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove)
+    // (releaseRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         ReleaseRole,
         HashSet<PublicationRole>,
         HashSet<ReleaseRole>,
+        PublicationRole?,
         PublicationRole?
-    > ReleaseRoleDeletionData =>
+    > ReleaseRoleRemovalData =>
         new()
         {
             // Tests for the NEW `Drafter` publication role
-            // role exists, no OLD publication role maps to same new role, the NEW publication role does NOT exist => Does NOTHING
+            // no OLD publication role maps to 'Drafter', the NEW publication role does NOT exist => Does NOTHING
             {
                 ReleaseRole.Contributor,
                 [PublicationRole.Allower],
                 [ReleaseRole.Contributor, ReleaseRole.Approver],
+                null,
                 null
             },
-            // role exists, 1 OLD publication role maps to same new role, the NEW publication role does NOT exist => Does NOTHING
+            // 1 OLD publication role maps to 'Drafter', the NEW publication role does NOT exist => Does NOTHING
             {
                 ReleaseRole.Contributor,
                 [PublicationRole.Owner],
                 [ReleaseRole.Contributor, ReleaseRole.Approver],
+                null,
                 null
             },
-            // role exists, no OLD publication role maps to same new role, the NEW publication role DOES exist => Deletes NEW role
+            // no OLD publication role maps to 'Drafter', the NEW publication role DOES exist => Deletes 'Drafter' role
             {
                 ReleaseRole.Contributor,
                 [PublicationRole.Allower, PublicationRole.Drafter],
                 [ReleaseRole.Contributor, ReleaseRole.Approver],
-                PublicationRole.Drafter
+                PublicationRole.Drafter,
+                null
             },
-            // role exists, 1 OLD publication role maps to same new role, the NEW publication role DOES exist => Does NOTHING
+            // 1 OLD publication role maps to 'Drafter', the NEW publication role DOES exist => Does NOTHING
             {
                 ReleaseRole.Contributor,
                 [PublicationRole.Owner, PublicationRole.Drafter],
                 [ReleaseRole.Contributor, ReleaseRole.Approver],
+                null,
                 null
             },
             // Tests for the NEW `Approver` publication role
-            // role exists, no OLD publication role maps to same new role, the NEW publication role does NOT exist => Does NOTHING
-            { ReleaseRole.Approver, [PublicationRole.Owner], [ReleaseRole.Approver, ReleaseRole.Contributor], null },
-            // role exists, 1 OLD publication role maps to same new role, the NEW publication role does NOT exist => Does NOTHING
-            { ReleaseRole.Approver, [PublicationRole.Allower], [ReleaseRole.Approver, ReleaseRole.Contributor], null },
-            // role exists, no OLD publication role maps to same new role, the NEW publication role DOES exist => Deletes NEW role
+            // no OLD publication role maps to 'Approver', the NEW publication role does NOT exist => Does NOTHING
+            {
+                ReleaseRole.Approver,
+                [PublicationRole.Owner],
+                [ReleaseRole.Approver, ReleaseRole.Contributor],
+                null,
+                null
+            },
+            // 1 OLD publication role maps to 'Approver', the NEW publication role does NOT exist => Does NOTHING
+            {
+                ReleaseRole.Approver,
+                [PublicationRole.Allower],
+                [ReleaseRole.Approver, ReleaseRole.Contributor],
+                null,
+                null
+            },
+            // no other role maps to 'Drafter' + no OLD publication role maps to 'Approver', the NEW publication role DOES exist => Deletes 'Approver' role
+            {
+                ReleaseRole.Approver,
+                [PublicationRole.Approver],
+                [ReleaseRole.Approver, ReleaseRole.PrereleaseViewer],
+                PublicationRole.Approver,
+                null
+            },
+            // 1 release role maps to 'Drafter' + no OLD publication role maps to 'Approver', the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
+            {
+                ReleaseRole.Approver,
+                [PublicationRole.Approver],
+                [ReleaseRole.Approver, ReleaseRole.Contributor],
+                PublicationRole.Approver,
+                PublicationRole.Drafter
+            },
+            // 1 publication role maps to 'Drafter' + no OLD publication role maps to 'Approver', the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
             {
                 ReleaseRole.Approver,
                 [PublicationRole.Owner, PublicationRole.Approver],
-                [ReleaseRole.Approver, ReleaseRole.Contributor],
-                PublicationRole.Approver
+                [ReleaseRole.Approver],
+                PublicationRole.Approver,
+                PublicationRole.Drafter
             },
-            // role exists, 1 OLD publication role maps to same new role, the NEW publication role DOES exist => Does NOTHING
+            // 1 OLD publication role maps to 'Approver', the NEW publication role DOES exist => Does NOTHING
             {
                 ReleaseRole.Approver,
                 [PublicationRole.Allower, PublicationRole.Approver],
                 [ReleaseRole.Approver, ReleaseRole.Contributor],
+                null,
                 null
             },
         };
 
     [Theory]
     [MemberData(nameof(PublicationRoleCreationData))]
-    public void DetermineNewPermissionsSystemChanges_ForPublicationRole(
+    public void DetermineNewPermissionsSystemChangesForRoleCreation_ForPublicationRole(
         PublicationRole publicationRoleToCreate,
         HashSet<PublicationRole> existingPublicationRoles,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
@@ -196,7 +256,7 @@ public class NewPermissionsSystemHelperTests
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
-            newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 publicationRoleToCreate: publicationRoleToCreate,
                 existingPublicationRoles: existingPublicationRoles
             );
@@ -207,7 +267,7 @@ public class NewPermissionsSystemHelperTests
 
     [Theory]
     [MemberData(nameof(ReleaseRoleCreationData))]
-    public void DetermineNewPermissionsSystemChanges_ForReleaseRole(
+    public void DetermineNewPermissionsSystemChangesForRoleCreation_ForReleaseRole(
         ReleaseRole releaseRoleToCreate,
         HashSet<PublicationRole> existingPublicationRoles,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
@@ -217,7 +277,7 @@ public class NewPermissionsSystemHelperTests
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
-            newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 releaseRoleToCreate: releaseRoleToCreate,
                 existingPublicationRoles: existingPublicationRoles
             );
@@ -226,37 +286,55 @@ public class NewPermissionsSystemHelperTests
         Assert.Equal(expectedNewSystemPublicationRoleToCreate, newSystemPublicationRoleToCreate);
     }
 
+    [Fact]
+    public void DetermineNewPermissionsSystemChangesForRoleCreation_ForPrereleaseReleaseRole_ReturnsNull()
+    {
+        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
+
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
+                releaseRoleToCreate: ReleaseRole.PrereleaseViewer,
+                existingPublicationRoles: []
+            );
+
+        Assert.Null(newSystemPublicationRoleToRemove);
+        Assert.Null(newSystemPublicationRoleToCreate);
+    }
+
     [Theory]
     [MemberData(nameof(PublicationRoleRemovalData))]
-    public void DetermineNewPermissionsSystemRoleToRemove_ForPublicationRole(
+    public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForPublicationRole(
         PublicationRole oldPublicationRoleToRemove,
         HashSet<PublicationRole> existingPublicationRoles,
         HashSet<ReleaseRole> existingReleaseRoles,
-        PublicationRole? expectedNewSystemPublicationRoleToRemove
+        PublicationRole? expectedNewSystemPublicationRoleToRemove,
+        PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
     {
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
-        var newSystemPublicationRoleToRemove = newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToRemove(
-            oldPublicationRoleToRemove: oldPublicationRoleToRemove,
-            existingPublicationRoles: existingPublicationRoles,
-            existingReleaseRoles: existingReleaseRoles
-        );
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                oldPublicationRoleToRemove: oldPublicationRoleToRemove,
+                existingPublicationRoles: existingPublicationRoles,
+                existingReleaseRoles: existingReleaseRoles
+            );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
+        Assert.Equal(expectedNewSystemPublicationRoleToCreate, newSystemPublicationRoleToCreate);
     }
 
     [Theory]
     [InlineData(PublicationRole.Owner)]
     [InlineData(PublicationRole.Allower)]
-    public void DetermineNewPermissionsSystemRoleToRemove_ForOldPublicationRoleWhichDoesNotExist_Throws(
+    public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForOldPublicationRoleWhichDoesNotExist_Throws(
         PublicationRole publicationRole
     )
     {
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToRemove(
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 oldPublicationRoleToRemove: publicationRole,
                 existingPublicationRoles: [],
                 existingReleaseRoles: []
@@ -274,7 +352,7 @@ public class NewPermissionsSystemHelperTests
     [InlineData(PublicationRole.Approver, false)]
     [InlineData(PublicationRole.Drafter, true)]
     [InlineData(PublicationRole.Approver, true)]
-    public void DetermineNewPermissionsSystemRoleToRemove_ForNewPublicationRole_Throws(
+    public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForNewPublicationRole_Throws(
         PublicationRole publicationRole,
         bool roleExists
     )
@@ -282,7 +360,7 @@ public class NewPermissionsSystemHelperTests
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToRemove(
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 oldPublicationRoleToRemove: publicationRole,
                 existingPublicationRoles: roleExists ? [publicationRole] : [],
                 existingReleaseRoles: []
@@ -296,32 +374,35 @@ public class NewPermissionsSystemHelperTests
     }
 
     [Theory]
-    [MemberData(nameof(ReleaseRoleDeletionData))]
-    public void DetermineNewPermissionsSystemRoleToRemove_ForReleaseRole(
+    [MemberData(nameof(ReleaseRoleRemovalData))]
+    public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForReleaseRole(
         ReleaseRole releaseRoleToRemove,
         HashSet<PublicationRole> existingPublicationRoles,
         HashSet<ReleaseRole> existingReleaseRoles,
-        PublicationRole? expectedNewSystemPublicationRoleToRemove
+        PublicationRole? expectedNewSystemPublicationRoleToRemove,
+        PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
     {
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
-        var newSystemPublicationRoleToRemove = newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToRemove(
-            releaseRoleToRemove: releaseRoleToRemove,
-            existingPublicationRoles: existingPublicationRoles,
-            existingReleaseRoles: existingReleaseRoles
-        );
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                releaseRoleToRemove: releaseRoleToRemove,
+                existingPublicationRoles: existingPublicationRoles,
+                existingReleaseRoles: existingReleaseRoles
+            );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
+        Assert.Equal(expectedNewSystemPublicationRoleToCreate, newSystemPublicationRoleToCreate);
     }
 
     [Fact]
-    public void DetermineNewPermissionsSystemRoleToRemove_ForReleaseRoleWhichDoesNotExist_Throws()
+    public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForReleaseRoleWhichDoesNotExist_Throws()
     {
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToRemove(
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 releaseRoleToRemove: ReleaseRole.Contributor,
                 existingPublicationRoles: [],
                 existingReleaseRoles: []
@@ -335,17 +416,19 @@ public class NewPermissionsSystemHelperTests
     }
 
     [Fact]
-    public void DetermineNewPermissionsSystemRoleToRemove_ForPrereleaseReleaseRole_ReturnsNull()
+    public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForPrereleaseReleaseRole_ReturnsNull()
     {
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
-        var newSystemPublicationRoleToRemove = newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToRemove(
-            releaseRoleToRemove: ReleaseRole.PrereleaseViewer,
-            existingPublicationRoles: [],
-            existingReleaseRoles: [ReleaseRole.PrereleaseViewer]
-        );
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                releaseRoleToRemove: ReleaseRole.PrereleaseViewer,
+                existingPublicationRoles: [],
+                existingReleaseRoles: [ReleaseRole.PrereleaseViewer]
+            );
 
         Assert.Null(newSystemPublicationRoleToRemove);
+        Assert.Null(newSystemPublicationRoleToCreate);
     }
 
     private static NewPermissionsSystemHelper SetupNewPermissionsSystemHelper()

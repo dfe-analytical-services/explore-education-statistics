@@ -15,7 +15,7 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
     public (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
-    ) DetermineNewPermissionsSystemChanges(
+    ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
         PublicationRole publicationRoleToCreate
     )
@@ -29,7 +29,7 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
     public (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
-    ) DetermineNewPermissionsSystemChanges(
+    ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
         ReleaseRole releaseRoleToCreate
     )
@@ -47,7 +47,10 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
-    public PublicationRole? DetermineNewPermissionsSystemRoleToRemove(
+    public (
+        PublicationRole? newSystemPublicationRoleToRemove,
+        PublicationRole? newSystemPublicationRoleToCreate
+    ) DetermineNewPermissionsSystemChangesForRoleRemoval(
         HashSet<PublicationRole> existingPublicationRoles,
         HashSet<ReleaseRole> existingReleaseRoles,
         PublicationRole oldPublicationRoleToRemove
@@ -72,24 +75,23 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
 
         if (!existingPublicationRoles.Contains(equivalentNewPermissionsSystemPublicationRoleToDelete))
         {
-            return null;
+            return (null, null);
         }
 
         var remainingPublicationRoles = existingPublicationRoles.Except([oldPublicationRoleToRemove]).ToHashSet();
 
-        var shouldRemoveNewPermissionsSystemPublicationRole = ShouldRemoveNewPermissionsSystemPublicationRole(
-            newPermissionsSystemPublicationRoleToCheck: equivalentNewPermissionsSystemPublicationRoleToDelete,
+        return DetermineRolesToRemoveAndCreate(
+            resourceRoleToRemoveNewSystemEquivalent: equivalentNewPermissionsSystemPublicationRoleToDelete,
             remainingPublicationRoles: remainingPublicationRoles,
             remainingReleaseRoles: existingReleaseRoles
         );
-
-        return shouldRemoveNewPermissionsSystemPublicationRole
-            ? equivalentNewPermissionsSystemPublicationRoleToDelete
-            : null;
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
-    public PublicationRole? DetermineNewPermissionsSystemRoleToRemove(
+    public (
+        PublicationRole? newSystemPublicationRoleToRemove,
+        PublicationRole? newSystemPublicationRoleToCreate
+    ) DetermineNewPermissionsSystemChangesForRoleRemoval(
         HashSet<PublicationRole> existingPublicationRoles,
         HashSet<ReleaseRole> existingReleaseRoles,
         ReleaseRole releaseRoleToRemove
@@ -108,25 +110,21 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
             )
         )
         {
-            return null;
+            return (null, null);
         }
 
         if (!existingPublicationRoles.Contains(equivalentNewPermissionsSystemPublicationRoleToDelete.Value))
         {
-            return null;
+            return (null, null);
         }
 
         var remainingReleaseRoles = existingReleaseRoles.Except([releaseRoleToRemove]).ToHashSet();
 
-        var shouldRemoveNewPermissionsSystemPublicationRole = ShouldRemoveNewPermissionsSystemPublicationRole(
-            newPermissionsSystemPublicationRoleToCheck: equivalentNewPermissionsSystemPublicationRoleToDelete.Value,
+        return DetermineRolesToRemoveAndCreate(
+            resourceRoleToRemoveNewSystemEquivalent: equivalentNewPermissionsSystemPublicationRoleToDelete.Value,
             remainingPublicationRoles: existingPublicationRoles,
             remainingReleaseRoles: remainingReleaseRoles
         );
-
-        return shouldRemoveNewPermissionsSystemPublicationRole
-            ? equivalentNewPermissionsSystemPublicationRoleToDelete.Value
-            : null;
     }
 
     private static (
@@ -169,8 +167,11 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
-    private static bool ShouldRemoveNewPermissionsSystemPublicationRole(
-        PublicationRole newPermissionsSystemPublicationRoleToCheck,
+    private static (
+        PublicationRole? newSystemPublicationRoleToRemove,
+        PublicationRole? newSystemPublicationRoleToCreate
+    ) DetermineRolesToRemoveAndCreate(
+        PublicationRole resourceRoleToRemoveNewSystemEquivalent,
         HashSet<PublicationRole> remainingPublicationRoles,
         HashSet<ReleaseRole> remainingReleaseRoles
     )
@@ -196,6 +197,25 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
             )
             .ToHashSet();
 
-        return !allEquivalentNewPermissionsSystemPublicationRoles.Contains(newPermissionsSystemPublicationRoleToCheck);
+        var stillExistsOldSystemRolesWhichMapToNewSystemEquivalent =
+            allEquivalentNewPermissionsSystemPublicationRoles.Contains(resourceRoleToRemoveNewSystemEquivalent);
+
+        if (stillExistsOldSystemRolesWhichMapToNewSystemEquivalent)
+        {
+            return (null, null);
+        }
+
+        if (resourceRoleToRemoveNewSystemEquivalent == PublicationRole.Drafter)
+        {
+            return (PublicationRole.Drafter, null);
+        }
+
+        var atLeastOneOldSystemRoleMapsToDrafter = allEquivalentNewPermissionsSystemPublicationRoles.Contains(
+            PublicationRole.Drafter
+        );
+
+        return atLeastOneOldSystemRoleMapsToDrafter
+            ? (PublicationRole.Approver, PublicationRole.Drafter)
+            : (PublicationRole.Approver, null);
     }
 }

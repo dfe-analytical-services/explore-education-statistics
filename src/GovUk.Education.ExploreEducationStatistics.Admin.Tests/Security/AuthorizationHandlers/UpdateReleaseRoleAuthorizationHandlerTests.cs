@@ -56,6 +56,8 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
 
     private static UpdateReleaseRoleAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
+        var userRepository = new UserRepository(contentDbContext);
+
         var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
 
         var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(contentDbContext);
@@ -63,7 +65,8 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
         var userPublicationRoleRepository = new UserPublicationRoleRepository(
             contentDbContext: contentDbContext,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+            userRepository: userRepository
         );
 
         return new UpdateReleaseRoleAuthorizationHandler(
