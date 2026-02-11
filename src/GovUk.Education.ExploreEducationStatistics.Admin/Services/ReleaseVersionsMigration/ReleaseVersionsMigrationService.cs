@@ -380,6 +380,20 @@ public class ReleaseVersionsMigrationService(
         // The duration between the ScheduledPublishFinalStageTrigger and the LatestAttemptTimestamp
         var duration = publishingInfo.TimeSinceScheduledTriggerToCompletion;
 
+        // If there's no duration because there is no latest 'Complete' publishing attempt or no scheduled trigger date,
+        // then it's not similar.
+        if (duration == null)
+        {
+            return false;
+        }
+
+        // If the duration is negative because the latest 'Complete' publishing attempt is before the scheduled trigger date,
+        // that's unexpected, so treat it as not similar.
+        if (duration < TimeSpan.Zero)
+        {
+            return false;
+        }
+
         if (publishingInfo.PublishMethod == ReleasePublishingMethod.Immediate)
         {
             return duration <= PublishingToleranceImmediate;
