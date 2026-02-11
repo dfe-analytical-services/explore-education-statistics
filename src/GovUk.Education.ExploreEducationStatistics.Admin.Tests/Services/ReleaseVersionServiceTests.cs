@@ -1833,7 +1833,7 @@ public abstract class ReleaseVersionServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
             userReleaseRoleRepository
-                .Setup(mock => mock.RemoveMany(ListOf(userReleaseRoles[0], userReleaseRoles[1]), default))
+                .Setup(mock => mock.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
@@ -2191,7 +2191,7 @@ public abstract class ReleaseVersionServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
             userReleaseRoleRepository
-                .Setup(mock => mock.RemoveMany(ListOf(userReleaseRoles[0], userReleaseRoles[1]), default))
+                .Setup(mock => mock.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);

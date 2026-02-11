@@ -175,6 +175,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         IPreReleaseService? preReleaseService = null
     )
     {
+        var userRepository = new UserRepository(contentDbContext);
+
         var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
 
         var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(contentDbContext);
@@ -182,14 +184,16 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         var userPublicationRoleRepository = new UserPublicationRoleRepository(
             contentDbContext: contentDbContext,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+            userRepository: userRepository
         );
 
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext: contentDbContext,
             userPublicationRoleRepository: userPublicationRoleRepository,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+            userRepository: userRepository
         );
 
         return new ViewSpecificReleaseAuthorizationHandler(

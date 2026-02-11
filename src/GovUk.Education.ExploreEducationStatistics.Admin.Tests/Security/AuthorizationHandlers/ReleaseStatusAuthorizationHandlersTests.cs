@@ -162,6 +162,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
+            var userRepository = new UserRepository(context);
+
             var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
 
             var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
@@ -169,14 +171,16 @@ public class ReleaseStatusAuthorizationHandlersTests
             var userPublicationRoleRepository = new UserPublicationRoleRepository(
                 contentDbContext: context,
                 newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+                userRepository: userRepository
             );
 
             var userReleaseRoleRepository = new UserReleaseRoleRepository(
                 contentDbContext: context,
                 userPublicationRoleRepository: userPublicationRoleRepository,
                 newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+                userRepository: userRepository
             );
 
             return new MarkReleaseAsDraftAuthorizationHandler(
@@ -327,6 +331,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
+            var userRepository = new UserRepository(context);
+
             var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
 
             var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
@@ -334,14 +340,16 @@ public class ReleaseStatusAuthorizationHandlersTests
             var userPublicationRoleRepository = new UserPublicationRoleRepository(
                 contentDbContext: context,
                 newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+                userRepository: userRepository
             );
 
             var userReleaseRoleRepository = new UserReleaseRoleRepository(
                 contentDbContext: context,
                 userPublicationRoleRepository: userPublicationRoleRepository,
                 newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+                userRepository: userRepository
             );
 
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
@@ -464,6 +472,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
+            var userRepository = new UserRepository(context);
+
             var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
 
             var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
@@ -471,14 +481,16 @@ public class ReleaseStatusAuthorizationHandlersTests
             var userPublicationRoleRepository = new UserPublicationRoleRepository(
                 contentDbContext: context,
                 newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+                userRepository: userRepository
             );
 
             var userReleaseRoleRepository = new UserReleaseRoleRepository(
                 contentDbContext: context,
                 userPublicationRoleRepository: userPublicationRoleRepository,
                 newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
+                userRepository: userRepository
             );
 
             return new MarkReleaseAsApprovedAuthorizationHandler(

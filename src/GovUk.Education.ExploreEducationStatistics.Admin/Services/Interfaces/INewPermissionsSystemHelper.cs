@@ -14,7 +14,7 @@ public interface INewPermissionsSystemHelper
     (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
-    ) DetermineNewPermissionsSystemChanges(
+    ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
         PublicationRole publicationRoleToCreate
     );
@@ -28,7 +28,7 @@ public interface INewPermissionsSystemHelper
     (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
-    ) DetermineNewPermissionsSystemChanges(
+    ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
         ReleaseRole releaseRoleToCreate
     );
@@ -40,7 +40,10 @@ public interface INewPermissionsSystemHelper
     /// <param name="existingPublicationRoles">All existing publication roles for a user/publication combination.</param>
     /// <param name="existingReleaseRoles">All existing release roles for a user/publication combination.</param>
     /// <param name="oldPublicationRoleToRemove">The OLD permissions system publication role to be deleted for the user/publication combination.</param>
-    PublicationRole? DetermineNewPermissionsSystemRoleToRemove(
+    (
+        PublicationRole? newSystemPublicationRoleToRemove,
+        PublicationRole? newSystemPublicationRoleToCreate
+    ) DetermineNewPermissionsSystemChangesForRoleRemoval(
         HashSet<PublicationRole> existingPublicationRoles,
         HashSet<ReleaseRole> existingReleaseRoles,
         PublicationRole oldPublicationRoleToRemove
@@ -53,7 +56,10 @@ public interface INewPermissionsSystemHelper
     /// <param name="existingPublicationRoles">All existing publication roles for a user/publication combination.</param>
     /// <param name="existingReleaseRoles">All existing release roles for a user/publication combination.</param>
     /// <param name="releaseRoleToRemove">The release role to be deleted for the user/publication combination.</param>
-    PublicationRole? DetermineNewPermissionsSystemRoleToRemove(
+    (
+        PublicationRole? newSystemPublicationRoleToRemove,
+        PublicationRole? newSystemPublicationRoleToCreate
+    ) DetermineNewPermissionsSystemChangesForRoleRemoval(
         HashSet<PublicationRole> existingPublicationRoles,
         HashSet<ReleaseRole> existingReleaseRoles,
         ReleaseRole releaseRoleToRemove

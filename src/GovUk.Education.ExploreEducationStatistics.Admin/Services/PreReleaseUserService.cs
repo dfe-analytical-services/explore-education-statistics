@@ -136,8 +136,14 @@ public class PreReleaseUserService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async () => await FindUserByEmail(email))
-            .OnSuccess(async user => await FindUserPrereleaseRole(userId: user.Id, releaseVersionId: releaseVersionId))
-            .OnSuccessVoid(async userPrereleaseRole => await userReleaseRoleRepository.Remove(userPrereleaseRole));
+            .OnSuccess(async user =>
+                await userReleaseRoleRepository.RemoveByCompositeKey(
+                    userId: user.Id,
+                    releaseVersionId: releaseVersionId,
+                    role: ReleaseRole.PrereleaseViewer
+                )
+            )
+            .OnSuccess(removed => (Either<ActionResult, Unit>)(removed ? Unit.Instance : new NotFoundResult()));
     }
 
     private async Task<PreReleaseUserViewModel> InvitePreReleaseUser(ReleaseVersion releaseVersion, string email)
@@ -177,16 +183,5 @@ public class PreReleaseUserService(
         var user = await userRepository.FindUserByEmail(email);
 
         return user is null ? new NotFoundResult() : user;
-    }
-
-    private async Task<Either<ActionResult, UserReleaseRole>> FindUserPrereleaseRole(Guid userId, Guid releaseVersionId)
-    {
-        var userPrereleaseRole = await userReleaseRoleRepository.GetByCompositeKey(
-            userId: userId,
-            releaseVersionId: releaseVersionId,
-            role: ReleaseRole.PrereleaseViewer
-        );
-
-        return userPrereleaseRole is null ? new NotFoundResult() : userPrereleaseRole;
     }
 }
