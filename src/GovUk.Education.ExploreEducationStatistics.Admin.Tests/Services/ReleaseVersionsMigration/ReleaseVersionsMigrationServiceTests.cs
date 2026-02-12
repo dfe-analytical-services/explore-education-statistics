@@ -1067,6 +1067,123 @@ public abstract class ReleaseVersionsMigrationServiceTests
         }
 
         [Theory]
+        [InlineData("2025-01-01T09:30:25 +00:00", "2025-01-02T00:00:00", ReleasePublishingMethod.Scheduled, true)] // Duration is negative (actual duration= -23 hours, 59 minutes, 35 seconds)
+        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T17:00:25", ReleasePublishingMethod.Immediate, true)] // Duration is negative (actual duration= -30 minutes)
+        [InlineData("2025-01-01T09:30:25 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, false)] // Within 5 minute tolerance (actual duration= 25 seconds)
+        [InlineData("2025-01-01T09:35:00 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, false)] // Within 5 minute tolerance (actual duration= 5 minutes)
+        [InlineData("2025-01-01T09:35:01 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, true)] // Outside 5 minute tolerance (actual duration= 5 minutes, 1 second)
+        [InlineData("2025-01-02T09:30:25 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, true)] // Outside 5 minute tolerance (actual duration= 1 day, 25 seconds)
+        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T16:30:00", ReleasePublishingMethod.Immediate, false)] // Within 6 hour tolerance (actual duration= 25 seconds)
+        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T10:30:25", ReleasePublishingMethod.Immediate, false)] // Within 6 hour tolerance (actual duration= 6 hours)
+        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T10:30:24", ReleasePublishingMethod.Immediate, true)] // Outside 6 hour tolerance (actual duration= 6 hours, 1 second)
+        [InlineData("2025-01-02T16:30:25 +00:00", "2025-01-01T16:30:00", ReleasePublishingMethod.Immediate, true)] // Outside 6 hour tolerance (actual duration= 1 day, 25 seconds)
+        public async Task WhenProposedPublishedDateIsNotSimilarToScheduledTriggerDate_ReportIncludesWarning(
+            string latestAttemptTimestampString,
+            string publishedScheduledString,
+            ReleasePublishingMethod method,
+            bool expectedWarning
+        )
+        {
+            // There are differences in how this warning is determined for 'Immediate' vs 'Scheduled' methods,
+            // and when the method is 'Scheduled', the AppEnvironment (Local/Dev/Test/Pre-Prod/Prod) is a factor too.
+            // The Local, Dev and Test environments should have the same behavior,
+            // and the Pre-Prod and Prod environments should have the same behavior, but different to Local, Dev and Test.
+
+            // This test doesn't go to the extent of preparing data for testing all the different environments.
+            // It only tests the Pre-Prod/Prod behavior. The AppOptions are set up in the same way as all the other
+            // unit tests with the environment defaulting to Prod.
+
+            // Arrange
+            var latestAttemptTimestamp = DateTimeOffset.Parse(latestAttemptTimestampString);
+            var publishScheduled = DateTimeOffset.Parse(publishedScheduledString);
+
+            // Unrelated to setting up data for this warning, but for the purpose of not causing any other warnings:
+
+            // (1) The release update note needs to have the same date-only element as the latest attempt timestamp
+            // to avoid causing the 'ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate' warning.
+            var updateNoteDate = GetDateTimeForUpdateNoteOnSameUkDay(latestAttemptTimestamp);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithVersion(1)
+                                        .WithPublished(DefaultPublished)
+                                        .WithPublishScheduled(publishScheduled)
+                                        .WithUpdates(
+                                            _dataFixture.DefaultUpdate().WithOn(updateNoteDate).GenerateList(1)
+                                        ),
+                                ]
+                            ),
+                    ]
+                );
+            var releaseVersionId = publication.Releases.Single().Versions.Single(rv => rv.Version == 1).Id;
+
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(MockBehavior.Strict);
+            releasePublishingStatusRepository.SetupGetAllByOverallStageCompleteReturnsSingleResult(
+                releaseVersionId,
+                immediate: method == ReleasePublishingMethod.Immediate,
+                timestamp: latestAttemptTimestamp
+            );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(
+                    context,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object
+                );
+
+                // Act
+                var outcome = await sut.MigrateReleaseVersionsPublishedDate();
+
+                // Assert
+                var report = outcome.AssertRight();
+                var releaseVersionReport = GetReleaseVersionReportFromReport(report, releaseVersionId);
+
+                if (expectedWarning)
+                {
+                    Assert.True(releaseVersionReport.Warnings.ProposedPublishedDateIsNotSimilarToScheduledTriggerDate);
+                    AssertReportHasSingleReleaseVersionWithWarnings(report, releaseVersionId);
+                }
+                else
+                {
+                    Assert.Null(releaseVersionReport.Warnings.ProposedPublishedDateIsNotSimilarToScheduledTriggerDate);
+                }
+
+                // There should be no other types of warning for this release version
+                Assert.Null(releaseVersionReport.Warnings.NoSuccessfulPublishingAttempts);
+                Assert.Null(releaseVersionReport.Warnings.MultipleSuccessfulPublishingAttempts);
+                Assert.Null(releaseVersionReport.Warnings.UpdatesCountDoesNotMatchVersion);
+                Assert.Null(releaseVersionReport.Warnings.ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate);
+                Assert.Null(releaseVersionReport.Warnings.ScheduledTriggerDateIsNotMidnightUkLocalTime);
+
+                if (!expectedWarning)
+                {
+                    AssertReportHasNoReleaseVersionsWithWarnings(report);
+                }
+
+                // This type of warning should not stop the release version from being updated
+                AssertReportHasSingleReleaseVersionToUpdate(report, releaseVersionId);
+
+                releasePublishingStatusRepository.VerifyAll();
+            }
+        }
+
+        [Theory]
         [InlineData("2025-01-01T09:30:25 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, false)] // Date-only elements match (1st Jan)
         [InlineData("2025-01-01T09:30:25 +00:00", "2025-01-01T07:00:00", ReleasePublishingMethod.Scheduled, false)] // Date-only elements match (1st Jan)
         [InlineData("2025-01-01T09:30:25 +00:00", "2025-01-01T16:00:00", ReleasePublishingMethod.Scheduled, false)] // Date-only elements match (1st Jan)
