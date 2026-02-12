@@ -7,7 +7,7 @@ import {
   useCallback,
   useReducer,
 } from 'react';
-import { Reducer as ImmerReducer } from 'use-immer';
+import { ImmerReducer } from 'use-immer';
 
 export default function useLoggedReducer<S, A>(
   name: string,
