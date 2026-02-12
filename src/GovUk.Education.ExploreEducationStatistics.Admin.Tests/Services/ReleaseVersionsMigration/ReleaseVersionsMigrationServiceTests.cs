@@ -352,6 +352,232 @@ public abstract class ReleaseVersionsMigrationServiceTests
                 Assert.Null(actualReleaseVersion4.Published);
             }
         }
+
+        [Fact]
+        public async Task WhenReleaseVersionsExistWithoutPublishingAttempts_ThenReportContainsExpectedDataAndDatabaseIsNotUpdated()
+        {
+            // Arrange
+
+            // Set up the data for three release versions consisting of:
+            // - version 0 which is the first published version, so not relevant to the migration.
+            // - versions 1 which is a published amendment but has no history of publishing attempts.
+            // - versions 2 which is a published amendment and the only version that should be updated by the migration.
+
+            // Version 0 is not relevant to the migration, *so not all of its data needs setting up*
+
+            var releaseVersion0Id = Guid.NewGuid();
+            var releaseVersion1Id = Guid.NewGuid();
+            var releaseVersion2Id = Guid.NewGuid();
+
+            // Set up version 1 to be published on 1st June 2025 (which would be scheduled to trigger at 09:30 UK local time)
+            // Set up version 2 to be published on 1st Sep 11:34:21 (which would be 12:34:21 UK local time)
+            var version0PublishedScheduled = DefaultPublishedScheduled;
+            var version1PublishedScheduled = new DateOnly(year: 2025, month: 6, day: 1).GetUkStartOfDayUtc();
+            var version2PublishedScheduled = new DateTimeOffset(
+                year: 2025,
+                month: 9,
+                day: 1,
+                hour: 11,
+                minute: 34,
+                second: 21,
+                offset: TimeSpan.Zero
+            );
+
+            // Published date of version 0 which can be any value and after the migration should not change
+            var version0Published = DefaultPublished;
+
+            // Set up the original values of 'Published' for version 1 and 2, inherited from the previous versions
+            var version1Published = version0Published;
+            var version2Published = version1Published;
+
+            // Set up the publishing methods.
+            // This is irrelevant for version 1 without a history of publishing attempts for it.
+            // Version 2 is set to method 'Immediate'
+            const bool version2Immediate = true;
+
+            // Set up the update note dates - Any time on scheduled date should be fine, as long as it's got the same date-only
+            // element as the proposed published date (the publisher's latest successful attempt) when converted to UK local time.
+            var version1UpdateNote0Date = GetDateTimeForUpdateNoteOnSameUkDay(version1PublishedScheduled);
+            var version2UpdateNote0Date = version1UpdateNote0Date;
+            var version2UpdateNote1Date = GetDateTimeForUpdateNoteOnSameUkDay(version2PublishedScheduled);
+
+            // Set up the latest successful publishing attempt timestamps
+            // This is irrelevant for version 1 without a history of publishing attempts for it.
+            // Version 2's latest successful attempt is just after its scheduled trigger time because it's method is 'Immediate'.
+            var version2LatestAttempt = version2PublishedScheduled.AddSeconds(45);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    // Version 0 - not relevant
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithId(releaseVersion0Id)
+                                        .WithVersion(0)
+                                        .WithPublished(version0Published)
+                                        .WithPublishScheduled(version0PublishedScheduled),
+                                    // Version 1 - relevant but has no history of publishing attempts
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithId(releaseVersion1Id)
+                                        .WithVersion(1)
+                                        .WithPublished(version1Published)
+                                        .WithPublishScheduled(version1PublishedScheduled)
+                                        .WithUpdates(
+                                            _dataFixture
+                                                .DefaultUpdate()
+                                                .ForIndex(0, s => s.SetOn(version1UpdateNote0Date))
+                                                .GenerateList(1)
+                                        ),
+                                    // Version 2 - relevant
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithId(releaseVersion2Id)
+                                        .WithVersion(2)
+                                        .WithPublished(version2Published)
+                                        .WithPublishScheduled(version2PublishedScheduled)
+                                        .WithUpdates(
+                                            _dataFixture
+                                                .DefaultUpdate()
+                                                .ForIndex(0, s => s.SetOn(version2UpdateNote0Date))
+                                                .ForIndex(1, s => s.SetOn(version2UpdateNote1Date))
+                                                .GenerateList(2)
+                                        ),
+                                ]
+                            ),
+                    ]
+                );
+
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(MockBehavior.Strict);
+            // Set up no history of publishing attempts to be returned for version 1
+            releasePublishingStatusRepository.SetupGetAllByOverallStageCompleteReturnsNoResults(releaseVersion1Id);
+            releasePublishingStatusRepository.SetupGetAllByOverallStageCompleteReturnsSingleResult(
+                releaseVersion2Id,
+                immediate: version2Immediate,
+                timestamp: version2LatestAttempt
+            );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(
+                    context,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object
+                );
+
+                // Act
+                var outcome = await sut.MigrateReleaseVersionsPublishedDate(dryRun: false);
+
+                // Assert - report
+                var report = outcome.AssertRight();
+
+                // The count of relevant versions should exclude version 0, but include version 1 and version 2,
+                // even though version 1 has no history of publishing attempts, because it is still relevant to
+                // be considered by the migration.
+                Assert.Equal(2, report.TotalRelevantReleaseVersions);
+
+                // Only version 2 should be updated
+                Assert.Equal(1, report.TotalReleaseVersionsToUpdate);
+                Assert.Single(report.ReleaseVersionsToUpdate);
+                Assert.Equal(releaseVersion2Id, report.ReleaseVersionsToUpdate[0]);
+
+                // Version 1 should not be updated
+                Assert.Equal(1, report.TotalReleaseVersionsNotToUpdate);
+                Assert.Single(report.ReleaseVersionsNotToUpdate);
+                Assert.Equal(releaseVersion1Id, report.ReleaseVersionsNotToUpdate[0]);
+
+                // There should be warnings for version 1
+                Assert.Equal(1, report.TotalReleaseVersionsWithWarnings);
+                Assert.Single(report.ReleaseVersionsWithWarnings);
+                Assert.Equal(releaseVersion1Id, report.ReleaseVersionsWithWarnings[0]);
+
+                // Deep dive on the report data for version 1
+                // Because there is no history of publishing attempts for version 1, a lot of the values are Null
+                var releaseVersion1Report = GetReleaseVersionReportFromReport(report, releaseVersion1Id);
+                Assert.Null(releaseVersion1Report.PublishingInfo.LatestAttemptTimestamp);
+                Assert.Null(releaseVersion1Report.PublishingInfo.LatestAttemptTimestampUkDateOnly);
+                Assert.Equal(ReleasePublishingMethod.Unknown, releaseVersion1Report.PublishingInfo.PublishMethod);
+                Assert.Equal(version1PublishedScheduled, releaseVersion1Report.PublishingInfo.ScheduledPublishTrigger);
+                // Without the history of publishing attempts, the method is 'Unknown'.
+                // Even though the scheduled trigger date is at midnight, ScheduledPublishFinalStageTrigger doesn't get adjusted to 09:30.
+                Assert.Equal(
+                    version1PublishedScheduled,
+                    releaseVersion1Report.PublishingInfo.ScheduledPublishFinalStageTrigger
+                );
+                Assert.Equal(0, releaseVersion1Report.PublishingInfo.SuccessfulPublishingAttempts);
+                Assert.Null(releaseVersion1Report.PublishingInfo.TimeSinceScheduledTriggerToCompletion);
+                Assert.Null(releaseVersion1Report.PublishingInfo.TimeSinceScheduledTriggerToCompletionPretty);
+                Assert.Equal(1, releaseVersion1Report.UpdateNotes.UpdatesCount);
+                Assert.Equal(
+                    version1PublishedScheduled.ToUkDateOnly(),
+                    releaseVersion1Report.UpdateNotes.LatestUpdateNoteUkDateOnly
+                );
+                Assert.True(releaseVersion1Report.Warnings.HasWarnings);
+
+                // Deep dive on the report data for version 2
+                var releaseVersion2Report = GetReleaseVersionReportFromReport(report, releaseVersion2Id);
+                Assert.Equal(version2LatestAttempt, releaseVersion2Report.PublishingInfo.LatestAttemptTimestamp);
+                Assert.Equal(
+                    version2LatestAttempt.ToUkDateOnly(),
+                    releaseVersion2Report.PublishingInfo.LatestAttemptTimestampUkDateOnly
+                );
+                Assert.Equal(ReleasePublishingMethod.Immediate, releaseVersion2Report.PublishingInfo.PublishMethod);
+                Assert.Equal(version2PublishedScheduled, releaseVersion2Report.PublishingInfo.ScheduledPublishTrigger);
+                Assert.Equal(
+                    version2PublishedScheduled,
+                    releaseVersion2Report.PublishingInfo.ScheduledPublishFinalStageTrigger
+                );
+                Assert.Equal(1, releaseVersion2Report.PublishingInfo.SuccessfulPublishingAttempts);
+                Assert.Equal(
+                    version2LatestAttempt - version2PublishedScheduled,
+                    releaseVersion2Report.PublishingInfo.TimeSinceScheduledTriggerToCompletion
+                );
+                Assert.Equal(
+                    (version2LatestAttempt - version2PublishedScheduled).PrettyPrint(),
+                    releaseVersion2Report.PublishingInfo.TimeSinceScheduledTriggerToCompletionPretty
+                );
+                Assert.Equal(2, releaseVersion2Report.UpdateNotes.UpdatesCount);
+                Assert.Equal(
+                    version2PublishedScheduled.ToUkDateOnly(),
+                    releaseVersion2Report.UpdateNotes.LatestUpdateNoteUkDateOnly
+                );
+                Assert.False(releaseVersion2Report.Warnings.HasWarnings);
+
+                releasePublishingStatusRepository.VerifyAll();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                // Assert - database
+                var actualReleaseVersions = await context.ReleaseVersions.AsNoTracking().ToListAsync();
+
+                var actualReleaseVersion0 = actualReleaseVersions.Single(rv => rv.Id == releaseVersion0Id);
+                var actualReleaseVersion1 = actualReleaseVersions.Single(rv => rv.Id == releaseVersion1Id);
+                var actualReleaseVersion2 = actualReleaseVersions.Single(rv => rv.Id == releaseVersion2Id);
+
+                // Version 0 should be unchanged because it was not relevant, being the first version
+                Assert.Equal(version0Published, actualReleaseVersion0.Published);
+
+                // Version 1 should be unchanged because it had no history of publishing attempts,
+                // so there was no proposed new value for 'Published'
+                Assert.Equal(version1Published, actualReleaseVersion1.Published);
+
+                // Version 2 should be updated to have the same 'Published' value as its latest successful publishing attempt
+                Assert.Equal(version2LatestAttempt, actualReleaseVersion2.Published);
+            }
+        }
     }
 
     public class MigrateReleaseVersionsPublishedDateRelevanceTests : ReleaseVersionsMigrationServiceTests
