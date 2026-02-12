@@ -16,8 +16,8 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0(commander@11.0.0)
       '@next/eslint-plugin-next':
-        specifier: 15.5.9
-        version: 15.5.9
+        specifier: 15.5.12
+        version: 15.5.12
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
@@ -61,8 +61,8 @@ importers:
         specifier: ^19.0.4
         version: 19.0.4(eslint-plugin-import@2.27.5)(eslint-plugin-jsx-a11y@6.7.1)(eslint-plugin-react-hooks@4.6.0)(eslint-plugin-react@7.32.2)(eslint@8.57.0)
       eslint-config-next:
-        specifier: 15.5.9
-        version: 15.5.9(eslint@8.57.0)(typescript@5.5.4)
+        specifier: 15.5.12
+        version: 15.5.12(eslint@8.57.0)(typescript@5.5.4)
       eslint-config-prettier:
         specifier: ^8.8.0
         version: 8.8.0(eslint@8.57.0)
@@ -732,11 +732,11 @@ importers:
         specifier: ^18.0.1
         version: 18.0.1(@types/react@19.2.13)(react-dom@19.2.4)(react@19.2.4)
       '@next/bundle-analyzer':
-        specifier: 15.5.9
-        version: 15.5.9
+        specifier: 15.5.12
+        version: 15.5.12
       '@next/env':
-        specifier: 15.5.9
-        version: 15.5.9
+        specifier: 15.5.12
+        version: 15.5.12
       '@tanstack/react-query':
         specifier: 4.42.0
         version: 4.42.0(react-dom@19.2.4)(react@19.2.4)
@@ -789,11 +789,11 @@ importers:
         specifier: ^0.4.14
         version: 0.4.15
       next:
-        specifier: 15.5.9
-        version: 15.5.9(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13)
+        specifier: 15.5.12
+        version: 15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13)
       next-sitemap:
         specifier: ^4.2.3
-        version: 4.2.3(next@15.5.9)
+        version: 4.2.3(next@15.5.12)
       nookies:
         specifier: ^2.5.2
         version: 2.5.2
@@ -892,8 +892,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(@jest/globals@30.2.0)(jest@30.2.0)(typescript@5.5.4)
       jest-next-dynamic:
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.0.2
+        version: 1.0.2
       jest-resolve:
         specifier: ^30.2.0
         version: 30.2.0
@@ -904,8 +904,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1(jest@30.2.0)
       next-router-mock:
-        specifier: ^0.9.13
-        version: 0.9.13(next@15.5.9)(react@19.2.4)
+        specifier: ^1.0.5
+        version: 1.0.5(next@15.5.12)(react@19.2.4)
       node-mocks-http:
         specifier: ^1.12.2
         version: 1.12.2
@@ -6789,8 +6789,8 @@ packages:
       typescript: 5.5.4
     dev: false
 
-  /@next/bundle-analyzer@15.5.9:
-    resolution: {integrity: sha512-lT1EBpFyGVN9u8M43f2jE78DsCu0A5KPA5OkF5PdIHrKDo4oTJ4lUQKciA9T2u9gccSXIPQcZb5TYkHF4f8iiw==}
+  /@next/bundle-analyzer@15.5.12:
+    resolution: {integrity: sha512-tDkdfvuKz9JlH+B/CEIY0+XqQ5gymVZZWvDer5HJI68rPI0EYfbSadbvIUvHTugYnMkyxSBf8u0P2yGOSQ4h+w==}
     dependencies:
       webpack-bundle-analyzer: 4.10.1
     transitivePeerDependencies:
@@ -6802,73 +6802,73 @@ packages:
     resolution: {integrity: sha512-fbb2C7HChgM7CemdCY+y3N1n8pcTKdqtQLbC7/EQtPdLvlMUT9JX/dBYl8MMZAtYG4uVMyPFHXckb68q/NRwqg==}
     dev: false
 
-  /@next/env@15.5.9:
-    resolution: {integrity: sha512-4GlTZ+EJM7WaW2HEZcyU317tIQDjkQIyENDLxYJfSWlfqguN+dHkZgyQTV/7ykvobU7yEH5gKvreNrH4B6QgIg==}
+  /@next/env@15.5.12:
+    resolution: {integrity: sha512-pUvdJN1on574wQHjaBfNGDt9Mz5utDSZFsIIQkMzPgNS8ZvT4H2mwOrOIClwsQOb6EGx5M76/CZr6G8i6pSpLg==}
 
-  /@next/eslint-plugin-next@15.5.9:
-    resolution: {integrity: sha512-kUzXx0iFiXw27cQAViE1yKWnz/nF8JzRmwgMRTMh8qMY90crNsdXJRh2e+R0vBpFR3kk1yvAR7wev7+fCCb79Q==}
+  /@next/eslint-plugin-next@15.5.12:
+    resolution: {integrity: sha512-+ZRSDFTv4aC96aMb5E41rMjysx8ApkryevnvEYZvPZO52KvkqP5rNExLUXJFr9P4s0f3oqNQR6vopCZsPWKDcQ==}
     dependencies:
       fast-glob: 3.3.1
     dev: true
 
-  /@next/swc-darwin-arm64@15.5.7:
-    resolution: {integrity: sha512-IZwtxCEpI91HVU/rAUOOobWSZv4P2DeTtNaCdHqLcTJU4wdNXgAySvKa/qJCgR5m6KI8UsKDXtO2B31jcaw1Yw==}
+  /@next/swc-darwin-arm64@15.5.12:
+    resolution: {integrity: sha512-RnRjBtH8S8eXCpUNkQ+543DUc7ys8y15VxmFU9HRqlo9BG3CcBUiwNtF8SNoi2xvGCVJq1vl2yYq+3oISBS0Zg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
     optional: true
 
-  /@next/swc-darwin-x64@15.5.7:
-    resolution: {integrity: sha512-UP6CaDBcqaCBuiq/gfCEJw7sPEoX1aIjZHnBWN9v9qYHQdMKvCKcAVs4OX1vIjeE+tC5EIuwDTVIoXpUes29lg==}
+  /@next/swc-darwin-x64@15.5.12:
+    resolution: {integrity: sha512-nqa9/7iQlboF1EFtNhWxQA0rQstmYRSBGxSM6g3GxvxHxcoeqVXfGNr9stJOme674m2V7r4E3+jEhhGvSQhJRA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
     optional: true
 
-  /@next/swc-linux-arm64-gnu@15.5.7:
-    resolution: {integrity: sha512-NCslw3GrNIw7OgmRBxHtdWFQYhexoUCq+0oS2ccjyYLtcn1SzGzeM54jpTFonIMUjNbHmpKpziXnpxhSWLcmBA==}
+  /@next/swc-linux-arm64-gnu@15.5.12:
+    resolution: {integrity: sha512-dCzAjqhDHwmoB2M4eYfVKqXs99QdQxNQVpftvP1eGVppamXh/OkDAwV737Zr0KPXEqRUMN4uCjh6mjO+XtF3Mw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     optional: true
 
-  /@next/swc-linux-arm64-musl@15.5.7:
-    resolution: {integrity: sha512-nfymt+SE5cvtTrG9u1wdoxBr9bVB7mtKTcj0ltRn6gkP/2Nu1zM5ei8rwP9qKQP0Y//umK+TtkKgNtfboBxRrw==}
+  /@next/swc-linux-arm64-musl@15.5.12:
+    resolution: {integrity: sha512-+fpGWvQiITgf7PUtbWY1H7qUSnBZsPPLyyq03QuAKpVoTy/QUx1JptEDTQMVvQhvizCEuNLEeghrQUyXQOekuw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     optional: true
 
-  /@next/swc-linux-x64-gnu@15.5.7:
-    resolution: {integrity: sha512-hvXcZvCaaEbCZcVzcY7E1uXN9xWZfFvkNHwbe/n4OkRhFWrs1J1QV+4U1BN06tXLdaS4DazEGXwgqnu/VMcmqw==}
+  /@next/swc-linux-x64-gnu@15.5.12:
+    resolution: {integrity: sha512-jSLvgdRRL/hrFAPqEjJf1fFguC719kmcptjNVDJl26BnJIpjL3KH5h6mzR4mAweociLQaqvt4UyzfbFjgAdDcw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     optional: true
 
-  /@next/swc-linux-x64-musl@15.5.7:
-    resolution: {integrity: sha512-4IUO539b8FmF0odY6/SqANJdgwn1xs1GkPO5doZugwZ3ETF6JUdckk7RGmsfSf7ws8Qb2YB5It33mvNL/0acqA==}
+  /@next/swc-linux-x64-musl@15.5.12:
+    resolution: {integrity: sha512-/uaF0WfmYqQgLfPmN6BvULwxY0dufI2mlN2JbOKqqceZh1G4hjREyi7pg03zjfyS6eqNemHAZPSoP84x17vo6w==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     optional: true
 
-  /@next/swc-win32-arm64-msvc@15.5.7:
-    resolution: {integrity: sha512-CpJVTkYI3ZajQkC5vajM7/ApKJUOlm6uP4BknM3XKvJ7VXAvCqSjSLmM0LKdYzn6nBJVSjdclx8nYJSa3xlTgQ==}
+  /@next/swc-win32-arm64-msvc@15.5.12:
+    resolution: {integrity: sha512-xhsL1OvQSfGmlL5RbOmU+FV120urrgFpYLq+6U8C6KIym32gZT6XF/SDE92jKzzlPWskkbjOKCpqk5m4i8PEfg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
     optional: true
 
-  /@next/swc-win32-x64-msvc@15.5.7:
-    resolution: {integrity: sha512-gMzgBX164I6DN+9/PGA+9dQiwmTkE4TloBNx8Kv9UiGARsr9Nba7IpcBRA1iTV9vwlYnrE3Uy6I7Aj6qLjQuqw==}
+  /@next/swc-win32-x64-msvc@15.5.12:
+    resolution: {integrity: sha512-Z1Dh6lhFkxvBDH1FoW6OU/L6prYwPSlwjLiZkExIAh8fbP6iI/M7iGTQAJPYJ9YFlWobCZ1PHbchFhFYb2ADkw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -12277,8 +12277,8 @@ packages:
       object.entries: 1.1.6
     dev: true
 
-  /eslint-config-next@15.5.9(eslint@8.57.0)(typescript@5.5.4):
-    resolution: {integrity: sha512-852JYI3NkFNzW8CqsMhI0K2CDRxTObdZ2jQJj5CtpEaOkYHn13107tHpNuD/h0WRpU4FAbCdUaxQsrfBtNK9Kw==}
+  /eslint-config-next@15.5.12(eslint@8.57.0)(typescript@5.5.4):
+    resolution: {integrity: sha512-ktW3XLfd+ztEltY5scJNjxjHwtKWk6vU2iwzZqSN09UsbBmMeE/cVlJ1yESg6Yx5LW7p/Z8WzUAgYXGLEmGIpg==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0 || ^9.0.0
       typescript: '>=3.3.1'
@@ -12286,7 +12286,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@next/eslint-plugin-next': 15.5.9
+      '@next/eslint-plugin-next': 15.5.12
       '@rushstack/eslint-patch': 1.15.0
       '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0)(eslint@8.57.0)(typescript@5.5.4)
       '@typescript-eslint/parser': 7.18.0(eslint@8.57.0)(typescript@5.5.4)
@@ -15595,8 +15595,8 @@ packages:
       jest-util: 30.2.0
     dev: true
 
-  /jest-next-dynamic@1.0.1:
-    resolution: {integrity: sha512-peo9yRvUn8u6PZro9AzzjxpgUc+1NZhZMan+1xzk7Bz1vA0d5IC2Iw8E7bkC2cwl9AG3XxTaqPVAXbC3aMbVkw==}
+  /jest-next-dynamic@1.0.2:
+    resolution: {integrity: sha512-4vKTkNji+fytsAeGyZF0pSRwtTEaa3Z4pnPDDNAe0aQXz2yenUU/L03vB9vt/6gdcl8vmBVa9m9smZ9FZCerDw==}
     dev: true
 
   /jest-pnp-resolver@1.2.3(jest-resolve@30.2.0):
@@ -17124,17 +17124,17 @@ packages:
   /neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  /next-router-mock@0.9.13(next@15.5.9)(react@19.2.4):
-    resolution: {integrity: sha512-906n2RRaE6Y28PfYJbaz5XZeJ6Tw8Xz1S6E31GGwZ0sXB6/XjldD1/2azn1ZmBmRk5PQRkzjg+n+RHZe5xQzWA==}
+  /next-router-mock@1.0.5(next@15.5.12)(react@19.2.4):
+    resolution: {integrity: sha512-mEndN1KdRlofR1Hf+FvfHogabpx1SQ8cbXYENCm3SA1W5Bj3UlaIW814DA6vg5gmPF6tBw5E1rX2JY4ogN9aaQ==}
     peerDependencies:
       next: '>=10.0.0'
       react: '>=17.0.0'
     dependencies:
-      next: 15.5.9(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13)
+      next: 15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13)
       react: 19.2.4
     dev: true
 
-  /next-sitemap@4.2.3(next@15.5.9):
+  /next-sitemap@4.2.3(next@15.5.12):
     resolution: {integrity: sha512-vjdCxeDuWDzldhCnyFCQipw5bfpl4HmZA7uoo3GAaYGjGgfL4Cxb1CiztPuWGmS+auYs7/8OekRS8C2cjdAsjQ==}
     engines: {node: '>=14.18'}
     hasBin: true
@@ -17145,15 +17145,15 @@ packages:
       '@next/env': 13.5.11
       fast-glob: 3.3.0
       minimist: 1.2.8
-      next: 15.5.9(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13)
+      next: 15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13)
     dev: false
 
   /next-tick@1.1.0:
     resolution: {integrity: sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==}
     dev: false
 
-  /next@15.5.9(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13):
-    resolution: {integrity: sha512-agNLK89seZEtC5zUHwtut0+tNrc0Xw4FT/Dg+B/VLEo9pAcS9rtTKpek3V6kVcVwsB2YlqMaHdfZL4eLEVYuCg==}
+  /next@15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.4.1)(react-dom@19.2.4)(react@19.2.4)(sass@1.32.13):
+    resolution: {integrity: sha512-Fi/wQ4Etlrn60rz78bebG1i1SR20QxvV8tVp6iJspjLUSHcZoeUXCt+vmWoEcza85ElZzExK/jJ/F6SvtGktjA==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -17173,7 +17173,7 @@ packages:
       sass:
         optional: true
     dependencies:
-      '@next/env': 15.5.9
+      '@next/env': 15.5.12
       '@opentelemetry/api': 1.4.1
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001769
@@ -17183,14 +17183,14 @@ packages:
       sass: 1.32.13
       styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.2.4)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.7
-      '@next/swc-darwin-x64': 15.5.7
-      '@next/swc-linux-arm64-gnu': 15.5.7
-      '@next/swc-linux-arm64-musl': 15.5.7
-      '@next/swc-linux-x64-gnu': 15.5.7
-      '@next/swc-linux-x64-musl': 15.5.7
-      '@next/swc-win32-arm64-msvc': 15.5.7
-      '@next/swc-win32-x64-msvc': 15.5.7
+      '@next/swc-darwin-arm64': 15.5.12
+      '@next/swc-darwin-x64': 15.5.12
+      '@next/swc-linux-arm64-gnu': 15.5.12
+      '@next/swc-linux-arm64-musl': 15.5.12
+      '@next/swc-linux-x64-gnu': 15.5.12
+      '@next/swc-linux-x64-musl': 15.5.12
+      '@next/swc-win32-arm64-msvc': 15.5.12
+      '@next/swc-win32-x64-msvc': 15.5.12
       sharp: 0.34.5
     transitivePeerDependencies:
       - '@babel/core'
