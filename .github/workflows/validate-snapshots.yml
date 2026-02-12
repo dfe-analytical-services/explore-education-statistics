@@ -90,7 +90,7 @@ jobs:
           token: ${{ env.GH_TOKEN }}
 
       - name: Slack Notification
-        uses: slackapi/slack-github-action@v1.27.1
+        uses: slackapi/slack-github-action@v2.1.1
         with:
           payload: |
             {
