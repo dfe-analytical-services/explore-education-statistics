@@ -89,10 +89,10 @@ public interface IUserPublicationRoleRepository
     );
 
     /// <summary>
-    // This method is only intended to be used within this class, and by the `UserReleaseRoleRepository`. So although
-    // it is `public`, it is not intended to be used by other external callers. It is necessary to make this `public` for now,
-    // as a temporary measure, but it will be removed in EES-6196, when we no longer have to cater for the old roles,
-    // and the `UserReleaseRoleRepository` will no longer need to call this method.
+    /// This method is only intended to be used within this class, and by the <see cref="UserReleaseRoleRepository"/>. So although
+    /// it is `public`, it is not intended to be used by other external callers. It is necessary to make this `public` for now,
+    /// as a temporary measure, but it will be removed in EES-6196, when we no longer have to cater for the old roles,
+    /// and the <see cref="UserReleaseRoleRepository"/> will no longer need to call this method.
     /// </summary>
     Task<UserPublicationRole> CreateRole(
         Guid userId,
@@ -104,10 +104,10 @@ public interface IUserPublicationRoleRepository
     );
 
     /// <summary>
-    // This method is only intended to be used within this class, and by the `UserReleaseRoleRepository`. So although
-    // it is `public`, it is not intended to be used by other external callers. It is necessary to make this `public` for now,
-    // as a temporary measure, but it will be removed in EES-6196, when we no longer have to cater for the old roles,
-    // and the `UserReleaseRoleRepository` will no longer need to call this method.
+    /// This method is only intended to be used within this class, and by the <see cref="UserReleaseRoleRepository"/>. So although
+    /// it is `public`, it is not intended to be used by other external callers. It is necessary to make this `public` for now,
+    /// as a temporary measure, but it will be removed in EES-6196, when we no longer have to cater for the old roles,
+    /// and the <see cref="UserReleaseRoleRepository"/> will no longer need to call this method.
     /// </summary>
     Task RemoveRole(UserPublicationRole userPublicationRole, CancellationToken cancellationToken);
 }
