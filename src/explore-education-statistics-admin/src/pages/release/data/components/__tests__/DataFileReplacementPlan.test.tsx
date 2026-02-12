@@ -1448,7 +1448,7 @@ describe('DataReplacementPlan', () => {
           ...defaultTestConfig,
         }}
       >
-        <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+        <AuthContext value={{ user }}>{children}</AuthContext>
       </TestConfigContextProvider>,
     );
   }

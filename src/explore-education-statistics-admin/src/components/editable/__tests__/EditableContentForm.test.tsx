@@ -373,7 +373,7 @@ describe('EditableContentForm', () => {
       const handlePendingDelete = jest.fn();
 
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
@@ -395,7 +395,7 @@ describe('EditableContentForm', () => {
               onSubmit={noop}
             />
           </CommentsContextProvider>
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(handlePendingDelete).not.toHaveBeenCalled();
@@ -420,7 +420,7 @@ describe('EditableContentForm', () => {
       const handleUpdate = jest.fn();
 
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
@@ -442,7 +442,7 @@ describe('EditableContentForm', () => {
               onSubmit={noop}
             />
           </CommentsContextProvider>
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(handleUpdate).not.toHaveBeenCalled();
@@ -475,7 +475,7 @@ describe('EditableContentForm', () => {
       const handleUpdate = jest.fn();
 
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
@@ -497,7 +497,7 @@ describe('EditableContentForm', () => {
               onSubmit={noop}
             />
           </CommentsContextProvider>
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(handleUpdate).not.toHaveBeenCalled();
@@ -523,7 +523,7 @@ describe('EditableContentForm', () => {
       const handleUpdate = jest.fn();
 
       render(
-        <AuthContext.Provider
+        <AuthContext
           value={{
             user: testUser1,
           }}
@@ -545,7 +545,7 @@ describe('EditableContentForm', () => {
               onSubmit={noop}
             />
           </CommentsContextProvider>
-        </AuthContext.Provider>,
+        </AuthContext>,
       );
 
       expect(handleUpdate).not.toHaveBeenCalled();

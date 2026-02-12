@@ -39,11 +39,7 @@ export const PublicationContextProvider = ({
     };
   }, [publication, onPublicationChange, onReload]);
 
-  return (
-    <PublicationContext.Provider value={value}>
-      {children}
-    </PublicationContext.Provider>
-  );
+  return <PublicationContext value={value}>{children}</PublicationContext>;
 };
 
 export default function usePublicationContext() {
