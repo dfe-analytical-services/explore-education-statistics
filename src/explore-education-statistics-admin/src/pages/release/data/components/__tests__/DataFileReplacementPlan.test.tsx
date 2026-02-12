@@ -1062,14 +1062,8 @@ describe('DataReplacementPlan', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Data block 1/ }),
-      ).toBeInTheDocument();
-    });
-
     expect(
-      screen.getByRole('button', { name: 'Data block 1 : ERROR' }),
+      await screen.findByRole('button', { name: 'Data block 1 : ERROR' }),
     ).toBeInTheDocument();
 
     await userEvent.click(
