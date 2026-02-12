@@ -29,6 +29,8 @@ interface Props
 }
 
 const FixedMultiHeaderDataTable = (props: Props) => {
+  const { ref, ...tableProps } = props;
+
   const {
     caption,
     captionId,
@@ -37,12 +39,11 @@ const FixedMultiHeaderDataTable = (props: Props) => {
     footnotesClassName,
     footnotesHeadingTag,
     footnotesId,
-    ref,
     source,
     footnotesHeadingHiddenText,
     tableHeadersForm,
     tableJson,
-  } = props;
+  } = tableProps;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const mainTableRef = useRef<HTMLTableElement>(null);
@@ -122,7 +123,7 @@ const FixedMultiHeaderDataTable = (props: Props) => {
         }}
       >
         <MultiHeaderTable
-          {...props}
+          {...tableProps}
           ariaLabelledBy={captionId}
           ref={mainTableRef}
         />
