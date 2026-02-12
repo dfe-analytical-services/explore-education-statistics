@@ -2,6 +2,9 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ReleaseVersionsMigration;
 
+/// <summary>
+/// TODO EES-6885 Remove after the Release Versions migration is complete.
+/// </summary>
 public abstract class TimeSpanExtensionsTests
 {
     public class PrettyPrintTests : TimeSpanExtensionsTests
