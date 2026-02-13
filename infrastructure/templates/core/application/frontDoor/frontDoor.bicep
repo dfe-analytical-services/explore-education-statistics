@@ -167,8 +167,8 @@ The problem is:
       
 This rule tells Azure Front Door to not serve any response from the cache if it is a Next.JS prefetch.
 
-It also adds a "X-NextJS-Prefetch-Response-Not-Cached" HTTP header to the response to prove that is is not
-being served up from the cache but instead is being handled by this rule.
+It also adds a "X-NextJS-Prefetch-Response-Not-Served-From-Cache" HTTP header to the response to prove that is
+being handled by this rule.
 */
 resource doNotServeCachedContentForNextJsPrefetchesRule 'Microsoft.Cdn/profiles/rulesets/rules@2025-04-15' = {
   parent: nextJsRuleSet

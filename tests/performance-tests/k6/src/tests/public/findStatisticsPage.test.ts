@@ -30,34 +30,7 @@ const name = 'findStatisticsPage.test.ts';
 export function setup(): SetupData {
   const { buildId, response } = setupPublicPageTest(name);
 
-  let dataUrls: string[];
-
-  if (!excludeDataUrls) {
-    const defaultSearchResultsJson = http.get(
-      `${environmentAndUsers.environment.publicUrl}/_next/data/${buildId}/find-statistics.json`,
-    );
-
-    const publications = defaultSearchResultsJson.json(
-      'pageProps.dehydratedState.queries.0.state.data.results',
-    ) as {
-      slug: string;
-      latestReleaseSlug: string;
-    }[];
-
-    const topSearchResultPublications = publications.slice(
-      0,
-      Math.min(numberOfSearchResultsToPrefetch, publications.length),
-    );
-
-    dataUrls = topSearchResultPublications.map(
-      p =>
-        `/find-statistics/${p.slug}/${p.latestReleaseSlug}.json?publication=${p.slug}&release=${p.latestReleaseSlug}`,
-    );
-
-    console.log(`Found data URLs: \n\n${dataUrls.join('\n')}`);
-  } else {
-    dataUrls = [];
-  }
+  const dataUrls = excludeDataUrls ? [] : getDataUrls(buildId);
 
   return {
     buildId,
@@ -82,5 +55,32 @@ const performTest = ({ buildId, dataUrls }: SetupData) =>
     },
     dataUrls: dataUrls.map(getPrefetchRequestConfig),
   });
+
+function getDataUrls(buildId: string): string[] {
+  const defaultSearchResultsJson = http.get(
+    `${environmentAndUsers.environment.publicUrl}/_next/data/${buildId}/find-statistics.json`,
+  );
+
+  const publications = defaultSearchResultsJson.json(
+    'pageProps.dehydratedState.queries.0.state.data.results',
+  ) as {
+    slug: string;
+    latestReleaseSlug: string;
+  }[];
+
+  const topSearchResultPublications = publications.slice(
+    0,
+    Math.min(numberOfSearchResultsToPrefetch, publications.length),
+  );
+
+  const dataUrls = topSearchResultPublications.map(
+    p =>
+      `/find-statistics/${p.slug}/${p.latestReleaseSlug}.json?publication=${p.slug}&release=${p.latestReleaseSlug}`,
+  );
+
+  console.log(`Found data URLs: \n\n${dataUrls.join('\n')}`);
+
+  return dataUrls;
+}
 
 export default performTest;
