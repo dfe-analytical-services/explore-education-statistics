@@ -139,6 +139,79 @@ resource customDomainWithoutCertificate 'Microsoft.Cdn/profiles/customdomains@20
   }
 }
 
+resource nextJsRuleSet 'Microsoft.Cdn/profiles/rulesets@2025-04-15' = {
+  parent: frontDoor
+  name: 'nextjsruleset'
+}
+
+/*
+This rule prevents Next.JS prefetch request responses from being served up from the cache.
+ 
+The problem is:
+  
+    - Next.JS sends prefetch requests AND getServerSideProps requests on the exact same URL, using HTTP headers
+      to differentiate between the 2 behaviours.  The prefetch generally sends back an empty JSON body "{}",
+      whereas the JSON request sends back JSON with server-side props included for the purposes of client-side
+      rendering.
+      
+    - Azure Front Door has no notion of using HTTP headers as part of a cache key.  To Azure Front Door, these
+      two requests look exactly the same.
+      
+    - If a prefetch is called first, it returns no-cache headers and so nothing is cached in AFD.  When a
+      subsequent JSON request comes in on the same URL it is unaffected, as nothing has yet been cached for the
+      URL.
+      
+    - If a JSON request is called first however, it sends back caching headers and so is cached.  When a
+      subsequent prefetch request comes in on the same URL, the cached response from the original JSON request
+      is mistakenly returned.  While not necessarily harmful, it is unexpected.
+      
+This rule tells Azure Front Door to not serve any response from the cache if it is a Next.JS prefetch.
+
+It also adds a "X-NextJS-Prefetch-Response-Not-Cached" HTTP header to the response to prove that is is not
+being served up from the cache but instead is being handled by this rule.
+*/
+resource doNotServeCachedContentForNextJsPrefetchesRule 'Microsoft.Cdn/profiles/rulesets/rules@2025-04-15' = {
+  parent: nextJsRuleSet
+  name: 'donotservecachedcontentfornextjsprefetches'
+  properties: {
+    order: 100
+    conditions: [
+      {
+        name: 'RequestHeader'
+        parameters: {
+          typeName: 'DeliveryRuleRequestHeaderConditionParameters'
+          operator: 'Equal'
+          selector: 'x-middleware-prefetch'
+          matchValues: [
+            '1'
+          ]
+        }
+      }
+    ]
+    actions: [
+      {
+        name: 'ModifyResponseHeader'
+        parameters: {
+          typeName: 'DeliveryRuleHeaderActionParameters'
+          headerAction: 'Append'
+          headerName: 'X-NextJS-Prefetch-Response-Not-Served-From-Cache'
+          value: 'true'
+        }
+      }
+      {
+        name: 'RouteConfigurationOverride'
+        parameters: {
+          typeName: 'DeliveryRuleRouteConfigurationOverrideActionParameters'
+        }
+      }
+    ]
+    matchProcessingBehavior: 'Continue'
+  }
+  dependsOn: [
+    frontDoor
+  ]
+}
+
 resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoints
   name: '${resourcePrefix}-${abbreviations.frontDoorRoutes}'
@@ -205,7 +278,11 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
     originGroup: {
       id: originGroup.id
     }
-    ruleSets: []
+    ruleSets: [
+      {
+        id: nextJsRuleSet.id
+      }
+    ]
     supportedProtocols: [
       'Http'
       'Https'
