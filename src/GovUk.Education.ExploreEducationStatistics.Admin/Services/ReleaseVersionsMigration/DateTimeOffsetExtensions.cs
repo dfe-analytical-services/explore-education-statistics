@@ -17,7 +17,7 @@ public static class DateTimeOffsetExtensions
     public static bool IsUkLocalMidnight(this DateTimeOffset? dateTimeOffset) =>
         dateTimeOffset.HasValue && dateTimeOffset.Value.IsUkLocalMidnight();
 
-    private static bool IsUkLocalMidnight(this DateTimeOffset dateTimeOffset)
+    public static bool IsUkLocalMidnight(this DateTimeOffset dateTimeOffset)
     {
         // Convert the DateTimeOffset to UK local time
         var ukLocalDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneUtils.GetUkTimeZone());

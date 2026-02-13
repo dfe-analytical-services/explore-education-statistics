@@ -1067,20 +1067,151 @@ public abstract class ReleaseVersionsMigrationServiceTests
         }
 
         [Theory]
-        [InlineData("2025-01-01T09:30:25 +00:00", "2025-01-02T00:00:00", ReleasePublishingMethod.Scheduled, true)] // Duration is negative (actual duration= -23 hours, 59 minutes, 35 seconds)
-        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T17:00:25", ReleasePublishingMethod.Immediate, true)] // Duration is negative (actual duration= -30 minutes)
-        [InlineData("2025-01-01T09:30:25 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, false)] // Within 5 minute tolerance (actual duration= 25 seconds)
-        [InlineData("2025-01-01T09:35:00 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, false)] // Within 5 minute tolerance (actual duration= 5 minutes)
-        [InlineData("2025-01-01T09:35:01 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, true)] // Outside 5 minute tolerance (actual duration= 5 minutes, 1 second)
-        [InlineData("2025-01-02T09:30:25 +00:00", "2025-01-01T00:00:00", ReleasePublishingMethod.Scheduled, true)] // Outside 5 minute tolerance (actual duration= 1 day, 25 seconds)
-        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T16:30:00", ReleasePublishingMethod.Immediate, false)] // Within 6 hour tolerance (actual duration= 25 seconds)
-        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T10:30:25", ReleasePublishingMethod.Immediate, false)] // Within 6 hour tolerance (actual duration= 6 hours)
-        [InlineData("2025-01-01T16:30:25 +00:00", "2025-01-01T10:30:24", ReleasePublishingMethod.Immediate, true)] // Outside 6 hour tolerance (actual duration= 6 hours, 1 second)
-        [InlineData("2025-01-02T16:30:25 +00:00", "2025-01-01T16:30:00", ReleasePublishingMethod.Immediate, true)] // Outside 6 hour tolerance (actual duration= 1 day, 25 seconds)
+        [InlineData(
+            "2025-01-01T09:30:25 +00:00",
+            "2025-01-01T00:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "25 seconds",
+            false
+        )]
+        [InlineData(
+            "2025-06-01T08:30:25 +00:00",
+            "2025-05-31T23:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "25 seconds",
+            false
+        )] // Falls within BST
+        [InlineData(
+            "2025-01-01T09:35:00 +00:00",
+            "2025-01-01T00:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "5 minutes",
+            false
+        )]
+        [InlineData(
+            "2025-06-01T08:35:00 +00:00",
+            "2025-05-31T23:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "5 minutes",
+            false
+        )] // Falls within BST
+        [InlineData(
+            "2025-01-01T09:35:01 +00:00",
+            "2025-01-01T00:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "5 minutes, 1 second",
+            true
+        )] // Outside Scheduled tolerance
+        [InlineData(
+            "2025-06-01T08:35:01 +00:00",
+            "2025-05-31T23:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "5 minutes, 1 second",
+            true
+        )] // Falls within BST, Outside Scheduled tolerance
+        [InlineData(
+            "2025-01-02T09:30:25 +00:00",
+            "2025-01-01T00:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "1 day, 25 seconds",
+            true
+        )] // Outside Scheduled tolerance
+        [InlineData(
+            "2025-06-02T08:30:25 +00:00",
+            "2025-05-31T23:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "1 day, 25 seconds",
+            true
+        )] // Falls within BST, Outside Scheduled tolerance
+        [InlineData(
+            "2025-01-01T16:30:25 +00:00",
+            "2025-01-01T16:30:00 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "25 seconds",
+            false
+        )]
+        [InlineData(
+            "2025-06-01T15:30:25 +00:00",
+            "2025-06-01T15:30:00 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "25 seconds",
+            false
+        )] // Falls within BST
+        [InlineData(
+            "2025-01-01T16:30:25 +00:00",
+            "2025-01-01T10:30:25 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "6 hours",
+            false
+        )]
+        [InlineData(
+            "2025-06-01T15:30:25 +00:00",
+            "2025-06-01T09:30:25 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "6 hours",
+            false
+        )] // Falls within BST
+        [InlineData(
+            "2025-01-01T16:30:25 +00:00",
+            "2025-01-01T10:30:24 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "6 hours, 1 second",
+            true
+        )] // Outside Immediate tolerance
+        [InlineData(
+            "2025-06-01T15:30:25 +00:00",
+            "2025-06-01T09:30:24 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "6 hours, 1 second",
+            true
+        )] // Falls within BST, Outside Immediate tolerance
+        [InlineData(
+            "2025-01-02T16:30:25 +00:00",
+            "2025-01-01T16:30:00 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "1 day, 25 seconds",
+            true
+        )] // Outside Immediate tolerance
+        [InlineData(
+            "2025-06-02T15:30:25 +00:00",
+            "2025-06-01T15:30:00 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "1 day, 25 seconds",
+            true
+        )] // Falls within BST, Outside Immediate tolerance
+        [InlineData(
+            "2025-01-01T09:30:25 +00:00",
+            "2025-01-02T00:00:00 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "-23 hours, 59 minutes, 35 seconds",
+            true
+        )] // Duration is negative
+        [InlineData(
+            "2025-01-01T16:30:25 +00:00",
+            "2025-01-01T17:00:25 +00:00",
+            ReleasePublishingMethod.Immediate,
+            "-30 minutes",
+            true
+        )] // Duration is negative
+        [InlineData(
+            "2025-01-01T09:30:25 +00:00",
+            "2025-01-01T00:00:01 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "9 hours, 30 minutes, 24 seconds",
+            true
+        )] // Scheduled trigger time is not midnight, so not adjusted
+        [InlineData(
+            "2025-06-01T08:30:25 +00:00",
+            "2025-05-31T23:00:01 +00:00",
+            ReleasePublishingMethod.Scheduled,
+            "9 hours, 30 minutes, 24 seconds",
+            true
+        )] // Falls within BST, Scheduled trigger time is not midnight, so not adjusted
         public async Task WhenProposedPublishedDateIsNotSimilarToScheduledTriggerDate_ReportIncludesWarning(
             string latestAttemptTimestampString,
             string publishedScheduledString,
             ReleasePublishingMethod method,
+            string expectedDurationPretty,
             bool expectedWarning
         )
         {
@@ -1154,6 +1285,11 @@ public abstract class ReleaseVersionsMigrationServiceTests
                 var report = outcome.AssertRight();
                 var releaseVersionReport = GetReleaseVersionReportFromReport(report, releaseVersionId);
 
+                Assert.Equal(
+                    expectedDurationPretty,
+                    releaseVersionReport.PublishingInfo.TimeSinceScheduledTriggerToCompletionPretty
+                );
+
                 if (expectedWarning)
                 {
                     Assert.True(releaseVersionReport.Warnings.ProposedPublishedDateIsNotSimilarToScheduledTriggerDate);
@@ -1164,14 +1300,21 @@ public abstract class ReleaseVersionsMigrationServiceTests
                     Assert.Null(releaseVersionReport.Warnings.ProposedPublishedDateIsNotSimilarToScheduledTriggerDate);
                 }
 
-                // There should be no other types of warning for this release version
+                // There should be no other types of warning for this release version,
+                // except for when the method is Scheduled and the scheduled trigger time is not midnight UK local time in a couple of the test cases
+                var expectTriggerDateIsNotMidnightWarning =
+                    method == ReleasePublishingMethod.Scheduled && !publishScheduled.IsUkLocalMidnight();
+
                 Assert.Null(releaseVersionReport.Warnings.NoSuccessfulPublishingAttempts);
                 Assert.Null(releaseVersionReport.Warnings.MultipleSuccessfulPublishingAttempts);
                 Assert.Null(releaseVersionReport.Warnings.UpdatesCountDoesNotMatchVersion);
                 Assert.Null(releaseVersionReport.Warnings.ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate);
-                Assert.Null(releaseVersionReport.Warnings.ScheduledTriggerDateIsNotMidnightUkLocalTime);
+                if (!expectTriggerDateIsNotMidnightWarning)
+                {
+                    Assert.Null(releaseVersionReport.Warnings.ScheduledTriggerDateIsNotMidnightUkLocalTime);
+                }
 
-                if (!expectedWarning)
+                if (!(expectedWarning || expectTriggerDateIsNotMidnightWarning))
                 {
                     AssertReportHasNoReleaseVersionsWithWarnings(report);
                 }
