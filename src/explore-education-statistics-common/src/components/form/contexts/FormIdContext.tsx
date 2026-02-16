@@ -46,9 +46,7 @@ export const FormIdContextProvider = ({
     };
   }, [formId]);
 
-  return (
-    <FormIdContext.Provider value={value}>{children}</FormIdContext.Provider>
-  );
+  return <FormIdContext value={value}>{children}</FormIdContext>;
 };
 
 export function useFormIdContext(): FormIdContextValue {

@@ -8,7 +8,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseVersionService');
@@ -87,8 +87,8 @@ describe('PublicationScheduledReleases', () => {
     });
 
     expect(
-      within(row1Cells[2]).getByRole('button', {
-        name: 'View stages for Release 1',
+      within(row1Cells[2]).getByText(/View stages/, {
+        selector: 'summary *',
       }),
     ).toBeInTheDocument();
     expect(
@@ -105,8 +105,8 @@ describe('PublicationScheduledReleases', () => {
     expect(within(row2Cells[0]).getByText('Release 2')).toBeInTheDocument();
     expect(within(row2Cells[1]).getByText('Scheduled')).toBeInTheDocument();
     expect(
-      within(row2Cells[2]).getByRole('button', {
-        name: 'View stages for Release 2',
+      within(row1Cells[2]).getByText(/View stages/, {
+        selector: 'summary *',
       }),
     ).toBeInTheDocument();
     expect(
@@ -133,7 +133,7 @@ describe('PublicationScheduledReleases', () => {
     ).toBeInTheDocument();
   });
 
-  test('shows a view instead of edit link if you do not have permission to edit the release', () => {
+  test('shows a view instead of edit link if you do not have permission to edit the release', async () => {
     render(
       <PublicationScheduledReleases
         publicationId={testPublicationId}
@@ -150,7 +150,7 @@ describe('PublicationScheduledReleases', () => {
       />,
     );
 
-    const rows = screen.getAllByRole('row');
+    const rows = await screen.findAllByRole('row');
     const row1Cells = within(rows[1]).getAllByRole('cell');
 
     expect(within(row1Cells[0]).getByText('Release 1')).toBeInTheDocument();
@@ -164,6 +164,6 @@ describe('PublicationScheduledReleases', () => {
   });
 });
 
-function render(element: ReactElement) {
+function render(element: ReactNode) {
   baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

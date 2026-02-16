@@ -3,7 +3,6 @@ import {
   SubjectMeta,
   SubjectMetaFilterHierarchy,
 } from '@common/services/tableBuilderService';
-import { FilterHierarchyOption } from '../../FilterHierarchyOptions';
 import { OptionLabelsMap } from '../../utils/getFilterHierarchyLabelsMap';
 
 export const testSubjectMeta: SubjectMeta = {

@@ -22,7 +22,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { produce } from 'immer';
 import { testFullTable } from '../../__tests__/__data__/testTableData';
 
@@ -1447,7 +1447,7 @@ describe('chartBuilderReducer', () => {
       });
     });
 
-    test('setting boundary levels does not change data groupings', () => {
+    test('setting boundary levels does not change data groupings', async () => {
       const initialConfiguration: Chart = {
         type: 'map',
         legend: {
@@ -1513,27 +1513,30 @@ describe('chartBuilderReducer', () => {
         }),
       );
 
-      result.current.actions.updateMapBoundaryLevels({
-        boundaryLevel: 10,
-        dataSetConfigs: [
-          {
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2015_AY',
+      await act(() =>
+        result.current.actions.updateMapBoundaryLevels({
+          boundaryLevel: 10,
+          dataSetConfigs: [
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              boundaryLevel: 20,
             },
-            boundaryLevel: 20,
-          },
-          {
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2014_AY',
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+              boundaryLevel: 30,
             },
-            boundaryLevel: 30,
-          },
-        ],
-      });
+          ],
+        }),
+      );
+
       rerender();
 
       expect(result.current.state.map).toEqual<ChartBuilderState['map']>({
@@ -1564,7 +1567,7 @@ describe('chartBuilderReducer', () => {
       });
     });
 
-    test('setting data groupings does not change boundary levels', () => {
+    test('setting data groupings does not change boundary levels', async () => {
       const initialConfiguration: Chart = {
         type: 'map',
         legend: {
@@ -1630,26 +1633,29 @@ describe('chartBuilderReducer', () => {
         }),
       );
 
-      result.current.actions.updateMapDataGroupings({
-        dataSetConfigs: [
-          {
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2015_AY',
+      await act(async () =>
+        result.current.actions.updateMapDataGroupings({
+          dataSetConfigs: [
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              dataGrouping: { type: 'Quantiles', customGroups: [] },
             },
-            dataGrouping: { type: 'Quantiles', customGroups: [] },
-          },
-          {
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2014_AY',
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+              dataGrouping: { type: 'Quantiles', customGroups: [] },
             },
-            dataGrouping: { type: 'Quantiles', customGroups: [] },
-          },
-        ],
-      });
+          ],
+        }),
+      );
+
       rerender();
 
       expect(result.current.state.map).toEqual<ChartBuilderState['map']>({

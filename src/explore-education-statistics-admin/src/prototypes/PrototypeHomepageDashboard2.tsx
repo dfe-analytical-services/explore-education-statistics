@@ -1,6 +1,5 @@
 // import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React from 'react';
-import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 import PageFooter from '@admin/components/PageFooter';
 import PrototypeDashboardContent from '@admin/prototypes/components/PrototypeDashboardContent';
@@ -11,9 +10,7 @@ import styles from './PrototypePublicPage.module.scss';
 const PrototypeHomepage = () => {
   return (
     <>
-      <Helmet>
-        <title>Explore education statistics - GOV.UK</title>
-      </Helmet>
+      <title>Explore education statistics - GOV.UK</title>
       <a href="#main-content" className="govuk-skip-link">
         Skip to main content
       </a>

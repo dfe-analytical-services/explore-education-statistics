@@ -5,8 +5,8 @@ import { MethodologyVersion } from '@admin/services/methodologyService';
 import _publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
@@ -158,12 +158,11 @@ describe('PublicationAdoptMethodologyPage', () => {
   });
 
   test('handles successful form submission', async () => {
-    const user = userEvent.setup();
     const history = createMemoryHistory();
     publicationService.getAdoptableMethodologies.mockResolvedValue(
       testMethodologies,
     );
-    render(
+    const { user } = render(
       <Router history={history}>
         <PublicationContextProvider
           publication={testPublication}
@@ -175,11 +174,7 @@ describe('PublicationAdoptMethodologyPage', () => {
       </Router>,
     );
 
-    await waitFor(() =>
-      expect(
-        screen.getByText('Select a published methodology'),
-      ).toBeInTheDocument(),
-    );
+    await screen.findByLabelText('Search for a published methodology');
 
     await user.click(screen.getByLabelText('Methodology 2'));
 
@@ -198,12 +193,11 @@ describe('PublicationAdoptMethodologyPage', () => {
   });
 
   test('handles clicking the cancel button', async () => {
-    const user = userEvent.setup();
     const history = createMemoryHistory();
     publicationService.getAdoptableMethodologies.mockResolvedValue(
       testMethodologies,
     );
-    render(
+    const { user } = render(
       <Router history={history}>
         <PublicationContextProvider
           publication={testPublication}

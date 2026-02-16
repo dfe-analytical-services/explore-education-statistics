@@ -347,7 +347,7 @@ describe('ChartConfiguration', () => {
     });
   });
 
-  test('renders with initial values', () => {
+  test('renders with initial values', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
@@ -359,7 +359,7 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Subtitle')).toHaveValue(
+    expect(await screen.findByLabelText('Subtitle')).toHaveValue(
       'This is the subtitle',
     );
     expect(screen.getByLabelText('Alt text')).toHaveValue(

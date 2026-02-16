@@ -6,17 +6,19 @@ import ChevronGrid from '@common/components/ChevronGrid';
 import styles from '@common/modules/release/components/ReleaseDataAndFiles.module.scss';
 import { FileInfo } from '@common/services/types/file';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode } from 'react';
+import React, { HTMLAttributes, ReactElement, ReactNode } from 'react';
 
 interface Props {
   downloadFiles: FileInfo[];
   hasDataGuidance: boolean;
   headingClassName?: string;
-  renderCreateTablesLink?: ReactNode;
-  renderDataCatalogueLink?: ReactNode;
-  renderAllFilesLink?: ReactNode;
-  renderDataGuidanceLink: ReactNode;
-  renderDownloadLink: (file: FileInfo) => ReactNode;
+  renderCreateTablesLink?: ReactElement<HTMLAttributes<HTMLElement>>;
+  renderDataCatalogueLink?: ReactElement<HTMLAttributes<HTMLElement>>;
+  renderAllFilesLink?: ReactElement<HTMLAttributes<HTMLElement>>;
+  renderDataGuidanceLink: ReactElement<HTMLAttributes<HTMLElement>>;
+  renderDownloadLink: (
+    file: FileInfo,
+  ) => ReactElement<HTMLAttributes<HTMLElement>>;
   renderRelatedDashboards?: ReactNode;
   showDownloadFilesList?: boolean;
   trackScroll?: boolean;

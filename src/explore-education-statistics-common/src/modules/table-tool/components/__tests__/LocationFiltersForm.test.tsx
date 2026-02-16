@@ -13,7 +13,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 describe('LocationFiltersForm', () => {
-  test('renders flat location group options correctly', () => {
+  test('renders flat location group options correctly', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -23,7 +23,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    const countryGroup = screen.getByRole('group', {
+    const countryGroup = await screen.findByRole('group', {
       name: 'Country',
       hidden: true,
     });
@@ -37,7 +37,7 @@ describe('LocationFiltersForm', () => {
     );
     expect(countryCheckboxes[0]).not.toBeChecked();
 
-    const localAuthorityGroup = screen.getByRole('group', {
+    const localAuthorityGroup = await screen.findByRole('group', {
       name: 'Local authority',
       hidden: true,
     });
@@ -73,7 +73,7 @@ describe('LocationFiltersForm', () => {
     );
     expect(localAuthorityCheckboxes[2]).not.toBeChecked();
 
-    const regionGroup = screen.getByRole('group', {
+    const regionGroup = await screen.findByRole('group', {
       name: 'Region',
       hidden: true,
     });
@@ -93,7 +93,7 @@ describe('LocationFiltersForm', () => {
     expect(regionCheckboxes[1]).not.toBeChecked();
   });
 
-  test('renders nested location group options correctly', () => {
+  test('renders nested location group options correctly', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -103,7 +103,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    const countryGroup = screen.getByRole('group', {
+    const countryGroup = await screen.findByRole('group', {
       name: 'Country',
       hidden: true,
     });
@@ -118,7 +118,7 @@ describe('LocationFiltersForm', () => {
     expect(countryCheckboxes[0]).not.toBeChecked();
 
     const localAuthorityGroup = within(
-      screen.getByRole('group', {
+      await screen.findByRole('group', {
         name: 'Local authority',
         hidden: true,
       }),
@@ -170,7 +170,7 @@ describe('LocationFiltersForm', () => {
     );
   });
 
-  test('does not render school location group options by default', () => {
+  test('does not render school location group options by default', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -184,7 +184,7 @@ describe('LocationFiltersForm', () => {
     expect(schoolCheckboxes).toHaveLength(0);
 
     expect(
-      screen.getByText(
+      await screen.findByText(
         'Search by school name or unique reference number (URN), and select at least one option before continuing to the next step.',
       ),
     ).toBeInTheDocument();
@@ -200,16 +200,14 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    const searchInput = screen.getByLabelText(/Search options/);
+    const searchInput = await screen.findByLabelText(/Search options/);
 
     await userEvent.type(searchInput, 'school');
 
-    await waitFor(() => {
-      expect(screen.getByText('Select all 3 options')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Select all 3 options')).toBeInTheDocument();
 
     const schoolGroup = within(
-      screen.getByRole('group', {
+      await screen.findByRole('group', {
         name: 'Schools',
       }),
     );
@@ -258,23 +256,23 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('Local authority 2'));
+    await userEvent.click(await screen.findByLabelText('Local authority 2'));
 
     const countrySection = within(
-      screen.getByTestId('locations-country-accordion'),
+      await screen.findByTestId('locations-country-accordion'),
     );
     const localAuthoritySection = within(
-      screen.getByTestId('locations-localAuthority-accordion'),
+      await screen.findByTestId('locations-localAuthority-accordion'),
     );
     const regionSection = within(
-      screen.getByTestId('locations-region-accordion'),
+      await screen.findByTestId('locations-region-accordion'),
     );
 
     expect(localAuthoritySection.getByText('1 selected')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByLabelText('Local authority 3'));
-    await userEvent.click(screen.getByLabelText('Country 1'));
-    await userEvent.click(screen.getByLabelText('Region 2'));
+    await userEvent.click(await screen.findByLabelText('Local authority 3'));
+    await userEvent.click(await screen.findByLabelText('Country 1'));
+    await userEvent.click(await screen.findByLabelText('Region 2'));
 
     expect(localAuthoritySection.getByText('2 selected')).toBeInTheDocument();
     expect(countrySection.getByText('1 selected')).toBeInTheDocument();
@@ -292,18 +290,18 @@ describe('LocationFiltersForm', () => {
     );
 
     const countrySection = within(
-      screen.getByTestId('locations-country-accordion'),
+      await screen.findByTestId('locations-country-accordion'),
     );
     const localAuthoritySection = within(
-      screen.getByTestId('locations-localAuthority-accordion'),
+      await screen.findByTestId('locations-localAuthority-accordion'),
     );
 
-    await userEvent.click(screen.getByLabelText('Local authority 2'));
+    await userEvent.click(await screen.findByLabelText('Local authority 2'));
 
     expect(localAuthoritySection.getByText('1 selected')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByLabelText('Local authority 3'));
-    await userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(await screen.findByLabelText('Local authority 3'));
+    await userEvent.click(await screen.findByLabelText('Country 1'));
 
     expect(localAuthoritySection.getByText('2 selected')).toBeInTheDocument();
     expect(countrySection.getByText('1 selected')).toBeInTheDocument();
@@ -320,21 +318,19 @@ describe('LocationFiltersForm', () => {
     );
 
     await userEvent.click(
-      screen.getByRole('button', {
+      await screen.findByRole('button', {
         name: 'Next step',
       }),
     );
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('link', {
-          name: 'Select at least one location',
-        }),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByRole('link', {
+        name: 'Select at least one location',
+      }),
+    ).toBeInTheDocument();
   });
 
-  test('only the correct checkboxes are selected from initial values', () => {
+  test('only the correct checkboxes are selected from initial values', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -345,16 +341,16 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Local authority 1')).toBeChecked();
-    expect(screen.getByLabelText('Local authority 3')).toBeChecked();
-    expect(screen.getByLabelText('Region 2')).toBeChecked();
+    expect(await screen.findByLabelText('Local authority 1')).toBeChecked();
+    expect(await screen.findByLabelText('Local authority 3')).toBeChecked();
+    expect(await screen.findByLabelText('Region 2')).toBeChecked();
 
-    expect(screen.getByLabelText('Country 1')).not.toBeChecked();
-    expect(screen.getByLabelText('Local authority 2')).not.toBeChecked();
-    expect(screen.getByLabelText('Region 1')).not.toBeChecked();
+    expect(await screen.findByLabelText('Country 1')).not.toBeChecked();
+    expect(await screen.findByLabelText('Local authority 2')).not.toBeChecked();
+    expect(await screen.findByLabelText('Region 1')).not.toBeChecked();
   });
 
-  test('only the correct checkboxes (in nested groups) are selected from initial values', () => {
+  test('only the correct checkboxes (in nested groups) are selected from initial values', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -365,15 +361,15 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Local authority 1')).toBeChecked();
-    expect(screen.getByLabelText('Local authority 3')).toBeChecked();
+    expect(await screen.findByLabelText('Local authority 1')).toBeChecked();
+    expect(await screen.findByLabelText('Local authority 3')).toBeChecked();
 
-    expect(screen.getByLabelText('Country 1')).not.toBeChecked();
-    expect(screen.getByLabelText('Local authority 2')).not.toBeChecked();
-    expect(screen.getByLabelText('Local authority 4')).not.toBeChecked();
+    expect(await screen.findByLabelText('Country 1')).not.toBeChecked();
+    expect(await screen.findByLabelText('Local authority 2')).not.toBeChecked();
+    expect(await screen.findByLabelText('Local authority 4')).not.toBeChecked();
   });
 
-  test('automatically selects the option and expands the group if only one location available', () => {
+  test('automatically selects the option and expands the group if only one location available', async () => {
     const testSingleLocation: SubjectMeta['locations'] = {
       country: {
         legend: 'Country',
@@ -397,11 +393,13 @@ describe('LocationFiltersForm', () => {
     );
 
     const countrySection = within(
-      screen.getByTestId('locations-country-accordion'),
+      await screen.findByTestId('locations-country-accordion'),
     );
     expect(countrySection.getByText('1 selected')).toBeInTheDocument();
 
-    const country = within(screen.getByRole('group', { name: 'Country' }));
+    const country = within(
+      await screen.findByRole('group', { name: 'Country' }),
+    );
 
     const checkboxes = country.getAllByRole('checkbox');
 
@@ -412,7 +410,7 @@ describe('LocationFiltersForm', () => {
     expect(country.getByLabelText('Country 1')).toBeChecked();
   });
 
-  test('automatically selects the option and expands the nested group if only one location available', () => {
+  test('automatically selects the option and expands the nested group if only one location available', async () => {
     const testSingleLocationNested: SubjectMeta['locations'] = {
       localAuthority: {
         legend: 'Local authority',
@@ -443,23 +441,27 @@ describe('LocationFiltersForm', () => {
     );
 
     const localAuthoritySection = within(
-      screen.getByTestId('locations-localAuthority-accordion'),
+      await screen.findByTestId('locations-localAuthority-accordion'),
     );
 
-    expect(localAuthoritySection.getByText('1 selected')).toBeInTheDocument();
+    expect(
+      await localAuthoritySection.findByText('1 selected'),
+    ).toBeInTheDocument();
 
     const localAuthority = within(
-      screen.getByRole('group', { name: 'Local authority' }),
+      await screen.findByRole('group', { name: 'Local authority' }),
     );
 
-    const checkboxes = localAuthority.getAllByRole('checkbox');
+    const checkboxes = await localAuthority.findAllByRole('checkbox');
 
     expect(checkboxes).toHaveLength(1);
 
-    expect(localAuthority.getByLabelText('Local authority 1')).toEqual(
+    expect(await localAuthority.findByLabelText('Local authority 1')).toEqual(
       checkboxes[0],
     );
-    expect(localAuthority.getByLabelText('Local authority 1')).toBeChecked();
+    expect(
+      await localAuthority.findByLabelText('Local authority 1'),
+    ).toBeChecked();
   });
 
   test('clicking `Next step` calls `onSubmit` with correct values', async () => {
@@ -473,10 +475,12 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('Local authority 3'));
-    await userEvent.click(screen.getByLabelText('Region 1'));
+    await userEvent.click(await screen.findByLabelText('Local authority 3'));
+    await userEvent.click(await screen.findByLabelText('Region 1'));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Next step' }),
+    );
 
     const expected = {
       locationIds: ['local-authority-3', 'region-1'],
@@ -499,11 +503,13 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('Local authority 1'));
-    await userEvent.click(screen.getByLabelText('Local authority 3'));
-    await userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(await screen.findByLabelText('Local authority 1'));
+    await userEvent.click(await screen.findByLabelText('Local authority 3'));
+    await userEvent.click(await screen.findByLabelText('Country 1'));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Next step' }),
+    );
 
     const expected = {
       locationIds: ['country-1', 'local-authority-1', 'local-authority-3'],

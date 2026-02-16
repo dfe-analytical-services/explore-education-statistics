@@ -30,12 +30,13 @@ import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import Editor from 'explore-education-statistics-ckeditor';
 import React, {
-  MutableRefObject,
   ReactNode,
+  RefObject,
   useCallback,
   useEffect,
   useMemo,
   useRef,
+  useTransition,
 } from 'react';
 
 export type EditorChangeHandler = (value: string) => void;
@@ -90,11 +91,11 @@ const FormEditor = ({
   onImageUpload,
   onImageUploadCancel,
 }: FormEditorProps) => {
-  const editorInstance = useRef<EditorType>();
-  const commentsPlugin = useRef<CommentsPlugin>();
-  const featuredTablesPlugin = useRef<FeaturedTablesPlugin>();
-  const glossaryPlugin = useRef<GlossaryPlugin>();
-  const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+  const editorInstance = useRef<EditorType>(null);
+  const commentsPlugin = useRef<CommentsPlugin>(null);
+  const featuredTablesPlugin = useRef<FeaturedTablesPlugin>(null);
+  const glossaryPlugin = useRef<GlossaryPlugin>(null);
+  const editorRef: RefObject<HTMLDivElement | null> = useRef(null);
   const { currentInteraction, selectedComment, setMarkersOrder } =
     useCommentsContext();
   const [showFeaturedTablesModal, toggleFeaturedTablesModal] = useToggle(false);
@@ -116,6 +117,8 @@ const FormEditor = ({
   });
 
   const [isFocused, toggleFocused] = useToggle(false);
+
+  const [, startBlurTransition] = useTransition();
 
   const describedBy = useMemo(
     () =>
@@ -187,18 +190,11 @@ const FormEditor = ({
   const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
     toggleFocused.off();
 
-    // Add a tiny timeout to prevent form submit events being lost during
-    // the blur (but only when there is a large DOM change e.g. element renders).
-    // By 'deferring' the blur event slightly, the higher priority submit
-    // event can take place without interruption.
-    //
-    // I'm fairly sure this is due to CKEditor's event system not being
-    // handled by React. This means React is not aware the CKEditor
-    // blur should not take precedence over the submit event.
-    // This may be fixable in React 18 with the new `useTransition` hook.
-    setTimeout(() => {
+    // Ensure form submit events are not lost during the blur by marking
+    // the blur state updates as low priority.
+    startBlurTransition(() => {
       onBlur?.();
-    }, 100);
+    });
   }, [onBlur, toggleFocused]);
 
   // Change editor to add attributes like `aria-describedby`

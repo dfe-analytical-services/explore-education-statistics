@@ -35,9 +35,9 @@ export const ApplicationInsightsContextProvider = ({
   }, [instrumentationKey]);
 
   return (
-    <ApplicationInsightsContext.Provider value={appInsights}>
+    <ApplicationInsightsContext value={appInsights}>
       {children}
-    </ApplicationInsightsContext.Provider>
+    </ApplicationInsightsContext>
   );
 };
 

@@ -5,9 +5,9 @@ import {
   ConfigContextProvider,
   useConfig,
 } from '@admin/contexts/ConfigContext';
+import { ConfiguredMsalProvider } from '@admin/contexts/ConfiguredMsalProvider';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import routes, { publicRoutes } from '@admin/routes/routes';
-import { ConfiguredMsalProvider } from '@admin/contexts/ConfiguredMsalProvider';
 import {
   ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
   useApplicationInsights,
@@ -16,17 +16,24 @@ import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivity
 import composeProviders from '@common/hocs/composeProviders';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import {
-  QueryClient,
   QueryClientProvider as BaseQueryClientProvider,
+  QueryClient,
 } from '@tanstack/react-query';
+import {
+  createHead,
+  UnheadProvider as BaseUnheadProvider,
+} from '@unhead/react/client';
 import React, { lazy, ReactNode, Suspense, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
-import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
+import PageNotFoundPage from './pages/errors/PageNotFoundPage';
+
 import 'ckeditor5/ckeditor5.css';
 
 const queryClient = new QueryClient();
+
+const head = createHead();
 
 const PrototypeIndexPage = lazy(
   () => import('@admin/prototypes/PrototypeIndexPage'),
@@ -107,6 +114,7 @@ const Providers = composeProviders(
   ApplicationInsightsContextProvider,
   BrowserRouter,
   NetworkActivityContextProvider,
+  UnheadProvider,
   QueryClientProvider,
   ConfiguredMsalProvider,
   AuthContextProvider,
@@ -135,4 +143,8 @@ function QueryClientProvider({ children }: { children?: ReactNode }) {
       {children}
     </BaseQueryClientProvider>
   );
+}
+
+function UnheadProvider({ children }: { children?: ReactNode }) {
+  return <BaseUnheadProvider head={head}>{children}</BaseUnheadProvider>;
 }

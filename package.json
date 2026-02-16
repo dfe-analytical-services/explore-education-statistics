@@ -9,14 +9,14 @@
   },
   "pnpm": {
     "overrides": {
-      "@tanstack/query-core": "4.36.1",
-      "@tanstack/react-query": "4.36.1"
+      "@tanstack/query-core": "4.41.1",
+      "@tanstack/react-query": "4.42.0"
     }
   },
   "devDependencies": {
     "@commander-js/extra-typings": "^11.0.0",
     "@next/eslint-plugin-next": "15.5.9",
-    "@types/jest": "^29.5.3",
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18.17.5",
     "@types/signal-exit": "^3.0.1",
@@ -44,9 +44,9 @@
     "prettier": "^3.0.1",
     "signal-exit": "^4.1.0",
     "split2": "^4.2.0",
-    "stylelint": "^15.10.2",
-    "stylelint-config-sass-guidelines": "^10.0.0",
-    "stylelint-prettier": "^4.0.2",
+    "stylelint": "^16.26.1",
+    "stylelint-config-sass-guidelines": "^12.1.0",
+    "stylelint-prettier": "^5.0.3",
     "tree-kill": "^1.2.2",
     "tsx": "^4.12.0",
     "typescript": "^5.5.4"

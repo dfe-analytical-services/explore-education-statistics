@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormFieldDateInput renders correctly 1`] = `
 <div class="govuk-form-group">
@@ -14,12 +14,12 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       >
         Day
       </label>
-      <input name="startDate.day"
-             class="govuk-input govuk-input--width-2"
+      <input class="govuk-input govuk-input--width-2"
              id="startDate-day"
              inputmode="numeric"
              type="text"
              value
+             name="startDate.day"
       >
     </div>
     <div class="govuk-form-group govuk-date-input__item">
@@ -28,12 +28,12 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       >
         Month
       </label>
-      <input name="startDate.month"
-             class="govuk-input govuk-input--width-2"
+      <input class="govuk-input govuk-input--width-2"
              id="startDate-month"
              inputmode="numeric"
              type="text"
              value
+             name="startDate.month"
       >
     </div>
     <div class="govuk-form-group govuk-date-input__item">
@@ -42,12 +42,12 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       >
         Year
       </label>
-      <input name="startDate.year"
-             class="govuk-input govuk-input--width-4"
+      <input class="govuk-input govuk-input--width-4"
              id="startDate-year"
              inputmode="numeric"
              type="text"
              value
+             name="startDate.year"
       >
     </div>
   </fieldset>

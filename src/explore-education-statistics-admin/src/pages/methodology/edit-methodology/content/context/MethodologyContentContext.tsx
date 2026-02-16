@@ -2,7 +2,7 @@ import { MethodologyContent } from '@admin/services/methodologyContentService';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
-import { Reducer } from 'use-immer';
+import { ImmerReducer } from 'use-immer';
 import { MethodologyDispatchAction } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 
@@ -24,7 +24,7 @@ const MethodologyDispatchContext = createContext<
   MethodologyContextDispatch | undefined
 >(undefined);
 
-export const methodologyReducer: Reducer<
+export const methodologyReducer: ImmerReducer<
   MethodologyContextState,
   MethodologyDispatchAction
 > = (draft, action) => {
@@ -149,11 +149,11 @@ function MethodologyContentProvider({
   );
 
   return (
-    <MethodologyStateContext.Provider value={state}>
-      <MethodologyDispatchContext.Provider value={dispatch}>
+    <MethodologyStateContext value={state}>
+      <MethodologyDispatchContext value={dispatch}>
         {children}
-      </MethodologyDispatchContext.Provider>
-    </MethodologyStateContext.Provider>
+      </MethodologyDispatchContext>
+    </MethodologyStateContext>
   );
 }
 

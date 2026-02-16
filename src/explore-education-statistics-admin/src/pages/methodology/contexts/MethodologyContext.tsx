@@ -31,11 +31,7 @@ export const MethodologyContextProvider = ({
     };
   }, [onMethodologyChange, methodology]);
 
-  return (
-    <MethodologyContext.Provider value={value}>
-      {children}
-    </MethodologyContext.Provider>
-  );
+  return <MethodologyContext value={value}>{children}</MethodologyContext>;
 };
 
 export function useMethodologyContext() {

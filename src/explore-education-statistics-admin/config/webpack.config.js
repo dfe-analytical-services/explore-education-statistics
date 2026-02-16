@@ -132,16 +132,7 @@ module.exports = webpackEnv => {
             // https://github.com/facebook/create-react-app/issues/2677
             ident: 'postcss',
             plugins: [
-              'postcss-flexbugs-fixes',
-              [
-                'postcss-preset-env',
-                {
-                  autoprefixer: {
-                    flexbox: 'no-2009',
-                  },
-                  stage: 3,
-                },
-              ],
+              ['postcss-preset-env'],
               // Adds PostCSS Normalize as the reset css with default options,
               // so that it honors browserslist config in package.json
               // which in turn let's users customize the target behavior as per their needs.
@@ -260,9 +251,6 @@ module.exports = webpackEnv => {
               // https://github.com/terser-js/terser/issues/120
               inline: 2,
             },
-            mangle: {
-              safari10: true,
-            },
             // Added for profiling in devtools
             keep_classnames: isEnvProductionProfile,
             keep_fnames: isEnvProductionProfile,
@@ -309,7 +297,7 @@ module.exports = webpackEnv => {
         './dist/cpexcel.js': false,
         '@admin': paths.appSrc,
         '@common': 'explore-education-statistics-common/src',
-        react: require.resolve('react'),
+        react: path.dirname(require.resolve('react')),
       },
       fallback: {
         path: require.resolve('path-browserify'),
@@ -331,7 +319,7 @@ module.exports = webpackEnv => {
           babelRuntimeRegenerator,
           // EES - Add extra allowed files for compatibility
           // with our custom import aliases
-          require.resolve('react'),
+          path.dirname(require.resolve('react')),
         ]),
       ],
     },

@@ -27,9 +27,9 @@ export const PublicationContextProvider = ({
   );
 
   return (
-    <PublicationContext.Provider value={state}>
+    <PublicationContext value={state}>
       {typeof children === 'function' ? children(state) : children}
-    </PublicationContext.Provider>
+    </PublicationContext>
   );
 };
 

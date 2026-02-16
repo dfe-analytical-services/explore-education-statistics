@@ -175,9 +175,9 @@ describe('expandDataSet', () => {
       },
     };
 
-    expect(() =>
-      expandDataSet(dataSet, testFullTable.subjectMeta),
-    ).toThrowError("Could not find indicator: 'indicator-12345'");
+    expect(() => expandDataSet(dataSet, testFullTable.subjectMeta)).toThrow(
+      "Could not find indicator: 'indicator-12345'",
+    );
   });
 
   test('throws error if filter could not be found', () => {
@@ -191,9 +191,9 @@ describe('expandDataSet', () => {
       },
     };
 
-    expect(() =>
-      expandDataSet(dataSet, testFullTable.subjectMeta),
-    ).toThrowError("Could not find category filter: 'filter-12345'");
+    expect(() => expandDataSet(dataSet, testFullTable.subjectMeta)).toThrow(
+      "Could not find category filter: 'filter-12345'",
+    );
   });
 
   test('throws error if location could not be found', () => {
@@ -207,9 +207,7 @@ describe('expandDataSet', () => {
       },
     };
 
-    expect(() =>
-      expandDataSet(dataSet, testFullTable.subjectMeta),
-    ).toThrowError(
+    expect(() => expandDataSet(dataSet, testFullTable.subjectMeta)).toThrow(
       "Could not find location with value: '12345', level: 'localAuthority'",
     );
   });

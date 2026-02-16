@@ -63,7 +63,7 @@ describe('partialDate', () => {
           month: 7,
           day: 13,
         }),
-      ).toThrowError(/Could not parse invalid PartialDate to date/);
+      ).toThrow(/Could not parse invalid PartialDate to date/);
     });
   });
 

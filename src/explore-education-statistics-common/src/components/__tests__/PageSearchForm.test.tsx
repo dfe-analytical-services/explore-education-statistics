@@ -4,7 +4,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import PageSearchForm from '../PageSearchForm';
@@ -14,6 +14,7 @@ const labelText = 'Find on this page';
 describe('PageSearchForm', () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    Element.prototype.scrollIntoView = jest.fn();
   });
 
   test('does not render results if input is less than default 3 characters', async () => {
@@ -51,9 +52,11 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'To');
+    await user.type(await screen.findByLabelText(labelText), 'To');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     await waitFor(() =>
       expect(screen.queryAllByRole('option')).toHaveLength(0),
@@ -95,9 +98,11 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(await screen.findByLabelText(labelText), 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(screen.queryAllByRole('option')).toHaveLength(0);
   });
@@ -137,15 +142,17 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'TEST');
+    await user.type(await screen.findByLabelText(labelText), 'TEST');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 2 results',
     );
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('TESTING 2');
@@ -187,15 +194,17 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'TE');
+    await user.type(await screen.findByLabelText(labelText), 'TE');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 2 results',
     );
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('TESTING 2');
@@ -237,15 +246,17 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(await screen.findByLabelText(labelText), 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 5 results',
     );
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
 
     expect(options).toHaveLength(5);
     expect(options[0]).toHaveTextContent('Test 1');
@@ -254,7 +265,7 @@ describe('PageSearchForm', () => {
     expect(options[3]).toHaveTextContent('Test 4');
     expect(options[4]).toHaveTextContent('Test 5');
 
-    expect(screen.getByRole('listbox')).toMatchSnapshot();
+    expect(await screen.findByRole('listbox')).toMatchSnapshot();
   });
 
   test('renders results found in custom selectors', async () => {
@@ -296,21 +307,23 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(await screen.findByLabelText(labelText), 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 2 results',
     );
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('Test 1');
     expect(options[1]).toHaveTextContent('Test 2');
 
-    expect(screen.getByRole('listbox')).toMatchSnapshot();
+    expect(await screen.findByRole('listbox')).toMatchSnapshot();
   });
 
   test('result locations uses nearest heading', async () => {
@@ -335,15 +348,17 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(await screen.findByLabelText(labelText), 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 2 results',
     );
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('Test 1');
@@ -351,7 +366,7 @@ describe('PageSearchForm', () => {
     expect(options[1]).toHaveTextContent('Test 2');
     expect(options[1]).toHaveTextContent('Section 2');
 
-    expect(screen.getByRole('listbox')).toMatchSnapshot();
+    expect(await screen.findByRole('listbox')).toMatchSnapshot();
   });
 
   test('result locations include heading hierarchy', async () => {
@@ -373,21 +388,23 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(await screen.findByLabelText(labelText), 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 1 result',
     );
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
 
     expect(options).toHaveLength(1);
     expect(options[0]).toHaveTextContent('Test 1');
     expect(options[0]).toHaveTextContent('Section 1 > Section 2 > Section 3');
 
-    expect(screen.getByRole('listbox')).toMatchSnapshot();
+    expect(await screen.findByRole('listbox')).toMatchSnapshot();
   });
 
   test('result locations include accordion sections', async () => {
@@ -415,15 +432,17 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(await screen.findByLabelText(labelText), 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 2 results',
     );
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('Test 1');
@@ -435,11 +454,12 @@ describe('PageSearchForm', () => {
       'Section 1 > Section 2 > Accordion section 2',
     );
 
-    expect(screen.getByRole('listbox')).toMatchSnapshot();
+    expect(await screen.findByRole('listbox')).toMatchSnapshot();
   });
 
   test('clicking result scrolls and focuses the element', async () => {
     const user = userEvent.setup({ delay: null });
+
     render(
       <div>
         <h2>Section 1</h2>
@@ -449,23 +469,24 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(await screen.findByLabelText(labelText), 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 1 result',
     );
 
-    await user.click(screen.getAllByRole('option')[0]);
+    const option = (await screen.findAllByRole('option'))[0];
+    await user.click(option);
 
-    await flushTasks();
+    await act(() => flushTasks());
 
-    await waitFor(() => {
-      const target = screen.getByTestId('target');
-      expect(target).toHaveFocus();
-      expect(target).toHaveScrolledIntoView();
-    });
+    const target = await screen.findByTestId('target');
+    expect(target).toHaveFocus();
+    expect(target).toHaveScrolledIntoView();
   });
 
   test('pressing Enter on result scrolls and focuses the element', async () => {
@@ -479,24 +500,25 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await user.type(screen.getByLabelText(labelText), 'Test');
+    const input = await screen.findByLabelText(labelText);
+    await user.type(input, 'Test');
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 1 result',
     );
 
-    await user.keyboard('[ArrowDown]');
-    await user.keyboard('[Enter]');
-
-    await flushTasks();
-
-    await waitFor(() => {
-      const target = screen.getByTestId('target');
-      expect(target).toHaveFocus();
-      expect(target).toHaveScrolledIntoView();
+    await act(async () => {
+      await user.keyboard('{ArrowDown}{Enter}');
+      await flushTasks();
     });
+
+    const target = await screen.findByTestId('target');
+    expect(target).toHaveFocus();
+    expect(target).toHaveScrolledIntoView();
   });
 
   test('opens parent accordion of selected result', async () => {
@@ -513,25 +535,27 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
+    expect(await screen.findByLabelText(labelText)).toBeInTheDocument();
+
+    await user.type(await screen.findByLabelText(labelText), 'Test');
+
+    await act(async () => {
+      jest.runOnlyPendingTimers();
     });
-
-    await user.type(screen.getByLabelText(labelText), 'Test');
-
-    jest.runOnlyPendingTimers();
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 1 result',
     );
 
-    const accordionSection = screen.getByTestId('accordionSection');
+    const accordionSection = await screen.findByTestId('accordionSection');
 
     expect(within(accordionSection).getByText('Show')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('option'));
+    await user.click(await screen.findByRole('option'));
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(within(accordionSection).getByText('Hide')).toBeInTheDocument();
   });
@@ -548,30 +572,30 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
+    expect(await screen.findByLabelText(labelText)).toBeInTheDocument();
+
+    await user.type(await screen.findByLabelText(labelText), 'Test');
+
+    await act(async () => {
+      jest.runOnlyPendingTimers();
     });
-
-    await user.type(screen.getByLabelText(labelText), 'Test');
-
-    jest.runOnlyPendingTimers();
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 1 result',
     );
 
     expect(
-      screen.getByRole('button', {
+      await screen.findByRole('button', {
         name: 'Details 1',
       }),
     ).toHaveAttribute('aria-expanded', 'false');
 
-    await user.click(screen.getByRole('option'));
+    await user.click(await screen.findByRole('option'));
 
-    await flushTasks();
+    await act(() => flushTasks());
 
     expect(
-      screen.getByRole('button', {
+      await screen.findByRole('button', {
         name: 'Details 1',
       }),
     ).toHaveAttribute('aria-expanded', 'true');
@@ -594,19 +618,19 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
+    expect(await screen.findByLabelText(labelText)).toBeInTheDocument();
+
+    await user.type(await screen.findByLabelText(labelText), 'Test');
+
+    await act(async () => {
+      jest.runOnlyPendingTimers();
     });
-
-    await user.type(screen.getByLabelText(labelText), 'Test');
-
-    jest.runOnlyPendingTimers();
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 1 result',
     );
 
-    const tabs = screen.getAllByRole('tab');
+    const tabs = await screen.findAllByRole('tab');
 
     expect(tabs[0]).toHaveTextContent('Tab 1');
     expect(tabs[1]).toHaveTextContent('Tab 2');
@@ -614,9 +638,12 @@ describe('PageSearchForm', () => {
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
-    await user.click(screen.getByRole('option'));
+    const option = await screen.findByRole('option');
 
-    await flushTasks();
+    await act(async () => {
+      await user.click(option);
+      await flushTasks();
+    });
 
     expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
@@ -624,6 +651,7 @@ describe('PageSearchForm', () => {
 
   test('opens nested sections of selected result', async () => {
     const user = userEvent.setup({ delay: null });
+
     render(
       <div>
         <Accordion id="test-accordion">
@@ -645,26 +673,30 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(labelText)).toBeInTheDocument();
+    expect(await screen.findByLabelText(labelText)).toBeInTheDocument();
+
+    await user.type(await screen.findByLabelText(labelText), 'Test');
+
+    await act(async () => {
+      jest.runOnlyPendingTimers();
     });
-
-    await user.type(screen.getByLabelText(labelText), 'Test');
-
-    jest.runOnlyPendingTimers();
 
     expect(await screen.findByTestId('results-label')).toHaveTextContent(
       'Found 1 result',
     );
 
-    const accordionSection = screen.getByTestId('accordionSection');
-    const tabs = screen.getAllByRole('tab');
+    const accordionSection = await screen.findByTestId('accordionSection');
+    const tabs = await screen.findAllByRole('tab');
 
     expect(within(accordionSection).getByText('Show')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('option'));
+    const option = await screen.findByRole('option');
+    expect(option).toBeInTheDocument();
 
-    await flushTasks();
+    await act(async () => {
+      await user.click(option);
+      await flushTasks();
+    });
 
     expect(within(accordionSection).getByText('Hide')).toBeInTheDocument();
 

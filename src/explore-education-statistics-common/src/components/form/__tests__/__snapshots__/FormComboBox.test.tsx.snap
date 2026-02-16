@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormComboBox renders with no options by default 1`] = `
 <div class="container"
@@ -9,8 +9,7 @@ exports[`FormComboBox renders with no options by default 1`] = `
   >
     Choose option
   </label>
-  <input type="text"
-         role="combobox"
+  <input role="combobox"
          autocomplete="off"
          class="govuk-input searchInput"
          id="test-combobox-input"
@@ -18,6 +17,7 @@ exports[`FormComboBox renders with no options by default 1`] = `
          aria-haspopup="listbox"
          aria-controls="test-combobox-options"
          aria-expanded="true"
+         type="text"
          value
   >
 </div>
@@ -32,8 +32,7 @@ exports[`FormComboBox renders with options in correct order when input changes 1
   >
     Choose option
   </label>
-  <input type="text"
-         role="combobox"
+  <input role="combobox"
          autocomplete="off"
          class="govuk-input searchInput"
          id="test-combobox-input"
@@ -41,6 +40,7 @@ exports[`FormComboBox renders with options in correct order when input changes 1
          aria-haspopup="listbox"
          aria-controls="test-combobox-options"
          aria-expanded="true"
+         type="text"
          value="Test"
   >
   <div class="optionsContainer overflowContainer"
