@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -356,14 +357,10 @@ public class ThemeServiceTests
         userService.Setup(s => s.GetUserId()).Returns(user.Id);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        userReleaseRoleRepository
-            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-        userPublicationRoleRepository
-            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userPublicationRoles.BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
         var service = SetupThemeService(
             userService: userService.Object,
