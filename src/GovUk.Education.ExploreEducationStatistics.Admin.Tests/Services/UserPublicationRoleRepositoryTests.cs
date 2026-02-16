@@ -2502,7 +2502,7 @@ public abstract class UserPublicationRoleRepositoryTests
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
                 .WithPublication(_fixture.DefaultPublication())
-                // These should ALL be filtered out
+                // These should ALL be included
                 .ForIndex(0, s => s.SetUser(user).SetRole(PublicationRole.Approver))
                 .ForIndex(1, s => s.SetUser(user).SetRole(PublicationRole.Drafter))
                 .GenerateList(2);
