@@ -2,6 +2,8 @@ import useHubState, { HubState } from '@admin/hooks/useHubState';
 import notificationHub, {
   NotificationHub,
 } from '@admin/services/hubs/notificationHub';
+import FormattedDate from '@common/components/FormattedDate';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Modal from '@common/components/Modal';
 import useMountedRef from '@common/hooks/useMountedRef';
@@ -29,11 +31,13 @@ export function NotificationHubContextProvider({
 
   const [showNotificationModal, setShowNotificationModal] =
     useState<boolean>(false);
+  const [notificationSenderName, setNotificationSenderName] =
+    useState<string>();
   const [notificationMessage, setNotificationMessage] = useState<
     undefined | string
   >(undefined);
 
-  const joinStateRef = useRef<'joining' | 'joined' | ''>('');
+  const joinStateRef = useRef<'joining' | ''>('');
   const isMountedRef = useMountedRef();
 
   const { hub, status } = hubState;
@@ -42,10 +46,14 @@ export function NotificationHubContextProvider({
     if (joinStateRef.current === '' && status === 'Connected') {
       joinStateRef.current = 'joining';
 
-      hub.subscribe('ServiceAnnouncement', incomingMessage => {
-        setNotificationMessage(incomingMessage);
-        setShowNotificationModal(true);
-      });
+      hub.subscribe(
+        'ServiceAnnouncement',
+        (senderName: string, message: string) => {
+          setNotificationSenderName(senderName);
+          setNotificationMessage(message);
+          setShowNotificationModal(true);
+        },
+      );
     }
   }, [hub, hubState, isMountedRef, status]);
 
@@ -61,7 +69,16 @@ export function NotificationHubContextProvider({
         onExit={() => setShowNotificationModal(false)}
         open={showNotificationModal}
       >
-        <p>{notificationMessage}</p>
+        <p>{notificationSenderName} has sent the following message:</p>
+        <InsetText>
+          <FormattedDate
+            className="govuk-!-font-weight-bold"
+            format="d MMM yyyy, HH:mm"
+          >
+            {new Date()}
+          </FormattedDate>
+          <p>{notificationMessage}</p>
+        </InsetText>
       </Modal>
       {typeof children === 'function' ? children(hubState) : children}
     </NotificationHubContext.Provider>

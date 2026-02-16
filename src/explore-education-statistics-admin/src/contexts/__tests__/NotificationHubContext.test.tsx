@@ -25,7 +25,8 @@ describe('NotificationHubContext', () => {
   });
 
   const testMessage =
-    'Scheduled system update will occur in 15 minutes, please save your work';
+    'Scheduled system update will occur in 15 minutes, please save your work.';
+  const senderName = 'Joe Bloggs';
 
   test('starts in a Disconnected state', () => {
     const { result } = renderHook(() => useNotificationHubContext(), {
@@ -58,7 +59,9 @@ describe('NotificationHubContext', () => {
       () => new Promise(resolve => setTimeout(resolve, 50)),
     );
 
-    let onServiceAnnouncement: ((message: string) => void) | undefined;
+    let onServiceAnnouncement:
+      | ((senderName: string, message: string) => void)
+      | undefined;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ServiceAnnouncement') {
@@ -78,7 +81,7 @@ describe('NotificationHubContext', () => {
       expect(onServiceAnnouncement).toBeDefined();
     });
 
-    onServiceAnnouncement?.(testMessage);
+    onServiceAnnouncement?.(senderName, testMessage);
 
     await waitFor(() => {
       expect(
@@ -86,10 +89,15 @@ describe('NotificationHubContext', () => {
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByText(testMessage)).toBeInTheDocument();
+    expect(
+      screen.getByText(content => content.includes(senderName)),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(content => content.includes(testMessage)),
+    ).toBeInTheDocument();
   });
 
-  test('displays notification message in modal', async () => {
+  test('subsequent notifications overwrite previous messages if multiple are sent', async () => {
     const stateSpy = jest
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Disconnected);
@@ -98,7 +106,9 @@ describe('NotificationHubContext', () => {
       () => new Promise(resolve => setTimeout(resolve, 50)),
     );
 
-    let onServiceAnnouncement: ((message: string) => void) | undefined;
+    let onServiceAnnouncement:
+      | ((senderName: string, message: string) => void)
+      | undefined;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ServiceAnnouncement') {
@@ -121,17 +131,27 @@ describe('NotificationHubContext', () => {
     const message1 = 'Service will be unavailable for 15 minutes';
     const message2 = 'New features released';
 
-    onServiceAnnouncement?.(message1);
+    onServiceAnnouncement?.(senderName, message1);
 
     await waitFor(() => {
-      expect(screen.getByText(message1)).toBeInTheDocument();
+      expect(
+        screen.getByText(content => content.includes(senderName)),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(content => content.includes(message1)),
+      ).toBeInTheDocument();
     });
 
     // Trigger another message
-    onServiceAnnouncement?.(message2);
+    onServiceAnnouncement?.(senderName, message2);
 
     await waitFor(() => {
-      expect(screen.getByText(message2)).toBeInTheDocument();
+      expect(
+        screen.getByText(content => content.includes(senderName)),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(content => content.includes(message2)),
+      ).toBeInTheDocument();
     });
   });
 
@@ -144,7 +164,9 @@ describe('NotificationHubContext', () => {
       () => new Promise(resolve => setTimeout(resolve, 50)),
     );
 
-    let onServiceAnnouncement: ((message: string) => void) | undefined;
+    let onServiceAnnouncement:
+      | ((senderName: string, message: string) => void)
+      | undefined;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ServiceAnnouncement') {
@@ -164,10 +186,15 @@ describe('NotificationHubContext', () => {
       expect(onServiceAnnouncement).toBeDefined();
     });
 
-    onServiceAnnouncement?.(testMessage);
+    onServiceAnnouncement?.(senderName, testMessage);
 
     await waitFor(() => {
-      expect(screen.getByText(testMessage)).toBeInTheDocument();
+      expect(
+        screen.getByText(content => content.includes(senderName)),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(content => content.includes(testMessage)),
+      ).toBeInTheDocument();
     });
 
     // Switch to real timers for user interaction

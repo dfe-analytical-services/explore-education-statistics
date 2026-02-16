@@ -22,18 +22,11 @@ public class ServiceAnnouncementController(IHubContext<NotificationHub> hubConte
     {
         var givenName = User.FindFirstValue(ClaimTypes.GivenName);
         var surname = User.FindFirstValue(ClaimTypes.Surname);
-        var messageWithSender = $"{givenName} {surname} has sent the following message: '{message}'";
+        var senderName = $"{givenName} {surname}";
 
         await hubContext
             .Clients.AllExcept(connectionId)
-            .SendAsync("ServiceAnnouncement", messageWithSender, cancellationToken);
-        await hubContext
-            .Clients.Client(connectionId)
-            .SendAsync(
-                "ServiceAnnouncement",
-                $"The following message was sent to all users: '{messageWithSender}'",
-                cancellationToken
-            );
+            .SendAsync("ServiceAnnouncement", senderName, message, cancellationToken);
 
         return Ok();
     }
