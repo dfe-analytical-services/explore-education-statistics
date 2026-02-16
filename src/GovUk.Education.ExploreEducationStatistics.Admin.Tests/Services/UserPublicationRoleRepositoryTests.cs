@@ -1855,11 +1855,11 @@ public abstract class UserPublicationRoleRepositoryTests
             Assert.Null(result);
         }
 
-        // This is a temporary test to ensure that the new permissions system roles are excluded in all results
-        // via the global query filter
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
-        public async Task IgnoresNewPermissionsSystemRoles(Func<DataFixture, User> userFactory)
+        public async Task DefaultValueForIncludeNewPermissionsSystemRoles_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
         {
             var user = userFactory(_fixture);
             User createdBy = _fixture.DefaultUser();
@@ -1868,9 +1868,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 .DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(_fixture.DefaultPublication())
-                .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1))
                 .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
                 .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
                 .GenerateList(2);
@@ -1893,6 +1891,98 @@ public abstract class UserPublicationRoleRepositoryTests
 
                 Assert.Null(result1);
                 Assert.Null(result2);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IncludeNewPermissionsSystemRolesIsFalse_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreatedById(createdBy.Id)
+                .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result1 = await repository.GetById(
+                    userPublicationRoles[0].Id,
+                    includeNewPermissionsSystemRoles: false
+                );
+                var result2 = await repository.GetById(
+                    userPublicationRoles[1].Id,
+                    includeNewPermissionsSystemRoles: false
+                );
+
+                Assert.Null(result1);
+                Assert.Null(result2);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IncludeNewPermissionsSystemRolesIsTrue_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreatedById(createdBy.Id)
+                .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result1 = await repository.GetById(
+                    userPublicationRoles[0].Id,
+                    includeNewPermissionsSystemRoles: true
+                );
+                var result2 = await repository.GetById(
+                    userPublicationRoles[1].Id,
+                    includeNewPermissionsSystemRoles: true
+                );
+
+                Assert.NotNull(result1);
+                Assert.NotNull(result2);
+                Assert.Equal(userPublicationRoles[0].Id, result1.Id);
+                Assert.Equal(userPublicationRoles[1].Id, result2.Id);
             }
         }
     }
@@ -1958,11 +2048,11 @@ public abstract class UserPublicationRoleRepositoryTests
             Assert.Null(result);
         }
 
-        // This is a temporary test to ensure that the new permissions system roles are excluded in all results
-        // via the global query filter
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
-        public async Task IgnoresNewPermissionsSystemRoles(Func<DataFixture, User> userFactory)
+        public async Task DefaultValueForIncludeNewPermissionsSystemRoles_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
         {
             var user = userFactory(_fixture);
             User createdBy = _fixture.DefaultUser();
@@ -1971,9 +2061,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 .DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(_fixture.DefaultPublication())
-                .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1))
                 .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
                 .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
                 .GenerateList(2);
@@ -2004,6 +2092,106 @@ public abstract class UserPublicationRoleRepositoryTests
 
                 Assert.Null(result1);
                 Assert.Null(result2);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IncludeNewPermissionsSystemRolesIsFalse_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreatedById(createdBy.Id)
+                .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result1 = await repository.GetByCompositeKey(
+                    userId: userPublicationRoles[0].UserId,
+                    publicationId: userPublicationRoles[0].PublicationId,
+                    role: userPublicationRoles[0].Role,
+                    includeNewPermissionsSystemRoles: false
+                );
+                var result2 = await repository.GetByCompositeKey(
+                    userId: userPublicationRoles[1].UserId,
+                    publicationId: userPublicationRoles[1].PublicationId,
+                    role: userPublicationRoles[1].Role,
+                    includeNewPermissionsSystemRoles: false
+                );
+
+                Assert.Null(result1);
+                Assert.Null(result2);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IncludeNewPermissionsSystemRolesIsTrue_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreatedById(createdBy.Id)
+                .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result1 = await repository.GetByCompositeKey(
+                    userId: userPublicationRoles[0].UserId,
+                    publicationId: userPublicationRoles[0].PublicationId,
+                    role: userPublicationRoles[0].Role,
+                    includeNewPermissionsSystemRoles: true
+                );
+                var result2 = await repository.GetByCompositeKey(
+                    userId: userPublicationRoles[1].UserId,
+                    publicationId: userPublicationRoles[1].PublicationId,
+                    role: userPublicationRoles[1].Role,
+                    includeNewPermissionsSystemRoles: true
+                );
+
+                Assert.NotNull(result1);
+                Assert.NotNull(result2);
+                Assert.Equal(userPublicationRoles[0].Id, result1.Id);
+                Assert.Equal(userPublicationRoles[1].Id, result2.Id);
             }
         }
     }
@@ -2226,27 +2414,21 @@ public abstract class UserPublicationRoleRepositoryTests
             }
         }
 
-        [Fact]
-        public async Task DefaultValueForIncludeNewPermissionsSystemRoles_IgnoresNewPermissionsSystemRoles()
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task DefaultValueForIncludeNewPermissionsSystemRoles_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
         {
-            User activeUser = _fixture.DefaultUser();
-            User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
-            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
-            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+            var user = userFactory(_fixture);
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
                 .WithPublication(_fixture.DefaultPublication())
                 // These should ALL be filtered out
-                .ForIndex(0, s => s.SetUser(activeUser).SetRole(PublicationRole.Approver))
-                .ForIndex(1, s => s.SetUser(activeUser).SetRole(PublicationRole.Drafter))
-                .ForIndex(2, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Approver))
-                .ForIndex(3, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Drafter))
-                .ForIndex(4, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Approver))
-                .ForIndex(5, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Drafter))
-                .ForIndex(6, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Approver))
-                .ForIndex(7, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Drafter))
-                .GenerateList(8);
+                .ForIndex(0, s => s.SetUser(user).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetUser(user).SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -2269,27 +2451,21 @@ public abstract class UserPublicationRoleRepositoryTests
             }
         }
 
-        [Fact]
-        public async Task IncludeNewPermissionsSystemRolesIsFalse_IgnoresNewPermissionsSystemRoles()
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IncludeNewPermissionsSystemRolesIsFalse_IgnoresNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
         {
-            User activeUser = _fixture.DefaultUser();
-            User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
-            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
-            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+            var user = userFactory(_fixture);
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
                 .WithPublication(_fixture.DefaultPublication())
                 // These should ALL be filtered out
-                .ForIndex(0, s => s.SetUser(activeUser).SetRole(PublicationRole.Approver))
-                .ForIndex(1, s => s.SetUser(activeUser).SetRole(PublicationRole.Drafter))
-                .ForIndex(2, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Approver))
-                .ForIndex(3, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Drafter))
-                .ForIndex(4, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Approver))
-                .ForIndex(5, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Drafter))
-                .ForIndex(6, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Approver))
-                .ForIndex(7, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Drafter))
-                .GenerateList(8);
+                .ForIndex(0, s => s.SetUser(user).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetUser(user).SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -2315,27 +2491,21 @@ public abstract class UserPublicationRoleRepositoryTests
             }
         }
 
-        [Fact]
-        public async Task IncludeNewPermissionsSystemRolesIsTrue_ReturnsNewPermissionsSystemRoles()
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IncludeNewPermissionsSystemRolesIsTrue_ReturnsNewPermissionsSystemRoles(
+            Func<DataFixture, User> userFactory
+        )
         {
-            User activeUser = _fixture.DefaultUser();
-            User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
-            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
-            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+            var user = userFactory(_fixture);
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
                 .WithPublication(_fixture.DefaultPublication())
                 // These should ALL be filtered out
-                .ForIndex(0, s => s.SetUser(activeUser).SetRole(PublicationRole.Approver))
-                .ForIndex(1, s => s.SetUser(activeUser).SetRole(PublicationRole.Drafter))
-                .ForIndex(2, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Approver))
-                .ForIndex(3, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Drafter))
-                .ForIndex(4, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Approver))
-                .ForIndex(5, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Drafter))
-                .ForIndex(6, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Approver))
-                .ForIndex(7, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Drafter))
-                .GenerateList(8);
+                .ForIndex(0, s => s.SetUser(user).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetUser(user).SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -2357,7 +2527,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 // Don't apply any further filtering to the queryable, and just execute it to get all results
                 var results = await resultingQueryable.ToListAsync();
 
-                Assert.Equal(8, results.Count);
+                Assert.Equal(2, results.Count);
             }
         }
     }
@@ -3571,28 +3741,22 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetUser = _fixture.DefaultUser().WithEmail("test1@test.com");
             User otherUser = _fixture.DefaultUser().WithEmail("test2@test.com");
-            const PublicationRole role1 = PublicationRole.Allower;
-            const PublicationRole role2 = PublicationRole.Owner;
             Publication publication1 = _fixture.DefaultPublication();
             Publication publication2 = _fixture.DefaultPublication();
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
-                // These 2 roles should be removed
-                .ForIndex(0, s => s.SetPublication(publication1))
-                .ForIndex(0, s => s.SetUser(targetUser))
-                .ForIndex(0, s => s.SetRole(role1))
-                .ForIndex(1, s => s.SetPublication(publication2))
-                .ForIndex(1, s => s.SetUser(targetUser))
-                .ForIndex(1, s => s.SetRole(role2))
+                // These 4 roles should be removed (including the NEW permissions system roles)
+                .ForIndex(0, s => s.SetPublication(publication1).SetUser(targetUser).SetRole(PublicationRole.Allower))
+                .ForIndex(1, s => s.SetPublication(publication1).SetUser(targetUser).SetRole(PublicationRole.Owner))
+                .ForIndex(2, s => s.SetPublication(publication2).SetUser(targetUser).SetRole(PublicationRole.Drafter))
+                .ForIndex(3, s => s.SetPublication(publication2).SetUser(targetUser).SetRole(PublicationRole.Approver))
                 // These roles are for a different email and should not be removed
-                .ForIndex(2, s => s.SetPublication(publication1))
-                .ForIndex(2, s => s.SetUser(otherUser))
-                .ForIndex(2, s => s.SetRole(role1))
-                .ForIndex(3, s => s.SetPublication(publication2))
-                .ForIndex(3, s => s.SetUser(otherUser))
-                .ForIndex(3, s => s.SetRole(role2))
-                .GenerateList(4);
+                .ForIndex(4, s => s.SetPublication(publication1).SetUser(otherUser).SetRole(PublicationRole.Allower))
+                .ForIndex(5, s => s.SetPublication(publication1).SetUser(otherUser).SetRole(PublicationRole.Owner))
+                .ForIndex(6, s => s.SetPublication(publication2).SetUser(otherUser).SetRole(PublicationRole.Drafter))
+                .ForIndex(7, s => s.SetPublication(publication2).SetUser(otherUser).SetRole(PublicationRole.Approver))
+                .GenerateList(8);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -3611,17 +3775,26 @@ public abstract class UserPublicationRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingRoles = await contentDbContext.UserPublicationRoles.Include(upr => upr.User).ToListAsync();
+                // Ignore query filters so that we can assess whether the correct NEW permissions system roles were deleted
+                var remainingRoles = await contentDbContext
+                    .UserPublicationRoles.IgnoreQueryFilters()
+                    .Include(upr => upr.User)
+                    .ToListAsync();
 
-                Assert.Equal(2, remainingRoles.Count);
+                Assert.Equal(4, remainingRoles.Count);
 
                 Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
                 Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
-                Assert.Equal(role1, remainingRoles[0].Role);
-
-                Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
+                Assert.Equal(PublicationRole.Allower, remainingRoles[0].Role);
+                Assert.Equal(publication1.Id, remainingRoles[1].PublicationId);
                 Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
-                Assert.Equal(role2, remainingRoles[1].Role);
+                Assert.Equal(PublicationRole.Owner, remainingRoles[1].Role);
+                Assert.Equal(publication2.Id, remainingRoles[2].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[2].User.Id);
+                Assert.Equal(PublicationRole.Drafter, remainingRoles[2].Role);
+                Assert.Equal(publication2.Id, remainingRoles[3].PublicationId);
+                Assert.Equal(otherUser.Id, remainingRoles[3].User.Id);
+                Assert.Equal(PublicationRole.Approver, remainingRoles[3].Role);
             }
         }
 
@@ -3638,12 +3811,8 @@ public abstract class UserPublicationRoleRepositoryTests
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
                 // These roles are for a different email and should not be removed
-                .ForIndex(0, s => s.SetPublication(publication1))
-                .ForIndex(0, s => s.SetUser(otherUser))
-                .ForIndex(0, s => s.SetRole(role1))
-                .ForIndex(1, s => s.SetPublication(publication2))
-                .ForIndex(1, s => s.SetUser(otherUser))
-                .ForIndex(1, s => s.SetRole(role2))
+                .ForIndex(0, s => s.SetPublication(publication1).SetUser(otherUser).SetRole(role1))
+                .ForIndex(1, s => s.SetPublication(publication2).SetUser(otherUser).SetRole(role2))
                 .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -4369,6 +4538,43 @@ public abstract class UserPublicationRoleRepositoryTests
                         publicationId: targetPublication.Id,
                         role: targetRole,
                         resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+            }
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Drafter)]
+        [InlineData(PublicationRole.Approver)]
+        public async Task IncludesNewPermissionsSystemRolesInCheck(PublicationRole targetRole)
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetActiveUser)
+                .WithPublication(targetPublication)
+                .WithRole(targetRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
                     )
                 );
             }
