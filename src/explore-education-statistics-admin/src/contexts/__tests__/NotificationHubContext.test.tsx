@@ -3,9 +3,9 @@ import {
   useNotificationHubContext,
 } from '@admin/contexts/NotificationHubContext';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
+import render from '@common-test/render';
 import { HubConnectionState } from '@microsoft/signalr';
-import { render, renderHook, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { renderHook, screen, waitFor } from '@testing-library/react';
 import React, { FC, ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
@@ -174,7 +174,7 @@ describe('NotificationHubContext', () => {
       }
     });
 
-    render(
+    const { user } = render(
       <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
     );
 
@@ -200,8 +200,7 @@ describe('NotificationHubContext', () => {
     // Switch to real timers for user interaction
     jest.useRealTimers();
 
-    const closeButton = screen.getByRole('button', { name: 'Close modal' });
-    await userEvent.click(closeButton);
+    await user.click(screen.getByRole('button', { name: 'Close modal' }));
 
     await waitFor(() => {
       expect(screen.queryByText(testMessage)).not.toBeInTheDocument();

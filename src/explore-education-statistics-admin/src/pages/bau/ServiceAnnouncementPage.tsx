@@ -34,8 +34,7 @@ const ServiceAnnouncementPage = () => {
     async (values: FormValues) => {
       await serviceAnnouncementService.broadcastMessage({
         message: values.message,
-        // @ts-expect-error: Property 'connection' is protected and only accessible within class 'Hub' and its subclasses.
-        connectionId: hub.connection.connectionId,
+        connectionId: hub.connectionId ?? '',
       });
     },
     [hub],

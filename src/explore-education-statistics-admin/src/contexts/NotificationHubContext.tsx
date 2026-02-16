@@ -2,6 +2,7 @@ import useHubState, { HubState } from '@admin/hooks/useHubState';
 import notificationHub, {
   NotificationHub,
 } from '@admin/services/hubs/notificationHub';
+import { Subscription } from '@admin/services/hubs/utils/Hub';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -43,10 +44,12 @@ export function NotificationHubContextProvider({
   const { hub, status } = hubState;
 
   useEffect(() => {
+    let subscription: Subscription | undefined;
+
     if (joinStateRef.current === '' && status === 'Connected') {
       joinStateRef.current = 'joining';
 
-      hub.subscribe(
+      subscription = hub.subscribe(
         'ServiceAnnouncement',
         (senderName: string, message: string) => {
           setNotificationSenderName(senderName);
@@ -55,6 +58,11 @@ export function NotificationHubContextProvider({
         },
       );
     }
+
+    return () => {
+      subscription?.unsubscribe();
+      joinStateRef.current = '';
+    };
   }, [hub, hubState, isMountedRef, status]);
 
   if (!hubState) {
