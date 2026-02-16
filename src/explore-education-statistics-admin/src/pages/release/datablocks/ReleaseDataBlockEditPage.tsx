@@ -8,6 +8,8 @@ import DataBlockSelector from '@admin/pages/release/datablocks/components/DataBl
 import {
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataBlocksService, {
@@ -19,6 +21,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import isGuid from '@common/utils/string/isGuid';
 import React, { useCallback, useRef } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
@@ -34,6 +37,10 @@ const ReleaseDataBlockEditPage = ({
   const {
     params: { publicationId, releaseVersionId, dataBlockId },
   } = match;
+
+  const replacementFileId =
+    new URLSearchParams(window.location.search).get('fromFileReplacementId') ??
+    '';
 
   const config = useConfig();
   const pageRef = useRef<HTMLDivElement>(null);
@@ -89,19 +96,29 @@ const ReleaseDataBlockEditPage = ({
   const { canUpdateRelease, dataBlock } = model ?? {};
 
   const pageTitle = canUpdateRelease ? 'Edit data block' : 'View data block';
-
   return (
     <div ref={pageRef}>
       <PageMetaTitle title={pageTitle} />
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
-          publicationId,
-          releaseVersionId,
-        })}
+        to={
+          replacementFileId && isGuid(replacementFileId)
+            ? generatePath<ReleaseDataFileReplaceRouteParams>(
+                releaseDataFileReplaceRoute.path,
+                {
+                  publicationId,
+                  releaseVersionId,
+                  fileId: replacementFileId,
+                },
+              )
+            : generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
+                publicationId,
+                releaseVersionId,
+              })
+        }
       >
-        Back
+        {isGuid(replacementFileId) ? 'Back to data replacement page' : 'Back'}
       </Link>
 
       <LoadingSpinner loading={isLoading}>

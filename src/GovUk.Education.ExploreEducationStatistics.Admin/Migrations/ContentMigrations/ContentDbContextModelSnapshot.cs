@@ -1397,7 +1397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("UpdatePublishedDate")
+                    b.Property<bool>("UpdatePublishedDisplayDate")
                         .HasColumnType("bit");
 
                     b.Property<int>("Version")

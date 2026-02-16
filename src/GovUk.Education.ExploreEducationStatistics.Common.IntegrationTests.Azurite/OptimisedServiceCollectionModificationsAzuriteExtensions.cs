@@ -1,6 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
-
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 
 public static class OptimisedServiceCollectionModificationsAzuriteExtensions
 {

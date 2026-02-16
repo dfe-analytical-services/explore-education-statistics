@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -10,6 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersi
 /// </summary>
 public record ReleaseVersionsMigrationReportDto
 {
+    /// <summary>
+    /// The <see cref="AppEnvironment"/>, determined from the <see cref="AppOptions.Url"/> property which is initialised from application settings on startup.
+    /// It is indicated in the report so that it can be verified when the migration is run because of the way the
+    /// <c>ProposedPublishedDateIsNotSimilarToScheduledTriggerDate</c> warning calculation is dependent on it.
+    /// </summary>
+    [JsonConverter(typeof(StringEnumConverter))]
+    public required AppEnvironment AppEnvironment { get; init; }
+
     public required bool DryRun { get; init; }
 
     public required List<Guid> ReleaseVersionsWithWarnings { get; init; }
@@ -95,6 +104,12 @@ public record ReleaseVersionsMigrationReportPublishingInfoDto
     public required DateTimeOffset? LatestAttemptTimestamp { get; init; }
 
     /// <summary>
+    /// The date-only element in UK local time of the latest 'Complete' publishing attempt.
+    /// </summary>
+    [JsonIgnore]
+    public required DateOnly? LatestAttemptTimestampUkDateOnly { get; init; }
+
+    /// <summary>
     /// The time when publishing the release version was due to start in UTC. This is midnight UK local time on the scheduled date
     /// when <c>PublishMethod</c> is <c>Scheduled</c>, or the time when the release version was approved when it is <c>Immediate</c>.
     /// The source of this value is <see cref="ReleaseVersion.PublishScheduled"/>.
@@ -158,10 +173,10 @@ public record ReleaseVersionsMigrationReportWarningsDto
     /// It's included in the report because it indicates that public facing 'last updated' date will differ when EES-6833
     /// alters that field to use the actual published date.
     /// </summary>
-    public required bool? ProposedPublishedDateDoesNotMatchLatestUpdateNote { get; init; }
+    public required bool? ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate { get; init; }
 
     /// <summary>
-    /// True if the proposed published date is not similar to the publishing trigger date.
+    /// True if the proposed published date is not similar to the publishing trigger date, otherwise null.
     /// It's included in the report because it may indicate an issue with the proposed date that needs manually reviewing.
     /// It allows a tolerance for the duration taken to complete publishing and differs depending on the publishing method:
     /// Scheduled = 5 minutes (The final stage trigger is at 09:30 UK local time and would normally be expected to complete within a minute or so).
@@ -170,11 +185,23 @@ public record ReleaseVersionsMigrationReportWarningsDto
     /// </summary>
     public required bool? ProposedPublishedDateIsNotSimilarToScheduledTriggerDate { get; init; }
 
+    /// <summary>
+    /// True if the publishing method is 'Scheduled' and the scheduled trigger date of the release version is not midnight UK local time, otherwise null.
+    /// It's included in the report because the report also includes <c>ScheduledPublishFinalStageTrigger</c>, which for
+    /// this publishing method is the scheduled trigger date adjusted from midnight to 09:30 UK local time. It also has
+    /// another warning <c>ProposedPublishedDateIsNotSimilarToScheduledTriggerDate</c> which indicates that the proposed
+    /// date is not similar to that adjusted date.
+    /// This warning indicates that no adjustment took place, which is unexpected, and that these two values are based on
+    /// the unadjusted scheduled trigger date.
+    /// </summary>
+    public required bool? ScheduledTriggerDateIsNotMidnightUkLocalTime { get; init; }
+
     [JsonIgnore]
     public bool HasWarnings =>
         NoSuccessfulPublishingAttempts == true
         || MultipleSuccessfulPublishingAttempts == true
         || UpdatesCountDoesNotMatchVersion == true
-        || ProposedPublishedDateDoesNotMatchLatestUpdateNote == true
-        || ProposedPublishedDateIsNotSimilarToScheduledTriggerDate == true;
+        || ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate == true
+        || ProposedPublishedDateIsNotSimilarToScheduledTriggerDate == true
+        || ScheduledTriggerDateIsNotMidnightUkLocalTime == true;
 }

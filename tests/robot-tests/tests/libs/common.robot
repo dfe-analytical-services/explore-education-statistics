@@ -1194,3 +1194,13 @@ Get Texts From Elements
         Append To List    ${texts}    ${text}
     END
     [Return]    ${texts}
+
+user checks section is in position
+    [Arguments]
+    ...    ${section_text}
+    ...    ${position}
+    ...    ${parent}=css:[data-testid="home-content"]
+    ...    ${exact_match}=${False}
+    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
+    user waits until parent contains element    ${parent}
+    ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]

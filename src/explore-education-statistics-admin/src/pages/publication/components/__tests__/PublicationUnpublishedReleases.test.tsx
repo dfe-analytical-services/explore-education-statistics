@@ -329,6 +329,44 @@ describe('PublicationUnpublishedReleases', () => {
       expect(handleAmendmentDelete).toHaveBeenCalled();
     });
   });
+
+  test('shows Back to top link when showBackToTopLink prop is true', async () => {
+    const handleAmendmentDelete = jest.fn();
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+    releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
+      scheduledMethodologies: [],
+    });
+
+    render(
+      <PublicationUnpublishedReleases
+        publicationId={testPublicationId}
+        onAmendmentDelete={handleAmendmentDelete}
+        showBackToTopLink
+      />,
+    );
+    await waitFor(() => {
+      const backToTopLinks = screen.getAllByRole('link', {
+        name: 'Back to top',
+      });
+      expect(backToTopLinks.length).toBe(2); // Scheduled and Draft links both have 'Back to top' links
+    });
+  });
+
+  test('does not show Back to top link when showBackToTopLink prop is not provided', async () => {
+    const handleAmendmentDelete = jest.fn();
+
+    render(
+      <PublicationUnpublishedReleases
+        publicationId={testPublicationId}
+        onAmendmentDelete={handleAmendmentDelete}
+      />,
+    );
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('link', { name: 'Back to top' }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
 
 function render(element: ReactElement) {

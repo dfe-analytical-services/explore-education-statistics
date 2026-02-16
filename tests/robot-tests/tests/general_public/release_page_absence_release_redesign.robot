@@ -13,7 +13,7 @@ Force Tags
 ...                 Dev
 ...                 Preprod
 ...                 ReleaseRedesign
-#TODO: remove ReleaseRedesign tag when EES-6843 is complete
+#TODO EES-6843: remove ReleaseRedesign tag when EES-6843 is complete
 
 
 *** Variables ***
@@ -113,7 +113,7 @@ Validate "Releases in this series" page
 #
 
 Validate 'On this page section'
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Skip in page navigation
     ...    Background information
     ...    Headline facts and figures
@@ -250,14 +250,14 @@ Validate content section basic content
     user checks section with ID contains elements and back to top link
     ...    section-regional-and-local-authority-la-breakdown    Regional and local authority (LA) breakdown
     ...    Overall absence and persistent absence rates vary across primary, secondary and special schools by region and local authority (LA).
-    # TODO: Test that the chart in section-regional-and-local-authority-la-breakdown displays correctly (in https://dfedigital.atlassian.net/browse/EES-6851)
+    # TODO EES-6851: Test that the chart in section-regional-and-local-authority-la-breakdown displays correctly (in https://dfedigital.atlassian.net/browse/EES-6851)
 
 Verify contact us section
     check the contact us section has expected details
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test that the tables are as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test that the tables are as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
@@ -306,7 +306,7 @@ Validate Regional and local authority (LA) breakdown table
 
 Check Regional and local authority (LA) breakdown table has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test that the footers are as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test that the footers are as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls down    500
@@ -328,7 +328,7 @@ Check Regional and local authority (LA) breakdown table has footnotes
 
 Validate Regional and local authority (LA) breakdown chart
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269 -
-    ...    # TODO: Test charts display as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test charts display as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section    Regional and local authority (LA) breakdown    id:content
@@ -367,7 +367,7 @@ Validate Regional and local authority (LA) breakdown chart
 
 Check Regional and local authority (LA) breakdown chart has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test charts footnote displays as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test charts footnote displays as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
@@ -397,14 +397,14 @@ Verify Explore and Download data
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Skip in page navigation
     ...    Explore data used in this release
     ...    Data sets: download or create tables
     ...    Data guidance
     ...    Contact us
     ...    Back to top
-    check main links for page are persistent
+    user checks main links for page 'Explore and download data' are present
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
@@ -417,8 +417,23 @@ Verify Explore and Download data
     ${file_size}=    Get File Size    ${DOWNLOAD_DIR}/seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
     Should Be True    ${file_size} > 0
 
-    User checks data set list item properties    Absence by characteristic    201,625    2012/13 to 2016/17
-    User checks data set list item properties    Absence in PRUs    612    2013/14 to 2016/17
+    User checks page 'Explore and download data' data set available properties    Absence by characteristic    201,625
+    ...    2012/13 to 2016/17
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+
+    user navigates to the Absence publication
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
+    User checks page 'Explore and download data' data set available properties    Absence in PRUs    612
+    ...    2013/14 to 2016/17
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+
+    user navigates to the Absence publication
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
+
     user checks section with ID contains elements and back to top link    data-guidance-section
     ...    Test data guidance content
     check the contact us section has expected details
@@ -430,7 +445,7 @@ Verify Explore and Download data
 Verify Methodology tab
     user clicks link    Methodology
     user waits until h2 is visible    Methodology
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Skip in page navigation
     ...    Methodology
     ...    Contact us
@@ -448,7 +463,7 @@ Verify Methodology tab
 Verify Help and related information tab
     user clicks link    Help and related information
     user waits until h2 is visible    Get help by contacting us
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Get help by contacting us
     ...    Official statistics
     ...    Back to top
@@ -467,86 +482,6 @@ user navigates to the Absence publication
     user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
-user checks section is in position
-    [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${False}
-    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
-    user waits until parent contains element    ${parent}
-    ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]
-
-User checks data set list item properties
-    [Arguments]    ${data_set_name}    ${expected_row_count}    ${expected_time_period}
-
-    ${dataset_xpath}=    Set Variable
-    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
-
-    # Wait for dataset to exist
-    Wait Until Element Is Visible    xpath=${dataset_xpath}
-
-    # Expand accordion if collapsed
-    ${toggle_xpath}=    Set Variable
-    ...    ${dataset_xpath}//button[@aria-expanded="false"]
-
-    Run Keyword And Ignore Error
-    ...    Click Element    xpath=${toggle_xpath}
-
-    # Assert "Number of rows" dt exists
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]
-    ...    Dataset "${data_set_name}" is missing "Number of rows" label
-
-    # Assert dd value for "Number of rows"
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
-    ...    Dataset "${data_set_name}" has incorrect Number of rows
-
-    # Assert dd value for "Time period"
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
-    ...    Dataset "${data_set_name}" has incorrect Time period
-
-    # Verify data guidance content
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${data_set_name} data guidance content")]
-    ...    Dataset "${data_set_name}" is missing the data guidance content link
-
-    # Verify Data set information page link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
-    ...    Dataset "${data_set_name}" is missing the "Data set information page" link
-
-    # Verify Create table link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    ...    Dataset "${data_set_name}" is missing the "Create table" link
-
-    # Verify Download (ZIP) button
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//button[contains(normalize-space(.), "Download")]
-    ...    Dataset "${data_set_name}" is missing the "Download (ZIP)" button
-
-    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
-    user waits until page finishes loading
-
-    user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user navigates to the Absence publication
-    user clicks link    Explore and download data
-    user waits until h2 is visible    Explore data used in this release
-    user waits until h2 is visible    Data sets: download or create tables
-
-check main links for page are persistent
-    [Arguments]    @{expected_link_texts}
-    FOR    ${link_text}    IN    @{expected_link_texts}
-        ${button_xpath}=    Set Variable
-        ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
-        Page Should Contain Element
-        ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
-    END
-
 check the contact us section has expected details
     user checks section with ID contains elements and back to top link    contact-us-section
     ...    UI test team name
@@ -555,13 +490,3 @@ check the contact us section has expected details
     ...    0123 4567
     ...    037 0000 2288
     ...    Monday to Friday from 9.30am to 5pm (excluding bank holidays)
-
-check 'On this page section' for this tab contains
-    [Arguments]    @{expected_link_texts}
-    FOR    ${link_text}    IN    @{expected_link_texts}
-        ${button_xpath}=    Set Variable
-        ...    //h2[normalize-space(.)='On this page']/parent::div//a[text()="${link_text}"]
-        Page Should Contain Element
-        ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
-    END

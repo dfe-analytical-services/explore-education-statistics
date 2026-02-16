@@ -2157,7 +2157,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
         )
         {
             var client = fixture
-                .CreateClient(user)
+                .CreateClient(user!)
                 .WithPreviewTokenHeader(previewTokenId)
                 .WithRequestSourceHeader(requestSource);
 

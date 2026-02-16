@@ -93,7 +93,7 @@ public class ReleaseApprovalServiceTests
             Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
             // NotifySubscribers should default to true for first release versions
             Assert.True(saved.NotifySubscribers);
-            Assert.False(saved.UpdatePublishedDate);
+            Assert.False(saved.UpdatePublishedDisplayDate);
 
             var savedStatus = Assert.Single(saved.ReleaseStatuses);
             Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
@@ -126,7 +126,9 @@ public class ReleaseApprovalServiceTests
             .ReturnsAsync(new List<HtmlBlock>());
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(
                 new List<ReleaseChecklistIssue>
                 {
@@ -599,7 +601,9 @@ public class ReleaseApprovalServiceTests
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync([]);
 
         publishingService
@@ -675,7 +679,7 @@ public class ReleaseApprovalServiceTests
 
             // NotifySubscribers should default to true for original releases
             Assert.True(saved.NotifySubscribers);
-            Assert.False(saved.UpdatePublishedDate);
+            Assert.False(saved.UpdatePublishedDisplayDate);
 
             var savedStatus = Assert.Single(saved.ReleaseStatuses);
             Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
@@ -704,7 +708,9 @@ public class ReleaseApprovalServiceTests
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(new List<ReleaseChecklistIssue>());
 
         publishingService
@@ -764,7 +770,7 @@ public class ReleaseApprovalServiceTests
             nextReleaseDateEdited.AssertDeepEqualTo(saved.NextReleaseDate);
             // NotifySubscribers should default to true for first release versions
             Assert.True(saved.NotifySubscribers);
-            Assert.False(saved.UpdatePublishedDate);
+            Assert.False(saved.UpdatePublishedDisplayDate);
 
             var savedStatus = Assert.Single(saved.ReleaseStatuses);
             Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
@@ -796,7 +802,12 @@ public class ReleaseApprovalServiceTests
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == amendedReleaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(
+                    It.Is<ReleaseVersion>(rv => rv.Id == amendedReleaseVersion.Id),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new List<ReleaseChecklistIssue>());
 
         publishingService
@@ -823,14 +834,14 @@ public class ReleaseApprovalServiceTests
             );
 
             // Alter the approval status to Approved,
-            // toggling the values of NotifySubscribers and UpdatePublishedDate from their initial values
+            // toggling the values of NotifySubscribers and UpdatePublishedDisplayDate from their initial values
             var result = await releaseService.CreateReleaseStatus(
                 amendedReleaseVersion.Id,
                 new ReleaseStatusCreateRequest
                 {
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     NotifySubscribers = false,
-                    UpdatePublishedDate = true,
+                    UpdatePublishedDisplayDate = true,
                 }
             );
 
@@ -843,9 +854,9 @@ public class ReleaseApprovalServiceTests
         {
             var saved = await context.ReleaseVersions.SingleAsync(rv => rv.Id == amendedReleaseVersion.Id);
 
-            // Expect NotifySubscribers and UpdatePublishedDate to match the approval request values
+            // Expect NotifySubscribers and UpdatePublishedDisplayDate to match the approval request values
             Assert.False(saved.NotifySubscribers);
-            Assert.True(saved.UpdatePublishedDate);
+            Assert.True(saved.UpdatePublishedDisplayDate);
         }
     }
 
@@ -1104,7 +1115,9 @@ public class ReleaseApprovalServiceTests
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync([]);
 
         contentService
@@ -1192,7 +1205,9 @@ public class ReleaseApprovalServiceTests
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync([]);
 
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);

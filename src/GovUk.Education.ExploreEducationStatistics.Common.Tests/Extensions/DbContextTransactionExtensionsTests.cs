@@ -330,10 +330,7 @@ public abstract class DbContextTransactionExtensionsTests
         public readonly PostgreSqlContainer[] PostgreSqlContainers = Enumerable
             .Range(0, 3)
             .Select(_ =>
-                new PostgreSqlBuilder()
-                    .WithImage("postgres:16.1-alpine")
-                    .WithCommand("-c", "max_prepared_transactions=100")
-                    .Build()
+                new PostgreSqlBuilder("postgres:16.1-alpine").WithCommand("-c", "max_prepared_transactions=100").Build()
             )
             .ToArray();
 

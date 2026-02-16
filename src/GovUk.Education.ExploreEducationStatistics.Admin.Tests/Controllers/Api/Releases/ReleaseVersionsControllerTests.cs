@@ -1182,8 +1182,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
             Assert.Equal("Data set title cannot be empty", validationProblem.Errors[1].Message);
-            Assert.Equal("File 'Data File' either empty or not found.", validationProblem.Errors[2].Message);
-            Assert.Equal("File 'Meta File' either empty or not found.", validationProblem.Errors[3].Message);
+            Assert.Equal("File 'empty.csv' either empty or not found.", validationProblem.Errors[2].Message);
+            Assert.Equal("File 'empty.csv' either empty or not found.", validationProblem.Errors[3].Message);
         }
 
         [Fact(Skip = "EES-6171: Requires test setup for screener and storage containers")]
@@ -1276,7 +1276,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
             Assert.Equal("Data set title cannot be empty", validationProblem.Errors[1].Message);
-            Assert.Equal("File 'Zip File' either empty or not found.", validationProblem.Errors[2].Message);
+            Assert.Equal("File 'empty.zip' either empty or not found.", validationProblem.Errors[2].Message);
         }
 
         [Fact(Skip = "EES-6171: Requires test setup for screener and storage containers")]
@@ -1395,7 +1395,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             var validationProblem = response.AssertValidationProblem();
 
             Assert.Equal("Must not be empty.", validationProblem.Errors[0].Message);
-            Assert.Equal("File 'Zip File' either empty or not found.", validationProblem.Errors[1].Message);
+            Assert.Equal("File 'empty.zip' either empty or not found.", validationProblem.Errors[1].Message);
         }
 
         [Fact]

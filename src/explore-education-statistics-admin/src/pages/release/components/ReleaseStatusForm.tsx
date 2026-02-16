@@ -43,7 +43,7 @@ export interface ReleaseStatusFormValues {
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers?: boolean;
   internalReleaseNote?: string;
-  updatePublishedDate?: boolean;
+  updatePublishedDisplayDate?: boolean;
 }
 
 export const formId = 'releaseStatusForm';
@@ -136,7 +136,7 @@ const ReleaseStatusForm = ({
     publishMethod,
     publishScheduled,
     notifySubscribers,
-    updatePublishedDate,
+    updatePublishedDisplayDate,
     ...values
   }: ReleaseStatusFormValues) => {
     const isApproved = approvalStatus === 'Approved';
@@ -154,9 +154,9 @@ const ReleaseStatusForm = ({
           isApproved && releaseVersion.amendment
             ? notifySubscribers
             : undefined,
-        updatePublishedDate:
+        updatePublishedDisplayDate:
           isApproved && releaseVersion.amendment
-            ? updatePublishedDate
+            ? updatePublishedDisplayDate
             : undefined,
       });
     } catch (err) {
@@ -225,7 +225,7 @@ const ReleaseStatusForm = ({
           },
         }),
       notifySubscribers: Yup.boolean(),
-      updatePublishedDate: Yup.boolean(),
+      updatePublishedDisplayDate: Yup.boolean(),
     });
 
     if (releaseVersion.amendment) {
@@ -234,7 +234,7 @@ const ReleaseStatusForm = ({
           is: (value: string) => value === 'Approved',
           then: s => s.required(),
         }),
-        updatePublishedDate: Yup.boolean().when('approvalStatus', {
+        updatePublishedDisplayDate: Yup.boolean().when('approvalStatus', {
           is: (value: ReleaseApprovalStatus) => value === 'Approved',
           then: s => s.required(),
         }),
@@ -253,8 +253,8 @@ const ReleaseStatusForm = ({
         notifySubscribers: releaseVersion.amendment
           ? releaseVersion.notifySubscribers
           : undefined,
-        updatePublishedDate: releaseVersion.amendment
-          ? releaseVersion.updatePublishedDate
+        updatePublishedDisplayDate: releaseVersion.amendment
+          ? releaseVersion.updatePublishedDisplayDate
           : undefined,
         internalReleaseNote: releaseVersion.latestInternalReleaseNote,
         publishMethod: releaseVersion.publishScheduled
@@ -300,7 +300,7 @@ const ReleaseStatusForm = ({
                     element.target.value === 'Approved'
                   ) {
                     setValue('notifySubscribers' as const, true);
-                    setValue('updatePublishedDate' as const, false);
+                    setValue('updatePublishedDisplayDate' as const, false);
                   }
                 }}
               />
@@ -321,7 +321,7 @@ const ReleaseStatusForm = ({
                   />
 
                   <FormFieldCheckbox<ReleaseStatusFormValues>
-                    name="updatePublishedDate"
+                    name="updatePublishedDisplayDate"
                     label="Update published date"
                     conditional={
                       <WarningMessage className="govuk-!-width-two-thirds">

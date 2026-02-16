@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
-    <PackageReference Include="Testcontainers" Version="4.9.0" />
-    <PackageReference Include="Testcontainers.Azurite" Version="4.9.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
+    <PackageReference Include="Testcontainers" Version="4.10.0" />
+    <PackageReference Include="Testcontainers.Azurite" Version="4.10.0" />
   </ItemGroup>
 
   <ItemGroup>

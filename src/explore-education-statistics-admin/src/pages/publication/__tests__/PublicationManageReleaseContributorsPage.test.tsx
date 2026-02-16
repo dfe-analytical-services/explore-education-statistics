@@ -52,7 +52,7 @@ const testReleaseVersion: ReleaseVersion = {
   type: 'AdHocStatistics',
   year: 2000,
   yearTitle: '2000/01',
-  updatePublishedDate: false,
+  updatePublishedDisplayDate: false,
 };
 
 const testPublicationContributors: UserReleaseRole[] = [

@@ -107,6 +107,8 @@ public enum ValidationErrorMessages
     NoPublicPreReleaseAccessList,
     MethodologyNotApproved,
     UnresolvedComments,
+    MissingUpdatedApiDataSet,
+    ReleaseSummarySectionContainsHtmlBlock,
 
     // Footnotes
     FootnotesDifferFromReleaseFootnotes,

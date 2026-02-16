@@ -1,3 +1,5 @@
+using System;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 
 public record ProcessDataSetVersionResponseViewModel

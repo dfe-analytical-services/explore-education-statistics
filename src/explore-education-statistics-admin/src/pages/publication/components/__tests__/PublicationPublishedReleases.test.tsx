@@ -544,6 +544,45 @@ describe('PublicationPublishedReleases', () => {
       within(rows[1]).queryByRole('button', { name: 'Amend Release 1' }),
     ).not.toBeInTheDocument();
   });
+
+  test('hows Back to top link when showBackToTopLink prop is true', async () => {
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+          showBackToTopLink
+        />
+      </TestConfigContextProvider>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Back to top' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('does not show Back to top link when showBackToTopLink prop is not provided', async () => {
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+      </TestConfigContextProvider>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('link', { name: 'Back to top' }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
 
 function render(element: ReactElement) {

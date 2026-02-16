@@ -20,7 +20,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     /// The date displayed as the published date for the release version.
     /// For the initial version, this always equals <c>Published</c>.
     /// For subsequent versions, when publishing completes it inherits the previous version's <c>PublishedDisplayDate</c>,
-    /// unless <c>UpdatePublishedDate</c> is set to true, in which case it is set to <c>Published</c>.
+    /// unless <c>UpdatePublishedDisplayDate</c> is set to true, in which case it is set to <c>Published</c>.
     /// </summary>
     public DateTimeOffset? PublishedDisplayDate { get; set; }
 
@@ -75,9 +75,8 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     /// <summary>
     /// When publishing the release version, if this property is true, <c>PublishedDisplayDate</c> is set to the current date,
     /// otherwise it inherits the previous version's <c>PublishedDisplayDate</c>.
-    /// TODO EES-6832 rename this to UpdatePublishedDisplayDate.
     /// </summary>
-    public bool UpdatePublishedDate { get; set; }
+    public bool UpdatePublishedDisplayDate { get; set; }
 
     public ReleaseVersion? PreviousVersion { get; set; }
 

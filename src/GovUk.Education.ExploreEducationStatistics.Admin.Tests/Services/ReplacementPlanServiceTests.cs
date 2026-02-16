@@ -500,7 +500,6 @@ public class ReplacementPlanServiceTests
             Assert.False(dataBlockPlan.TimePeriods.End.Valid);
 
             Assert.False(dataBlockPlan.Valid);
-            Assert.False(dataBlockPlan.Fixable);
 
             Assert.Equal(5, replacementPlan.Footnotes.Count());
 
@@ -607,7 +606,7 @@ public class ReplacementPlanServiceTests
     }
 
     [Fact]
-    public async Task GetReplacementPlan_SelectedFilterItemsNoLongerExistButSomeDo_ReplacementInvalidButFixable()
+    public async Task GetReplacementPlan_SelectedFilterItemsNoLongerExistButSomeDo_ReplacementInvalid()
     {
         var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
@@ -791,12 +790,11 @@ public class ReplacementPlanServiceTests
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
             Assert.False(dataBlockPlan.Valid);
-            Assert.True(dataBlockPlan.Fixable);
         }
     }
 
     [Fact]
-    public async Task GetReplacementPlan_AllOriginalFilterItemsNoLongerExist_ReplacementInvalidAndNotFixable()
+    public async Task GetReplacementPlan_AllOriginalFilterItemsNoLongerExist_ReplacementInvalid()
     {
         var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
@@ -978,12 +976,11 @@ public class ReplacementPlanServiceTests
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
             Assert.False(dataBlockPlan.Valid);
-            Assert.False(dataBlockPlan.Fixable);
         }
     }
 
     [Fact]
-    public async Task GetReplacementPlan_NewFiltersIntroduced_ReplacementInvalidAndNotFixable()
+    public async Task GetReplacementPlan_NewFiltersIntroduced_ReplacementInvalid()
     {
         var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
@@ -1188,7 +1185,6 @@ public class ReplacementPlanServiceTests
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
             Assert.False(dataBlockPlan.Valid);
-            Assert.False(dataBlockPlan.Fixable);
         }
     }
 
@@ -1990,7 +1986,6 @@ public class ReplacementPlanServiceTests
             Assert.True(dataBlockPlan.TimePeriods?.End.Valid);
 
             Assert.True(dataBlockPlan.Valid);
-            Assert.False(dataBlockPlan.Fixable);
 
             Assert.Equal(5, replacementPlan.Footnotes.Count());
 

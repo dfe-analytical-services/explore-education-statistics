@@ -81,15 +81,12 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
+        // Set Published to the actual published date, maintaining a record of when the release version was actually published.
+        releaseVersion.Published = actualPublishedDate;
+
+        // Calculate and set the PublishedDisplayDate, which can differ from the actual published date.
         var publishedDisplayDate = await CalculatePublishedDisplayDate(releaseVersion, actualPublishedDate);
         releaseVersion.PublishedDisplayDate = publishedDisplayDate;
-
-        // TODO EES-6831 Alter this to set Published to the actual published date,
-        // maintaining a record of when the release version was actually published.
-        // Up until now it can have been inherited from the previous release version.
-        // Provided that the values for all existing release versions are also corrected by EES-6830 in a one-off migration,
-        // Published can also become the public facing 'last updated' date of the release in EES-6833.
-        releaseVersion.Published = publishedDisplayDate;
 
         await UpdateReleaseFilePublishedDate(releaseVersion, publishedDisplayDate);
 
@@ -105,7 +102,7 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
     {
         // For the first version of a release or if an update to the published display date has been requested
         // return the actual published date
-        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
+        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDisplayDate)
         {
             return actualPublishedDate;
         }

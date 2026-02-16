@@ -79,7 +79,7 @@ public class ReleaseAmendmentServiceTests
             .WithVersion(2)
             .WithNotifiedOn(DateTime.UtcNow.AddDays(-4))
             .WithNotifySubscribers(true)
-            .WithUpdatePublishedDate(true)
+            .WithUpdatePublishedDisplayDate(true)
             .WithPreReleaseAccessList("Some Pre-release details")
             .WithRelatedInformation(
                 ListOf<Link>(
@@ -391,7 +391,7 @@ public class ReleaseAmendmentServiceTests
                     r => r.CreatedById,
                     r => r.NotifiedOn,
                     r => r.NotifySubscribers,
-                    r => r.UpdatePublishedDate,
+                    r => r.UpdatePublishedDisplayDate,
                     r => r.LatestInternalReleaseNote,
                     r => r.RelatedInformation,
                     r => r.Updates,
@@ -423,7 +423,7 @@ public class ReleaseAmendmentServiceTests
             Assert.Equal(amendmentCreator.Id, amendment.CreatedById);
             Assert.Null(amendment.NotifiedOn);
             Assert.False(amendment.NotifySubscribers);
-            Assert.False(amendment.UpdatePublishedDate);
+            Assert.False(amendment.UpdatePublishedDisplayDate);
             Assert.Null(amendment.LatestInternalReleaseNote);
 
             Assert.NotEqual(originalReleaseVersion.Created, amendment.Created);

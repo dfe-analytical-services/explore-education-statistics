@@ -8,8 +8,22 @@ public static class TimeSpanExtensions
 {
     public static string PrettyPrint(this TimeSpan ts)
     {
+        if (ts == TimeSpan.Zero)
+        {
+            return "0 seconds";
+        }
+
         var parts = new List<string>();
         const char s = 's';
+
+        var timeSpanIsNegative = ts < TimeSpan.Zero;
+
+        // Make sure the TimeSpan is positive for further processing, but keep track of whether it was negative
+        // so that a negative prefix can be added to the final result.
+        if (timeSpanIsNegative && ts != TimeSpan.MinValue)
+        {
+            ts = ts.Negate();
+        }
 
         if (ts.Days > 0)
         {
@@ -31,6 +45,8 @@ public static class TimeSpanExtensions
             parts.Add($"{ts.Seconds} second{(ts.Seconds != 1 ? s : string.Empty)}");
         }
 
-        return parts.Count > 0 ? string.Join(", ", parts) : "0 seconds";
+        // If TimeSpan is less than one second, treat as "0 seconds"
+        var result = parts.Count == 0 ? "0 seconds" : string.Join(", ", parts);
+        return timeSpanIsNegative ? $"-{result}" : result;
     }
 }

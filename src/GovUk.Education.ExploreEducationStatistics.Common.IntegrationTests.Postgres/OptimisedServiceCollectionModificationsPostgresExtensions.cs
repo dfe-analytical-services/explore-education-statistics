@@ -1,5 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 

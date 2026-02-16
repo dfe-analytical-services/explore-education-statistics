@@ -6,6 +6,7 @@ import DataSymbolsModal from '@common/components/DataSymbolsModal';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import BackToTopLink from '@common/components/BackToTopLink';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
@@ -38,6 +39,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
       source,
       footnotesHeadingHiddenText,
       tableHeadersForm,
+      tableJson,
     } = props;
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -146,6 +148,9 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
         <p>
           <DataSymbolsModal />
         </p>
+        {tableJson.tbody.length > 10 && (
+          <BackToTopLink className="govuk-!-margin-top-4 govuk-!-margin-bottom-4" />
+        )}
         <div className={footnotesClassName}>
           <FigureFootnotes
             footnotes={footnotes}

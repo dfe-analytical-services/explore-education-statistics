@@ -1,6 +1,8 @@
 services:
   data-storage:
     image: mcr.microsoft.com/azure-storage/azurite:3.35.0
+    # --skipApiVersionCheck is necessary until Azurite supports the latest API version. See https://github.com/Azure/Azurite/issues/2623
+    command: "azurite --blobHost 0.0.0.0 --tableHost 0.0.0.0 --queueHost 0.0.0.0 --skipApiVersionCheck"
     ports:
       - "10000:10000"
       - "10001:10001"

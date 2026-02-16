@@ -136,10 +136,13 @@ public static class ReleaseVersionGeneratorExtensions
         bool notifySubscribers
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetNotifySubscribers(notifySubscribers));
 
-    public static Generator<ReleaseVersion> WithUpdatePublishedDate(
+    public static Generator<ReleaseVersion> WithUpdatePublishedDisplayDate(
         this Generator<ReleaseVersion> generator,
-        bool updatePublishedDate
-    ) => generator.ForInstance(releaseVersion => releaseVersion.SetUpdatePublishedDate(updatePublishedDate));
+        bool updatePublishedDisplayDate
+    ) =>
+        generator.ForInstance(releaseVersion =>
+            releaseVersion.SetUpdatePublishedDisplayDate(updatePublishedDisplayDate)
+        );
 
     public static Generator<ReleaseVersion> WithPreReleaseAccessList(
         this Generator<ReleaseVersion> generator,
@@ -378,10 +381,10 @@ public static class ReleaseVersionGeneratorExtensions
         DateTime notifiedOn
     ) => setters.Set(releaseVersion => releaseVersion.NotifiedOn, notifiedOn);
 
-    public static InstanceSetters<ReleaseVersion> SetUpdatePublishedDate(
+    public static InstanceSetters<ReleaseVersion> SetUpdatePublishedDisplayDate(
         this InstanceSetters<ReleaseVersion> setters,
-        bool updatePublishedDate
-    ) => setters.Set(releaseVersion => releaseVersion.UpdatePublishedDate, updatePublishedDate);
+        bool updatePublishedDisplayDate
+    ) => setters.Set(releaseVersion => releaseVersion.UpdatePublishedDisplayDate, updatePublishedDisplayDate);
 
     public static InstanceSetters<ReleaseVersion> SetPreReleaseAccessList(
         this InstanceSetters<ReleaseVersion> setters,

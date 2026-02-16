@@ -1,8 +1,11 @@
+import { useConfig } from '@admin/contexts/ConfigContext';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
 import { useEditingContext } from '@admin/contexts/EditingContext';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import WarningMessage from '@common/components/WarningMessage';
 import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
 import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
@@ -40,8 +43,6 @@ import React, {
 } from 'react';
 import { generatePath, useLocation } from 'react-router';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
-import { useConfig } from '@admin/contexts/ConfigContext';
-import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface MethodologyLink {
   key: string;
@@ -236,6 +237,30 @@ const ReleaseContent = ({
           />
 
           <div id="releaseSummary" data-testid="release-summary">
+            {editingMode === 'edit' && (
+              <WarningMessage testId="release-summary-deprecated-warning">
+                <p className="govuk-!-font-weight-bold">
+                  Warning: As part of the redesign of the EES release pages, the
+                  summary text block functionality will be removed.
+                </p>
+                <p>
+                  Existing pages released with a summary text block will retain
+                  the information as legacy support, but new releases will cease
+                  to offer this as an option.
+                </p>
+                <p>
+                  We recommend any draft publications avoid using the summary
+                  text block and instead add any summary content in a standard
+                  text block below headlines and key stats.
+                </p>
+                <p>
+                  Note that important warnings and messages will be accommodated
+                  via a dedicated warnings text block in future. As always, we
+                  welcome feedback on this change via the feedback form linked
+                  above.
+                </p>
+              </WarningMessage>
+            )}
             {release.summarySection && (
               <>
                 <EditableSectionBlocks

@@ -1,9 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -39,249 +37,6 @@ public class DataSetFileStorage(
     ILogger<DataSetFileStorage> logger
 ) : IDataSetFileStorage
 {
-    // TODO (EES-6176): Remove once manual replacement processes have been consolidated to use Upload* methods.
-    public async Task<DataFileInfo> UploadDataSet(
-        Guid releaseVersionId,
-        DataSet dataSet,
-        CancellationToken cancellationToken
-    )
-    {
-        var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
-
-        ReleaseFile? replacedReleaseDataFile = null;
-
-        if (dataSet.ReplacingFile is not null)
-        {
-            replacedReleaseDataFile = await GetReplacedReleaseFile(releaseVersionId, dataSet.ReplacingFile.Id);
-
-            if (replacedReleaseDataFile is not null)
-            {
-                replacedReleaseDataFile.File.ReplacedById = dataSet.ReplacingFile.Id;
-                await contentDbContext.SaveChangesAsync(cancellationToken);
-            }
-        }
-
-        var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId, replacedReleaseDataFile?.File.Id);
-
-        var dataFile = await releaseDataFileRepository.Create(
-            releaseVersionId,
-            subjectId,
-            dataSet.DataFile.FileName,
-            contentLength: dataSet.DataFile.FileSize,
-            type: FileType.Data,
-            createdById: userService.GetUserId(),
-            name: dataSet.Title,
-            replacingDataFile: dataSet.ReplacingFile,
-            order: releaseDataFileOrder
-        );
-
-        var dataReleaseFile = await contentDbContext
-            .ReleaseFiles.Include(rf => rf.File)
-                .ThenInclude(f => f.CreatedBy)
-            .SingleAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == dataFile.Id, cancellationToken);
-
-        var metaFile = await releaseDataFileRepository.Create(
-            releaseVersionId,
-            subjectId,
-            dataSet.MetaFile.FileName,
-            contentLength: dataSet.MetaFile.FileSize,
-            type: FileType.Metadata,
-            createdById: userService.GetUserId()
-        );
-
-        await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
-
-        if (dataSet.ReplacingFile is not null && replacedReleaseDataFile!.PublicApiDataSetId != null)
-        {
-            await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
-        }
-
-        var dataImport = await dataImportService.Import(subjectId, dataFile, metaFile);
-
-        var permissions = await userService.GetDataFilePermissions(dataFile);
-
-        return new DataFileInfo(dataReleaseFile, dataImport, permissions) { Name = dataSet.Title };
-    }
-
-    private async Task CreateDraftDataSetVersion(
-        Guid dataReleaseFileId,
-        ReleaseFile replacedReleaseDataFile,
-        CancellationToken cancellationToken
-    )
-    {
-        var dataSetId = replacedReleaseDataFile.PublicApiDataSetId;
-
-        await dataSetVersionService
-            .GetDataSetVersion(dataSetId!.Value, replacedReleaseDataFile.PublicApiDataSetVersion!, cancellationToken)
-            .OnFailureDo(_ =>
-            {
-                var errorMessage =
-                    "Failed to find the data set version expected to be linked to the release file that is being replaced for the "
-                    + $"data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}. This has occured when creating the next draft version.";
-                logger.LogError(errorMessage);
-                throw new InvalidOperationException(
-                    "Failed to find the associated API data set version for the release file."
-                );
-            })
-            .OnSuccessDo(async dataSetVersion =>
-            {
-                if (dataSetVersion.IsFirstVersion && dataSetVersion.Status != DataSetVersionStatus.Published)
-                {
-                    await DeleteAndRecreateInitialDataSetVersion(
-                        dataReleaseFileId,
-                        cancellationToken,
-                        dataSetVersion,
-                        dataSetId
-                    );
-                }
-                else if (dataSetVersion.Status != DataSetVersionStatus.Published)
-                {
-                    await DeleteAndRecreateDataSetVersion(
-                        dataReleaseFileId,
-                        replacedReleaseDataFile,
-                        cancellationToken,
-                        dataSetVersion,
-                        dataSetId
-                    );
-                }
-                else
-                {
-                    await CreateNextDataSetVersion(
-                        dataReleaseFileId,
-                        replacedReleaseDataFile,
-                        cancellationToken,
-                        dataSetVersion,
-                        dataSetId
-                    );
-                }
-            });
-    }
-
-    private async Task CreateNextDataSetVersion(
-        Guid dataReleaseFileId,
-        ReleaseFile replacedReleaseDataFile,
-        CancellationToken cancellationToken,
-        DataSetVersion dataSetVersion,
-        [DisallowNull] Guid? dataSetId
-    )
-    {
-        await dataSetVersionService
-            .CreateNextVersion(
-                releaseFileId: dataReleaseFileId,
-                dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
-                dataSetVersionToReplaceId: dataSetVersion.Id,
-                cancellationToken
-            )
-            .OnFailureDo(_ =>
-            {
-                var errorMessage =
-                    $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
-                logger.LogError(errorMessage);
-                throw new InvalidOperationException(
-                    "Failure detected when creating the next draft version for the data file uploaded."
-                );
-            });
-    }
-
-    private async Task DeleteAndRecreateDataSetVersion(
-        Guid dataReleaseFileId,
-        ReleaseFile replacedReleaseDataFile,
-        CancellationToken cancellationToken,
-        DataSetVersion dataSetVersion,
-        [DisallowNull] Guid? dataSetId
-    )
-    {
-        await dataSetVersionService
-            .DeleteVersion(dataSetVersion.Id, cancellationToken)
-            .OnSuccessVoid(async _ =>
-            {
-                await dataSetVersionService
-                    .CreateNextVersion(
-                        releaseFileId: dataReleaseFileId,
-                        dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
-                        dataSetVersionToReplaceId: null,
-                        cancellationToken
-                    )
-                    .OnFailureDo(_ =>
-                    {
-                        var errorMessage =
-                            $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
-                        logger.LogError(errorMessage);
-                        throw new InvalidOperationException(
-                            "Failure detected when creating the next draft version for the data file uploaded."
-                        );
-                    });
-            })
-            .OnFailureVoid(_ =>
-            {
-                var errorMessage = $"Failed whilst deleting the draft version for the data set id: {dataSetId}.";
-                logger.LogError(errorMessage);
-                throw new InvalidOperationException(
-                    "Failure detected when deleting the draft version for the data file uploaded."
-                );
-            });
-    }
-
-    private async Task DeleteAndRecreateInitialDataSetVersion(
-        Guid dataReleaseFileId,
-        CancellationToken cancellationToken,
-        DataSetVersion dataSetVersion,
-        [DisallowNull] Guid? dataSetId
-    )
-    {
-        await dataSetVersionService
-            .DeleteVersion(dataSetVersion.Id, cancellationToken)
-            .OnSuccessVoid(async _ =>
-            {
-                await dataSetService
-                    .CreateDataSet(dataReleaseFileId, cancellationToken)
-                    .OnFailureDo(_ =>
-                    {
-                        var errorMessage =
-                            $"Failed whilst creating the initial draft version for the data set id: {dataSetId}";
-                        logger.LogError(errorMessage);
-                        throw new InvalidOperationException("Failed whilst creating the initial draft version ");
-                    });
-            })
-            .OnFailureVoid(_ =>
-            {
-                var errorMessage =
-                    $"Failed whilst deleting the initial draft version for the data set id: {dataSetId}.";
-                logger.LogError(errorMessage);
-                throw new InvalidOperationException("Failed whilst deleting initial the draft version.");
-            });
-    }
-
-    private async Task UploadDataSetToReleaseStorage(
-        Guid releaseVersionId,
-        Guid dataFileId,
-        Guid metaFileId,
-        DataSet dataSet,
-        CancellationToken cancellationToken
-    )
-    {
-        var dataFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{dataFileId}";
-        var metaFilePath = $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{metaFileId}";
-
-        await privateBlobStorageService.UploadStream(
-            containerName: PrivateReleaseFiles,
-            dataFilePath,
-            dataSet.DataFile.FileStreamProvider(),
-            contentType: ContentTypes.Csv,
-            contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken
-        );
-
-        await privateBlobStorageService.UploadStream(
-            containerName: PrivateReleaseFiles,
-            metaFilePath,
-            dataSet.MetaFile.FileStreamProvider(),
-            contentType: ContentTypes.Csv,
-            contentEncoding: ContentEncodings.Gzip,
-            cancellationToken: cancellationToken
-        );
-    }
-
     public async Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
@@ -295,38 +50,6 @@ public class DataSetFileStorage(
         var uploads = await Task.WhenAll(uploadTasks);
 
         return [.. uploads];
-    }
-
-    // TODO - EES-6480.
-    public async Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(
-        Guid releaseVersionId,
-        Guid dataSetUploadId,
-        FileType fileType,
-        CancellationToken cancellationToken
-    )
-    {
-        return await ValidateFileTypeForTemporaryDataSetUploadFile(fileType)
-            .OnSuccess(async () =>
-                await contentDbContext.DataSetUploads.SingleOrNotFoundAsync(
-                    upload => upload.Id == dataSetUploadId,
-                    cancellationToken: cancellationToken
-                )
-            )
-            .OnSuccess(upload =>
-            {
-                var fileDetails = GetTemporaryDataUploadFileDetails(
-                    releaseVersionId: releaseVersionId,
-                    fileType: fileType,
-                    upload: upload
-                );
-
-                return privateBlobStorageService.GetBlobDownloadToken(
-                    container: PrivateReleaseTempFiles,
-                    filename: fileDetails.FileName,
-                    path: fileDetails.FilePath,
-                    cancellationToken: cancellationToken
-                );
-            });
     }
 
     /// <summary>
@@ -376,6 +99,72 @@ public class DataSetFileStorage(
             UploadedBy = userService.GetProfileFromClaims().Email.ToLower(),
             ReplacingFileId = dataSet.ReplacingFile?.Id,
         };
+    }
+
+    // TODO - EES-6480.
+    public async Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(
+        Guid releaseVersionId,
+        Guid dataSetUploadId,
+        FileType fileType,
+        CancellationToken cancellationToken
+    )
+    {
+        return await ValidateFileTypeForTemporaryDataSetUploadFile(fileType)
+            .OnSuccess(async () =>
+                await contentDbContext.DataSetUploads.SingleOrNotFoundAsync(
+                    upload => upload.Id == dataSetUploadId,
+                    cancellationToken: cancellationToken
+                )
+            )
+            .OnSuccess(upload =>
+            {
+                var (FilePath, FileName) = GetTemporaryDataUploadFileDetails(
+                    releaseVersionId: releaseVersionId,
+                    fileType: fileType,
+                    upload: upload
+                );
+
+                return privateBlobStorageService.GetBlobDownloadToken(
+                    container: PrivateReleaseTempFiles,
+                    filename: FileName,
+                    path: FilePath,
+                    cancellationToken: cancellationToken
+                );
+            });
+    }
+
+    private static Either<ActionResult, Unit> ValidateFileTypeForTemporaryDataSetUploadFile(FileType fileType)
+    {
+        return fileType is FileType.Data or FileType.Metadata
+            ? Unit.Instance
+            : ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Message = $"Invalid {nameof(fileType)} value {fileType} for temporary data set upload file type",
+                    Path = nameof(fileType),
+                    Detail = new InvalidErrorDetail<FileType>(fileType),
+                }
+            );
+    }
+
+    private static (string FilePath, string FileName) GetTemporaryDataUploadFileDetails(
+        Guid releaseVersionId,
+        FileType fileType,
+        DataSetUpload upload
+    )
+    {
+        if (fileType == FileType.Data)
+        {
+            return (
+                FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{upload.DataFileId}",
+                FileName: upload.DataFileName
+            );
+        }
+
+        return (
+            FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
+            FileName: upload.MetaFileName
+        );
     }
 
     public async Task<DataSetUpload> CreateOrReplaceExistingDataSetUpload(
@@ -539,6 +328,17 @@ public class DataSetFileStorage(
         return releaseFiles;
     }
 
+    private async Task<ReleaseFile?> GetReplacedReleaseFile(Guid releaseVersionId, Guid fileToBeReplacedId)
+    {
+        return await contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .SingleAsync(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.Type == FileType.Data
+                && rf.File.Id == fileToBeReplacedId
+            );
+    }
+
     private async Task<int> GetNextDataFileOrder(Guid releaseVersionId, Guid? fileToBeReplaceId = null)
     {
         if (fileToBeReplaceId is not null)
@@ -566,48 +366,152 @@ public class DataSetFileStorage(
         return currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
     }
 
-    private async Task<ReleaseFile?> GetReplacedReleaseFile(Guid releaseVersionId, Guid fileToBeReplacedId)
-    {
-        return await contentDbContext
-            .ReleaseFiles.Include(rf => rf.File)
-            .SingleAsync(rf =>
-                rf.ReleaseVersionId == releaseVersionId
-                && rf.File.Type == FileType.Data
-                && rf.File.Id == fileToBeReplacedId
-            );
-    }
-
-    private static Either<ActionResult, Unit> ValidateFileTypeForTemporaryDataSetUploadFile(FileType fileType)
-    {
-        return fileType is FileType.Data or FileType.Metadata
-            ? Unit.Instance
-            : ValidationUtils.ValidationResult(
-                new ErrorViewModel
-                {
-                    Message = $"Invalid {nameof(fileType)} value {fileType} for temporary data set upload file type",
-                    Path = nameof(fileType),
-                    Detail = new InvalidErrorDetail<FileType>(fileType),
-                }
-            );
-    }
-
-    private static (string FilePath, string FileName) GetTemporaryDataUploadFileDetails(
-        Guid releaseVersionId,
-        FileType fileType,
-        DataSetUpload upload
+    private async Task CreateDraftDataSetVersion(
+        Guid dataReleaseFileId,
+        ReleaseFile replacedReleaseDataFile,
+        CancellationToken cancellationToken
     )
     {
-        if (fileType == FileType.Data)
-        {
-            return (
-                FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Data)}{upload.DataFileId}",
-                FileName: upload.DataFileName
-            );
-        }
+        var dataSetId = replacedReleaseDataFile.PublicApiDataSetId;
 
-        return (
-            FilePath: $"{FileStoragePathUtils.FilesPath(releaseVersionId, FileType.Metadata)}{upload.MetaFileId}",
-            FileName: upload.MetaFileName
-        );
+        await dataSetVersionService
+            .GetDataSetVersion(dataSetId!.Value, replacedReleaseDataFile.PublicApiDataSetVersion!, cancellationToken)
+            .OnFailureDo(_ =>
+            {
+                var errorMessage =
+                    "Failed to find the data set version expected to be linked to the release file that is being replaced for the "
+                    + $"data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}. This has occured when creating the next draft version.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException(
+                    "Failed to find the associated API data set version for the release file."
+                );
+            })
+            .OnSuccessDo(async dataSetVersion =>
+            {
+                if (dataSetVersion.IsFirstVersion && dataSetVersion.Status != DataSetVersionStatus.Published)
+                {
+                    await DeleteAndRecreateInitialDataSetVersion(
+                        dataReleaseFileId,
+                        dataSetVersion,
+                        dataSetId,
+                        cancellationToken
+                    );
+                }
+                else if (dataSetVersion.Status != DataSetVersionStatus.Published)
+                {
+                    await DeleteAndRecreateDataSetVersion(
+                        dataReleaseFileId,
+                        replacedReleaseDataFile,
+                        dataSetVersion,
+                        dataSetId,
+                        cancellationToken
+                    );
+                }
+                else
+                {
+                    await CreateNextDataSetVersion(
+                        dataReleaseFileId,
+                        replacedReleaseDataFile,
+                        dataSetVersion,
+                        dataSetId,
+                        cancellationToken
+                    );
+                }
+            });
+    }
+
+    private async Task DeleteAndRecreateInitialDataSetVersion(
+        Guid dataReleaseFileId,
+        DataSetVersion dataSetVersion,
+        [DisallowNull] Guid? dataSetId,
+        CancellationToken cancellationToken
+    )
+    {
+        await dataSetVersionService
+            .DeleteVersion(dataSetVersion.Id, cancellationToken)
+            .OnSuccessVoid(async _ =>
+            {
+                await dataSetService
+                    .CreateDataSet(dataReleaseFileId, cancellationToken)
+                    .OnFailureDo(_ =>
+                    {
+                        var errorMessage =
+                            $"Failed whilst creating the initial draft version for the data set id: {dataSetId}";
+                        logger.LogError(errorMessage);
+                        throw new InvalidOperationException("Failed whilst creating the initial draft version.");
+                    });
+            })
+            .OnFailureVoid(_ =>
+            {
+                var errorMessage =
+                    $"Failed whilst deleting the initial draft version for the data set id: {dataSetId}.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException("Failed whilst deleting the initial draft version.");
+            });
+    }
+
+    private async Task DeleteAndRecreateDataSetVersion(
+        Guid dataReleaseFileId,
+        ReleaseFile replacedReleaseDataFile,
+        DataSetVersion dataSetVersion,
+        [DisallowNull] Guid? dataSetId,
+        CancellationToken cancellationToken
+    )
+    {
+        await dataSetVersionService
+            .DeleteVersion(dataSetVersion.Id, cancellationToken)
+            .OnSuccessVoid(async _ =>
+            {
+                await dataSetVersionService
+                    .CreateNextVersion(
+                        releaseFileId: dataReleaseFileId,
+                        dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
+                        dataSetVersionToReplaceId: null,
+                        cancellationToken
+                    )
+                    .OnFailureDo(_ =>
+                    {
+                        var errorMessage =
+                            $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
+                        logger.LogError(errorMessage);
+                        throw new InvalidOperationException(
+                            "Failure detected when creating the next draft version for the data file uploaded."
+                        );
+                    });
+            })
+            .OnFailureVoid(_ =>
+            {
+                var errorMessage = $"Failed whilst deleting the draft version for the data set id: {dataSetId}.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException(
+                    "Failure detected when deleting the draft version for the data file uploaded."
+                );
+            });
+    }
+
+    private async Task CreateNextDataSetVersion(
+        Guid dataReleaseFileId,
+        ReleaseFile replacedReleaseDataFile,
+        DataSetVersion dataSetVersion,
+        [DisallowNull] Guid? dataSetId,
+        CancellationToken cancellationToken
+    )
+    {
+        await dataSetVersionService
+            .CreateNextVersion(
+                releaseFileId: dataReleaseFileId,
+                dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
+                dataSetVersionToReplaceId: dataSetVersion.Id,
+                cancellationToken
+            )
+            .OnFailureDo(_ =>
+            {
+                var errorMessage =
+                    $"Failed whilst creating the next draft version for the data set id: {dataSetId} and the data set version number: {replacedReleaseDataFile.PublicApiDataSetVersionString}.";
+                logger.LogError(errorMessage);
+                throw new InvalidOperationException(
+                    "Failure detected when creating the next draft version for the data file uploaded."
+                );
+            });
     }
 }

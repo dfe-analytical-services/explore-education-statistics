@@ -534,6 +534,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
             services.AddTransient<IDataSetService, DataSetService>();
             services.AddTransient<IDataSetVersionService, DataSetVersionService>();
+            services.AddTransient<IReleasePublishingValidator, ReleasePublishingValidator>();
             services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
             services.AddTransient<IPreviewTokenService, PreviewTokenService>();
             services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
@@ -554,6 +555,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             ));
 
             services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
+            services.AddTransient<IReleasePublishingValidator, NoOpReleasePublishingValidator>();
             services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
             services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
             services.AddTransient<IDataSetVersionRepository, NoOpDataSetVersionRepository>();
@@ -1086,4 +1088,13 @@ internal class NoOpMappingTypesRepository : IMappingTypesRepository
         Guid targetDataSetVersionId,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
+}
+
+internal class NoOpReleasePublishingValidator : IReleasePublishingValidator
+{
+    public Task<bool> IsMissingUpdatedApiDataSet(
+        Content.Model.ReleaseVersion releaseVersion,
+        IList<Content.Model.File> dataFileUploads,
+        CancellationToken cancellationToken = default
+    ) => Task.FromResult(false);
 }

@@ -13,11 +13,11 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <!-- Required to execute unit tests in IDE -->
     <PackageReference Include="MockQueryable.Moq" Version="8.0.1" />
-    <PackageReference Include="Testcontainers.Azurite" Version="4.9.0" />
+    <PackageReference Include="Testcontainers.Azurite" Version="4.10.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite.csproj" />

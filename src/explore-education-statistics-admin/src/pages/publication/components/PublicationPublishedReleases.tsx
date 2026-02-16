@@ -16,6 +16,7 @@ import last from 'lodash/last';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import { Publication } from '@admin/services/publicationService';
+import BackToTopLink from '@common/components/BackToTopLink';
 import { ReleaseLabelFormValues } from './ReleaseLabelEditModal';
 
 interface Props {
@@ -26,6 +27,8 @@ interface Props {
     releaseId: string,
     releaseDetailsFormValues: ReleaseLabelFormValues,
   ) => Promise<void>;
+  setVisibleCount?: (count: number) => void;
+  showBackToTopLink?: boolean;
 }
 
 export default function PublicationPublishedReleases({
@@ -33,6 +36,8 @@ export default function PublicationPublishedReleases({
   pageSize = 5,
   refetchRef,
   onEdit,
+  setVisibleCount,
+  showBackToTopLink,
 }: Props) {
   const history = useHistory();
 
@@ -74,6 +79,10 @@ export default function PublicationPublishedReleases({
     () => releases?.pages.flatMap(page => page.results) ?? [],
     [releases?.pages],
   );
+
+  useEffect(() => {
+    setVisibleCount?.(allReleases.length);
+  }, [setVisibleCount, allReleases.length]);
 
   const showMoreNumber = useMemo(() => {
     if (!lastPage || !allReleases.length) {
@@ -146,6 +155,9 @@ export default function PublicationPublishedReleases({
                   size="sm"
                 />
               </div>
+            )}
+            {showBackToTopLink && (
+              <BackToTopLink className="govuk-!-margin-top-4" />
             )}
           </>
         ) : (

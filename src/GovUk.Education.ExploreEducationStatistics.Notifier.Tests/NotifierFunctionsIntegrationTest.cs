@@ -115,9 +115,11 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
 {
     public readonly Mock<INotificationClient> NotificationClient = new(MockBehavior.Strict);
 
-    private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
+    private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder(
+        "mcr.microsoft.com/azure-storage/azurite:3.35.0"
+    )
         .WithInMemoryPersistence()
+        .WithCommand("--skipApiVersionCheck")
         .Build();
 
     public async Task DisposeAsync()

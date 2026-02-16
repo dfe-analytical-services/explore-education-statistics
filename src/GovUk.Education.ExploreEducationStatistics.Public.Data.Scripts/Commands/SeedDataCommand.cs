@@ -519,7 +519,7 @@ public class SeedDataCommand : ICommand
                                     OptionId = option.Id,
                                 }
                         )
-                        .ToListAsync(token: _cancellationToken);
+                        .ToListAsync(_cancellationToken);
 
                     _dbContext.FilterOptionMetaLinks.AddRange(links);
                     await _dbContext.SaveChangesAsync(_cancellationToken);
@@ -639,9 +639,7 @@ public class SeedDataCommand : ICommand
                                 + (o.Ukprn ?? "null")
                         );
 
-                    var existingRowKeys = (
-                        await optionTable.Where(hasBatchRowKey).ToListAsync(token: _cancellationToken)
-                    )
+                    var existingRowKeys = (await optionTable.Where(hasBatchRowKey).ToListAsync(_cancellationToken))
                         .Select(o => o.GetRowKey())
                         .ToHashSet();
 
@@ -683,7 +681,7 @@ public class SeedDataCommand : ICommand
                                     OptionId = option.Id,
                                 }
                         )
-                        .ToListAsync(token: _cancellationToken);
+                        .ToListAsync(_cancellationToken);
 
                     _dbContext.LocationOptionMetaLinks.AddRange(links);
                     await _dbContext.SaveChangesAsync(_cancellationToken);

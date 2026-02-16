@@ -187,7 +187,7 @@ public class DataSetQueryTimePeriodValidatorTests
                 {
                     var yearFormat = EnumUtil
                         .GetFromEnumValue<TimeIdentifier>(allowedCode)
-                        .GetEnumAttribute<TimeIdentifierMetaAttribute>()
+                        .GetEnumAttribute<TimeIdentifierMetaAttribute>()!
                         .YearFormat;
 
                     var isValidYearFormat = yearFormat is TimePeriodYearFormat.Academic or TimePeriodYearFormat.Fiscal;
