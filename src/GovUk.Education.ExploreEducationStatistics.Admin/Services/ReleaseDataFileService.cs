@@ -647,10 +647,14 @@ public class ReleaseDataFileService(
     private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
     {
         var isBauUser = await userService.CheckIsBauUser();
+        if (isBauUser.IsLeft)
+        {
+            return ValidationUtils.ValidationResult(
+                ValidationMessages.GenerateErrorAnalystCannotReplaceApiDataSet(dataSetUpload.DataFileName)
+            );
+        }
 
-        return
-            !isBauUser.IsRight
-            && dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
+        return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
             ? ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
             : dataSetUpload;
     }

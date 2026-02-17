@@ -1,8 +1,9 @@
-﻿import { DataSetUpload } from '@admin/services/releaseDataFileService';
+﻿import { AuthContext } from '@admin/contexts/AuthContext';
+import { DataSetUpload } from '@admin/services/releaseDataFileService';
 import render from '@common-test/render';
 import { Dictionary } from '@common/types';
-import React from 'react';
 import { screen, waitFor, within } from '@testing-library/dom';
+import React from 'react';
 import DataFilesTableUploadRow from '../DataFilesTableUploadsRow';
 
 describe('DataFilesTableUploadsRow', () => {
@@ -388,5 +389,242 @@ describe('DataFilesTableUploadsRow', () => {
         'You will need to delete this file (close this window, and select "Delete files"), fix the failed tests and upload again. If you have any questions, please get in touch with the explore.statistics@education.gov.uk team.',
       ),
     ).toBeInTheDocument();
+  });
+  describe('User permission and replacing an API Data set linked data file', () => {
+    const defaultPermissions = {
+      isBauUser: true,
+      canAccessSystem: true,
+      canAccessPrereleasePages: true,
+      canAccessAnalystPages: true,
+      canAccessAllImports: true,
+      canManageAllTaxonomy: true,
+      isApprover: true,
+    };
+
+    describe('Analyst user', () => {
+      test('can continue import when data file being replaced is not linked to API data set', async () => {
+        const bauUser = {
+          id: 'user-2',
+          name: 'Test User',
+          permissions: defaultPermissions,
+        };
+        const passingFileWithAPI = {
+          ...fileUploads.passAndWarning,
+        };
+
+        const { user } = render(
+          <AuthContext.Provider
+            value={{
+              user: {
+                ...bauUser,
+                permissions: { ...defaultPermissions, isBauUser: false },
+              },
+            }}
+          >
+            <table>
+              <tbody>
+                <DataFilesTableUploadRow
+                  {...rowBaseProps}
+                  dataSetUpload={passingFileWithAPI}
+                />
+              </tbody>
+            </table>
+          </AuthContext.Provider>,
+        );
+
+        const detailsButton = screen.getByRole('button', {
+          name: 'View details for pass',
+        });
+
+        user.click(detailsButton);
+        await waitFor(async () => {
+          expect(
+            screen.queryByRole('heading', {
+              name: 'Data set details',
+            }),
+          ).toBeInTheDocument();
+        });
+        const importButton = screen.queryByText(
+          'Continue import with warnings',
+        );
+
+        expect(importButton).toBeInTheDocument();
+
+        expect(
+          screen.queryAllByText(
+            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
+          ),
+        ).toHaveLength(0);
+      });
+
+      test('can not continue import when data file being replaced is linked to API data set', async () => {
+        const bauUser = {
+          id: 'user-2',
+          name: 'Test User',
+          permissions: defaultPermissions,
+        };
+        const passingFileWithAPI = {
+          ...fileUploads.passAndWarning,
+          replacedByFileAPIDataSetId: 'b13b2247-ae76-41c7-b442-08ddafffd9e4',
+        };
+
+        const { user } = render(
+          <AuthContext.Provider
+            value={{
+              user: {
+                ...bauUser,
+                permissions: { ...defaultPermissions, isBauUser: false },
+              },
+            }}
+          >
+            <table>
+              <tbody>
+                <DataFilesTableUploadRow
+                  {...rowBaseProps}
+                  dataSetUpload={passingFileWithAPI}
+                />
+              </tbody>
+            </table>
+          </AuthContext.Provider>,
+        );
+
+        const detailsButton = screen.getByRole('button', {
+          name: 'View details for pass',
+        });
+
+        user.click(detailsButton);
+        await waitFor(async () => {
+          expect(
+            screen.queryByRole('heading', {
+              name: 'Data set details',
+            }),
+          ).toBeInTheDocument();
+        });
+        const importButton = screen.queryByText(
+          'Continue import with warnings',
+        );
+
+        expect(importButton).not.toBeInTheDocument();
+
+        expect(
+          screen.queryAllByText(
+            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
+          ),
+        ).toHaveLength(3);
+      });
+    });
+
+    describe('BAU user', () => {
+      test('can continue import when data file being replaced is not linked to API data set', async () => {
+        const bauUser = {
+          id: 'user-2',
+          name: 'Test User',
+          permissions: defaultPermissions,
+        };
+        const passingFileWithAPI = {
+          ...fileUploads.passAndWarning,
+        };
+
+        const { user } = render(
+          <AuthContext.Provider
+            value={{
+              user: {
+                ...bauUser,
+                permissions: { ...defaultPermissions, isBauUser: true },
+              },
+            }}
+          >
+            <table>
+              <tbody>
+                <DataFilesTableUploadRow
+                  {...rowBaseProps}
+                  dataSetUpload={passingFileWithAPI}
+                />
+              </tbody>
+            </table>
+          </AuthContext.Provider>,
+        );
+
+        const detailsButton = screen.getByRole('button', {
+          name: 'View details for pass',
+        });
+
+        user.click(detailsButton);
+        await waitFor(async () => {
+          expect(
+            screen.queryByRole('heading', {
+              name: 'Data set details',
+            }),
+          ).toBeInTheDocument();
+        });
+        const importButton = screen.queryByText(
+          'Continue import with warnings',
+        );
+
+        expect(importButton).toBeInTheDocument();
+
+        expect(
+          screen.queryAllByText(
+            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
+          ),
+        ).toHaveLength(0);
+      });
+
+      test('can continue import when data file being replaced is linked to API data set', async () => {
+        const bauUser = {
+          id: 'user-2',
+          name: 'Test User',
+          permissions: defaultPermissions,
+        };
+        const passingFileWithAPI = {
+          ...fileUploads.passAndWarning,
+          replacedByFileAPIDataSetId: 'b13b2247-ae76-41c7-b442-08ddafffd9e4',
+        };
+
+        const { user } = render(
+          <AuthContext.Provider
+            value={{
+              user: {
+                ...bauUser,
+                permissions: { ...defaultPermissions, isBauUser: true },
+              },
+            }}
+          >
+            <table>
+              <tbody>
+                <DataFilesTableUploadRow
+                  {...rowBaseProps}
+                  dataSetUpload={passingFileWithAPI}
+                />
+              </tbody>
+            </table>
+          </AuthContext.Provider>,
+        );
+
+        const detailsButton = screen.getByRole('button', {
+          name: 'View details for pass',
+        });
+
+        user.click(detailsButton);
+        await waitFor(async () => {
+          expect(
+            screen.queryByRole('heading', {
+              name: 'Data set details',
+            }),
+          ).toBeInTheDocument();
+        });
+        const importButton = screen.queryByText(
+          'Continue import with warnings',
+        );
+
+        expect(importButton).toBeInTheDocument();
+
+        expect(
+          screen.queryAllByText(
+            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
+          ),
+        ).toHaveLength(0);
+      });
+    });
   });
 });

@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -220,7 +221,10 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Type, m => m.MapFrom(dataSetVersion => dataSetVersion.VersionType));
 
         CreateMap<DataSetUpload, DataSetUploadViewModel>()
-            .ForMember(dest => dest.Status, m => m.MapFrom(upload => GetDataSetUploadStatus(upload.ScreenerResult)))
+            .ForMember(
+                dest => dest.Status,
+                m => m.MapFrom(upload => ScreenerResponseUtility.GetDataSetUploadStatus(upload.ScreenerResult))
+            )
             .ForMember(
                 dest => dest.PublicApiCompatible,
                 m => m.MapFrom(upload => upload.ScreenerResult.PublicApiCompatible)
@@ -241,23 +245,6 @@ public class MappingProfiles : CommonMappingProfile
 
         CreateMap<DataSetUpload, DataSetScreenerRequest>()
             .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
-    }
-
-    private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
-    {
-        if (screenerResult is null)
-        {
-            return nameof(DataSetUploadStatus.SCREENER_ERROR);
-        }
-
-        if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
-        {
-            return nameof(DataSetUploadStatus.PENDING_REVIEW);
-        }
-
-        return !screenerResult.Passed
-            ? nameof(DataSetUploadStatus.FAILED_SCREENING)
-            : nameof(DataSetUploadStatus.PENDING_IMPORT);
     }
 
     private void CreateContentBlockMap()

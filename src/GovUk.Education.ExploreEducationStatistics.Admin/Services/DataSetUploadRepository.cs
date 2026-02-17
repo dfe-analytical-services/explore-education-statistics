@@ -1,11 +1,13 @@
 #nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -24,10 +26,37 @@ public class DataSetUploadRepository(
         CancellationToken cancellationToken = default
     )
     {
-        return await contentDbContext
+        var queryResults = await contentDbContext
             .DataSetUploads.Where(uploads => uploads.ReleaseVersionId == releaseVersionId)
-            .Select(entity => mapper.Map<DataSetUploadViewModel>(entity))
+            .Join(
+                contentDbContext.ReleaseFiles,
+                upload => new { FileId = upload.ReplacingFileId, upload.ReleaseVersionId },
+                releaseFile => new { FileId = (Guid?)releaseFile.FileId, releaseFile.ReleaseVersionId },
+                (upload, releaseFile) => new { upload, releaseFile.PublicApiDataSetId }
+            )
             .ToListAsync(cancellationToken);
+
+        return queryResults
+            .Select(tuple => new DataSetUploadViewModel
+            {
+                Id = tuple.upload.Id,
+                DataSetTitle = tuple.upload.DataSetTitle,
+                DataFileName = tuple.upload.DataFileName,
+                MetaFileName = tuple.upload.MetaFileName,
+                DataFileSize = FileExtensions.DisplaySize(tuple.upload.DataFileSizeInBytes),
+                MetaFileSize = FileExtensions.DisplaySize(tuple.upload.MetaFileSizeInBytes),
+                Status = ScreenerResponseUtility.GetDataSetUploadStatus(tuple.upload.ScreenerResult),
+                ScreenerResult =
+                    tuple.upload.ScreenerResult != null
+                        ? mapper.Map<ScreenerResultViewModel>(tuple.upload.ScreenerResult)
+                        : null,
+                Created = tuple.upload.Created,
+                UploadedBy = tuple.upload.UploadedBy,
+                PublicApiCompatible = tuple.upload.ScreenerResult?.PublicApiCompatible ?? false,
+                ReplacingFileId = tuple.upload.ReplacingFileId,
+                ReplacedByFileAPIDataSetId = tuple.PublicApiDataSetId,
+            })
+            .ToList();
     }
 
     public async Task<Either<ActionResult, Unit>> Delete(

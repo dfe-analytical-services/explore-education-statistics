@@ -34,6 +34,7 @@ export interface DataSetUpload {
   uploadedBy: string;
   publicApiCompatible?: boolean;
   replacingFileId?: string;
+  replacedByFileAPIDataSetId?: string;
 }
 
 export interface ScreenerResult {
