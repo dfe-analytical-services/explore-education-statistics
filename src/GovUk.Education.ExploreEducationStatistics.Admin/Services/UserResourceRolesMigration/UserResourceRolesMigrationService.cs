@@ -82,6 +82,7 @@ public class UserResourceRolesMigrationService(
                         Role = changes.NewSystemPublicationRoleToCreate!.Role,
                         Created = changes.NewSystemPublicationRoleToCreate.CreatedDate,
                         CreatedById = changes.NewSystemPublicationRoleToCreate.CreatedById,
+                        EmailSent = changes.NewSystemPublicationRoleToCreate.EmailSent,
                     })
                     .ToList();
 
@@ -106,6 +107,7 @@ public class UserResourceRolesMigrationService(
                 upr.Role,
                 upr.Created,
                 upr.CreatedById,
+                upr.EmailSent,
             })
             .GroupBy(a => new { a.UserId, a.PublicationId })
             // Check to see if .ToHashSet is done in-memory or SQL. If in SQL, change to g.Select(a => a.Role).Distinct().ToList() and then do
@@ -113,7 +115,7 @@ public class UserResourceRolesMigrationService(
             .Select(g => new GroupedUserPublicationRoles(
                 g.Key.UserId,
                 g.Key.PublicationId,
-                g.Select(a => new PublicationRoleDetails(a.Role, a.Created, a.CreatedById)).ToHashSet()
+                g.Select(a => new PublicationRoleDetails(a.Role, a.Created, a.CreatedById, a.EmailSent)).ToHashSet()
             ))
             .ToListAsync();
 
@@ -126,6 +128,7 @@ public class UserResourceRolesMigrationService(
                 urr.Role,
                 urr.Created,
                 urr.CreatedById,
+                urr.EmailSent,
             })
             // Becuase the same release roles can be across multiple release versions for the same publication, this can
             // return duplicate roles for the same publication. Hence, we do a .Distinct() to optimise the query.
@@ -136,7 +139,7 @@ public class UserResourceRolesMigrationService(
             .Select(g => new GroupedUserReleaseRoles(
                 g.Key.UserId,
                 g.Key.PublicationId,
-                g.Select(a => new ReleaseRoleDetails(a.Role, a.Created, a.CreatedById)).ToHashSet()
+                g.Select(a => new ReleaseRoleDetails(a.Role, a.Created, a.CreatedById, a.EmailSent)).ToHashSet()
             ))
             .ToListAsync();
 
@@ -232,10 +235,11 @@ public class UserResourceRolesMigrationService(
     {
         var oldSystemPublicationRolesNewSystemEquivalents = groupedUserResourceRoles
             .PublicationRoles.Where(pr => !pr.Role.IsNewPermissionsSystemPublicationRole())
-            .Select(r => new PublicationRoleDetails(
-                PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(r.Role),
-                r.CreatedDate,
-                r.CreatedById
+            .Select(pr => new PublicationRoleDetails(
+                PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(pr.Role),
+                pr.CreatedDate,
+                pr.CreatedById,
+                pr.EmailSent
             ))
             .ToHashSet();
 
@@ -247,14 +251,16 @@ public class UserResourceRolesMigrationService(
                     ),
                     newSystemPublicationRole,
                     rr.CreatedDate,
-                    rr.CreatedById
+                    rr.CreatedById,
+                    rr.EmailSent
                 )
             )
             .Where(tuple => tuple.canConvertToNewPermissionsSystemPublicationRole)
             .Select(tuple => new PublicationRoleDetails(
                 tuple.newSystemPublicationRole!.Value,
                 tuple.CreatedDate,
-                tuple.CreatedById
+                tuple.CreatedById,
+                tuple.EmailSent
             ))
             .ToHashSet();
 
@@ -266,13 +272,23 @@ public class UserResourceRolesMigrationService(
         return allEquivalentNewSystemPublicationRoles
             .OrderByDescending(pr => pr.Role == PublicationRole.Approver) // Approver first, Drafter second
             .ThenBy(pr => pr.CreatedDate) // Then by earliest created date
-            .Select(pr => new PublicationRoleDetails(pr.Role, pr.CreatedDate, pr.CreatedById))
+            .Select(pr => new PublicationRoleDetails(pr.Role, pr.CreatedDate, pr.CreatedById, pr.EmailSent))
             .FirstOrDefault();
     }
 
-    private record PublicationRoleDetails(PublicationRole Role, DateTime CreatedDate, Guid? CreatedById);
+    private record PublicationRoleDetails(
+        PublicationRole Role,
+        DateTime CreatedDate,
+        Guid? CreatedById,
+        DateTimeOffset? EmailSent
+    );
 
-    private record ReleaseRoleDetails(ReleaseRole Role, DateTime CreatedDate, Guid? CreatedById);
+    private record ReleaseRoleDetails(
+        ReleaseRole Role,
+        DateTime CreatedDate,
+        Guid? CreatedById,
+        DateTimeOffset? EmailSent
+    );
 
     private record GroupedUserPublicationRoles(Guid UserId, Guid PublicationId, HashSet<PublicationRoleDetails> Roles);
 
