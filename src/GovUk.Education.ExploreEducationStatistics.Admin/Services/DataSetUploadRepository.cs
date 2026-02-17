@@ -27,12 +27,23 @@ public class DataSetUploadRepository(
     )
     {
         var queryResults = await contentDbContext
-            .DataSetUploads.Where(uploads => uploads.ReleaseVersionId == releaseVersionId)
-            .Join(
+            .DataSetUploads.Where(upload => upload.ReleaseVersionId == releaseVersionId)
+            .GroupJoin(
                 contentDbContext.ReleaseFiles,
                 upload => new { FileId = upload.ReplacingFileId, upload.ReleaseVersionId },
                 releaseFile => new { FileId = (Guid?)releaseFile.FileId, releaseFile.ReleaseVersionId },
-                (upload, releaseFile) => new { upload, releaseFile.PublicApiDataSetId }
+                (upload, originalReleaseFile) => new { upload, originalReleaseFile }
+            )
+            .SelectMany(
+                temp => temp.originalReleaseFile.DefaultIfEmpty(),
+                (temp, originalReleaseFile) =>
+                    new
+                    {
+                        temp.upload,
+                        PublicApiDataSetId = originalReleaseFile != null
+                            ? originalReleaseFile.PublicApiDataSetId
+                            : null,
+                    }
             )
             .ToListAsync(cancellationToken);
 
@@ -43,8 +54,8 @@ public class DataSetUploadRepository(
                 DataSetTitle = tuple.upload.DataSetTitle,
                 DataFileName = tuple.upload.DataFileName,
                 MetaFileName = tuple.upload.MetaFileName,
-                DataFileSize = FileExtensions.DisplaySize(tuple.upload.DataFileSizeInBytes),
-                MetaFileSize = FileExtensions.DisplaySize(tuple.upload.MetaFileSizeInBytes),
+                DataFileSize = tuple.upload.DataFileSizeInBytes.DisplaySize(),
+                MetaFileSize = tuple.upload.MetaFileSizeInBytes.DisplaySize(),
                 Status = ScreenerResponseUtility.GetDataSetUploadStatus(tuple.upload.ScreenerResult),
                 ScreenerResult =
                     tuple.upload.ScreenerResult != null
