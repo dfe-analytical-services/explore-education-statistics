@@ -1,5 +1,5 @@
 import Page from '@admin/components/Page';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import FormProvider from '@common/components/form/FormProvider';
 import FormGroup from '@common/components/form/FormGroup';
 import FormFieldset from '@common/components/form/FormFieldset';
@@ -22,7 +22,6 @@ const ServiceAnnouncementPage = () => {
 
   const { hub } = useNotificationHubContext();
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
-  const [messagePreview, setMessagePreview] = useState<string>('');
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
@@ -57,7 +56,6 @@ const ServiceAnnouncementPage = () => {
               <Form
                 id="broadcastMessageForm"
                 onSubmit={() => {
-                  setMessagePreview(form.getValues('message'));
                   toggleConfirmModal.on();
                 }}
               >
@@ -89,7 +87,6 @@ const ServiceAnnouncementPage = () => {
                     await form.handleSubmit(async values => {
                       await handleSubmit(values);
                       form.reset();
-                      setMessagePreview('');
                       toggleConfirmModal.off();
                     })();
                   }}
@@ -100,7 +97,7 @@ const ServiceAnnouncementPage = () => {
                   <p>
                     The following message will be sent to all connected users:
                   </p>
-                  <InsetText>{messagePreview}</InsetText>
+                  <InsetText>{form.getValues('message')}</InsetText>
                   <p>Are you sure you want to send this message?</p>
                 </ModalConfirm>
               )}

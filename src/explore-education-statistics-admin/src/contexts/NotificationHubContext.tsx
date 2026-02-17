@@ -30,8 +30,6 @@ export function NotificationHubContextProvider({
 }: NotificationHubContextProviderProps) {
   const hubState = useHubState(notificationHub);
 
-  const [showNotificationModal, setShowNotificationModal] =
-    useState<boolean>(false);
   const [notificationMessage, setNotificationMessage] = useState<
     undefined | string
   >(undefined);
@@ -49,7 +47,6 @@ export function NotificationHubContextProvider({
 
       subscription = hub.subscribe('ServiceAnnouncement', (message: string) => {
         setNotificationMessage(message);
-        setShowNotificationModal(true);
       });
     }
 
@@ -68,8 +65,8 @@ export function NotificationHubContextProvider({
       <Modal
         title="Service announcement"
         showClose
-        onExit={() => setShowNotificationModal(false)}
-        open={showNotificationModal}
+        onExit={() => setNotificationMessage('')}
+        open={!!notificationMessage}
       >
         <InsetText>
           <FormattedDate
