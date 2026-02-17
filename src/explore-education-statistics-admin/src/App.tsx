@@ -30,6 +30,7 @@ import { LastLocationContextProvider } from './contexts/LastLocationContext';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 
 import 'ckeditor5/ckeditor5.css';
+import { NotificationHubContextProvider } from './contexts/NotificationHubContext';
 
 const queryClient = new QueryClient();
 
@@ -83,27 +84,29 @@ export default function App() {
   return (
     <Providers>
       <PageErrorBoundary>
-        <ApplicationInsightsTracking />
+        <NotificationHubContextProvider>
+          <ApplicationInsightsTracking />
 
-        <Switch>
-          {Object.entries(publicRoutes).map(([key, route]) => (
-            <Route key={key} {...route} />
-          ))}
+          <Switch>
+            {Object.entries(publicRoutes).map(([key, route]) => (
+              <Route key={key} {...route} />
+            ))}
 
-          {Object.entries(routes).map(([key, route]) => (
-            <ProtectedRoute key={key} {...route} />
-          ))}
+            {Object.entries(routes).map(([key, route]) => (
+              <ProtectedRoute key={key} {...route} />
+            ))}
 
-          {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
-          {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
-          <ProtectedRoute
-            path="/prototypes"
-            protectionAction={permissions => permissions.isBauUser}
-            component={PrototypesEntry}
-          />
+            {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
+            {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
+            <ProtectedRoute
+              path="/prototypes"
+              protectionAction={permissions => permissions.isBauUser}
+              component={PrototypesEntry}
+            />
 
-          <ProtectedRoute path="*" component={PageNotFoundPage} />
-        </Switch>
+            <ProtectedRoute path="*" component={PageNotFoundPage} />
+          </Switch>
+        </NotificationHubContextProvider>
       </PageErrorBoundary>
     </Providers>
   );

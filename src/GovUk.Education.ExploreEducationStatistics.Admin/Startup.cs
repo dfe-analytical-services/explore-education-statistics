@@ -819,6 +819,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+            endpoints.MapHub<NotificationHub>("/hubs/service-announcement");
         });
 
         app.UseMvc();
