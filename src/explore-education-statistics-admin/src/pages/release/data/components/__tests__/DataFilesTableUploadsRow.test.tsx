@@ -400,6 +400,8 @@ describe('DataFilesTableUploadsRow', () => {
       canManageAllTaxonomy: true,
       isApprover: true,
     };
+    const analystNotAllowedMessage =
+      /This upload can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i;
 
     describe('Analyst user', () => {
       test('can continue import when data file being replaced is not linked to API data set', async () => {
@@ -450,11 +452,7 @@ describe('DataFilesTableUploadsRow', () => {
 
         expect(importButton).toBeInTheDocument();
 
-        expect(
-          screen.queryAllByText(
-            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
-          ),
-        ).toHaveLength(0);
+        expect(screen.queryAllByText(analystNotAllowedMessage)).toHaveLength(0);
       });
 
       test('can not continue import when data file being replaced is linked to API data set', async () => {
@@ -506,11 +504,7 @@ describe('DataFilesTableUploadsRow', () => {
 
         expect(importButton).not.toBeInTheDocument();
 
-        expect(
-          screen.queryAllByText(
-            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
-          ),
-        ).toHaveLength(3);
+        expect(screen.queryAllByText(analystNotAllowedMessage)).toHaveLength(3);
       });
     });
 
@@ -563,11 +557,7 @@ describe('DataFilesTableUploadsRow', () => {
 
         expect(importButton).toBeInTheDocument();
 
-        expect(
-          screen.queryAllByText(
-            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
-          ),
-        ).toHaveLength(0);
+        expect(screen.queryAllByText(analystNotAllowedMessage)).toHaveLength(0);
       });
 
       test('can continue import when data file being replaced is linked to API data set', async () => {
@@ -619,11 +609,7 @@ describe('DataFilesTableUploadsRow', () => {
 
         expect(importButton).toBeInTheDocument();
 
-        expect(
-          screen.queryAllByText(
-            /This action can only be completed by a BAU user. This data file is linked to an API data set version which only BAU users can modify. Please contact the EES team for support at /i,
-          ),
-        ).toHaveLength(0);
+        expect(screen.queryAllByText(analystNotAllowedMessage)).toHaveLength(0);
       });
     });
   });

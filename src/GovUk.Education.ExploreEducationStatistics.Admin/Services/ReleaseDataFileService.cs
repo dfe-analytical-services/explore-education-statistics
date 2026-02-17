@@ -654,7 +654,9 @@ public class ReleaseDataFileService(
             );
         }
 
-        return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
+        return
+            !isBauUser.IsRight
+            && dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
             ? ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
             : dataSetUpload;
     }
