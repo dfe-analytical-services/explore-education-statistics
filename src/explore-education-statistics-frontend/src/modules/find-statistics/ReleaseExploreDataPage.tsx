@@ -224,112 +224,118 @@ const ReleaseExploreDataPage = ({
           </WarningMessage>
         )}
         {!isMobileMedia && hasAnyDataSection && (
-          <ReleaseDataPageCardLinkGrid>
+          <>
             {(hasDataSets || hasSupportingFiles || hasDataGuidance) && (
-              <ReleaseDataPageCardLink
-                renderLink={
-                  <Link
-                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
-                    onClick={() => {
-                      logEvent({
-                        category: 'Downloads',
-                        action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
-                      });
-                    }}
-                    unvisited
-                  >
-                    Download all data from this release (ZIP)
-                  </Link>
-                }
-                caption="This includes all data sets, guidance files and any supporting files"
-                isHighlightVariant
-              />
+              <>
+                <Link
+                  to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+                  onClick={() => {
+                    logEvent({
+                      category: 'Downloads',
+                      action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
+                    });
+                  }}
+                  unvisited
+                  className="govuk-!-display-inline-block govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-1"
+                  id="download-all-data-link"
+                >
+                  Download all data (ZIP)
+                </Link>
+
+                <p>
+                  This includes all data sets, guidance files and any supporting
+                  files
+                </p>
+                <h3>More options</h3>
+              </>
             )}
 
-            {hasFeaturedTables && (
-              <ReleaseDataPageCardLink
-                renderLink={
-                  <a
-                    href={`#${pageSections.featuredTables.id}`}
-                    className="govuk-link govuk-link--no-visited-state"
-                  >
-                    {pageSections.featuredTables.text}
-                  </a>
-                }
-                caption={pageSections.featuredTables.shortCaption}
-              />
-            )}
+            <ReleaseDataPageCardLinkGrid>
+              {hasFeaturedTables && (
+                <ReleaseDataPageCardLink
+                  renderLink={
+                    <a
+                      href={`#${pageSections.featuredTables.id}`}
+                      className="govuk-link govuk-link--no-visited-state"
+                    >
+                      {pageSections.featuredTables.text}
+                    </a>
+                  }
+                  caption={pageSections.featuredTables.shortCaption}
+                />
+              )}
 
-            {hasDataSets && (
-              <ReleaseDataPageCardLink
-                renderLink={
-                  <a
-                    href={`#${pageSections.datasets.id}`}
-                    className="govuk-link govuk-link--no-visited-state"
-                  >
-                    {pageSections.datasets.text}
-                  </a>
-                }
-                caption={pageSections.datasets.caption}
-              />
-            )}
+              {hasDataSets && (
+                <ReleaseDataPageCardLink
+                  renderLink={
+                    <a
+                      href={`#${pageSections.datasets.id}`}
+                      className="govuk-link govuk-link--no-visited-state"
+                    >
+                      {pageSections.datasets.text}
+                    </a>
+                  }
+                  caption={pageSections.datasets.caption}
+                />
+              )}
 
-            {hasSupportingFiles && (
-              <ReleaseDataPageCardLink
-                renderLink={
-                  <a
-                    href={`#${pageSections.supportingFiles.id}`}
-                    className="govuk-link govuk-link--no-visited-state"
-                  >
-                    {pageSections.supportingFiles.text}
-                  </a>
-                }
-                caption={pageSections.supportingFiles.caption}
-              />
-            )}
+              {hasSupportingFiles && (
+                <ReleaseDataPageCardLink
+                  renderLink={
+                    <a
+                      href={`#${pageSections.supportingFiles.id}`}
+                      className="govuk-link govuk-link--no-visited-state"
+                    >
+                      {pageSections.supportingFiles.text}
+                    </a>
+                  }
+                  caption={pageSections.supportingFiles.caption}
+                />
+              )}
 
-            {hasDataDashboards && (
-              <ReleaseDataPageCardLink
-                renderLink={
-                  <a
-                    href={`#${pageSections.dataDashboards.id}`}
-                    className="govuk-link govuk-link--no-visited-state"
-                  >
-                    {pageSections.dataDashboards.text}
-                  </a>
-                }
-                caption={pageSections.dataDashboards.caption}
-              />
-            )}
+              {hasDataDashboards && (
+                <ReleaseDataPageCardLink
+                  renderLink={
+                    <a
+                      href={`#${pageSections.dataDashboards.id}`}
+                      className="govuk-link govuk-link--no-visited-state"
+                    >
+                      {pageSections.dataDashboards.text}
+                    </a>
+                  }
+                  caption={pageSections.dataDashboards.caption}
+                />
+              )}
 
-            {hasDataGuidance && (
-              <ReleaseDataPageCardLink
-                renderLink={
-                  <a
-                    href={`#${pageSections.dataGuidance.id}`}
-                    className="govuk-link govuk-link--no-visited-state"
-                  >
-                    {pageSections.dataGuidance.text}
-                  </a>
-                }
-                caption={pageSections.dataGuidance.caption}
-              />
-            )}
+              {hasDataGuidance && (
+                <ReleaseDataPageCardLink
+                  renderLink={
+                    <a
+                      href={`#${pageSections.dataGuidance.id}`}
+                      className="govuk-link govuk-link--no-visited-state"
+                    >
+                      {pageSections.dataGuidance.text}
+                    </a>
+                  }
+                  caption={pageSections.dataGuidance.caption}
+                />
+              )}
 
-            {hasDataSets && (
-              <ReleaseDataPageCardLink
-                renderLink={
-                  <Link
-                    to={`/data-catalogue?themeId=${publicationSummary.theme.id}&publicationId=${publicationSummary.id}&releaseVersionId=${releaseVersionSummary.id}`}
-                    unvisited
-                  >
-                    Data catalogue
-                  </Link>
-                }
-                caption="Alternatively use our data catalogue to search and filter for specific data sets from this release or our entire library, providing full data summaries, data previews and access to API data sets."
-              />
-            )}
-          </ReleaseDataPageCardLinkGrid>
+              {hasDataSets && (
+                <ReleaseDataPageCardLink
+                  renderLink={
+                    <Link
+                      to={`/data-catalogue?themeId=${publicationSummary.theme.id}&publicationId=${publicationSummary.id}&releaseVersionId=${releaseVersionSummary.id}`}
+                      unvisited
+                    >
+                      Data catalogue
+                    </Link>
+                  }
+                  caption="Alternatively use our data catalogue to search and filter for specific data sets from this release or our entire library, providing full data summaries, data previews and access to API data sets."
+                />
+              )}
+            </ReleaseDataPageCardLinkGrid>
+          </>
         )}
       </ReleasePageContentSection>
 

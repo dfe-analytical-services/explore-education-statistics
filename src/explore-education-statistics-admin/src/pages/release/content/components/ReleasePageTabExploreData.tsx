@@ -255,101 +255,106 @@ const ReleasePageTabExploreData = ({
                 includeSectionBreak={!isMobileMedia}
               >
                 {!isMobileMedia && (
-                  <ReleaseDataPageCardLinkGrid>
-                    <ReleaseDataPageCardLink
-                      renderLink={
-                        <ButtonText
-                          className="govuk-!-font-weight-bold"
-                          underline={false}
-                          preventDoubleClick
-                          onClick={() =>
-                            releaseFileService.downloadFilesAsZip(release.id)
+                  <>
+                    <ButtonText
+                      className="govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-1"
+                      preventDoubleClick
+                      onClick={() =>
+                        releaseFileService.downloadFilesAsZip(release.id)
+                      }
+                    >
+                      Download all data (ZIP)
+                    </ButtonText>
+
+                    <p>
+                      This includes all data sets, guidance files and any
+                      supporting files
+                    </p>
+                    <h3>More options</h3>
+
+                    <ReleaseDataPageCardLinkGrid>
+                      {hasFeaturedTables && (
+                        <ReleaseDataPageCardLink
+                          renderLink={
+                            <Link
+                              to={`#${pageSections.featuredTables.id}`}
+                              unvisited
+                            >
+                              {pageSections.featuredTables.text}
+                            </Link>
                           }
-                        >
-                          Download all data from this release (ZIP)
-                        </ButtonText>
-                      }
-                      caption="This includes all data sets, guidance files and any supporting files"
-                      isHighlightVariant
-                    />
+                          caption={pageSections.featuredTables.shortCaption}
+                        />
+                      )}
 
-                    {hasFeaturedTables && (
+                      <ReleaseDataPageCardLink
+                        renderLink={
+                          <Link to={`#${pageSections.datasets.id}`} unvisited>
+                            {pageSections.datasets.text}
+                          </Link>
+                        }
+                        caption={pageSections.datasets.caption}
+                      />
+
+                      {hasSupportingFiles && (
+                        <ReleaseDataPageCardLink
+                          renderLink={
+                            <Link
+                              to={`#${pageSections.supportingFiles.id}`}
+                              unvisited
+                            >
+                              {pageSections.supportingFiles.text}
+                            </Link>
+                          }
+                          caption={pageSections.supportingFiles.caption}
+                        />
+                      )}
+
+                      {hasDataDashboards && (
+                        <ReleaseDataPageCardLink
+                          renderLink={
+                            <Link
+                              to={`#${pageSections.dataDashboards.id}`}
+                              unvisited
+                            >
+                              {pageSections.dataDashboards.text}
+                            </Link>
+                          }
+                          caption={pageSections.dataDashboards.caption}
+                        />
+                      )}
+
                       <ReleaseDataPageCardLink
                         renderLink={
                           <Link
-                            to={`#${pageSections.featuredTables.id}`}
+                            to={`#${pageSections.dataGuidance.id}`}
                             unvisited
                           >
-                            {pageSections.featuredTables.text}
+                            {pageSections.dataGuidance.text}
                           </Link>
                         }
-                        caption={pageSections.featuredTables.shortCaption}
+                        caption={pageSections.dataGuidance.caption}
                       />
-                    )}
 
-                    <ReleaseDataPageCardLink
-                      renderLink={
-                        <Link to={`#${pageSections.datasets.id}`} unvisited>
-                          {pageSections.datasets.text}
-                        </Link>
-                      }
-                      caption={pageSections.datasets.caption}
-                    />
-
-                    {hasSupportingFiles && (
                       <ReleaseDataPageCardLink
                         renderLink={
-                          <Link
-                            to={`#${pageSections.supportingFiles.id}`}
-                            unvisited
-                          >
-                            {pageSections.supportingFiles.text}
-                          </Link>
+                          release.published ? (
+                            <Link
+                              to={`${publicAppUrl}/data-catalogue?publicationId=${release.publicationId}&releaseVersionId=${release.id}`}
+                            >
+                              Data catalogue
+                            </Link>
+                          ) : (
+                            <span>
+                              Data catalogue (available when release is
+                              published)
+                            </span>
+                          )
                         }
-                        caption={pageSections.supportingFiles.caption}
+                        caption="Alternatively use our data catalogue to search and filter for specific data sets from this release or our entire library, providing full data summaries, data previews and access to API data sets."
                       />
-                    )}
-
-                    {hasDataDashboards && (
-                      <ReleaseDataPageCardLink
-                        renderLink={
-                          <Link
-                            to={`#${pageSections.dataDashboards.id}`}
-                            unvisited
-                          >
-                            {pageSections.dataDashboards.text}
-                          </Link>
-                        }
-                        caption={pageSections.dataDashboards.caption}
-                      />
-                    )}
-
-                    <ReleaseDataPageCardLink
-                      renderLink={
-                        <Link to={`#${pageSections.dataGuidance.id}`} unvisited>
-                          {pageSections.dataGuidance.text}
-                        </Link>
-                      }
-                      caption={pageSections.dataGuidance.caption}
-                    />
-
-                    <ReleaseDataPageCardLink
-                      renderLink={
-                        release.published ? (
-                          <Link
-                            to={`${publicAppUrl}/data-catalogue?publicationId=${release.publicationId}&releaseVersionId=${release.id}`}
-                          >
-                            Data catalogue
-                          </Link>
-                        ) : (
-                          <span>
-                            Data catalogue (available when release is published)
-                          </span>
-                        )
-                      }
-                      caption="Alternatively use our data catalogue to search and filter for specific data sets from this release or our entire library, providing full data summaries, data previews and access to API data sets."
-                    />
-                  </ReleaseDataPageCardLinkGrid>
+                    </ReleaseDataPageCardLinkGrid>
+                  </>
                 )}
               </ReleasePageContentSection>
 

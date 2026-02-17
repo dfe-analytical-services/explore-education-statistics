@@ -38,46 +38,46 @@ describe('ReleaseExploreDataPage', () => {
       }),
     ).toBeInTheDocument();
 
+    expect(
+      screen.getByRole('link', {
+        name: 'Download all data (ZIP)',
+      }),
+    ).toHaveAttribute('id', 'download-all-data-link');
     const linksList = screen.getByTestId('links-grid');
     const listItems = within(linksList).getAllByRole('listitem');
-    expect(listItems).toHaveLength(7);
+    expect(listItems).toHaveLength(6);
     expect(
       within(listItems[0]).getByRole('link', {
-        name: 'Download all data from this release (ZIP)',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(listItems[1]).getByRole('link', {
         name: 'Featured tables',
       }),
     ).toHaveAttribute('href', '#featured-tables-section');
     expect(
-      within(listItems[1]).getByText(
+      within(listItems[0]).getByText(
         "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by users and can be adapted to switch between different categories.",
       ),
     ).toBeInTheDocument();
     expect(
-      within(listItems[2]).getByRole('link', {
+      within(listItems[1]).getByRole('link', {
         name: 'Data sets: download or create tables',
       }),
     ).toHaveAttribute('href', '#datasets-section');
     expect(
-      within(listItems[3]).getByRole('link', {
+      within(listItems[2]).getByRole('link', {
         name: 'Supporting files',
       }),
     ).toHaveAttribute('href', '#supporting-files-section');
     expect(
-      within(listItems[4]).getByRole('link', {
+      within(listItems[3]).getByRole('link', {
         name: 'Data dashboards',
       }),
     ).toHaveAttribute('href', '#data-dashboards-section');
     expect(
-      within(listItems[5]).getByRole('link', {
+      within(listItems[4]).getByRole('link', {
         name: 'Data guidance',
       }),
     ).toHaveAttribute('href', '#data-guidance-section');
     expect(
-      within(listItems[6]).getByRole('link', {
+      within(listItems[5]).getByRole('link', {
         name: 'Data catalogue',
       }),
     ).toHaveAttribute(
@@ -237,26 +237,26 @@ describe('ReleaseExploreDataPage', () => {
       }),
     ).toBeInTheDocument();
 
-    const linksList = screen.getByTestId('links-grid');
-    const listItems = within(linksList).getAllByRole('listitem');
-    expect(listItems).toHaveLength(4);
     expect(
-      within(listItems[0]).getByRole('link', {
-        name: 'Download all data from this release (ZIP)',
+      screen.getByRole('link', {
+        name: 'Download all data (ZIP)',
       }),
     ).toBeInTheDocument();
+    const linksList = screen.getByTestId('links-grid');
+    const listItems = within(linksList).getAllByRole('listitem');
+    expect(listItems).toHaveLength(3);
     expect(
-      within(listItems[1]).getByRole('link', {
+      within(listItems[0]).getByRole('link', {
         name: 'Data sets: download or create tables',
       }),
     ).toHaveAttribute('href', '#datasets-section');
     expect(
-      within(listItems[2]).getByRole('link', {
+      within(listItems[1]).getByRole('link', {
         name: 'Data guidance',
       }),
     ).toHaveAttribute('href', '#data-guidance-section');
     expect(
-      within(listItems[3]).getByRole('link', {
+      within(listItems[2]).getByRole('link', {
         name: 'Data catalogue',
       }),
     ).toHaveAttribute(
