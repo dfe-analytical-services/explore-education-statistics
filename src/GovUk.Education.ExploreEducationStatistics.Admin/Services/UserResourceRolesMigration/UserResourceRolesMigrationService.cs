@@ -39,7 +39,7 @@ public class UserResourceRolesMigrationService(
                     // If the User/Publication combination has no changes to be made, then we don't need to consider it further
                     .Where(changes =>
                         changes.NewSystemPublicationRoleToRemove.HasValue
-                        || changes.NewSystemPublicationRoleToCreate.HasValue
+                        || changes.NewSystemPublicationRoleToCreate is not null
                     )
                     .ToList();
 
@@ -54,17 +54,16 @@ public class UserResourceRolesMigrationService(
                     )
                     .ToHashSet();
 
-                var newPermissionsSystemRoleKeysToCreate = newPermissionsSystemChanges
-                    .Where(changes => changes.NewSystemPublicationRoleToCreate.HasValue)
-                    .Select(changes =>
-                        (
-                            changes.UserId,
-                            changes.PublicationId,
-                            RoleToCreate: changes.NewSystemPublicationRoleToCreate!.Value
-                        )
-                    )
-                    .ToHashSet();
-
+                // We're expecting the number of removals to be pretty small. The SYNCING code we added in EES-6148
+                // will not have been running for too long by the time this migration has ran. And the only time we expect a NEW
+                // role to be removed here, is when the OLD and NEW systems get out of SYNC. That is only currenly possible in a couple of scenarios.
+                // Namely: where a User has some OLD system roles that would map to a NEW system role of 'Approver', but the SYNCING code was
+                // deployed after those OLD roles were added. Then, an OLD role of Publication 'Owner', or Release 'Contributor', was added
+                // to the user for the same Publication and therefore the SYNCING code created a NEW system role of 'Drafter' for them.
+                // In this case, they should really be an 'Approver' in the NEW system, but the SYNCING code wasn't made smart enough to detect this.
+                // It was written to keep the systems in SYNC, rather than to check ALL existing roles for the User/Publication combination
+                // on every role creation/removal. Once this migration has ran, however, the SYNCING code should work as expected and we should
+                // not be able to get into this scenario again.
                 var newPermissionsSystemRolesToRemove = await userPublicationRoleRepository
                     .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
                     .Where(upr =>
@@ -74,14 +73,15 @@ public class UserResourceRolesMigrationService(
                     )
                     .ToListAsync();
 
-                var newPermissionsSystemRolesToCreate = newPermissionsSystemRoleKeysToCreate
-                    .Select(k => new UserPublicationRole
+                var newPermissionsSystemRolesToCreate = newPermissionsSystemChanges
+                    .Where(changes => changes.NewSystemPublicationRoleToCreate is not null)
+                    .Select(changes => new UserPublicationRole
                     {
-                        UserId = k.UserId,
-                        PublicationId = k.PublicationId,
-                        Role = k.RoleToCreate,
-                        Created = DateTime.UtcNow, // Needs changing to whatever we think is appropriate
-                        CreatedById = Guid.NewGuid(), // Needs changing to whatever we think is appropriate
+                        UserId = changes.UserId,
+                        PublicationId = changes.PublicationId,
+                        Role = changes.NewSystemPublicationRoleToCreate!.Role,
+                        Created = changes.NewSystemPublicationRoleToCreate.CreatedDate,
+                        CreatedById = changes.NewSystemPublicationRoleToCreate.CreatedById,
                     })
                     .ToList();
 
@@ -104,6 +104,8 @@ public class UserResourceRolesMigrationService(
                 upr.UserId,
                 upr.PublicationId,
                 upr.Role,
+                upr.Created,
+                upr.CreatedById,
             })
             .GroupBy(a => new { a.UserId, a.PublicationId })
             // Check to see if .ToHashSet is done in-memory or SQL. If in SQL, change to g.Select(a => a.Role).Distinct().ToList() and then do
@@ -111,7 +113,7 @@ public class UserResourceRolesMigrationService(
             .Select(g => new GroupedUserPublicationRoles(
                 g.Key.UserId,
                 g.Key.PublicationId,
-                g.Select(a => a.Role).ToHashSet()
+                g.Select(a => new PublicationRoleDetails(a.Role, a.Created, a.CreatedById)).ToHashSet()
             ))
             .ToListAsync();
 
@@ -122,6 +124,8 @@ public class UserResourceRolesMigrationService(
                 urr.UserId,
                 urr.ReleaseVersion.Release.PublicationId,
                 urr.Role,
+                urr.Created,
+                urr.CreatedById,
             })
             // Becuase the same release roles can be across multiple release versions for the same publication, this can
             // return duplicate roles for the same publication. Hence, we do a .Distinct() to optimise the query.
@@ -132,7 +136,7 @@ public class UserResourceRolesMigrationService(
             .Select(g => new GroupedUserReleaseRoles(
                 g.Key.UserId,
                 g.Key.PublicationId,
-                g.Select(a => a.Role).ToHashSet()
+                g.Select(a => new ReleaseRoleDetails(a.Role, a.Created, a.CreatedById)).ToHashSet()
             ))
             .ToListAsync();
 
@@ -144,14 +148,14 @@ public class UserResourceRolesMigrationService(
                     upr.UserId,
                     upr.PublicationId,
                     PublicationRoles = upr.Roles,
-                    ReleaseRoles = new HashSet<ReleaseRole>(),
+                    ReleaseRoles = new HashSet<ReleaseRoleDetails>(),
                 })
                 .Concat(
                     groupedUserReleaseRoles.Select(urr => new
                     {
                         urr.UserId,
                         urr.PublicationId,
-                        PublicationRoles = new HashSet<PublicationRole>(),
+                        PublicationRoles = new HashSet<PublicationRoleDetails>(),
                         ReleaseRoles = urr.Roles,
                     })
                 )
@@ -169,18 +173,18 @@ public class UserResourceRolesMigrationService(
         GroupedUserResourceRoles groupedUserResourceRoles
     )
     {
-        PublicationRole? expectedNewSystemPublicationRole = DetermineExpectedNewSystemPublicationRole(
-            groupedUserResourceRoles
-        );
+        PublicationRoleDetails? expectedNewSystemPublicationRoleDetails =
+            DetermineExpectedNewSystemPublicationRoleDetails(groupedUserResourceRoles);
 
         // There should only ever be a MAXIMUM of ONE NEW system publication role for any User/Publication combination at any one time.
         // So if that is not the case, expect this to blow up so we can investigate further before doing any migration.
         var existingNewSystemPublicationRole = groupedUserResourceRoles
-            .PublicationRoles.Where(PublicationRoleUtils.IsNewPermissionsSystemPublicationRole)
+            .PublicationRoles.Select(pr => pr.Role)
+            .Where(PublicationRoleUtils.IsNewPermissionsSystemPublicationRole)
             .Cast<PublicationRole?>()
             .SingleOrDefault();
 
-        NewPermissionsSystemChanges Changes(PublicationRole? remove, PublicationRole? create) =>
+        NewPermissionsSystemChanges Changes(PublicationRole? remove, PublicationRoleDetails? create) =>
             new(
                 UserId: groupedUserResourceRoles.UserId,
                 PublicationId: groupedUserResourceRoles.PublicationId,
@@ -190,7 +194,7 @@ public class UserResourceRolesMigrationService(
 
         // If no OLD system roles map to any NEW system roles, and there isn't already a NEW system role for this User/Publication combination,
         // then there are no changes to be made for this User/Publication combination
-        if (!expectedNewSystemPublicationRole.HasValue && !existingNewSystemPublicationRole.HasValue)
+        if (expectedNewSystemPublicationRoleDetails is null && existingNewSystemPublicationRole is null)
         {
             return Changes(remove: null, create: null);
         }
@@ -199,75 +203,92 @@ public class UserResourceRolesMigrationService(
         // then we need to remove the existing NEW system role for this User/Publication combination.
         // In theory, this scenario should never arise because the SYNCING code we added in EES-6148 should have ensured that there are no existing
         // NEW system roles without an equivalent OLD system role. But, we should still account for it just in case.
-        if (!expectedNewSystemPublicationRole.HasValue)
+        if (expectedNewSystemPublicationRoleDetails is null)
         {
-            return Changes(remove: existingNewSystemPublicationRole!.Value, create: null);
+            return Changes(remove: existingNewSystemPublicationRole, create: null);
         }
 
         // If the OLD system roles map to a NEW system role, but there isn't already a NEW system role for this User/Publication combination,
         // then we need to create the NEW system role for this User/Publication combination.
-        if (!existingNewSystemPublicationRole.HasValue)
+        if (existingNewSystemPublicationRole is null)
         {
-            return Changes(remove: null, create: expectedNewSystemPublicationRole.Value);
+            return Changes(remove: null, create: expectedNewSystemPublicationRoleDetails);
         }
 
         // If the OLD system roles map to the existing NEW system role, then there is nothing to change for this User/Publication combination.
-        if (existingNewSystemPublicationRole == expectedNewSystemPublicationRole)
+        if (existingNewSystemPublicationRole == expectedNewSystemPublicationRoleDetails.Role)
         {
             return Changes(remove: null, create: null);
         }
 
         // If the OLD system roles map to a different NEW system role from the existing NEW system role,
         // then we need to remove the existing NEW system role and create the expected NEW system role for this User/Publication combination.
-        return Changes(remove: existingNewSystemPublicationRole.Value, create: expectedNewSystemPublicationRole.Value);
+        return Changes(remove: existingNewSystemPublicationRole, create: expectedNewSystemPublicationRoleDetails);
     }
 
-    private static PublicationRole? DetermineExpectedNewSystemPublicationRole(
+    private static PublicationRoleDetails? DetermineExpectedNewSystemPublicationRoleDetails(
         GroupedUserResourceRoles groupedUserResourceRoles
     )
     {
         var oldSystemPublicationRolesNewSystemEquivalents = groupedUserResourceRoles
-            .PublicationRoles.Where(r => !r.IsNewPermissionsSystemPublicationRole())
-            .Select(PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole)
+            .PublicationRoles.Where(pr => !pr.Role.IsNewPermissionsSystemPublicationRole())
+            .Select(r => new PublicationRoleDetails(
+                PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(r.Role),
+                r.CreatedDate,
+                r.CreatedById
+            ))
             .ToHashSet();
 
         var releaseRolesNewSystemEquivalents = groupedUserResourceRoles
-            .ReleaseRoles.Select(releaseRole =>
+            .ReleaseRoles.Select(rr =>
                 (
-                    canConvertToNewPermissionsSystemPublicationRole: releaseRole.TryConvertToNewPermissionsSystemPublicationRole(
+                    canConvertToNewPermissionsSystemPublicationRole: rr.Role.TryConvertToNewPermissionsSystemPublicationRole(
                         out var newSystemPublicationRole
                     ),
-                    newSystemPublicationRole
+                    newSystemPublicationRole,
+                    rr.CreatedDate,
+                    rr.CreatedById
                 )
             )
             .Where(tuple => tuple.canConvertToNewPermissionsSystemPublicationRole)
-            .Select(tuple => tuple.newSystemPublicationRole!.Value)
+            .Select(tuple => new PublicationRoleDetails(
+                tuple.newSystemPublicationRole!.Value,
+                tuple.CreatedDate,
+                tuple.CreatedById
+            ))
             .ToHashSet();
 
         var allEquivalentNewSystemPublicationRoles = oldSystemPublicationRolesNewSystemEquivalents
             .Union(releaseRolesNewSystemEquivalents)
             .ToHashSet();
 
-        return allEquivalentNewSystemPublicationRoles.Contains(PublicationRole.Approver) ? PublicationRole.Approver
-            : allEquivalentNewSystemPublicationRoles.Contains(PublicationRole.Drafter) ? PublicationRole.Drafter
-            : null;
+        // Pick the earliest Approver if exists, otherwise the earliest Drafter, otherwise null
+        return allEquivalentNewSystemPublicationRoles
+            .OrderByDescending(pr => pr.Role == PublicationRole.Approver) // Approver first, Drafter second
+            .ThenBy(pr => pr.CreatedDate) // Then by earliest created date
+            .Select(pr => new PublicationRoleDetails(pr.Role, pr.CreatedDate, pr.CreatedById))
+            .FirstOrDefault();
     }
 
-    private record GroupedUserPublicationRoles(Guid UserId, Guid PublicationId, HashSet<PublicationRole> Roles);
+    private record PublicationRoleDetails(PublicationRole Role, DateTime CreatedDate, Guid? CreatedById);
 
-    private record GroupedUserReleaseRoles(Guid UserId, Guid PublicationId, HashSet<ReleaseRole> Roles);
+    private record ReleaseRoleDetails(ReleaseRole Role, DateTime CreatedDate, Guid? CreatedById);
+
+    private record GroupedUserPublicationRoles(Guid UserId, Guid PublicationId, HashSet<PublicationRoleDetails> Roles);
+
+    private record GroupedUserReleaseRoles(Guid UserId, Guid PublicationId, HashSet<ReleaseRoleDetails> Roles);
 
     private record GroupedUserResourceRoles(
         Guid UserId,
         Guid PublicationId,
-        HashSet<PublicationRole> PublicationRoles,
-        HashSet<ReleaseRole> ReleaseRoles
+        HashSet<PublicationRoleDetails> PublicationRoles,
+        HashSet<ReleaseRoleDetails> ReleaseRoles
     );
 
     private record NewPermissionsSystemChanges(
         Guid UserId,
         Guid PublicationId,
         PublicationRole? NewSystemPublicationRoleToRemove,
-        PublicationRole? NewSystemPublicationRoleToCreate
+        PublicationRoleDetails? NewSystemPublicationRoleToCreate
     );
 }
