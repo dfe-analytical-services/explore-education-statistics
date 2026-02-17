@@ -1,5 +1,4 @@
 #nullable enable
-using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +19,7 @@ public class ServiceAnnouncementController(IHubContext<NotificationHub> hubConte
         CancellationToken cancellationToken
     )
     {
-        var givenName = User.FindFirstValue(ClaimTypes.GivenName);
-        var surname = User.FindFirstValue(ClaimTypes.Surname);
-        var senderName = $"{givenName} {surname}";
-
-        await hubContext
-            .Clients.AllExcept(connectionId)
-            .SendAsync("ServiceAnnouncement", senderName, message, cancellationToken);
+        await hubContext.Clients.AllExcept(connectionId).SendAsync("ServiceAnnouncement", message, cancellationToken);
 
         return Ok();
     }

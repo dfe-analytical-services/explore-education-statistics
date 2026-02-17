@@ -5,7 +5,8 @@ import {
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
 import render from '@common-test/render';
 import { HubConnectionState } from '@microsoft/signalr';
-import { renderHook, screen, waitFor } from '@testing-library/react';
+import { act, renderHook, screen, waitFor } from '@testing-library/react';
+import { UserEvent } from '@testing-library/user-event';
 import React, { FC, ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
@@ -26,14 +27,15 @@ describe('NotificationHubContext', () => {
 
   const testMessage =
     'Scheduled system update will occur in 15 minutes, please save your work.';
-  const senderName = 'Joe Bloggs';
 
-  test('starts in a Disconnected state', () => {
+  test('starts in a Disconnected state', async () => {
     const { result } = renderHook(() => useNotificationHubContext(), {
       wrapper,
     });
 
-    expect(result.current.status).toBe(HubConnectionState.Disconnected);
+    await waitFor(() => {
+      expect(result.current.status).toBe(HubConnectionState.Disconnected);
+    });
   });
 
   test('changes to a Connected state', async () => {
@@ -59,9 +61,7 @@ describe('NotificationHubContext', () => {
       () => new Promise(resolve => setTimeout(resolve, 50)),
     );
 
-    let onServiceAnnouncement:
-      | ((senderName: string, message: string) => void)
-      | undefined;
+    let onServiceAnnouncement: ((message: string) => void) | undefined;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ServiceAnnouncement') {
@@ -69,11 +69,12 @@ describe('NotificationHubContext', () => {
       }
     });
 
-    render(
-      <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
-    );
-
-    jest.advanceTimersByTime(50);
+    await act(async () => {
+      render(
+        <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
+      );
+      jest.advanceTimersByTime(50);
+    });
 
     stateSpy.mockReturnValue(HubConnectionState.Connected);
 
@@ -81,17 +82,16 @@ describe('NotificationHubContext', () => {
       expect(onServiceAnnouncement).toBeDefined();
     });
 
-    onServiceAnnouncement?.(senderName, testMessage);
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Service announcement' }),
-      ).toBeInTheDocument();
+    await act(async () => {
+      onServiceAnnouncement?.(testMessage);
     });
 
-    expect(
-      screen.getByText(content => content.includes(senderName)),
-    ).toBeInTheDocument();
+    const heading = await screen.findByRole('heading', {
+      name: 'Service announcement',
+    });
+
+    expect(heading).toBeInTheDocument();
+
     expect(
       screen.getByText(content => content.includes(testMessage)),
     ).toBeInTheDocument();
@@ -106,9 +106,7 @@ describe('NotificationHubContext', () => {
       () => new Promise(resolve => setTimeout(resolve, 50)),
     );
 
-    let onServiceAnnouncement:
-      | ((senderName: string, message: string) => void)
-      | undefined;
+    let onServiceAnnouncement: ((message: string) => void) | undefined;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ServiceAnnouncement') {
@@ -116,11 +114,12 @@ describe('NotificationHubContext', () => {
       }
     });
 
-    render(
-      <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
-    );
-
-    jest.advanceTimersByTime(50);
+    await act(async () => {
+      render(
+        <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
+      );
+      jest.advanceTimersByTime(50);
+    });
 
     stateSpy.mockReturnValue(HubConnectionState.Connected);
 
@@ -131,24 +130,22 @@ describe('NotificationHubContext', () => {
     const message1 = 'Service will be unavailable for 15 minutes';
     const message2 = 'New features released';
 
-    onServiceAnnouncement?.(senderName, message1);
+    await act(async () => {
+      onServiceAnnouncement?.(message1);
+    });
 
     await waitFor(() => {
-      expect(
-        screen.getByText(content => content.includes(senderName)),
-      ).toBeInTheDocument();
       expect(
         screen.getByText(content => content.includes(message1)),
       ).toBeInTheDocument();
     });
 
     // Trigger another message
-    onServiceAnnouncement?.(senderName, message2);
+    await act(async () => {
+      onServiceAnnouncement?.(message2);
+    });
 
     await waitFor(() => {
-      expect(
-        screen.getByText(content => content.includes(senderName)),
-      ).toBeInTheDocument();
       expect(
         screen.getByText(content => content.includes(message2)),
       ).toBeInTheDocument();
@@ -164,9 +161,7 @@ describe('NotificationHubContext', () => {
       () => new Promise(resolve => setTimeout(resolve, 50)),
     );
 
-    let onServiceAnnouncement:
-      | ((senderName: string, message: string) => void)
-      | undefined;
+    let onServiceAnnouncement: ((message: string) => void) | undefined;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ServiceAnnouncement') {
@@ -174,11 +169,14 @@ describe('NotificationHubContext', () => {
       }
     });
 
-    const { user } = render(
-      <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
-    );
-
-    jest.advanceTimersByTime(50);
+    let user!: UserEvent;
+    await act(async () => {
+      const renderResult = render(
+        <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
+      );
+      user = renderResult.user;
+      jest.advanceTimersByTime(50);
+    });
 
     stateSpy.mockReturnValue(HubConnectionState.Connected);
 
@@ -186,12 +184,11 @@ describe('NotificationHubContext', () => {
       expect(onServiceAnnouncement).toBeDefined();
     });
 
-    onServiceAnnouncement?.(senderName, testMessage);
+    await act(async () => {
+      onServiceAnnouncement?.(testMessage);
+    });
 
     await waitFor(() => {
-      expect(
-        screen.getByText(content => content.includes(senderName)),
-      ).toBeInTheDocument();
       expect(
         screen.getByText(content => content.includes(testMessage)),
       ).toBeInTheDocument();

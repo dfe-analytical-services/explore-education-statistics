@@ -32,8 +32,6 @@ export function NotificationHubContextProvider({
 
   const [showNotificationModal, setShowNotificationModal] =
     useState<boolean>(false);
-  const [notificationSenderName, setNotificationSenderName] =
-    useState<string>();
   const [notificationMessage, setNotificationMessage] = useState<
     undefined | string
   >(undefined);
@@ -49,14 +47,10 @@ export function NotificationHubContextProvider({
     if (joinStateRef.current === '' && status === 'Connected') {
       joinStateRef.current = 'joining';
 
-      subscription = hub.subscribe(
-        'ServiceAnnouncement',
-        (senderName: string, message: string) => {
-          setNotificationSenderName(senderName);
-          setNotificationMessage(message);
-          setShowNotificationModal(true);
-        },
-      );
+      subscription = hub.subscribe('ServiceAnnouncement', (message: string) => {
+        setNotificationMessage(message);
+        setShowNotificationModal(true);
+      });
     }
 
     return () => {
@@ -77,7 +71,6 @@ export function NotificationHubContextProvider({
         onExit={() => setShowNotificationModal(false)}
         open={showNotificationModal}
       >
-        <p>{notificationSenderName} has sent the following message:</p>
         <InsetText>
           <FormattedDate
             className="govuk-!-font-weight-bold"
