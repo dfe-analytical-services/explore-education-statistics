@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # 1. Define exact versions
 ENV NVM_DIR=/usr/local/nvm
-ENV NODE_VERSION=22.20.0
+ENV NODE_VERSION=22.22.0
 ENV RUBY_VERSION=3.2.6
 # IMPORTANT: Ruby 3.2.x still uses '3.2.0' as the ABI directory name for gems
 ENV RUBY_ABI_VERSION=3.2.0
@@ -46,7 +46,7 @@ USER ubuntu
 WORKDIR /home/ubuntu/docs
 
 # 6. Install Bundler and Gems
-# Cache the appropriate Gems in the Docker image based on the current state of the 
+# Cache the appropriate Gems in the Docker image based on the current state of the
 # `Gemfile` and `Gemfile.lock` that was copied to a temporary staging area in a
 # previous step above.
 RUN gem install bundler -v 2.5.22 --user-install && \
