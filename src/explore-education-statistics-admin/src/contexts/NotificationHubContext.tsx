@@ -7,7 +7,6 @@ import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Modal from '@common/components/Modal';
-import useMountedRef from '@common/hooks/useMountedRef';
 import React, {
   createContext,
   ReactNode,
@@ -37,8 +36,6 @@ export function NotificationHubContextProvider({
     undefined | string
   >(undefined);
 
-  const isMountedRef = useMountedRef();
-
   const { hub, status } = hubState || {};
 
   useEffect(() => {
@@ -56,7 +53,7 @@ export function NotificationHubContextProvider({
     return () => {
       subscription.unsubscribe();
     };
-  }, [hub, hubState, isMountedRef, status]);
+  }, [hub, status]);
 
   if (!isAuthenticated) {
     return (

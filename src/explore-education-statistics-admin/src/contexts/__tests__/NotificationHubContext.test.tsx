@@ -40,6 +40,22 @@ describe('NotificationHubContext', () => {
   const testMessage =
     'Scheduled system update will occur in 15 minutes, please save your work.';
 
+  test('hub state is undefined when user is not authenticated', async () => {
+    await act(async () => {
+      render(
+        <NotificationHubContextProvider>
+          {hubState => {
+            expect(hubState).toBeUndefined();
+            return <div>Test</div>;
+          }}
+        </NotificationHubContextProvider>,
+      );
+      jest.advanceTimersByTime(50);
+    });
+
+    expect(connectionMock.start).not.toHaveBeenCalled();
+  });
+
   test('starts in a Disconnected state', async () => {
     const { result } = renderHook(() => useNotificationHubContext(), {
       wrapper,

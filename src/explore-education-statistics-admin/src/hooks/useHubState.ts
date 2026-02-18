@@ -27,9 +27,15 @@ export default function useHubState<THub extends Hub = Hub>(
   });
 
   useEffect(() => {
-    if (!enabled) return;
-
     let currentHub = hubState?.hub;
+
+    if (!enabled) {
+      if (currentHub) {
+        currentHub.stop();
+      }
+      return;
+    }
+
     if (!currentHub) {
       currentHub = factory();
       setHubState({ hub: currentHub, status: currentHub.status() });
