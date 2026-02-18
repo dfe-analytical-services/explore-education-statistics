@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Xunit;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -2405,10 +2404,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> GetDataSetFile(
-            Guid dataSetFileId,
-            WebApplicationFactory<Startup>? app = null
-        )
+        private async Task<HttpResponseMessage> GetDataSetFile(Guid dataSetFileId)
         {
             return await fixture.CreateClient().GetAsync($"/api/data-set-files/{dataSetFileId}");
         }
