@@ -30,9 +30,13 @@ export function ReleaseContentHubContextProvider({
   const joinStateRef = useRef<'joining' | 'joined' | ''>('');
   const isMountedRef = useMountedRef();
 
-  const { hub, status } = hubState;
+  const { hub, status } = hubState || {};
 
   useEffect(() => {
+    if (!hub) {
+      return;
+    }
+
     if (joinStateRef.current === '' && status === 'Connected') {
       joinStateRef.current = 'joining';
 
@@ -48,6 +52,12 @@ export function ReleaseContentHubContextProvider({
   }, [hub, hubState, isMountedRef, releaseVersionId, status]);
 
   useEffect(() => {
+    if (!hub) {
+      // eslint-disable-next-line consistent-return
+      return;
+    }
+
+    // eslint-disable-next-line consistent-return
     return () => {
       if (hub.status() === 'Connected' && joinStateRef.current === 'joined') {
         hub.leaveReleaseGroup(releaseVersionId);

@@ -13,9 +13,11 @@ export interface HubState<THub extends Hub> {
  */
 export default function useHubState<THub extends Hub = Hub>(
   factory: () => THub,
-): HubState<THub> {
+  enabled: boolean = true,
+): HubState<THub> | undefined {
   const isMountedRef = useMountedRef();
-  const [hubState, setHubState] = useState<HubState<THub>>(() => {
+  const [hubState, setHubState] = useState<HubState<THub> | undefined>(() => {
+    if (!enabled) return undefined;
     const hub = factory();
 
     return {
@@ -24,39 +26,37 @@ export default function useHubState<THub extends Hub = Hub>(
     };
   });
 
-  const { hub } = hubState;
-
   useEffect(() => {
+    if (!enabled) return;
+
+    let currentHub = hubState?.hub;
+    if (!currentHub) {
+      currentHub = factory();
+      setHubState({ hub: currentHub, status: currentHub.status() });
+    }
+
     const updateHub = async () => {
-      const status = hub.status();
+      if (!currentHub) return;
+      const status = currentHub.status();
 
       if (isMountedRef.current) {
-        // Re-set the hub in state to avoid stale state
-        // issues with the underlying hub connection.
-        setHubState({ status, hub });
-
+        setHubState({ status, hub: currentHub });
         return;
       }
-
-      // Hub may only finish connecting after the component
-      // has unmounted, so we should call `stop` here to
-      // disconnect the hub as well.
-      // We do this to keep the number of open connections
-      // to a minimum to prevent over-saturating server.
-      await hub.stop();
+      await currentHub.stop();
     };
 
-    hub.start().then(updateHub);
+    currentHub.start().then(updateHub);
+    currentHub.onReconnected(updateHub);
+    currentHub.onReconnecting(updateHub);
+    currentHub.onDisconnect(updateHub);
 
-    hub.onReconnected(updateHub);
-    hub.onReconnecting(updateHub);
-    hub.onDisconnect(updateHub);
-
+    // eslint-disable-next-line consistent-return
     return () => {
-      hub.stop();
+      currentHub?.stop();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [enabled]);
 
   return hubState;
 }

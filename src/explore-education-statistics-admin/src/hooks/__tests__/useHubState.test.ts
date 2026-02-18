@@ -30,7 +30,7 @@ describe('useHubState', () => {
 
     const { result } = renderHook(() => useHubState(() => mockHub));
 
-    expect(result.current.status).toBe(HubConnectionState.Disconnected);
+    expect(result.current?.status).toBe(HubConnectionState.Disconnected);
 
     mockHub.status.mockReturnValue(HubConnectionState.Connected);
 
@@ -39,7 +39,7 @@ describe('useHubState', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.status).toBe(HubConnectionState.Connected);
+      expect(result.current?.status).toBe(HubConnectionState.Connected);
     });
   });
 

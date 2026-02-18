@@ -1,8 +1,8 @@
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import useHubState, { HubState } from '@admin/hooks/useHubState';
 import notificationHub, {
   NotificationHub,
 } from '@admin/services/hubs/notificationHub';
-import { Subscription } from '@admin/services/hubs/utils/Hub';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -13,7 +13,6 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
@@ -22,39 +21,50 @@ const NotificationHubContext = createContext<
 >(undefined);
 
 interface NotificationHubContextProviderProps {
-  children: ReactNode | ((value: HubState<NotificationHub>) => ReactNode);
+  children:
+    | ReactNode
+    | ((value: HubState<NotificationHub> | undefined) => ReactNode);
 }
 
 export function NotificationHubContextProvider({
   children,
 }: NotificationHubContextProviderProps) {
-  const hubState = useHubState(notificationHub);
+  const { user } = useAuthContext();
+  const isAuthenticated = !!user;
+  const hubState = useHubState(notificationHub, isAuthenticated);
 
   const [notificationMessage, setNotificationMessage] = useState<
     undefined | string
   >(undefined);
 
-  const joinStateRef = useRef<'joining' | ''>('');
   const isMountedRef = useMountedRef();
 
-  const { hub, status } = hubState;
+  const { hub, status } = hubState || {};
 
   useEffect(() => {
-    let subscription: Subscription | undefined;
-
-    if (joinStateRef.current === '' && status === 'Connected') {
-      joinStateRef.current = 'joining';
-
-      subscription = hub.subscribe('ServiceAnnouncement', (message: string) => {
-        setNotificationMessage(message);
-      });
+    if (!hub || status !== 'Connected') {
+      return;
     }
+    const subscription = hub.subscribe(
+      'ServiceAnnouncement',
+      (message: string) => {
+        setNotificationMessage(message);
+      },
+    );
 
+    // eslint-disable-next-line consistent-return
     return () => {
-      subscription?.unsubscribe();
-      joinStateRef.current = '';
+      subscription.unsubscribe();
     };
   }, [hub, hubState, isMountedRef, status]);
+
+  if (!isAuthenticated) {
+    return (
+      <NotificationHubContext.Provider value={undefined}>
+        {typeof children === 'function' ? children(undefined) : children}
+      </NotificationHubContext.Provider>
+    );
+  }
 
   if (!hubState) {
     return <LoadingSpinner />;
