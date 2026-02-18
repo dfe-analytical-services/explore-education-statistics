@@ -149,7 +149,7 @@ public class DataSetFileService(
             IsSuperseded =
                 result.Value.ReleaseVersion.Release.Publication.SupersededBy != null
                 && result.Value.ReleaseVersion.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
-            Published = result.Value.ReleaseVersion.Published!.Value,
+            Published = result.Value.ReleaseVersion.PublishedDisplayDate!.Value,
             LastUpdated = result.Value.Published!.Value,
             Api = BuildDataSetFileApiViewModel(result.Value),
             Meta = BuildDataSetFileMetaViewModel(
@@ -252,7 +252,7 @@ public class DataSetFileService(
                     releaseFile.ReleaseVersion.Release.Publication.SupersededBy != null
                     && releaseFile.ReleaseVersion.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId
                         != null,
-                Published = releaseFile.ReleaseVersion.Published!.Value,
+                Published = releaseFile.ReleaseVersion.PublishedDisplayDate!.Value,
                 LastUpdated = releaseFile.Published!.Value,
                 Publication = new DataSetFilePublicationViewModel
                 {
