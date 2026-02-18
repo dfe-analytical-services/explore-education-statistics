@@ -507,8 +507,8 @@ internal static class FreeTextReleaseFileValueResultQueryableExtensions
                 ? query.OrderBy(result => result.Value.Order)
                 : query.OrderByDescending(result => result.Value.Order),
             Published => sortDirection == Asc
-                ? query.OrderBy(result => result.Value.ReleaseVersion.Published)
-                : query.OrderByDescending(result => result.Value.ReleaseVersion.Published),
+                ? query.OrderBy(result => result.Value.ReleaseVersion.PublishedDisplayDate)
+                : query.OrderByDescending(result => result.Value.ReleaseVersion.PublishedDisplayDate),
             Relevance => sortDirection == Asc
                 ? query.OrderBy(result => result.Rank)
                 : query.OrderByDescending(result => result.Rank),
