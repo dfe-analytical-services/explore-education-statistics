@@ -380,7 +380,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                // Expect no data set files to be returned unless they are associated with a latest published release
+                // Expect no data set files to be returned unless they are associated with the latest published release
                 // version regardless of LatestOnly
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
             }
@@ -943,21 +943,52 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             }
 
             [Fact]
-            public async Task SortByPublishedAscending_SortsByPublishedInAscendingOrder()
+            public async Task SortByPublishedAscending_SortsByPublishedDisplayDateInAscendingOrder()
             {
                 var (publication1, publication2) = DataFixture
                     .DefaultPublication()
-                    // Publications each have a published release version
-                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    // Publications each have a release with a published release version.
+                    // Set up the release versions in descending order of their published display dates
+                    // to allow verification that the sorting is applied in ascending order.
+                    .ForIndex(
+                        0,
+                        s =>
+                            s.SetReleases([
+                                DataFixture
+                                    .DefaultRelease()
+                                    .WithVersions([
+                                        // Published display date 2025-02-15
+                                        DataFixture
+                                            .DefaultReleaseVersion()
+                                            .WithPublished(DateTimeOffset.UtcNow)
+                                            .WithPublishedDisplayDate(
+                                                DateTimeOffset.Parse("2025-02-15T09:30:00 +00:00")
+                                            ),
+                                    ]),
+                            ])
+                    )
+                    .ForIndex(
+                        1,
+                        s =>
+                            s.SetReleases([
+                                DataFixture
+                                    .DefaultRelease(publishedVersions: 1)
+                                    .WithVersions([
+                                        // Published display date 2025-02-14
+                                        DataFixture
+                                            .DefaultReleaseVersion()
+                                            .WithPublished(DateTimeOffset.UtcNow)
+                                            .WithPublishedDisplayDate(
+                                                DateTimeOffset.Parse("2025-02-14T09:30:00 +00:00")
+                                            ),
+                                    ]),
+                            ])
+                    )
                     .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1 = publication1.Releases[0].Versions[0];
                 var publication2Release1Version1 = publication2.Releases[0].Versions[0];
-
-                // Apply a descending sequence of published dates to the releases
-                publication1Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-1);
-                publication2Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-2);
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
                     publication1Release1Version1
@@ -983,14 +1014,18 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                // Expect data set files belonging to the oldest published release to be returned first
-                var expectedReleaseFiles = new List<ReleaseFile>
-                {
-                    publication2Release1Version1Files[0], // Published 2 days ago
-                    publication2Release1Version1Files[1], // Published 2 days ago
-                    publication1Release1Version1Files[0], // Published 1 day ago
-                    publication1Release1Version1Files[1], // Published 1 day ago
-                };
+                // Expect data set files to be returned in ascending order of their release versions' published display dates
+                // and then by their Ids to ensure a deterministic order of files with the same published display date.
+                var expectedPublication1Release1Version1Files = publication1Release1Version1Files.OrderBy(f => f.Id);
+                var expectedPublication2Release1Version1Files = publication2Release1Version1Files.OrderBy(f => f.Id);
+
+                List<ReleaseFile> expectedReleaseFiles =
+                [
+                    // Files associated with publication2Release1Version1 (published display date 2025-02-14)
+                    .. expectedPublication2Release1Version1Files,
+                    // Files associated with publication1Release1Version1 (published display date 2025-02-15)
+                    .. expectedPublication1Release1Version1Files,
+                ];
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
@@ -999,23 +1034,54 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             [Theory]
             [InlineData(SortDirection.Desc)]
             [InlineData(null)]
-            public async Task SortByPublished_SortsByPublishedInDescendingOrderAndIsDescendingByDefault(
+            public async Task SortByPublished_SortsByPublishedDisplayDateInDescendingOrderAndIsDescendingByDefault(
                 SortDirection? sortDirection
             )
             {
                 var (publication1, publication2) = DataFixture
                     .DefaultPublication()
-                    // Publications each have a published release version
-                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    // Publications each have a release with a published release version.
+                    // Set up the release versions in ascending order of their published display dates
+                    // to allow verification that the sorting is applied in descending order.
+                    .ForIndex(
+                        0,
+                        s =>
+                            s.SetReleases([
+                                DataFixture
+                                    .DefaultRelease()
+                                    .WithVersions([
+                                        // Published display date 2025-02-14
+                                        DataFixture
+                                            .DefaultReleaseVersion()
+                                            .WithPublished(DateTimeOffset.UtcNow)
+                                            .WithPublishedDisplayDate(
+                                                DateTimeOffset.Parse("2025-02-14T09:30:00 +00:00")
+                                            ),
+                                    ]),
+                            ])
+                    )
+                    .ForIndex(
+                        1,
+                        s =>
+                            s.SetReleases([
+                                DataFixture
+                                    .DefaultRelease(publishedVersions: 1)
+                                    .WithVersions([
+                                        // Published display date 2025-02-15
+                                        DataFixture
+                                            .DefaultReleaseVersion()
+                                            .WithPublished(DateTimeOffset.UtcNow)
+                                            .WithPublishedDisplayDate(
+                                                DateTimeOffset.Parse("2025-02-15T09:30:00 +00:00")
+                                            ),
+                                    ]),
+                            ])
+                    )
                     .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1 = publication1.Releases[0].Versions[0];
                 var publication2Release1Version1 = publication2.Releases[0].Versions[0];
-
-                // Apply an ascending sequence of published dates to the releases
-                publication1Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-2);
-                publication2Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-1);
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
                     publication1Release1Version1
@@ -1041,14 +1107,18 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                // Expect data set files belonging to the newest published release to be returned first
-                var expectedReleaseFiles = new List<ReleaseFile>
-                {
-                    publication2Release1Version1Files[0], // Published 1 day ago
-                    publication2Release1Version1Files[1], // Published 1 day ago
-                    publication1Release1Version1Files[0], // Published 2 days ago
-                    publication1Release1Version1Files[1], // Published 2 days ago
-                };
+                // Expect data set files to be returned in descending order of their release versions' published display dates
+                // and then by their Ids to ensure a deterministic order of files with the same published display date.
+                var expectedPublication1Release1Version1Files = publication1Release1Version1Files.OrderBy(f => f.Id);
+                var expectedPublication2Release1Version1Files = publication2Release1Version1Files.OrderBy(f => f.Id);
+
+                List<ReleaseFile> expectedReleaseFiles =
+                [
+                    // Files associated with publication2Release1Version1 (published display date 2025-02-15)
+                    .. expectedPublication2Release1Version1Files,
+                    // Files associated with publication1Release1Version1 (published display date 2025-02-14)
+                    .. expectedPublication1Release1Version1Files,
+                ];
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
@@ -1501,9 +1571,13 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             Assert.Equal(releaseFiles.Count, viewModels.Count);
             Assert.All(
                 releaseFiles,
-                releaseFile =>
+                (releaseFile, index) =>
                 {
                     var viewModel = viewModels.Single(vm => vm.FileId == releaseFile.FileId);
+
+                    // Assert that the result is in the expected position,
+                    // as some tests use this method to verify that the sort order of results is correct
+                    Assert.Equal(index, viewModels.IndexOf(viewModel));
 
                     var releaseVersion = releaseFile.ReleaseVersion;
                     var release = releaseVersion.Release;
@@ -1532,11 +1606,10 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                             ),
                         () =>
                             Assert.Equal(
-                                publication.SupersededBy != null
-                                    && publication.SupersededBy.LatestPublishedReleaseVersionId != null,
+                                publication.SupersededBy is { LatestPublishedReleaseVersionId: not null },
                                 viewModel.IsSuperseded
                             ),
-                        () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
+                        () => Assert.Equal(releaseFile.ReleaseVersion.PublishedDisplayDate!.Value, viewModel.Published),
                         () => Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api?.Id),
                         () => Assert.Equal(releaseFile.PublicApiDataSetVersionString, viewModel.Api?.Version)
                     );
@@ -1544,7 +1617,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             );
         }
 
-        private List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(
+        private static List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(
             ReleaseVersion releaseVersion,
             int numberOfDataSets = 2
         )
@@ -1741,7 +1814,16 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease()
+                        .WithVersions([
+                            DataFixture
+                                .DefaultReleaseVersion()
+                                .WithPublished(DateTimeOffset.Parse("2026-01-01T09:30:00 +00:00"))
+                                .WithPublishedDisplayDate(DateTimeOffset.Parse("2025-02-15T09:30:00 +00:00")),
+                        ]),
+                ])
                 .WithTheme(DataFixture.DefaultTheme());
 
             ReleaseFile releaseFile = DataFixture
@@ -1810,7 +1892,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             Assert.Equal(releaseFile.ReleaseVersion.Type, viewModel.Release.Type);
             Assert.True(viewModel.Release.IsLatestPublishedRelease);
             Assert.False(viewModel.Release.IsSuperseded);
-            Assert.Equal(releaseFile.ReleaseVersion.Published, viewModel.Release.Published);
+            Assert.Equal(releaseFile.ReleaseVersion.PublishedDisplayDate, viewModel.Release.Published);
 
             Assert.Equal(publication.Id, viewModel.Release.Publication.Id);
             Assert.Equal(publication.Title, viewModel.Release.Publication.Title);
