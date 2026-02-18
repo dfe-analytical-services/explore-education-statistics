@@ -139,12 +139,14 @@ Validate checklist errors and warnings after adding content to text blocks
     user clicks link    Publishing checklist
 
     user checks checklist warnings contains
-    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
+    ...    6 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No next expected release date has been added
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
     user checks checklist warnings contains link    The content has unresolved comments
+    user checks checklist warnings contains link
+    ...    A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)
 
     user waits until page does not contain testid    releaseChecklist-errors
     user waits until page does not contain testid    releaseChecklist-success
@@ -173,10 +175,12 @@ Verify release checklist has not been updated by status
     user clicks link    Publishing checklist
 
     user checks checklist warnings contains
-    ...    3 things you may have forgotten, but do not need to resolve to publish this release.
+    ...    4 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
+    user checks checklist warnings contains link
+    ...    A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)
     user checks checklist warnings does not contain link    The content has unresolved comments
 
     user waits until page does not contain testid    releaseChecklist-errors
@@ -190,7 +194,9 @@ Verify release checklist has been updated
     user clicks link    Publishing checklist
 
     user checks checklist warnings contains
-    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    ...    3 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link
+    ...    A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No data files uploaded
 
@@ -234,7 +240,9 @@ Check that having a Draft owned Methodology attached to this Release's Publicati
     user clicks link    Publishing checklist
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
-    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    ...    3 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link
+    ...    A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)
     user checks checklist warnings contains link    A methodology for this publication is not yet approved
 
 Approve the owned methodology and verify the warning disappears
@@ -244,7 +252,9 @@ Approve the owned methodology and verify the warning disappears
     user clicks link    Publishing checklist
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
-    ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
+    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link
+    ...    A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
 
 Create published methodology for adopted publication
@@ -276,7 +286,9 @@ Check that having a draft methodology amendment adopted by this Release's Public
     ...    Financial year 2100-01
     user clicks link    Publishing checklist
     user checks checklist warnings contains
-    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    ...    3 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link
+    ...    A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)
     user checks checklist warnings contains link    A methodology for this publication is not yet approved
 
 Approve the adopted methodology amendment and verify the warning disappears
@@ -285,7 +297,9 @@ Approve the adopted methodology amendment and verify the warning disappears
     ...    Financial year 2100-01
     user clicks link    Publishing checklist
     user checks checklist warnings contains
-    ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
+    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link
+    ...    A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
 
 Publish new release from adopted publication and make an amendment
