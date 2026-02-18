@@ -3,7 +3,6 @@ import releaseContentHub, {
   ReleaseContentHub,
 } from '@admin/services/hubs/releaseContentHub';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useMountedRef from '@common/hooks/useMountedRef';
 import React, {
   createContext,
   ReactNode,
@@ -28,11 +27,14 @@ export function ReleaseContentHubContextProvider({
   const hubState = useHubState(releaseContentHub);
 
   const joinStateRef = useRef<'joining' | 'joined' | ''>('');
-  const isMountedRef = useMountedRef();
 
-  const { hub, status } = hubState;
+  const { hub, status } = hubState || {};
 
   useEffect(() => {
+    if (!hub) {
+      return;
+    }
+
     if (joinStateRef.current === '' && status === 'Connected') {
       joinStateRef.current = 'joining';
 
@@ -45,9 +47,15 @@ export function ReleaseContentHubContextProvider({
           joinStateRef.current = '';
         });
     }
-  }, [hub, hubState, isMountedRef, releaseVersionId, status]);
+  }, [hub, releaseVersionId, status]);
 
   useEffect(() => {
+    if (!hub) {
+      // eslint-disable-next-line consistent-return
+      return;
+    }
+
+    // eslint-disable-next-line consistent-return
     return () => {
       if (hub.status() === 'Connected' && joinStateRef.current === 'joined') {
         hub.leaveReleaseGroup(releaseVersionId);

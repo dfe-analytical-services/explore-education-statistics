@@ -8,11 +8,23 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { act, renderHook, screen, waitFor } from '@testing-library/react';
 import { UserEvent } from '@testing-library/user-event';
 import React, { FC, ReactNode } from 'react';
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
+import { GlobalPermissions } from '@admin/services/authService';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 
+const nonBauUser: User = {
+  id: 'user-id',
+  name: 'Analyst 1',
+  permissions: {
+    isBauUser: false,
+  } as GlobalPermissions,
+};
+
 const wrapper: FC = ({ children }: { children?: ReactNode }) => (
-  <NotificationHubContextProvider>{children}</NotificationHubContextProvider>
+  <AuthContextTestProvider user={nonBauUser}>
+    <NotificationHubContextProvider>{children}</NotificationHubContextProvider>
+  </AuthContextTestProvider>
 );
 
 describe('NotificationHubContext', () => {
@@ -27,6 +39,22 @@ describe('NotificationHubContext', () => {
 
   const testMessage =
     'Scheduled system update will occur in 15 minutes, please save your work.';
+
+  test('hub state is undefined when user is not authenticated', async () => {
+    await act(async () => {
+      render(
+        <NotificationHubContextProvider>
+          {hubState => {
+            expect(hubState).toBeUndefined();
+            return <div>Test</div>;
+          }}
+        </NotificationHubContextProvider>,
+      );
+      jest.advanceTimersByTime(50);
+    });
+
+    expect(connectionMock.start).not.toHaveBeenCalled();
+  });
 
   test('starts in a Disconnected state', async () => {
     const { result } = renderHook(() => useNotificationHubContext(), {
@@ -71,7 +99,9 @@ describe('NotificationHubContext', () => {
 
     await act(async () => {
       render(
-        <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
+        <AuthContextTestProvider user={nonBauUser}>
+          <NotificationHubContextProvider>Test</NotificationHubContextProvider>
+        </AuthContextTestProvider>,
       );
       jest.advanceTimersByTime(50);
     });
@@ -116,7 +146,9 @@ describe('NotificationHubContext', () => {
 
     await act(async () => {
       render(
-        <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
+        <AuthContextTestProvider user={nonBauUser}>
+          <NotificationHubContextProvider>Test</NotificationHubContextProvider>
+        </AuthContextTestProvider>,
       );
       jest.advanceTimersByTime(50);
     });
@@ -172,7 +204,9 @@ describe('NotificationHubContext', () => {
     let user!: UserEvent;
     await act(async () => {
       const renderResult = render(
-        <NotificationHubContextProvider>Test</NotificationHubContextProvider>,
+        <AuthContextTestProvider user={nonBauUser}>
+          <NotificationHubContextProvider>Test</NotificationHubContextProvider>
+        </AuthContextTestProvider>,
       );
       user = renderResult.user;
       jest.advanceTimersByTime(50);
