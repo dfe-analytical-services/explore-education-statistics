@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionsMigration.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.UserResourceRolesMigration;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.UserResourceRolesMigration.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 
 /// <summary>
-/// TODO EES-6885 Remove after the Release Versions migration is complete.
+/// TODO EES-XXXX Remove after the User Resource Roles migration is complete.
 /// </summary>
 [Route("api/bau")]
 [ApiController]
@@ -18,13 +18,13 @@ public class UserResourceRolesMigrationController(IUserResourceRolesMigrationSer
     : ControllerBase
 {
     [HttpPatch("migrate-user-resource-roles")]
-    public Task<ActionResult<ReleaseVersionsMigrationReportDto>> MigrateUserResourceRoles(
+    public Task<ActionResult<ThingDto>> MigrateUserResourceRoles(
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default
     ) =>
         // TODO EES-6830 Dry run has been deliberately set to true to prevent accidental runs
         // while it is being tested.
         userResourceRolesMigrationService
-            .MigrateUserResourceRoles(dryRun: true, cancellationToken)
+            .MigrateUserResourceRoles(dryRun: dryRun, cancellationToken)
             .HandleFailuresOrOk();
 }
