@@ -544,10 +544,9 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect the result to be the data set files of the latest published release versions
-                // of the latest published releases of both publications, in ascending title order
+                // of the latest published releases of both publications
                 var expectedReleaseFiles = publication1Release2Version2Files
                     .Concat(publication2Release2Version2Files)
-                    .OrderBy(rf => rf.Name)
                     .ToList();
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
@@ -631,12 +630,11 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect the result to be the data set files of the latest published release versions
-                // of both publications, in ascending title order
+                // of both publications
                 var expectedReleaseFiles = publication1Release2Version2Files
                     .Concat(publication1Release3Version1Files)
                     .Concat(publication2Release2Version2Files)
                     .Concat(publication2Release3Version1Files)
-                    .OrderBy(rf => rf.Name)
                     .ToList();
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
@@ -678,10 +676,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                var expectedReleaseFiles = releaseVersionFiles
-                    .Where(rf => rf.PublicApiDataSetId.HasValue)
-                    .OrderBy(rf => rf.Name)
-                    .ToList();
+                var expectedReleaseFiles = releaseVersionFiles.Where(rf => rf.PublicApiDataSetId.HasValue).ToList();
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
@@ -729,7 +724,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             }
 
             [Fact]
-            public async Task NoFilter_ReturnsAllResultsOrderedByTitleAscending()
+            public async Task NoFilter_ReturnsAllResults()
             {
                 var (publication1, publication2) = DataFixture
                     .DefaultPublication()
@@ -760,7 +755,6 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var expectedReleaseFiles = publication1Release1Version1Files
                     .Concat(publication2Release1Version1Files)
-                    .OrderBy(file => file.Name)
                     .ToList();
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
@@ -812,6 +806,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+                AssertResultsMatchReleaseFilesOrder(expectedReleaseFiles, pagedResult.Results);
             }
 
             [Fact]
@@ -852,6 +847,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+                AssertResultsMatchReleaseFilesOrder(expectedReleaseFiles, pagedResult.Results);
             }
 
             [Theory]
@@ -898,6 +894,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+                AssertResultsMatchReleaseFilesOrder(expectedReleaseFiles, pagedResult.Results);
             }
 
             [Fact]
@@ -940,6 +937,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+                AssertResultsMatchReleaseFilesOrder(expectedReleaseFiles, pagedResult.Results);
             }
 
             [Fact]
@@ -1029,6 +1027,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+                AssertResultsMatchReleaseFilesOrder(expectedReleaseFiles, pagedResult.Results);
             }
 
             [Theory]
@@ -1122,6 +1121,73 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+                AssertResultsMatchReleaseFilesOrder(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Theory]
+            [InlineData(SortDirection.Asc)]
+            [InlineData(SortDirection.Desc)]
+            [InlineData(null)]
+            public async Task NoSort_SortsByTitleAsDefault(SortDirection? sortDirection)
+            {
+                Publication publication = DataFixture
+                    .DefaultPublication()
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
+
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
+
+                release1Version1Files[0].Name = "a";
+                release1Version1Files[1].Name = "b";
+
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                    });
+
+                var query = new DataSetFileListRequest
+                {
+                    Sort = null, // Query has no 'Sort' specified, so it should default to sort by title
+                    SortDirection = sortDirection,
+                };
+                var response = await ListDataSetFiles(query);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                List<ReleaseFile> expectedReleaseFiles;
+                if (sortDirection is null or SortDirection.Asc)
+                {
+                    expectedReleaseFiles =
+                    [
+                        release1Version1Files[0], // Has title "a"
+                        release1Version1Files[1], // Has title "b"
+                    ];
+                }
+                else
+                {
+                    expectedReleaseFiles =
+                    [
+                        release1Version1Files[1], // Has title "b"
+                        release1Version1Files[0], // Has title "a"
+                    ];
+                }
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+                AssertResultsMatchReleaseFilesOrder(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            private static void AssertResultsMatchReleaseFilesOrder(
+                List<ReleaseFile> releaseFiles,
+                List<DataSetFileSummaryViewModel> viewModels
+            )
+            {
+                var expectedReleaseFileIds = releaseFiles.Select(f => f.FileId).ToList();
+                var actualReleaseFileIds = viewModels.Select(vm => vm.FileId).ToList();
+
+                Assert.Equal(expectedReleaseFileIds, actualReleaseFileIds);
             }
         }
 
@@ -1571,13 +1637,9 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             Assert.Equal(releaseFiles.Count, viewModels.Count);
             Assert.All(
                 releaseFiles,
-                (releaseFile, index) =>
+                releaseFile =>
                 {
                     var viewModel = viewModels.Single(vm => vm.FileId == releaseFile.FileId);
-
-                    // Assert that the result is in the expected position,
-                    // as some tests use this method to verify that the sort order of results is correct
-                    Assert.Equal(index, viewModels.IndexOf(viewModel));
 
                     var releaseVersion = releaseFile.ReleaseVersion;
                     var release = releaseVersion.Release;
@@ -1620,9 +1682,8 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
         private static List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(
             ReleaseVersion releaseVersion,
             int numberOfDataSets = 2
-        )
-        {
-            return DataFixture
+        ) =>
+            DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(
@@ -1633,7 +1694,6 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                         .GenerateList(numberOfDataSets)
                 )
                 .GenerateList();
-        }
     }
 
     public class DownloadDataSetFileTests(DataSetFilesControllerTestsFixture fixture)
