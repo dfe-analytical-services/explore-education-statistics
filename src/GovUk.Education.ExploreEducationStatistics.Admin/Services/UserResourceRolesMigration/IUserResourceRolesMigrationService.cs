@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.UserResource
 /// </summary>
 public interface IUserResourceRolesMigrationService
 {
-    Task<Either<ActionResult, ThingDto>> MigrateUserResourceRoles(
+    Task<Either<ActionResult, UserResourceRolesMigrationReportDto>> MigrateUserResourceRoles(
         bool dryRun = true,
         CancellationToken cancellationToken = default
     );
