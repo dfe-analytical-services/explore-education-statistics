@@ -149,7 +149,7 @@ public class DataSetFileService(
             IsSuperseded =
                 result.Value.ReleaseVersion.Release.Publication.SupersededBy != null
                 && result.Value.ReleaseVersion.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
-            Published = result.Value.ReleaseVersion.Published!.Value,
+            Published = result.Value.ReleaseVersion.PublishedDisplayDate!.Value,
             LastUpdated = result.Value.Published!.Value,
             Api = BuildDataSetFileApiViewModel(result.Value),
             Meta = BuildDataSetFileMetaViewModel(
@@ -252,7 +252,7 @@ public class DataSetFileService(
                     releaseFile.ReleaseVersion.Release.Publication.SupersededBy != null
                     && releaseFile.ReleaseVersion.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId
                         != null,
-                Published = releaseFile.ReleaseVersion.Published!.Value,
+                Published = releaseFile.ReleaseVersion.PublishedDisplayDate!.Value,
                 LastUpdated = releaseFile.Published!.Value,
                 Publication = new DataSetFilePublicationViewModel
                 {
@@ -507,8 +507,8 @@ internal static class FreeTextReleaseFileValueResultQueryableExtensions
                 ? query.OrderBy(result => result.Value.Order)
                 : query.OrderByDescending(result => result.Value.Order),
             Published => sortDirection == Asc
-                ? query.OrderBy(result => result.Value.ReleaseVersion.Published)
-                : query.OrderByDescending(result => result.Value.ReleaseVersion.Published),
+                ? query.OrderBy(result => result.Value.ReleaseVersion.PublishedDisplayDate)
+                : query.OrderByDescending(result => result.Value.ReleaseVersion.PublishedDisplayDate),
             Relevance => sortDirection == Asc
                 ? query.OrderBy(result => result.Rank)
                 : query.OrderByDescending(result => result.Rank),
