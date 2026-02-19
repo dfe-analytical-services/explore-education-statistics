@@ -54,7 +54,7 @@ public class PublicationService : IPublicationService
                     Title = publication.Title,
                     Slug = publication.Slug,
                     Summary = publication.Summary,
-                    Published = publication.LatestPublishedReleaseVersion!.Published!.Value,
+                    Published = publication.LatestPublishedReleaseVersion!.PublishedDisplayDate!.Value,
                 };
             });
     }
