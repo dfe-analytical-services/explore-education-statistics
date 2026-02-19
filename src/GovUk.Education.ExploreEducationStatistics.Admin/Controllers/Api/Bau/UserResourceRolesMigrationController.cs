@@ -18,7 +18,7 @@ public class UserResourceRolesMigrationController(IUserResourceRolesMigrationSer
     : ControllerBase
 {
     [HttpPatch("migrate-user-resource-roles")]
-    public Task<ActionResult<ThingDto>> MigrateUserResourceRoles(
+    public Task<ActionResult<UserResourceRolesMigrationReportDto>> MigrateUserResourceRoles(
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default
     ) =>

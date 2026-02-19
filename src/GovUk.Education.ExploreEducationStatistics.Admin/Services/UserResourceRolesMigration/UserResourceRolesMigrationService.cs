@@ -23,7 +23,7 @@ public class UserResourceRolesMigrationService(
     IUserService userService
 ) : IUserResourceRolesMigrationService
 {
-    public async Task<Either<ActionResult, ThingDto>> MigrateUserResourceRoles(
+    public async Task<Either<ActionResult, UserResourceRolesMigrationReportDto>> MigrateUserResourceRoles(
         bool dryRun = true,
         CancellationToken cancellationToken = default
     ) =>
@@ -76,6 +76,19 @@ public class UserResourceRolesMigrationService(
                     })
                     .ToList();
 
+                var numberOfDrafterRolesRemoved = newPermissionsSystemRolesToRemove.Count(upr =>
+                    upr.Role == PublicationRole.Drafter
+                );
+                var numberOfDrafterRolesCreated = newPermissionsSystemRolesToCreate.Count(upr =>
+                    upr.Role == PublicationRole.Drafter
+                );
+                var numberOfApproverRolesRemoved = newPermissionsSystemRolesToRemove.Count(upr =>
+                    upr.Role == PublicationRole.Approver
+                );
+                var numberOfApproverRolesCreated = newPermissionsSystemRolesToCreate.Count(upr =>
+                    upr.Role == PublicationRole.Approver
+                );
+
                 if (!dryRun)
                 {
                     contentDbContext.UserPublicationRoles.RemoveRange(newPermissionsSystemRolesToRemove);
@@ -83,7 +96,14 @@ public class UserResourceRolesMigrationService(
                     await contentDbContext.SaveChangesAsync(cancellationToken);
                 }
 
-                return new ThingDto { DryRun = dryRun };
+                return new UserResourceRolesMigrationReportDto
+                {
+                    DryRun = dryRun,
+                    NumberOfDrafterRolesRemoved = numberOfDrafterRolesRemoved,
+                    NumberOfDrafterRolesCreated = numberOfDrafterRolesCreated,
+                    NumberOfApproverRolesRemoved = numberOfApproverRolesRemoved,
+                    NumberOfApproverRolesCreated = numberOfApproverRolesCreated,
+                };
             });
 
     private async Task<List<GroupedUserResourceRoles>> GetAllDistinctUserResourceRolesGroupedByUserAndPublication()
