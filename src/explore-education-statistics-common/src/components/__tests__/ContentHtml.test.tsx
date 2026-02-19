@@ -331,9 +331,9 @@ describe('ContentHtml', () => {
       render(
         <ContentHtml
           formatLinks={false}
-          html={` 
+          html={`
           <a href="https://explore-education-statistics.service.gov.uk/Find-Statistics?testParam=Something">
-          Internal link</a> 
+          Internal link</a>
           <a href="  https://gov.uk/TEST something  ">External link</a>`}
         />,
       );
@@ -359,6 +359,43 @@ describe('ContentHtml', () => {
         'rel',
         'noopener noreferrer nofollow',
       );
+    });
+  });
+
+  describe('rendering h3s', () => {
+    test('adds an id to a heading correctly', () => {
+      render(
+        <ContentHtml blockId="test-block-id" html="<h3>Heading Content</h3>" />,
+      );
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Heading Content',
+          level: 3,
+        }),
+      ).toHaveAttribute('id', 'test-heading-content');
+    });
+
+    test('strips out nested html inside the heading', () => {
+      render(
+        <ContentHtml
+          blockId="test-block-id"
+          html="<h3><a href='#'>Heading</a> <strong>Content</strong></h3>"
+        />,
+      );
+
+      expect(
+        screen.getByRole('heading', {
+          level: 3,
+        }),
+      ).toHaveTextContent('Heading Content');
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Heading Content',
+          level: 3,
+        }),
+      ).toHaveAttribute('id', 'test-heading-content');
     });
   });
 });
