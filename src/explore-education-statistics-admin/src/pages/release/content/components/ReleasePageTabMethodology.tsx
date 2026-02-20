@@ -1,12 +1,17 @@
 import Link from '@admin/components/Link';
 import ReleasePageTabPanel from '@admin/pages/release/content/components/ReleasePageTabPanel';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import {
+  preReleaseMethodologyRoute,
+  PreReleaseMethodologyRouteParams,
+} from '@admin/routes/preReleaseRoutes';
 import ContactUsSection, {
   contactUsNavItem,
 } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import React, { useMemo } from 'react';
+import { generatePath } from 'react-router';
 
 interface MethodologyLink {
   key: string;
@@ -15,9 +20,13 @@ interface MethodologyLink {
   external?: boolean;
 }
 
-const ReleasePageTabMethodology = () => {
+interface Props {
+  isPra?: boolean;
+}
+
+const ReleasePageTabMethodology = ({ isPra = false }: Props) => {
   const {
-    release: { publication, publishingOrganisations },
+    release: { id: releaseVersionId, publication, publishingOrganisations },
   } = useReleaseContentState();
 
   const { methodologies, externalMethodology } = publication;
@@ -26,7 +35,16 @@ const ReleasePageTabMethodology = () => {
     const mappedMethodologies = methodologies.map(methodology => ({
       key: methodology.id,
       title: methodology.title,
-      url: `/methodology/${methodology.id}/summary`,
+      url: isPra
+        ? generatePath<PreReleaseMethodologyRouteParams>(
+            preReleaseMethodologyRoute.path,
+            {
+              publicationId: publication.id,
+              releaseVersionId,
+              methodologyId: methodology.id,
+            },
+          )
+        : `/methodology/${methodology.id}/summary`,
       external: false,
     }));
 
@@ -40,7 +58,13 @@ const ReleasePageTabMethodology = () => {
     }
 
     return mappedMethodologies;
-  }, [externalMethodology, methodologies]);
+  }, [
+    externalMethodology,
+    isPra,
+    methodologies,
+    publication.id,
+    releaseVersionId,
+  ]);
 
   const navItems = useMemo(
     () =>
