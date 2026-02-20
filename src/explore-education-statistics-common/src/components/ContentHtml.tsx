@@ -1,6 +1,7 @@
 import styles from '@common/components/ContentHtml.module.scss';
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
+import extractTextFromDOMNode from '@common/components/util/extractTextFromDOMNode';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -121,15 +122,15 @@ export default function ContentHtml({
       }
 
       if (node.name === 'h3') {
-        const text = domToReact(node.children as DOMNode[]);
-        return typeof text === 'string' ? (
-          // generate an id optionally using 4 chars of the block id to ensure uniqueness
-          <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
-            {text}
-          </h3>
-        ) : (
-          node
-        );
+        const text = extractTextFromDOMNode(node);
+        if (text && text.trim().length > 0) {
+          return (
+            <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
+              {text}
+            </h3>
+          );
+        }
+        return node;
       }
 
       return undefined;
