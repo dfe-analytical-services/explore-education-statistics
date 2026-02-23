@@ -152,45 +152,41 @@ export default function DataFilesReplacementTableRow({
             <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
           </Link>
           <>
-            {(canCancel || replacementDataFile.status === 'COMPLETE') &&
-              (dataFile.publicApiDataSetId === undefined ||
-                user?.permissions.isBauUser) && (
-                <ModalConfirm
-                  title="Cancel data replacement"
-                  triggerButton={
-                    <ButtonText variant="secondary">
-                      Cancel replacement
-                    </ButtonText>
-                  }
-                  onConfirm={async () => {
-                    await releaseDataFileService.deleteDataFiles(
-                      releaseVersionId,
-                      replacementDataFile.id,
-                    );
-                    onConfirmAction?.();
-                  }}
-                >
-                  <p>
-                    Are you sure you want to cancel this data replacement? The
-                    pending replacement data file will be deleted.
-                  </p>
-                </ModalConfirm>
-              )}
-            {plan?.valid &&
-              (dataFile.publicApiDataSetId === undefined ||
-                user?.permissions.isBauUser) && (
-                <ButtonText
-                  onClick={async () => {
-                    await dataReplacementService.replaceData(releaseVersionId, [
-                      dataFile.id,
-                    ]);
+            {(canCancel || replacementDataFile.status === 'COMPLETE') && (
+              <ModalConfirm
+                title="Cancel data replacement"
+                triggerButton={
+                  <ButtonText variant="secondary">
+                    Cancel replacement
+                  </ButtonText>
+                }
+                onConfirm={async () => {
+                  await releaseDataFileService.deleteDataFiles(
+                    releaseVersionId,
+                    replacementDataFile.id,
+                  );
+                  onConfirmAction?.();
+                }}
+              >
+                <p>
+                  Are you sure you want to cancel this data replacement? The
+                  pending replacement data file will be deleted.
+                </p>
+              </ModalConfirm>
+            )}
+            {plan?.valid && (
+              <ButtonText
+                onClick={async () => {
+                  await dataReplacementService.replaceData(releaseVersionId, [
+                    dataFile.id,
+                  ]);
 
-                    onConfirmAction?.();
-                  }}
-                >
-                  Confirm replacement
-                </ButtonText>
-              )}
+                  onConfirmAction?.();
+                }}
+              >
+                Confirm replacement
+              </ButtonText>
+            )}
           </>
         </ButtonGroup>
       </td>

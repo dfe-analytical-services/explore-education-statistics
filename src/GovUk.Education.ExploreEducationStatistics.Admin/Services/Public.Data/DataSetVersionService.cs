@@ -130,15 +130,12 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await processorClient.CreateNextDataSetVersionMappings(
-                    dataSetId: dataSetId,
-                    releaseFileId: releaseFileId,
-                    dataSetVersionToReplaceId: dataSetVersionToReplaceId,
-                    cancellationToken: cancellationToken
-                )
+        return await processorClient
+            .CreateNextDataSetVersionMappings(
+                dataSetId: dataSetId,
+                releaseFileId: releaseFileId,
+                dataSetVersionToReplaceId: dataSetVersionToReplaceId,
+                cancellationToken: cancellationToken
             )
             .OnSuccess(async processorResponse =>
                 await publicDataDbContext.DataSetVersions.SingleAsync(

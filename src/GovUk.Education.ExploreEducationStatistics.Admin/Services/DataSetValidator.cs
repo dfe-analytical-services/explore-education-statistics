@@ -61,14 +61,6 @@ public class DataSetValidator(
 
             if (releaseFileWithApiDataSet != null)
             {
-                var isBauUser = await userService.CheckIsBauUser().IsRight();
-
-                if (!isBauUser)
-                {
-                    errors.Add(ValidationMessages.GenerateErrorAnalystCannotReplaceApiDataSet(dataSet.Title));
-                    return errors;
-                }
-
                 if (!releaseFileWithApiDataSet.ReleaseVersion.Amendment)
                 {
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDraftApiDataSet(dataSet.Title));

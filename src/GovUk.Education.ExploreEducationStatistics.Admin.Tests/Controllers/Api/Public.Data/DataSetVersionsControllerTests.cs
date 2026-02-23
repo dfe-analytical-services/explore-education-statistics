@@ -547,18 +547,6 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
-        public async Task NotBauUser_Returns403()
-        {
-            var response = await CreateNextVersion(
-                dataSetId: Guid.NewGuid(),
-                releaseFileId: Guid.NewGuid(),
-                user: OptimisedTestUsers.Authenticated
-            );
-
-            response.AssertForbidden();
-        }
-
-        [Fact]
         public async Task EmptyRequiredFields_Return400()
         {
             var response = await CreateNextVersion(dataSetId: Guid.Empty, releaseFileId: Guid.Empty);
