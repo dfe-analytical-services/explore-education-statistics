@@ -123,14 +123,14 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
 
     private async Task UpdateReleaseFilesPublishedDate(ReleaseVersion releaseVersion, DateTimeOffset publishedDate)
     {
-        // Only update the Published date for new or updated files, i.e. where the Published date is null.
+        // Only update the Published date for new or replacement files, i.e. where the Published date is null.
         // This is to preserve the original published date for unchanged files on an amendment version.
-        var newOrUpdatedReleaseFiles = await contentDbContext
+        var newOrReplacementReleaseFiles = await contentDbContext
             .ReleaseFiles.Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
             .Where(rf => rf.Published == null)
             .ToListAsync();
 
-        newOrUpdatedReleaseFiles.ForEach(rf => rf.Published = publishedDate.UtcDateTime);
+        newOrReplacementReleaseFiles.ForEach(rf => rf.Published = publishedDate.UtcDateTime);
     }
 
     private async Task UpdatePublishedDataBlockVersions(ReleaseVersion releaseVersion)
