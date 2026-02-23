@@ -413,29 +413,26 @@ public class ReleaseServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(previousReleaseVersion, releaseVersion);
 
-            var amendedFile = new File { Id = amendedFileId, Type = FileType.Data };
-
             var amendedReleaseFile = new ReleaseFile
             {
                 Id = amendedReleaseFileId,
                 ReleaseVersionId = releaseVersion.Id,
+                Published = null,
                 Name = "file.csv",
                 Summary = "Summary text",
                 FileId = amendedFileId,
-                File = amendedFile,
+                File = new File { Id = amendedFileId, Type = FileType.Data },
             };
-
-            var unamendedFile = new File { Id = unamendedFileId, Type = FileType.Data };
 
             var unamendedReleaseFile = new ReleaseFile
             {
                 Id = unamendedReleaseFileId,
-                Published = previousPublishedDate?.UtcDateTime,
                 ReleaseVersionId = releaseVersion.Id,
+                Published = previousPublishedDate?.UtcDateTime,
                 Name = "file.csv",
                 Summary = "Summary text",
                 FileId = unamendedFileId,
-                File = unamendedFile,
+                File = new File { Id = unamendedFileId, Type = FileType.Data },
             };
 
             contentDbContext.ReleaseFiles.AddRange(amendedReleaseFile, unamendedReleaseFile);
@@ -488,14 +485,17 @@ public class ReleaseServiceTests
                 Assert.Null(parent.LatestDraftVersionId);
             });
 
-            Assert.Equal(
-                DateTime.UtcNow,
-                contentDbContext.ReleaseFiles.Find(amendedReleaseFileId)!.Published!.Value,
-                TimeSpan.FromMinutes(1)
+            var actualAmendedReleaseFile = await contentDbContext.ReleaseFiles.SingleAsync(rf =>
+                rf.Id == amendedReleaseFileId
+            );
+            Assert.Equal(actualPublishedDate.UtcDateTime, actualAmendedReleaseFile.Published!.Value);
+
+            var actualUnamendedReleaseFile = await contentDbContext.ReleaseFiles.SingleAsync(rf =>
+                rf.Id == unamendedReleaseFileId
             );
             Assert.Equal(
-                previousReleaseVersion.Published,
-                contentDbContext.ReleaseFiles.Find(unamendedReleaseFileId)!.Published
+                previousReleaseVersion.Published!.Value.UtcDateTime,
+                actualUnamendedReleaseFile.Published!.Value
             );
         }
     }
