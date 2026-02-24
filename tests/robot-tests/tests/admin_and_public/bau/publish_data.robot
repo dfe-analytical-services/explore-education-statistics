@@ -500,7 +500,7 @@ Add text block with link to a featured table to accordion section
     ${block}=    user starts editing accordion section text block    Test section    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    # We add text to avoid the "Enter content" error displaying when clicking the `Insert` toolbar button, which was causing the toolbar menu not to open
+    # We add text to avoid the "Enter content" error displaying when clicking the `Insert` toolbar button, which was causing the toolbar menu to not    open
     user presses keys    Test content block text
 
     ${toolbar}=    get editor toolbar    ${block}
