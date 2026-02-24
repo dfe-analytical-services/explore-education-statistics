@@ -271,9 +271,9 @@ var commonSiteProperties = {
   clientAffinityEnabled: true
   reserved: operatingSystem == 'Linux'
   siteConfig: {
-    alwaysOn: alwaysOn ?? null
+    alwaysOn: alwaysOn
     healthCheckPath: healthCheckPath
-    preWarmedInstanceCount: preWarmedInstanceCount ?? null
+    preWarmedInstanceCount: preWarmedInstanceCount
     netFrameworkVersion: '8.0'
     linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity

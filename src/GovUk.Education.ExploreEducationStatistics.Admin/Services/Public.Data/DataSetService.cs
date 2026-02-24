@@ -309,13 +309,12 @@ internal class DataSetService(
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             TotalResults = dataSetVersion.TotalResults,
             Notes = dataSetVersion.Notes,
-            GeographicLevels =
-                dataSetVersion.MetaSummary?.GeographicLevels.Select(l => l.GetEnumLabel()).ToList() ?? null,
+            GeographicLevels = dataSetVersion.MetaSummary?.GeographicLevels.Select(l => l.GetEnumLabel()).ToList(),
             TimePeriods = dataSetVersion.MetaSummary?.TimePeriodRange is not null
                 ? TimePeriodRangeViewModel.Create(dataSetVersion.MetaSummary.TimePeriodRange)
                 : null,
-            Filters = dataSetVersion.MetaSummary?.Filters ?? null,
-            Indicators = dataSetVersion.MetaSummary?.Indicators ?? null,
+            Filters = dataSetVersion.MetaSummary?.Filters,
+            Indicators = dataSetVersion.MetaSummary?.Indicators,
             MappingStatus = mappingStatus,
         };
     }

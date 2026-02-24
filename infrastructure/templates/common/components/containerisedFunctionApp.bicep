@@ -262,7 +262,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     virtualNetworkSubnetId: subnetId
     siteConfig: {
       linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${functionAppDockerImageTag}'
-      alwaysOn: alwaysOn ?? null
+      alwaysOn: alwaysOn
       keyVaultReferenceIdentity: keyVaultReferenceIdentity
       scmType: 'None'
       autoHealEnabled: true

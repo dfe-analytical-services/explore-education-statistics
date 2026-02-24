@@ -17,8 +17,8 @@ public class DataSetSummaryViewModelBuilder
             Title = "Data set title",
             Summary = "Data set summary",
             Status = DataSetStatus.Published,
-            DraftVersion = _draftVersion ?? null,
-            LatestLiveVersion = _liveVersion ?? null,
+            DraftVersion = _draftVersion,
+            LatestLiveVersion = _liveVersion,
             SupersedingDataSetId = null,
             PreviousReleaseIds = [],
         };
