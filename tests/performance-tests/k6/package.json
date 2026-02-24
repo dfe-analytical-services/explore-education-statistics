@@ -8,8 +8,7 @@
     "stop": "docker compose down",
     "stop:clear": "docker compose down -v",
     "auth": "docker compose run --rm --user \"$(id -u):$(id -g)\" node --enable-source-maps dist/storeAuthTokens.js ${npm_config_environment} ${npm_config_users}",
-    "perftest": "cross-env TEST_ENVIRONMENT=${npm_config_environment} docker compose run --rm k6 run",
-    "tsc": "tsc --noEmit"
+    "perftest": "cross-env TEST_ENVIRONMENT=${npm_config_environment} docker compose run --rm k6 run"
   },
   "dependencies": {
     "source-map-support": "^0.5.21"

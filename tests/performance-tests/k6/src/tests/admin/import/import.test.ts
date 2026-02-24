@@ -3,7 +3,6 @@ import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import exec from 'k6/execution';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import createAdminService, {
   getDataFileUploadStrategy,
 } from '../../../utils/adminService';
@@ -125,7 +124,7 @@ const performTest = ({ themeId, publicationId }: SetupData) => {
 
   console.log(`Creating Release ${year} for file import to be uploaded to`);
 
-  const { id: releaseId } = adminService.getOrCreateRelease({
+  const { id: releaseVersionId } = adminService.getOrCreateRelease({
     themeId,
     publicationId,
     publicationTitle,
@@ -136,7 +135,7 @@ const performTest = ({ themeId, publicationId }: SetupData) => {
   console.log(`Uploading subject ${subjectName}`);
 
   const { response: uploadResponse, id: fileId } =
-    uploadFileStrategy.getOrImportSubject(adminService, releaseId);
+    uploadFileStrategy.getOrImportSubject(adminService, releaseVersionId);
 
   console.log(`Subject ${subjectName} finished uploading`);
 
@@ -163,7 +162,7 @@ const performTest = ({ themeId, publicationId }: SetupData) => {
   const importStartTime = Date.now();
 
   adminService.waitForDataFileToImport({
-    releaseId,
+    releaseVersionId,
     fileId,
     pollingDelaySeconds: IMPORT_STATUS_POLLING_DELAY_SECONDS,
     onStatusCheckFailed: _ => {
@@ -226,11 +225,5 @@ export const teardown = ({ themeId }: SetupData) => {
     console.log(`Deleted Theme ${themeId}`);
   }
 };
-
-export function handleSummary(data: unknown) {
-  return {
-    'import.html': htmlReport(data),
-  };
-}
 
 export default performTest;

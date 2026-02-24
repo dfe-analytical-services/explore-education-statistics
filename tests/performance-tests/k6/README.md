@@ -467,6 +467,168 @@ pnpm --environment=dev perftest dist/releaseHelpPage.test.js \
   -e USE_CDN=true
 ```
 
+#### createYourOwnTablesPageDirect.test.js
+
+This tests the act of navigating to the page via direct navigation, and thus receiving a fully
+server-side-rendered page.
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/createYourOwnTablesPageDirect.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
+#### createYourOwnTablesPageIndirect.test.js
+
+This tests the act of navigating to the page via Next.JS navigation (and thus pageProps JSON requests for
+client-side rendering purposes rather than full HTML page responses.)
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/createYourOwnTablesPageIndirect.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
+#### dataCataloguePageDirect.test.js
+
+This tests the act of navigating to the page via direct navigation, and thus receiving a fully
+server-side-rendered page.
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/dataCataloguePageDirect.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
+#### dataCataloguePageIndirect.test.js
+
+This tests the act of navigating to the page via Next.JS navigation (and thus pageProps JSON requests for
+client-side rendering purposes rather than full HTML page responses.)
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/dataCataloguePageIndirect.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
+#### findStatisticsPage.test.js
+
+This tests the act of navigating to the page via direct navigation, and thus receiving a fully
+server-side-rendered page.
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/findStatisticsPage.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
+#### homePage.test.js
+
+This tests the act of navigating to the page via direct navigation, and thus receiving a fully
+server-side-rendered page.
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/homePage.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
 #### publicTableBuilderQuery.test.js
 
 * PUBLICATION_TITLE - default value is "publicTableBuilderQuery.test.ts".

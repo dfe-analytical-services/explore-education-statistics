@@ -1,21 +1,13 @@
 import { check } from 'k6';
 import getStandardOptions from '../../configuration/options';
 import testPageAndDataUrls, {
-  getPrefetchRequestConfig,
   PublicPageSetupData,
   setupPublicPageTest,
 } from './utils/publicPageTest';
 
-const name = 'homePage.test.ts';
+const name = 'createYourOwnTablesPageDirect.test.ts';
 
 export const options = getStandardOptions();
-
-const dataUrls = [
-  '/find-statistics.json',
-  '/data-catalogue.json',
-  '/data-tables.json',
-  '/methodology.json',
-];
 
 export const setup = () => setupPublicPageTest(name);
 
@@ -23,17 +15,16 @@ const performTest = ({ buildId }: PublicPageSetupData) =>
   testPageAndDataUrls({
     buildId,
     mainPageUrl: {
-      url: '/',
+      url: '/data-tables',
       prefetch: false,
       successCheck: response =>
         check(response, {
           'response code was 200': ({ status }) => status === 200,
           'response should have contained body': ({ body }) => body != null,
           'response contains expected text': res =>
-            res.html().text().includes('Explore our statistics and data'),
+            res.html().text().includes('Choose the data and area of interest'),
         }),
     },
-    dataUrls: dataUrls.map(getPrefetchRequestConfig),
   });
 
 export default performTest;
