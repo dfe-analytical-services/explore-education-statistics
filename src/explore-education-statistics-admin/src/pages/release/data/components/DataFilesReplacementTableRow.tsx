@@ -174,19 +174,21 @@ export default function DataFilesReplacementTableRow({
                 </p>
               </ModalConfirm>
             )}
-            {plan?.valid && (
-              <ButtonText
-                onClick={async () => {
-                  await dataReplacementService.replaceData(releaseVersionId, [
-                    dataFile.id,
-                  ]);
+            {plan?.valid &&
+              (dataFile.publicApiDataSetId === undefined ||
+                user?.permissions.isBauUser) && (
+                <ButtonText
+                  onClick={async () => {
+                    await dataReplacementService.replaceData(releaseVersionId, [
+                      dataFile.id,
+                    ]);
 
-                  onConfirmAction?.();
-                }}
-              >
-                Confirm replacement
-              </ButtonText>
-            )}
+                    onConfirmAction?.();
+                  }}
+                >
+                  Confirm replacement
+                </ButtonText>
+              )}
           </>
         </ButtonGroup>
       </td>

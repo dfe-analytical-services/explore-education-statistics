@@ -177,14 +177,10 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccessVoid(async () =>
-                await processorClient.DeleteDataSetVersion(
-                    dataSetVersionId: dataSetVersionId,
-                    cancellationToken: cancellationToken
-                )
-            );
+        return await processorClient.DeleteDataSetVersion(
+            dataSetVersionId: dataSetVersionId,
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(

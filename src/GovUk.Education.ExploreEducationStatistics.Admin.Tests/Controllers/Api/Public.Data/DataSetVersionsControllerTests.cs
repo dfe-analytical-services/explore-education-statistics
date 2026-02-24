@@ -709,14 +709,6 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
-        public async Task NotBauUser_Returns403()
-        {
-            var response = await DeleteVersion(Guid.NewGuid(), user: OptimisedTestUsers.Authenticated);
-
-            response.AssertForbidden();
-        }
-
-        [Fact]
         public async Task ProcessorReturns404_Returns404()
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();

@@ -269,7 +269,7 @@ describe('DataFilesReplacementTableRow', () => {
     ).not.toBeInTheDocument();
     expect(
       within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
   test('show confirm and cancel buttons when user analyst but the data file has no API linked', async () => {

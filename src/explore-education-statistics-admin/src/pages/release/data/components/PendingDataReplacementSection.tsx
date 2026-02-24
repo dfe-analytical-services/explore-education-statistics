@@ -1,5 +1,4 @@
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import WarningMessage from '@common/components/WarningMessage';
 import {
   releaseDataFileReplacementCompleteRoute,
@@ -32,7 +31,6 @@ const PendingDataReplacementSection: React.FC<{
   history,
   fetchDataFile,
 }) => {
-  const { user } = useAuthContext();
   const getReplacementPlanMessage = () => {
     if (replacementDataFile?.status === 'COMPLETE') {
       return null;

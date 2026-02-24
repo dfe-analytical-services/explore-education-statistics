@@ -86,42 +86,6 @@ describe('PendingDataReplacementSection', () => {
     jest.clearAllMocks();
   });
 
-  test('cancelling as an analyst when there is a public API linked to the data file is not possible', async () => {
-    render(
-      <TestConfigContextProvider>
-        <AuthContext value={{ user: analyst }}>
-          <PendingDataReplacementSection {...defaultProps} />,
-        </AuthContext>
-      </TestConfigContextProvider>,
-    );
-
-    expect(
-      await screen.findByRole('button', { name: /cancel data replacement/i }),
-    ).toBeInTheDocument();
-
-    await userEvent.click(
-      screen.getByRole('button', { name: /cancel data replacement/i }),
-    );
-
-    expect(
-      await screen.findByText(
-        /You do not have permission to cancel this data replacement. This is because it is linked to an API data set version which can only be modified by BAU users./i,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('explore.statistics@education.gov.uk'),
-    ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
-    expect(
-      screen.getByText(/Please contact the EES team for support/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/explore.statistics@education.gov.uk/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /confirm/i }),
-    ).not.toBeInTheDocument();
-  });
-
   test('cancelling as an bau when there is a public API linked to the data file is not possible', async () => {
     render(
       <TestConfigContextProvider>
