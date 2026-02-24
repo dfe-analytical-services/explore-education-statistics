@@ -267,8 +267,13 @@ public abstract class DataSetFilesControllerRanksTests(DataSetFilesControllerRan
         )
         {
             Assert.Equal(releaseFiles.Count, viewModels.Count);
+
+            // Zip together the expected release files and the actual results to compare them in pairs.
+            // This is to verify matching order as well as content.
+            var valueTuples = releaseFiles.Zip(viewModels);
+
             Assert.All(
-                releaseFiles.Zip(viewModels),
+                valueTuples,
                 tuple =>
                 {
                     var (releaseFile, viewModel) = tuple;
@@ -300,8 +305,7 @@ public abstract class DataSetFilesControllerRanksTests(DataSetFilesControllerRan
                             ),
                         () =>
                             Assert.Equal(
-                                publication.SupersededBy != null
-                                    && publication.SupersededBy.LatestPublishedReleaseVersionId != null,
+                                publication.SupersededBy is { LatestPublishedReleaseVersionId: not null },
                                 viewModel.IsSuperseded
                             ),
                         () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
@@ -312,12 +316,11 @@ public abstract class DataSetFilesControllerRanksTests(DataSetFilesControllerRan
             );
         }
 
-        private List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(
+        private static List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(
             ReleaseVersion releaseVersion,
             int numberOfDataSets = 2
-        )
-        {
-            return DataFixture
+        ) =>
+            DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(
@@ -328,7 +331,6 @@ public abstract class DataSetFilesControllerRanksTests(DataSetFilesControllerRan
                         .GenerateList(numberOfDataSets)
                 )
                 .GenerateList();
-        }
 
         private void SetupContentDbContextExpectations(
             IEnumerable<ReleaseVersion>? releaseVersions = null,

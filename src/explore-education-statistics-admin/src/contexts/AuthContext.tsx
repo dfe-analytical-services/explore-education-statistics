@@ -1,6 +1,5 @@
 import React, {
   createContext,
-  ReactElement,
   ReactNode,
   useCallback,
   useContext,
@@ -386,7 +385,7 @@ export const AuthContextProvider = ({
   }, [state.user]);
 
   return state.readyToRenderChildren ? (
-    <AuthContext.Provider value={contextState}>{children}</AuthContext.Provider>
+    <AuthContext value={contextState}>{children}</AuthContext>
   ) : null;
 };
 
@@ -403,9 +402,9 @@ interface AuthContextTestProviderProps {
 export function AuthContextTestProvider({
   children,
   user,
-}: AuthContextTestProviderProps): ReactElement {
+}: AuthContextTestProviderProps) {
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+    <AuthContext value={{ user }}>{children}</AuthContext>
   );
 }

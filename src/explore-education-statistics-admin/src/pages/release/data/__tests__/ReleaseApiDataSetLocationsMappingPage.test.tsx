@@ -15,7 +15,7 @@ import testLocationsMapping, {
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
@@ -124,7 +124,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // new LAs
     expect(
       newLocationsAccordion.getByRole('heading', {
-        name: 'Local Authorities (2)',
+        name: /Local Authorities \(2\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -136,7 +136,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // new regions
     expect(
       newLocationsAccordion.getByRole('heading', {
-        name: 'Regions (2)',
+        name: /Regions \(2\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -159,7 +159,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped LA
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Local Authorities (2)',
+        name: /Local Authorities \(2\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -171,7 +171,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped regions
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Regions (1)',
+        name: /Regions \(1\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -183,7 +183,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped englishDevolvedArea
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'English Devolved Areas (3)',
+        name: /English Devolved Areas \(3\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -755,7 +755,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -853,7 +855,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -918,7 +922,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1033,7 +1039,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1161,7 +1169,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1252,7 +1262,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(

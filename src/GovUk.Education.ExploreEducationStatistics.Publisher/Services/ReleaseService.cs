@@ -88,7 +88,7 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
         var publishedDisplayDate = await CalculatePublishedDisplayDate(releaseVersion, actualPublishedDate);
         releaseVersion.PublishedDisplayDate = publishedDisplayDate;
 
-        await UpdateReleaseFilePublishedDate(releaseVersion, publishedDisplayDate);
+        await UpdateReleaseFilesPublishedDate(releaseVersion, actualPublishedDate);
 
         await UpdatePublishedDataBlockVersions(releaseVersion);
 
@@ -121,22 +121,16 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
         return previousVersion.PublishedDisplayDate.Value;
     }
 
-    private async Task UpdateReleaseFilePublishedDate(ReleaseVersion releaseVersion, DateTimeOffset publishedDate)
+    private async Task UpdateReleaseFilesPublishedDate(ReleaseVersion releaseVersion, DateTimeOffset publishedDate)
     {
-        var dataReleaseFiles = contentDbContext
-            .ReleaseFiles.Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersion.Id)
-            .Include(rf => rf.File);
+        // Only update the Published date for new or replacement files, i.e. where the Published date is null.
+        // This is to preserve the original published date for unchanged files on an amendment version.
+        var newOrReplacementReleaseFiles = await contentDbContext
+            .ReleaseFiles.Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
+            .Where(rf => rf.Published == null)
+            .ToListAsync();
 
-        if (releaseVersion.PreviousVersion is null)
-        {
-            await dataReleaseFiles.ForEachAsync(releaseFile => releaseFile.Published = publishedDate.UtcDateTime);
-        }
-        else
-        {
-            await dataReleaseFiles
-                .Where(rf => rf.Published == null)
-                .ForEachAsync(releaseFile => releaseFile.Published = DateTime.UtcNow);
-        }
+        newOrReplacementReleaseFiles.ForEach(rf => rf.Published = publishedDate.UtcDateTime);
     }
 
     private async Task UpdatePublishedDataBlockVersions(ReleaseVersion releaseVersion)

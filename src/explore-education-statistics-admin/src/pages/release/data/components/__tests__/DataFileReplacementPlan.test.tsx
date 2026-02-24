@@ -198,7 +198,6 @@ describe('DataReplacementPlan', () => {
           valid: false,
         },
         valid: false,
-        fixable: true,
       },
       {
         id: 'block-2',
@@ -207,7 +206,6 @@ describe('DataReplacementPlan', () => {
         indicatorGroups: {},
         locations: {},
         valid: true,
-        fixable: false,
       },
     ],
     footnotes: [
@@ -351,7 +349,6 @@ describe('DataReplacementPlan', () => {
         locations: {},
         filters: {},
         valid: true,
-        fixable: false,
       },
       {
         id: 'block-2',
@@ -360,7 +357,6 @@ describe('DataReplacementPlan', () => {
         locations: {},
         filters: {},
         valid: true,
-        fixable: false,
       },
     ],
     footnotes: [
@@ -675,8 +671,8 @@ describe('DataReplacementPlan', () => {
     const dataBlock1 = within(details[0]);
 
     expect(
-      dataBlock1.getByRole('button', { name: /Data block 1/ }),
-    ).toHaveTextContent('ERROR');
+      dataBlock1.getByRole('button', { name: 'Data block 1 : ERROR' }),
+    ).toBeInTheDocument();
 
     expect(dataBlock1.getByTestId('Country')).toHaveTextContent('England');
     expect(dataBlock1.getByTestId('Country')).not.toHaveTextContent(
@@ -755,14 +751,17 @@ describe('DataReplacementPlan', () => {
     );
 
     expect(
-      dataBlock1.getByRole('link', { name: 'Edit data block', hidden: true }),
+      dataBlock1.getByRole('link', {
+        name: 'Edit data block - Data block 1',
+        hidden: true,
+      }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data-blocks/block-1',
+      '/publication/publication-1/release/release-1/data-blocks/block-1?fromFileReplacementId=file-1',
     );
     expect(
       dataBlock1.getByRole('button', {
-        name: 'Delete data block',
+        name: 'Delete data block - Data block 1',
         hidden: true,
       }),
     ).toBeInTheDocument();
@@ -889,9 +888,8 @@ describe('DataReplacementPlan', () => {
 
     const dataBlock1 = within(details[0]);
 
-    expect(
-      dataBlock1.getByRole('button', { name: /Data block 1/ }),
-    ).toHaveTextContent('OK');
+    expect(dataBlock1.getByText(/Data block 1/)).toBeInTheDocument();
+    expect(dataBlock1.getByText('OK')).toBeInTheDocument();
     expect(
       dataBlock1.getByText(
         'This data block has no conflicts and can be replaced.',
@@ -900,9 +898,8 @@ describe('DataReplacementPlan', () => {
 
     const dataBlock2 = within(details[1]);
 
-    expect(
-      dataBlock2.getByRole('button', { name: /Data block 2/ }),
-    ).toHaveTextContent('OK');
+    expect(dataBlock2.getByText(/Data block 2/)).toBeInTheDocument();
+    expect(dataBlock2.getByText('OK')).toBeInTheDocument();
     expect(
       dataBlock2.getByText(
         'This data block has no conflicts and can be replaced.',
@@ -911,9 +908,8 @@ describe('DataReplacementPlan', () => {
 
     const footnote1 = within(details[2]);
 
-    expect(
-      footnote1.getByRole('button', { name: /Footnote 1/ }),
-    ).toHaveTextContent('OK');
+    expect(footnote1.getByText(/Footnote 1/)).toBeInTheDocument();
+    expect(footnote1.getByText('OK')).toBeInTheDocument();
     expect(
       footnote1.getByText(
         'This footnote has no conflicts and can be replaced.',
@@ -922,9 +918,8 @@ describe('DataReplacementPlan', () => {
 
     const footnote2 = within(details[3]);
 
-    expect(
-      footnote2.getByRole('button', { name: /Footnote 2/ }),
-    ).toHaveTextContent('OK');
+    expect(footnote2.getByText(/Footnote 2/)).toBeInTheDocument();
+    expect(footnote2.getByText('OK')).toBeInTheDocument();
     expect(
       footnote2.getByText(
         'This footnote has no conflicts and can be replaced.',
@@ -1067,63 +1062,20 @@ describe('DataReplacementPlan', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Data block 1/ }),
-      ).toBeInTheDocument();
-    });
-
     expect(
-      screen.getByRole('button', { name: /Data block 1/ }),
+      await screen.findByRole('button', { name: 'Data block 1 : ERROR' }),
     ).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    await userEvent.click(
+      screen.getByRole('button', { name: /Data block 1 : ERROR/ }),
+    );
 
     expect(
-      screen.getByRole('link', { name: 'Edit data block' }),
+      screen.getByRole('link', { name: 'Edit data block - Data block 1' }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data-blocks/block-1',
+      '/publication/publication-1/release/release-1/data-blocks/block-1?fromFileReplacementId=file-1',
     );
-  });
-
-  test("does not render 'Edit data block' link if data block is not fixable", async () => {
-    dataReplacementService.getReplacementPlan.mockResolvedValue({
-      ...testReplacementPlan,
-      dataBlocks: [
-        {
-          ...testReplacementPlan.dataBlocks[0],
-          fixable: false,
-        },
-        testReplacementPlan.dataBlocks[1],
-      ],
-      footnotes: [],
-    });
-
-    renderWithTestConfig(
-      <MemoryRouter>
-        <DataFileReplacementPlan
-          cancelButton={<button type="button">Cancel</button>}
-          publicationId="publication-1"
-          releaseVersionId="release-1"
-          fileId="file-1"
-          replacementFileId="file-2"
-        />
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/Data block 1/)).toBeInTheDocument();
-    });
-
-    expect(
-      screen.getByRole('button', { name: /Data block 1/ }),
-    ).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
-    expect(
-      screen.queryByRole('link', { name: 'Edit data block' }),
-    ).not.toBeInTheDocument();
   });
 
   test("clicking 'Delete data block' button renders confirmation modal", async () => {
@@ -1145,16 +1097,12 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Data block 1/)).toBeInTheDocument();
+      expect(screen.getByText(/Data blocks: ERROR/)).toBeInTheDocument();
     });
 
-    expect(
-      screen.getByRole('button', { name: /Data block 1/ }),
-    ).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    await userEvent.click(screen.getByText(/Data blocks: ERROR/));
     await userEvent.click(
-      screen.getByRole('button', { name: 'Delete data block' }),
+      screen.getByRole('button', { name: 'Delete data block - Data block 1' }),
     );
 
     await waitFor(() => {
@@ -1190,17 +1138,13 @@ describe('DataReplacementPlan', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText(/Data block 1/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Data blocks: ERROR/)).toBeInTheDocument();
+    });
 
-    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
-
-    expect(
-      screen.getByRole('button', { name: /Data block 1/ }),
-    ).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    await userEvent.click(screen.getByText(/Data blocks: ERROR/));
     await userEvent.click(
-      screen.getByRole('button', { name: 'Delete data block' }),
+      screen.getByRole('button', { name: 'Delete data block - Data block 1' }),
     );
 
     await waitFor(() => {
@@ -1498,7 +1442,7 @@ describe('DataReplacementPlan', () => {
           ...defaultTestConfig,
         }}
       >
-        <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+        <AuthContext value={{ user }}>{children}</AuthContext>
       </TestConfigContextProvider>,
     );
   }

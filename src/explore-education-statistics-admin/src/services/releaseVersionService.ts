@@ -171,7 +171,8 @@ export type ReleaseVersionChecklistWarning =
         | 'NoFeaturedTables'
         | 'NoPublicPreReleaseAccessList'
         | 'UnresolvedComments'
-        | 'MissingUpdatedApiDataSet';
+        | 'MissingUpdatedApiDataSet'
+        | 'ReleaseSummarySectionContainsHtmlBlock';
     }
   | {
       code: 'NoFootnotesOnSubjects';

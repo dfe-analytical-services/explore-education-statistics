@@ -1,6 +1,7 @@
 import styles from '@common/components/ContentHtml.module.scss';
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
+import extractTextFromDOMNode from '@common/components/util/extractTextFromDOMNode';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
@@ -10,13 +11,13 @@ import sanitizeHtml, {
 import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import classNames from 'classnames';
-import { Element } from 'domhandler/lib/node';
+import { Element, isTag } from 'domhandler';
 import parseHtmlString, {
   DOMNode,
   attributesToProps,
   domToReact,
 } from 'html-react-parser';
-import React, { ReactElement, useMemo } from 'react';
+import React, { ReactElement, useMemo, type JSX } from 'react';
 
 export interface ContentHtmlProps {
   blockId?: string;
@@ -56,13 +57,13 @@ export default function ContentHtml({
 
   const parsedContent = parseHtmlString(cleanHtml, {
     replace: (node: DOMNode) => {
-      if (!(node instanceof Element)) {
+      if (!isTag(node)) {
         return undefined;
       }
 
       // Links
       if (node.name === 'a') {
-        const text = domToReact(node.children);
+        const text = domToReact(node.children as DOMNode[]);
 
         // Glossary links
         if (
@@ -121,15 +122,15 @@ export default function ContentHtml({
       }
 
       if (node.name === 'h3') {
-        const text = domToReact(node.children);
-        return typeof text === 'string' ? (
-          // generate an id optionally using 4 chars of the block id to ensure uniqueness
-          <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
-            {text}
-          </h3>
-        ) : (
-          node
-        );
+        const text = extractTextFromDOMNode(node);
+        if (text && text.trim().length > 0) {
+          return (
+            <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
+              {text}
+            </h3>
+          );
+        }
+        return node;
       }
 
       return undefined;
@@ -155,7 +156,7 @@ function renderTable(element: Element): ReactElement | undefined {
   const { children } = element;
 
   const table = children.find(
-    child => child instanceof Element && child.name === 'table',
+    child => isTag(child) && child.name === 'table',
   ) as Element | undefined;
 
   if (!table) {
@@ -163,7 +164,7 @@ function renderTable(element: Element): ReactElement | undefined {
   }
 
   const figcaption = children.find(
-    child => child instanceof Element && child.name === 'figcaption',
+    child => isTag(child) && child.name === 'figcaption',
   ) as Element | undefined;
 
   return (
@@ -173,8 +174,10 @@ function renderTable(element: Element): ReactElement | undefined {
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...attributesToProps(table.attribs)}
       >
-        {figcaption && <caption>{domToReact(figcaption.children)}</caption>}
-        {domToReact(table.children, { trim: true })}
+        {figcaption && (
+          <caption>{domToReact(figcaption.children as DOMNode[])}</caption>
+        )}
+        {domToReact(table.children as DOMNode[], { trim: true })}
       </table>
     </div>
   );

@@ -1,6 +1,6 @@
 import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { FC, ReactNode } from 'react';
 
@@ -114,7 +114,9 @@ describe('useAsyncHandledRetry', () => {
       { wrapper },
     );
 
-    result.current.setState({ error: new Error('test') } as never);
+    await act(async () => {
+      await result.current.setState({ error: new Error('test') } as never);
+    });
 
     await waitFor(() => {
       expect((result.current as { error?: Error }).error).not.toBeDefined();

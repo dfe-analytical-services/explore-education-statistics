@@ -8,18 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersi
 /// </summary>
 public static class DateTimeOffsetExtensions
 {
-    public static DateTimeOffset? AdjustUkLocalMidnightTo0930(this DateTimeOffset? dateTimeOffset)
-    {
-        if (dateTimeOffset == null)
-        {
-            return null;
-        }
-        return IsUkLocalMidnight(dateTimeOffset.Value)
-            ? dateTimeOffset.Value.AddHours(9).AddMinutes(30)
-            : dateTimeOffset;
-    }
+    public static DateTimeOffset? AdjustUkLocalMidnightTo0930(this DateTimeOffset? dateTimeOffset) =>
+        dateTimeOffset?.AdjustUkLocalMidnightTo0930();
 
-    private static bool IsUkLocalMidnight(DateTimeOffset dateTimeOffset)
+    public static DateTimeOffset AdjustUkLocalMidnightTo0930(this DateTimeOffset dateTimeOffset) =>
+        dateTimeOffset.IsUkLocalMidnight() ? dateTimeOffset.AddHours(9).AddMinutes(30) : dateTimeOffset;
+
+    public static bool IsUkLocalMidnight(this DateTimeOffset? dateTimeOffset) =>
+        dateTimeOffset.HasValue && dateTimeOffset.Value.IsUkLocalMidnight();
+
+    public static bool IsUkLocalMidnight(this DateTimeOffset dateTimeOffset)
     {
         // Convert the DateTimeOffset to UK local time
         var ukLocalDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneUtils.GetUkTimeZone());

@@ -8,7 +8,7 @@ const useCurrentPng = ({
   ref,
 }: {
   options?: Partial<HTML2CanvasOptions>;
-  ref: RefObject<HTMLElement>;
+  ref: RefObject<HTMLElement | null>;
 }): UseCurrentPngType => {
   const getPng = useCallback(
     async (callback?: BlobCallback): Promise<string | null> => {

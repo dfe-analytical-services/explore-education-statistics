@@ -151,8 +151,8 @@ describe('ReleaseUserTable', () => {
       'Are you sure you want to remove User 1 from all releases in this publication?',
     );
 
-    expect(onUserRemove).not.toBeCalled();
-    expect(onUserInvitesRemove).not.toBeCalled();
+    expect(onUserRemove).not.toHaveBeenCalled();
+    expect(onUserInvitesRemove).not.toHaveBeenCalled();
 
     await userEvent.click(
       within(modal).getByRole('button', { name: 'Confirm' }),
@@ -161,7 +161,7 @@ describe('ReleaseUserTable', () => {
     await waitFor(() => {
       expect(onUserRemove).toHaveBeenCalledTimes(1);
       expect(onUserRemove).toHaveBeenCalledWith('user-1');
-      expect(onUserInvitesRemove).not.toBeCalled();
+      expect(onUserInvitesRemove).not.toHaveBeenCalled();
     });
   });
 
@@ -203,8 +203,8 @@ describe('ReleaseUserTable', () => {
       'Are you sure you want to cancel all invites to releases under this publication for email address user4@test.com?',
     );
 
-    expect(onUserRemove).not.toBeCalled();
-    expect(onUserInvitesRemove).not.toBeCalled();
+    expect(onUserRemove).not.toHaveBeenCalled();
+    expect(onUserInvitesRemove).not.toHaveBeenCalled();
 
     await userEvent.click(
       within(modal).getByRole('button', { name: 'Confirm' }),
@@ -213,7 +213,7 @@ describe('ReleaseUserTable', () => {
     await waitFor(() => {
       expect(onUserInvitesRemove).toHaveBeenCalledTimes(1);
       expect(onUserInvitesRemove).toHaveBeenCalledWith('user4@test.com');
-      expect(onUserRemove).not.toBeCalled();
+      expect(onUserRemove).not.toHaveBeenCalled();
     });
   });
 

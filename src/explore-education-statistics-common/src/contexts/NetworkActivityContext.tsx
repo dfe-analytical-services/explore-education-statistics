@@ -131,9 +131,7 @@ export function NetworkActivityContextProvider({
   }, [idleTimeout, setState]);
 
   return (
-    <NetworkActivityContext.Provider value={state}>
-      {children}
-    </NetworkActivityContext.Provider>
+    <NetworkActivityContext value={state}>{children}</NetworkActivityContext>
   );
 }
 

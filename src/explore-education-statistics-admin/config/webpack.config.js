@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 const resolve = require('resolve');
-const ErrorOverlayPlugin = require('error-overlay-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
@@ -132,16 +131,7 @@ module.exports = webpackEnv => {
             // https://github.com/facebook/create-react-app/issues/2677
             ident: 'postcss',
             plugins: [
-              'postcss-flexbugs-fixes',
-              [
-                'postcss-preset-env',
-                {
-                  autoprefixer: {
-                    flexbox: 'no-2009',
-                  },
-                  stage: 3,
-                },
-              ],
+              ['postcss-preset-env'],
               // Adds PostCSS Normalize as the reset css with default options,
               // so that it honors browserslist config in package.json
               // which in turn let's users customize the target behavior as per their needs.
@@ -260,9 +250,6 @@ module.exports = webpackEnv => {
               // https://github.com/terser-js/terser/issues/120
               inline: 2,
             },
-            mangle: {
-              safari10: true,
-            },
             // Added for profiling in devtools
             keep_classnames: isEnvProductionProfile,
             keep_fnames: isEnvProductionProfile,
@@ -309,7 +296,7 @@ module.exports = webpackEnv => {
         './dist/cpexcel.js': false,
         '@admin': paths.appSrc,
         '@common': 'explore-education-statistics-common/src',
-        react: require.resolve('react'),
+        react: path.dirname(require.resolve('react')),
       },
       fallback: {
         path: require.resolve('path-browserify'),
@@ -331,7 +318,7 @@ module.exports = webpackEnv => {
           babelRuntimeRegenerator,
           // EES - Add extra allowed files for compatibility
           // with our custom import aliases
-          require.resolve('react'),
+          path.dirname(require.resolve('react')),
         ]),
       ],
     },
@@ -766,8 +753,6 @@ module.exports = webpackEnv => {
           //   },
           // },
         }),
-      // EES - Add error overlay plugin that is Webpack 5 compatible
-      new ErrorOverlayPlugin(),
     ].filter(Boolean),
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter

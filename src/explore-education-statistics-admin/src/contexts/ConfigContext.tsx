@@ -14,9 +14,9 @@ export const ConfigContextProvider = ({
   const { value, isLoading } = useAsyncHandledRetry(getConfig);
 
   return (
-    <ConfigContext.Provider value={value}>
+    <ConfigContext value={value}>
       {!isLoading && value ? children : null}
-    </ConfigContext.Provider>
+    </ConfigContext>
   );
 };
 
@@ -62,7 +62,5 @@ export const TestConfigContextProvider = ({
   children,
   config = defaultTestConfig,
 }: TestConfigContextProps) => {
-  return (
-    <ConfigContext.Provider value={config}>{children}</ConfigContext.Provider>
-  );
+  return <ConfigContext value={config}>{children}</ConfigContext>;
 };

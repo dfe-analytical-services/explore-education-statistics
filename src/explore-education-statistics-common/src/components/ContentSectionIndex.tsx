@@ -28,7 +28,7 @@ type ViewportPosition = 'before' | 'within' | 'after';
 
 interface Props {
   className?: string;
-  contentRef: RefObject<HTMLElement>;
+  contentRef: RefObject<HTMLElement | null>;
   id: string;
   selector?: string;
   sticky?: boolean;

@@ -670,7 +670,7 @@ describe('TableToolWizard', () => {
   });
 
   describe('location step heading', () => {
-    test('sets the step heading to `Choose locations` if multiple location types', () => {
+    test('sets the step heading to `Choose locations` if multiple location types', async () => {
       render(
         <TableToolWizard
           themeMeta={testThemeMeta}
@@ -697,13 +697,13 @@ describe('TableToolWizard', () => {
       );
 
       expect(
-        screen.getByRole('heading', {
+        await screen.findByRole('heading', {
           name: 'Step 3 Choose locations',
         }),
       ).toBeInTheDocument();
     });
 
-    test('sets the step heading based on location type if only one type', () => {
+    test('sets the step heading based on location type if only one type', async () => {
       const testSingleLocationType: SubjectMeta['locations'] = {
         country: {
           legend: 'Country',
@@ -751,13 +751,13 @@ describe('TableToolWizard', () => {
       );
 
       expect(
-        screen.getByRole('heading', {
+        await screen.findByRole('heading', {
           name: 'Step 3 Choose Countries',
         }),
       ).toBeInTheDocument();
     });
 
-    test('sets the step heading to `Choose locations` if single location type is not in the locationLevelsMap', () => {
+    test('sets the step heading to `Choose locations` if single location type is not in the locationLevelsMap', async () => {
       const testSingleLocationTypeUnknown: SubjectMeta['locations'] = {
         unknownType: {
           legend: 'Unknown',
@@ -805,7 +805,7 @@ describe('TableToolWizard', () => {
       );
 
       expect(
-        screen.getByRole('heading', {
+        await screen.findByRole('heading', {
           name: 'Step 3 Choose locations',
         }),
       ).toBeInTheDocument();

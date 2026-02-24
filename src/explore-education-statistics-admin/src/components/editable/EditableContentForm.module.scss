@@ -2,9 +2,10 @@
 @import '@admin/styles/variables';
 
 .form {
-  // stylelint-disable-next-line selector-no-qualifying-type
+  // stylelint-disable selector-no-qualifying-type
   img:not([alt]),
   img[alt=''] {
+    // stylelint-enable selector-no-qualifying-type
     border: 4px solid $govuk-error-colour;
     padding: 4px;
   }

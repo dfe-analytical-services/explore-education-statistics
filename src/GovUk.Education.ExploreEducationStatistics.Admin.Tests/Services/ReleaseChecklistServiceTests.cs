@@ -169,6 +169,14 @@ public class ReleaseChecklistServiceTests
             .WithContent(DefaultContentSections())
             .WithPreReleaseAccessList(string.Empty);
 
+        releaseVersion.Content.Add(
+            new ContentSection
+            {
+                Type = ContentSectionType.ReleaseSummary,
+                Content = [new HtmlBlock { Body = "Not empty" }],
+            }
+        );
+
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -213,7 +221,7 @@ public class ReleaseChecklistServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(true);
+                .ReturnsAsync(false);
 
             var service = BuildReleaseChecklistService(
                 context,
@@ -243,7 +251,7 @@ public class ReleaseChecklistServiceTests
             Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
             Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
             Assert.Equal(UnresolvedComments, checklist.Warnings[4].Code);
-            Assert.Equal(MissingUpdatedApiDataSet, checklist.Warnings[5].Code);
+            Assert.Equal(ReleaseSummarySectionContainsHtmlBlock, checklist.Warnings[5].Code);
         }
     }
 
@@ -500,11 +508,6 @@ public class ReleaseChecklistServiceTests
             RelatedDashboardsSection = new ContentSection
             {
                 Type = ContentSectionType.RelatedDashboards,
-                Content = [new HtmlBlock { Body = "Not empty" }],
-            },
-            SummarySection = new ContentSection
-            {
-                Type = ContentSectionType.ReleaseSummary,
                 Content = [new HtmlBlock { Body = "Not empty" }],
             },
             NextReleaseDate = new PartialDate { Month = "12", Year = "2021" },

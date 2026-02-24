@@ -15,7 +15,7 @@ import testFiltersMapping, {
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
@@ -122,7 +122,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // new Filter 1
     expect(
       newFilterOptionsAccordion.getByRole('heading', {
-        name: 'Filter 1 (1) Column: Filter1Key',
+        name: /Filter 1 \(1\) Column: Filter1Key/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -145,7 +145,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // auto mapped Filter 1
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Filter 1 (1) Column: Filter1Key',
+        name: /Filter 1 \(1\) Column: Filter1Key/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -157,7 +157,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // auto mapped Filter3Key
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Filter 3 (3) Column: Filter3Key',
+        name: /Filter 3 \(3\) Column: Filter3Key/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -559,7 +559,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => jest.runAllTimers());
 
       await waitFor(() => {
         expect(
@@ -660,7 +660,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -730,7 +732,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -847,7 +851,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -977,7 +983,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1078,7 +1086,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(

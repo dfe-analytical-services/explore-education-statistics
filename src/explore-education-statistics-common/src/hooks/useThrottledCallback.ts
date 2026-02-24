@@ -17,7 +17,7 @@ export default function useThrottledCallback<Args extends unknown[] = []>(
   callback: (...args: Args) => void,
   timeout = 0,
 ): UseThrottledCallbackReturn<Args> {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const callbackRef = useRef(callback);
   const mountedRef = useMountedRef();
 
@@ -32,7 +32,7 @@ export default function useThrottledCallback<Args extends unknown[] = []>(
       timeoutRef.current = setTimeout(() => {
         if (mountedRef.current) {
           callbackRef.current(...args);
-          timeoutRef.current = undefined;
+          timeoutRef.current = null;
         }
       }, timeout);
     },
@@ -43,7 +43,7 @@ export default function useThrottledCallback<Args extends unknown[] = []>(
   const cancel = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
-      timeoutRef.current = undefined;
+      timeoutRef.current = null;
     }
   }, []);
 

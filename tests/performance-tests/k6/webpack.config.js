@@ -24,7 +24,21 @@ module.exports = {
     ],
   },
   target: 'node',
-  externals: /^(k6|https?:\/\/)(\/.*)?/,
+  externals: [
+    // keep k6 imports external (common in k6 bundling)
+    ({ request }, cb) => {
+      if (/^(k6(\/|$))|(https?:\/\/)/.test(request))
+        return cb(null, `commonjs ${request}`);
+
+      // do NOT bundle puppeteer (node-only)
+      if (/^puppeteer($|\/)/.test(request))
+        return cb(null, `commonjs ${request}`);
+      if (/^puppeteer-core($|\/)/.test(request))
+        return cb(null, `commonjs ${request}`);
+
+      return cb();
+    },
+  ],
   stats: {
     colors: true,
   },

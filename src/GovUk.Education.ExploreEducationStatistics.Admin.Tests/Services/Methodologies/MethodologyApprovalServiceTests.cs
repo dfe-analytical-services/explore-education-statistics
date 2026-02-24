@@ -374,7 +374,7 @@ public class MethodologyApprovalServiceTests
             .Setup(mock => mock.ListLatestActiveUserReleaseRolesByPublication(publication.Id, ReleaseRole.Approver))
             .ReturnsAsync([]);
 
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -1250,7 +1250,7 @@ public class MethodologyApprovalServiceTests
                     .Generate(),
             ]);
 
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
         emailTemplateService
             .Setup(mock =>

@@ -12,6 +12,7 @@
 }
 
 // Set offset for release nav if editing mode bar present
+// stylelint-disable-next-line selector-max-id
 :global(body:has(#editingMode)) {
   --admin-bar-offset: 48px;
 
@@ -20,6 +21,7 @@
   }
 }
 
+// stylelint-disable-next-line selector-max-id
 :global(body:has(#pageViewToggleButton[aria-expanded='true'])) {
   @include govuk-media-query($until: tablet) {
     --admin-bar-offset: 180px;

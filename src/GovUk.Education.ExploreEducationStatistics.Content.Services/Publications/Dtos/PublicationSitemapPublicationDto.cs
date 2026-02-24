@@ -32,6 +32,8 @@ public record PublicationSitemapReleaseDto
         new()
         {
             Slug = releaseVersion.Release.Slug,
+            // LastModified uses the actual published time of the release version,
+            // rather than the 'published display date' which may be inherited from the previous version.
             LastModified = releaseVersion.Published ?? throw new ArgumentException("ReleaseVersion must be published"),
         };
 }

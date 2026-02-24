@@ -4,6 +4,7 @@ import React, {
   Children,
   cloneElement,
   ReactElement,
+  ReactNode,
   useEffect,
   useState,
 } from 'react';
@@ -39,7 +40,7 @@ export interface InjectedWizardProps {
 }
 
 interface Props {
-  children: ReactElement | (ReactElement | undefined | boolean)[];
+  children: ReactNode | (ReactNode | undefined | boolean)[];
   currentStep?: number;
   initialStep?: number;
   id: string;

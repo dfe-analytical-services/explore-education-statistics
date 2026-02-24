@@ -372,25 +372,27 @@ const DataFileReplacementPlan = ({
                   </SummaryList>
 
                   <ButtonGroup>
-                    {dataBlock.fixable && (
-                      <ButtonLink
-                        to={generatePath<ReleaseDataBlockRouteParams>(
-                          releaseDataBlockEditRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            dataBlockId: dataBlock.id,
-                          },
-                        )}
-                      >
-                        Edit data block
-                      </ButtonLink>
-                    )}
+                    <ButtonLink
+                      to={`${generatePath<ReleaseDataBlockRouteParams>(
+                        releaseDataBlockEditRoute.path,
+                        {
+                          publicationId,
+                          releaseVersionId,
+                          dataBlockId: dataBlock.id,
+                        },
+                      )}?fromFileReplacementId=${fileId}`}
+                    >
+                      Edit data block{' '}
+                      <VisuallyHidden>- {dataBlock.name}</VisuallyHidden>
+                    </ButtonLink>
 
                     <ModalConfirm
                       title="Delete data block"
                       triggerButton={
-                        <Button variant="warning">Delete data block</Button>
+                        <Button variant="warning">
+                          Delete data block{' '}
+                          <VisuallyHidden>- {dataBlock.name}</VisuallyHidden>
+                        </Button>
                       }
                       onConfirm={async () => {
                         await dataBlockService.deleteDataBlock(

@@ -41,9 +41,7 @@ const renderWithContext = (
         <EditingContextProvider editingMode="preview">
           <MemoryRouter>{component}</MemoryRouter>
         </EditingContextProvider>
-        ,
       </ReleaseContentProvider>
-      ,
     </TestConfigContextProvider>,
   );
 

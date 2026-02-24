@@ -14,7 +14,7 @@ import Details from '@common/components/Details';
 import DataSetDetailsList from '@common/modules/table-tool/components/DataSetDetailsList';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import React, { ReactNode } from 'react';
+import React, { HTMLAttributes, ReactElement } from 'react';
 import orderBy from 'lodash/orderBy';
 
 export type DataSetFormSubmitHandler = (values: { subjectId: string }) => void;
@@ -30,7 +30,9 @@ interface Props extends InjectedWizardProps {
   stepTitle: string;
   subjects: Subject[];
   subjectId?: string;
-  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (
+    featuredTable: FeaturedTable,
+  ) => ReactElement<HTMLAttributes<HTMLElement>>;
   onSubmit: DataSetFormSubmitHandler;
 }
 

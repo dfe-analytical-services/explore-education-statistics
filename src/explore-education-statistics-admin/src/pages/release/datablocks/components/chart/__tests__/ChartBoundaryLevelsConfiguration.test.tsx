@@ -12,7 +12,7 @@ import { defaultDataGrouping } from '@common/modules/charts/util/getMapDataSetCa
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import { MapBoundaryLevelConfig } from '../types/mapConfig';
 
 describe('ChartBoundaryLevelsConfiguration', () => {
@@ -80,7 +80,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     ],
   };
 
-  function render(element: ReactElement) {
+  function render(element: ReactNode) {
     return baseRender(
       <ChartBuilderFormsContextProvider
         initialForms={{
@@ -177,7 +177,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     expect(row2BoundaryLevels[3]).toHaveValue('3');
   });
 
-  test('renders data sets with initial boundary levels', () => {
+  test('renders data sets with initial boundary levels', async () => {
     render(
       <ChartBoundaryLevelsConfiguration
         map={{
@@ -206,7 +206,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Default boundary level')).toHaveValue(
+    expect(await screen.findByLabelText('Default boundary level')).toHaveValue(
       String(testMeta.boundaryLevels[2].id),
     );
     const rows = screen.getAllByRole('row');

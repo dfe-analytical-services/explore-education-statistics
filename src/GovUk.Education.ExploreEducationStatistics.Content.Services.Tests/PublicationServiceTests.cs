@@ -28,9 +28,22 @@ public abstract class PublicationServiceTests
         [Fact]
         public async Task PublicationExists_HasPublishedReleaseVersion_ReturnsPublication()
         {
+            var releaseVersionPublishedDisplayDate = DateTimeOffset.Parse("2026-01-01T09:30:00 +00:00");
+
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions([
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithPublished(DateTimeOffset.UtcNow)
+                                    .WithPublishedDisplayDate(releaseVersionPublishedDisplayDate),
+                            ]),
+                    ]
+                );
 
             await SeedDatabase(publication, _contentDbContextId);
 
@@ -42,7 +55,7 @@ public abstract class PublicationServiceTests
             Assert.Equal(publication.Title, publicationViewModel.Title);
             Assert.Equal(publication.Slug, publicationViewModel.Slug);
             Assert.Equal(publication.Summary, publicationViewModel.Summary);
-            Assert.Equal(publication.LatestPublishedReleaseVersion!.Published!.Value, publicationViewModel.Published);
+            Assert.Equal(releaseVersionPublishedDisplayDate, publicationViewModel.Published);
         }
 
         [Fact]

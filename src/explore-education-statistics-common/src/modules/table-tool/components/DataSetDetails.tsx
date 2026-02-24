@@ -7,12 +7,14 @@ import { SelectedRelease } from '@common/modules/table-tool/types/selectedPublic
 import ButtonText from '@common/components/ButtonText';
 import downloadService from '@common/services/downloadService';
 import { FeaturedTable, Subject } from '@common/services/tableBuilderService';
-import React, { ReactNode } from 'react';
+import React, { HTMLAttributes, ReactElement } from 'react';
 
 interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   isSubmitting: boolean;
-  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (
+    featuredTable: FeaturedTable,
+  ) => ReactElement<HTMLAttributes<HTMLElement>>;
   releaseVersion?: SelectedRelease;
   subject: Subject;
 }

@@ -18,7 +18,7 @@ jest.mock('@common/hooks/useMedia', () => ({
 }));
 
 describe('PublicationReleasePageHome', () => {
-  test('Does not render summary block and publication summary on desktop', () => {
+  test('Does not render summary block and publication summary on desktop', async () => {
     render(
       <PublicationReleasePageHome
         publicationSummary={testPublicationSummary}
@@ -26,6 +26,8 @@ describe('PublicationReleasePageHome', () => {
         homeContent={testReleaseHomeContent}
       />,
     );
+
+    await screen.findByTestId('home-content');
 
     expect(
       screen.queryByRole('heading', {
@@ -35,7 +37,7 @@ describe('PublicationReleasePageHome', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders summary block and publication summary on mobile with updates info', () => {
+  test('renders summary block and publication summary on mobile with updates info', async () => {
     mockIsMedia = true;
     render(
       <PublicationReleasePageHome
@@ -46,7 +48,7 @@ describe('PublicationReleasePageHome', () => {
     );
 
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         level: 2,
         name: 'Introduction',
       }),
@@ -103,7 +105,7 @@ describe('PublicationReleasePageHome', () => {
     mockIsMedia = false;
   });
 
-  test('renders summary section if summary content exists', () => {
+  test('renders summary section if summary content exists', async () => {
     render(
       <PublicationReleasePageHome
         publicationSummary={testPublicationSummary}
@@ -113,14 +115,14 @@ describe('PublicationReleasePageHome', () => {
     );
 
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         level: 2,
         name: 'Background information',
       }),
     ).toBeInTheDocument();
   });
 
-  test('does not render summary section if no summary content', () => {
+  test('does not render summary section if no summary content', async () => {
     render(
       <PublicationReleasePageHome
         publicationSummary={testPublicationSummary}
@@ -143,7 +145,7 @@ describe('PublicationReleasePageHome', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders headlines section', () => {
+  test('renders headlines section', async () => {
     render(
       <PublicationReleasePageHome
         publicationSummary={testPublicationSummary}
@@ -151,7 +153,7 @@ describe('PublicationReleasePageHome', () => {
         homeContent={testReleaseHomeContent}
       />,
     );
-    const headlinesSection = screen.getByTestId('headlines-section');
+    const headlinesSection = await screen.findByTestId('headlines-section');
     expect(headlinesSection).toBeInTheDocument();
 
     expect(
@@ -162,7 +164,7 @@ describe('PublicationReleasePageHome', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders content sections as normal sections on desktop', () => {
+  test('renders content sections as normal sections on desktop', async () => {
     render(
       <PublicationReleasePageHome
         publicationSummary={testPublicationSummary}
@@ -171,7 +173,7 @@ describe('PublicationReleasePageHome', () => {
       />,
     );
 
-    const content = screen.getByTestId('home-content');
+    const content = await screen.findByTestId('home-content');
     expect(content).toBeInTheDocument();
 
     expect(within(content).queryByTestId('accordion')).not.toBeInTheDocument();
@@ -186,7 +188,7 @@ describe('PublicationReleasePageHome', () => {
     ).toHaveAttribute('id', 'heading-section-1-heading');
   });
 
-  test('renders content sections as accordions on mobile', () => {
+  test('renders content sections as accordions on mobile', async () => {
     mockIsMedia = true;
     render(
       <PublicationReleasePageHome
@@ -196,7 +198,7 @@ describe('PublicationReleasePageHome', () => {
       />,
     );
 
-    const content = screen.getByTestId('home-content');
+    const content = await screen.findByTestId('home-content');
 
     expect(within(content).getByTestId('accordion')).toBeInTheDocument();
     expect(
