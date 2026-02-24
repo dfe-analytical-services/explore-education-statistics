@@ -47,12 +47,13 @@ Add text block with link to absence glossary entry to accordion section
     user adds text block to editable accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${block}=    user starts editing accordion section text block    Test section    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+    # We add text to avoid the "Enter content" error displaying when clicking the "Insert" toolbar button, which was causing the toolbar menu to not open
+    user presses keys    Test content block text
+
     ${toolbar}=    get editor toolbar    ${block}
-    ${insert}=    get child element    parent_locator=${toolbar}
-    ...    child_locator=css:[data-cke-tooltip-text="Insert"]
-    user clicks element    ${insert}
-    ${button}=    user gets button element    Insert glossary link    ${toolbar}
-    user clicks element    ${button}
+    user clicks element    css:[data-cke-tooltip-text="Insert"]    ${toolbar}
+    user clicks button    Insert glossary link
     ${modal}=    user waits until modal is visible    Insert glossary link
     user enters text into element    id:glossarySearch-input    abs
     user waits until page contains element    id:glossarySearch-options
