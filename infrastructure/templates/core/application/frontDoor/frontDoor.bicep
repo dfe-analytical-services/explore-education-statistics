@@ -33,13 +33,22 @@ param tagValues object
 
 var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
-// TODO EES-6883 - remove the "afd.explore-education" line below once we are ready to switch the public site DNS
+// TODO EES-6883 - remove the "afd.explore-education" lines below once we are ready to switch the public site DNS
 // over to Azure Front Door properly.  In the meantime, we will host the site through AFD on a temporary
 // https://<env name>afd.explore-education-statistics.service.gov.uk with an associated certificate so as
 // not to break the use of the environment for others.
 var publicSiteHostName = replaceMultiple(publicSiteUrl, {
-  'https://': ''
+  
+  // Handle the case for Prod to allow access via "https://afd.explore-education-statistics.service.gov.uk" during
+  // testing.
+  'https://explore-education': 'afd.explore-education'
+  
+  // Handle the case for all other environments to allow access via
+  // "https://<env>afd.explore-education-statistics.service.gov.uk" during testing.
   '.explore-education': 'afd.explore-education'
+  
+  // Finally, remove the "https://" from the URL to leave just the domain name.
+  'https://': ''
 })
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
@@ -207,9 +216,6 @@ resource doNotServeCachedContentForNextJsPrefetchesRule 'Microsoft.Cdn/profiles/
     ]
     matchProcessingBehavior: 'Continue'
   }
-  dependsOn: [
-    frontDoor
-  ]
 }
 
 resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
