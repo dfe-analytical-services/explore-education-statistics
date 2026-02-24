@@ -3,6 +3,7 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
+import { toolbarConfigLinkOnly } from '@admin/config/ckEditorConfig';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -68,6 +69,7 @@ const ReleaseContent = ({
   const { addContentSectionBlock } = useReleaseContentActions();
 
   const addSummaryBlockButton = useRef<HTMLButtonElement>(null);
+  const addWarningBlockButton = useRef<HTMLButtonElement>(null);
 
   const blockRouteChange = useMemo(() => {
     if (unsavedBlocks.length > 0) {
@@ -80,6 +82,21 @@ const ReleaseContent = ({
 
     return blocksWithCommentDeletions.length > 0;
   }, [unsavedBlocks, unsavedCommentDeletions]);
+
+  const addWarningBlock = useCallback(async () => {
+    const newBlock = await addContentSectionBlock({
+      releaseVersionId: release.id,
+      sectionId: release.warningSection.id,
+      sectionKey: 'warningSection',
+      block: {
+        type: 'HtmlBlock',
+        order: 0,
+        body: '',
+      },
+    });
+
+    focusAddedSectionBlockButton(newBlock.id);
+  }, [addContentSectionBlock, release.id, release.warningSection?.id]);
 
   const addSummaryBlock = useCallback(async () => {
     const newBlock = await addContentSectionBlock({
@@ -177,6 +194,12 @@ const ReleaseContent = ({
     }, 100);
   };
 
+  const onAfterDeleteWarningBlock = () => {
+    setTimeout(() => {
+      addWarningBlockButton.current?.focus();
+    }, 100);
+  };
+
   return (
     <>
       <RouteLeavingGuard
@@ -235,6 +258,53 @@ const ReleaseContent = ({
             }
             trackScroll
           />
+          <div id="releaseWarning" data-testid="release-warning">
+            {release.warningSection && (
+              <>
+                <EditableSectionBlocks
+                  blocks={release.warningSection.content}
+                  renderBlock={block => (
+                    <ReleaseBlock block={block} releaseVersionId={release.id} />
+                  )}
+                  renderEditableBlock={block => (
+                    <ReleaseEditableBlock
+                      allowComments
+                      block={block}
+                      editButtonLabel={
+                        <>
+                          Edit<VisuallyHidden> warning</VisuallyHidden> block
+                        </>
+                      }
+                      label="Warning block"
+                      publicationId={release.publication.id}
+                      releaseVersionId={release.id}
+                      removeButtonLabel={
+                        <>
+                          Remove<VisuallyHidden> warning</VisuallyHidden> block
+                        </>
+                      }
+                      sectionId={release.warningSection?.id || 'warningSection'}
+                      sectionKey="warningSection"
+                      toolbarConfig={toolbarConfigLinkOnly}
+                      onAfterDeleteBlock={onAfterDeleteWarningBlock}
+                    />
+                  )}
+                />
+                {editingMode === 'edit' &&
+                  release.warningSection?.content?.length === 0 && (
+                    <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+                      <Button
+                        variant="secondary"
+                        onClick={addWarningBlock}
+                        ref={addWarningBlockButton}
+                      >
+                        Add a warning text block
+                      </Button>
+                    </div>
+                  )}
+              </>
+            )}
+          </div>
 
           <div id="releaseSummary" data-testid="release-summary">
             {editingMode === 'edit' && (

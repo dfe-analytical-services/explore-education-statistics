@@ -184,6 +184,7 @@ export interface ReleaseVersion<
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
+  warningSection: ContentSection<ContentBlockType>;
   keyStatistics: KeyStatistic[];
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
