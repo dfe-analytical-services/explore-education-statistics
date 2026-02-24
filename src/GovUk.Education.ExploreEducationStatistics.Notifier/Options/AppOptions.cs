@@ -12,6 +12,10 @@ public class AppOptions
 
     public string PublicAppUrl { get; init; } = null!;
 
+    public string AdminAppUrl { get; init; } = null!;
+
+    public string BauEmail { get; init; } = null!;
+
     public string NotifierStorageConnectionString { get; init; } = null!;
 
     public string TokenSecretKey { get; init; } = null!;

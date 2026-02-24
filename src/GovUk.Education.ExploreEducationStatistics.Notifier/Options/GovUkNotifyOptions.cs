@@ -1,4 +1,3 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Validators;
 
@@ -41,6 +40,8 @@ public class GovUkNotifyOptions
         public string ApiSubscriptionVerificationId { get; init; } = null!;
 
         public string ReleasePublishingFeedbackId { get; init; } = null!;
+
+        public string EinTilesRequireUpdateId { get; init; } = null!;
 
         /// <summary>
         /// Returns the email template to use when a new breaking or non-breaking dataset version is published

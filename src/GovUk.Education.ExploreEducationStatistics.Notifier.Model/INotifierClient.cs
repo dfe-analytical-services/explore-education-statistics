@@ -2,18 +2,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 public interface INotifierClient
 {
-    public Task NotifyPublicationSubscribers(
+    Task NotifyPublicationSubscribers(
         IReadOnlyList<ReleaseNotificationMessage> messages,
         CancellationToken cancellationToken = default
     );
 
-    public Task NotifyApiSubscribers(
+    Task NotifyApiSubscribers(
         IReadOnlyList<ApiNotificationMessage> messages,
         CancellationToken cancellationToken = default
     );
 
-    public Task NotifyReleasePublishingFeedbackUsers(
+    Task NotifyReleasePublishingFeedbackUsers(
         IReadOnlyList<ReleasePublishingFeedbackMessage> messages,
+        CancellationToken cancellationToken = default
+    );
+
+    Task NotifyEinTilesRequireUpdate(
+        IReadOnlyList<EinTilesRequireUpdateMessage> messages,
         CancellationToken cancellationToken = default
     );
 }
