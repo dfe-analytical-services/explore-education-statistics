@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
@@ -22,6 +23,9 @@ public abstract class PublisherFunctionsIntegrationTest(PublisherFunctionsIntegr
 {
     public async Task InitializeAsync()
     {
+        fixture.NotifierClient.Invocations.Clear();
+        fixture.NotifierClient.Reset();
+
         ResetDbContext<ContentDbContext>();
         await ClearTestData<PublicDataDbContext>();
     }
@@ -40,6 +44,8 @@ public abstract class PublisherFunctionsIntegrationTest(PublisherFunctionsIntegr
 // ReSharper disable once ClassNeverInstantiated.Global
 public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
 {
+    public readonly Mock<INotifierClient> NotifierClient = new(MockBehavior.Strict);
+
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder("postgres:16.1-alpine").Build();
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder(
@@ -105,6 +111,8 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             .ConfigureServices(services =>
             {
                 services.MockService<IPublicBlobCacheService>(MockBehavior.Loose);
+
+                services.ReplaceService(NotifierClient);
 
                 services.UseInMemoryDbContext<ContentDbContext>(Guid.NewGuid().ToString());
 

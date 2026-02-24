@@ -4,12 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -21,6 +23,8 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
     public class PublishDataSetsTests(PublisherFunctionsIntegrationTestFixture fixture)
         : DataSetPublishingServiceTests(fixture)
     {
+        private readonly PublisherFunctionsIntegrationTestFixture _fixture = fixture;
+
         [Fact]
         public async Task FirstDataSetVersionPublished()
         {
@@ -53,6 +57,21 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
             Directory.CreateDirectory(draftFolderPath);
+
+            var expectedMessage = new ApiNotificationMessage
+            {
+                DataSetFileId = releaseDataFile.File.DataSetFileId!.Value,
+                DataSetId = dataSet.Id,
+                Version = dataSetVersion.PublicVersion,
+            };
+            _fixture
+                .NotifierClient.Setup(mock =>
+                    mock.NotifyApiSubscribers(
+                        It.Is<List<ApiNotificationMessage>>(messages => AssertMessage(messages, expectedMessage)),
+                        CancellationToken.None
+                    )
+                )
+                .Returns(Task.CompletedTask);
 
             var service = GetRequiredService<IDataSetPublishingService>();
             await service.PublishDataSets([releaseVersion.Id]);
@@ -127,6 +146,21 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersions[1]);
             Directory.CreateDirectory(draftFolderPath);
+
+            var expectedMessage = new ApiNotificationMessage
+            {
+                DataSetFileId = releaseDataFile.File.DataSetFileId!.Value,
+                DataSetId = dataSet.Id,
+                Version = dataSetVersions[1].PublicVersion,
+            };
+            _fixture
+                .NotifierClient.Setup(mock =>
+                    mock.NotifyApiSubscribers(
+                        It.Is<List<ApiNotificationMessage>>(messages => AssertMessage(messages, expectedMessage)),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
 
             var service = GetRequiredService<IDataSetPublishingService>();
             await service.PublishDataSets([releaseVersion.Id]);
@@ -357,6 +391,21 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
             var draftFolderPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion2);
             Directory.CreateDirectory(draftFolderPath);
 
+            var expectedMessage = new ApiNotificationMessage
+            {
+                DataSetFileId = newReleaseDataFile.File.DataSetFileId!.Value,
+                DataSetId = dataSet.Id,
+                Version = amendmentResultedInPatchReplacement ? "1.0.1" : "2.0",
+            };
+            _fixture
+                .NotifierClient.Setup(mock =>
+                    mock.NotifyApiSubscribers(
+                        It.Is<List<ApiNotificationMessage>>(messages => AssertMessage(messages, expectedMessage)),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
             var service = GetRequiredService<IDataSetPublishingService>();
             await service.PublishDataSets([amendmentReleaseVersion.Id]);
 
@@ -401,5 +450,15 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 Assert.Equal(amendmentReleaseDataFile.Id, savedDataSetVersion1.Release.ReleaseFileId);
             }
         }
+    }
+
+    private static bool AssertMessage(List<ApiNotificationMessage> messages, ApiNotificationMessage expectedMessage)
+    {
+        var message = Assert.Single(messages);
+        Assert.Equal(expectedMessage.DataSetFileId, message.DataSetFileId);
+        Assert.Equal(expectedMessage.DataSetId, message.DataSetId);
+        Assert.Equal(expectedMessage.Version, message.Version);
+
+        return true;
     }
 }

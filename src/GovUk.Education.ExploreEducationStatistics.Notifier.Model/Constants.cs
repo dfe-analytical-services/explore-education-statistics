@@ -12,6 +12,7 @@ public static class NotifierQueueStorage
     public const string ReleaseNotificationQueue = "release-notifications";
     public const string ApiNotificationQueue = "api-notifications";
     public const string ReleasePublishingFeedbackQueue = "release-publishing-feedback";
+    public const string EinTilesRequireUpdate = "ein-tiles-require-update";
 }
 
 public static class NotifierEmailTemplateFields

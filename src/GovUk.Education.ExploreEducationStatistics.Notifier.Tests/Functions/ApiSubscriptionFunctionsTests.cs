@@ -29,11 +29,13 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
     public class RequestPendingSubscriptionTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
+        private readonly NotifierFunctionsIntegrationTestFixture _fixture = fixture;
+
         [Fact]
         public async Task Success()
         {
             string? verificationUrl = null;
-            fixture
+            _fixture
                 .NotificationClient.Setup(mock =>
                     mock.SendEmail(
                         Email,
@@ -84,7 +86,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var subscription = await GetApiSubscriptionIfExists(dataSetId: _dataSetId, email: Email);
 
-            MockUtils.VerifyAllMocks(fixture.NotificationClient);
+            MockUtils.VerifyAllMocks(_fixture.NotificationClient);
 
             Assert.NotNull(subscription);
             Assert.Equal(Email, subscription.RowKey);
@@ -255,6 +257,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
     public class VerifySubscriptionTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
+        private readonly NotifierFunctionsIntegrationTestFixture _fixture = fixture;
+
         [Fact]
         public async Task Success()
         {
@@ -270,7 +274,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             await CreateApiSubscription(pendingSubscription);
 
             string? unsubscribeUrl = null;
-            fixture
+            _fixture
                 .NotificationClient.Setup(mock =>
                     mock.SendEmail(
                         Email,
@@ -310,7 +314,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             var result = await VerifySubscription(dataSetId: _dataSetId, token: subscribeToken);
 
-            MockUtils.VerifyAllMocks(fixture.NotificationClient);
+            MockUtils.VerifyAllMocks(_fixture.NotificationClient);
 
             var response = result.AssertOkObjectResult<ApiSubscriptionViewModel>();
 
@@ -554,6 +558,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
     public class NotifySubscribersTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
+        private readonly NotifierFunctionsIntegrationTestFixture _fixture = fixture;
+
         [Theory]
         [InlineData("2.0.0", "api-subscription-major-data-set-version-published-id")]
         [InlineData("2.0", "api-subscription-major-data-set-version-published-id")]
@@ -580,7 +586,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             };
             await CreateApiSubscription(subscription);
             string? unsubscribeUrl = null;
-            fixture
+            _fixture
                 .NotificationClient.Setup(mock =>
                     mock.SendEmail(
                         Email,
@@ -616,7 +622,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             await NotifyApiSubscribers(dataSetId: _dataSetId, dataSetFileId: _dataSetFileId, version: version);
 
-            MockUtils.VerifyAllMocks(fixture.NotificationClient);
+            MockUtils.VerifyAllMocks(_fixture.NotificationClient);
 
             // Assert that the unsubscribe link contains a valid token
             var extractedEmail = ExtractEmailFromSubscriptionLinkToken(unsubscribeUrl);
