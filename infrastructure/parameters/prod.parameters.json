@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "skuPublic": {
-      "value": "P1V2 PremiumV2"
+      "value": "P2V2 PremiumV2"
     },
     "skuData": {
       "value": "P1V2 PremiumV2"
