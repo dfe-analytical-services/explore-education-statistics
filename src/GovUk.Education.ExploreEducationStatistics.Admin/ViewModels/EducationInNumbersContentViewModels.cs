@@ -192,8 +192,8 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
             Statistic = statTile.Statistic,
             IndicatorUnit = statTile.IndicatorUnit,
             DecimalPlaces = statTile.DecimalPlaces,
-            PublicationSlug = statTile.Release?.Publication.Slug ?? null,
-            ReleaseSlug = statTile.Release?.Slug ?? null,
+            PublicationSlug = statTile.Release?.Publication.Slug,
+            ReleaseSlug = statTile.Release?.Slug,
         };
     }
 }

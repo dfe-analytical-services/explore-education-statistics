@@ -18,7 +18,7 @@ public class PublicDataSetRepository(PublicDataDbContext publicDataDbContext) : 
         string indicatorPublicId,
         CancellationToken cancellationToken = default
     ) =>
-        await publicDataDbContext.IndicatorMetas.SingleOrDefaultAsync(
+        await publicDataDbContext.IndicatorMetas.SingleOrDefaultAsync( // Using OrDefault so can return a more useful validation error if it isn't found
             im => im.DataSetVersionId == dataSetVersionId && im.PublicId == indicatorPublicId,
             cancellationToken
         );

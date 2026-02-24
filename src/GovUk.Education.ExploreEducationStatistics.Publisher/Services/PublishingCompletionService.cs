@@ -95,9 +95,9 @@ public class PublishingCompletionService(
 
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
-        await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
-
         await educationInNumbersService.UpdateEinTiles(releaseVersionIdsToUpdate);
+
+        await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()

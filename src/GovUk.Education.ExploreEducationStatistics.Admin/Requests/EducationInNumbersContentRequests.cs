@@ -55,8 +55,8 @@ public record EinFreeTextStatTileUpdateRequest
         {
             RuleFor(r => r.Title).NotEmpty().MaximumLength(2048);
             RuleFor(r => r.Statistic).NotEmpty();
-            RuleFor(x => x.LinkUrl).IsValidUrl().When(r => r.LinkUrl != null && r.LinkText != null);
-            RuleFor(x => x.LinkText).MinimumLength(1).When(r => r.LinkText != null && r.LinkUrl != null);
+            RuleFor(r => r.LinkUrl).IsValidUrl().When(r => r.LinkUrl != null && r.LinkText != null);
+            RuleFor(r => r.LinkText).MinimumLength(1).When(r => r.LinkText != null && r.LinkUrl != null);
         }
     }
 }
@@ -73,6 +73,7 @@ public record EinApiQueryStatTileUpdateRequest
         public Validator()
         {
             RuleFor(r => r.Title).NotEmpty().MaximumLength(2048);
+            RuleFor(r => r.DataSetId).NotEmpty();
             RuleFor(r => r.Version).NotEmpty().MaximumLength(32);
             RuleFor(r => r.Query).NotEmpty().IsValidJson();
         }

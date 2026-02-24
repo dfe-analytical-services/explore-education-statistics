@@ -1,11 +1,9 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
