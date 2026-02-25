@@ -26,30 +26,36 @@
     - [I get the following error when trying to run a UI test](#i-get-the-following-error-when-trying-to-run-a-ui-test)
 - [**Who should I talk to?**](#who-should-i-talk-to)
 
-
 ## What is this?
+
 This test framework runs UI tests against the Explore Education Statistics service using Selenium and Robot Framework.
 
 Currently, these tests are being maintained so they can be run on Windows and Ubuntu
 
-
 ## Pyenv installation
-  Pyenv is a tool for installing and managing multiple versions of Python on a single machine. It is the recommended way of installing and managing python.
 
-  See the [installation guide](https://github.com/pyenv/pyenv#installation) for details on how to install pyenv for your operating system  
+Pyenv is a tool for installing and managing multiple versions of Python on a single machine. It is the recommended way of installing and managing python.
+
+See the [installation guide](https://github.com/pyenv/pyenv#installation) for details on how to install pyenv for your operating system
 
 ## What do I need to install?
 
-Firstly, install Python 3.10. You can use pyenv to do this which is the recommended way of installing and managing python. See [pyenv installation instructions](
-  #pyenv-installation
-)
+Firstly, install Python 3.10. You can use pyenv to do this which is the recommended way of installing and managing python. See [pyenv installation instructions](#pyenv-installation)
 
+> **Installing Python via Homebrew?**
+> If using silicon Apple machine, ensure your homebrew is installed correctly in `/opt/homebrew/ and after installing python via homebrew ensure that it's the arm64 version installed
+>
+> ```sh
+> $ file $(which python)
+> # returns: Mach-O 64-bit executable arm64 (not x86)
+> ```
 
 Then ensure python and pip are included in your PATH environment variable
-   * `python --version` should return a version >= 3.10. If it doesn't you can try using the commands `python3` or `python3.10`, if you have multiple versions of python installed on your machine.
-   * To verify `pip` is installed, it is probably easiest to run entering `python -m pip` into a terminal. You should see the pip help text in response.
-   * For Windows, I needed to add `C:\Program Files\Python38` and `C:\Program Files\Python38\Scripts` to the `PATH` system variable. Check your Program Files directory to find out where Python is installed on your computer. A search engine will tell you how to add them to the `PATH`.
-   
+
+- `python --version` should return a version >= 3.10. If it doesn't you can try using the commands `python3` or `python3.10`, if you have multiple versions of python installed on your machine.
+- To verify `pip` is installed, it is probably easiest to run entering `python -m pip` into a terminal. You should see the pip help text in response.
+- For Windows, I needed to add `C:\Program Files\Python38` and `C:\Program Files\Python38\Scripts` to the `PATH` system variable. Check your Program Files directory to find out where Python is installed on your computer. A search engine will tell you how to add them to the `PATH`.
+
 Then install `pipenv`:
 
 ```bash
@@ -68,14 +74,14 @@ From the project root run:
 pipenv install
 ```
 
-If you intend to run the tests from your local machine, you will also need to create `.env` files for the relevant environments: 
+If you intend to run the tests from your local machine, you will also need to create `.env` files for the relevant environments:
 
 - `.env.local`
 - `.env.dev`
 - `.env.test`
 - `.env.preprod`
 - `.env.prod`
- 
+
 You can copy and rename the `.env.example` file in the `robot-tests` directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
 
 Variables you may want to set in a `.env` file are documented in `.env.example`.
@@ -84,17 +90,17 @@ Variables you may want to set in a `.env` file are documented in `.env.example`.
 
 In order to adhere to various linting & formatting rules, we use a few formatting and static-analysis tools to keep both Python & RobotFramework code clean. These are as follows:
 
-* [Flake8](https://pypi.org/project/flake8/): 
-We use Flake8 to verify pep8, pyflakes & circular complexity rules. 
+- [Flake8](https://pypi.org/project/flake8/):
+  We use Flake8 to verify pep8, pyflakes & circular complexity rules.
 
-* [Black](https://pypi.org/project/black/): 
-We use black to adhear to PEP8 and [the black code style](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html)
+- [Black](https://pypi.org/project/black/):
+  We use black to adhear to PEP8 and [the black code style](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html)
 
-* [Isort](https://pypi.org/project/isort/):
-We use Isort to organise imports
+- [Isort](https://pypi.org/project/isort/):
+  We use Isort to organise imports
 
-* [Robotframework-tidy](https://pypi.org/project/robotframework-tidy/):
-We use RobotFramework-tidy to format robotframework test code
+- [Robotframework-tidy](https://pypi.org/project/robotframework-tidy/):
+  We use RobotFramework-tidy to format robotframework test code
 
 ## How do I run the tests?
 
@@ -151,21 +157,25 @@ You can force a specific version by using the script's `--chromedriver <version>
 
 The latest version of chromedriver should always work for the pipeline. But if you need a specific version for the CI pipeline, you will need to add the `--chromedriver` argument to the `run_tests.py` call inside `scripts/run_tests_pipeline.py`. You can check [this repository](https://github.com/actions/virtual-environments/tree/master/images) for the version of chrome used on the Azure agent you're using. At the time of writing, the robot tests use the [Ubuntu 22.04 image](https://github.com/actions/virtual-environments/blob/master/images/linux).
 
-
 ## Directory structure
+
 This section details what the various directories in robot-tests contain.
 
 ## scripts
+
 This directory holds scripts used by `run_tests.py` and the CI pipeline.
 
 ## test-results
+
 This directory holds the output of a test run, including the test report and log. Screenshots are preserved across runs, but other files are overwritten.
 
 ## tests
+
 This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` doesn't contain tests, but utility keywords used by the tests. Similar to `libs`, `files` contains files used by the tests.
 
 ## Snapshots
-To monitor changes to pages on Production, we use snapshots that are stored in `robot-tests/tests/snapshots`. These snapshots are created using the `create_snapshots.py` script in the `robot-tests/scripts` directory. 
+
+To monitor changes to pages on Production, we use snapshots that are stored in `robot-tests/tests/snapshots`. These snapshots are created using the `create_snapshots.py` script in the `robot-tests/scripts` directory.
 
 You can refresh the current snapshots by running:
 
@@ -176,10 +186,10 @@ pipenv run python scripts/create_snapshots.py
 
 These snapshot files are used by the test suite `tests/general_public/check_snapshots.robot`. If the snapshot doesn't match the current page, the test case fails, and an alert is sent to Slack.
 
-
 ## Guidelines for people writing UI tests
 
 ## Parallelism / Pabot
+
 It is essential that the test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. This might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.
 
 For this reason, you **MUST** ensure that if a test suite changes test data, that you create test new data to be used specifically with that suite. Be careful if scavenging test data from other test suites! Ideally, every test suite will use test data that is only used by those particular tests.
@@ -195,22 +205,26 @@ can be found in the [Seed Data README](tests/robot-tests/tests/seed_data/README.
 
 ## IDE
 
-If searching for an IDE to add/edit these tests, consider using IntelliJ, Pycharm or VScode with the following extensions: 
+If searching for an IDE to add/edit these tests, consider using IntelliJ, Pycharm or VScode with the following extensions:
 
-IntelliJ / Pycharm: 
-- [IntelliBot](https://plugins.jetbrains.com/plugin/7386-intellibot) 
+IntelliJ / Pycharm:
+
+- [IntelliBot](https://plugins.jetbrains.com/plugin/7386-intellibot)
 - [Robot Plugin](https://plugins.jetbrains.com/plugin/7430-robot-plugin)
 
 VScode:
+
 - [Robot Framework Intellisense](https://marketplace.visualstudio.com/items?itemName=TomiTurtiainen.rf-intellisense)
 
 ### Additional IntelliJ settings
-  This should give you autocompletion and allow you to click through to keywords defined in both `.robot` and `.py` files. For this to work in, you'll need to change the Project Structure to use "No SDK".
 
-  IntelliJ also allows you use to External Tools to right click on a file and run that file exclusively with these settings:
-  - Program: `/home/${USER}/.local/bin/pipenv` OR `C:\Python38\Scripts\pipenv.exe` OR wherever pipenv is located -- use `whereis pipenv` on linux or `where pipenv` on windows
-  - Arguments: `run python run_tests.py --visual -i robot -f "$FilePath$" -e dev`
-  - Working directory: `$ProjectFileDir$` (which should represent the robot-tests directory. You may have to do something like `$ProjectFileDir$/../tests/robot-tests`)
+This should give you autocompletion and allow you to click through to keywords defined in both `.robot` and `.py` files. For this to work in, you'll need to change the Project Structure to use "No SDK".
+
+IntelliJ also allows you use to External Tools to right click on a file and run that file exclusively with these settings:
+
+- Program: `/home/${USER}/.local/bin/pipenv` OR `C:\Python38\Scripts\pipenv.exe` OR wherever pipenv is located -- use `whereis pipenv` on linux or `where pipenv` on windows
+- Arguments: `run python run_tests.py --visual -i robot -f "$FilePath$" -e dev`
+- Working directory: `$ProjectFileDir$` (which should represent the robot-tests directory. You may have to do something like `$ProjectFileDir$/../tests/robot-tests`)
 
 ## Visual testing - tables, charts and permalinks
 
@@ -224,7 +238,7 @@ Try running the frontend with `pnpm build & pnpm start`.
 
 ### Test fails after not finding an element after x amount of seconds.
 
-Try using the following command to run the tests: 
+Try using the following command to run the tests:
 
 You can also increase the length of waits via arguments to `run_tests.py`. You can see the options available by running `pipenv run python run_tests.py --help`.
 
@@ -232,7 +246,7 @@ To find the specific keyword that needs an increased wait, you can see what fail
 
 You can also increase the length of waits via environment variables. See the variables listed in `.env.example`. Change the relevant `.env.*` file when running tests locally, or by changing Azure DevOps variables for the CI pipeline.
 
-### I get the following error when trying to run a UI test 
+### I get the following error when trying to run a UI test
 
 ```
     raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
@@ -251,20 +265,24 @@ Traceback (most recent call last):
     raise AssertionError('Error when entering/submitting password')
 AssertionError: Error when entering/submitting password
 ```
+
 This error typically occurs when the BAU user password has expired and `setup_auth_variables` fails to login as the BAU user. You will need to update the password for the following users (as they usually expire around the same time).
-* BAU 
-* Analyst 
-* Pre-release
+
+- BAU
+- Analyst
+- Pre-release
 
 ### running-snapshot-tests
+
 Refer to the `create_snapshots.py` script for more information (located in `robot-tests/scripts`).
 
 ### Library-bugs
 
-There are currently some bugs with the libraries we use for testing. This mainly pertains to running the tests on Mac. This bug basically means that the tests will fail when trying to operate the keyboard. 
+There are currently some bugs with the libraries we use for testing. This mainly pertains to running the tests on Mac. This bug basically means that the tests will fail when trying to operate the keyboard.
 See the open issue raised [here](https://github.com/robotframework/SeleniumLibrary/issues/1803)
 
 ## Who should I talk to?
+
 Mark Youngman
 Duncan Watson
 Nusrath Mohammed
