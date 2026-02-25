@@ -48,7 +48,7 @@
       "value": "pre-production.explore-education-statistics.service.gov.uk"
     },
     "contentApiUrl": {
-      "value": "s101p02-as-ees-content.azurewebsites.net"
+      "value": "cont.pre-production.explore-education-statistics.service.gov.uk"
     },
     "dataApiUrl": {
       "value": "data.pre-production.explore-education-statistics.service.gov.uk"
