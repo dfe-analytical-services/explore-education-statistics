@@ -8,8 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using LinqToDB.Async;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.UserResourceRolesMigration;
 
@@ -55,6 +55,7 @@ public class UserResourceRolesMigrationService(
                 // then we should investigate how the systems got out of SYNC before proceeding with the migration.
                 var newPermissionsSystemRolesToRemove = await userPublicationRoleRepository
                     .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
+                    .AsNoTracking()
                     .Where(upr => newPermissionsSystemRoleIdsToRemove.Contains(upr.Id))
                     .ToListAsync(cancellationToken);
 
@@ -110,6 +111,7 @@ public class UserResourceRolesMigrationService(
     {
         var groupedUserPublicationRoles = await userPublicationRoleRepository
             .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
+            .AsNoTracking()
             .GroupBy(upr => new { upr.UserId, upr.PublicationId })
             .Select(g => new GroupedUserPublicationRoles(
                 g.Key.UserId,
@@ -127,6 +129,7 @@ public class UserResourceRolesMigrationService(
 
         var groupedUserReleaseRoles = await userReleaseRoleRepository
             .Query(ResourceRoleFilter.All)
+            .AsNoTracking()
             .Select(urr => new
             {
                 urr.Id,
