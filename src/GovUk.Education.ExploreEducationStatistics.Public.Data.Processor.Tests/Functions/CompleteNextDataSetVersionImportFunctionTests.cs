@@ -348,15 +348,13 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            var dataSetVersionMapping = new DataSetVersionMapping
-            {
-                SourceDataSetVersionId = dataSet.LatestLiveVersionId!.Value,
-                TargetDataSetVersionId = nextDataSetVersion.Id,
-                FilterMappingPlan = new FilterMappingPlan(),
-                LocationMappingPlan = new LocationMappingPlan(),
-                LocationMappingsComplete = true,
-                FilterMappingsComplete = true,
-            };
+            DataSetVersionMapping dataSetVersionMapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(dataSet.LatestLiveVersionId!.Value)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingsComplete()
+                .WithFilterMappingsComplete()
+                .WithIndicatorMappingsComplete();
 
             await fixture
                 .GetPublicDataDbContext()

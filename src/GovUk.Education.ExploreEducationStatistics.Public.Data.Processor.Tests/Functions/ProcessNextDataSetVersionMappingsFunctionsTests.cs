@@ -139,75 +139,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
         }
 
         [Fact]
-        public async Task Success_HasDeletedIndicators_True()
-        {
-            var initialVersionMeta = new DataSetVersionMeta
-            {
-                IndicatorMetas = DataFixture.DefaultIndicatorMeta().GenerateList(2),
-                GeographicLevelMeta = DataFixture
-                    .DefaultGeographicLevelMeta()
-                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
-            };
-
-            var (instanceId, _, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
-                Stage.PreviousStage(),
-                initialVersionMeta
-            );
-
-            await CreateMappings(instanceId);
-
-            var mapping = await GetDataSetVersionMapping(nextVersion);
-
-            Assert.True(mapping.HasDeletedIndicators);
-        }
-
-        [Fact]
-        public async Task Success_HasDeletedIndicators_SameIndicators_False()
-        {
-            var initialVersionMeta = new DataSetVersionMeta
-            {
-                IndicatorMetas = ProcessorTestData.AbsenceSchool.ExpectedIndicators,
-                GeographicLevelMeta = DataFixture
-                    .DefaultGeographicLevelMeta()
-                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
-            };
-
-            var (instanceId, _, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
-                Stage.PreviousStage(),
-                initialVersionMeta
-            );
-
-            await CreateMappings(instanceId);
-
-            var mapping = await GetDataSetVersionMapping(nextVersion);
-
-            Assert.False(mapping.HasDeletedIndicators);
-        }
-
-        [Fact]
-        public async Task Success_HasDeletedIndicators_NewIndicators_False()
-        {
-            var initialVersionMeta = new DataSetVersionMeta
-            {
-                IndicatorMetas = ProcessorTestData.AbsenceSchool.ExpectedIndicators[..2],
-                GeographicLevelMeta = DataFixture
-                    .DefaultGeographicLevelMeta()
-                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
-            };
-
-            var (instanceId, _, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
-                Stage.PreviousStage(),
-                initialVersionMeta
-            );
-
-            await CreateMappings(instanceId);
-
-            var mapping = await GetDataSetVersionMapping(nextVersion);
-
-            Assert.False(mapping.HasDeletedIndicators);
-        }
-
-        [Fact]
         public async Task Success_HasDeletedGeographicLevels_True()
         {
             var initialVersionMeta = new DataSetVersionMeta
@@ -580,6 +511,77 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
         }
     }
 
+    public class CreateMappingsIndicatorsTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
+        : CreateMappingsTests(fixture)
+    {
+        [Fact]
+        public async Task Success_Mappings()
+        {
+            var (instanceId, initialVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
+                Stage.PreviousStage()
+            );
+
+            var initialIndicatorMeta = DataFixture
+                .DefaultIndicatorMeta()
+                .WithDataSetVersionId(initialVersion.Id)
+                .GenerateList(2);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context => context.IndicatorMetas.AddRange(initialIndicatorMeta));
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.Equal(initialVersion.Id, mapping.SourceDataSetVersionId);
+            Assert.Equal(nextVersion.Id, mapping.TargetDataSetVersionId);
+            Assert.False(mapping.IndicatorMappingsComplete);
+
+            var expectedIndicatorMappings = initialIndicatorMeta.ToDictionary(
+                keySelector: MappingKeyGenerators.IndicatorMeta,
+                elementSelector: indicator => new IndicatorMapping
+                {
+                    CandidateKey = null,
+                    PublicId = indicator.PublicId,
+                    Source = new MappableIndicator { Label = indicator.Label },
+                }
+            );
+
+            // TODO EES-6764 - remove null-forgiving operator.
+            mapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+                expectedIndicatorMappings,
+                ignoreCollectionOrders: true
+            );
+        }
+
+        [Fact]
+        public async Task Success_Candidates()
+        {
+            var (instanceId, initialVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
+                Stage.PreviousStage()
+            );
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.Equal(initialVersion.Id, mapping.SourceDataSetVersionId);
+            Assert.Equal(nextVersion.Id, mapping.TargetDataSetVersionId);
+
+            var expectedIndicatorTargets = ProcessorTestData.AbsenceSchool.ExpectedIndicators.ToDictionary(
+                keySelector: MappingKeyGenerators.IndicatorMeta,
+                elementSelector: indicator => new MappableIndicator { Label = indicator.Label }
+            );
+
+            // TODO EES-6764 - remove null-forgiving operator.
+            mapping.IndicatorMappingPlan!.Candidates.AssertDeepEqualTo(
+                expectedIndicatorTargets,
+                ignoreCollectionOrders: true
+            );
+        }
+    }
+
     public abstract class ApplyAutoMappingsTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : ProcessNextDataSetVersionMappingsFunctionsTests(fixture)
     {
@@ -611,6 +613,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                             TargetDataSetVersionId = nextVersion.Id,
                             LocationMappingPlan = new LocationMappingPlan(),
                             FilterMappingPlan = new FilterMappingPlan(),
+                            IndicatorMappingPlan = new IndicatorMappingPlan(),
                         }
                     )
                 );
@@ -1873,6 +1876,240 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
 
             // Is an exact match but as there are deleted time periods so needs to be a major update.
             await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+    }
+
+    public class ApplyAutoMappingsIndicatorsTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
+        : ApplyAutoMappingsTests(fixture)
+    {
+        [Fact]
+        public async Task PartiallyComplete_MinorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
+                Stage.PreviousStage()
+            );
+
+            // Create a mapping plan based on 2 data set versions with partially overlapping indicators.
+            // The source has "Indicator 1" and "Indicator 2".
+            // The target has "Indicator 2" and "Indicator 3".
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithIndicatorMappingPlan(
+                    DataFixture
+                        .DefaultIndicatorMappingPlan()
+                        .AddIndicatorMapping(
+                            columnName: "indicator_1",
+                            mapping: DataFixture
+                                .DefaultIndicatorMapping()
+                                .WithSource(DataFixture.DefaultMappableIndicator().WithLabel("Indicator 1"))
+                                .WithNoMapping()
+                        )
+                        .AddIndicatorMapping(
+                            columnName: "indicator_2",
+                            mapping: DataFixture
+                                .DefaultIndicatorMapping()
+                                .WithSource(DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2"))
+                                .WithNoMapping()
+                        )
+                        .AddIndicatorCandidate(
+                            columnName: "indicator_2",
+                            candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2")
+                        )
+                        .AddIndicatorCandidate(
+                            columnName: "indicator_3",
+                            candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 3")
+                        )
+                        .Generate()
+                );
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            Dictionary<string, IndicatorMapping> expectedIndicatorMappings = new()
+            {
+                {
+                    "indicator_1",
+                    mapping.GetIndicatorMapping("indicator_1")! with
+                    {
+                        // The code did not manage to establish an automapping for this indicator.
+                        Type = MappingType.AutoNone,
+                        CandidateKey = null,
+                    }
+                },
+                {
+                    "indicator_2",
+                    mapping.GetIndicatorMapping("indicator_2")! with
+                    {
+                        // The code managed to establish an automapping for this indicator.
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "indicator_2",
+                    }
+                },
+            };
+
+            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+                expectedIndicatorMappings,
+                ignoreCollectionOrders: true
+            );
+
+            Assert.False(updatedMapping.IndicatorMappingsComplete);
+
+            // Some source indicators have not yet been mapped but possible candidates exist, thus
+            // resulting in a minor version update for now.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+        }
+
+        [Fact]
+        public async Task Complete_ExactMatch_MinorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
+                Stage.PreviousStage()
+            );
+
+            // Create a mapping plan based on 2 data set versions with exactly-matching indicators.
+            // The source has "Indicator 1" and "Indicator 2".
+            // The target has "Indicator 1" and "Indicator 2".
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithIndicatorMappingPlan(
+                    DataFixture
+                        .DefaultIndicatorMappingPlan()
+                        .AddIndicatorMapping(
+                            columnName: "indicator_1",
+                            mapping: DataFixture
+                                .DefaultIndicatorMapping()
+                                .WithSource(DataFixture.DefaultMappableIndicator().WithLabel("Indicator 1"))
+                                .WithNoMapping()
+                        )
+                        .AddIndicatorMapping(
+                            columnName: "indicator_2",
+                            mapping: DataFixture
+                                .DefaultIndicatorMapping()
+                                .WithSource(DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2"))
+                                .WithNoMapping()
+                        )
+                        .AddIndicatorCandidate(
+                            columnName: "indicator_1",
+                            candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 1")
+                        )
+                        .AddIndicatorCandidate(
+                            columnName: "indicator_2",
+                            candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2")
+                        )
+                        .Generate()
+                );
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            Dictionary<string, IndicatorMapping> expectedIndicatorMappings = new()
+            {
+                {
+                    "indicator_1",
+                    mapping.GetIndicatorMapping("indicator_1")! with
+                    {
+                        // The code managed to establish an automapping for this indicator.
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "indicator_1",
+                    }
+                },
+                {
+                    "indicator_2",
+                    mapping.GetIndicatorMapping("indicator_2")! with
+                    {
+                        // The code managed to establish an automapping for this indicator.
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "indicator_2",
+                    }
+                },
+            };
+
+            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+                expectedIndicatorMappings,
+                ignoreCollectionOrders: true
+            );
+
+            Assert.True(updatedMapping.IndicatorMappingsComplete);
+
+            // All indicators were automapped, resulting in a minor version update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+        }
+
+        [Fact]
+        public async Task Complete_AllSourcesMapped_NewCandidatesExist_MinorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
+                Stage.PreviousStage()
+            );
+
+            // Create a mapping plan based on 2 data set versions with matching indicators, but where the target
+            // data set version also contains additional indicators.
+            // The source has "Indicator 1".
+            // The target has "Indicator 1" and, additionally, "Indicator 2".
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithIndicatorMappingPlan(
+                    DataFixture
+                        .DefaultIndicatorMappingPlan()
+                        .AddIndicatorMapping(
+                            columnName: "indicator_1",
+                            mapping: DataFixture
+                                .DefaultIndicatorMapping()
+                                .WithSource(DataFixture.DefaultMappableIndicator().WithLabel("Indicator 1"))
+                                .WithNoMapping()
+                        )
+                        .AddIndicatorCandidate(
+                            columnName: "indicator_1",
+                            candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 1")
+                        )
+                        .AddIndicatorCandidate(
+                            columnName: "indicator_2",
+                            candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2")
+                        )
+                        .Generate()
+                );
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            Dictionary<string, IndicatorMapping> expectedIndicatorMappings = new()
+            {
+                {
+                    "indicator_1",
+                    mapping.GetIndicatorMapping("indicator_1")! with
+                    {
+                        // The code managed to establish an automapping for this indicator.
+                        Type = MappingType.AutoMapped,
+                        CandidateKey = "indicator_1",
+                    }
+                },
+            };
+
+            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+                expectedIndicatorMappings,
+                ignoreCollectionOrders: true
+            );
+
+            Assert.True(updatedMapping.IndicatorMappingsComplete);
+
+            // All indicators were automapped, resulting in a minor version update. The inclusion of new indicators
+            // not present in the original version does not matter.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
     }
 
