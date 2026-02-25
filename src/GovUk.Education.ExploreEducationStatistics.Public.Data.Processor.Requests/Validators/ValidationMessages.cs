@@ -79,4 +79,9 @@ public static class ValidationMessages
         Code: nameof(NextDataSetVersionNotFound),
         Message: "The data set version required for creating the next version was not found."
     );
+
+    public static readonly LocalizableMessage SourceDataSetVersionNotFound = new(
+        Code: nameof(SourceDataSetVersionNotFound),
+        Message: "The source data set version was not found for mapping."
+    );
 }
