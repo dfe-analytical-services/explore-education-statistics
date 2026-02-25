@@ -2,7 +2,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.UserResourceRolesMigration.Dtos;
 
 /// <summary>
-/// TODO EES-XXXX Remove after the User Resource Roles migration is complete.
+/// TODO EES-6957 Remove after the User Resource Roles migration is complete.
 /// </summary>
 public record UserResourceRolesMigrationReportDto
 {
@@ -11,4 +11,5 @@ public record UserResourceRolesMigrationReportDto
     public required int NumberOfDrafterRolesCreated { get; init; }
     public required int NumberOfApproverRolesRemoved { get; init; }
     public required int NumberOfApproverRolesCreated { get; init; }
+    public required HashSet<Guid> IdsOfRolesRemoved { get; init; }
 }

@@ -13,7 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.UserResourceRolesMigration;
 
 /// <summary>
-/// TODO EES-XXXX Remove after the User Resource Roles migration is complete.
+/// TODO EES-6957 Remove after the User Resource Roles migration is complete.
 /// </summary>
 public abstract class UserResourceRolesMigrationServiceTests
 {
