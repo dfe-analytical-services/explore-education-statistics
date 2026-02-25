@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -3514,26 +3515,7 @@ public class PublicationServiceTests
         IPublicationRepository? publicationRepository
     )
     {
-        var userRepository = new UserRepository(context);
-
-        var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
-
-        var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
-
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext: context,
-            newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-            userRepository: userRepository
-        );
-
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(
-            contentDbContext: context,
-            userPublicationRoleRepository: userPublicationRoleRepository,
-            newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-            userRepository: userRepository
-        );
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(context);
 
         return new PublicationRepository(
             context: context,

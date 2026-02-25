@@ -37,6 +37,7 @@ public interface IUserPublicationRoleRepository
 
     /// <summary>
     /// <para>
+    /// Return a queryable representation of all user publication roles, with the option to filter by their status (see <see cref="ResourceRoleFilter"/>).
     /// The optional <paramref name="includeNewPermissionsSystemRoles"/> parameter will be removed once we remove all OLD publication
     /// roles from the DB in STEP 11 (EES-6212) of the Permissions Rework. For now, in certain situations, we need to be able to grab
     /// ALL of the publication roles (NEW &amp; OLD permissions system roles).

@@ -6,54 +6,180 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class NewPermissionsSystemHelperTests
 {
-    // (publicationRoleToCreate, existingPublicationRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
+    // (publicationRoleToCreate, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         PublicationRole,
         HashSet<PublicationRole>,
+        HashSet<ReleaseRole>,
         PublicationRole?,
         PublicationRole?
     > PublicationRoleCreationData =>
         new()
         {
-            { PublicationRole.Owner, [], null, PublicationRole.Drafter },
-            { PublicationRole.Owner, [PublicationRole.Allower], null, PublicationRole.Drafter },
-            { PublicationRole.Owner, [PublicationRole.Approver], null, null },
-            { PublicationRole.Owner, [PublicationRole.Drafter], null, null },
-            { PublicationRole.Drafter, [], null, PublicationRole.Drafter },
-            { PublicationRole.Drafter, [PublicationRole.Allower], null, PublicationRole.Drafter },
-            { PublicationRole.Drafter, [PublicationRole.Approver], null, null },
-            { PublicationRole.Drafter, [PublicationRole.Drafter], null, null },
-            { PublicationRole.Allower, [], null, PublicationRole.Approver },
-            { PublicationRole.Allower, [PublicationRole.Owner], null, PublicationRole.Approver },
-            { PublicationRole.Allower, [PublicationRole.Approver], null, null },
-            { PublicationRole.Allower, [PublicationRole.Drafter], PublicationRole.Drafter, PublicationRole.Approver },
-            { PublicationRole.Approver, [], null, PublicationRole.Approver },
-            { PublicationRole.Approver, [PublicationRole.Owner], null, PublicationRole.Approver },
-            { PublicationRole.Approver, [PublicationRole.Approver], null, null },
-            { PublicationRole.Approver, [PublicationRole.Drafter], PublicationRole.Drafter, PublicationRole.Approver },
+            // csharpier-ignore-start
+            { PublicationRole.Owner, [], [], null, PublicationRole.Drafter },
+            { PublicationRole.Owner, [], [ReleaseRole.PrereleaseViewer], null, PublicationRole.Drafter },
+            { PublicationRole.Owner, [], [ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { PublicationRole.Owner, [], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [], [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower], [], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Approver], [], PublicationRole.Approver, PublicationRole.Drafter },
+            { PublicationRole.Owner, [PublicationRole.Drafter], [], null, null },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Approver], [], null, null },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower], [ReleaseRole.Approver, ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { PublicationRole.Owner, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null},
+            { PublicationRole.Owner, [PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Owner, [PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Contributor], null, null },
+            { PublicationRole.Owner, [PublicationRole.Drafter], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Owner, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Contributor], null, null },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [], [], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [], [ReleaseRole.PrereleaseViewer], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [], [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner], [], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Approver], [], null, null },
+            { PublicationRole.Allower, [PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Approver], [], null, null },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner], [ReleaseRole.Approver, ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Allower, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null},
+            { PublicationRole.Allower, [PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Allower, [PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Contributor], null, null },
+            { PublicationRole.Allower, [PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Contributor], null, null },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            // csharpier-ignore-end
         };
 
-    // (releaseRoleToCreate, existingPublicationRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
+    // (releaseRoleToCreate, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         ReleaseRole,
         HashSet<PublicationRole>,
+        HashSet<ReleaseRole>,
         PublicationRole?,
         PublicationRole?
     > ReleaseRoleCreationData =>
         new()
         {
-            { ReleaseRole.PrereleaseViewer, [], null, null },
-            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower], null, null },
-            { ReleaseRole.PrereleaseViewer, [PublicationRole.Approver], null, null },
-            { ReleaseRole.PrereleaseViewer, [PublicationRole.Drafter], null, null },
-            { ReleaseRole.Contributor, [], null, PublicationRole.Drafter },
-            { ReleaseRole.Contributor, [PublicationRole.Allower], null, PublicationRole.Drafter },
-            { ReleaseRole.Contributor, [PublicationRole.Approver], null, null },
-            { ReleaseRole.Contributor, [PublicationRole.Drafter], null, null },
-            { ReleaseRole.Approver, [], null, PublicationRole.Approver },
-            { ReleaseRole.Approver, [PublicationRole.Owner], null, PublicationRole.Approver },
-            { ReleaseRole.Approver, [PublicationRole.Approver], null, null },
-            { ReleaseRole.Approver, [PublicationRole.Drafter], PublicationRole.Drafter, PublicationRole.Approver },
+            // csharpier-ignore-start
+            { ReleaseRole.PrereleaseViewer, [], [], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner], [], null, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower], [], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Approver], [], PublicationRole.Approver, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Drafter], [], PublicationRole.Drafter, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Approver], [], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Drafter], [], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Approver], [], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [], [ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner], [ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Drafter], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [], [], null, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Owner], [], null, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Allower], [], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Approver], [], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Drafter], [], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Approver], [], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Drafter], [], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Approver], [], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver], [], null, null },
+            { ReleaseRole.Contributor, [], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [], [], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner], [], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower], [], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Approver], [], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Approver], [], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Approver], [], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver], [], null, null },
+            { ReleaseRole.Approver, [], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            // csharpier-ignore-end
         };
 
     // (oldPublicationRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
@@ -66,88 +192,50 @@ public class NewPermissionsSystemHelperTests
     > PublicationRoleRemovalData =>
         new()
         {
-            // Tests for the NEW `Drafter` publication role
-            // no release role for same publication maps to 'Drafter' + the NEW publication role does NOT exist => Does NOTHING
-            {
-                PublicationRole.Owner,
-                [PublicationRole.Owner, PublicationRole.Allower],
-                [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver],
-                null,
-                null
-            },
-            // 1 release role for same publication maps to 'Drafter' + the NEW publication role does NOT exist => Does NOTHING
-            {
-                PublicationRole.Owner,
-                [PublicationRole.Owner, PublicationRole.Allower],
-                [ReleaseRole.Contributor],
-                null,
-                null
-            },
-            // no release role for same publication maps to 'Drafter' + the NEW publication role DOES exist => Deletes 'Drafter' role
-            {
-                PublicationRole.Owner,
-                [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter],
-                [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver],
-                PublicationRole.Drafter,
-                null
-            },
-            // 1 release role for same publication maps to 'Drafter' + the NEW publication role DOES exist => Does NOTHING
-            {
-                PublicationRole.Owner,
-                [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter],
-                [ReleaseRole.Contributor],
-                null,
-                null
-            },
-            // Tests for the NEW `Approver` publication role
-            // no release role for same publication maps to 'Approver' + the NEW publication role does NOT exist => Does NOTHING
-            {
-                PublicationRole.Allower,
-                [PublicationRole.Allower, PublicationRole.Owner],
-                [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor],
-                null,
-                null
-            },
-            // 1 release role for same publication maps to 'Approver' + the NEW publication role does NOT exist => Does NOTHING
-            {
-                PublicationRole.Allower,
-                [PublicationRole.Allower, PublicationRole.Owner],
-                [ReleaseRole.Approver],
-                null,
-                null
-            },
-            // no other role maps to 'Drafter' + no release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Deletes 'Approver' role
-            {
-                PublicationRole.Allower,
-                [PublicationRole.Allower, PublicationRole.Approver],
-                [ReleaseRole.PrereleaseViewer],
-                PublicationRole.Approver,
-                null
-            },
-            // 1 publication role maps to 'Drafter' + no release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
-            {
-                PublicationRole.Allower,
-                [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver],
-                [ReleaseRole.PrereleaseViewer],
-                PublicationRole.Approver,
-                PublicationRole.Drafter
-            },
-            // 1 release role maps to 'Drafter' + no release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
-            {
-                PublicationRole.Allower,
-                [PublicationRole.Allower, PublicationRole.Approver],
-                [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor],
-                PublicationRole.Approver,
-                PublicationRole.Drafter
-            },
-            // 1 release role for same publication maps to 'Approver' + the NEW publication role DOES exist => Does NOTHING
-            {
-                PublicationRole.Allower,
-                [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver],
-                [ReleaseRole.Approver],
-                null,
-                null
-            },
+            // csharpier-ignore-start
+            { PublicationRole.Owner, [PublicationRole.Owner], [], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower], [], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Drafter], [], PublicationRole.Drafter, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Approver], [], PublicationRole.Approver, null },
+            { PublicationRole.Owner, [PublicationRole.Owner], [ReleaseRole.PrereleaseViewer], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner], [ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { PublicationRole.Owner, [PublicationRole.Owner], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { PublicationRole.Owner, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Allower], [], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner], [], null, PublicationRole.Drafter },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Drafter], [], PublicationRole.Drafter, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Approver], [], PublicationRole.Approver, null },
+            { PublicationRole.Allower, [PublicationRole.Allower], [ReleaseRole.PrereleaseViewer], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower], [ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { PublicationRole.Allower, [PublicationRole.Allower], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner], [ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver], [], PublicationRole.Approver, PublicationRole.Drafter },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Drafter], [], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { PublicationRole.Allower, [PublicationRole.Allower, PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            // csharpier-ignore-end
         };
 
     // (releaseRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
@@ -160,88 +248,86 @@ public class NewPermissionsSystemHelperTests
     > ReleaseRoleRemovalData =>
         new()
         {
-            // Tests for the NEW `Drafter` publication role
-            // no OLD publication role maps to 'Drafter', the NEW publication role does NOT exist => Does NOTHING
-            {
-                ReleaseRole.Contributor,
-                [PublicationRole.Allower],
-                [ReleaseRole.Contributor, ReleaseRole.Approver],
-                null,
-                null
-            },
-            // 1 OLD publication role maps to 'Drafter', the NEW publication role does NOT exist => Does NOTHING
-            {
-                ReleaseRole.Contributor,
-                [PublicationRole.Owner],
-                [ReleaseRole.Contributor, ReleaseRole.Approver],
-                null,
-                null
-            },
-            // no OLD publication role maps to 'Drafter', the NEW publication role DOES exist => Deletes 'Drafter' role
-            {
-                ReleaseRole.Contributor,
-                [PublicationRole.Allower, PublicationRole.Drafter],
-                [ReleaseRole.Contributor, ReleaseRole.Approver],
-                PublicationRole.Drafter,
-                null
-            },
-            // 1 OLD publication role maps to 'Drafter', the NEW publication role DOES exist => Does NOTHING
-            {
-                ReleaseRole.Contributor,
-                [PublicationRole.Owner, PublicationRole.Drafter],
-                [ReleaseRole.Contributor, ReleaseRole.Approver],
-                null,
-                null
-            },
-            // Tests for the NEW `Approver` publication role
-            // no OLD publication role maps to 'Approver', the NEW publication role does NOT exist => Does NOTHING
-            {
-                ReleaseRole.Approver,
-                [PublicationRole.Owner],
-                [ReleaseRole.Approver, ReleaseRole.Contributor],
-                null,
-                null
-            },
-            // 1 OLD publication role maps to 'Approver', the NEW publication role does NOT exist => Does NOTHING
-            {
-                ReleaseRole.Approver,
-                [PublicationRole.Allower],
-                [ReleaseRole.Approver, ReleaseRole.Contributor],
-                null,
-                null
-            },
-            // no other role maps to 'Drafter' + no OLD publication role maps to 'Approver', the NEW publication role DOES exist => Deletes 'Approver' role
-            {
-                ReleaseRole.Approver,
-                [PublicationRole.Approver],
-                [ReleaseRole.Approver, ReleaseRole.PrereleaseViewer],
-                PublicationRole.Approver,
-                null
-            },
-            // 1 release role maps to 'Drafter' + no OLD publication role maps to 'Approver', the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
-            {
-                ReleaseRole.Approver,
-                [PublicationRole.Approver],
-                [ReleaseRole.Approver, ReleaseRole.Contributor],
-                PublicationRole.Approver,
-                PublicationRole.Drafter
-            },
-            // 1 publication role maps to 'Drafter' + no OLD publication role maps to 'Approver', the NEW publication role DOES exist => Deletes 'Approver' role + Creates 'Drafter' role (DEMOTION)
-            {
-                ReleaseRole.Approver,
-                [PublicationRole.Owner, PublicationRole.Approver],
-                [ReleaseRole.Approver],
-                PublicationRole.Approver,
-                PublicationRole.Drafter
-            },
-            // 1 OLD publication role maps to 'Approver', the NEW publication role DOES exist => Does NOTHING
-            {
-                ReleaseRole.Approver,
-                [PublicationRole.Allower, PublicationRole.Approver],
-                [ReleaseRole.Approver, ReleaseRole.Contributor],
-                null,
-                null
-            },
+            // csharpier-ignore-start
+            { ReleaseRole.PrereleaseViewer, [], [ReleaseRole.PrereleaseViewer], null, null },
+            { ReleaseRole.PrereleaseViewer, [], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [], [ReleaseRole.PrereleaseViewer, ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver, ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner], [ReleaseRole.PrereleaseViewer], null, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower], [ReleaseRole.PrereleaseViewer], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer], PublicationRole.Drafter, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Approver], [ReleaseRole.PrereleaseViewer], PublicationRole.Approver, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Approver], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.PrereleaseViewer], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.PrereleaseViewer], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.PrereleaseViewer], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.PrereleaseViewer], null, null},
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, null },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.PrereleaseViewer, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], null, null},
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer], null, null },
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner], [ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Allower], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, null },
+            { ReleaseRole.Contributor, [PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor], null, null},
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null},
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver, ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver, ReleaseRole.PrereleaseViewer], null, null },
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer], null, PublicationRole.Drafter },
+            { ReleaseRole.Approver, [PublicationRole.Owner], [ReleaseRole.Approver], null, PublicationRole.Drafter },
+            { ReleaseRole.Approver, [PublicationRole.Allower], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, null },
+            { ReleaseRole.Approver, [PublicationRole.Approver], [ReleaseRole.Approver], PublicationRole.Approver, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Drafter },
+            { ReleaseRole.Approver, [PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver], null, null},
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null},
+            // csharpier-ignore-end
         };
 
     [Theory]
@@ -249,6 +335,7 @@ public class NewPermissionsSystemHelperTests
     public void DetermineNewPermissionsSystemChangesForRoleCreation_ForPublicationRole(
         PublicationRole publicationRoleToCreate,
         HashSet<PublicationRole> existingPublicationRoles,
+        HashSet<ReleaseRole> existingReleaseRoles,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
         PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
@@ -257,8 +344,9 @@ public class NewPermissionsSystemHelperTests
 
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
-                publicationRoleToCreate: publicationRoleToCreate,
-                existingPublicationRoles: existingPublicationRoles
+                oldPublicationRoleToCreate: publicationRoleToCreate,
+                existingPublicationRoles: existingPublicationRoles,
+                existingReleaseRoles: existingReleaseRoles
             );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
@@ -266,10 +354,47 @@ public class NewPermissionsSystemHelperTests
     }
 
     [Theory]
+    [InlineData(PublicationRole.Approver)]
+    [InlineData(PublicationRole.Drafter)]
+    public void DetermineNewPermissionsSystemChangesForRoleCreation_ForNewPublicationRole_Throws(
+        PublicationRole publicationRoleToCreate
+    )
+    {
+        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
+
+        Assert.Throws<ArgumentException>(() =>
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
+                oldPublicationRoleToCreate: publicationRoleToCreate,
+                existingPublicationRoles: [],
+                existingReleaseRoles: []
+            )
+        );
+    }
+
+    [Theory]
+    [InlineData(PublicationRole.Allower)]
+    [InlineData(PublicationRole.Owner)]
+    public void DetermineNewPermissionsSystemChangesForRoleCreation_ForExistingPublicationRole_Throws(
+        PublicationRole publicationRoleToCreate
+    )
+    {
+        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
+
+        Assert.Throws<ArgumentException>(() =>
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
+                oldPublicationRoleToCreate: publicationRoleToCreate,
+                existingPublicationRoles: [publicationRoleToCreate],
+                existingReleaseRoles: []
+            )
+        );
+    }
+
+    [Theory]
     [MemberData(nameof(ReleaseRoleCreationData))]
     public void DetermineNewPermissionsSystemChangesForRoleCreation_ForReleaseRole(
         ReleaseRole releaseRoleToCreate,
         HashSet<PublicationRole> existingPublicationRoles,
+        HashSet<ReleaseRole> existingReleaseRoles,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
         PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
@@ -279,26 +404,12 @@ public class NewPermissionsSystemHelperTests
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 releaseRoleToCreate: releaseRoleToCreate,
-                existingPublicationRoles: existingPublicationRoles
+                existingPublicationRoles: existingPublicationRoles,
+                existingReleaseRoles: existingReleaseRoles
             );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
         Assert.Equal(expectedNewSystemPublicationRoleToCreate, newSystemPublicationRoleToCreate);
-    }
-
-    [Fact]
-    public void DetermineNewPermissionsSystemChangesForRoleCreation_ForPrereleaseReleaseRole_ReturnsNull()
-    {
-        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
-
-        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
-            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
-                releaseRoleToCreate: ReleaseRole.PrereleaseViewer,
-                existingPublicationRoles: []
-            );
-
-        Assert.Null(newSystemPublicationRoleToRemove);
-        Assert.Null(newSystemPublicationRoleToCreate);
     }
 
     [Theory]
@@ -413,22 +524,6 @@ public class NewPermissionsSystemHelperTests
             $"The release role '{ReleaseRole.Contributor}' is not in the existing list of release roles.",
             exception.Message
         );
-    }
-
-    [Fact]
-    public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForPrereleaseReleaseRole_ReturnsNull()
-    {
-        var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
-
-        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
-            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
-                releaseRoleToRemove: ReleaseRole.PrereleaseViewer,
-                existingPublicationRoles: [],
-                existingReleaseRoles: [ReleaseRole.PrereleaseViewer]
-            );
-
-        Assert.Null(newSystemPublicationRoleToRemove);
-        Assert.Null(newSystemPublicationRoleToCreate);
     }
 
     private static NewPermissionsSystemHelper SetupNewPermissionsSystemHelper()

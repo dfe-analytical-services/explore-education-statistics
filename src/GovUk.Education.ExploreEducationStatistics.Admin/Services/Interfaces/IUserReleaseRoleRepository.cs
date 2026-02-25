@@ -29,6 +29,11 @@ public interface IUserReleaseRoleRepository
         CancellationToken cancellationToken = default
     );
 
+    /// <summary>
+    /// <para>
+    /// Return a queryable representation of all user release roles, with the option to filter by their status (see <see cref="ResourceRoleFilter"/>).
+    /// </para>
+    /// </summary>
     /// <param name="resourceRoleFilter">Filter resource roles by their status (see <see cref="ResourceRoleFilter"/>).</param>
     IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
 

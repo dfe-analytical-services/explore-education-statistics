@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using LinqToDB;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -17,13 +16,29 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
-        PublicationRole publicationRoleToCreate
+        HashSet<ReleaseRole> existingReleaseRoles,
+        PublicationRole oldPublicationRoleToCreate
     )
     {
-        var publicationRoleToCreateNewSystemEquivalent =
-            PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(publicationRoleToCreate);
+        if (oldPublicationRoleToCreate.IsNewPermissionsSystemPublicationRole())
+        {
+            throw new ArgumentException(
+                $"Unexpected publication role: '{oldPublicationRoleToCreate}'. Expected an OLD permissions system role."
+            );
+        }
 
-        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, publicationRoleToCreateNewSystemEquivalent);
+        if (existingPublicationRoles.Contains(oldPublicationRoleToCreate))
+        {
+            throw new ArgumentException(
+                $"The publication role '{oldPublicationRoleToCreate}' is already in the existing list of publication roles."
+            );
+        }
+
+        var effectiveSetOfResultantPublicationRoles = existingPublicationRoles
+            .Append(oldPublicationRoleToCreate)
+            .ToHashSet();
+
+        return DetermineRolesToRemoveAndCreate(effectiveSetOfResultantPublicationRoles, existingReleaseRoles);
     }
 
     public (
@@ -31,19 +46,20 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
+        HashSet<ReleaseRole> existingReleaseRoles,
         ReleaseRole releaseRoleToCreate
     )
     {
-        if (
-            !releaseRoleToCreate.TryConvertToNewPermissionsSystemPublicationRole(
-                out var releaseRoleToCreateNewSystemEquivalent
-            )
-        )
+        if (existingReleaseRoles.Contains(releaseRoleToCreate))
         {
-            return (null, null);
+            throw new ArgumentException(
+                $"The release role '{releaseRoleToCreate}' is already in the existing list of release roles."
+            );
         }
 
-        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, releaseRoleToCreateNewSystemEquivalent.Value);
+        var effectiveSetOfResultantReleaseRoles = existingReleaseRoles.Append(releaseRoleToCreate).ToHashSet();
+
+        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, effectiveSetOfResultantReleaseRoles);
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
@@ -70,21 +86,11 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
             );
         }
 
-        var equivalentNewPermissionsSystemPublicationRoleToDelete =
-            PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(oldPublicationRoleToRemove);
+        var effectiveSetOfResultantPublicationRoles = existingPublicationRoles
+            .Except([oldPublicationRoleToRemove])
+            .ToHashSet();
 
-        if (!existingPublicationRoles.Contains(equivalentNewPermissionsSystemPublicationRoleToDelete))
-        {
-            return (null, null);
-        }
-
-        var remainingPublicationRoles = existingPublicationRoles.Except([oldPublicationRoleToRemove]).ToHashSet();
-
-        return DetermineRolesToRemoveAndCreate(
-            resourceRoleToRemoveNewSystemEquivalent: equivalentNewPermissionsSystemPublicationRoleToDelete,
-            remainingPublicationRoles: remainingPublicationRoles,
-            remainingReleaseRoles: existingReleaseRoles
-        );
+        return DetermineRolesToRemoveAndCreate(effectiveSetOfResultantPublicationRoles, existingReleaseRoles);
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
@@ -104,118 +110,75 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
             );
         }
 
-        if (
-            !releaseRoleToRemove.TryConvertToNewPermissionsSystemPublicationRole(
-                out var equivalentNewPermissionsSystemPublicationRoleToDelete
-            )
-        )
-        {
-            return (null, null);
-        }
+        var effectiveSetOfResultantReleaseRoles = existingReleaseRoles.Except([releaseRoleToRemove]).ToHashSet();
 
-        if (!existingPublicationRoles.Contains(equivalentNewPermissionsSystemPublicationRoleToDelete.Value))
-        {
-            return (null, null);
-        }
-
-        var remainingReleaseRoles = existingReleaseRoles.Except([releaseRoleToRemove]).ToHashSet();
-
-        return DetermineRolesToRemoveAndCreate(
-            resourceRoleToRemoveNewSystemEquivalent: equivalentNewPermissionsSystemPublicationRoleToDelete.Value,
-            remainingPublicationRoles: existingPublicationRoles,
-            remainingReleaseRoles: remainingReleaseRoles
-        );
+        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, effectiveSetOfResultantReleaseRoles);
     }
 
     private static (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineRolesToRemoveAndCreate(
-        HashSet<PublicationRole> existingPublicationRoles,
-        PublicationRole resourceRoleToCreateNewSystemEquivalent
+        HashSet<PublicationRole> effectiveSetOfResultantPublicationRoles,
+        HashSet<ReleaseRole> effectiveSetOfResultantReleaseRoles
     )
     {
-        if (!resourceRoleToCreateNewSystemEquivalent.IsNewPermissionsSystemPublicationRole())
-        {
-            throw new ArgumentException(
-                $"Unexpected publication role: '{resourceRoleToCreateNewSystemEquivalent}'. Only NEW permissions system roles should be passed into this method."
-            );
-        }
-
-        if (existingPublicationRoles.Contains(resourceRoleToCreateNewSystemEquivalent))
-        {
-            return (null, null);
-        }
-
-        return resourceRoleToCreateNewSystemEquivalent switch
-        {
-            PublicationRole.Approver when existingPublicationRoles.Contains(PublicationRole.Drafter) => (
-                PublicationRole.Drafter,
-                PublicationRole.Approver
-            ),
-
-            PublicationRole.Approver => (null, PublicationRole.Approver),
-
-            PublicationRole.Drafter when existingPublicationRoles.Contains(PublicationRole.Approver) => (null, null),
-
-            PublicationRole.Drafter => (null, PublicationRole.Drafter),
-
-            _ => throw new ArgumentException(
-                $"Unexpected new permissions system publication role: '{resourceRoleToCreateNewSystemEquivalent}'"
-            ),
-        };
-    }
-
-    // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
-    private static (
-        PublicationRole? newSystemPublicationRoleToRemove,
-        PublicationRole? newSystemPublicationRoleToCreate
-    ) DetermineRolesToRemoveAndCreate(
-        PublicationRole resourceRoleToRemoveNewSystemEquivalent,
-        HashSet<PublicationRole> remainingPublicationRoles,
-        HashSet<ReleaseRole> remainingReleaseRoles
-    )
-    {
-        var remainingOldPublicationRoles = remainingPublicationRoles
-            .Where(role => !role.IsNewPermissionsSystemPublicationRole())
-            .ToHashSet();
-
-        var allEquivalentNewPermissionsSystemPublicationRoles = remainingOldPublicationRoles
+        var equivalentNewRoles = effectiveSetOfResultantPublicationRoles
+            .Where(r => !r.IsNewPermissionsSystemPublicationRole())
             .Select(PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole)
-            .Union(
-                remainingReleaseRoles
-                    .Select(releaseRole =>
-                        (
-                            canConvertToNewPermissionsSystemPublicationRole: releaseRole.TryConvertToNewPermissionsSystemPublicationRole(
-                                out var newSystemPublicationRole
-                            ),
-                            newSystemPublicationRole
-                        )
-                    )
-                    .Where(tuple => tuple.canConvertToNewPermissionsSystemPublicationRole)
-                    .Select(tuple => tuple.newSystemPublicationRole!.Value)
+            .Concat(
+                effectiveSetOfResultantReleaseRoles
+                    .Select(r => r.TryConvertToNewPermissionsSystemPublicationRole(out var role) ? role : null)
+                    .Where(r => r.HasValue)
+                    .Select(r => r!.Value)
             )
             .ToHashSet();
 
-        var stillExistsOldSystemRolesWhichMapToNewSystemEquivalent =
-            allEquivalentNewPermissionsSystemPublicationRoles.Contains(resourceRoleToRemoveNewSystemEquivalent);
+        PublicationRole? expectedNewSystemPublicationRole =
+            equivalentNewRoles.Contains(PublicationRole.Approver) ? PublicationRole.Approver
+            : equivalentNewRoles.Contains(PublicationRole.Drafter) ? PublicationRole.Drafter
+            : null;
 
-        if (stillExistsOldSystemRolesWhichMapToNewSystemEquivalent)
+        var hasApprover = effectiveSetOfResultantPublicationRoles.Contains(PublicationRole.Approver);
+        var hasDrafter = effectiveSetOfResultantPublicationRoles.Contains(PublicationRole.Drafter);
+
+        if (expectedNewSystemPublicationRole is null)
         {
-            return (null, null);
+            return hasApprover ? (PublicationRole.Approver, null)
+                : hasDrafter ? (PublicationRole.Drafter, null)
+                : (null, null);
         }
 
-        if (resourceRoleToRemoveNewSystemEquivalent == PublicationRole.Drafter)
+        if (expectedNewSystemPublicationRole is PublicationRole.Approver)
         {
-            return (PublicationRole.Drafter, null);
+            if (hasApprover)
+            {
+                return (null, null);
+            }
+
+            if (hasDrafter)
+            {
+                return (PublicationRole.Drafter, PublicationRole.Approver);
+            }
+
+            return (null, PublicationRole.Approver);
         }
 
-        var atLeastOneOldSystemRoleMapsToDrafter = allEquivalentNewPermissionsSystemPublicationRoles.Contains(
-            PublicationRole.Drafter
-        );
+        if (expectedNewSystemPublicationRole is PublicationRole.Drafter)
+        {
+            if (hasDrafter)
+            {
+                return (null, null);
+            }
 
-        return atLeastOneOldSystemRoleMapsToDrafter
-            ? (PublicationRole.Approver, PublicationRole.Drafter)
-            : (PublicationRole.Approver, null);
+            if (hasApprover)
+            {
+                return (PublicationRole.Approver, PublicationRole.Drafter);
+            }
+
+            return (null, PublicationRole.Drafter);
+        }
+
+        throw new ArgumentException($"Unexpected role: {expectedNewSystemPublicationRole}");
     }
 }
