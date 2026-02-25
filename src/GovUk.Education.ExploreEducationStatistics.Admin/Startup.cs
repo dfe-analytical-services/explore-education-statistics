@@ -24,6 +24,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.UserResourceRolesMigration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -413,6 +414,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
         services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
         services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+
+        // TODO EES-6957 Remove after the User Resource Roles migration is complete.
+        services.AddTransient<IUserResourceRolesMigrationService, UserResourceRolesMigrationService>();
 
         services.AddTransient<IReleaseDataContentService, ReleaseDataContentService>();
         services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
