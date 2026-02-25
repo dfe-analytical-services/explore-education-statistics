@@ -971,6 +971,7 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
         Guid releaseFileId,
         Guid dataSetId,
         Guid? dataSetVersionToReplaceId = null,
+        Guid[]? contributorsAndApproversUserIds = null,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
@@ -981,6 +982,7 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
 
     public Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
+        Guid[]? contributorsAndApproversUserIds = null,
         CancellationToken cancellationToken = default
     )
     {

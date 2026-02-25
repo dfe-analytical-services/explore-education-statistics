@@ -127,23 +127,28 @@ public class DataSetVersionService(
         Guid releaseFileId,
         Guid dataSetId,
         Guid? dataSetVersionToReplaceId = null,
+        Guid[]? contributorsAndApproversUserIds = null,
         CancellationToken cancellationToken = default
     )
     {
-        return await processorClient
-            .CreateNextDataSetVersionMappings(
-                dataSetId: dataSetId,
-                releaseFileId: releaseFileId,
-                dataSetVersionToReplaceId: dataSetVersionToReplaceId,
-                cancellationToken: cancellationToken
-            )
-            .OnSuccess(async processorResponse =>
-                await publicDataDbContext.DataSetVersions.SingleAsync(
-                    dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
-                    cancellationToken
-                )
-            )
-            .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
+        return await userService
+            .CheckIsBauUserOrInAllowedList(contributorsAndApproversUserIds)
+            .OnSuccess(async () =>
+                await processorClient
+                    .CreateNextDataSetVersionMappings(
+                        dataSetId: dataSetId,
+                        releaseFileId: releaseFileId,
+                        dataSetVersionToReplaceId: dataSetVersionToReplaceId,
+                        cancellationToken: cancellationToken
+                    )
+                    .OnSuccess(async processorResponse =>
+                        await publicDataDbContext.DataSetVersions.SingleAsync(
+                            dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
+                            cancellationToken
+                        )
+                    )
+                    .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken))
+            );
     }
 
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
@@ -174,13 +179,18 @@ public class DataSetVersionService(
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
+        Guid[]? contributorsAndApproversUserIds = null,
         CancellationToken cancellationToken = default
     )
     {
-        return await processorClient.DeleteDataSetVersion(
-            dataSetVersionId: dataSetVersionId,
-            cancellationToken: cancellationToken
-        );
+        return await userService
+            .CheckIsBauUserOrInAllowedList(contributorsAndApproversUserIds)
+            .OnSuccessVoid(async () =>
+                await processorClient.DeleteDataSetVersion(
+                    dataSetVersionId: dataSetVersionId,
+                    cancellationToken: cancellationToken
+                )
+            );
     }
 
     public async Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(

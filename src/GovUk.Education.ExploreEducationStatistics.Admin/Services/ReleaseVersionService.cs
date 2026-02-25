@@ -637,6 +637,14 @@ public class ReleaseVersionService(
 
     public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
     {
+        var contributorsAndApproversUserIds = await userReleaseRoleRepository
+            .Query()
+            .AsNoTracking()
+            .WhereForReleaseVersion(releaseVersionId)
+            .WhereRolesIn(ReleaseRole.Contributor, ReleaseRole.Approver)
+            .Select(urr => urr.UserId)
+            .ToArrayAsync();
+
         return await context
             .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
@@ -668,11 +676,16 @@ public class ReleaseVersionService(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId)
                 );
             })
-            .OnSuccessDo(DeleteDraftApiDataSetVersion)
+            .OnSuccessDo(async deletePlan =>
+                await DeleteDraftApiDataSetVersion(deletePlan, contributorsAndApproversUserIds)
+            )
             .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
     }
 
-    private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(DeleteDataFilePlanViewModel deletePlan)
+    private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(
+        DeleteDataFilePlanViewModel deletePlan,
+        Guid[] contributorsAndApprovers
+    )
     {
         // Skip when Status == DataSetVersionStatus.Published;
         if (deletePlan.ApiDataSetVersionPlan is null or { Valid: false })
@@ -680,7 +693,10 @@ public class ReleaseVersionService(
             return Unit.Instance;
         }
 
-        return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
+        return await dataSetVersionService.DeleteVersion(
+            deletePlan.ApiDataSetVersionPlan!.Id,
+            contributorsAndApprovers
+        );
     }
 
     public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(

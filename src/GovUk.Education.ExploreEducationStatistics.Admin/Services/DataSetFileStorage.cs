@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,8 @@ public class DataSetFileStorage(
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
     IDataSetService dataSetService,
-    ILogger<DataSetFileStorage> logger
+    ILogger<DataSetFileStorage> logger,
+    IUserReleaseRoleRepository userReleaseRoleRepository
 ) : IDataSetFileStorage
 {
     public async Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
@@ -428,7 +430,7 @@ public class DataSetFileStorage(
     )
     {
         await dataSetVersionService
-            .DeleteVersion(dataSetVersion.Id, cancellationToken)
+            .DeleteVersion(dataSetVersion.Id, contributorsAndApproversUserIds: null, cancellationToken)
             .OnSuccessVoid(async _ =>
             {
                 await dataSetService
@@ -459,7 +461,7 @@ public class DataSetFileStorage(
     )
     {
         await dataSetVersionService
-            .DeleteVersion(dataSetVersion.Id, cancellationToken)
+            .DeleteVersion(dataSetVersion.Id, contributorsAndApproversUserIds: null, cancellationToken)
             .OnSuccessVoid(async _ =>
             {
                 await dataSetVersionService
@@ -467,6 +469,7 @@ public class DataSetFileStorage(
                         releaseFileId: dataReleaseFileId,
                         dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
                         dataSetVersionToReplaceId: null,
+                        contributorsAndApproversUserIds: null,
                         cancellationToken
                     )
                     .OnFailureDo(_ =>
@@ -497,11 +500,20 @@ public class DataSetFileStorage(
         CancellationToken cancellationToken
     )
     {
+        var contributorsAndApproversUserIds = await userReleaseRoleRepository
+            .Query()
+            .AsNoTracking()
+            .WhereForReleaseVersion(replacedReleaseDataFile.ReleaseVersion.Id)
+            .WhereRolesIn(ReleaseRole.Contributor, ReleaseRole.Approver)
+            .Select(urr => urr.UserId)
+            .ToArrayAsync(cancellationToken);
+
         await dataSetVersionService
             .CreateNextVersion(
                 releaseFileId: dataReleaseFileId,
                 dataSetId: replacedReleaseDataFile.PublicApiDataSetId!.Value,
                 dataSetVersionToReplaceId: dataSetVersion.Id,
+                contributorsAndApproversUserIds: contributorsAndApproversUserIds,
                 cancellationToken
             )
             .OnFailureDo(_ =>

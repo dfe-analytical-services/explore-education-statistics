@@ -425,4 +425,17 @@ public static class UserServiceExtensions
     {
         return new DataFilePermissions { CanCancelImport = (await userService.CheckCanCancelFileImport(file)).IsRight };
     }
+
+    public static async Task<Either<ActionResult, Unit>> CheckIsBauUserOrInAllowedList(
+        this IUserService userService,
+        Guid[]? userIdsAllowed
+    )
+    {
+        if (userIdsAllowed != null && userIdsAllowed.Any(id => id == userService.GetUserId()))
+        {
+            return Unit.Instance;
+        }
+
+        return await userService.CheckIsBauUser();
+    }
 }
