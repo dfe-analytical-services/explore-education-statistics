@@ -94,7 +94,7 @@ Switch to bau1 to add review comments for first text block
     ${block}=    user starts editing accordion section text block    First content section    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    user presses keys    CTRL+a
+    user selects all text
     user adds comment to selected text    ${block}    Test comment 1
 
     user checks list has x items    testid:comments-unresolved    1    ${block}
@@ -120,7 +120,7 @@ Add review comment for second text block as bau1
     ${block}=    user starts editing accordion section text block    First content section    2
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    user presses keys    CTRL+a
+    user selects all text
     user adds comment to selected text    ${block}    Test comment 3
 
     user checks list has x items    testid:comments-unresolved    1    ${block}

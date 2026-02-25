@@ -50,7 +50,7 @@ Add public prerelease access list
     user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Create public pre-release access list
-    user presses keys    CTRL+a+BACKSPACE
+    user selects all text and hits backspace
     user presses keys    Test public access list
     user clicks button    Save access list
     user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
