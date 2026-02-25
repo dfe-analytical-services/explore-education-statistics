@@ -16,6 +16,7 @@ public interface INewPermissionsSystemHelper
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
+        HashSet<ReleaseRole> existingReleaseRoles,
         PublicationRole publicationRoleToCreate
     );
 
@@ -30,6 +31,7 @@ public interface INewPermissionsSystemHelper
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleCreation(
         HashSet<PublicationRole> existingPublicationRoles,
+        HashSet<ReleaseRole> existingReleaseRoles,
         ReleaseRole releaseRoleToCreate
     );
 

@@ -29,6 +29,13 @@ public class UserPublicationRoleRepository(
         CancellationToken cancellationToken = default
     )
     {
+        if (role.IsNewPermissionsSystemPublicationRole())
+        {
+            throw new ArgumentException(
+                $"Unexpected publication role: '{role}'. Expected an OLD permissions system role."
+            );
+        }
+
         createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
 
         var allUserPublicationRolesForUserAndPublicationByRole = await Query(
@@ -42,9 +49,19 @@ public class UserPublicationRoleRepository(
         var allPublicationRolesForUserAndPublication =
             allUserPublicationRolesForUserAndPublicationByRole.Keys.ToHashSet();
 
+        var allReleaseRolesForUserAndPublication = (
+            await userReleaseRoleQueryRepository
+                .Query(ResourceRoleFilter.All)
+                .WhereForUser(userId)
+                .WhereForPublication(publicationId)
+                .Select(urr => urr.Role)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
+
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 existingPublicationRoles: allPublicationRolesForUserAndPublication,
+                existingReleaseRoles: allReleaseRolesForUserAndPublication,
                 publicationRoleToCreate: role
             );
 
@@ -88,26 +105,35 @@ public class UserPublicationRoleRepository(
         CancellationToken cancellationToken = default
     )
     {
+        if (userPublicationRolesToCreate.Any(dto => dto.Role.IsNewPermissionsSystemPublicationRole()))
+        {
+            throw new ArgumentException(
+                $"Unexpected publication role found in the list of roles to create. All roles should be OLD permissions system roles."
+            );
+        }
+
         return await userPublicationRolesToCreate
             .ToAsyncEnumerable()
-            .WhereAwait(async upr =>
-                !await UserHasRoleOnPublication(
-                    userId: upr.UserId,
-                    publicationId: upr.PublicationId,
-                    role: upr.Role,
-                    resourceRoleFilter: ResourceRoleFilter.All,
-                    cancellationToken: cancellationToken
-                )
+            .Where(
+                async (upr, cancellationToken) =>
+                    !await UserHasRoleOnPublication(
+                        userId: upr.UserId,
+                        publicationId: upr.PublicationId,
+                        role: upr.Role,
+                        resourceRoleFilter: ResourceRoleFilter.All,
+                        cancellationToken: cancellationToken
+                    )
             )
-            .SelectAwait(async upr =>
-                await Create(
-                    userId: upr.UserId,
-                    publicationId: upr.PublicationId,
-                    role: upr.Role,
-                    createdById: upr.CreatedById,
-                    createdDate: upr.CreatedDate,
-                    cancellationToken: cancellationToken
-                )
+            .Select(
+                async (upr, cancellationToken) =>
+                    await Create(
+                        userId: upr.UserId,
+                        publicationId: upr.PublicationId,
+                        role: upr.Role,
+                        createdById: upr.CreatedById,
+                        createdDate: upr.CreatedDate,
+                        cancellationToken: cancellationToken
+                    )
             )
             .WhereNotNull()
             .ToListAsync(cancellationToken);

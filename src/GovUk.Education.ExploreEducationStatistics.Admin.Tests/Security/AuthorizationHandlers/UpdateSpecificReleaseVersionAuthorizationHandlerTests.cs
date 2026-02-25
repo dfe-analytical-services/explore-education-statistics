@@ -1,8 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -148,25 +148,8 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
 
     private static UpdateSpecificReleaseVersionAuthorizationHandler HandlerSupplier(ContentDbContext contentDbContext)
     {
-        var userRepository = new UserRepository(contentDbContext);
-
-        var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
-
-        var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(contentDbContext);
-
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext: contentDbContext,
-            newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-            userRepository: userRepository
-        );
-
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(
-            contentDbContext: contentDbContext,
-            userPublicationRoleRepository: userPublicationRoleRepository,
-            newPermissionsSystemHelper: newPermissionsSystemHelper,
-            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-            userRepository: userRepository
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+            contentDbContext
         );
 
         return new UpdateSpecificReleaseVersionAuthorizationHandler(

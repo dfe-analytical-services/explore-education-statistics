@@ -9,9 +9,7 @@ public class PublicationRoleUtilsTests
     [Theory]
     [InlineData(PublicationRole.Owner, PublicationRole.Drafter)]
     [InlineData(PublicationRole.Allower, PublicationRole.Approver)]
-    [InlineData(PublicationRole.Drafter, PublicationRole.Drafter)]
-    [InlineData(PublicationRole.Approver, PublicationRole.Approver)]
-    public void ConvertToNewPermissionsSystemPublicationRole(
+    public void ConvertToNewPermissionsSystemPublicationRole_WithOldRole(
         PublicationRole publicationRoleToConvert,
         PublicationRole expectedPublicationRole
     )
@@ -19,6 +17,18 @@ public class PublicationRoleUtilsTests
         var convertedPublicationRole = publicationRoleToConvert.ConvertToNewPermissionsSystemPublicationRole();
 
         Assert.Equal(expectedPublicationRole, convertedPublicationRole);
+    }
+
+    [Theory]
+    [InlineData(PublicationRole.Drafter)]
+    [InlineData(PublicationRole.Approver)]
+    public void ConvertToNewPermissionsSystemPublicationRole_WithNewRole_Throws(
+        PublicationRole publicationRoleToConvert
+    )
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            publicationRoleToConvert.ConvertToNewPermissionsSystemPublicationRole()
+        );
     }
 
     [Theory]

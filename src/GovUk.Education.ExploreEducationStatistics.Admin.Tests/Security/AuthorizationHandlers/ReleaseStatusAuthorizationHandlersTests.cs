@@ -1,8 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -162,25 +162,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
-            var userRepository = new UserRepository(context);
-
-            var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
-
-            var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
-
-            var userPublicationRoleRepository = new UserPublicationRoleRepository(
-                contentDbContext: context,
-                newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-                userRepository: userRepository
-            );
-
-            var userReleaseRoleRepository = new UserReleaseRoleRepository(
-                contentDbContext: context,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-                userRepository: userRepository
+            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+                context
             );
 
             return new MarkReleaseAsDraftAuthorizationHandler(
@@ -331,25 +314,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
-            var userRepository = new UserRepository(context);
-
-            var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
-
-            var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
-
-            var userPublicationRoleRepository = new UserPublicationRoleRepository(
-                contentDbContext: context,
-                newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-                userRepository: userRepository
-            );
-
-            var userReleaseRoleRepository = new UserReleaseRoleRepository(
-                contentDbContext: context,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-                userRepository: userRepository
+            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+                context
             );
 
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
@@ -472,25 +438,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
-            var userRepository = new UserRepository(context);
-
-            var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
-
-            var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
-
-            var userPublicationRoleRepository = new UserPublicationRoleRepository(
-                contentDbContext: context,
-                newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-                userRepository: userRepository
-            );
-
-            var userReleaseRoleRepository = new UserReleaseRoleRepository(
-                contentDbContext: context,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                newPermissionsSystemHelper: newPermissionsSystemHelper,
-                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository,
-                userRepository: userRepository
+            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+                context
             );
 
             return new MarkReleaseAsApprovedAuthorizationHandler(

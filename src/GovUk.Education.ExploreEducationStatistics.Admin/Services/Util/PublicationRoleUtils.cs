@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -9,20 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 // permissions system to the new one. It will be removed in EES-6196.
 public static class PublicationRoleUtils
 {
-    public static PublicationRole ConvertToNewPermissionsSystemPublicationRole(this PublicationRole publicationRole)
-    {
-        if (publicationRole.IsNewPermissionsSystemPublicationRole())
-        {
-            return publicationRole;
-        }
-
-        return publicationRole switch
+    public static PublicationRole ConvertToNewPermissionsSystemPublicationRole(this PublicationRole publicationRole) =>
+        publicationRole switch
         {
             PublicationRole.Owner => PublicationRole.Drafter,
             PublicationRole.Allower => PublicationRole.Approver,
             _ => throw new ArgumentOutOfRangeException($"Unexpected publication role: '{publicationRole}'"),
         };
-    }
 
     public static bool TryConvertToNewPermissionsSystemPublicationRole(
         this ReleaseRole oldSystemReleaseRole,

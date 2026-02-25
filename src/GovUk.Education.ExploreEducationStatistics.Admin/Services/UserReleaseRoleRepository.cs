@@ -42,9 +42,18 @@ public class UserReleaseRoleRepository(
         var allPublicationRolesForUserAndPublication =
             allUserPublicationRolesForUserAndPublicationByRole.Keys.ToHashSet();
 
+        var allReleaseRolesForUserAndPublication = (
+            await Query(ResourceRoleFilter.All)
+                .WhereForUser(userId)
+                .WhereForPublication(publicationId)
+                .Select(urr => urr.Role)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
+
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 existingPublicationRoles: allPublicationRolesForUserAndPublication,
+                existingReleaseRoles: allReleaseRolesForUserAndPublication,
                 releaseRoleToCreate: role
             );
 
@@ -98,25 +107,27 @@ public class UserReleaseRoleRepository(
     {
         return await userReleaseRolesToCreate
             .ToAsyncEnumerable()
-            .WhereAwait(async urr =>
-                !await UserHasRoleOnReleaseVersion(
-                    userId: urr.UserId,
-                    releaseVersionId: urr.ReleaseVersionId,
-                    role: urr.Role,
-                    resourceRoleFilter: ResourceRoleFilter.All,
-                    cancellationToken: cancellationToken
-                )
+            .Where(
+                async (urr, cancellationToken) =>
+                    !await UserHasRoleOnReleaseVersion(
+                        userId: urr.UserId,
+                        releaseVersionId: urr.ReleaseVersionId,
+                        role: urr.Role,
+                        resourceRoleFilter: ResourceRoleFilter.All,
+                        cancellationToken: cancellationToken
+                    )
             )
-            .SelectAwait(async urr =>
-                await Create(
-                    userId: urr.UserId,
-                    releaseVersionId: urr.ReleaseVersionId,
-                    role: urr.Role,
-                    // Need to check if all database values are non-null now. Maybe I can migrate this field to be non-nullable?
-                    createdById: urr.CreatedById!.Value,
-                    createdDate: urr.Created,
-                    cancellationToken: cancellationToken
-                )
+            .Select(
+                async (urr, cancellationToken) =>
+                    await Create(
+                        userId: urr.UserId,
+                        releaseVersionId: urr.ReleaseVersionId,
+                        role: urr.Role,
+                        // Need to check if all database values are non-null now. Maybe I can migrate this field to be non-nullable?
+                        createdById: urr.CreatedById!.Value,
+                        createdDate: urr.Created,
+                        cancellationToken: cancellationToken
+                    )
             )
             .ToListAsync(cancellationToken);
     }

@@ -6,8 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-// The method in this class will remain but be moved back to the 'UserReleaseRoleRespository' class in EES-6196, when we no longer
-// have to cater for the old roles. For now, it have been moved here temporarily for convenience to allow
+// The method in this class will remain but be moved back to the 'UserReleaseRoleRepository' class in EES-6196, when we no longer
+// have to cater for the old roles. For now, it has been moved here temporarily for convenience to allow
 // us to avoid duplication, and avoid using circular dependencies where the two resource role repositories would depend on each other.
 // An interface has purposefully NOT been created, as I do not want to mock this dependency. It should be tested as part of the
 // corresponding repository tests. As this is a temporary class, we do not want to be moving/switching tests around just to move them back again later.
