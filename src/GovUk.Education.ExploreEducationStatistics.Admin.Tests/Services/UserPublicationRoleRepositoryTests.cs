@@ -699,12 +699,13 @@ public abstract class UserPublicationRoleRepositoryTests
                 .ForIndex(3, s => s.SetUser(user2).SetPublication(publication2))
                 .GenerateList(4);
 
-            UserPublicationRole[] allUserPublicationRoles =
+            UserPublicationRole[] allOldUserPublicationRoles =
             [
                 .. newUserPublicationRoles,
-                .. existingUserPublicationRoles,
+                // Only select the OLD roles. The NEW roles result in an exception being thrown if they are included in the CreateManyIfNotExists input, as they shouldn't be created directly.
+                .. existingUserPublicationRoles[..4],
             ];
-            var allUserPublicationRolesCreateDtos = allUserPublicationRoles
+            var allUserPublicationRolesCreateDtos = allOldUserPublicationRoles
                 .Select(upr => new UserPublicationRoleCreateDto(
                     UserId: upr.UserId,
                     PublicationId: upr.PublicationId,
