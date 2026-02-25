@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.UserResourceRolesMigration;
 
 /// <summary>
-/// TODO EES-XXXX Remove after the User Resource Roles migration is complete.
+/// TODO EES-6957 Remove after the User Resource Roles migration is complete.
 /// </summary>
 public class UserResourceRolesMigrationService(
     ContentDbContext contentDbContext,
@@ -32,7 +32,7 @@ public class UserResourceRolesMigrationService(
             .OnSuccess(async () =>
             {
                 var allDistinctUserResourceRolesGroupedByUserAndPublication =
-                    await GetAllDistinctUserResourceRolesGroupedByUserAndPublication();
+                    await GetAllDistinctUserResourceRolesGroupedByUserAndPublication(cancellationToken);
 
                 var newPermissionsSystemChanges = allDistinctUserResourceRolesGroupedByUserAndPublication
                     .Select(DetermineNewPermissionsSystemChanges)
@@ -48,20 +48,15 @@ public class UserResourceRolesMigrationService(
                     .Select(changes => changes.NewSystemPublicationRoleToRemove!.Id)
                     .ToHashSet();
 
-                // We're expecting the number of removals to be pretty small. The SYNCING code we added in EES-6148
-                // will not have been running for too long by the time this migration has ran. And the only time we expect a NEW
-                // role to be removed here, is when the OLD and NEW systems get out of SYNC. That is only currenly possible in a couple of scenarios.
-                // Namely: where a User has some OLD system roles that would map to a NEW system role of 'Approver', but the SYNCING code was
-                // deployed after those OLD roles were added. Then, an OLD role of Publication 'Owner', or Release 'Contributor', was added
-                // to the user for the same Publication and therefore the SYNCING code created a NEW system role of 'Drafter' for them.
-                // In this case, they should really be an 'Approver' in the NEW system, but the SYNCING code wasn't made smart enough to detect this.
-                // It was written to keep the systems in SYNC, rather than to check ALL existing roles for the User/Publication combination
-                // on every role creation/removal. Once this migration has ran, however, the SYNCING code should work as expected and we should
-                // not be able to get into this scenario again.
+                // We're expecting the number of removals to be ZERO. The SYNCING code we added in EES-6148
+                // should, in theory, have kept any NEW roles it has created up-to-date and correct. The only time we expect a NEW
+                // role to be removed here, is if the OLD and NEW systems get out of SYNC - which we don't expect to happen.
+                // We have included this removal in the migration just in case, but if we do end up with NEW roles to remove,
+                // then we should investigate how the systems got out of SYNC before proceeding with the migration.
                 var newPermissionsSystemRolesToRemove = await userPublicationRoleRepository
                     .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
                     .Where(upr => newPermissionsSystemRoleIdsToRemove.Contains(upr.Id))
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var newPermissionsSystemRolesToCreate = newPermissionsSystemChanges
                     .Where(changes => changes.NewSystemPublicationRoleToCreate is not null)
@@ -89,6 +84,8 @@ public class UserResourceRolesMigrationService(
                     upr.Role == PublicationRole.Approver
                 );
 
+                var idsOfRolesRemoved = newPermissionsSystemRolesToRemove.Select(upr => upr.Id).ToHashSet();
+
                 if (!dryRun)
                 {
                     contentDbContext.UserPublicationRoles.RemoveRange(newPermissionsSystemRolesToRemove);
@@ -103,16 +100,17 @@ public class UserResourceRolesMigrationService(
                     NumberOfDrafterRolesCreated = numberOfDrafterRolesCreated,
                     NumberOfApproverRolesRemoved = numberOfApproverRolesRemoved,
                     NumberOfApproverRolesCreated = numberOfApproverRolesCreated,
+                    IdsOfRolesRemoved = idsOfRolesRemoved,
                 };
             });
 
-    private async Task<List<GroupedUserResourceRoles>> GetAllDistinctUserResourceRolesGroupedByUserAndPublication()
+    private async Task<List<GroupedUserResourceRoles>> GetAllDistinctUserResourceRolesGroupedByUserAndPublication(
+        CancellationToken cancellationToken
+    )
     {
         var groupedUserPublicationRoles = await userPublicationRoleRepository
             .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
             .GroupBy(upr => new { upr.UserId, upr.PublicationId })
-            // Check to see if .ToHashSet is done in-memory or SQL. If in SQL, change to g.Select(a => a.Role).Distinct().ToList() and then do
-            // .ToHashSet() in-memory after the query.
             .Select(g => new GroupedUserPublicationRoles(
                 g.Key.UserId,
                 g.Key.PublicationId,
@@ -125,7 +123,7 @@ public class UserResourceRolesMigrationService(
                     ))
                     .ToHashSet()
             ))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var groupedUserReleaseRoles = await userReleaseRoleRepository
             .Query(ResourceRoleFilter.All)
@@ -139,19 +137,14 @@ public class UserResourceRolesMigrationService(
                 urr.CreatedById,
                 urr.EmailSent,
             })
-            // Becuase the same release roles can be across multiple release versions for the same publication, this can
-            // return duplicate roles for the same publication. Hence, we do a .Distinct() to optimise the query.
-            .Distinct()
             .GroupBy(a => new { a.UserId, a.PublicationId })
-            // Check to see if .ToHashSet is done in-memory or SQL. If in SQL, change to g.Select(a => a.Role).Distinct().ToList() and then do
-            // .ToHashSet() in-memory after the query.
             .Select(g => new GroupedUserReleaseRoles(
                 g.Key.UserId,
                 g.Key.PublicationId,
                 g.Select(a => new ExistingReleaseRoleDetails(a.Id, a.Role, a.Created, a.CreatedById, a.EmailSent))
                     .ToHashSet()
             ))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return
         [
@@ -192,7 +185,7 @@ public class UserResourceRolesMigrationService(
         // There should only ever be a MAXIMUM of ONE NEW system publication role for any User/Publication combination at any one time.
         // So if that is not the case, expect this to blow up so we can investigate further before doing any migration.
         var existingNewSystemPublicationRole = groupedUserResourceRoles
-            .PublicationRoles.Where(epr => PublicationRoleUtils.IsNewPermissionsSystemPublicationRole(epr.Role))
+            .PublicationRoles.Where(epr => epr.Role.IsNewPermissionsSystemPublicationRole())
             .SingleOrDefault();
 
         NewPermissionsSystemChanges Changes(
@@ -247,7 +240,7 @@ public class UserResourceRolesMigrationService(
         var oldSystemPublicationRolesNewSystemEquivalents = groupedUserResourceRoles
             .PublicationRoles.Where(pr => !pr.Role.IsNewPermissionsSystemPublicationRole())
             .Select(pr => new NewPublicationRoleDetails(
-                PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(pr.Role),
+                pr.Role.ConvertToNewPermissionsSystemPublicationRole(),
                 pr.CreatedDate,
                 pr.CreatedById,
                 pr.EmailSent
