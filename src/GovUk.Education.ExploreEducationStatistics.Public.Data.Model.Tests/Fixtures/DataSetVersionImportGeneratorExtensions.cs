@@ -20,6 +20,11 @@ public static class DataSetVersionImportGeneratorExtensions
         Guid dataSetVersionId
     ) => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
 
+    public static Generator<DataSetVersionImport> WithDataSetVersionToReplaceId(
+        this Generator<DataSetVersionImport> generator,
+        Guid? dataSetVersionToReplaceId
+    ) => generator.ForInstance(s => s.SetDataSetVersionToReplaceId(dataSetVersionToReplaceId));
+
     public static Generator<DataSetVersionImport> WithInstanceId(
         this Generator<DataSetVersionImport> generator,
         Guid instanceId
@@ -48,6 +53,11 @@ public static class DataSetVersionImportGeneratorExtensions
         this InstanceSetters<DataSetVersionImport> instanceSetter,
         Guid dataSetVersionId
     ) => instanceSetter.Set(i => i.DataSetVersionId, dataSetVersionId);
+
+    public static InstanceSetters<DataSetVersionImport> SetDataSetVersionToReplaceId(
+        this InstanceSetters<DataSetVersionImport> instanceSetter,
+        Guid? dataSetVersionToReplaceId
+    ) => instanceSetter.Set(i => i.DataSetVersionToReplaceId, dataSetVersionToReplaceId);
 
     public static InstanceSetters<DataSetVersionImport> SetInstanceId(
         this InstanceSetters<DataSetVersionImport> instanceSetter,

@@ -16,4 +16,6 @@ public static class MappingKeyGenerators
     public static Func<FilterOptionMeta, string> FilterOptionMeta => option => option.Label;
 
     public static Func<FilterOptionMetaLink, string> FilterOptionMetaLink => link => FilterOptionMeta(link.Option);
+
+    public static Func<IndicatorMeta, string> IndicatorMeta => option => option.Column;
 }

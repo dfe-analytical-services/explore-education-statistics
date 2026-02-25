@@ -3956,6 +3956,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             );
         }
 
+        // TODO EES-6764 - add tests for mapped indicators in here.
+
         private async Task CompleteNextDataSetVersionImportProcessing(Guid instanceId)
         {
             await fixture.Function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
