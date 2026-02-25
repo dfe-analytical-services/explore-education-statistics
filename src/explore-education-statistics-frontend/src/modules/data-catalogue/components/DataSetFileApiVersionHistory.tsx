@@ -64,7 +64,7 @@ export default function DataSetFileApiVersionHistory({
         <p>
           More detailed information on versioning can be found in our{' '}
           <Link
-            to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/overview/versioning/#versioning"
+            to="https://api.education.gov.uk/statistics/docs/overview/versioning/#data-set-versioning"
             target="_blank"
             rel="noopener noreferrer"
           >
