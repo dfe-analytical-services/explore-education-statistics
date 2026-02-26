@@ -87,7 +87,10 @@ public record MajorChangesStatus
 
     public required bool FiltersHaveMajorChange { get; init; }
 
-    public bool IsMajorVersionUpdate => HasDeletionChanges || LocationsHaveMajorChange || FiltersHaveMajorChange;
+    public required bool IndicatorsHaveMajorChange { get; init; }
+
+    public bool IsMajorVersionUpdate =>
+        HasDeletionChanges || LocationsHaveMajorChange || FiltersHaveMajorChange || IndicatorsHaveMajorChange;
 }
 
 public record MappingStatusViewModel : MajorChangesStatus
@@ -95,6 +98,8 @@ public record MappingStatusViewModel : MajorChangesStatus
     public required bool LocationsComplete { get; init; }
 
     public required bool FiltersComplete { get; init; }
+
+    public required bool IndicatorsComplete { get; init; }
 }
 
 public record DataSetVersionInfoViewModel
