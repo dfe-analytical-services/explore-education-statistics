@@ -69,7 +69,11 @@ public class DataSetVersionMappingServiceTests
 
         var locationMappingTypes = new List<LocationMappingTypes>
         {
-            new() { LocationLevelRaw = locationMappingTypesLevel, LocationOptionRaw = locationMappingTypesOption },
+            new()
+            {
+                LocationLevelMappingTypeString = locationMappingTypesLevel,
+                LocationOptionMappingTypeString = locationMappingTypesOption,
+            },
         };
 
         SetupDbContext(
@@ -117,7 +121,10 @@ public class DataSetVersionMappingServiceTests
         // Arrange
         var targetDataSetVersionId = Guid.NewGuid();
 
-        var indicatorMappingTypes = new List<IndicatorMappingTypes> { new() { IndicatorRaw = indicatorMappingType } };
+        var indicatorMappingTypes = new List<IndicatorMappingTypes>
+        {
+            new() { IndicatorMappingTypeString = indicatorMappingType },
+        };
 
         SetupDbContext(
             targetDataSetVersionId,
@@ -345,8 +352,8 @@ public class DataSetVersionMappingServiceTests
                 {
                     new()
                     {
-                        LocationLevelRaw = locationMappingTypesLevel,
-                        LocationOptionRaw = locationMappingTypesOption,
+                        LocationLevelMappingTypeString = locationMappingTypesLevel,
+                        LocationOptionMappingTypeString = locationMappingTypesOption,
                     },
                 }
             );
@@ -356,13 +363,19 @@ public class DataSetVersionMappingServiceTests
             .ReturnsAsync(
                 new List<FilterMappingTypes>
                 {
-                    new() { FilterRaw = filterMappingTypesFilter, FilterOptionRaw = filterMappingTypesOption },
+                    new()
+                    {
+                        FilterMappingTypeString = filterMappingTypesFilter,
+                        FilterOptionMappingTypeString = filterMappingTypesOption,
+                    },
                 }
             );
 
         mockMappingTypesRepository
             .Setup(m => m.GetIndicatorMappingTypes(targetDataSetVersionId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<IndicatorMappingTypes> { new() { IndicatorRaw = indicatorMappingTypes } });
+            .ReturnsAsync(
+                new List<IndicatorMappingTypes> { new() { IndicatorMappingTypeString = indicatorMappingTypes } }
+            );
 
         return mockMappingTypesRepository;
     }
