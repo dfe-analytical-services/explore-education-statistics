@@ -27,7 +27,7 @@ public class TableBuilderQueryOptimiserTests
     {
         _statisticsDbContext = new StatisticsDbContext();
         _filterItemRepository = new Mock<IFilterItemRepository>(Strict);
-        _options = new TableBuilderOptions { CroppedTableMaxRows = 5, MaxTableCellsAllowed = 20 }.ToOptionsWrapper();
+        _options = new TableBuilderOptions { MaxTableCellsAllowed = 20 }.ToOptionsWrapper();
         _optimiser = new TableBuilderQueryOptimiser(_statisticsDbContext, _filterItemRepository.Object, _options);
     }
 
@@ -141,7 +141,7 @@ public class TableBuilderQueryOptimiserTests
 
     private static IOptions<TableBuilderOptions> DefaultTableBuilderOptions()
     {
-        return new TableBuilderOptions { CroppedTableMaxRows = 5, MaxTableCellsAllowed = 20 }.ToOptionsWrapper();
+        return new TableBuilderOptions { MaxTableCellsAllowed = 20 }.ToOptionsWrapper();
     }
 
     private static TableBuilderQueryOptimiser BuildTableBuilderQueryOptimiser(
