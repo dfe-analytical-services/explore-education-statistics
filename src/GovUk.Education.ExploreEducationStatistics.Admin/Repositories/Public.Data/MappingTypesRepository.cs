@@ -27,8 +27,8 @@ public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypes
                     CASE WHEN Level.value -> '{{{nameof(LocationLevelMappings.Candidates)}}}' = '{{}}' 
                         THEN '{{{nameof(MappingType.AutoNone)}}}'
                         ELSE '{{{nameof(MappingType.AutoMapped)}}}'
-                    END "{{{nameof(LocationMappingTypes.LocationLevelRaw)}}}",
-                    OptionMappingType "{{{nameof(LocationMappingTypes.LocationOptionRaw)}}}"
+                    END "{{{nameof(LocationMappingTypes.LocationLevelMappingTypeString)}}}",
+                    OptionMappingType "{{{nameof(LocationMappingTypes.LocationOptionMappingTypeString)}}}"
                 FROM
                     "{{{nameof(PublicDataDbContext.DataSetVersionMappings)}}}" Mapping,
                     jsonb_each(Mapping."{{{nameof(DataSetVersionMapping.LocationMappingPlan)}}}"
@@ -57,8 +57,8 @@ public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypes
             .Database.SqlQueryRaw<FilterMappingTypes>(
                 $"""
                 SELECT DISTINCT 
-                    FilterMappingType "{nameof(FilterMappingTypes.FilterRaw)}", 
-                    OptionMappingType "{nameof(FilterMappingTypes.FilterOptionRaw)}" 
+                    FilterMappingType "{nameof(FilterMappingTypes.FilterMappingTypeString)}", 
+                    OptionMappingType "{nameof(FilterMappingTypes.FilterOptionMappingTypeString)}" 
                 FROM 
                     "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.FilterMappingPlan)}" 
@@ -85,7 +85,7 @@ public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypes
             .Database.SqlQueryRaw<IndicatorMappingTypes>(
                 $"""
                 SELECT DISTINCT 
-                    IndicatorMappingType "{nameof(IndicatorMappingTypes.IndicatorRaw)}"
+                    IndicatorMappingType "{nameof(IndicatorMappingTypes.IndicatorMappingTypeString)}"
                 FROM 
                     "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
                     jsonb_each(Mapping."{nameof(DataSetVersionMapping.IndicatorMappingPlan)}" 

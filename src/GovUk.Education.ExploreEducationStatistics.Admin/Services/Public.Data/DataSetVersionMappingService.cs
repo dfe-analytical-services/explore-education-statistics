@@ -298,12 +298,16 @@ public class DataSetVersionMappingService(
         var majorChangesStatus = new MajorChangesStatus
         {
             LocationsHaveMajorChange = locationMappingTypes.Any(types =>
-                NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption)
+                NoMappingTypes.Contains(types.LocationLevelMappingType)
+                || NoMappingTypes.Contains(types.LocationOptionMappingType)
             ),
             FiltersHaveMajorChange = filterMappingTypes.Any(types =>
-                NoMappingTypes.Contains(types.Filter) || NoMappingTypes.Contains(types.FilterOption)
+                NoMappingTypes.Contains(types.FilterMappingType)
+                || NoMappingTypes.Contains(types.FilterOptionMappingType)
             ),
-            IndicatorsHaveMajorChange = indicatorMappingTypes.Any(types => NoMappingTypes.Contains(types.Indicator)),
+            IndicatorsHaveMajorChange = indicatorMappingTypes.Any(types =>
+                NoMappingTypes.Contains(types.IndicatorMappingType)
+            ),
             HasDeletionChanges = await HasDeletionChanges(dataSetVersionId, cancellationToken),
         };
         return majorChangesStatus;
@@ -341,16 +345,16 @@ public class DataSetVersionMappingService(
         // We omit options for location levels that are mapped as `AutoNone` as these
         // means the entire location level has been deleted and cannot be mapped.
         var locationMappingsComplete = !locationLevelAndOptionMappingTypes
-            .Where(types => types.LocationLevel != MappingType.AutoNone)
-            .Any(types => IncompleteMappingTypes.Contains(types.LocationOption));
+            .Where(types => types.LocationLevelMappingType != MappingType.AutoNone)
+            .Any(types => IncompleteMappingTypes.Contains(types.LocationOptionMappingType));
 
         // Find any filter options that that indicates the user still needs to take action
         // in order to resolve the mapping. If any exist, mappings are not yet complete.
         // We omit options for filters that are mapped as `AutoNone` as this
         // means the entire filter has been deleted and cannot be mapped.
         var filterMappingsComplete = !filterAndOptionMappingTypes
-            .Where(types => types.Filter != MappingType.AutoNone)
-            .Any(types => IncompleteMappingTypes.Contains(types.FilterOption));
+            .Where(types => types.FilterMappingType != MappingType.AutoNone)
+            .Any(types => IncompleteMappingTypes.Contains(types.FilterOptionMappingType));
 
         // Update the mapping complete flags.
         await publicDataDbContext
