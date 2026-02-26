@@ -150,7 +150,9 @@ const ReleaseContent = ({
           handleFeaturedTableItemClick={handleFeaturedTableItemClick}
         />
       )}
-      {activeTab === 'methodology' && <ReleasePageTabMethodology />}
+      {activeTab === 'methodology' && (
+        <ReleasePageTabMethodology isPra={isPra} />
+      )}
       {activeTab === 'help' && <ReleasePageTabHelp />}
     </>
   );

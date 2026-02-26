@@ -23,7 +23,7 @@ const PreReleaseContentPage = ({
   const { publicationId, releaseVersionId } = match.params;
 
   const { data: content, isLoading: isLoadingContent } = useQuery(
-    releaseContentQueries.get(releaseVersionId),
+    releaseContentQueries.get(releaseVersionId, true),
   );
 
   const previewRedesign =
