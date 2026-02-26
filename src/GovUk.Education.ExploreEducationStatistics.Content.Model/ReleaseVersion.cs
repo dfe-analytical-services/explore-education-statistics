@@ -129,6 +129,13 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
         set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, value);
     }
 
+    [NotMapped]
+    public ContentSection? WarningSection
+    {
+        get => FindSingleSectionByType(ContentSectionType.Warning);
+        set => ReplaceContentSectionsOfType(ContentSectionType.Warning, value);
+    }
+
     public List<DataBlockVersion> DataBlockVersions { get; set; } = new();
 
     private ContentSection? FindSingleSectionByType(ContentSectionType type)

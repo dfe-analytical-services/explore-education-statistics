@@ -20,6 +20,7 @@ public class ReleaseContentDtoBuilder
 
     private ContentSectionDto _summarySection = new ContentSectionDtoBuilder().Build();
     private ContentSectionDto _keyStatisticsSecondarySection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto? _warningSection = new ContentSectionDtoBuilder().Build();
 
     public ReleaseContentDto Build() =>
         new()
@@ -31,6 +32,7 @@ public class ReleaseContentDtoBuilder
             KeyStatistics = _keyStatistics,
             KeyStatisticsSecondarySection = _keyStatisticsSecondarySection,
             SummarySection = _summarySection,
+            WarningSection = _warningSection,
         };
 
     public ReleaseContentDtoBuilder WithReleaseId(Guid releaseId)
@@ -72,6 +74,12 @@ public class ReleaseContentDtoBuilder
     public ReleaseContentDtoBuilder WithSummarySection(ContentSectionDto summarySection)
     {
         _summarySection = summarySection;
+        return this;
+    }
+
+    public ReleaseContentDtoBuilder WithWarningSection(ContentSectionDto? warningSection)
+    {
+        _warningSection = warningSection;
         return this;
     }
 }

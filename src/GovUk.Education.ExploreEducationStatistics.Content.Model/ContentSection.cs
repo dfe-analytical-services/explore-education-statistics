@@ -10,6 +10,7 @@ public enum ContentSectionType
     KeyStatisticsSecondary,
     Headlines,
     RelatedDashboards,
+    Warning,
 }
 
 public class ContentSection
@@ -20,7 +21,7 @@ public class ContentSection
 
     public string? Heading { get; set; }
 
-    public List<ContentBlock> Content { get; set; } = new();
+    public List<ContentBlock> Content { get; set; } = [];
 
     public ReleaseVersion ReleaseVersion { get; set; } = null!;
 

@@ -122,6 +122,7 @@ public class ManageContentPageServiceTests
                 inContentDataBlockParent
             );
             contentDbContext.ContentSections.AddRange(
+                genericContentSection,
                 new ContentSection { ReleaseVersion = releaseVersion, Type = ContentSectionType.Headlines },
                 new ContentSection
                 {
@@ -130,7 +131,7 @@ public class ManageContentPageServiceTests
                 },
                 new ContentSection { ReleaseVersion = releaseVersion, Type = ContentSectionType.ReleaseSummary },
                 new ContentSection { ReleaseVersion = releaseVersion, Type = ContentSectionType.RelatedDashboards },
-                genericContentSection
+                new ContentSection { ReleaseVersion = releaseVersion, Type = ContentSectionType.Warning }
             );
 
             await contentDbContext.SaveChangesAsync();
@@ -198,6 +199,7 @@ public class ManageContentPageServiceTests
             );
             Assert.Equal(releaseVersion.HeadlinesSection!.Id, contentRelease.HeadlinesSection.Id);
             Assert.Equal(releaseVersion.RelatedDashboardsSection!.Id, contentRelease.RelatedDashboardsSection.Id);
+            Assert.Equal(releaseVersion.WarningSection!.Id, contentRelease.WarningSection.Id);
             Assert.True(contentRelease.LatestRelease);
             Assert.Equal(releaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
             Assert.Equal(releaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
@@ -364,11 +366,16 @@ public class ManageContentPageServiceTests
             contentDbContext.Publications.Add(publication);
             contentDbContext.MethodologyVersions.AddRange(methodologyVersions);
             contentDbContext.ContentSections.AddRange(
-                new() { Type = ContentSectionType.Headlines, ReleaseVersion = releaseVersion },
-                new() { Type = ContentSectionType.KeyStatisticsSecondary, ReleaseVersion = releaseVersion },
-                new() { Type = ContentSectionType.ReleaseSummary, ReleaseVersion = releaseVersion },
-                new() { Type = ContentSectionType.RelatedDashboards, ReleaseVersion = releaseVersion },
-                new() { Type = ContentSectionType.Generic, ReleaseVersion = releaseVersion }
+                new ContentSection { Type = ContentSectionType.Generic, ReleaseVersion = releaseVersion },
+                new ContentSection { Type = ContentSectionType.Headlines, ReleaseVersion = releaseVersion },
+                new ContentSection
+                {
+                    Type = ContentSectionType.KeyStatisticsSecondary,
+                    ReleaseVersion = releaseVersion,
+                },
+                new ContentSection { Type = ContentSectionType.ReleaseSummary, ReleaseVersion = releaseVersion },
+                new ContentSection { Type = ContentSectionType.RelatedDashboards, ReleaseVersion = releaseVersion },
+                new ContentSection { Type = ContentSectionType.Warning, ReleaseVersion = releaseVersion }
             );
             await contentDbContext.SaveChangesAsync();
         }

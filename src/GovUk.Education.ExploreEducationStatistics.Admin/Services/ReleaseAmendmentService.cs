@@ -320,21 +320,28 @@ public class ReleaseAmendmentService(
             })
             .ToList();
 
-        // If the original Release did not contain a RelatedDashboards section, add an empty one to its amendment.
-        if (originalReleaseVersion.RelatedDashboardsSection == null)
-        {
-            amendedContent.Add(
-                new ContentSection
-                {
-                    Id = Guid.NewGuid(),
-                    Type = ContentSectionType.RelatedDashboards,
-                    ReleaseVersionId = amendmentReleaseVersionId,
-                }
-            );
-        }
+        // Ensure all non-generic sections are initialised as not every type of section has existed historically
+        var missingSectionTypes = Enum.GetValues<ContentSectionType>()
+            .Except(originalReleaseVersion.Content.Select(s => s.Type))
+            .Except([ContentSectionType.Generic])
+            .ToArray();
+        amendedContent.AddRange(
+            missingSectionTypes.Select(t => InitialiseEmptyContentSectionOfType(t, amendmentReleaseVersionId))
+        );
 
         return amendedContent;
     }
+
+    private ContentSection InitialiseEmptyContentSectionOfType(
+        ContentSectionType contentSectionType,
+        Guid amendmentReleaseVersionId
+    ) =>
+        new()
+        {
+            Id = Guid.NewGuid(),
+            Type = contentSectionType,
+            ReleaseVersionId = amendmentReleaseVersionId,
+        };
 
     private List<ContentBlock> CopyContentBlocks(
         List<ContentBlock> originalSectionContent,

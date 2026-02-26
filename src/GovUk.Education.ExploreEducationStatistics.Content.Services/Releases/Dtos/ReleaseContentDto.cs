@@ -16,10 +16,17 @@ public record ReleaseContentDto
     public required KeyStatisticBaseDto[] KeyStatistics { get; init; }
     public required ContentSectionDto KeyStatisticsSecondarySection { get; init; }
     public required ContentSectionDto SummarySection { get; init; }
+    public required ContentSectionDto? WarningSection { get; init; }
 
     public ContentSectionDto[] GetAllSections()
     {
-        ContentSectionDto?[] optionalSections = [HeadlinesSection, KeyStatisticsSecondarySection, SummarySection];
+        ContentSectionDto?[] optionalSections =
+        [
+            HeadlinesSection,
+            KeyStatisticsSecondarySection,
+            SummarySection,
+            WarningSection,
+        ];
         return optionalSections.OfType<ContentSectionDto>().Concat(Content).ToArray();
     }
 
@@ -47,6 +54,10 @@ public record ReleaseContentDto
             SummarySection = ContentSectionDto.FromContentSection(
                 releaseVersion.SummarySection ?? throw new ArgumentException("ReleaseVersion must have SummarySection")
             ),
+            WarningSection =
+                releaseVersion.WarningSection != null
+                    ? ContentSectionDto.FromContentSection(releaseVersion.WarningSection)
+                    : null,
         };
 }
 

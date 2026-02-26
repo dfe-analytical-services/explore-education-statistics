@@ -71,6 +71,11 @@ public abstract class ReleaseContentServiceTests
                 .WithType(ContentSectionType.ReleaseSummary)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Summary content</p>")]);
 
+            releaseVersion.WarningSection = _dataFixture
+                .DefaultContentSection()
+                .WithType(ContentSectionType.Warning)
+                .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Warning content</p>")]);
+
             releaseVersion.GenericContent =
             [
                 _dataFixture
@@ -125,6 +130,9 @@ public abstract class ReleaseContentServiceTests
                 Assert.NotNull(result.SummarySection);
                 AssertContentSectionEqual(releaseVersion.SummarySection, result.SummarySection);
 
+                Assert.NotNull(result.WarningSection);
+                AssertContentSectionEqual(releaseVersion.WarningSection, result.WarningSection);
+
                 var expectedContentSections = releaseVersion.GenericContent.OrderBy(cs => cs.Order).ToList();
                 Assert.Equal(expectedContentSections.Count, result.Content.Length);
                 Assert.All(
@@ -153,48 +161,66 @@ public abstract class ReleaseContentServiceTests
         public async Task WhenContentContainsComments_RemovesComments()
         {
             // Arrange
+            const string section1Block1Body = """
+                <p><comment-start name="comment-1"></comment-start>Section 1 block 1 content<comment-end name="comment-1"></comment-end></p>
+                """;
+            const string section1Block2Body = """
+                <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Section 1 block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
+                """;
+            const string section1Block3Body = """
+                <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Section 1 block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
+                """;
+            const string headlinesBlockBody = """
+                <p><comment-start name="comment-4"></comment-start>Headlines content<comment-end name="comment-4"></comment-end></p>
+                """;
+            const string summaryBlockBody = """
+                <p><commentplaceholder-start name="comment-5"></commentplaceholder-start>Summary content<commentplaceholder-end name="comment-5"></commentplaceholder-end></p>
+                """;
+            const string warningBlockBody = """
+                <p><resolvedcomment-start name="comment-6"></resolvedcomment-start>Warning content<resolvedcomment-end name="comment-6"></resolvedcomment-end></p>
+                """;
+
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithPublished(DateTimeOffset.UtcNow)
+                                        .WithContent([
+                                            _dataFixture
+                                                .DefaultContentSection()
+                                                .WithHeading("Section 1")
+                                                .WithContentBlocks(
+                                                    _dataFixture
+                                                        .DefaultHtmlBlock()
+                                                        .ForIndex(0, s => s.SetBody(section1Block1Body))
+                                                        .ForIndex(1, s => s.SetBody(section1Block2Body))
+                                                        .ForIndex(2, s => s.SetBody(section1Block3Body))
+                                                        .GenerateList()
+                                                ),
+                                        ])
+                                        .WithKeyStatisticsSecondaryContent([])
+                                        .WithHeadlinesContent([
+                                            _dataFixture.DefaultHtmlBlock().WithBody(headlinesBlockBody),
+                                        ])
+                                        .WithReleaseSummaryContent([
+                                            _dataFixture.DefaultHtmlBlock().WithBody(summaryBlockBody),
+                                        ])
+                                        .WithWarningContent([
+                                            _dataFixture.DefaultHtmlBlock().WithBody(warningBlockBody),
+                                        ]),
+                                ]
+                            ),
+                    ]
+                );
+
             var release = publication.Releases[0];
-            var releaseVersion = release.Versions[0];
-
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
-                ContentSectionType.KeyStatisticsSecondary
-            );
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
-
-            releaseVersion.GenericContent =
-            [
-                _dataFixture
-                    .DefaultContentSection()
-                    .WithHeading("Section 1")
-                    .WithContentBlocks([
-                        _dataFixture
-                            .DefaultHtmlBlock()
-                            .WithBody(
-                                """
-                                <p><comment-start name="comment-1"></comment-start>Section 1 block 1 content<comment-end name="comment-1"></comment-end></p>
-                                """
-                            ),
-                        _dataFixture
-                            .DefaultHtmlBlock()
-                            .WithBody(
-                                """
-                                <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Section 1 block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
-                                """
-                            ),
-                        _dataFixture
-                            .DefaultHtmlBlock()
-                            .WithBody(
-                                """
-                                <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Section 1 block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
-                                """
-                            ),
-                    ]),
-            ];
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -222,11 +248,24 @@ public abstract class ReleaseContentServiceTests
                 Assert.Equal("<p>Section 1 block 2 content</p>", htmlBlock2.Body);
                 var htmlBlock3 = Assert.IsType<HtmlBlockDto>(contentSection1.Content[2]);
                 Assert.Equal("<p>Section 1 block 3 content</p>", htmlBlock3.Body);
+
+                Assert.Single(actual.HeadlinesSection.Content);
+                var headlinesHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.HeadlinesSection.Content[0]);
+                Assert.Equal("<p>Headlines content</p>", headlinesHtmlBlock.Body);
+
+                Assert.Single(actual.SummarySection.Content);
+                var summaryHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.SummarySection.Content[0]);
+                Assert.Equal("<p>Summary content</p>", summaryHtmlBlock.Body);
+
+                Assert.NotNull(actual.WarningSection);
+                Assert.Single(actual.WarningSection.Content);
+                var warningHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.WarningSection.Content[0]);
+                Assert.Equal("<p>Warning content</p>", warningHtmlBlock.Body);
             }
         }
 
         [Fact]
-        public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyContent()
+        public async Task WhenReleaseVersionHasEmptyContent_ReturnsEmptyContent()
         {
             // Arrange
             Publication publication = _dataFixture
@@ -235,12 +274,8 @@ public abstract class ReleaseContentServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Initialise the release version with empty sections to match how a newly created release would be configured
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
-                ContentSectionType.KeyStatisticsSecondary
-            );
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            // Initialise the release version with empty sections to match how a newly created release would be configured.
+            InitialiseNonGenericSectionsForReleaseVersion(releaseVersion);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -266,6 +301,42 @@ public abstract class ReleaseContentServiceTests
                 Assert.Empty(result.KeyStatistics);
                 Assert.Empty(result.KeyStatisticsSecondarySection.Content);
                 Assert.Empty(result.SummarySection.Content);
+                Assert.NotNull(result.WarningSection);
+                Assert.Empty(result.WarningSection.Content);
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionHasNoWarningSection_ReturnsNullWarningSection()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Initialise the release version with empty sections but without a warning section,
+            // as would be the case for a release version published before the warning section feature was introduced.
+            InitialiseNonGenericSectionsForReleaseVersion(releaseVersion, includeWarningSection: false);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseContent(publicationSlug: publication.Slug, releaseSlug: release.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+                Assert.Null(result.WarningSection);
             }
         }
 
@@ -286,11 +357,7 @@ public abstract class ReleaseContentServiceTests
                     .WithHeading("Section 1")
                     .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Old content</p>")]),
             ];
-            olderReleaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            olderReleaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
-                ContentSectionType.KeyStatisticsSecondary
-            );
-            olderReleaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            InitialiseNonGenericSectionsForReleaseVersion(olderReleaseVersion);
 
             var latestPublishedReleaseVersion = release.Versions[1];
             latestPublishedReleaseVersion.GenericContent =
@@ -300,11 +367,7 @@ public abstract class ReleaseContentServiceTests
                     .WithHeading("Section 1")
                     .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Latest published content</p>")]),
             ];
-            latestPublishedReleaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            latestPublishedReleaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
-                ContentSectionType.KeyStatisticsSecondary
-            );
-            latestPublishedReleaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            InitialiseNonGenericSectionsForReleaseVersion(latestPublishedReleaseVersion);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -397,6 +460,22 @@ public abstract class ReleaseContentServiceTests
 
                 // Assert
                 outcome.AssertNotFound();
+            }
+        }
+
+        private void InitialiseNonGenericSectionsForReleaseVersion(
+            ReleaseVersion releaseVersion,
+            bool includeWarningSection = true
+        )
+        {
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
+                ContentSectionType.KeyStatisticsSecondary
+            );
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            if (includeWarningSection)
+            {
+                releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
             }
         }
 
