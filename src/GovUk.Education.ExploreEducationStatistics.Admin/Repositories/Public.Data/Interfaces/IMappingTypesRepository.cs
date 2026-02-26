@@ -13,4 +13,9 @@ public interface IMappingTypesRepository
         Guid targetDataSetVersionId,
         CancellationToken cancellationToken = default
     );
+
+    public Task<List<IndicatorMappingTypes>> GetIndicatorMappingTypes(
+        Guid targetDataSetVersionId,
+        CancellationToken cancellationToken = default
+    );
 }

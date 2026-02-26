@@ -72,4 +72,31 @@ public class MappingTypesRepository(PublicDataDbContext context) : IMappingTypes
             )
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<List<IndicatorMappingTypes>> GetIndicatorMappingTypes(
+        Guid targetDataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", targetDataSetVersionId);
+
+        // Find all the distinct mapping types across all indicators.
+        return await _context
+            .Database.SqlQueryRaw<IndicatorMappingTypes>(
+                $"""
+                SELECT DISTINCT 
+                    IndicatorMappingType "{nameof(IndicatorMappingTypes.IndicatorRaw)}"
+                FROM 
+                    "{nameof(PublicDataDbContext.DataSetVersionMappings)}" Mapping,
+                    jsonb_each(Mapping."{nameof(DataSetVersionMapping.IndicatorMappingPlan)}" 
+                                   -> '{nameof(IndicatorMappingPlan.Mappings)}') IndicatorMapping,
+                    jsonb_extract_path_text(IndicatorMapping.value, '{nameof(
+                    IndicatorMapping.Type
+                )}') IndicatorMappingType
+                WHERE "{nameof(DataSetVersionMapping.TargetDataSetVersionId)}" = @targetDataSetVersionId
+                """,
+                parameters: [targetDataSetVersionIdParam]
+            )
+            .ToListAsync(cancellationToken);
+    }
 }

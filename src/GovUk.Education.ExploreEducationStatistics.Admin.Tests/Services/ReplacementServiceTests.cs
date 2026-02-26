@@ -682,9 +682,11 @@ public class ReplacementServiceTests
                 {
                     FiltersComplete = true,
                     LocationsComplete = true,
+                    IndicatorsComplete = true,
                     HasDeletionChanges = false,
                     FiltersHaveMajorChange = false,
                     LocationsHaveMajorChange = false,
+                    IndicatorsHaveMajorChange = false,
                 }
             );
 

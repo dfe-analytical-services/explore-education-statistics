@@ -70,6 +70,18 @@ public class DataSetVersionMappingService(
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
 
+    // TODO EES-6764 - remove null-forgiving operator.
+    public Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return userService
+            .CheckIsBauUser()
+            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+            .OnSuccess(mapping => mapping.IndicatorMappingPlan)!;
+    }
+
     public async Task<MappingStatusViewModel?> GetMappingStatus(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default
@@ -85,10 +97,16 @@ public class DataSetVersionMappingService(
             cancellationToken
         );
 
+        var indicatorMappingTypes = await mappingTypesRepository.GetIndicatorMappingTypes(
+            dataSetVersionId,
+            cancellationToken
+        );
+
         var majorChangesStatus = await GetMajorChangesStatus(
             dataSetVersionId,
             locationOptionMappingTypes,
             filterAndOptionMappingTypes,
+            indicatorMappingTypes,
             cancellationToken
         );
 
@@ -98,8 +116,10 @@ public class DataSetVersionMappingService(
             {
                 LocationsComplete = mapping.LocationMappingsComplete,
                 FiltersComplete = mapping.FilterMappingsComplete,
+                IndicatorsComplete = mapping.IndicatorMappingsComplete,
                 LocationsHaveMajorChange = majorChangesStatus.LocationsHaveMajorChange,
                 FiltersHaveMajorChange = majorChangesStatus.FiltersHaveMajorChange,
+                IndicatorsHaveMajorChange = majorChangesStatus.IndicatorsHaveMajorChange,
                 HasDeletionChanges = majorChangesStatus.HasDeletionChanges,
             })
             .SingleOrDefaultAsync(cancellationToken);
@@ -176,6 +196,11 @@ public class DataSetVersionMappingService(
             cancellationToken
         );
 
+        var indicatorMappingTypes = await mappingTypesRepository.GetIndicatorMappingTypes(
+            nextDataSetVersionId,
+            cancellationToken
+        );
+
         await UpdateMappingCompleteFlags(
             nextDataSetVersionId: nextDataSetVersionId,
             locationLevelAndOptionMappingTypes: locationOptionMappingTypes,
@@ -187,6 +212,7 @@ public class DataSetVersionMappingService(
             nextDataSetVersionId: nextDataSetVersionId,
             locationMappingTypes: locationOptionMappingTypes,
             filterMappingTypes: filterAndOptionMappingTypes,
+            indicatorMappingTypes: indicatorMappingTypes,
             cancellationToken: cancellationToken
         );
     }
@@ -195,6 +221,7 @@ public class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
+        List<IndicatorMappingTypes> indicatorMappingTypes,
         CancellationToken cancellationToken
     )
     {
@@ -212,6 +239,7 @@ public class DataSetVersionMappingService(
             nextDataSetVersionId,
             locationMappingTypes,
             filterMappingTypes,
+            indicatorMappingTypes,
             cancellationToken
         );
 
@@ -263,17 +291,19 @@ public class DataSetVersionMappingService(
         Guid dataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
+        List<IndicatorMappingTypes> indicatorMappingTypes,
         CancellationToken cancellationToken = default
     )
     {
         var majorChangesStatus = new MajorChangesStatus
         {
-            FiltersHaveMajorChange = filterMappingTypes.Any(types =>
-                NoMappingTypes.Contains(types.Filter) || NoMappingTypes.Contains(types.FilterOption)
-            ),
             LocationsHaveMajorChange = locationMappingTypes.Any(types =>
                 NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption)
             ),
+            FiltersHaveMajorChange = filterMappingTypes.Any(types =>
+                NoMappingTypes.Contains(types.Filter) || NoMappingTypes.Contains(types.FilterOption)
+            ),
+            IndicatorsHaveMajorChange = indicatorMappingTypes.Any(types => NoMappingTypes.Contains(types.Indicator)),
             HasDeletionChanges = await HasDeletionChanges(dataSetVersionId, cancellationToken),
         };
         return majorChangesStatus;
