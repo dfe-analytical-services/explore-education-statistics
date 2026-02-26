@@ -551,6 +551,9 @@ public class DataSetValidatorTests
 
         var userService = new Mock<IUserService>(MockBehavior.Strict);
         userService.Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser)).ReturnsAsync(true);
+        userService
+            .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), SecurityPolicies.CanUpdateSpecificReleaseVersion))
+            .ReturnsAsync(true);
 
         var dataSetDto = new DataSetDto
         {
@@ -565,7 +568,6 @@ public class DataSetValidatorTests
 
         context.ReleaseFiles.AddRange(existingDataReleaseFile, existingMetaReleaseFile);
         await context.SaveChangesAsync();
-
         var sut = BuildService(context, userService.Object);
 
         // Act
@@ -639,7 +641,16 @@ public class DataSetValidatorTests
             .Setup(s => s.HasDraftVersion(existingDataReleaseFile.PublicApiDataSetId.Value, CancellationToken.None))
             .ReturnsAsync(true);
 
-        var sut = BuildService(contentDbContext: context, dataSetService: dataSetServiceMock.Object);
+        var userServiceMock = new Mock<IUserService>(MockBehavior.Strict);
+        userServiceMock
+            .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), SecurityPolicies.CanUpdateSpecificReleaseVersion))
+            .ReturnsAsync(true);
+
+        var sut = BuildService(
+            contentDbContext: context,
+            userService: userServiceMock.Object,
+            dataSetService: dataSetServiceMock.Object
+        );
 
         // Act
         var result = await sut.ValidateDataSet(dataSetDto);
