@@ -1035,6 +1035,12 @@ internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
+    public Task<Either<ActionResult, BatchIndicatorMappingUpdatesResponseViewModel>> ApplyBatchIndicatorMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchIndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+
     public Task<
         Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>
     > ApplyBatchFilterOptionMappingUpdates(

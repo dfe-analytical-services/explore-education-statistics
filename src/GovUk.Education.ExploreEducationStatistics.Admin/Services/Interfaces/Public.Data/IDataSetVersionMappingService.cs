@@ -35,5 +35,11 @@ public interface IDataSetVersionMappingService
         CancellationToken cancellationToken = default
     );
 
+    Task<Either<ActionResult, BatchIndicatorMappingUpdatesResponseViewModel>> ApplyBatchIndicatorMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchIndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    );
+
     Task<MappingStatusViewModel> GetMappingStatus(Guid dataSetVersionId, CancellationToken cancellationToken = default);
 }
