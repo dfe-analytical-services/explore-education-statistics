@@ -112,12 +112,10 @@ public class DataSetValidatorTests
     }
 
     [Theory]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(false, false)]
-    public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsDataSetObjectIfContributorOrApprover(
-        bool isContributor,
-        bool isApprover
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsDataSetObjectIfUserHasClaim(
+        bool userHasClaimToUpdateRelease
     )
     {
         // Arrange
@@ -180,16 +178,6 @@ public class DataSetValidatorTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using var context = InMemoryContentDbContext(contentDbContextId);
 
-        if (isContributor)
-        {
-            context.UserReleaseRoles.Add(userReleaseRoleContributor);
-        }
-
-        if (isApprover)
-        {
-            context.UserReleaseRoles.Add(userReleaseRoleApprover);
-        }
-
         context.ReleaseFiles.AddRange(
             existingDataReleaseFile,
             existingMetaReleaseFile,
@@ -199,6 +187,9 @@ public class DataSetValidatorTests
         await context.SaveChangesAsync();
 
         var userService = new Mock<IUserService>(MockBehavior.Strict);
+        userService
+            .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), SecurityPolicies.CanUpdateSpecificReleaseVersion))
+            .ReturnsAsync(userHasClaimToUpdateRelease);
         userService.Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser)).ReturnsAsync(false);
 
         var sut = BuildService(context, userService.Object);
@@ -207,7 +198,7 @@ public class DataSetValidatorTests
         var result = await sut.ValidateDataSet(dataSetDto);
 
         // Assert
-        if (!isContributor && !isApprover)
+        if (!userHasClaimToUpdateRelease)
         {
             var errors = result.AssertLeft();
             Assert.Single(errors);
