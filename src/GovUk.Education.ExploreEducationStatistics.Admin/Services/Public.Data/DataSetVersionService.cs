@@ -127,28 +127,30 @@ public class DataSetVersionService(
         Guid releaseFileId,
         Guid dataSetId,
         Guid? dataSetVersionToReplaceId = null,
-        Guid[]? contributorsAndApproversUserIds = null,
         CancellationToken cancellationToken = default
     )
     {
+        var releaseFile = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.ReleaseVersion)
+            .SingleAsync(r => r.Id == releaseFileId, cancellationToken);
+
         return await userService
-            .CheckIsBauUserOrInAllowedList(contributorsAndApproversUserIds)
+            .CheckCanUpdateReleaseVersion(releaseFile.ReleaseVersion)
             .OnSuccess(async () =>
-                await processorClient
-                    .CreateNextDataSetVersionMappings(
-                        dataSetId: dataSetId,
-                        releaseFileId: releaseFileId,
-                        dataSetVersionToReplaceId: dataSetVersionToReplaceId,
-                        cancellationToken: cancellationToken
-                    )
-                    .OnSuccess(async processorResponse =>
-                        await publicDataDbContext.DataSetVersions.SingleAsync(
-                            dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
-                            cancellationToken
-                        )
-                    )
-                    .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken))
-            );
+                await processorClient.CreateNextDataSetVersionMappings(
+                    dataSetId: dataSetId,
+                    releaseFileId: releaseFileId,
+                    dataSetVersionToReplaceId: dataSetVersionToReplaceId,
+                    cancellationToken: cancellationToken
+                )
+            )
+            .OnSuccess(async processorResponse =>
+                await publicDataDbContext.DataSetVersions.SingleAsync(
+                    dataSetVersion => dataSetVersion.Id == processorResponse.DataSetVersionId,
+                    cancellationToken
+                )
+            )
+            .OnSuccess(async dataSetVersion => await MapDraftVersionSummary(dataSetVersion, cancellationToken));
     }
 
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
@@ -179,12 +181,31 @@ public class DataSetVersionService(
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
-        Guid[]? contributorsAndApproversUserIds = null,
         CancellationToken cancellationToken = default
     )
     {
         return await userService
-            .CheckIsBauUserOrInAllowedList(contributorsAndApproversUserIds)
+            .CheckIsBauUser()
+            .OnSuccessVoid(async () =>
+                await processorClient.DeleteDataSetVersion(
+                    dataSetVersionId: dataSetVersionId,
+                    cancellationToken: cancellationToken
+                )
+            );
+    }
+
+    public async Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var releaseVersion = await contentDbContext
+            .ReleaseVersions.AsNoTracking()
+            .SingleAsync(r => r.Id == releaseVersionId, cancellationToken);
+
+        return await userService
+            .CheckCanUpdateReleaseVersion(releaseVersion)
             .OnSuccessVoid(async () =>
                 await processorClient.DeleteDataSetVersion(
                     dataSetVersionId: dataSetVersionId,

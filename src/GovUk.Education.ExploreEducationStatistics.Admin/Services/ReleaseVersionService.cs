@@ -637,14 +637,6 @@ public class ReleaseVersionService(
 
     public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
     {
-        var contributorsAndApproversUserIds = await userReleaseRoleRepository
-            .Query()
-            .AsNoTracking()
-            .WhereForReleaseVersion(releaseVersionId)
-            .WhereRolesIn(ReleaseRole.Contributor, ReleaseRole.Approver)
-            .Select(urr => urr.UserId)
-            .ToArrayAsync();
-
         return await context
             .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
@@ -676,15 +668,13 @@ public class ReleaseVersionService(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId)
                 );
             })
-            .OnSuccessDo(async deletePlan =>
-                await DeleteDraftApiDataSetVersion(deletePlan, contributorsAndApproversUserIds)
-            )
+            .OnSuccessDo(async deletePlan => await DeleteDraftApiDataSetVersion(deletePlan, releaseVersionId))
             .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
     }
 
     private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(
         DeleteDataFilePlanViewModel deletePlan,
-        Guid[] contributorsAndApprovers
+        Guid releaseVersionId
     )
     {
         // Skip when Status == DataSetVersionStatus.Published;
@@ -692,11 +682,7 @@ public class ReleaseVersionService(
         {
             return Unit.Instance;
         }
-
-        return await dataSetVersionService.DeleteVersion(
-            deletePlan.ApiDataSetVersionPlan!.Id,
-            contributorsAndApprovers
-        );
+        return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id, releaseVersionId);
     }
 
     public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(

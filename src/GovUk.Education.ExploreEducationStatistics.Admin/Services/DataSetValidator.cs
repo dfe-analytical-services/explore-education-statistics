@@ -61,6 +61,18 @@ public class DataSetValidator(
 
             if (releaseFileWithApiDataSet != null)
             {
+                var releaseVersion = await contentDbContext
+                    .ReleaseVersions.AsNoTracking()
+                    .SingleAsync(v => v.Id == dataSet.ReleaseVersionId);
+
+                var canUpdateReleaseVersion = await userService.CheckCanUpdateReleaseVersion(releaseVersion).IsRight();
+
+                if (!canUpdateReleaseVersion)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorAnalystCannotReplaceApiDataSet(dataSet.Title));
+                    return errors;
+                }
+
                 if (!releaseFileWithApiDataSet.ReleaseVersion.Amendment)
                 {
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDraftApiDataSet(dataSet.Title));

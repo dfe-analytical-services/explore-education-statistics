@@ -111,8 +111,14 @@ public class DataSetValidatorTests
         }
     }
 
-    [Fact]
-    public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsDataSetObject()
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(false, false)]
+    public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsDataSetObjectIfContributorOrApprover(
+        bool isContributor,
+        bool isApprover
+    )
     {
         // Arrange
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
@@ -122,13 +128,13 @@ public class DataSetValidatorTests
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
 
         var dataSetTitle = "Data set title";
-
+        var publicationId = Guid.NewGuid();
         var existingDataReleaseFile = _fixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseVersion)
             .WithName(dataSetTitle)
             .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithFilename(dataFile.FileName))
-            .WithPublicApiDataSetId(Guid.NewGuid())
+            .WithPublicApiDataSetId(publicationId)
             .Generate();
 
         var existingMetaReleaseFile = _fixture
@@ -151,6 +157,18 @@ public class DataSetValidatorTests
             .WithFile(_fixture.DefaultFile().WithType(FileType.Metadata).WithFilename(metaFile.FileName))
             .Generate();
 
+        var userId = Guid.NewGuid();
+        UserReleaseRole userReleaseRoleContributor = _fixture
+            .DefaultUserReleaseRole()
+            .WithUserId(userId)
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Contributor);
+        UserReleaseRole userReleaseRoleApprover = _fixture
+            .DefaultUserReleaseRole()
+            .WithUserId(userId)
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Approver);
+
         var dataSetDto = new DataSetDto
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -161,6 +179,16 @@ public class DataSetValidatorTests
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using var context = InMemoryContentDbContext(contentDbContextId);
+
+        if (isContributor)
+        {
+            context.UserReleaseRoles.Add(userReleaseRoleContributor);
+        }
+
+        if (isApprover)
+        {
+            context.UserReleaseRoles.Add(userReleaseRoleApprover);
+        }
 
         context.ReleaseFiles.AddRange(
             existingDataReleaseFile,
@@ -179,6 +207,14 @@ public class DataSetValidatorTests
         var result = await sut.ValidateDataSet(dataSetDto);
 
         // Assert
+        if (!isContributor && !isApprover)
+        {
+            var errors = result.AssertLeft();
+            Assert.Single(errors);
+            Assert.Equal(ValidationMessages.AnalystCannotReplaceApiDataSet.Code, errors[0].Code);
+            return;
+        }
+
         var dataSet = result.AssertRight();
         Assert.Equal("Data set title", dataSet.Title);
         Assert.Equal("test-data.csv", dataSet.DataFile.FileName);

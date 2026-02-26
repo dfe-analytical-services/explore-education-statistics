@@ -37,7 +37,12 @@ public interface IDataSetVersionService
 
     Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
-        Guid[]? contributorsAndApproversUserIds = null,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
+        Guid releaseVersionId,
         CancellationToken cancellationToken = default
     );
 
@@ -45,7 +50,6 @@ public interface IDataSetVersionService
         Guid releaseFileId,
         Guid dataSetId,
         Guid? dataSetVersionToReplaceId = null,
-        Guid[]? contributorsAndApproversUserIds = null,
         CancellationToken cancellationToken = default
     );
 
