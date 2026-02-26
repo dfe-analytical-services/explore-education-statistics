@@ -96,6 +96,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             migrationBuilder.Sql("GRANT SELECT ON dbo.EinTiles TO [publisher]");
             migrationBuilder.Sql("GRANT UPDATE ON dbo.EinTiles TO [publisher]");
+
+            migrationBuilder.Sql("GRANT SELECT ON dbo.EinContentBlocks TO [publisher]");
+            migrationBuilder.Sql("GRANT SELECT ON dbo.EinContentSections TO [publisher]");
+            migrationBuilder.Sql("GRANT SELECT ON dbo.EducationInNumbersPages TO [publisher]");
         }
 
         /// <inheritdoc />
@@ -138,6 +142,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             migrationBuilder.Sql("REVOKE SELECT ON dbo.EinTiles TO [publisher]");
             migrationBuilder.Sql("REVOKE UPDATE ON dbo.EinTiles TO [publisher]");
+
+            migrationBuilder.Sql("REVOKE SELECT ON dbo.EinContentBlocks TO [publisher]");
+            migrationBuilder.Sql("REVOKE SELECT ON dbo.EinContentSections TO [publisher]");
+            migrationBuilder.Sql("REVOKE SELECT ON dbo.EducationInNumbersPages TO [publisher]");
         }
     }
 }
