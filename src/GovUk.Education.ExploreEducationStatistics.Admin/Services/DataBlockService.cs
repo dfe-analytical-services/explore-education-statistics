@@ -336,20 +336,16 @@ public class DataBlockService : IDataBlockService
     private static string? GetContentSectionHeading(DataBlockVersion dataBlockVersion)
     {
         var section = dataBlockVersion.ContentSection;
-
-        if (section == null)
+        return section?.Type switch
         {
-            return null;
-        }
-
-        return section.Type switch
-        {
+            null => null,
             ContentSectionType.Generic => section.Heading,
-            ContentSectionType.ReleaseSummary => "Release Summary",
             ContentSectionType.Headlines => "Headlines",
             ContentSectionType.KeyStatisticsSecondary => "Key Statistics",
-            ContentSectionType.RelatedDashboards => "Related Dashboards",
-            _ => section.Type.ToString(),
+            // The other types of section don't support adding DataBlocks, so don't expect to encounter them here
+            _ => throw new InvalidOperationException(
+                $"Unexpected ContentSectionType {section.Type} for ContentSection with id {section.Id}"
+            ),
         };
     }
 

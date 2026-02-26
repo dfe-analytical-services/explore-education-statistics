@@ -197,6 +197,7 @@ public class ReleaseAmendmentServiceTests
             .WithReleaseSummaryContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithHeadlinesContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithRelatedDashboardContent(_fixture.DefaultHtmlBlock().Generate(2))
+            .WithWarningContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithFeaturedTables(
                 ListOf<FeaturedTable>(
                     new()
@@ -404,6 +405,7 @@ public class ReleaseAmendmentServiceTests
                     r => r.KeyStatisticsSecondarySection,
                     r => r.RelatedDashboardsSection,
                     r => r.SummarySection,
+                    r => r.WarningSection,
                     r => r.FeaturedTables,
                 ]
             );
@@ -540,11 +542,18 @@ public class ReleaseAmendmentServiceTests
                 originalReleaseVersion.RelatedDashboardsSection!
             );
 
-            // Check Summary section has been copied over OK.
+            // Check the Summary section has been copied over OK.
             AssertAmendedContentSectionCorrect(
                 amendment,
                 amendment.SummarySection!,
                 originalReleaseVersion.SummarySection!
+            );
+
+            // Check the Warning section has been copied over OK.
+            AssertAmendedContentSectionCorrect(
+                amendment,
+                amendment.WarningSection!,
+                originalReleaseVersion.WarningSection!
             );
 
             // Check EmbedBlocks have been copied over OK.
@@ -681,61 +690,17 @@ public class ReleaseAmendmentServiceTests
     [Fact]
     public async Task FiltersCommentsFromContent()
     {
-        var htmlBlock1Body = @"
-                <p>
-                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
-                </p>
-                <ul>
-                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
-                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
-                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
-                </ul>".TrimIndent();
+        const string htmlBlock1Body = """
+            <p><comment-start name="comment-1"></comment-start>Content block 1 content<comment-end name="comment-1"></comment-end></p>
+            """;
 
-        var expectedHtmlBlock1Body = @"
-                <p>
-                    Content 1 goes here
-                </p>
-                <ul>
-                    <li>Content 2</li>
-                    <li>Content 3</li>
-                    <li>Content 4</li>
-                </ul>".TrimIndent();
+        const string htmlBlock2Body = """
+            <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Content block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
+            """;
 
-        var htmlBlock2Body = @"
-                    <p>
-                        Content block 2
-                        <comment-start name=""comment-1""></comment-start>
-                            Content 1
-                        <comment-end name=""comment-1""></comment-end>
-
-                        Content 2
-                    </p>".TrimIndent();
-
-        var expectedHtmlBlock2Body = @"
-                    <p>
-                        Content block 2
-                        
-                            Content 1
-                        
-
-                        Content 2
-                    </p>".TrimIndent();
-
-        var htmlBlock3Body = @"
-                    <p>
-                        Content block 3
-                        <comment-start name=""comment-1""></comment-start>
-                            Content 1
-                        <comment-end name=""comment-1""></comment-end>
-                    </p>".TrimIndent();
-
-        var expectedHtmlBlock3Body = @"
-                    <p>
-                        Content block 3
-                        
-                            Content 1
-                        
-                    </p>".TrimIndent();
+        const string htmlBlock3Body = """
+            <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Content block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
+            """;
 
         ReleaseVersion originalReleaseVersion = _fixture
             .DefaultReleaseVersion()
@@ -755,12 +720,11 @@ public class ReleaseAmendmentServiceTests
                                     .GenerateList()
                             )
                     )
-                    // Test that we are amending content across multiple sections.
+                    // Test that we are filtering comments across multiple sections.
                     .ForIndex(
                         1,
                         s => s.SetContentBlocks(_fixture.DefaultHtmlBlock().WithBody(htmlBlock3Body).Generate(1))
                     )
-                    .ForIndex(2, s => s.SetType(ContentSectionType.RelatedDashboards))
                     .GenerateList()
             );
 
@@ -785,12 +749,10 @@ public class ReleaseAmendmentServiceTests
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            // Method under test
             var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
-            var amendment = result.AssertRight();
+            amendmentId = result.AssertRight().Id;
 
-            Assert.NotEqual(originalReleaseVersion.Id, amendment.Id);
-            amendmentId = amendment.Id;
+            Assert.NotEqual(originalReleaseVersion.Id, amendmentId);
         }
 
         VerifyAllMocks(userReleaseRoleRepository);
@@ -799,22 +761,23 @@ public class ReleaseAmendmentServiceTests
         {
             var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
 
-            Assert.Equal(3, amendment.Content.Count);
-            Assert.Equal(ContentSectionType.Generic, amendment.Content[0].Type);
-            Assert.Equal(ContentSectionType.Generic, amendment.Content[1].Type);
-            Assert.Equal(ContentSectionType.RelatedDashboards, amendment.Content[2].Type);
+            var amendmentContentBlock1 = amendment
+                .Content.SelectMany(section => section.Content)
+                .OfType<HtmlBlock>()
+                .Single(hb => hb.Body.Contains("block 1"));
+            Assert.Equal("<p>Content block 1 content</p>", amendmentContentBlock1.Body);
 
-            var amendmentContentSection1 = amendment.Content[0];
-            var amendmentContentSection2 = amendment.Content[1];
+            var amendmentContentBlock2 = amendment
+                .Content.SelectMany(section => section.Content)
+                .OfType<HtmlBlock>()
+                .Single(hb => hb.Body.Contains("block 2"));
+            Assert.Equal("<p>Content block 2 content</p>", amendmentContentBlock2.Body);
 
-            Assert.Equal(2, amendmentContentSection1.Content.Count);
-            var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(amendmentContentSection1.Content[0]);
-            var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(amendmentContentSection1.Content[1]);
-            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection2.Content));
-
-            Assert.Equal(expectedHtmlBlock1Body, amendmentContentBlock1.Body);
-            Assert.Equal(expectedHtmlBlock2Body, amendmentContentBlock2.Body);
-            Assert.Equal(expectedHtmlBlock3Body, amendmentContentBlock3.Body);
+            var amendmentContentBlock3 = amendment
+                .Content.SelectMany(section => section.Content)
+                .OfType<HtmlBlock>()
+                .Single(hb => hb.Body.Contains("block 3"));
+            Assert.Equal("<p>Content block 3 content</p>", amendmentContentBlock3.Body);
         }
     }
 
@@ -872,7 +835,7 @@ public class ReleaseAmendmentServiceTests
     }
 
     [Fact]
-    public async Task CreatesRelatedDashboardsSectionIfNotOnOriginal()
+    public async Task CreatesNonGenericContentSectionsIfNotPresentOnOriginal()
     {
         ReleaseVersion originalReleaseVersion = _fixture
             .DefaultReleaseVersion()
@@ -900,12 +863,10 @@ public class ReleaseAmendmentServiceTests
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            // Method under test
             var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
-            var amendment = result.AssertRight();
+            amendmentId = result.AssertRight().Id;
 
-            Assert.NotEqual(originalReleaseVersion.Id, amendment.Id);
-            amendmentId = amendment.Id;
+            Assert.NotEqual(originalReleaseVersion.Id, amendmentId);
         }
 
         VerifyAllMocks(userReleaseRoleRepository);
@@ -914,8 +875,12 @@ public class ReleaseAmendmentServiceTests
         {
             var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
 
-            var relatedDashboardsSection = Assert.Single(amendment.Content);
-            Assert.Equal(ContentSectionType.RelatedDashboards, relatedDashboardsSection.Type);
+            Assert.NotNull(amendment.GenericContent);
+            Assert.NotNull(amendment.HeadlinesSection);
+            Assert.NotNull(amendment.KeyStatisticsSecondarySection);
+            Assert.NotNull(amendment.RelatedDashboardsSection);
+            Assert.NotNull(amendment.SummarySection);
+            Assert.NotNull(amendment.WarningSection);
         }
     }
 
@@ -1138,9 +1103,7 @@ public class ReleaseAmendmentServiceTests
     {
         Assert.Equal(amendment, amendedSection.ReleaseVersion);
         Assert.Equal(amendment.Id, amendedSection.ReleaseVersionId);
-        Assert.True(amendedSection.Id != Guid.Empty);
-        Assert.NotEqual(originalSection.Id, amendedSection.Id);
-
+        Assert.NotEqual(Guid.Empty, amendedSection.Id);
         Assert.NotEqual(originalSection.Id, amendedSection.Id);
         Assert.Equal(originalSection.Heading, amendedSection.Heading);
         Assert.Equal(originalSection.Order, amendedSection.Order);

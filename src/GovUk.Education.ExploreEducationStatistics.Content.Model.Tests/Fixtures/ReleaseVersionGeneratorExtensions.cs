@@ -164,6 +164,11 @@ public static class ReleaseVersionGeneratorExtensions
         IEnumerable<KeyStatistic> keyStatistics
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetKeyStatistics(keyStatistics));
 
+    public static Generator<ReleaseVersion> WithKeyStatisticsSecondaryContent(
+        this Generator<ReleaseVersion> generator,
+        IEnumerable<ContentBlock> content
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetKeyStatisticsSecondaryContent(content));
+
     public static Generator<ReleaseVersion> WithReleaseSummaryContent(
         this Generator<ReleaseVersion> generator,
         IEnumerable<ContentBlock> content
@@ -178,6 +183,11 @@ public static class ReleaseVersionGeneratorExtensions
         this Generator<ReleaseVersion> generator,
         IEnumerable<ContentBlock> content
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetRelatedDashboardsContent(content));
+
+    public static Generator<ReleaseVersion> WithWarningContent(
+        this Generator<ReleaseVersion> generator,
+        IEnumerable<ContentBlock> content
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetWarningContent(content));
 
     public static Generator<ReleaseVersion> WithFeaturedTables(
         this Generator<ReleaseVersion> generator,
@@ -421,7 +431,8 @@ public static class ReleaseVersionGeneratorExtensions
     {
         var keyStatisticsList = keyStatistics.ToList();
         return setters
-            .Set(releaseVersion => releaseVersion.KeyStatistics, keyStatisticsList.ToList())
+            .Set(releaseVersion => releaseVersion.KeyStatistics, [.. keyStatisticsList])
+            // TODO EES-6940 What's this?
             .Set(
                 releaseVersion => releaseVersion.KeyStatisticsSecondarySection,
                 new ContentSection { Type = ContentSectionType.KeyStatisticsSecondary }
@@ -435,6 +446,16 @@ public static class ReleaseVersionGeneratorExtensions
                     })
             );
     }
+
+    public static InstanceSetters<ReleaseVersion> SetKeyStatisticsSecondaryContent(
+        this InstanceSetters<ReleaseVersion> setters,
+        IEnumerable<ContentBlock> content
+    ) =>
+        setters.SetTopLevelContentSection(
+            releaseVersion => releaseVersion.KeyStatisticsSecondarySection,
+            ContentSectionType.KeyStatisticsSecondary,
+            content
+        );
 
     public static InstanceSetters<ReleaseVersion> SetReleaseSummaryContent(
         this InstanceSetters<ReleaseVersion> setters,
@@ -466,6 +487,16 @@ public static class ReleaseVersionGeneratorExtensions
             content
         );
 
+    public static InstanceSetters<ReleaseVersion> SetWarningContent(
+        this InstanceSetters<ReleaseVersion> setters,
+        IEnumerable<ContentBlock> content
+    ) =>
+        setters.SetTopLevelContentSection(
+            releaseVersion => releaseVersion.WarningSection,
+            ContentSectionType.Warning,
+            content
+        );
+
     public static InstanceSetters<ReleaseVersion> SetFeaturedTables(
         this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<FeaturedTable> featuredTables
@@ -493,7 +524,7 @@ public static class ReleaseVersionGeneratorExtensions
     {
         var contentList = content.ToList();
         return setters
-            .Set(field, new ContentSection { Type = type })
+            .Set(field, new ContentSection { Content = contentList, Type = type })
             .Set(
                 (_, releaseVersion, _) =>
                     contentList.ForEach(contentBlock =>

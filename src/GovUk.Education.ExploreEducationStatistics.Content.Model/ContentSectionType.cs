@@ -7,4 +7,5 @@ public enum ContentSectionType
     KeyStatisticsSecondary,
     Headlines,
     RelatedDashboards,
+    Warning,
 }
