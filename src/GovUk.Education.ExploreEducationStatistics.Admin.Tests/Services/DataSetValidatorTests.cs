@@ -111,6 +111,109 @@ public class DataSetValidatorTests
         }
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsDataSetObjectIfUserHasClaim(
+        bool userHasClaimToUpdateRelease
+    )
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
+        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
+
+        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
+        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
+
+        var dataSetTitle = "Data set title";
+        var publicationId = Guid.NewGuid();
+        var existingDataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithFilename(dataFile.FileName))
+            .WithPublicApiDataSetId(publicationId)
+            .Generate();
+
+        var existingMetaReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Metadata).WithFilename(metaFile.FileName))
+            .Generate();
+
+        var replacementDataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(amendmentReleaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithFilename(dataFile.FileName))
+            .WithPublicApiDataSetId(Guid.NewGuid())
+            .Generate();
+
+        var replacementMetaReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(amendmentReleaseVersion)
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Metadata).WithFilename(metaFile.FileName))
+            .Generate();
+
+        var userId = Guid.NewGuid();
+        UserReleaseRole userReleaseRoleContributor = _fixture
+            .DefaultUserReleaseRole()
+            .WithUserId(userId)
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Contributor);
+        UserReleaseRole userReleaseRoleApprover = _fixture
+            .DefaultUserReleaseRole()
+            .WithUserId(userId)
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Approver);
+
+        var dataSetDto = new DataSetDto
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            Title = dataSetTitle,
+            DataFile = dataFile,
+            MetaFile = metaFile,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var context = InMemoryContentDbContext(contentDbContextId);
+
+        context.ReleaseFiles.AddRange(
+            existingDataReleaseFile,
+            existingMetaReleaseFile,
+            replacementDataReleaseFile,
+            replacementMetaReleaseFile
+        );
+        await context.SaveChangesAsync();
+
+        var userService = new Mock<IUserService>(MockBehavior.Strict);
+        userService
+            .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), SecurityPolicies.CanUpdateSpecificReleaseVersion))
+            .ReturnsAsync(userHasClaimToUpdateRelease);
+        userService.Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser)).ReturnsAsync(false);
+
+        var sut = BuildService(context, userService.Object);
+
+        // Act
+        var result = await sut.ValidateDataSet(dataSetDto);
+
+        // Assert
+        if (!userHasClaimToUpdateRelease)
+        {
+            var errors = result.AssertLeft();
+            Assert.Single(errors);
+            Assert.Equal(ValidationMessages.AnalystCannotReplaceApiDataSet.Code, errors[0].Code);
+            return;
+        }
+
+        var dataSet = result.AssertRight();
+        Assert.Equal("Data set title", dataSet.Title);
+        Assert.Equal("test-data.csv", dataSet.DataFile.FileName);
+        Assert.Equal(dataFile.FileStreamProvider().Length, dataSet.DataFile.FileSize);
+        Assert.Equal("test-data.meta.csv", dataSet.MetaFile.FileName);
+        Assert.Equal(metaFile.FileStreamProvider().Length, dataSet.MetaFile.FileSize);
+    }
+
     [Fact]
     public async Task ValidateDataSet_ReplacementFileNameMatchesAnotherDataSetsFileName_ReturnsErrorDetails()
     {
@@ -448,6 +551,9 @@ public class DataSetValidatorTests
 
         var userService = new Mock<IUserService>(MockBehavior.Strict);
         userService.Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser)).ReturnsAsync(true);
+        userService
+            .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), SecurityPolicies.CanUpdateSpecificReleaseVersion))
+            .ReturnsAsync(true);
 
         var dataSetDto = new DataSetDto
         {
@@ -462,7 +568,6 @@ public class DataSetValidatorTests
 
         context.ReleaseFiles.AddRange(existingDataReleaseFile, existingMetaReleaseFile);
         await context.SaveChangesAsync();
-
         var sut = BuildService(context, userService.Object);
 
         // Act
@@ -470,79 +575,6 @@ public class DataSetValidatorTests
 
         // Assert
         result.AssertRight();
-    }
-
-    [Fact]
-    public async Task ValidateDataSet_AnalystUserPatchReplacement_ReturnsErrorDetails()
-    {
-        // Arrange
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
-        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
-
-        var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
-        var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
-
-        var dataSetTitle = "Data set title";
-
-        var existingDataReleaseFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion)
-            .WithName(dataSetTitle)
-            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithFilename(dataFile.FileName))
-            .WithPublicApiDataSetId(Guid.NewGuid())
-            .Generate();
-
-        var existingMetaReleaseFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion)
-            .WithFile(_fixture.DefaultFile().WithType(FileType.Metadata).WithFilename(metaFile.FileName))
-            .Generate();
-
-        var replacementDataReleaseFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(amendmentReleaseVersion)
-            .WithName(dataSetTitle)
-            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithFilename(dataFile.FileName))
-            .WithPublicApiDataSetId(Guid.NewGuid())
-            .Generate();
-
-        var replacementMetaReleaseFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(amendmentReleaseVersion)
-            .WithFile(_fixture.DefaultFile().WithType(FileType.Metadata).WithFilename(metaFile.FileName))
-            .Generate();
-
-        var dataSetDto = new DataSetDto
-        {
-            ReleaseVersionId = releaseVersion.Id,
-            Title = dataSetTitle,
-            DataFile = dataFile,
-            MetaFile = metaFile,
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using var context = InMemoryContentDbContext(contentDbContextId);
-
-        context.ReleaseFiles.AddRange(
-            existingDataReleaseFile,
-            existingMetaReleaseFile,
-            replacementDataReleaseFile,
-            replacementMetaReleaseFile
-        );
-        await context.SaveChangesAsync();
-
-        var userService = new Mock<IUserService>(MockBehavior.Strict);
-        userService.Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser)).ReturnsAsync(false);
-
-        var sut = BuildService(context, userService.Object);
-
-        // Act
-        var result = await sut.ValidateDataSet(dataSetDto);
-
-        // Assert
-        var errors = result.AssertLeft();
-        Assert.Single(errors);
-        Assert.Equal(ValidationMessages.AnalystCannotReplaceApiDataSet.Code, errors[0].Code);
     }
 
     [Fact]
@@ -609,7 +641,16 @@ public class DataSetValidatorTests
             .Setup(s => s.HasDraftVersion(existingDataReleaseFile.PublicApiDataSetId.Value, CancellationToken.None))
             .ReturnsAsync(true);
 
-        var sut = BuildService(contentDbContext: context, dataSetService: dataSetServiceMock.Object);
+        var userServiceMock = new Mock<IUserService>(MockBehavior.Strict);
+        userServiceMock
+            .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), SecurityPolicies.CanUpdateSpecificReleaseVersion))
+            .ReturnsAsync(true);
+
+        var sut = BuildService(
+            contentDbContext: context,
+            userService: userServiceMock.Object,
+            dataSetService: dataSetServiceMock.Object
+        );
 
         // Act
         var result = await sut.ValidateDataSet(dataSetDto);

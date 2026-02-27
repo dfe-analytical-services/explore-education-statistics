@@ -265,7 +265,7 @@ public class RemoveDataSetTestFixture
     public void SetUpDeleteVersionMocks()
     {
         DataSetVersionService
-            .Setup(service => service.DeleteVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .Setup(service => service.DeleteVersion(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Unit.Instance);
     }
 }

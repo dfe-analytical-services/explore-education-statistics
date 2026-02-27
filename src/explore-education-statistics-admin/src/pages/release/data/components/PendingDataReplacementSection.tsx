@@ -1,5 +1,4 @@
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import WarningMessage from '@common/components/WarningMessage';
 import {
   releaseDataFileReplacementCompleteRoute,
@@ -32,7 +31,6 @@ const PendingDataReplacementSection: React.FC<{
   history,
   fetchDataFile,
 }) => {
-  const { user } = useAuthContext();
   const getReplacementPlanMessage = () => {
     if (replacementDataFile?.status === 'COMPLETE') {
       return null;
@@ -77,9 +75,6 @@ const PendingDataReplacementSection: React.FC<{
           ? 'Cancel data replacement and remove draft API'
           : 'Cancel data replacement'
       }
-      hideConfirm={
-        !user?.permissions.isBauUser && publicApiDataSetId !== undefined
-      }
       triggerButton={
         <Button variant="secondary">Cancel data replacement</Button>
       }
@@ -94,10 +89,7 @@ const PendingDataReplacementSection: React.FC<{
         fetchDataFile();
       }}
     >
-      {getCancelBodyText(
-        publicApiDataSetId !== undefined,
-        !!user?.permissions.isBauUser,
-      )}
+      {getCancelBodyText(publicApiDataSetId !== undefined)}
     </ModalConfirm>
   );
 
@@ -132,26 +124,7 @@ const PendingDataReplacementSection: React.FC<{
   );
 };
 
-function getCancelBodyText(hasApiDataSetLinked: boolean, isBauUser: boolean) {
-  if (!isBauUser && hasApiDataSetLinked) {
-    return (
-      <>
-        <p>
-          You do not have permission to cancel this data replacement. This is
-          because it is linked to an API data set version which can only be
-          modified by BAU users.
-        </p>
-        <p>
-          Please contact the EES team for support at{' '}
-          <a href="mailto:explore.statistics@education.gov.uk">
-            explore.statistics@education.gov.uk
-          </a>
-          . Your user account does not have the role required access to the API
-          details page which can help resolve this issue.
-        </p>
-      </>
-    );
-  }
+function getCancelBodyText(hasApiDataSetLinked: boolean) {
   return (
     <div>
       {hasApiDataSetLinked && (

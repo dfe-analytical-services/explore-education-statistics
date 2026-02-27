@@ -983,6 +983,15 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
         return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
     }
 
+    public Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
+    }
+
     public Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default

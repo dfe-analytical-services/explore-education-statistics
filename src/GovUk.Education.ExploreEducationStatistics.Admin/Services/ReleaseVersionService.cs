@@ -668,19 +668,21 @@ public class ReleaseVersionService(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId)
                 );
             })
-            .OnSuccessDo(DeleteDraftApiDataSetVersion)
+            .OnSuccessDo(async deletePlan => await DeleteDraftApiDataSetVersion(deletePlan, releaseVersionId))
             .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
     }
 
-    private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(DeleteDataFilePlanViewModel deletePlan)
+    private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(
+        DeleteDataFilePlanViewModel deletePlan,
+        Guid releaseVersionId
+    )
     {
         // Skip when Status == DataSetVersionStatus.Published;
         if (deletePlan.ApiDataSetVersionPlan is null or { Valid: false })
         {
             return Unit.Instance;
         }
-
-        return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
+        return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id, releaseVersionId);
     }
 
     public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(

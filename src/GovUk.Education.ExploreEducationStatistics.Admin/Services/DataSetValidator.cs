@@ -61,9 +61,13 @@ public class DataSetValidator(
 
             if (releaseFileWithApiDataSet != null)
             {
-                var isBauUser = await userService.CheckIsBauUser().IsRight();
+                var releaseVersion = await contentDbContext
+                    .ReleaseVersions.AsNoTracking()
+                    .SingleAsync(v => v.Id == dataSet.ReleaseVersionId);
 
-                if (!isBauUser)
+                var canUpdateReleaseVersion = await userService.CheckCanUpdateReleaseVersion(releaseVersion).IsRight();
+
+                if (!canUpdateReleaseVersion)
                 {
                     errors.Add(ValidationMessages.GenerateErrorAnalystCannotReplaceApiDataSet(dataSet.Title));
                     return errors;
