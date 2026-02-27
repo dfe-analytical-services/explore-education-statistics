@@ -1,0 +1,1 @@
+﻿-- Insert missing content sections for non-generic content section types
