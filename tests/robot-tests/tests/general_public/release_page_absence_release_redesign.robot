@@ -488,5 +488,5 @@ check the contact us section has expected details
     ...    UI test contact name
     ...    ui_test@test.com
     ...    0123 4567
-    ...    037 0000 2288
-    ...    Monday to Friday from 9.30am to 5pm (excluding bank holidays)
+    ...    0370 000 2288
+    ...    Monday to Friday from 9.30am to 5.30pm (closed on bank holidays)
