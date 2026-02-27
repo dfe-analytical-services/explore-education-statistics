@@ -319,29 +319,8 @@ public class ReleaseAmendmentService(
                 };
             })
             .ToList();
-
-        // Ensure all non-generic sections are initialised as not every type of section has existed historically
-        var missingSectionTypes = Enum.GetValues<ContentSectionType>()
-            .Except(originalReleaseVersion.Content.Select(s => s.Type))
-            .Except([ContentSectionType.Generic])
-            .ToArray();
-        amendedContent.AddRange(
-            missingSectionTypes.Select(t => InitialiseEmptyContentSectionOfType(t, amendmentReleaseVersionId))
-        );
-
         return amendedContent;
     }
-
-    private ContentSection InitialiseEmptyContentSectionOfType(
-        ContentSectionType contentSectionType,
-        Guid amendmentReleaseVersionId
-    ) =>
-        new()
-        {
-            Id = Guid.NewGuid(),
-            Type = contentSectionType,
-            ReleaseVersionId = amendmentReleaseVersionId,
-        };
 
     private List<ContentBlock> CopyContentBlocks(
         List<ContentBlock> originalSectionContent,
