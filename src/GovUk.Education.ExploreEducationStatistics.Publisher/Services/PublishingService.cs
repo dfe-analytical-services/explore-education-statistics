@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.CopyDirectoryCallbacks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
@@ -21,8 +20,6 @@ public class PublishingService(
     ILogger<PublishingService> logger
 ) : IPublishingService
 {
-    private readonly AppOptions _appOptions = appOptions.Value;
-
     public async Task PublishStagedReleaseContent()
     {
         logger.LogInformation("Moving staged release content");
@@ -59,7 +56,7 @@ public class PublishingService(
         }
     }
 
-    public async Task PublishReleaseFiles(Guid releaseVersionId)
+    public async Task PublishReleaseFiles(Guid releaseVersionId, CancellationToken cancellationToken = default)
     {
         var releaseVersion = await releaseService.Get(releaseVersionId);
 
@@ -73,38 +70,18 @@ public class PublishingService(
             directoryPath: destinationDirectoryPath
         );
 
-        // Get a list of source directory paths for all the files.
-        // There will be multiple root paths if they were created on different amendment Releases
-        var sourceDirectoryPaths = files.Select(f => $"{f.RootPath}/").Distinct().ToList();
+        var blobNames = files.Select(f => $"{f.RootPath}/{f.Type}/{f.Filename}").ToList();
 
-        // Copy the blobs of those directories in private storage to the destination directory in public storage
-        foreach (var sourceDirectoryPath in sourceDirectoryPaths)
-        {
-            await privateBlobStorageService.CopyDirectory(
-                sourceContainerName: PrivateReleaseFiles,
-                sourceDirectoryPath: sourceDirectoryPath,
-                destinationContainerName: PublicReleaseFiles,
-                destinationDirectoryPath: destinationDirectoryPath,
-                new IBlobStorageService.CopyDirectoryOptions
-                {
-                    DestinationConnectionString = _appOptions.PublicStorageConnectionString,
-                    ShouldTransferCallbackAsync = (source, _) =>
-                        // Filter by blobs with matching file paths
-                        TransferBlobIfFileExistsCallback(
-                            source: source,
-                            files: files,
-                            sourceContainerName: PrivateReleaseFiles,
-                            logger: logger
-                        ),
-                }
-            );
-        }
+        await privateBlobStorageService.CopyBlobs(
+            sourceContainerName: PrivateReleaseFiles,
+            destinationContainerName: PublicReleaseFiles,
+            blobNames,
+            cancellationToken
+        );
     }
 
     private async Task PublishMethodologyFiles(MethodologyVersion methodologyVersion)
     {
-        var files = await methodologyService.GetFiles(methodologyVersion.Id, Image);
-
         var directoryPath = $"{methodologyVersion.Id}/";
 
         // Delete any existing blobs in public storage
@@ -115,19 +92,7 @@ public class PublishingService(
             sourceContainerName: PrivateMethodologyFiles,
             sourceDirectoryPath: directoryPath,
             destinationContainerName: PublicMethodologyFiles,
-            destinationDirectoryPath: directoryPath,
-            new IBlobStorageService.CopyDirectoryOptions
-            {
-                DestinationConnectionString = _appOptions.PublicStorageConnectionString,
-                ShouldTransferCallbackAsync = (source, _) =>
-                    // Filter by blobs with matching file paths
-                    TransferBlobIfFileExistsCallback(
-                        source: source,
-                        files: files,
-                        sourceContainerName: PrivateMethodologyFiles,
-                        logger: logger
-                    ),
-            }
+            destinationDirectoryPath: directoryPath
         );
     }
 }

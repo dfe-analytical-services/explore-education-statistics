@@ -38,6 +38,13 @@ public interface IBlobStorageService
 
     Task DeleteBlob(IBlobContainer containerName, string path);
 
+    Task<bool> CopyBlobs(
+        IBlobContainer sourceContainerName,
+        IBlobContainer destinationContainerName,
+        List<string> blobNames,
+        CancellationToken cancellationToken = default
+    );
+
     Task<bool> MoveBlob(
         IBlobContainer sourceContainer,
         string sourcePath,
@@ -146,12 +153,12 @@ public interface IBlobStorageService
         public ShouldOverwriteCallbackAsync? ShouldOverwriteCallbackAsync { get; set; }
     }
 
-    Task<List<BlobInfo>> CopyDirectory(
+    Task<bool> CopyDirectory(
         IBlobContainer sourceContainerName,
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,
         string destinationDirectoryPath,
-        CopyDirectoryOptions? options = null
+        CancellationToken cancellationToken = default
     );
 
     public class MoveDirectoryOptions
@@ -167,6 +174,6 @@ public interface IBlobStorageService
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,
         string destinationDirectoryPath,
-        MoveDirectoryOptions? options = null
+        CancellationToken cancellationToken = default
     );
 }

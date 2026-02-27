@@ -23,7 +23,8 @@ public class PublishReleaseFilesFunction(
     [Function("PublishReleaseFiles")]
     public async Task PublishReleaseFiles(
         [QueueTrigger(PublishReleaseFilesQueue)] PublishReleaseFilesMessage message,
-        FunctionContext context
+        FunctionContext context,
+        CancellationToken cancellationToken
     )
     {
         logger.LogInformation("{FunctionName} triggered: {Message}", context.FunctionDefinition.Name, message);
@@ -37,7 +38,7 @@ public class PublishReleaseFilesFunction(
                 try
                 {
                     await publishingService.PublishMethodologyFilesIfApplicableForRelease(key.ReleaseVersionId);
-                    await publishingService.PublishReleaseFiles(key.ReleaseVersionId);
+                    await publishingService.PublishReleaseFiles(key.ReleaseVersionId, cancellationToken);
                     return true;
                 }
                 catch (Exception e)

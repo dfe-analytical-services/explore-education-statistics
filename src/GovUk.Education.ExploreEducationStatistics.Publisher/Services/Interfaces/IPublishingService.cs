@@ -8,5 +8,5 @@ public interface IPublishingService
 
     Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseVersionId);
 
-    Task PublishReleaseFiles(Guid releaseVersionId);
+    Task PublishReleaseFiles(Guid releaseVersionId, CancellationToken cancellationToken = default);
 }

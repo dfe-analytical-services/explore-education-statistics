@@ -46,7 +46,8 @@ public class BauBlobManagementController(IPrivateBlobStorageService privateBlobS
                 PrivateReleaseFiles,
                 blobSourcePath,
                 PrivateReleaseFiles,
-                blobDestinationPath
+                blobDestinationPath,
+                cancellationToken
             );
 
             renamedDirectories.Add(blobSourcePath, blobDestinationPath);
