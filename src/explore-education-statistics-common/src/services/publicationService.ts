@@ -184,7 +184,7 @@ export interface ReleaseVersion<
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
-  warningSection: ContentSection<ContentBlockType>;
+  warningSection?: ContentSection<ContentBlockType>; // TODO EES-6941 - change this to be non-optional once migration work is done
   keyStatistics: KeyStatistic[];
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;

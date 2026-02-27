@@ -13,11 +13,13 @@ import {
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import ContentHtml from '@common/components/ContentHtml';
 import Tooltip from '@common/components/Tooltip';
+import { releaseWarningBlockParseOptions } from '@common/modules/release/components/ReleaseWarningBlock';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   commentTagAttributes,
   commentTags,
   defaultSanitizeOptions,
+  releaseWarningBlockSanitizeOptions,
   SanitizeHtmlOptions,
   TagFilter,
 } from '@common/utils/sanitizeHtml';
@@ -34,6 +36,7 @@ interface EditableContentBlockProps {
   idleTimeout?: number;
   isEditing?: boolean;
   isLoading?: boolean;
+  isReleaseWarningBlock?: boolean;
   label: string;
   locked?: string;
   lockedBy?: UserDetails;
@@ -65,8 +68,9 @@ const EditableContentBlock = ({
   editButtonLabel,
   id,
   idleTimeout,
-  isLoading,
   isEditing,
+  isLoading,
+  isReleaseWarningBlock = false,
   label,
   locked,
   lockedBy,
@@ -93,29 +97,31 @@ const EditableContentBlock = ({
     const commentTagFilter: TagFilter = frame =>
       comments.every(comment => comment.id !== frame.attribs.name);
 
-    return {
-      ...defaultSanitizeOptions,
-      allowedTags: [
-        ...(defaultSanitizeOptions.allowedTags ?? []),
-        ...commentTags,
-      ],
-      allowedAttributes: {
-        ...(defaultSanitizeOptions.allowedAttributes ?? {}),
-        ...commentTagAttributes,
-      },
-      filterTags: mapValues(commentTagAttributes, () => commentTagFilter),
-      transformTags: {
-        img: (tagName, attribs) => {
-          return {
-            tagName,
-            attribs: transformImageAttributes
-              ? transformImageAttributes(attribs)
-              : attribs,
-          };
-        },
-      },
-    };
-  }, [comments, transformImageAttributes]);
+    return isReleaseWarningBlock
+      ? releaseWarningBlockSanitizeOptions
+      : {
+          ...defaultSanitizeOptions,
+          allowedTags: [
+            ...(defaultSanitizeOptions.allowedTags ?? []),
+            ...commentTags,
+          ],
+          allowedAttributes: {
+            ...(defaultSanitizeOptions.allowedAttributes ?? {}),
+            ...commentTagAttributes,
+          },
+          filterTags: mapValues(commentTagAttributes, () => commentTagFilter),
+          transformTags: {
+            img: (tagName, attribs) => {
+              return {
+                tagName,
+                attribs: transformImageAttributes
+                  ? transformImageAttributes(attribs)
+                  : attribs,
+              };
+            },
+          },
+        };
+  }, [comments, isReleaseWarningBlock, transformImageAttributes]);
 
   if (isEditing && !lockedBy) {
     return (
@@ -183,6 +189,11 @@ const EditableContentBlock = ({
                 <ContentHtml
                   getGlossaryEntry={glossaryService.getEntry}
                   html={value || '<p>This section is empty</p>'}
+                  parseOptions={
+                    isReleaseWarningBlock
+                      ? releaseWarningBlockParseOptions
+                      : undefined
+                  }
                   sanitizeOptions={sanitizeOptions}
                 />
               </div>

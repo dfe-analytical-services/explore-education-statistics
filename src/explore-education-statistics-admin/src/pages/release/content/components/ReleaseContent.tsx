@@ -33,6 +33,7 @@ import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
+import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import React, {
@@ -84,6 +85,10 @@ const ReleaseContent = ({
   }, [unsavedBlocks, unsavedCommentDeletions]);
 
   const addWarningBlock = useCallback(async () => {
+    if (!release.warningSection) {
+      return;
+    }
+
     const newBlock = await addContentSectionBlock({
       releaseVersionId: release.id,
       sectionId: release.warningSection.id,
@@ -96,7 +101,7 @@ const ReleaseContent = ({
     });
 
     focusAddedSectionBlockButton(newBlock.id);
-  }, [addContentSectionBlock, release.id, release.warningSection?.id]);
+  }, [addContentSectionBlock, release.id, release.warningSection]);
 
   const addSummaryBlock = useCallback(async () => {
     const newBlock = await addContentSectionBlock({
@@ -258,53 +263,45 @@ const ReleaseContent = ({
             }
             trackScroll
           />
-          <div id="releaseWarning" data-testid="release-warning">
-            {release.warningSection && (
-              <>
-                <EditableSectionBlocks
-                  blocks={release.warningSection.content}
-                  renderBlock={block => (
-                    <ReleaseBlock block={block} releaseVersionId={release.id} />
-                  )}
-                  renderEditableBlock={block => (
-                    <ReleaseEditableBlock
-                      allowComments
-                      block={block}
-                      editButtonLabel={
-                        <>
-                          Edit<VisuallyHidden> warning</VisuallyHidden> block
-                        </>
-                      }
-                      label="Warning block"
-                      publicationId={release.publication.id}
-                      releaseVersionId={release.id}
-                      removeButtonLabel={
-                        <>
-                          Remove<VisuallyHidden> warning</VisuallyHidden> block
-                        </>
-                      }
-                      sectionId={release.warningSection?.id || 'warningSection'}
-                      sectionKey="warningSection"
-                      toolbarConfig={toolbarConfigLinkOnly}
-                      onAfterDeleteBlock={onAfterDeleteWarningBlock}
-                    />
-                  )}
-                />
-                {editingMode === 'edit' &&
-                  release.warningSection?.content?.length === 0 && (
-                    <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-                      <Button
-                        variant="secondary"
-                        onClick={addWarningBlock}
-                        ref={addWarningBlockButton}
-                      >
-                        Add a warning text block
-                      </Button>
-                    </div>
-                  )}
-              </>
-            )}
-          </div>
+          {editingMode === 'edit' && release.warningSection && (
+            <div id="releaseWarning" data-testid="release-warning">
+              <EditableSectionBlocks
+                blocks={release.warningSection.content}
+                renderBlock={block => <ReleaseWarningBlock block={block} />}
+                renderEditableBlock={block => (
+                  <ReleaseEditableBlock
+                    allowComments
+                    block={block}
+                    editButtonLabel={<>Edit warning block</>}
+                    label="Warning block"
+                    isReleaseWarningBlock
+                    publicationId={release.publication.id}
+                    releaseVersionId={release.id}
+                    removeButtonLabel={
+                      <>
+                        Remove<VisuallyHidden> warning</VisuallyHidden> block
+                      </>
+                    }
+                    sectionId={release.warningSection?.id || 'warningSection'}
+                    sectionKey="warningSection"
+                    toolbarConfig={toolbarConfigLinkOnly}
+                    onAfterDeleteBlock={onAfterDeleteWarningBlock}
+                  />
+                )}
+              />
+              {release.warningSection.content?.length === 0 && (
+                <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+                  <Button
+                    variant="secondary"
+                    onClick={addWarningBlock}
+                    ref={addWarningBlockButton}
+                  >
+                    Add a warning text block
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           <div id="releaseSummary" data-testid="release-summary">
             {editingMode === 'edit' && (
