@@ -257,7 +257,6 @@ public abstract class ReleaseContentServiceTests
                 var summaryHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.SummarySection.Content[0]);
                 Assert.Equal("<p>Summary content</p>", summaryHtmlBlock.Body);
 
-                Assert.NotNull(actual.WarningSection);
                 Assert.Single(actual.WarningSection.Content);
                 var warningHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.WarningSection.Content[0]);
                 Assert.Equal("<p>Warning content</p>", warningHtmlBlock.Body);
@@ -301,42 +300,7 @@ public abstract class ReleaseContentServiceTests
                 Assert.Empty(result.KeyStatistics);
                 Assert.Empty(result.KeyStatisticsSecondarySection.Content);
                 Assert.Empty(result.SummarySection.Content);
-                Assert.NotNull(result.WarningSection);
                 Assert.Empty(result.WarningSection.Content);
-            }
-        }
-
-        [Fact]
-        public async Task WhenReleaseVersionHasNoWarningSection_ReturnsNullWarningSection()
-        {
-            // Arrange
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
-            var release = publication.Releases[0];
-            var releaseVersion = release.Versions[0];
-
-            // Initialise the release version with empty sections but without a warning section,
-            // as would be the case for a release version published before the warning section feature was introduced.
-            InitialiseNonGenericSectionsForReleaseVersion(releaseVersion, includeWarningSection: false);
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Publications.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var outcome = await sut.GetReleaseContent(publicationSlug: publication.Slug, releaseSlug: release.Slug);
-
-                // Assert
-                var result = outcome.AssertRight();
-                Assert.Null(result.WarningSection);
             }
         }
 
@@ -463,20 +427,14 @@ public abstract class ReleaseContentServiceTests
             }
         }
 
-        private void InitialiseNonGenericSectionsForReleaseVersion(
-            ReleaseVersion releaseVersion,
-            bool includeWarningSection = true
-        )
+        private void InitialiseNonGenericSectionsForReleaseVersion(ReleaseVersion releaseVersion)
         {
             releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
             releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
                 ContentSectionType.KeyStatisticsSecondary
             );
             releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
-            if (includeWarningSection)
-            {
-                releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
-            }
+            releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
         }
 
         private ContentSection CreateContentSection(ContentSectionType type) =>

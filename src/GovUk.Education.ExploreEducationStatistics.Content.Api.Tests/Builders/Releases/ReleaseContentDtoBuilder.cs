@@ -20,7 +20,7 @@ public class ReleaseContentDtoBuilder
 
     private ContentSectionDto _summarySection = new ContentSectionDtoBuilder().Build();
     private ContentSectionDto _keyStatisticsSecondarySection = new ContentSectionDtoBuilder().Build();
-    private ContentSectionDto? _warningSection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto _warningSection = new ContentSectionDtoBuilder().Build();
 
     public ReleaseContentDto Build() =>
         new()
@@ -77,7 +77,7 @@ public class ReleaseContentDtoBuilder
         return this;
     }
 
-    public ReleaseContentDtoBuilder WithWarningSection(ContentSectionDto? warningSection)
+    public ReleaseContentDtoBuilder WithWarningSection(ContentSectionDto warningSection)
     {
         _warningSection = warningSection;
         return this;
