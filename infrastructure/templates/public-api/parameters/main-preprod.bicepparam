@@ -4,7 +4,7 @@ using '../main.bicep'
 param environmentName = 'Pre-Production'
 
 param publicUrls = {
-  contentApi: 'https://content.pre-production.explore-education-statistics.service.gov.uk'
+  contentApi: 'https://cont.pre-production.explore-education-statistics.service.gov.uk'
   publicSite: 'https://pre-production.explore-education-statistics.service.gov.uk'
   publicApi: 'https://pp-api.education.gov.uk/statistics-preprod'
   publicApiAppGateway: 'https://pre-production.statistics.api.education.gov.uk'
