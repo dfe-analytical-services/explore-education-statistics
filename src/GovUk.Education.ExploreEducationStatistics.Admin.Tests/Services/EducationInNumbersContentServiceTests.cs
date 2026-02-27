@@ -1,12 +1,25 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -66,12 +79,37 @@ public class EducationInNumbersContentServiceTests
                                         new EinFreeTextStatTile
                                         {
                                             Id = Guid.NewGuid(),
-                                            Title = "Tile title",
+                                            Title = "Free text stat tile",
+                                            Order = 0,
                                             Statistic = "Over 9000!",
                                             Trend = "It's up",
-                                            Order = 0,
                                             LinkText = "Link text",
                                             LinkUrl = "http://link.url",
+                                        },
+                                        new EinApiQueryStatTile
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Title = "Api query stat tile",
+                                            Order = 1,
+                                            DataSetId = Guid.NewGuid(),
+                                            Version = "1.0.1",
+                                            DataSetVersionId = Guid.NewGuid(),
+                                            LatestDataSetVersionId = Guid.NewGuid(),
+                                            Query = "query-json",
+                                            Statistic = "93",
+                                            IndicatorUnit = IndicatorUnit.Percent,
+                                            DecimalPlaces = 2,
+                                            QueryResult = "query-result-json",
+                                            ReleaseId = Guid.NewGuid(),
+                                            Release = new Content.Model.Release
+                                            {
+                                                Slug = "release-slug",
+                                                PublicationId = Guid.NewGuid(),
+                                                Publication = new Publication { Slug = "publication-slug" },
+
+                                                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                                Year = 1984,
+                                            },
                                         },
                                     ],
                                 },
@@ -85,8 +123,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.GetPageContent(_pageId);
+            var service = BuildService(context);
+            var result = await service.GetPageContent(_pageId, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(_pageId, viewModel.Id);
@@ -107,14 +145,26 @@ public class EducationInNumbersContentServiceTests
             Assert.Equal(0, blockA.Order);
             Assert.Equal("TileGroupBlock title", blockA.Title);
 
-            var tile = Assert.Single(blockA.Tiles);
-            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(tile);
-            Assert.Equal("Tile title", freeTextStatTile.Title);
+            Assert.Equal(2, blockA.Tiles.Count);
+            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(blockA.Tiles[0]);
+            Assert.Equal("Free text stat tile", freeTextStatTile.Title);
+            Assert.Equal(0, freeTextStatTile.Order);
             Assert.Equal("Over 9000!", freeTextStatTile.Statistic);
             Assert.Equal("It's up", freeTextStatTile.Trend);
-            Assert.Equal(0, freeTextStatTile.Order);
             Assert.Equal("Link text", freeTextStatTile.LinkText);
             Assert.Equal("http://link.url", freeTextStatTile.LinkUrl);
+
+            var apiQueryStatTile = Assert.IsType<EinApiQueryStatTileViewModel>(blockA.Tiles[1]);
+            Assert.Equal("Api query stat tile", apiQueryStatTile.Title);
+            Assert.Equal(1, apiQueryStatTile.Order);
+            Assert.Equal("1.0.1", apiQueryStatTile.Version);
+            Assert.False(apiQueryStatTile.IsLatestVersion);
+            Assert.Equal("query-json", apiQueryStatTile.Query);
+            Assert.Equal("93", apiQueryStatTile.Statistic);
+            Assert.Equal(IndicatorUnit.Percent, apiQueryStatTile.IndicatorUnit);
+            Assert.Equal(2, apiQueryStatTile.DecimalPlaces);
+            Assert.Equal("publication-slug", apiQueryStatTile.PublicationSlug);
+            Assert.Equal("release-slug", apiQueryStatTile.ReleaseSlug);
 
             var blockBGenericType = Assert.Single(viewModel.Content[1].Content);
             var blockB = Assert.IsType<EinHtmlBlockViewModel>(blockBGenericType);
@@ -129,9 +179,9 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
-        var result = await service.GetPageContent(Guid.NewGuid());
+        var result = await service.GetPageContent(Guid.NewGuid(), CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -147,8 +197,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.AddSection(_pageId, 0);
+            var service = BuildService(context);
+            var result = await service.AddSection(_pageId, 0, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(0, viewModel.Order);
@@ -189,8 +239,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.AddSection(_pageId, 0);
+            var service = BuildService(context);
+            var result = await service.AddSection(_pageId, 0, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(0, viewModel.Order);
@@ -240,8 +290,13 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.UpdateSectionHeading(_pageId, _sectionAId, "New Heading");
+            var service = BuildService(context);
+            var result = await service.UpdateSectionHeading(
+                _pageId,
+                _sectionAId,
+                "New Heading",
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal("New Heading", viewModel.Heading);
@@ -262,9 +317,9 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
-        var result = await service.UpdateSectionHeading(_pageId, Guid.NewGuid(), "New Heading");
+        var result = await service.UpdateSectionHeading(_pageId, Guid.NewGuid(), "New Heading", CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -292,9 +347,9 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var newOrder = new List<Guid> { _sectionBId, sectionCId, _sectionAId };
-            var result = await service.ReorderSections(_pageId, newOrder);
+            var result = await service.ReorderSections(_pageId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -317,9 +372,9 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
-        var result = await service.ReorderSections(Guid.NewGuid(), new List<Guid>());
+        var result = await service.ReorderSections(Guid.NewGuid(), new List<Guid>(), CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -341,10 +396,10 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // Providing a different set of IDs
             var newOrder = new List<Guid> { _sectionAId, _sectionBId };
-            var result = await service.ReorderSections(_pageId, newOrder);
+            var result = await service.ReorderSections(_pageId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(
@@ -377,8 +432,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.DeleteSection(_pageId, _sectionBId);
+            var service = BuildService(context);
+            var result = await service.DeleteSection(_pageId, _sectionBId, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(2, viewModels.Count);
@@ -411,8 +466,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.DeleteSection(_pageId, Guid.NewGuid());
+            var service = BuildService(context);
+            var result = await service.DeleteSection(_pageId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }
@@ -431,8 +486,14 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, 2);
+            var service = BuildService(context);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.HtmlBlock,
+                2,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.IsType<EinHtmlBlockViewModel>(viewModel);
@@ -464,9 +525,15 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // order is null, so should be added to the end
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, null);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.HtmlBlock,
+                null,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal(1, viewModel.Order);
@@ -499,9 +566,15 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // order is null, so should be added to the end
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.TileGroupBlock, null);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.TileGroupBlock,
+                null,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal(1, viewModel.Order);
@@ -543,8 +616,14 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, 0);
+            var service = BuildService(context);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.HtmlBlock,
+                0,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.IsType<EinHtmlBlockViewModel>(viewModel);
@@ -584,9 +663,15 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
-            var result = await service.UpdateHtmlBlock(_pageId, _sectionAId, _blockAId, request);
+            var result = await service.UpdateHtmlBlock(
+                _pageId,
+                _sectionAId,
+                _blockAId,
+                request,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight() as EinHtmlBlockViewModel;
             Assert.NotNull(viewModel);
@@ -604,10 +689,16 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
         var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
 
-        var result = await service.UpdateHtmlBlock(_pageId, _sectionAId, Guid.NewGuid(), request);
+        var result = await service.UpdateHtmlBlock(
+            _pageId,
+            _sectionAId,
+            Guid.NewGuid(),
+            request,
+            CancellationToken.None
+        );
         result.AssertNotFound();
     }
 
@@ -631,9 +722,15 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
-            var result = await service.UpdateTileGroupBlock(_pageId, _sectionAId, _blockAId, request);
+            var result = await service.UpdateTileGroupBlock(
+                _pageId,
+                _sectionAId,
+                _blockAId,
+                request,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             var tileGroupBlock = Assert.IsType<EinTileGroupBlockViewModel>(viewModel);
@@ -658,10 +755,16 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
 
-            var result = await service.UpdateTileGroupBlock(_pageId, _sectionAId, Guid.NewGuid(), request);
+            var result = await service.UpdateTileGroupBlock(
+                _pageId,
+                _sectionAId,
+                Guid.NewGuid(),
+                request,
+                CancellationToken.None
+            );
             result.AssertNotFound();
         }
     }
@@ -691,9 +794,9 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var newOrder = new List<Guid> { _blockBId, blockCId, _blockAId };
-            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
+            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -725,10 +828,10 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
 
             var newOrder = new List<Guid> { _blockAId, _blockBId }; // _blockBId does not exist in the section
-            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
+            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedBlockIdsDifferFromActualBlockIds);
@@ -760,8 +863,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.DeleteBlock(_pageId, _sectionAId, _blockBId);
+            var service = BuildService(context);
+            var result = await service.DeleteBlock(_pageId, _sectionAId, _blockBId, CancellationToken.None);
 
             result.AssertRight();
 
@@ -781,9 +884,9 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
-        var result = await service.DeleteBlock(_pageId, Guid.NewGuid(), _blockAId);
+        var result = await service.DeleteBlock(_pageId, Guid.NewGuid(), _blockAId, CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -801,8 +904,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.DeleteBlock(_pageId, _sectionAId, Guid.NewGuid());
+            var service = BuildService(context);
+            var result = await service.DeleteBlock(_pageId, _sectionAId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }
@@ -825,14 +928,20 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.AddTile(_pageId, _blockAId, EinTileType.FreeTextStatTile, 1);
+            var service = BuildService(context);
+            var result = await service.AddTile(
+                _pageId,
+                _blockAId,
+                EinTileType.FreeTextStatTile,
+                1,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             var freeTextTile = Assert.IsType<EinFreeTextStatTileViewModel>(viewModel);
             Assert.Equal(1, freeTextTile.Order);
-            Assert.Equal("", freeTextTile.Title);
-            Assert.Equal("", freeTextTile.Statistic);
+            Assert.Null(freeTextTile.Title);
+            Assert.Null(freeTextTile.Statistic);
 
             var dbTile = await context.EinTiles.SingleAsync();
             Assert.Equal(viewModel.Id, dbTile.Id);
@@ -860,9 +969,15 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // order is null, so should be added to the end of the list
-            var result = await service.AddTile(_pageId, _blockAId, EinTileType.FreeTextStatTile, null);
+            var result = await service.AddTile(
+                _pageId,
+                _blockAId,
+                EinTileType.FreeTextStatTile,
+                null,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal(1, viewModel.Order);
@@ -870,6 +985,54 @@ public class EducationInNumbersContentServiceTests
             var dbTiles = await context.EinTiles.ToListAsync();
             Assert.Equal(2, dbTiles.Count);
             Assert.Equal(1, dbTiles.Single(b => b.Id == viewModel.Id).Order);
+        }
+    }
+
+    [Fact]
+    public async Task AddTile_ApiQueryStatTile_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    EinContentSection = new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId },
+                }
+            );
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = BuildService(context);
+            var result = await service.AddTile(
+                _pageId,
+                _blockAId,
+                EinTileType.ApiQueryStatTile,
+                1,
+                CancellationToken.None
+            );
+
+            var viewModel = result.AssertRight();
+            var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
+            Assert.Equal(1, apiTile.Order);
+            Assert.Null(apiTile.Title);
+            Assert.Null(apiTile.DataSetId);
+            Assert.Null(apiTile.Version);
+            Assert.True(apiTile.IsLatestVersion); // we only need this to be false if it needs updating, not when its blank
+            Assert.Null(apiTile.Query);
+            Assert.Null(apiTile.IndicatorUnit);
+            Assert.Null(apiTile.Statistic);
+            Assert.Null(apiTile.DecimalPlaces);
+            Assert.Null(apiTile.PublicationSlug);
+            Assert.Null(apiTile.ReleaseSlug);
+
+            var dbTile = await context.EinTiles.SingleAsync();
+            Assert.Equal(viewModel.Id, dbTile.Id);
+            Assert.Equal(1, dbTile.Order);
+            Assert.Equal(_blockAId, dbTile.EinParentBlockId);
         }
     }
 
@@ -903,7 +1066,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinFreeTextStatTileUpdateRequest
             {
                 Title = "New title",
@@ -912,7 +1075,7 @@ public class EducationInNumbersContentServiceTests
                 LinkUrl = "http://new.url",
                 LinkText = "New link text",
             };
-            var result = await service.UpdateFreeTextStatTile(_pageId, _tileAId, request);
+            var result = await service.UpdateFreeTextStatTile(_pageId, _tileAId, request, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             var freeTextTile = Assert.IsType<EinFreeTextStatTileViewModel>(viewModel);
@@ -935,11 +1098,709 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
         var request = new EinFreeTextStatTileUpdateRequest();
 
-        var result = await service.UpdateFreeTextStatTile(_pageId, Guid.NewGuid(), request);
+        var result = await service.UpdateFreeTextStatTile(_pageId, Guid.NewGuid(), request, CancellationToken.None);
         result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Success()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var newDataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(newDataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+        publicDataApiClient
+            .Setup(c =>
+                c.QueryDataSetPost(
+                    It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
+                    It.Is<string>(version => version == "1.0.1"),
+                    It.Is<string>(query =>
+                        query
+                        == """
+                        {"indicators":["bbbbb"]}
+                        """
+                    ),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                new DataSetQueryPaginatedResultsViewModel
+                {
+                    Warnings = [],
+                    Paging = new PagingViewModel(1, 100, 3),
+                    Results =
+                    [
+                        new DataSetQueryResultViewModel
+                        {
+                            Filters = [],
+                            Locations = [], // normally there would be locations, but not needed for this test
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "9393" } },
+                        },
+                        new DataSetQueryResultViewModel
+                        {
+                            // This result isn't the latest year so filtered
+                            Filters = [],
+                            Locations = [],
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2000",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "shouldn't see this" } },
+                        },
+                        new DataSetQueryResultViewModel
+                        {
+                            // This result isn't GeogLvl.Country, so filtered
+                            Filters = [],
+                            Locations = [],
+                            GeographicLevel = GeographicLevel.LocalAuthority,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "shouldn't see this" } },
+                        },
+                    ],
+                }
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext,
+                dataSetRepository: publicDataSetRepository.Object,
+                publicDataApiClient: publicDataApiClient.Object
+            );
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.1",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+
+            var viewModel = result.AssertRight();
+            var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
+
+            Assert.Equal(_tileAId, apiTile.Id);
+            Assert.Equal("New title", apiTile.Title);
+            Assert.Equal(1, apiTile.Order);
+            Assert.Equal(
+                """
+                {"indicators":["bbbbb"]}
+                """,
+                apiTile.Query
+            );
+
+            Assert.Equal(newDataSetId, apiTile.DataSetId);
+            Assert.Equal("1.0.1", apiTile.Version);
+            Assert.True(apiTile.IsLatestVersion);
+
+            Assert.Equal("9393", apiTile.Statistic);
+            Assert.Equal(IndicatorUnit.MillionPounds, apiTile.IndicatorUnit);
+            Assert.Equal(2, apiTile.DecimalPlaces);
+
+            Assert.Equal(publication.Slug, apiTile.PublicationSlug);
+            Assert.Equal(publication.Releases[0].Slug, apiTile.ReleaseSlug);
+
+            var dbTile = await contentDbContext.EinTiles.OfType<EinApiQueryStatTile>().SingleAsync();
+            Assert.Equal(_tileAId, dbTile.Id);
+            Assert.Equal("New title", dbTile.Title);
+            Assert.Equal("9393", dbTile.Statistic);
+
+            Assert.Equal("1.0.1", dbTile.Version);
+            Assert.Equal(latestDataSetVersionId, dbTile.DataSetVersionId);
+            Assert.Equal(latestDataSetVersionId, dbTile.LatestDataSetVersionId);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Fail_ProvidedVersionNotLatest()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext, dataSetRepository: publicDataSetRepository.Object);
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.0",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+
+            var actionResult = result.AssertLeft();
+            Assert.Equal(
+                "Version provided isn't the latest version. Latest: 1.0.1 Provided: 1.0.0",
+                ((BadRequestObjectResult)actionResult).Value
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Fail_PapiQueryReturnsWarnings()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+        publicDataApiClient
+            .Setup(c =>
+                c.QueryDataSetPost(
+                    It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
+                    It.Is<string>(version => version == "1.0.1"),
+                    It.Is<string>(query =>
+                        query
+                        == """
+                        {"indicators":["bbbbb"]}
+                        """
+                    ),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                new DataSetQueryPaginatedResultsViewModel
+                {
+                    Warnings =
+                    [
+                        new WarningViewModel { Code = "PapiTestWarningCode", Message = "PAPI test warning message" },
+                    ],
+                    Paging = new PagingViewModel(1, 100, 10),
+                    Results = [],
+                }
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext,
+                dataSetRepository: publicDataSetRepository.Object,
+                publicDataApiClient: publicDataApiClient.Object
+            );
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.1",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+
+            var actionResult = result.AssertLeft();
+            Assert.Equal(
+                "PAPI query returned warnings: PAPI test warning message",
+                ((BadRequestObjectResult)actionResult).Value
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Fail_MoreThanOneResultAfterFiltering()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+        publicDataApiClient
+            .Setup(c =>
+                c.QueryDataSetPost(
+                    It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
+                    It.Is<string>(version => version == "1.0.1"),
+                    It.Is<string>(query =>
+                        query
+                        == """
+                        {"indicators":["bbbbb"]}
+                        """
+                    ),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                new DataSetQueryPaginatedResultsViewModel
+                {
+                    Warnings = [],
+                    Paging = new PagingViewModel(1, 100, 10),
+                    Results =
+                    [
+                        new DataSetQueryResultViewModel
+                        {
+                            Filters = [],
+                            Locations = [], // normally there would be locations, but not needed for this test
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "9393" } },
+                        },
+                        new DataSetQueryResultViewModel
+                        {
+                            // Duplicate of above result
+                            Filters = [],
+                            Locations = [],
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "9394" } },
+                        },
+                    ],
+                }
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext,
+                dataSetRepository: publicDataSetRepository.Object,
+                publicDataApiClient: publicDataApiClient.Object
+            );
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.1",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+
+            var actionResult = result.AssertLeft();
+            Assert.Equal(
+                "Should only be one result with NAT and latest year. Found 2 results",
+                ((BadRequestObjectResult)actionResult).Value
+            );
+        }
     }
 
     [Fact]
@@ -967,9 +1828,9 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var newOrder = new List<Guid> { _tileBId, tileCId, _tileAId };
-            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
+            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -1006,10 +1867,10 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
 
             var newOrder = new List<Guid> { _tileAId, _tileBId }; // _tileBId does not exist
-            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
+            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedTileIdsDifferFromActualTileIds);
@@ -1041,8 +1902,8 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.DeleteTile(_pageId, _blockAId, _tileBId);
+            var service = BuildService(context);
+            var result = await service.DeleteTile(_pageId, _blockAId, _tileBId, CancellationToken.None);
 
             result.AssertRight();
 
@@ -1062,9 +1923,9 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
-        var result = await service.DeleteTile(_pageId, Guid.NewGuid(), _tileAId);
+        var result = await service.DeleteTile(_pageId, Guid.NewGuid(), _tileAId, CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -1086,9 +1947,22 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
-            var result = await service.DeleteTile(_pageId, _blockAId, Guid.NewGuid());
+            var service = BuildService(context);
+            var result = await service.DeleteTile(_pageId, _blockAId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
+    }
+
+    private EducationInNumbersContentService BuildService(
+        ContentDbContext contentDbContext,
+        IPublicDataSetRepository? dataSetRepository = null,
+        IPublicDataApiClient? publicDataApiClient = null
+    )
+    {
+        return new EducationInNumbersContentService(
+            contentDbContext,
+            dataSetRepository ?? Mock.Of<IPublicDataSetRepository>(MockBehavior.Strict),
+            publicDataApiClient ?? new Mock<IPublicDataApiClient>(MockBehavior.Strict).Object
+        );
     }
 }
