@@ -21,10 +21,10 @@ const redirectPatterns: URLPattern[] = [
     pathname: `/methodology/:${methodologySlugKey}{/}?`,
   }),
   new URLPattern({
-    pathname: `/find-statistics/:${publicationSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
+    pathname: `/find-statistics/:${publicationSlugKey}/(releases/?|.{0})?`,
   }),
   new URLPattern({
-    pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
+    pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}/(explore/?|methodology/?|help/?|updates/?|.{0})?`,
   }),
   new URLPattern({
     pathname: `/data-tables/:${publicationSlugKey}{/}?`,
