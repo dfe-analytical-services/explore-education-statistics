@@ -4,6 +4,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import {
   releaseDataFileReplacementCompleteRoute,
   ReleaseDataFileReplaceRouteParams,
+  releaseDataRoute,
+  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import releaseDataFileService, {
   DataFile,
@@ -21,7 +23,6 @@ const PendingDataReplacementSection: React.FC<{
   publicationId: string;
   releaseVersionId: string;
   history: RouteComponentProps<ReleaseDataFileReplaceRouteParams>['history'];
-  fetchDataFile: () => void;
 }> = ({
   dataFileId,
   replacementDataFileError,
@@ -30,7 +31,6 @@ const PendingDataReplacementSection: React.FC<{
   publicationId,
   releaseVersionId,
   history,
-  fetchDataFile,
 }) => {
   const { user } = useAuthContext();
   const getReplacementPlanMessage = () => {
@@ -89,9 +89,13 @@ const PendingDataReplacementSection: React.FC<{
             releaseVersionId,
             replacementDataFile.id,
           );
+          history.push(
+            generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+              publicationId,
+              releaseVersionId,
+            }),
+          );
         }
-
-        fetchDataFile();
       }}
     >
       {getCancelBodyText(
