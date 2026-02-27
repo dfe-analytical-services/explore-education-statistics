@@ -63,6 +63,19 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
   parseStyleAttributes: false,
 };
 
+export const releaseWarningBlockSanitizeOptions: SanitizeHtmlOptions = {
+  allowedTags: ['p', 'a'],
+  allowedAttributes: {
+    a: ['href', 'rel', 'target'],
+    p: ['style'],
+  },
+  allowedSchemesByTag: {
+    a: ['http', 'https', 'mailto', 'tel'],
+  },
+  // Copied from defaultSanitizeOptions
+  parseStyleAttributes: false,
+};
+
 export const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {
   'comment-start': ['name'],
   'comment-end': ['name'],

@@ -12,6 +12,7 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ReleaseSummaryBlock from '@common/modules/release/components/ReleaseSummaryBlock';
+import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import {
   formatPartialDate,
   isValidPartialDate,
@@ -52,8 +53,13 @@ const ReleaseContent = ({
 
   const [activeTab, setActiveTab] = useState<ReleasePageTabSectionKey>('home');
 
-  const { nextReleaseDate, publication, publishingOrganisations, updates } =
-    release;
+  const {
+    nextReleaseDate,
+    publication,
+    publishingOrganisations,
+    updates,
+    warningSection,
+  } = release;
 
   return (
     <>
@@ -135,6 +141,10 @@ const ReleaseContent = ({
           }
           trackScroll
         />
+      )}
+
+      {warningSection?.content && warningSection.content.length > 0 && (
+        <ReleaseWarningBlock block={warningSection.content[0]} />
       )}
 
       <ReleasePageTabBar activeTab={activeTab} onChangeTab={setActiveTab} />

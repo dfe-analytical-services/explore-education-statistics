@@ -35,6 +35,7 @@ interface Props {
   block: EditableBlock;
   editable?: boolean;
   editButtonLabel?: ReactNode | string;
+  isReleaseWarningBlock?: boolean;
   label: string;
   publicationId: string;
   releaseVersionId: string;
@@ -52,6 +53,7 @@ const ReleaseEditableBlock = ({
   block,
   editable = true,
   editButtonLabel,
+  isReleaseWarningBlock,
   label,
   publicationId,
   releaseVersionId,
@@ -412,6 +414,7 @@ const ReleaseEditableBlock = ({
             id={blockId}
             isEditing={isLockedByUser}
             isLoading={isLocking}
+            isReleaseWarningBlock={isReleaseWarningBlock}
             label={label}
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
