@@ -974,6 +974,7 @@ Verify published date on publication page is overriden with past date
     user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
 Verify public published date is overriden with past date
+    user waits for caches to expire
     user navigates to    ${PUBLIC_RELEASE_LINK}
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
