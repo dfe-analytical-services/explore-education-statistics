@@ -26,4 +26,6 @@ public record DataSetUploadViewModel
     public bool? PublicApiCompatible { get; set; }
 
     public Guid? ReplacingFileId { get; init; }
+
+    public Guid? ReplacedByFileAPIDataSetId { get; init; }
 }

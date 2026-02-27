@@ -43,13 +43,16 @@ export default function DataFilesTableUploadRow({
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
   const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
   const { user } = useAuthContext();
-
   const hasFailures = dataSetUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'FAIL',
   );
   const hasWarnings = dataSetUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'WARNING',
   );
+
+  const blockAnalystContinuation =
+    user?.permissions.isBauUser === false &&
+    dataSetUpload.replacedByFileAPIDataSetId !== undefined;
 
   const [warningAcknowledgements, setWarningAcknowledgements] = useState<
     Dictionary<boolean>
@@ -62,7 +65,8 @@ export default function DataFilesTableUploadRow({
     !dataSetUpload.screenerResult ||
     dataSetUpload.status === 'SCREENER_ERROR' ||
     dataSetUpload.status === 'FAILED_SCREENING' ||
-    hasFailures;
+    hasFailures ||
+    blockAnalystContinuation;
 
   const importUnavailable = !Object.values(warningAcknowledgements).every(
     acknowledgement => acknowledgement === true,
@@ -108,6 +112,18 @@ export default function DataFilesTableUploadRow({
   const warningsNoticeMessage = (
     <WarningMessage>
       You will need to review each warning before continuing the file upload
+    </WarningMessage>
+  );
+
+  const warningsAnalystNotAllowedMessage = (
+    <WarningMessage>
+      This upload can only be completed by a BAU user. This data file is linked
+      to an API data set version which only BAU users can modify. Please contact
+      the EES team for support at{' '}
+      <a href="mailto:explore.statistics@education.gov.uk">
+        explore.statistics@education.gov.uk
+      </a>
+      .
     </WarningMessage>
   );
 
@@ -162,7 +178,8 @@ export default function DataFilesTableUploadRow({
             open={openImportConfirm}
             hideConfirm={importBlocked && !canOverride}
             disableConfirm={
-              importUnavailable && !(importBlocked && canOverride)
+              (importUnavailable && !(importBlocked && canOverride)) ||
+              blockAnalystContinuation
             }
             onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}
@@ -189,7 +206,11 @@ export default function DataFilesTableUploadRow({
                   }
                 >
                   {hasFailures && failuresNoticeMessage}
-                  {hasWarnings && !hasFailures && warningsNoticeMessage}
+                  {blockAnalystContinuation && warningsAnalystNotAllowedMessage}
+                  {hasWarnings &&
+                    !hasFailures &&
+                    !blockAnalystContinuation &&
+                    warningsNoticeMessage}
                   <ScreenerResultsTable
                     screenerResult={dataSetUpload.screenerResult}
                     showAll={false}
@@ -209,7 +230,11 @@ export default function DataFilesTableUploadRow({
                 }
               >
                 {hasFailures && failuresNoticeMessage}
-                {hasWarnings && !hasFailures && warningsNoticeMessage}
+                {blockAnalystContinuation && warningsAnalystNotAllowedMessage}
+                {hasWarnings &&
+                  !hasFailures &&
+                  !blockAnalystContinuation &&
+                  warningsNoticeMessage}
                 <ScreenerResultsTable
                   screenerResult={dataSetUpload.screenerResult}
                   showAll
@@ -222,7 +247,11 @@ export default function DataFilesTableUploadRow({
                 headingTitle="File details"
               >
                 {hasFailures && failuresNoticeMessage}
-                {hasWarnings && !hasFailures && warningsNoticeMessage}
+                {blockAnalystContinuation && warningsAnalystNotAllowedMessage}
+                {hasWarnings &&
+                  !hasFailures &&
+                  !blockAnalystContinuation &&
+                  warningsNoticeMessage}
                 <DataSetUploadSummaryList
                   releaseVersionId={releaseVersionId}
                   dataSetUpload={dataSetUpload}
