@@ -36,6 +36,7 @@ internal class DataSetVersionMappingService(
                 .ThenInclude(ds => ds.LatestLiveVersion)
             .Include(dataSetVersion => dataSetVersion.DataSet)
                 .ThenInclude(dataSet => dataSet.Versions)
+                    .ThenInclude(version => version.IndicatorMetas)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
         var sourceVersion = dataSetVersionToReplaceId is not null
@@ -47,6 +48,11 @@ internal class DataSetVersionMappingService(
             return VersionToReplaceNotFoundError();
         }
 
+        if (sourceVersion is null)
+        {
+            return SourceVersionNotFoundError();
+        }
+
         var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
             dataSetVersionId: nextDataSetVersionId,
             cancellationToken
@@ -54,16 +60,15 @@ internal class DataSetVersionMappingService(
 
         var sourceLocationMeta = await GetLocationMeta(sourceVersion.Id, cancellationToken);
 
-        var locationMappings = CreateLocationMappings(sourceLocationMeta, nextVersionMeta.Locations);
+        var locationMappingPlan = CreateInitialLocationMappingPlan(sourceLocationMeta, nextVersionMeta.Locations);
 
         var sourceFilterMeta = await GetFilterMeta(sourceVersion.Id, cancellationToken);
 
-        var filterMappings = CreateFilterMappings(sourceFilterMeta, nextVersionMeta.Filters);
+        var filterMappingPlan = CreateInitialFilterMappingPlan(sourceFilterMeta, nextVersionMeta.Filters);
 
-        var hasDeletedIndicators = await HasDeletedIndicators(
-            sourceVersion.Id,
-            nextVersionMeta.Indicators,
-            cancellationToken
+        var indicatorMappingPlan = CreateInitialIndicatorMappingPlan(
+            sourceVersion.IndicatorMetas,
+            nextVersionMeta.Indicators
         );
 
         var hasDeletedGeographicLevels = await HasDeletedGeographicLevels(
@@ -85,9 +90,9 @@ internal class DataSetVersionMappingService(
             {
                 SourceDataSetVersionId = sourceVersion.Id,
                 TargetDataSetVersionId = nextDataSetVersionId,
-                LocationMappingPlan = locationMappings,
-                FilterMappingPlan = filterMappings,
-                HasDeletedIndicators = hasDeletedIndicators,
+                LocationMappingPlan = locationMappingPlan,
+                FilterMappingPlan = filterMappingPlan,
+                IndicatorMappingPlan = indicatorMappingPlan,
                 HasDeletedGeographicLevels = hasDeletedGeographicLevels,
                 HasDeletedTimePeriods = hasDeletedTimePeriods,
             }
@@ -107,6 +112,17 @@ internal class DataSetVersionMappingService(
                 }
             );
         }
+
+        Either<ActionResult, Unit> SourceVersionNotFoundError()
+        {
+            return ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.SourceDataSetVersionNotFound.Code,
+                    Message = ValidationMessages.SourceDataSetVersionNotFound.Message,
+                }
+            );
+        }
     }
 
     public async Task ApplyAutoMappings(
@@ -121,6 +137,9 @@ internal class DataSetVersionMappingService(
 
         AutoMapLocations(mapping.LocationMappingPlan);
         AutoMapFilters(mapping.FilterMappingPlan);
+
+        // EES-6764 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
+        AutoMapIndicators(mapping.IndicatorMappingPlan!);
 
         mapping.LocationMappingsComplete = !mapping
             .LocationMappingPlan.Levels
@@ -137,6 +156,11 @@ internal class DataSetVersionMappingService(
             .FilterMappingPlan.Mappings.Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
+
+        // EES-6764 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
+        mapping.IndicatorMappingsComplete = mapping.IndicatorMappingPlan!.Mappings.All(indicatorMapping =>
+            indicatorMapping.Value.Type == MappingType.AutoMapped
+        );
 
         if (!isReplacement && IsMajorVersionUpdate(mapping))
         {
@@ -159,6 +183,7 @@ internal class DataSetVersionMappingService(
 
     private static bool IsMajorVersionUpdate(DataSetVersionMapping mapping)
     {
+        // TODO EES-6764 - remove once the flag is no longer populated.
         if (mapping.HasDeletedIndicators || mapping.HasDeletedGeographicLevels || mapping.HasDeletedTimePeriods)
         {
             return true;
@@ -266,7 +291,7 @@ internal class DataSetVersionMappingService(
             );
         }
 
-        if (!mapping.FilterMappingsComplete || !mapping.LocationMappingsComplete)
+        if (!mapping.FilterMappingsComplete || !mapping.LocationMappingsComplete || !mapping.IndicatorMappingsComplete)
         {
             return CreateDataSetVersionIdError(
                 message: ValidationMessages.DataSetVersionMappingsNotComplete,
@@ -278,9 +303,9 @@ internal class DataSetVersionMappingService(
         return mapping;
     }
 
-    private static void AutoMapLocations(LocationMappingPlan locationPlan)
+    private static void AutoMapLocations(LocationMappingPlan locationMappingPlan)
     {
-        locationPlan.Levels.ForEach(level =>
+        locationMappingPlan.Levels.ForEach(level =>
             level.Value.Mappings.ForEach(locationMapping =>
                 AutoMapElement(
                     sourceKey: locationMapping.Key,
@@ -291,14 +316,25 @@ internal class DataSetVersionMappingService(
         );
     }
 
-    private static void AutoMapFilters(FilterMappingPlan filtersPlan)
+    private static void AutoMapFilters(FilterMappingPlan filterMappingPlan)
     {
-        filtersPlan.Mappings.ForEach(filterMapping =>
+        filterMappingPlan.Mappings.ForEach(filterMapping =>
             AutoMapParentAndOptions(
                 sourceParentKey: filterMapping.Key,
                 parentMapping: filterMapping.Value,
-                parentCandidates: filtersPlan.Candidates,
+                parentCandidates: filterMappingPlan.Candidates,
                 candidateOptionsSupplier: autoMappedCandidate => autoMappedCandidate.Options
+            )
+        );
+    }
+
+    private static void AutoMapIndicators(IndicatorMappingPlan indicatorMappingPlan)
+    {
+        indicatorMappingPlan.Mappings.ForEach(indicatorMapping =>
+            AutoMapElement(
+                sourceKey: indicatorMapping.Key,
+                mapping: indicatorMapping.Value,
+                candidates: indicatorMappingPlan.Candidates
             )
         );
     }
@@ -370,7 +406,7 @@ internal class DataSetVersionMappingService(
         }
     }
 
-    private static LocationMappingPlan CreateLocationMappings(
+    private static LocationMappingPlan CreateInitialLocationMappingPlan(
         List<LocationMeta> sourceLocationMeta,
         IDictionary<LocationMeta, List<LocationOptionMetaRow>> targetLocationMeta
     )
@@ -427,7 +463,7 @@ internal class DataSetVersionMappingService(
         };
     }
 
-    private static FilterMappingPlan CreateFilterMappings(
+    private static FilterMappingPlan CreateInitialFilterMappingPlan(
         List<FilterMeta> sourceFilterMeta,
         IDictionary<FilterMeta, List<FilterOptionMeta>> targetFilterMeta
     )
@@ -463,9 +499,29 @@ internal class DataSetVersionMappingService(
                 }
             );
 
-        var filters = new FilterMappingPlan { Mappings = filterMappings, Candidates = filterTargets };
+        return new FilterMappingPlan { Mappings = filterMappings, Candidates = filterTargets };
+    }
 
-        return filters;
+    private static IndicatorMappingPlan CreateInitialIndicatorMappingPlan(
+        IList<IndicatorMeta> sourceIndicatorMeta,
+        IList<IndicatorMeta> targetIndicatorMeta
+    )
+    {
+        var sourceIndicatorMappings = sourceIndicatorMeta.ToDictionary(
+            keySelector: MappingKeyGenerators.IndicatorMeta,
+            elementSelector: indicator => new IndicatorMapping
+            {
+                Source = new MappableIndicator { Label = indicator.Label },
+                PublicId = indicator.PublicId,
+            }
+        );
+
+        var indicatorTargets = targetIndicatorMeta.ToDictionary(
+            keySelector: MappingKeyGenerators.IndicatorMeta,
+            elementSelector: indicator => new MappableIndicator { Label = indicator.Label }
+        );
+
+        return new IndicatorMappingPlan { Mappings = sourceIndicatorMappings, Candidates = indicatorTargets };
     }
 
     private static MappableLocationOption CreateLocationOptionFromMetaLink(LocationOptionMetaLink link)

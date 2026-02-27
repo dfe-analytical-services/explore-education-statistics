@@ -40,6 +40,11 @@ public static class DataSetVersionMappingGeneratorExtensions
         FilterMappingPlan filterMappingPlan
     ) => generator.ForInstance(s => s.SetFilterMappingPlan(filterMappingPlan));
 
+    public static Generator<DataSetVersionMapping> WithIndicatorMappingPlan(
+        this Generator<DataSetVersionMapping> generator,
+        IndicatorMappingPlan indicatorMappingPlan
+    ) => generator.ForInstance(s => s.SetIndicatorMappingPlan(indicatorMappingPlan));
+
     public static Generator<DataSetVersionMapping> WithHasDeletedIndicators(
         this Generator<DataSetVersionMapping> generator,
         bool hasDeletedIndicators
@@ -55,6 +60,21 @@ public static class DataSetVersionMappingGeneratorExtensions
         bool hasDeletedTimePeriods
     ) => generator.ForInstance(s => s.SetHasDeletedTimePeriods(hasDeletedTimePeriods));
 
+    public static Generator<DataSetVersionMapping> WithLocationMappingsComplete(
+        this Generator<DataSetVersionMapping> generator,
+        bool complete = true
+    ) => generator.ForInstance(s => s.SetLocationMappingsComplete(complete));
+
+    public static Generator<DataSetVersionMapping> WithFilterMappingsComplete(
+        this Generator<DataSetVersionMapping> generator,
+        bool complete = true
+    ) => generator.ForInstance(s => s.SetFilterMappingsComplete(complete));
+
+    public static Generator<DataSetVersionMapping> WithIndicatorMappingsComplete(
+        this Generator<DataSetVersionMapping> generator,
+        bool complete = true
+    ) => generator.ForInstance(s => s.SetIndicatorMappingsComplete(complete));
+
     public static InstanceSetters<DataSetVersionMapping> SetDefaults(
         this InstanceSetters<DataSetVersionMapping> setters
     ) =>
@@ -63,7 +83,8 @@ public static class DataSetVersionMappingGeneratorExtensions
             .SetDefault(mapping => mapping.SourceDataSetVersionId)
             .SetDefault(mapping => mapping.TargetDataSetVersionId)
             .SetLocationMappingPlan(new LocationMappingPlan())
-            .SetFilterMappingPlan(new FilterMappingPlan());
+            .SetFilterMappingPlan(new FilterMappingPlan())
+            .SetIndicatorMappingPlan(new IndicatorMappingPlan());
 
     public static InstanceSetters<DataSetVersionMapping> SetSourceDataSetVersion(
         this InstanceSetters<DataSetVersionMapping> instanceSetter,
@@ -101,6 +122,11 @@ public static class DataSetVersionMappingGeneratorExtensions
         FilterMappingPlan filterMappingPlan
     ) => instanceSetter.Set(mapping => mapping.FilterMappingPlan, filterMappingPlan);
 
+    public static InstanceSetters<DataSetVersionMapping> SetIndicatorMappingPlan(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        IndicatorMappingPlan indicatorMappingPlan
+    ) => instanceSetter.Set(mapping => mapping.IndicatorMappingPlan, indicatorMappingPlan);
+
     public static InstanceSetters<DataSetVersionMapping> SetHasDeletedIndicators(
         this InstanceSetters<DataSetVersionMapping> instanceSetter,
         bool hasDeletedIndicators
@@ -115,4 +141,19 @@ public static class DataSetVersionMappingGeneratorExtensions
         this InstanceSetters<DataSetVersionMapping> instanceSetter,
         bool hasDeletedTimePeriods
     ) => instanceSetter.Set(mapping => mapping.HasDeletedTimePeriods, hasDeletedTimePeriods);
+
+    public static InstanceSetters<DataSetVersionMapping> SetLocationMappingsComplete(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool complete = true
+    ) => instanceSetter.Set(mapping => mapping.LocationMappingsComplete, complete);
+
+    public static InstanceSetters<DataSetVersionMapping> SetFilterMappingsComplete(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool complete = true
+    ) => instanceSetter.Set(mapping => mapping.FilterMappingsComplete, complete);
+
+    public static InstanceSetters<DataSetVersionMapping> SetIndicatorMappingsComplete(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool complete = true
+    ) => instanceSetter.Set(mapping => mapping.IndicatorMappingsComplete, complete);
 }

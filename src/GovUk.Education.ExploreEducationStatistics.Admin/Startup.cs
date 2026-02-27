@@ -1027,6 +1027,17 @@ internal class NoOpDataSetVersionMappingService : IDataSetVersionMappingService
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
+    public Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+
+    public Task<Either<ActionResult, BatchIndicatorMappingUpdatesResponseViewModel>> ApplyBatchIndicatorMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchIndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+
     public Task<
         Either<ActionResult, BatchFilterOptionMappingUpdatesResponseViewModel>
     > ApplyBatchFilterOptionMappingUpdates(
@@ -1083,6 +1094,11 @@ internal class NoOpMappingTypesRepository : IMappingTypesRepository
     ) => throw new NotImplementedException();
 
     public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(
+        Guid targetDataSetVersionId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+
+    public Task<List<IndicatorMappingTypes>> GetIndicatorMappingTypes(
         Guid targetDataSetVersionId,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();

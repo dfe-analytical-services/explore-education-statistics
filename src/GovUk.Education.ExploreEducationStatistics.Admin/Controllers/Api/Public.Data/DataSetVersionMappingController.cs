@@ -69,4 +69,31 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
             )
             .HandleFailuresOrOk();
     }
+
+    [HttpGet("indicators")]
+    [Produces("application/json")]
+    public Task<ActionResult<IndicatorMappingPlan>> GetIndicatorMappings(
+        [FromRoute] Guid nextDataSetVersionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return mappingService.GetIndicatorMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
+    }
+
+    [HttpPatch("indicators")]
+    [Produces("application/json")]
+    public async Task<ActionResult<BatchIndicatorMappingUpdatesResponseViewModel>> ApplyBatchIndicatorMappingUpdates(
+        [FromRoute] Guid nextDataSetVersionId,
+        [FromBody] BatchIndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        return await mappingService
+            .ApplyBatchIndicatorMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersionId,
+                request: request,
+                cancellationToken: cancellationToken
+            )
+            .HandleFailuresOrOk();
+    }
 }

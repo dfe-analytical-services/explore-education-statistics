@@ -88,7 +88,7 @@ public class ReplacementPlanService(
         );
         var isPatch = DataSetVersionNumber.TryParse(apiDataSetVersionPlan.Version, out var number) && number.Patch > 0;
 
-        // If no mapping is found and the api version status is DRAFT, this data set version was deleted and recreated (& no mapping was necessary)
+        // If no mapping is found and the API version status is DRAFT, this data set version was deleted and recreated (& no mapping was necessary)
         // `completeStatusResult` is used for when we are replacing a draft release file (not an amendment) and therefore the mapping is complete/not applicable.
         var completeStatusResult = new MappingStatusViewModel
         {
@@ -96,6 +96,8 @@ public class ReplacementPlanService(
             FiltersHaveMajorChange = false,
             LocationsComplete = true,
             LocationsHaveMajorChange = false,
+            IndicatorsComplete = true,
+            IndicatorsHaveMajorChange = false,
             HasDeletionChanges = false,
         };
 

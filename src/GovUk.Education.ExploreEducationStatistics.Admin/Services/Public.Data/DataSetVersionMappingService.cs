@@ -70,6 +70,18 @@ public class DataSetVersionMappingService(
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
 
+    // TODO EES-6764 - remove null-forgiving operator.
+    public Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return userService
+            .CheckIsBauUser()
+            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+            .OnSuccess(mapping => mapping.IndicatorMappingPlan)!;
+    }
+
     public async Task<MappingStatusViewModel?> GetMappingStatus(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default
@@ -85,10 +97,16 @@ public class DataSetVersionMappingService(
             cancellationToken
         );
 
+        var indicatorMappingTypes = await mappingTypesRepository.GetIndicatorMappingTypes(
+            dataSetVersionId,
+            cancellationToken
+        );
+
         var majorChangesStatus = await GetMajorChangesStatus(
             dataSetVersionId,
             locationOptionMappingTypes,
             filterAndOptionMappingTypes,
+            indicatorMappingTypes,
             cancellationToken
         );
 
@@ -98,8 +116,10 @@ public class DataSetVersionMappingService(
             {
                 LocationsComplete = mapping.LocationMappingsComplete,
                 FiltersComplete = mapping.FilterMappingsComplete,
+                IndicatorsComplete = mapping.IndicatorMappingsComplete,
                 LocationsHaveMajorChange = majorChangesStatus.LocationsHaveMajorChange,
                 FiltersHaveMajorChange = majorChangesStatus.FiltersHaveMajorChange,
+                IndicatorsHaveMajorChange = majorChangesStatus.IndicatorsHaveMajorChange,
                 HasDeletionChanges = majorChangesStatus.HasDeletionChanges,
             })
             .SingleOrDefaultAsync(cancellationToken);
@@ -119,6 +139,21 @@ public class DataSetVersionMappingService(
                 ValidateFilterOptionCandidates(nextDataSetVersionId, request, cancellationToken),
             applyUpdatesFn: () => UpdateFilterOptionMappingsBatch(nextDataSetVersionId, request, cancellationToken),
             createViewModelFn: updates => new BatchFilterOptionMappingUpdatesResponseViewModel { Updates = updates },
+            cancellationToken: cancellationToken
+        );
+    }
+
+    public Task<Either<ActionResult, BatchIndicatorMappingUpdatesResponseViewModel>> ApplyBatchIndicatorMappingUpdates(
+        Guid nextDataSetVersionId,
+        BatchIndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return ApplyBatchMappingUpdates(
+            nextDataSetVersionId: nextDataSetVersionId,
+            validateCandidatesFn: () => ValidateIndicatorCandidates(nextDataSetVersionId, request, cancellationToken),
+            applyUpdatesFn: () => UpdateIndicatorMappingsBatch(nextDataSetVersionId, request, cancellationToken),
+            createViewModelFn: updates => new BatchIndicatorMappingUpdatesResponseViewModel { Updates = updates },
             cancellationToken: cancellationToken
         );
     }
@@ -176,10 +211,16 @@ public class DataSetVersionMappingService(
             cancellationToken
         );
 
+        var indicatorMappingTypes = await mappingTypesRepository.GetIndicatorMappingTypes(
+            nextDataSetVersionId,
+            cancellationToken
+        );
+
         await UpdateMappingCompleteFlags(
             nextDataSetVersionId: nextDataSetVersionId,
             locationLevelAndOptionMappingTypes: locationOptionMappingTypes,
             filterAndOptionMappingTypes: filterAndOptionMappingTypes,
+            indicatorMappingTypes: indicatorMappingTypes,
             cancellationToken: cancellationToken
         );
 
@@ -187,6 +228,7 @@ public class DataSetVersionMappingService(
             nextDataSetVersionId: nextDataSetVersionId,
             locationMappingTypes: locationOptionMappingTypes,
             filterMappingTypes: filterAndOptionMappingTypes,
+            indicatorMappingTypes: indicatorMappingTypes,
             cancellationToken: cancellationToken
         );
     }
@@ -195,6 +237,7 @@ public class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
+        List<IndicatorMappingTypes> indicatorMappingTypes,
         CancellationToken cancellationToken
     )
     {
@@ -212,6 +255,7 @@ public class DataSetVersionMappingService(
             nextDataSetVersionId,
             locationMappingTypes,
             filterMappingTypes,
+            indicatorMappingTypes,
             cancellationToken
         );
 
@@ -263,16 +307,22 @@ public class DataSetVersionMappingService(
         Guid dataSetVersionId,
         List<LocationMappingTypes> locationMappingTypes,
         List<FilterMappingTypes> filterMappingTypes,
+        List<IndicatorMappingTypes> indicatorMappingTypes,
         CancellationToken cancellationToken = default
     )
     {
         var majorChangesStatus = new MajorChangesStatus
         {
-            FiltersHaveMajorChange = filterMappingTypes.Any(types =>
-                NoMappingTypes.Contains(types.Filter) || NoMappingTypes.Contains(types.FilterOption)
-            ),
             LocationsHaveMajorChange = locationMappingTypes.Any(types =>
-                NoMappingTypes.Contains(types.LocationLevel) || NoMappingTypes.Contains(types.LocationOption)
+                NoMappingTypes.Contains(types.LocationLevelMappingType)
+                || NoMappingTypes.Contains(types.LocationOptionMappingType)
+            ),
+            FiltersHaveMajorChange = filterMappingTypes.Any(types =>
+                NoMappingTypes.Contains(types.FilterMappingType)
+                || NoMappingTypes.Contains(types.FilterOptionMappingType)
+            ),
+            IndicatorsHaveMajorChange = indicatorMappingTypes.Any(types =>
+                NoMappingTypes.Contains(types.IndicatorMappingType)
             ),
             HasDeletionChanges = await HasDeletionChanges(dataSetVersionId, cancellationToken),
         };
@@ -303,6 +353,7 @@ public class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         List<LocationMappingTypes> locationLevelAndOptionMappingTypes,
         List<FilterMappingTypes> filterAndOptionMappingTypes,
+        List<IndicatorMappingTypes> indicatorMappingTypes,
         CancellationToken cancellationToken
     )
     {
@@ -311,16 +362,22 @@ public class DataSetVersionMappingService(
         // We omit options for location levels that are mapped as `AutoNone` as these
         // means the entire location level has been deleted and cannot be mapped.
         var locationMappingsComplete = !locationLevelAndOptionMappingTypes
-            .Where(types => types.LocationLevel != MappingType.AutoNone)
-            .Any(types => IncompleteMappingTypes.Contains(types.LocationOption));
+            .Where(types => types.LocationLevelMappingType != MappingType.AutoNone)
+            .Any(types => IncompleteMappingTypes.Contains(types.LocationOptionMappingType));
 
-        // Find any filter options that that indicates the user still needs to take action
+        // Find any filter options that indicate the user still needs to take action
         // in order to resolve the mapping. If any exist, mappings are not yet complete.
         // We omit options for filters that are mapped as `AutoNone` as this
         // means the entire filter has been deleted and cannot be mapped.
         var filterMappingsComplete = !filterAndOptionMappingTypes
-            .Where(types => types.Filter != MappingType.AutoNone)
-            .Any(types => IncompleteMappingTypes.Contains(types.FilterOption));
+            .Where(types => types.FilterMappingType != MappingType.AutoNone)
+            .Any(types => IncompleteMappingTypes.Contains(types.FilterOptionMappingType));
+
+        // Find any indicators that indicate the user still needs to take action
+        // in order to resolve the mapping. If any exist, mappings are not yet complete.
+        var indicatorMappingsComplete = !indicatorMappingTypes.Any(types =>
+            IncompleteMappingTypes.Contains(types.IndicatorMappingType)
+        );
 
         // Update the mapping complete flags.
         await publicDataDbContext
@@ -328,7 +385,8 @@ public class DataSetVersionMappingService(
             .ExecuteUpdateAsync(
                 setPropertyCalls: s =>
                     s.SetProperty(mapping => mapping.LocationMappingsComplete, locationMappingsComplete)
-                        .SetProperty(mapping => mapping.FilterMappingsComplete, filterMappingsComplete),
+                        .SetProperty(mapping => mapping.FilterMappingsComplete, filterMappingsComplete)
+                        .SetProperty(mapping => mapping.IndicatorMappingsComplete, indicatorMappingsComplete),
                 cancellationToken: cancellationToken
             );
     }
@@ -467,6 +525,34 @@ public class DataSetVersionMappingService(
     }
 
     /// <summary>
+    /// Given a batch of Indicator mapping update requests, this method will validate that the chosen mapping
+    /// candidates exist and return a list of either success or failure responses for each candidate.
+    /// </summary>
+    private async Task<List<Either<ErrorViewModel, Unit>>> ValidateIndicatorCandidates(
+        Guid nextDataSetVersionId,
+        BatchIndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        return await request
+            .Updates.ToAsyncEnumerable()
+            .SelectAwait(
+                async (updateRequest, index) =>
+                    updateRequest.CandidateKey is null
+                        ? Unit.Instance
+                        : await ValidateMappingCandidate(
+                            nextDataSetVersionId: nextDataSetVersionId,
+                            index: index,
+                            jsonbColumnName: nameof(DataSetVersionMapping.IndicatorMappingPlan),
+                            jsonPathSegments: [nameof(DataSetVersionMapping.IndicatorMappingPlan.Candidates)],
+                            updateRequest.CandidateKey,
+                            cancellationToken
+                        )
+            )
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// This method finds the mappings between top-level source filters and their candidate filters.
     /// If a filter has not been mapped, it will return a null "candidate" string for that filter.
     /// </summary>
@@ -544,6 +630,48 @@ public class DataSetVersionMappingService(
                         createSuccessfulResponseFn: mappingUpdate => new FilterOptionMappingUpdateResponseViewModel
                         {
                             FilterKey = updateRequest.FilterKey,
+                            SourceKey = updateRequest.SourceKey,
+                            Mapping = mappingUpdate,
+                        },
+                        cancellationToken
+                    )
+            )
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Given a batch of Filter Option mapping update requests, this method will return a list of either success or
+    /// failure responses for each update.
+    /// </summary>
+    private async Task<
+        List<Either<ErrorViewModel, IndicatorMappingUpdateResponseViewModel>>
+    > UpdateIndicatorMappingsBatch(
+        Guid nextDataSetVersionId,
+        BatchIndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        return await request
+            .Updates.ToAsyncEnumerable()
+            .SelectAwait(
+                async (updateRequest, index) =>
+                    await UpdateMapping<
+                        IndicatorMapping,
+                        MappableIndicator,
+                        IndicatorMappingUpdateRequest,
+                        IndicatorMappingUpdateResponseViewModel
+                    >(
+                        nextDataSetVersionId: nextDataSetVersionId,
+                        updateRequest: updateRequest,
+                        index: index,
+                        jsonbColumnName: nameof(DataSetVersionMapping.IndicatorMappingPlan),
+                        jsonPathSegments:
+                        [
+                            nameof(DataSetVersionMapping.IndicatorMappingPlan.Mappings),
+                            updateRequest.SourceKey,
+                        ],
+                        createSuccessfulResponseFn: mappingUpdate => new IndicatorMappingUpdateResponseViewModel
+                        {
                             SourceKey = updateRequest.SourceKey,
                             Mapping = mappingUpdate,
                         },
