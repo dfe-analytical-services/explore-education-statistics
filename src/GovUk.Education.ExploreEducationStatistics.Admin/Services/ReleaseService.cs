@@ -75,29 +75,10 @@ public partial class ReleaseService(
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     PublicationId = release.PublicationId,
                     PublishingOrganisations = [.. publishingOrganisations],
+                    CreatedById = userService.GetUserId(),
                 };
 
-                if (request.TemplateReleaseId.HasValue)
-                {
-                    await CreateGenericContentFromTemplate(request.TemplateReleaseId.Value, newReleaseVersion);
-                }
-                else
-                {
-                    newReleaseVersion.GenericContent = new List<ContentSection>();
-                }
-
-                newReleaseVersion.SummarySection = new ContentSection { Type = ContentSectionType.ReleaseSummary };
-                newReleaseVersion.KeyStatisticsSecondarySection = new ContentSection
-                {
-                    Type = ContentSectionType.KeyStatisticsSecondary,
-                };
-                newReleaseVersion.HeadlinesSection = new ContentSection { Type = ContentSectionType.Headlines };
-                newReleaseVersion.RelatedDashboardsSection = new ContentSection
-                {
-                    Type = ContentSectionType.RelatedDashboards,
-                };
-                newReleaseVersion.Created = DateTime.UtcNow;
-                newReleaseVersion.CreatedById = userService.GetUserId();
+                await InitialiseContentSections(newReleaseVersion, request.TemplateReleaseId);
 
                 context.ReleaseVersions.Add(newReleaseVersion);
 
@@ -181,14 +162,36 @@ public partial class ReleaseService(
             .OnSuccess(MapRelease);
     }
 
-    private async Task CreateGenericContentFromTemplate(Guid templateReleaseVersionId, ReleaseVersion newReleaseVersion)
+    private async Task InitialiseContentSections(ReleaseVersion releaseVersion, Guid? templateReleaseVersionId = null)
+    {
+        if (templateReleaseVersionId.HasValue)
+        {
+            releaseVersion.GenericContent = await CreateGenericContentFromTemplate(
+                templateReleaseVersionId.Value,
+                releaseVersion
+            );
+        }
+
+        releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+        releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(ContentSectionType.KeyStatisticsSecondary);
+        releaseVersion.RelatedDashboardsSection = CreateContentSection(ContentSectionType.RelatedDashboards);
+        releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+        releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
+    }
+
+    private static ContentSection CreateContentSection(ContentSectionType type) => new() { Type = type };
+
+    private async Task<List<ContentSection>> CreateGenericContentFromTemplate(
+        Guid templateReleaseVersionId,
+        ReleaseVersion newReleaseVersion
+    )
     {
         var templateReleaseVersion = await context
             .ReleaseVersions.AsNoTracking()
             .Include(releaseVersion => releaseVersion.Content)
             .FirstAsync(rv => rv.Id == templateReleaseVersionId);
 
-        newReleaseVersion.Content = templateReleaseVersion
+        return templateReleaseVersion
             .Content.Where(section => section.Type == ContentSectionType.Generic)
             .Select(section => CloneContentSectionFromReleaseTemplate(section, newReleaseVersion))
             .ToList();

@@ -58,6 +58,8 @@ public record ManageContentPageViewModel
 
         public required ContentSectionViewModel RelatedDashboardsSection { get; init; }
 
+        public required ContentSectionViewModel WarningSection { get; init; }
+
         public IEnumerable<FileInfo> DownloadFiles { get; set; } = [];
 
         public required bool HasPreReleaseAccessList { get; init; }

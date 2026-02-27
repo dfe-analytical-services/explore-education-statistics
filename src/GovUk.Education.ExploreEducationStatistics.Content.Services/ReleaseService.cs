@@ -94,6 +94,8 @@ public class ReleaseService : IReleaseService
         releaseViewModel.SummarySection?.Content.ForEach(FilterContentBlock);
         releaseViewModel.KeyStatisticsSecondarySection?.Content.ForEach(FilterContentBlock);
         releaseViewModel.RelatedDashboardsSection?.Content.ForEach(FilterContentBlock);
+        // Note: ReleaseCacheViewModel has no WarningSection because it has deliberately not been updated to support it
+        // due the old Release page design meaning which is about to be removed.
         releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));
 
         releaseViewModel.DownloadFiles = await GetDownloadFiles(releaseVersion);

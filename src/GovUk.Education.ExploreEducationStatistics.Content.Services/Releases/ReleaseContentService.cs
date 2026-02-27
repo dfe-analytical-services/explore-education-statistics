@@ -25,7 +25,7 @@ public class ReleaseContentService(ContentDbContext contentDbContext) : IRelease
             .OnSuccess(releaseVersion =>
             {
                 var releaseContentDto = ReleaseContentDto.FromReleaseVersion(releaseVersion);
-                RemoveCommentsFromContent(releaseContentDto);
+                RemoveCommentsFromContentSections(releaseContentDto);
                 return releaseContentDto;
             });
 
@@ -51,7 +51,7 @@ public class ReleaseContentService(ContentDbContext contentDbContext) : IRelease
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
 
-    private static void RemoveCommentsFromContent(ReleaseContentDto content) =>
+    private static void RemoveCommentsFromContentSections(ReleaseContentDto content) =>
         content.GetAllSections().ForEach(RemoveCommentsFromContentSection);
 
     private static void RemoveCommentsFromContentSection(ContentSectionDto section) =>

@@ -319,20 +319,6 @@ public class ReleaseAmendmentService(
                 };
             })
             .ToList();
-
-        // If the original Release did not contain a RelatedDashboards section, add an empty one to its amendment.
-        if (originalReleaseVersion.RelatedDashboardsSection == null)
-        {
-            amendedContent.Add(
-                new ContentSection
-                {
-                    Id = Guid.NewGuid(),
-                    Type = ContentSectionType.RelatedDashboards,
-                    ReleaseVersionId = amendmentReleaseVersionId,
-                }
-            );
-        }
-
         return amendedContent;
     }
 

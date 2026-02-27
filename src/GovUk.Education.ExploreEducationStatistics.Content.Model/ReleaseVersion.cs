@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -55,7 +54,6 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
         }
     }
 
-    [JsonIgnore]
     public List<ContentSection> Content { get; set; } = new();
 
     public List<KeyStatistic> KeyStatistics { get; set; } = new();
@@ -97,7 +95,6 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public bool SoftDeleted { get; set; }
 
     [NotMapped]
-    [JsonProperty("Content")]
     public IEnumerable<ContentSection> GenericContent
     {
         get => Content.Where(section => section.Type == ContentSectionType.Generic).ToImmutableList();
@@ -130,6 +127,13 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     {
         get => FindSingleSectionByType(ContentSectionType.RelatedDashboards);
         set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, value);
+    }
+
+    [NotMapped]
+    public ContentSection? WarningSection
+    {
+        get => FindSingleSectionByType(ContentSectionType.Warning);
+        set => ReplaceContentSectionsOfType(ContentSectionType.Warning, value);
     }
 
     public List<DataBlockVersion> DataBlockVersions { get; set; } = new();
