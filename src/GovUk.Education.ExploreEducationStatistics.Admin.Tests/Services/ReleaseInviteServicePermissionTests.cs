@@ -111,6 +111,7 @@ public class ReleaseInviteServicePermissionTest
             .WithUser(user)
             .WithReleaseVersion(releaseVersion)
             .GenerateList(3);
+        var userReleaseRoleIds = userReleaseRoles.Select(urr => urr.Id).ToHashSet();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -128,7 +129,7 @@ public class ReleaseInviteServicePermissionTest
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
         userReleaseRoleRepository
-            .Setup(m => m.RemoveMany(userReleaseRoles, It.IsAny<CancellationToken>()))
+            .Setup(m => m.RemoveMany(userReleaseRoleIds, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

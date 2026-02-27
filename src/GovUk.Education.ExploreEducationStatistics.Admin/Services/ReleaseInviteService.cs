@@ -61,14 +61,17 @@ public class ReleaseInviteService(
             .OnSuccessDo(tuple => userService.CheckCanUpdateReleaseRole(tuple.Publication, releaseRole))
             .OnSuccess(async tuple =>
             {
-                var releaseRolesToRemove = await userReleaseRoleRepository
-                    .Query(ResourceRoleFilter.PendingOnly)
-                    .WhereForUser(tuple.User.Id)
-                    .WhereForPublication(publicationId)
-                    .WhereRolesIn(releaseRole)
-                    .ToListAsync();
+                var releaseRoleIdsToRemove = (
+                    await userReleaseRoleRepository
+                        .Query(ResourceRoleFilter.PendingOnly)
+                        .WhereForUser(tuple.User.Id)
+                        .WhereForPublication(publicationId)
+                        .WhereRolesIn(releaseRole)
+                        .Select(urr => urr.Id)
+                        .ToListAsync()
+                ).ToHashSet();
 
-                await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove);
+                await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove);
 
                 return Unit.Instance;
             });

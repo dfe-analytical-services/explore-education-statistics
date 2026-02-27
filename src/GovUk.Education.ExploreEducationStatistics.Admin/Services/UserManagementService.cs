@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -276,18 +277,17 @@ public class UserManagementService(
                     );
                 }
 
-                var userPublicationRoles = request
-                    .UserPublicationRoles.Select(userPublicationRole => new UserPublicationRole
-                    {
-                        UserId = user.Id,
-                        PublicationId = userPublicationRole.PublicationId,
-                        Role = userPublicationRole.PublicationRole,
-                        Created = request.CreatedDate?.UtcDateTime ?? DateTime.UtcNow,
-                        CreatedById = userService.GetUserId(),
-                    })
-                    .ToList();
+                var userPublicationRolesToCreate = request
+                    .UserPublicationRoles.Select(userPublicationRole => new UserPublicationRoleCreateDto(
+                        UserId: user.Id,
+                        PublicationId: userPublicationRole.PublicationId,
+                        Role: userPublicationRole.PublicationRole,
+                        CreatedDate: request.CreatedDate?.UtcDateTime ?? DateTime.UtcNow,
+                        CreatedById: userService.GetUserId()
+                    ))
+                    .ToHashSet();
 
-                await userPublicationRoleRepository.CreateManyIfNotExists(userPublicationRoles);
+                await userPublicationRoleRepository.CreateManyIfNotExists(userPublicationRolesToCreate);
 
                 await userResourceRoleNotificationService.NotifyUserOfInvite(user.Id);
 

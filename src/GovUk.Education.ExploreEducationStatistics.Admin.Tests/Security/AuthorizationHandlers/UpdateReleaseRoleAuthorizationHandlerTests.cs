@@ -1,7 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
@@ -56,11 +56,15 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
 
     private static UpdateReleaseRoleAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+            contentDbContext
+        );
+
         return new UpdateReleaseRoleAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: contentDbContext),
+                userReleaseRoleRepository: userReleaseRoleRepository,
+                userPublicationRoleRepository: userPublicationRoleRepository,
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)
             )
         );

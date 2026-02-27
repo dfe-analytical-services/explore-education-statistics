@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -10,9 +11,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : IUserPublicationRoleRepository
+public class UserPublicationRoleRepository(
+    ContentDbContext contentDbContext,
+    INewPermissionsSystemHelper newPermissionsSystemHelper,
+    UserReleaseRoleQueryRepository userReleaseRoleQueryRepository,
+    IUserRepository userRepository
+) : IUserPublicationRoleRepository
 {
-    public async Task<UserPublicationRole> Create(
+    // This method will remain but be amended slightly in EES-6196, when we no longer have to cater for
+    // the old roles.
+    public async Task<UserPublicationRole?> Create(
         Guid userId,
         Guid publicationId,
         PublicationRole role,
@@ -21,51 +29,123 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         CancellationToken cancellationToken = default
     )
     {
-        var newUserPublicationRole = new UserPublicationRole
+        if (role.IsNewPermissionsSystemPublicationRole())
         {
-            UserId = userId,
-            PublicationId = publicationId,
-            Role = role,
-            Created = createdDate?.ToUniversalTime() ?? DateTime.UtcNow,
-            CreatedById = createdById,
-        };
+            throw new ArgumentException(
+                $"Unexpected publication role: '{role}'. Expected an OLD permissions system role."
+            );
+        }
 
-        contentDbContext.UserPublicationRoles.Add(newUserPublicationRole);
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+        createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
 
-        return newUserPublicationRole;
+        var allUserPublicationRolesForUserAndPublicationByRole = await Query(
+                ResourceRoleFilter.All,
+                includeNewPermissionsSystemRoles: true
+            )
+            .WhereForUser(userId)
+            .WhereForPublication(publicationId)
+            .ToDictionaryAsync(upr => upr.Role, cancellationToken);
+
+        var allPublicationRolesForUserAndPublication =
+            allUserPublicationRolesForUserAndPublicationByRole.Keys.ToHashSet();
+
+        var allReleaseRolesForUserAndPublication = (
+            await userReleaseRoleQueryRepository
+                .Query(ResourceRoleFilter.All)
+                .WhereForUser(userId)
+                .WhereForPublication(publicationId)
+                .Select(urr => urr.Role)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
+
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
+                existingPublicationRoles: allPublicationRolesForUserAndPublication,
+                existingReleaseRoles: allReleaseRolesForUserAndPublication,
+                publicationRoleToCreate: role
+            );
+
+        if (newSystemPublicationRoleToRemove.HasValue)
+        {
+            var userPublicationRole = allUserPublicationRolesForUserAndPublicationByRole[
+                newSystemPublicationRoleToRemove.Value
+            ];
+
+            await RemoveRole(userPublicationRole!, cancellationToken);
+        }
+
+        UserPublicationRole? createdNewPermissionsSystemPublicationRole = null;
+
+        if (newSystemPublicationRoleToCreate.HasValue)
+        {
+            createdNewPermissionsSystemPublicationRole = await CreateRole(
+                userId: userId,
+                publicationId: publicationId,
+                role: newSystemPublicationRoleToCreate.Value,
+                createdById: createdById,
+                createdDate: createdDate!.Value,
+                cancellationToken: cancellationToken
+            );
+        }
+
+        return role.IsNewPermissionsSystemPublicationRole()
+            ? createdNewPermissionsSystemPublicationRole
+            : await CreateRole(
+                userId: userId,
+                publicationId: publicationId,
+                role: role,
+                createdById: createdById,
+                createdDate: createdDate!.Value,
+                cancellationToken: cancellationToken
+            );
     }
 
     public async Task<List<UserPublicationRole>> CreateManyIfNotExists(
-        IReadOnlyList<UserPublicationRole> userPublicationRoles,
+        HashSet<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
         CancellationToken cancellationToken = default
     )
     {
-        var newUserPublicationRoles = await userPublicationRoles
+        if (userPublicationRolesToCreate.Any(dto => dto.Role.IsNewPermissionsSystemPublicationRole()))
+        {
+            throw new ArgumentException(
+                $"Unexpected publication role found in the list of roles to create. All roles should be OLD permissions system roles."
+            );
+        }
+
+        return await userPublicationRolesToCreate
             .ToAsyncEnumerable()
-            .WhereAwait(async userPublicationRole =>
-                !await UserHasRoleOnPublication(
-                    userId: userPublicationRole.UserId,
-                    publicationId: userPublicationRole.PublicationId,
-                    role: userPublicationRole.Role,
-                    resourceRoleFilter: ResourceRoleFilter.All,
-                    cancellationToken: cancellationToken
-                )
+            .Where(
+                async (upr, cancellationToken) =>
+                    !await UserHasRoleOnPublication(
+                        userId: upr.UserId,
+                        publicationId: upr.PublicationId,
+                        role: upr.Role,
+                        resourceRoleFilter: ResourceRoleFilter.All,
+                        cancellationToken: cancellationToken
+                    )
             )
+            .Select(
+                async (upr, cancellationToken) =>
+                    await Create(
+                        userId: upr.UserId,
+                        publicationId: upr.PublicationId,
+                        role: upr.Role,
+                        createdById: upr.CreatedById,
+                        createdDate: upr.CreatedDate,
+                        cancellationToken: cancellationToken
+                    )
+            )
+            .WhereNotNull()
             .ToListAsync(cancellationToken);
-
-        contentDbContext.UserPublicationRoles.AddRange(newUserPublicationRoles);
-        await contentDbContext.SaveChangesAsync(cancellationToken);
-
-        return newUserPublicationRoles;
     }
 
     public async Task<UserPublicationRole?> GetById(
         Guid userPublicationRoleId,
+        bool includeNewPermissionsSystemRoles = false,
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(ResourceRoleFilter.All)
+        return await Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles)
             .SingleOrDefaultAsync(upr => upr.Id == userPublicationRoleId, cancellationToken);
     }
 
@@ -73,29 +153,17 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         Guid userId,
         Guid publicationId,
         PublicationRole role,
+        bool includeNewPermissionsSystemRoles = false,
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(ResourceRoleFilter.All)
+        return await Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
             .WhereRolesIn(role)
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    /// <summary>
-    /// <para>
-    /// The optional <paramref name="includeNewPermissionsSystemRoles"/> parameter will be removed once we remove all OLD publication
-    /// roles from the DB in STEP 11 (EES-6212) of the Permissions Rework. For now, in certain situations, we need to be able to grab
-    /// ALL of the publication roles (NEW &amp; OLD permissions system roles).
-    /// </para>
-    /// </summary>
-    /// <param name="resourceRoleFilter">Filter resource roles by their status (see <see cref="ResourceRoleFilter"/>).</param>
-    /// <param name="includeNewPermissionsSystemRoles">
-    /// <para>Temporary parameter that controls which roles are included.</para>
-    /// <para>When <c>true</c>, includes NEW permissions system roles in addition to OLD roles.</para>
-    /// <para>When <c>false</c>, includes only OLD roles.</para>
-    /// </param>
     public IQueryable<UserPublicationRole> Query(
         ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
         bool includeNewPermissionsSystemRoles = false
@@ -118,34 +186,136 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         };
     }
 
-    public async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
+    // This method will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
+    public async Task<bool> RemoveById(Guid userPublicationRoleId, CancellationToken cancellationToken = default)
     {
-        contentDbContext.UserPublicationRoles.Remove(userPublicationRole);
+        var userPublicationRole = await GetById(
+            userPublicationRoleId: userPublicationRoleId,
+            includeNewPermissionsSystemRoles: true,
+            cancellationToken: cancellationToken
+        );
 
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+        if (userPublicationRole is null)
+        {
+            return false;
+        }
+
+        await Remove(userPublicationRole, cancellationToken);
+
+        return true;
     }
 
-    public async Task RemoveMany(
-        IReadOnlyList<UserPublicationRole> userPublicationRoles,
+    // This method will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
+    public async Task<bool> RemoveByCompositeKey(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
         CancellationToken cancellationToken = default
     )
     {
-        if (!userPublicationRoles.Any())
+        var userPublicationRole = await GetByCompositeKey(
+            userId: userId,
+            publicationId: publicationId,
+            role: role,
+            includeNewPermissionsSystemRoles: true,
+            cancellationToken: cancellationToken
+        );
+
+        if (userPublicationRole is null)
+        {
+            return false;
+        }
+
+        await Remove(userPublicationRole, cancellationToken);
+
+        return true;
+    }
+
+    private async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
+    {
+        if (userPublicationRole.Role.IsNewPermissionsSystemPublicationRole())
+        {
+            throw new ArgumentException(
+                $"Unexpected publication role: '{userPublicationRole.Role}'. Expected an OLD permissions system role."
+            );
+        }
+
+        var allUserPublicationRolesForUserAndPublicationByRole = await Query(
+                ResourceRoleFilter.All,
+                includeNewPermissionsSystemRoles: true
+            )
+            .WhereForUser(userPublicationRole.UserId)
+            .WhereForPublication(userPublicationRole.PublicationId)
+            .ToDictionaryAsync(upr => upr.Role, cancellationToken);
+
+        var allPublicationRolesForUserAndPublication =
+            allUserPublicationRolesForUserAndPublicationByRole.Keys.ToHashSet();
+
+        var allReleaseRolesForUserAndPublication = (
+            await userReleaseRoleQueryRepository
+                .Query(ResourceRoleFilter.All)
+                .WhereForUser(userPublicationRole.UserId)
+                .WhereForPublication(userPublicationRole.PublicationId)
+                .Select(urr => urr.Role)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
+
+        var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
+                existingPublicationRoles: allPublicationRolesForUserAndPublication,
+                existingReleaseRoles: allReleaseRolesForUserAndPublication,
+                oldPublicationRoleToRemove: userPublicationRole.Role
+            );
+
+        await RemoveRole(userPublicationRole, cancellationToken);
+
+        if (newSystemPublicationRoleToRemove.HasValue)
+        {
+            var newSystemUserPublicationRoleToRemove = allUserPublicationRolesForUserAndPublicationByRole[
+                newSystemPublicationRoleToRemove.Value
+            ];
+
+            await RemoveRole(newSystemUserPublicationRoleToRemove, cancellationToken);
+        }
+
+        if (newSystemPublicationRoleToCreate.HasValue)
+        {
+            var deletedUserPlaceholder = await userRepository.FindDeletedUserPlaceholder(cancellationToken);
+
+            await CreateRole(
+                userId: userPublicationRole.UserId,
+                publicationId: userPublicationRole.PublicationId,
+                role: newSystemPublicationRoleToCreate.Value,
+                createdById: deletedUserPlaceholder.Id,
+                createdDate: DateTime.UtcNow,
+                cancellationToken: cancellationToken
+            );
+        }
+    }
+
+    // This will be reverted back to removing the role entities from the DbContext directly in EES-6196, when
+    // we no longer have to cater for the old roles.
+    public async Task RemoveMany(HashSet<Guid> userPublicationRoleIds, CancellationToken cancellationToken = default)
+    {
+        if (!userPublicationRoleIds.Any())
         {
             return;
         }
 
-        contentDbContext.UserPublicationRoles.RemoveRange(userPublicationRoles);
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+        foreach (var userPublicationRoleId in userPublicationRoleIds)
+        {
+            await RemoveById(userPublicationRoleId, cancellationToken);
+        }
     }
 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userPublicationRoles = await Query(ResourceRoleFilter.All)
+        var userPublicationRoles = await Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
             .Where(upr => upr.UserId == userId)
             .ToListAsync(cancellationToken);
 
-        await RemoveMany(userPublicationRoles, cancellationToken);
+        contentDbContext.UserPublicationRoles.RemoveRange(userPublicationRoles);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<bool> UserHasRoleOnPublication(
@@ -156,7 +326,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(resourceRoleFilter)
+        return await Query(resourceRoleFilter, includeNewPermissionsSystemRoles: true)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
             .WhereRolesIn(role)
@@ -200,4 +370,43 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<UserPublicationRole> CreateRole(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        Guid createdById,
+        DateTime createdDate,
+        CancellationToken cancellationToken
+    )
+    {
+        var newUserPublicationRole = new UserPublicationRole
+        {
+            UserId = userId,
+            PublicationId = publicationId,
+            Role = role,
+            Created = createdDate,
+            CreatedById = createdById,
+        };
+
+        contentDbContext.UserPublicationRoles.Add(newUserPublicationRole);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        return newUserPublicationRole;
+    }
+
+    public async Task RemoveRole(UserPublicationRole userPublicationRole, CancellationToken cancellationToken)
+    {
+        contentDbContext.UserPublicationRoles.Remove(userPublicationRole);
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public record UserPublicationRoleCreateDto(
+        Guid UserId,
+        Guid PublicationId,
+        PublicationRole Role,
+        Guid CreatedById,
+        DateTime? CreatedDate = null
+    );
 }

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -3491,17 +3492,14 @@ public class PublicationServiceTests
         IRedirectsCacheService? redirectsCacheService = null
     )
     {
+        publicationRepository ??= CreatePublicationRepository(context, publicationRepository);
+
         return new(
             context,
             AdminMapper(),
             new PersistenceHelper<ContentDbContext>(context),
             userService ?? AlwaysTrueUserService().Object,
-            publicationRepository
-                ?? new PublicationRepository(
-                    context: context,
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(context),
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(context)
-                ),
+            publicationRepository,
             releaseVersionRepository ?? new ReleaseVersionRepository(context),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),
@@ -3509,6 +3507,20 @@ public class PublicationServiceTests
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             _adminEventRaiserMockBuilder.Build()
+        );
+    }
+
+    private static PublicationRepository CreatePublicationRepository(
+        ContentDbContext context,
+        IPublicationRepository? publicationRepository
+    )
+    {
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(context);
+
+        return new PublicationRepository(
+            context: context,
+            userReleaseRoleRepository: userReleaseRoleRepository,
+            userPublicationRoleRepository: userPublicationRoleRepository
         );
     }
 

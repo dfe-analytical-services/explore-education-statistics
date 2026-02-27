@@ -1,8 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -56,13 +56,15 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
             contentDbContext.Releases.Add(release);
             contentDbContext.SaveChanges();
 
+            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+                contentDbContext
+            );
+
             return new UpdateSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: contentDbContext),
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(
-                        contentDbContext: contentDbContext
-                    ),
+                    userReleaseRoleRepository: userReleaseRoleRepository,
+                    userPublicationRoleRepository: userPublicationRoleRepository,
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );

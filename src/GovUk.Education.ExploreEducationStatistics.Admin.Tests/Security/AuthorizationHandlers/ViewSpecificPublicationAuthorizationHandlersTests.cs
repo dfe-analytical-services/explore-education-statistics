@@ -1,9 +1,9 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -127,19 +127,17 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
     private static ViewSpecificPublicationAuthorizationHandler CreateHandler(
         ContentDbContext context,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IPreReleaseService? preReleaseService = null
     )
     {
-        userReleaseRoleRepository ??= new UserReleaseRoleRepository(contentDbContext: context);
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(context);
 
         return new ViewSpecificPublicationAuthorizationHandler(
             userReleaseRoleRepository,
             new AuthorizationHandlerService(
                 releaseVersionRepository ?? new ReleaseVersionRepository(context),
                 userReleaseRoleRepository,
-                userPublicationRoleRepository ?? new UserPublicationRoleRepository(contentDbContext: context),
+                userPublicationRoleRepository,
                 preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)
             )
         );

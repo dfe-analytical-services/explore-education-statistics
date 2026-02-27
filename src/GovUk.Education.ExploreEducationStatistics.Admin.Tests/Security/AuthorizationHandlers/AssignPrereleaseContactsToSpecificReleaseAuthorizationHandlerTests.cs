@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -126,8 +127,9 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
 
     private static IAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(contentDbContext);
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+            contentDbContext
+        );
 
         return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(

@@ -1827,11 +1827,9 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(new IdentityResult());
 
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
-            userPublicationRoleRepository
-                .Setup(m => m.Remove(userPublicationRole, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
@@ -1860,7 +1858,7 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRoleGuid, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRoleGuid, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((UserPublicationRole?)null);
 
             var service = SetupUserRoleService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
@@ -1868,6 +1866,30 @@ public abstract class UserRoleServiceTests
             var result = await service.RemoveUserPublicationRole(userPublicationRoleGuid);
 
             result.AssertNotFound();
+
+            VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task RemoveUserPublicationRole_RoleRemovalFails()
+        {
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Owner);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(userPublicationRole);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(false);
+
+            var service = SetupUserRoleService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await service.RemoveUserPublicationRole(userPublicationRole.Id)
+            );
 
             VerifyAllMocks(userPublicationRoleRepository);
         }
@@ -1904,11 +1926,9 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
-            userPublicationRoleRepository
-                .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -1966,11 +1986,9 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
-            userPublicationRoleRepository
-                .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, anotherUserPublicationRole);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2032,11 +2050,9 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
-            userPublicationRoleRepository
-                .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2108,11 +2124,9 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
-            userPublicationRoleRepository
-                .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2175,9 +2189,7 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
-            userReleaseRoleRepository
-                .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository.Setup(m => m.RemoveById(userReleaseRole.Id, default)).ReturnsAsync(true);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2208,6 +2220,32 @@ public abstract class UserRoleServiceTests
             var result = await service.RemoveUserReleaseRole(Guid.NewGuid());
 
             result.AssertNotFound();
+
+            VerifyAllMocks(userReleaseRoleRepository);
+        }
+
+        [Fact]
+        public async Task RemoveUserReleaseRole_RoleRemovalFails()
+        {
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(ReleaseRole.Approver);
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
+            userReleaseRoleRepository.Setup(m => m.RemoveById(userReleaseRole.Id, default)).ReturnsAsync(false);
+
+            var service = SetupUserRoleService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await service.RemoveUserReleaseRole(userReleaseRole.Id)
+            );
 
             VerifyAllMocks(userReleaseRoleRepository);
         }
@@ -2248,9 +2286,7 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
-            userReleaseRoleRepository
-                .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository.Setup(m => m.RemoveById(userReleaseRole.Id, default)).ReturnsAsync(true);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2316,9 +2352,7 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
-            userReleaseRoleRepository
-                .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository.Setup(m => m.RemoveById(userReleaseRole.Id, default)).ReturnsAsync(true);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, anotherUserReleaseRole);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2387,9 +2421,7 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
-            userReleaseRoleRepository
-                .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository.Setup(m => m.RemoveById(userReleaseRole.Id, default)).ReturnsAsync(true);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -2477,9 +2509,7 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
-            userReleaseRoleRepository
-                .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository.Setup(m => m.RemoveById(userReleaseRole.Id, default)).ReturnsAsync(true);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, prereleaseRole);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2537,9 +2567,7 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, prereleaseRole);
-            userReleaseRoleRepository
-                .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == prereleaseRole.Id), default))
-                .Returns(Task.CompletedTask);
+            userReleaseRoleRepository.Setup(m => m.RemoveById(prereleaseRole.Id, default)).ReturnsAsync(true);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, approverRole);
 
             // Here the user has the Analyst role currently but now we are removing a Prerelease Release Role.

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHan
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -175,11 +176,15 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         IPreReleaseService? preReleaseService = null
     )
     {
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+            contentDbContext
+        );
+
         return new ViewSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext),
-                userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext),
+                userReleaseRoleRepository: userReleaseRoleRepository,
+                userPublicationRoleRepository: userPublicationRoleRepository,
                 preReleaseService: preReleaseService
                     ?? new PreReleaseService(
                         new PreReleaseAccessOptions
