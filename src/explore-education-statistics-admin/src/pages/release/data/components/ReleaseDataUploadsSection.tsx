@@ -1,6 +1,7 @@
 import DataFilesReorderableList from '@admin/pages/release/data/components/DataFilesReorderableList';
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
+import dataReplacementService from '@admin/services/dataReplacementService';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   DataFile,
@@ -16,7 +17,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import dataReplacementService from '@admin/services/dataReplacementService';
 
 interface Props {
   publicationId: string;
@@ -46,11 +46,13 @@ export default function ReleaseDataUploadsSection({
   // sets that have moved beyond the screener and are now being imported by the Data.Processor
   const {
     data: initialDataFiles,
+    isError: dataFilesError,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
   const {
     data: initialDataSetUploads,
+    isError: dataSetUploadsError,
     isLoading: isLoadingUploads,
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
@@ -201,6 +203,8 @@ export default function ReleaseDataUploadsSection({
     await refetchDataFiles();
   };
 
+  const errorFetchingData = dataFilesError || dataSetUploadsError;
+
   return (
     <>
       <h2>Add data file to release</h2>
@@ -264,7 +268,8 @@ export default function ReleaseDataUploadsSection({
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
       <LoadingSpinner loading={isLoading || isLoadingUploads}>
-        {allDataFiles.length > 0 || allDataSetUploads.length > 0 ? (
+        {(allDataFiles.length > 0 || allDataSetUploads.length > 0) &&
+        !errorFetchingData ? (
           <>
             <h2>Uploaded data files</h2>
 
@@ -327,7 +332,13 @@ export default function ReleaseDataUploadsSection({
             )}
           </>
         ) : (
-          <InsetText>No data files have been uploaded.</InsetText>
+          <>
+            {errorFetchingData ? (
+              <WarningMessage>Failed to fetch data files.</WarningMessage>
+            ) : (
+              <InsetText>No data files have been uploaded.</InsetText>
+            )}
+          </>
         )}
       </LoadingSpinner>
     </>
