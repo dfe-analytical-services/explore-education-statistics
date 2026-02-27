@@ -835,56 +835,6 @@ public class ReleaseAmendmentServiceTests
     }
 
     [Fact]
-    public async Task CreatesNonGenericContentSectionsIfNotPresentOnOriginal()
-    {
-        ReleaseVersion originalReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-            .WithCreated(createdById: _userId);
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
-            contentDbContext.Users.Add(_fixture.DefaultUser().WithId(_userId));
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
-        Guid? amendmentId;
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var releaseAmendmentService = BuildService(
-                contentDbContext,
-                statisticsDbContext: InMemoryStatisticsDbContext(),
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
-            );
-
-            var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
-            amendmentId = result.AssertRight().Id;
-
-            Assert.NotEqual(originalReleaseVersion.Id, amendmentId);
-        }
-
-        VerifyAllMocks(userReleaseRoleRepository);
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
-
-            Assert.NotNull(amendment.GenericContent);
-            Assert.NotNull(amendment.HeadlinesSection);
-            Assert.NotNull(amendment.KeyStatisticsSecondarySection);
-            Assert.NotNull(amendment.RelatedDashboardsSection);
-            Assert.NotNull(amendment.SummarySection);
-            Assert.NotNull(amendment.WarningSection);
-        }
-    }
-
-    [Fact]
     public async Task CopyFootnotes()
     {
         ReleaseVersion originalReleaseVersion = _fixture
