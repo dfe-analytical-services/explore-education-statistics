@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormTextInput renders correctly with error 1`] = `
 <label class="govuk-label"
@@ -15,11 +15,11 @@ exports[`FormTextInput renders correctly with error 1`] = `
   </span>
   Field is required
 </span>
-<input name="testInput"
-       aria-describedby="test-input-error"
+<input aria-describedby="test-input-error"
        class="govuk-input govuk-input--error"
        id="test-input"
        type="text"
+       name="testInput"
 >
 `;
 
@@ -34,11 +34,11 @@ exports[`FormTextInput renders correctly with hint 1`] = `
 >
   Fill me in
 </div>
-<input name="testInput"
-       aria-describedby="test-input-hint"
+<input aria-describedby="test-input-hint"
        class="govuk-input"
        id="test-input"
        type="text"
+       name="testInput"
 >
 `;
 
@@ -48,10 +48,10 @@ exports[`FormTextInput renders correctly with required props 1`] = `
 >
   Test input
 </label>
-<input name="testInput"
-       class="govuk-input"
+<input class="govuk-input"
        id="test-input"
        type="text"
+       name="testInput"
 >
 `;
 
@@ -66,11 +66,11 @@ exports[`FormTextInput renders with a specific width class 1`] = `
 >
   Fill me in
 </div>
-<input name="testInput"
-       aria-describedby="test-input-hint"
+<input aria-describedby="test-input-hint"
        class="govuk-input govuk-input--width-20"
        id="test-input"
        type="text"
+       name="testInput"
 >
 `;
 
@@ -86,11 +86,11 @@ exports[`FormTextInput renders with an add on 1`] = `
   Fill me in
 </div>
 <div class="dfe-flex">
-  <input name="testInput"
-         aria-describedby="test-input-hint"
+  <input aria-describedby="test-input-hint"
          class="govuk-input govuk-input--width-20"
          id="test-input"
          type="text"
+         name="testInput"
   >
   <button type="button">
     Click me!

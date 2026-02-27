@@ -35,6 +35,8 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
+    await screen.findByText('This is the latest data');
+
     // test the reordering controls for the table headers are present
     expect(
       screen.getByRole('button', {
@@ -88,6 +90,8 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
+    await screen.findByText('This is the latest data');
+
     const reorderRevealButton = screen.getByRole('button', {
       name: 'Move and reorder table headers',
     });
@@ -120,8 +124,8 @@ describe('TableToolFinalStep', () => {
         onReorderTableHeaders={noop}
       />,
     );
+    await screen.findByText('This is the latest data');
 
-    expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
     expect(
       screen.queryByText('This data is not from the latest release'),
     ).not.toBeInTheDocument();
@@ -143,6 +147,8 @@ describe('TableToolFinalStep', () => {
         onReorderTableHeaders={noop}
       />,
     );
+
+    await screen.findByText('This data is not from the latest release');
 
     expect(
       screen.queryByText('This is the latest data'),

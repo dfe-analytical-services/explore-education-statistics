@@ -255,11 +255,7 @@ export const CommentsContextProvider = ({
     onUpdate,
   ]);
 
-  return (
-    <CommentsContext.Provider value={state}>
-      {children}
-    </CommentsContext.Provider>
-  );
+  return <CommentsContext value={state}>{children}</CommentsContext>;
 };
 
 export function useCommentsContext() {

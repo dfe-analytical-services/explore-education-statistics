@@ -11,6 +11,7 @@ import BoundaryLevelEditPage from '@admin/pages/bau/BoundaryLevelEditPage';
 import BoundaryDataUploadPage from '@admin/pages/bau/BoundaryDataUploadPage';
 import GlossaryPage from '@admin/pages/bau/GlossaryPage';
 import PageFeedbackPage from '@admin/pages/bau/PageFeedbackPage';
+import ServiceAnnouncementPage from '@admin/pages/bau/ServiceAnnouncementPage';
 
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
@@ -61,6 +62,13 @@ export const administrationFeedbackRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const administrationServiceAnnouncementRoute: ProtectedRouteProps = {
+  path: '/administration/service-announcement',
+  component: ServiceAnnouncementPage,
+  protectionAction: permissions => permissions.isBauUser,
+  exact: true,
+};
+
 export const administrationUsersRoute: ProtectedRouteProps = {
   path: '/administration/users',
   component: BauUsersPage,
@@ -103,6 +111,7 @@ const administrationRoutes = {
   administrationBoundaryDataUploadRoute,
   administrationGlossaryRoute,
   administrationFeedbackRoute,
+  administrationServiceAnnouncementRoute,
   administrationUsersRoute,
   administrationUserInviteRoute,
   administrationInvitedUsersRoute,

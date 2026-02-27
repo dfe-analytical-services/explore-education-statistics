@@ -6,7 +6,7 @@ import {
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { OmitStrict } from '@common/types';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { ReactNode } from 'react';
 
 describe('useChartBuilderFormsContext', () => {
@@ -786,11 +786,14 @@ describe('useChartBuilderFormsContext', () => {
       }),
     });
 
-    result.current.updateForm({
-      formKey: 'legend',
-      isValid: true,
-      submitCount: 1,
+    await act(async () => {
+      await result.current.updateForm({
+        formKey: 'legend',
+        isValid: true,
+        submitCount: 1,
+      });
     });
+
     await waitFor(() => {
       expect(result.current.forms).toEqual<ChartBuilderForms>({
         options: {
@@ -844,11 +847,10 @@ describe('useChartBuilderFormsContext', () => {
 
     expect(result.current.isSubmitting).toBe(false);
 
-    result.current.submitForms();
-
-    await waitFor(() => {
-      expect(result.current.isSubmitting).toBe(true);
+    await act(async () => {
+      result.current.submitForms();
     });
+    expect(result.current.isSubmitting).toBe(true);
 
     await waitFor(() => {
       expect(result.current.isSubmitting).toBe(false);

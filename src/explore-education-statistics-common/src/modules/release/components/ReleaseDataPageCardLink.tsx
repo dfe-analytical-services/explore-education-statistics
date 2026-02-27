@@ -1,24 +1,17 @@
 import styles from '@common/modules/release/components/ReleaseDataPageCardLink.module.scss';
-import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
 interface Props {
   caption: string;
-  isHighlightVariant?: boolean;
   renderLink: ReactNode;
 }
 
 export default function ReleaseDataPageCardLink({
   caption,
-  isHighlightVariant = false,
   renderLink,
 }: Props) {
   return (
-    <li
-      className={classNames(styles.card, {
-        [styles.highlight]: isHighlightVariant,
-      })}
-    >
+    <li className={styles.card}>
       <p className="govuk-heading-m">{renderLink}</p>
       <p>{caption}</p>
     </li>

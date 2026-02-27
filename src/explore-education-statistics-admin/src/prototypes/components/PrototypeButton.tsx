@@ -2,13 +2,7 @@ import styles from '@common/components/Button.module.scss';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React, {
-  forwardRef,
-  MouseEventHandler,
-  ReactNode,
-  Ref,
-  useCallback,
-} from 'react';
+import React, { MouseEventHandler, ReactNode, Ref, useCallback } from 'react';
 
 export interface ButtonProps {
   ariaControls?: string;
@@ -19,29 +13,28 @@ export interface ButtonProps {
   disabled?: boolean;
   disableDoubleClick?: boolean;
   id?: string;
+  ref?: Ref<HTMLButtonElement>;
   testId?: string;
   type?: 'button' | 'submit' | 'reset';
   variant?: 'secondary' | 'warning';
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-function Button(
-  {
-    ariaControls,
-    ariaDisabled,
-    ariaExpanded,
-    children,
-    className,
-    disabled = false,
-    disableDoubleClick = true,
-    id,
-    testId,
-    type = 'button',
-    variant,
-    onClick,
-  }: ButtonProps,
-  ref: Ref<HTMLButtonElement>,
-) {
+function Button({
+  ariaControls,
+  ariaDisabled,
+  ariaExpanded,
+  children,
+  className,
+  disabled = false,
+  disableDoubleClick = true,
+  id,
+  ref,
+  testId,
+  type = 'button',
+  variant,
+  onClick,
+}: ButtonProps) {
   const [isClicking, toggleClicking] = useToggle(false);
   const isMountedRef = useMountedRef();
 
@@ -101,4 +94,4 @@ function Button(
   );
 }
 
-export default forwardRef(Button);
+export default Button;

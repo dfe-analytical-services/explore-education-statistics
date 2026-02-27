@@ -3,7 +3,6 @@
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import exec from 'k6/execution';
 import createAdminService, {
   getDataFileUploadStrategy,
@@ -41,7 +40,7 @@ export const options: Options = {
 
 interface SetupData {
   themeId: string;
-  releaseId: string;
+  releaseVersionId: string;
   subjectId: string;
   subjectMeta: SubjectMeta;
 }
@@ -83,7 +82,7 @@ function getOrCreateReleaseWithSubject() {
     title: publicationTitle,
   });
 
-  const { id: releaseId } = adminService.getOrCreateRelease({
+  const { id: releaseVersionId } = adminService.getOrCreateRelease({
     publicationId,
     publicationTitle,
     themeId,
@@ -92,25 +91,25 @@ function getOrCreateReleaseWithSubject() {
   });
 
   const { subjects: existingSubjects } = adminService.getSubjects({
-    releaseId,
+    releaseVersionId,
   });
 
   if (!existingSubjects.length) {
     const { id: fileId } = uploadFileStrategy.getOrImportSubject(
       adminService,
-      releaseId,
+      releaseVersionId,
     );
 
-    adminService.waitForDataFileToImport({ releaseId, fileId });
+    adminService.waitForDataFileToImport({ releaseVersionId, fileId });
   }
 
-  const { subjects } = adminService.getSubjects({ releaseId });
+  const { subjects } = adminService.getSubjects({ releaseVersionId });
   const subjectId = subjects[0].id;
 
   return {
     themeId,
     publicationId,
-    releaseId,
+    releaseVersionId,
     subjectId,
   };
 }
@@ -118,21 +117,29 @@ function getOrCreateReleaseWithSubject() {
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const { themeId, releaseId, subjectId } = getOrCreateReleaseWithSubject();
+  const { themeId, releaseVersionId, subjectId } =
+    getOrCreateReleaseWithSubject();
 
-  const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
+  const { subjectMeta } = adminService.getSubjectMeta({
+    releaseVersionId,
+    subjectId,
+  });
 
   loggingUtils.logDashboardUrls();
 
   return {
     themeId,
-    releaseId,
+    releaseVersionId,
     subjectId,
     subjectMeta,
   };
 }
 
-const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
+const performTest = ({
+  releaseVersionId,
+  subjectId,
+  subjectMeta,
+}: SetupData) => {
   const accessToken = getOrRefreshAccessTokens(userName, authTokens);
 
   const adminService = createAdminService(adminUrl, accessToken);
@@ -145,7 +152,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
   const startTimeMillis = Date.now();
 
   const { response, results } = adminService.tableQuery({
-    releaseId,
+    releaseVersionId,
     query,
   });
 
@@ -180,11 +187,5 @@ export const teardown = ({ themeId }: SetupData) => {
     console.log(`Deleted Theme ${themeId}`);
   }
 };
-
-export function handleSummary(data: unknown) {
-  return {
-    'adminTableBuilderQuery.html': htmlReport(data),
-  };
-}
 
 export default performTest;

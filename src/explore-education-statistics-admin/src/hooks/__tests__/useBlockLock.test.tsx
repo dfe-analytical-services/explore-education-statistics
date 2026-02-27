@@ -3,12 +3,15 @@ import useBlockLock, { BlockLock } from '@admin/hooks/useBlockLock';
 import { GlobalPermissions } from '@admin/services/permissionService';
 import { UserDetails } from '@admin/services/types/user';
 import MockDate from '@common-test/mockDate';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { FC, ReactNode } from 'react';
 
 describe('useBlockLock', () => {
   beforeEach(() => {
     jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   const testUser1: UserDetails = {
@@ -214,7 +217,8 @@ describe('useBlockLock', () => {
 
     // Lock has now expired
     MockDate.set('2022-03-20T12:10:01Z');
-    jest.advanceTimersByTime(61_000);
+    await act(async () => jest.advanceTimersByTime(61_000));
+
     await waitFor(() => {
       expect(result.current.error).toBeUndefined();
       expect(result.current.isLocked).toBe(false);
@@ -251,7 +255,7 @@ describe('useBlockLock', () => {
 
     // Lock has now expired
     MockDate.set('2022-03-20T12:10:01Z');
-    jest.advanceTimersByTime(61_000);
+    await act(async () => jest.advanceTimersByTime(61_000));
 
     expect(unlock).toHaveBeenCalledTimes(1);
   });
@@ -272,11 +276,9 @@ describe('useBlockLock', () => {
 
     expect(getLock).not.toHaveBeenCalled();
 
-    result.current.startLock();
+    await act(() => result.current.startLock());
 
-    await waitFor(() => {
-      expect(getLock).toHaveBeenCalledTimes(1);
-    });
+    expect(getLock).toHaveBeenCalledTimes(1);
   });
 
   // EES-4936 This test doesn't work with the new version of renderHook.
@@ -303,12 +305,9 @@ describe('useBlockLock', () => {
     expect(result.current.lockedBy).toBeUndefined();
     expect(result.current.lockedUntil).toBeUndefined();
 
-    result.current.startLock();
+    await act(() => result.current.startLock());
 
-    await waitFor(() => {
-      expect(result.current.isLocking).toBe(true);
-    });
-
+    expect(result.current.isLocking).toBe(true);
     expect(result.current.error).toBeUndefined();
     expect(result.current.isLocked).toBe(false);
     expect(result.current.isLockedByUser).toBe(false);
@@ -349,11 +348,9 @@ describe('useBlockLock', () => {
     expect(result.current.lockedBy).toBeUndefined();
     expect(result.current.lockedUntil).toBeUndefined();
 
-    result.current.startLock();
+    await act(() => result.current.startLock());
 
-    await waitFor(() => {
-      expect(result.current.isLocked).toBe(true);
-    });
+    expect(result.current.isLocked).toBe(true);
     expect(result.current.error).toBeUndefined();
     expect(result.current.isLockedByUser).toBe(true);
     expect(result.current.isLockedByOtherUser).toBe(false);
@@ -399,18 +396,16 @@ describe('useBlockLock', () => {
     expect(result.current.lockedBy).toEqual(testUser1);
     expect(result.current.lockedUntil).toBe('2022-03-20T12:10:00Z');
 
-    result.current.startLock();
+    await act(() => result.current.startLock());
 
-    await waitFor(() => {
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.isLocked).toBe(true);
-      expect(result.current.isLockedByUser).toBe(true);
-      expect(result.current.isLockedByOtherUser).toBe(false);
-      expect(result.current.isLocking).toBe(false);
-      expect(result.current.locked).toBe('2022-03-20T12:08:00Z');
-      expect(result.current.lockedBy).toEqual(testUser1);
-      expect(result.current.lockedUntil).toBe('2022-03-20T12:18:00Z');
-    });
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.isLocked).toBe(true);
+    expect(result.current.isLockedByUser).toBe(true);
+    expect(result.current.isLockedByOtherUser).toBe(false);
+    expect(result.current.isLocking).toBe(false);
+    expect(result.current.locked).toBe('2022-03-20T12:08:00Z');
+    expect(result.current.lockedBy).toEqual(testUser1);
+    expect(result.current.lockedUntil).toBe('2022-03-20T12:18:00Z');
   });
 
   test('calling `setLock` correctly updates state', async () => {
@@ -433,17 +428,16 @@ describe('useBlockLock', () => {
       },
     );
 
-    result.current.setLock(nextLock);
-    await waitFor(() => {
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.isLocked).toBe(true);
-      expect(result.current.isLockedByUser).toBe(true);
-      expect(result.current.isLockedByOtherUser).toBe(false);
-      expect(result.current.isLocking).toBe(false);
-      expect(result.current.locked).toBe('2022-03-20T12:00:00Z');
-      expect(result.current.lockedBy).toEqual(testUser1);
-      expect(result.current.lockedUntil).toBe('2022-03-20T12:10:00Z');
-    });
+    await act(() => result.current.setLock(nextLock));
+
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.isLocked).toBe(true);
+    expect(result.current.isLockedByUser).toBe(true);
+    expect(result.current.isLockedByOtherUser).toBe(false);
+    expect(result.current.isLocking).toBe(false);
+    expect(result.current.locked).toBe('2022-03-20T12:00:00Z');
+    expect(result.current.lockedBy).toEqual(testUser1);
+    expect(result.current.lockedUntil).toBe('2022-03-20T12:10:00Z');
   });
 
   test('calling `setLock` with undefined correctly updates state', async () => {
@@ -468,20 +462,19 @@ describe('useBlockLock', () => {
       },
     );
 
-    result.current.setLock(undefined);
-    await waitFor(() => {
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.isLocked).toBe(false);
-      expect(result.current.isLockedByUser).toBe(false);
-      expect(result.current.isLockedByOtherUser).toBe(false);
-      expect(result.current.isLocking).toBe(false);
-      expect(result.current.locked).toBeUndefined();
-      expect(result.current.lockedBy).toBeUndefined();
-      expect(result.current.lockedUntil).toBeUndefined();
-    });
+    await act(() => result.current.setLock(undefined));
+
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.isLocked).toBe(false);
+    expect(result.current.isLockedByUser).toBe(false);
+    expect(result.current.isLockedByOtherUser).toBe(false);
+    expect(result.current.isLocking).toBe(false);
+    expect(result.current.locked).toBeUndefined();
+    expect(result.current.lockedBy).toBeUndefined();
+    expect(result.current.lockedUntil).toBeUndefined();
   });
 
-  test('calling `refreshLock` does not update state if another user owns the lock', () => {
+  test('calling `refreshLock` does not update state if another user owns the lock', async () => {
     MockDate.set('2022-03-10T12:05:00Z');
 
     const { result } = renderHook(
@@ -502,7 +495,9 @@ describe('useBlockLock', () => {
 
     result.current.refreshLock();
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(getLock).not.toHaveBeenCalled();
 
@@ -532,7 +527,9 @@ describe('useBlockLock', () => {
 
     result.current.refreshLock();
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(getLock).not.toHaveBeenCalled();
 
@@ -576,7 +573,9 @@ describe('useBlockLock', () => {
 
     result.current.refreshLock();
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     await waitFor(() => {
       expect(result.current.error).toBeUndefined();
@@ -625,14 +624,16 @@ describe('useBlockLock', () => {
     expect(getLock).toHaveBeenCalledTimes(0);
 
     // Advance by our custom lock throttle time
-    jest.advanceTimersByTime(2000);
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
 
     await waitFor(() => {
       expect(getLock).toHaveBeenCalledTimes(1);
     });
   });
 
-  test('calling `endLock` calls `unlock` option if lock is owned by user', () => {
+  test('calling `endLock` calls `unlock` option if lock is owned by user', async () => {
     MockDate.set('2022-03-20T12:08:00Z');
 
     const { result } = renderHook(
@@ -654,7 +655,9 @@ describe('useBlockLock', () => {
 
     result.current.endLock();
 
-    expect(unlock).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(unlock).toHaveBeenCalledTimes(1);
+    });
   });
 
   test('calling `endLock` correctly updates state if lock is owned by user', async () => {
@@ -753,7 +756,7 @@ describe('useBlockLock', () => {
     expect(result.current.lockedUntil).toBeUndefined();
   });
 
-  test('calling `endLock` does not update state if `unlock` throws an error', () => {
+  test('calling `endLock` does not update state if `unlock` throws an error', async () => {
     MockDate.set('2022-03-20T12:08:00Z');
 
     unlock.mockRejectedValue(new Error('Something went wrong'));

@@ -13,7 +13,7 @@ interface UseImageUploadReturn {
 export default function useMethodologyImageUpload(
   methodologyId: string,
 ): UseImageUploadReturn {
-  const abortController = useRef<AbortController>();
+  const abortController = useRef<AbortController>(null);
 
   const handleImageUpload: ImageUploadHandler = useCallback(
     async (file, onProgress) => {

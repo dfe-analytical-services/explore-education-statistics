@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -125,9 +126,7 @@ public class ReleaseInviteServicePermissionTest
             .ReturnsAsync(user);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
         userReleaseRoleRepository
             .Setup(m => m.RemoveMany(userReleaseRoles, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);

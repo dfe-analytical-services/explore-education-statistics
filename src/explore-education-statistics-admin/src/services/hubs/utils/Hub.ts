@@ -17,6 +17,10 @@ export default class Hub {
     return this.connection.state;
   }
 
+  get connectionId(): string | null {
+    return this.connection.connectionId;
+  }
+
   async start(): Promise<void> {
     if (this.connection.state !== 'Connected') {
       await this.connection.start();

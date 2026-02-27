@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render } from '@testing-library/react';
 import FormTextSearchInput from '../FormTextSearchInput';
 
 jest.mock('lodash/debounce');
@@ -130,7 +130,7 @@ describe('FormTextSearchInput', () => {
     expect(getByText('Test input')).toHaveClass('govuk-visually-hidden');
   });
 
-  test('automatically debounces the `onChange` handler', () => {
+  test('automatically debounces the `onChange` handler', async () => {
     jest.useFakeTimers();
 
     const handleChange = jest.fn();
@@ -154,7 +154,9 @@ describe('FormTextSearchInput', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(handleChange).toHaveBeenCalled();
   });

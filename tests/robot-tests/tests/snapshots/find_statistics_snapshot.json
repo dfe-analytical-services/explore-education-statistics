@@ -49,13 +49,6 @@
     "theme": "Further education"
   },
   {
-    "publication_summary": "Attendance in education settings since Monday 23 March 2020 and early years settings since Thursday 16 April 2020.",
-    "publication_title": "Attendance in education and early years settings during the coronavirus (COVID-19) pandemic",
-    "published": "26 Jul 2022",
-    "release_type": "Official statistics",
-    "theme": "COVID-19"
-  },
-  {
     "publication_summary": "A summary of CO2 monitor delivery to state-funded education\u202fsettings in England.",
     "publication_title": "CO2 monitors: cumulative delivery statistics",
     "published": "16 Dec 2021",
@@ -102,6 +95,13 @@
     "publication_title": "Children in need",
     "published": "30 Oct 2025",
     "release_type": "Accredited official statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Ad-hoc statistics on re-referrals to children\u2019s social care services in England by child characteristics and journeys through the social care system.",
+    "publication_title": "Children in need: A focus on re-referrals",
+    "published": "26 Feb 2026",
+    "release_type": "Ad hoc statistics",
     "theme": "Children's social care"
   },
   {
@@ -259,13 +259,6 @@
     "theme": "Higher education"
   },
   {
-    "publication_summary": "Statistics on free school meals in schools in England as collected in the October 2020 school census.",
-    "publication_title": "Free school meals: Autumn term",
-    "published": "30 Mar 2021",
-    "release_type": "Ad hoc statistics",
-    "theme": "Pupils and schools"
-  },
-  {
     "publication_summary": "Annual January statistics on children under 5 registered for government funded entitlements in England, and on providers and staff delivering them.",
     "publication_title": "Funded early education and childcare",
     "published": "31 Jul 2025",
@@ -420,20 +413,6 @@
     "theme": "Children's social care"
   },
   {
-    "publication_summary": "Attainment statistics for students across KS2, KS4, 16 to 18 who attended multi-academy trusts (MATs) in England in academic year 2021 to 2022.",
-    "publication_title": "Multi-academy trust performance measures (Key stages 2, 4 and 5)",
-    "published": "16 Mar 2023",
-    "release_type": "Official statistics",
-    "theme": "School and college outcomes and performance"
-  },
-  {
-    "publication_summary": "Attainment statistics for KS2 pupils who attended multi-academy trusts (MATs) in England",
-    "publication_title": "Multi-academy trust performance measures at key stage 2",
-    "published": "8 Oct 2020",
-    "release_type": "Official statistics",
-    "theme": "School and college outcomes and performance"
-  },
-  {
     "publication_summary": "Multiplication tables check attainment by pupil characteristics, school characteristics, region and local authority.",
     "publication_title": "Multiplication tables check attainment",
     "published": "20 Nov 2025",
@@ -473,13 +452,6 @@
     "publication_title": "Outcomes for children in need, including children looked after by local authorities in England",
     "published": "10 Apr 2025",
     "release_type": "Accredited official statistics",
-    "theme": "Children's social care"
-  },
-  {
-    "publication_summary": "Children in need, including children looked after by local authorities in England, national level outcomes up to Key Stage 4, including absence and exclusion.",
-    "publication_title": "Outcomes of children in need, including looked after children",
-    "published": "24 Sep 2020",
-    "release_type": "Ad hoc statistics",
     "theme": "Children's social care"
   },
   {
@@ -562,7 +534,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "5 Feb 2026",
+    "published": "19 Feb 2026",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },

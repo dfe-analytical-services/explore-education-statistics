@@ -1,10 +1,9 @@
-import flushPromises from '@common-test/flushPromises';
-import { render, screen, within } from '@testing-library/react';
 import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus';
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
-import React from 'react';
+import flushPromises from '@common-test/flushPromises';
+import { render, screen, within } from '@testing-library/react';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -33,6 +32,9 @@ describe('ImporterStatus', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   test('renders initial complete status correctly', () => {
@@ -183,7 +185,7 @@ describe('ImporterStatus', () => {
       />,
     );
 
-    expect(screen.getByText('Queued')).toBeInTheDocument();
+    expect(await screen.findByText('Queued')).toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
 
     await flushPromises();
@@ -193,7 +195,7 @@ describe('ImporterStatus', () => {
     const details = within(screen.getByRole('group'));
 
     expect(
-      details.getByRole('button', { name: 'See errors' }),
+      details.getByText('See errors', { selector: 'summary *' }),
     ).toBeInTheDocument();
 
     const errors = details.getAllByRole('listitem', { hidden: true });
@@ -223,7 +225,7 @@ describe('ImporterStatus', () => {
       />,
     );
 
-    expect(screen.getByText('Queued')).toBeInTheDocument();
+    expect(await screen.findByText('Queued')).toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
 
     await flushPromises();

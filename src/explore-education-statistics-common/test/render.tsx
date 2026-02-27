@@ -6,7 +6,7 @@ import {
 } from '@testing-library/react';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React, { FC, ReactElement, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 export interface CustomRenderResult extends RenderResult {
   user: UserEvent;
@@ -39,7 +39,7 @@ const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
  * that would otherwise create unnecessary boilerplate.
  */
 export default function render(
-  ui: ReactElement,
+  ui: ReactNode,
   options?: Omit<RenderOptions, 'queries'>,
 ): CustomRenderResult {
   return {

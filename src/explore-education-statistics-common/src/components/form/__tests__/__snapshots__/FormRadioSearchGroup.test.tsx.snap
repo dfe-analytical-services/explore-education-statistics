@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`] = `
 <div class="govuk-form-group">
@@ -13,11 +13,11 @@ exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`]
     >
       Search
     </label>
-    <input name="testRadios-search"
-           class="govuk-input govuk-!-margin-bottom-4 searchInput govuk-input--width-20"
+    <input class="govuk-input govuk-!-margin-bottom-4 searchInput govuk-input--width-20"
            id="test-radios-search"
            type="text"
            value
+           name="testRadios-search"
     >
     <div aria-live="assertive">
       <div class="govuk-radios radio">
@@ -26,9 +26,9 @@ exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`]
         >
           <input class="govuk-radios__input"
                  id="test-radios-1"
-                 name="testRadios"
                  type="radio"
                  value="1"
+                 name="testRadios"
           >
           <label class="govuk-label govuk-radios__label"
                  for="test-radios-1"
@@ -41,9 +41,9 @@ exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`]
         >
           <input class="govuk-radios__input"
                  id="test-radios-2"
-                 name="testRadios"
                  type="radio"
                  value="2"
+                 name="testRadios"
           >
           <label class="govuk-label govuk-radios__label"
                  for="test-radios-2"
@@ -56,9 +56,9 @@ exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`]
         >
           <input class="govuk-radios__input"
                  id="test-radios-3"
-                 name="testRadios"
                  type="radio"
                  value="3"
+                 name="testRadios"
           >
           <label class="govuk-label govuk-radios__label"
                  for="test-radios-3"

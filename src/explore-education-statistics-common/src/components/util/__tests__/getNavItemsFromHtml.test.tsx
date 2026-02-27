@@ -20,6 +20,24 @@ describe('Get nav items from html', () => {
     expect(result).toEqual(output);
   });
 
+  test('Returns h3 headings as nav items when headings contain other nested elements', () => {
+    const input =
+      '<h2>Test Level 2 Heading</h2><h3>Test <strong>Heading</strong></h3><p>Lorem ipsum dolor sit amet.</p><p>Lorema</p><h4>Level 4 Heading</h4><h3>Another <a href="https://example.com">H3 Heading!</a></h3>';
+    const output = [
+      {
+        id: 'section-test-heading',
+        text: 'Test Heading',
+      },
+      {
+        id: 'section-another-h-3-heading',
+        text: 'Another H3 Heading!',
+      },
+    ];
+
+    const result = getNavItemsFromHtml({ html: input });
+    expect(result).toEqual(output);
+  });
+
   test('Uses blockId as ID prefix if provided', () => {
     const input =
       '<h2>Test Level 2 Heading</h2><h3>Test Heading</h3><p>Lorem ipsum dolor sit amet, sea pertinax pertinacia appellantur in, est ad esse assentior mediocritatem, magna populo menandri cum te.</p><p>Lorema</p><h4>Level 4 Heading</h4><h3>Another H3 Heading!</h3>';

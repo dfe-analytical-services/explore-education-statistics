@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
 <div class="govuk-form-group">
@@ -14,9 +14,9 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-1"
-               name="test-checkboxes"
                type="checkbox"
                value="1"
+               name="test-checkboxes"
         >
         <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-1"
@@ -29,10 +29,10 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-2"
-               name="test-checkboxes"
                type="checkbox"
                value="2"
                checked
+               name="test-checkboxes"
         >
         <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-2"
@@ -45,9 +45,9 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-3"
-               name="test-checkboxes"
                type="checkbox"
                value="3"
+               name="test-checkboxes"
         >
         <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-3"
@@ -74,9 +74,9 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-1"
-               name="test-checkboxes"
                type="checkbox"
                value="1"
+               name="test-checkboxes"
         >
         <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-1"
@@ -144,9 +144,9 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-1"
-               name="test-checkboxes"
                type="checkbox"
                value="1"
+               name="test-checkboxes"
         >
         <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-1"
@@ -159,9 +159,9 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-2"
-               name="test-checkboxes"
                type="checkbox"
                value="2"
+               name="test-checkboxes"
         >
         <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-2"
@@ -174,9 +174,9 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-3"
-               name="test-checkboxes"
                type="checkbox"
                value="3"
+               name="test-checkboxes"
         >
         <label class="govuk-label govuk-checkboxes__label label"
                for="test-checkboxes-checkbox-3"
@@ -203,9 +203,9 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-1"
-               name="test-checkboxes"
                type="checkbox"
                value="1"
+               name="test-checkboxes"
                aria-controls="test-checkboxes-checkbox-1-conditional"
                aria-expanded="false"
         >
@@ -227,10 +227,10 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-2"
-               name="test-checkboxes"
                type="checkbox"
                value="2"
                checked
+               name="test-checkboxes"
                aria-controls="test-checkboxes-checkbox-2-conditional"
                aria-expanded="true"
         >
@@ -252,9 +252,9 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
       >
         <input class="govuk-checkboxes__input"
                id="test-checkboxes-checkbox-3"
-               name="test-checkboxes"
                type="checkbox"
                value="3"
+               name="test-checkboxes"
                aria-controls="test-checkboxes-checkbox-3-conditional"
                aria-expanded="false"
         >

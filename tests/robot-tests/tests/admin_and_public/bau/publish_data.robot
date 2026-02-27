@@ -50,7 +50,7 @@ Add public prerelease access list
     user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Create public pre-release access list
-    user presses keys    CTRL+a+BACKSPACE
+    user selects all text and hits backspace
     user presses keys    Test public access list
     user clicks button    Save access list
     user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
@@ -499,12 +499,13 @@ Add text block with link to a featured table to accordion section
     user adds text block to editable accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${block}=    user starts editing accordion section text block    Test section    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+    # We add text to avoid the "Enter content" error displaying when clicking the `Insert` toolbar button, which was causing the toolbar menu to not    open
+    user presses keys    Test content block text
+
     ${toolbar}=    get editor toolbar    ${block}
-    ${insert}=    get child element    parent_locator=${toolbar}
-    ...    child_locator=css:[data-cke-tooltip-text="Insert"]
-    user clicks element    ${insert}
-    ${button}=    user gets button element    Insert featured table link    ${toolbar}
-    user clicks element    ${button}
+    user clicks element    css:[data-cke-tooltip-text="Insert"]    ${toolbar}
+    user clicks button    Insert featured table link
     ${modal}=    user waits until modal is visible    Insert featured table link
     user enters text into element    id:featuredTablesSearch-input    tes
     user waits until page contains element    id:featuredTablesSearch-options

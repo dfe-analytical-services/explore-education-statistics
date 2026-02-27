@@ -627,10 +627,8 @@ public abstract class UserPublicationRoleRepositoryTests
             }
         }
 
-        // This is a temporary test to ensure that the new permissions system roles are excluded in all results
-        // via the global query filter
         [Fact]
-        public async Task IgnoresNewPermissionsSystemRoles()
+        public async Task DefaultValueForIncludeNewPermissionsSystemRoles_IgnoresNewPermissionsSystemRoles()
         {
             User activeUser = _fixture.DefaultUser();
             User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
@@ -669,6 +667,98 @@ public abstract class UserPublicationRoleRepositoryTests
                 var results = await resultingQueryable.ToListAsync();
 
                 Assert.Empty(results);
+            }
+        }
+
+        [Fact]
+        public async Task IncludeNewPermissionsSystemRolesIsFalse_IgnoresNewPermissionsSystemRoles()
+        {
+            User activeUser = _fixture.DefaultUser();
+            User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(_fixture.DefaultPublication())
+                // These should ALL be filtered out
+                .ForIndex(0, s => s.SetUser(activeUser).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetUser(activeUser).SetRole(PublicationRole.Drafter))
+                .ForIndex(2, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Approver))
+                .ForIndex(3, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Drafter))
+                .ForIndex(4, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Approver))
+                .ForIndex(5, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Drafter))
+                .ForIndex(6, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Approver))
+                .ForIndex(7, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Drafter))
+                .GenerateList(8);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var resultingQueryable = repository.Query(
+                    ResourceRoleFilter.All,
+                    includeNewPermissionsSystemRoles: false
+                );
+
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var results = await resultingQueryable.ToListAsync();
+
+                Assert.Empty(results);
+            }
+        }
+
+        [Fact]
+        public async Task IncludeNewPermissionsSystemRolesIsTrue_ReturnsNewPermissionsSystemRoles()
+        {
+            User activeUser = _fixture.DefaultUser();
+            User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(_fixture.DefaultPublication())
+                // These should ALL be filtered out
+                .ForIndex(0, s => s.SetUser(activeUser).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetUser(activeUser).SetRole(PublicationRole.Drafter))
+                .ForIndex(2, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Approver))
+                .ForIndex(3, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Drafter))
+                .ForIndex(4, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Approver))
+                .ForIndex(5, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Drafter))
+                .ForIndex(6, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Approver))
+                .ForIndex(7, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Drafter))
+                .GenerateList(8);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var resultingQueryable = repository.Query(
+                    ResourceRoleFilter.All,
+                    includeNewPermissionsSystemRoles: true
+                );
+
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var results = await resultingQueryable.ToListAsync();
+
+                Assert.Equal(8, results.Count);
             }
         }
     }

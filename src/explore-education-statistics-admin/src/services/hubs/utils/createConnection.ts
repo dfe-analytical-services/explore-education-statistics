@@ -1,4 +1,5 @@
 import { exponentialBackoffPolicy } from '@admin/services/hubs/utils/retryPolicies';
+import logger from '@common/services/logger';
 import {
   HubConnection,
   HubConnectionBuilder,
@@ -20,8 +21,15 @@ export default function createConnection(
 ): HubConnection {
   const {
     accessToken = async () => {
-      const authenticationResult = await acquireTokenSilent();
-      return authenticationResult.accessToken;
+      try {
+        const authenticationResult = await acquireTokenSilent();
+        return authenticationResult.accessToken;
+      } catch (error) {
+        logger.info(
+          `createConnection: failed to retrieve access token - ${error}`,
+        );
+        return '';
+      }
     },
     retryPolicy = exponentialBackoffPolicy(),
   } = options;

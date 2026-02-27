@@ -1,85 +1,86 @@
 /* eslint-disable no-console */
-import { Counter, Rate, Trend } from 'k6/metrics';
-import { Options } from 'k6/options';
+import { check } from 'k6';
 import http from 'k6/http';
-import { check, fail } from 'k6';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
+import getStandardOptions from '../../configuration/options';
+import testPageAndDataUrls, {
+  getPrefetchRequestConfig,
+  PublicPageSetupData,
+  setupPublicPageTest,
+} from './utils/publicPageTest';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
-import loggingUtils from '../../utils/loggingUtils';
 
-export const options: Options = {
-  stages: [
-    {
-      duration: '0.1s',
-      target: 80,
-    },
-    {
-      duration: '10m',
-      target: 80,
-    },
-  ],
-  noConnectionReuse: true,
-  insecureSkipTLSVerify: true,
+type SetupData = PublicPageSetupData & {
+  dataUrls: string[];
 };
 
-export const errorRate = new Rate('ees_errors');
-export const getReleaseSuccessCount = new Counter(
-  'ees_find_statistics_success',
-);
-export const getReleaseFailureCount = new Counter(
-  'ees_find_statistics_failure',
-);
-export const getReleaseRequestDuration = new Trend(
-  'ees_find_statistics_duration',
-  true,
-);
+const numberOfSearchResultsToPrefetch = 4;
+
+const excludeDataUrls = __ENV.EXCLUDE_DATA_REQUESTS?.toLowerCase() === 'true';
+
+const expectedTitle = 'Find statistics and data';
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
 
-export function setup() {
-  loggingUtils.logDashboardUrls();
-}
+export const options = getStandardOptions();
 
-const performTest = () => {
-  const startTime = Date.now();
-  let response;
-  try {
-    response = http.get(
-      `${environmentAndUsers.environment.publicUrl}/find-statistics`,
-      {
-        timeout: '120s',
-      },
-    );
-  } catch (e) {
-    getReleaseFailureCount.add(1);
-    errorRate.add(1);
-    fail(`Failure to get Find Statistics page - ${JSON.stringify(e)}`);
-  }
+const name = 'findStatisticsPage.test.ts';
 
-  if (
-    check(response, {
-      'response code was 200': ({ status }) => status === 200,
-      'response should have contained body': ({ body }) => body != null,
-      'response contains expected text': res =>
-        res.html().text().includes('Browse to find the statistics and data'),
-    })
-  ) {
-    console.log('SUCCESS!');
-    getReleaseSuccessCount.add(1);
-    getReleaseRequestDuration.add(Date.now() - startTime);
-  } else {
-    console.log(`FAILURE! Got ${response.status} response code`);
-    getReleaseFailureCount.add(1);
-    getReleaseRequestDuration.add(Date.now() - startTime);
-    errorRate.add(1);
-    fail('Failure to Find Statistics page');
-  }
-};
-export function handleSummary(data: unknown) {
+export function setup(): SetupData {
+  const { buildId, response } = setupPublicPageTest(name);
+
+  const dataUrls = excludeDataUrls ? [] : getDataUrls(buildId);
+
   return {
-    'findStatisticsPage.html': htmlReport(data),
+    buildId,
+    response,
+    dataUrls,
   };
 }
+
+const performTest = ({ buildId, dataUrls }: SetupData) =>
+  testPageAndDataUrls({
+    buildId,
+    mainPageUrl: {
+      url: `/find-statistics`,
+      prefetch: false,
+      successCheck: response =>
+        check(response, {
+          'response code was 200': ({ status }) => status === 200,
+          'response should have contained body': ({ body }) => body != null,
+          'response contains expected title': res =>
+            res.html().text().includes(expectedTitle),
+        }),
+    },
+    dataUrls: dataUrls.map(getPrefetchRequestConfig),
+  });
+
+function getDataUrls(buildId: string): string[] {
+  const defaultSearchResultsJson = http.get(
+    `${environmentAndUsers.environment.publicUrl}/_next/data/${buildId}/find-statistics.json`,
+  );
+
+  const publications = defaultSearchResultsJson.json(
+    'pageProps.dehydratedState.queries.0.state.data.results',
+  ) as {
+    slug: string;
+    latestReleaseSlug: string;
+  }[];
+
+  const topSearchResultPublications = publications.slice(
+    0,
+    Math.min(numberOfSearchResultsToPrefetch, publications.length),
+  );
+
+  const dataUrls = topSearchResultPublications.map(
+    p =>
+      `/find-statistics/${p.slug}/${p.latestReleaseSlug}.json?publication=${p.slug}&release=${p.latestReleaseSlug}`,
+  );
+
+  console.log(`Found data URLs: \n\n${dataUrls.join('\n')}`);
+
+  return dataUrls;
+}
+
 export default performTest;
