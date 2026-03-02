@@ -273,6 +273,12 @@ export const testPublicationRelease: ReleaseVersion = {
     heading: '',
     content: [],
   },
+  warningSection: {
+    id: '',
+    order: 0,
+    heading: '',
+    content: [],
+  },
   publication: {
     id: '',
     slug: '',

@@ -263,7 +263,7 @@ const ReleaseContent = ({
             }
             trackScroll
           />
-          {editingMode === 'edit' && release.warningSection && (
+          {editingMode === 'edit' && (
             <div id="releaseWarning" data-testid="release-warning">
               <EditableSectionBlocks
                 blocks={release.warningSection.content}
@@ -282,7 +282,7 @@ const ReleaseContent = ({
                         Remove<VisuallyHidden> warning</VisuallyHidden> block
                       </>
                     }
-                    sectionId={release.warningSection?.id || 'warningSection'}
+                    sectionId={release.warningSection.id}
                     sectionKey="warningSection"
                     toolbarConfig={toolbarConfigLinkOnly}
                     onAfterDeleteBlock={onAfterDeleteWarningBlock}

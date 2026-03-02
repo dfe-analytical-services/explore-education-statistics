@@ -114,7 +114,6 @@ describe('ReleaseContentPage', () => {
         },
       ],
     },
-
     id: 'release-id',
     keyStatistics: [],
     keyStatisticsSecondarySection: {
@@ -162,6 +161,12 @@ describe('ReleaseContentPage', () => {
     title: 'Academic year 2020/21',
     type: 'OfficialStatistics',
     updates: [],
+    warningSection: {
+      id: 'warning-section-id',
+      order: 0,
+      content: [],
+      heading: '',
+    },
     yearTitle: '2020/21',
   };
 

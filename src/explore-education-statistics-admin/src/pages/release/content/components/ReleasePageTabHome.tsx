@@ -172,7 +172,7 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
           </ReleasePageContentSection>
         )}
 
-        {warningSection?.content && warningSection.content.length > 0 && (
+        {warningSection.content && warningSection.content.length > 0 && (
           <ReleaseWarningBlock block={warningSection.content[0]} />
         )}
 

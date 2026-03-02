@@ -208,6 +208,12 @@ export const testRelease: ReleaseVersion = {
   },
   downloadFiles: [],
   relatedInformation: [],
+  warningSection: {
+    id: 'warning-section-id',
+    order: 0,
+    content: [],
+    heading: '',
+  },
 };
 
 export const testPublicationSummary: PublicationSummaryRedesign = {
