@@ -36,6 +36,9 @@ public class ContentSection
                 .HasMaxLength(25);
 
             builder.HasIndex(cs => cs.Type);
+
+            // Unique constraint for all section types except for 'Generic' which can occur multiple times per release version.
+            builder.HasIndex(cs => new { cs.ReleaseVersionId, cs.Type }).IsUnique().HasFilter("[Type] <> 'Generic'");
         }
     }
 }
