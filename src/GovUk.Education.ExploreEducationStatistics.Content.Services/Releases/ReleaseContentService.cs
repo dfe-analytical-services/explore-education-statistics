@@ -51,8 +51,18 @@ public class ReleaseContentService(ContentDbContext contentDbContext) : IRelease
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
 
-    private static void RemoveCommentsFromContentSections(ReleaseContentDto content) =>
-        content.GetAllSections().ForEach(RemoveCommentsFromContentSection);
+    private static void RemoveCommentsFromContentSections(ReleaseContentDto content)
+    {
+        // Only content sections where HtmlBlocks are expected are included here
+        ContentSectionDto[] sectionsWithHtmlBlocks =
+        [
+            .. content.Content,
+            content.HeadlinesSection,
+            content.SummarySection,
+        ];
+
+        sectionsWithHtmlBlocks.ForEach(RemoveCommentsFromContentSection);
+    }
 
     private static void RemoveCommentsFromContentSection(ContentSectionDto section) =>
         section.Content.OfType<HtmlBlockDto>().ForEach(RemoveCommentsFromHtmlBlock);

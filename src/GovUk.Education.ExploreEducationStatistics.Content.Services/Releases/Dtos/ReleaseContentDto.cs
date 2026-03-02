@@ -17,12 +17,6 @@ public record ReleaseContentDto
     public required ContentSectionDto KeyStatisticsSecondarySection { get; init; }
     public required ContentSectionDto SummarySection { get; init; }
 
-    public ContentSectionDto[] GetAllSections()
-    {
-        ContentSectionDto?[] optionalSections = [HeadlinesSection, KeyStatisticsSecondarySection, SummarySection];
-        return optionalSections.OfType<ContentSectionDto>().Concat(Content).ToArray();
-    }
-
     public static ReleaseContentDto FromReleaseVersion(ReleaseVersion releaseVersion) =>
         new()
         {
