@@ -71,6 +71,11 @@ public abstract class ReleaseContentServiceTests
                 .WithType(ContentSectionType.ReleaseSummary)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Summary content</p>")]);
 
+            releaseVersion.WarningSection = _dataFixture
+                .DefaultContentSection()
+                .WithType(ContentSectionType.Warning)
+                .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Warning content</p>")]);
+
             releaseVersion.GenericContent =
             [
                 _dataFixture
@@ -125,6 +130,9 @@ public abstract class ReleaseContentServiceTests
                 Assert.NotNull(result.SummarySection);
                 AssertContentSectionEqual(releaseVersion.SummarySection, result.SummarySection);
 
+                Assert.NotNull(result.WarningSection);
+                AssertContentSectionEqual(releaseVersion.WarningSection, result.WarningSection);
+
                 var expectedContentSections = releaseVersion.GenericContent.OrderBy(cs => cs.Order).ToList();
                 Assert.Equal(expectedContentSections.Count, result.Content.Length);
                 Assert.All(
@@ -168,6 +176,9 @@ public abstract class ReleaseContentServiceTests
             const string summaryBlockBody = """
                 <p><commentplaceholder-start name="comment-5"></commentplaceholder-start>Summary content<commentplaceholder-end name="comment-5"></commentplaceholder-end></p>
                 """;
+            const string warningBlockBody = """
+                <p><resolvedcomment-start name="comment-6"></resolvedcomment-start>Warning content<resolvedcomment-end name="comment-6"></resolvedcomment-end></p>
+                """;
 
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -200,6 +211,9 @@ public abstract class ReleaseContentServiceTests
                                         ])
                                         .WithReleaseSummaryContent([
                                             _dataFixture.DefaultHtmlBlock().WithBody(summaryBlockBody),
+                                        ])
+                                        .WithWarningContent([
+                                            _dataFixture.DefaultHtmlBlock().WithBody(warningBlockBody),
                                         ]),
                                 ]
                             ),
@@ -242,6 +256,10 @@ public abstract class ReleaseContentServiceTests
                 Assert.Single(actual.SummarySection.Content);
                 var summaryHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.SummarySection.Content[0]);
                 Assert.Equal("<p>Summary content</p>", summaryHtmlBlock.Body);
+
+                Assert.Single(actual.WarningSection.Content);
+                var warningHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.WarningSection.Content[0]);
+                Assert.Equal("<p>Warning content</p>", warningHtmlBlock.Body);
             }
         }
 
@@ -282,6 +300,7 @@ public abstract class ReleaseContentServiceTests
                 Assert.Empty(result.KeyStatistics);
                 Assert.Empty(result.KeyStatisticsSecondarySection.Content);
                 Assert.Empty(result.SummarySection.Content);
+                Assert.Empty(result.WarningSection.Content);
             }
         }
 
@@ -415,6 +434,7 @@ public abstract class ReleaseContentServiceTests
                 ContentSectionType.KeyStatisticsSecondary
             );
             releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
         }
 
         private ContentSection CreateContentSection(ContentSectionType type) =>

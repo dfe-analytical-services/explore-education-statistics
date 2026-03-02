@@ -59,6 +59,7 @@ public class ReleaseContentService(ContentDbContext contentDbContext) : IRelease
             .. content.Content,
             content.HeadlinesSection,
             content.SummarySection,
+            content.WarningSection,
         ];
 
         sectionsWithHtmlBlocks.ForEach(RemoveCommentsFromContentSection);
