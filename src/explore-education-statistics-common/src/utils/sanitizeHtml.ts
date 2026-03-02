@@ -67,7 +67,6 @@ export const releaseWarningBlockSanitizeOptions: SanitizeHtmlOptions = {
   allowedTags: ['p', 'a'],
   allowedAttributes: {
     a: ['href', 'rel', 'target'],
-    p: ['style'],
   },
   allowedSchemesByTag: {
     a: ['http', 'https', 'mailto', 'tel'],

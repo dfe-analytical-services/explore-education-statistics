@@ -17,9 +17,9 @@ interface Props {
   block: ContentBlock;
 }
 
-// The html should only contain p and a elements.
-// We need to strip out the p elements as the WarningMessage
-// wraps the child content in <strong> tags, and process the
+// The provided html should only contain p and a elements.
+// We need to strip out the p elements (as the WarningMessage
+// wraps the child content in <strong> tags), and process the
 // links to add correct attributes and text.
 export const releaseWarningBlockParseOptions: HTMLReactParserOptions = {
   replace: (node: DOMNode) => {
@@ -79,7 +79,10 @@ const ReleaseWarningBlock = ({ block }: Props) => {
   );
 
   return (
-    <WarningMessage className="govuk-!-margin-bottom-4">
+    <WarningMessage
+      className="govuk-!-margin-bottom-4"
+      testId="release-warning-block"
+    >
       {parsedContent}
     </WarningMessage>
   );

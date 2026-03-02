@@ -143,6 +143,19 @@ const defaultSummarySection: ContentSection<EditableContentBlock> = {
   order: 0,
 };
 
+const defaultWarningSection: ContentSection<EditableContentBlock> = {
+  id: 'warning-section-id',
+  content: [
+    generateEditableContentBlock({
+      body: '<p>Warning block body</p>',
+      id: 'warning-block-id',
+      order: 0,
+    }),
+  ],
+  heading: 'Warning block heading',
+  order: 0,
+};
+
 const defaultUpdates: ReleaseNote[] = [
   {
     id: 'update-id',
@@ -174,6 +187,7 @@ export function generateEditableRelease({
   summarySection = defaultSummarySection,
   type = 'OfficialStatistics',
   updates = defaultUpdates,
+  warningSection = defaultWarningSection,
   yearTitle = '2020/21',
 }: Partial<EditableRelease>): EditableRelease {
   const releaseSlug = title.replaceAll(' ', '-');
@@ -201,6 +215,7 @@ export function generateEditableRelease({
     title,
     type,
     updates,
+    warningSection,
     yearTitle,
   };
 }

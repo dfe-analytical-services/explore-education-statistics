@@ -159,6 +159,32 @@ describe('ReleasePageTabHome', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders warning section if warning content exists', () => {
+    renderWithContext(<ReleasePageTabHome />);
+
+    expect(screen.getByTestId('release-warning-block')).toBeInTheDocument();
+  });
+
+  test('does not render warning section if no warning content', () => {
+    renderWithContext(
+      <ReleasePageTabHome />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          warningSection: {
+            id: 'warning-section-id',
+            content: [],
+            heading: 'Warning block heading',
+            order: 0,
+          },
+        }),
+      }),
+    );
+
+    expect(
+      screen.queryByTestId('release-warning-block'),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders headlines section', () => {
     renderWithContext(<ReleasePageTabHome />);
     const headlinesSection = screen.getByTestId('headlines-section');
