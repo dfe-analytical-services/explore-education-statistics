@@ -1,4 +1,7 @@
 #nullable enable
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -22,4 +25,17 @@ public class ContentSection
 
     public T? FindSingleContentBlockOfType<T>()
         where T : ContentBlock => Content.OfType<T>().SingleOrDefault();
+
+    internal class Config : IEntityTypeConfiguration<ContentSection>
+    {
+        public void Configure(EntityTypeBuilder<ContentSection> builder)
+        {
+            builder
+                .Property(cs => cs.Type)
+                .HasConversion(new EnumToStringConverter<ContentSectionType>())
+                .HasMaxLength(25);
+
+            builder.HasIndex(cs => cs.Type);
+        }
+    }
 }
