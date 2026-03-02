@@ -153,48 +153,60 @@ public abstract class ReleaseContentServiceTests
         public async Task WhenContentContainsComments_RemovesComments()
         {
             // Arrange
+            const string section1Block1Body = """
+                <p><comment-start name="comment-1"></comment-start>Section 1 block 1 content<comment-end name="comment-1"></comment-end></p>
+                """;
+            const string section1Block2Body = """
+                <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Section 1 block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
+                """;
+            const string section1Block3Body = """
+                <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Section 1 block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
+                """;
+            const string headlinesBlockBody = """
+                <p><comment-start name="comment-4"></comment-start>Headlines content<comment-end name="comment-4"></comment-end></p>
+                """;
+            const string summaryBlockBody = """
+                <p><commentplaceholder-start name="comment-5"></commentplaceholder-start>Summary content<commentplaceholder-end name="comment-5"></commentplaceholder-end></p>
+                """;
+
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithPublished(DateTimeOffset.UtcNow)
+                                        .WithContent([
+                                            _dataFixture
+                                                .DefaultContentSection()
+                                                .WithHeading("Section 1")
+                                                .WithContentBlocks(
+                                                    _dataFixture
+                                                        .DefaultHtmlBlock()
+                                                        .ForIndex(0, s => s.SetBody(section1Block1Body))
+                                                        .ForIndex(1, s => s.SetBody(section1Block2Body))
+                                                        .ForIndex(2, s => s.SetBody(section1Block3Body))
+                                                        .GenerateList()
+                                                ),
+                                        ])
+                                        .WithKeyStatisticsSecondaryContent([])
+                                        .WithHeadlinesContent([
+                                            _dataFixture.DefaultHtmlBlock().WithBody(headlinesBlockBody),
+                                        ])
+                                        .WithReleaseSummaryContent([
+                                            _dataFixture.DefaultHtmlBlock().WithBody(summaryBlockBody),
+                                        ]),
+                                ]
+                            ),
+                    ]
+                );
+
             var release = publication.Releases[0];
-            var releaseVersion = release.Versions[0];
-
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
-                ContentSectionType.KeyStatisticsSecondary
-            );
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
-
-            releaseVersion.GenericContent =
-            [
-                _dataFixture
-                    .DefaultContentSection()
-                    .WithHeading("Section 1")
-                    .WithContentBlocks([
-                        _dataFixture
-                            .DefaultHtmlBlock()
-                            .WithBody(
-                                """
-                                <p><comment-start name="comment-1"></comment-start>Section 1 block 1 content<comment-end name="comment-1"></comment-end></p>
-                                """
-                            ),
-                        _dataFixture
-                            .DefaultHtmlBlock()
-                            .WithBody(
-                                """
-                                <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Section 1 block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
-                                """
-                            ),
-                        _dataFixture
-                            .DefaultHtmlBlock()
-                            .WithBody(
-                                """
-                                <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Section 1 block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
-                                """
-                            ),
-                    ]),
-            ];
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -222,6 +234,14 @@ public abstract class ReleaseContentServiceTests
                 Assert.Equal("<p>Section 1 block 2 content</p>", htmlBlock2.Body);
                 var htmlBlock3 = Assert.IsType<HtmlBlockDto>(contentSection1.Content[2]);
                 Assert.Equal("<p>Section 1 block 3 content</p>", htmlBlock3.Body);
+
+                Assert.Single(actual.HeadlinesSection.Content);
+                var headlinesHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.HeadlinesSection.Content[0]);
+                Assert.Equal("<p>Headlines content</p>", headlinesHtmlBlock.Body);
+
+                Assert.Single(actual.SummarySection.Content);
+                var summaryHtmlBlock = Assert.IsType<HtmlBlockDto>(actual.SummarySection.Content[0]);
+                Assert.Equal("<p>Summary content</p>", summaryHtmlBlock.Body);
             }
         }
 
