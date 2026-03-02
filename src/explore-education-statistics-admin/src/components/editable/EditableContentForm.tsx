@@ -41,6 +41,7 @@ export interface Props {
   actionThrottle?: number;
   allowComments?: boolean;
   content: string;
+  customSanitizeOptions?: SanitizeHtmlOptions;
   hideLabel?: boolean;
   id: string;
   idleTimeout?: number;
@@ -62,6 +63,7 @@ const EditableContentForm = ({
   actionThrottle = 5_000,
   allowComments = false,
   content,
+  customSanitizeOptions,
   hideLabel = false,
   id,
   idleTimeout = 600_000,
@@ -95,29 +97,31 @@ const EditableContentForm = ({
   });
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
-    return {
-      ...defaultSanitizeOptions,
-      allowedTags: [
-        ...(defaultSanitizeOptions.allowedTags ?? []),
-        ...commentTags,
-      ],
-      allowedAttributes: {
-        ...(defaultSanitizeOptions.allowedAttributes ?? {}),
-        ...commentTagAttributes,
-      },
-      transformTags: {
-        a: (tagName, attribs) => {
-          return {
-            tagName,
-            attribs: {
-              ...attribs,
-              href: formatContentLinkUrl(attribs.href),
-            },
-          };
+    return (
+      customSanitizeOptions || {
+        ...defaultSanitizeOptions,
+        allowedTags: [
+          ...(defaultSanitizeOptions.allowedTags ?? []),
+          ...commentTags,
+        ],
+        allowedAttributes: {
+          ...(defaultSanitizeOptions.allowedAttributes ?? {}),
+          ...commentTagAttributes,
         },
-      },
-    };
-  }, []);
+        transformTags: {
+          a: (tagName, attribs) => {
+            return {
+              tagName,
+              attribs: {
+                ...attribs,
+                href: formatContentLinkUrl(attribs.href),
+              },
+            };
+          },
+        },
+      }
+    );
+  }, [customSanitizeOptions]);
 
   const [{ isLoading: isAutoSaving, error: autoSaveError }, handleAutoSave] =
     useAsyncCallback(

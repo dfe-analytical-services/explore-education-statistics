@@ -129,6 +129,9 @@ const EditableContentBlock = ({
         actionThrottle={actionThrottle}
         allowComments={allowComments}
         content={value ? sanitizeHtml(value, sanitizeOptions) : ''}
+        customSanitizeOptions={
+          isReleaseWarningBlock ? releaseWarningBlockSanitizeOptions : undefined
+        }
         label={label}
         hideLabel={hideLabel}
         id={id}
