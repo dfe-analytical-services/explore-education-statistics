@@ -59,7 +59,7 @@ public class LocationMetaRepository(
         publicDataDbContext.LocationMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+        var publicIdMappings = await GetPublicIdMappings(dataSetVersion, cancellationToken);
 
         foreach (var meta in metas)
         {
@@ -257,7 +257,7 @@ public class LocationMetaRepository(
         };
     }
 
-    private async Task<PublicIdMappings> CreatePublicIdMappings(
+    private async Task<PublicIdMappings> GetPublicIdMappings(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken
     )

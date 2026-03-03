@@ -3279,6 +3279,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             Assert.Null(actualChange);
         }
 
+        // TODO EES-6764 - add indicator tests here.
+
         [Fact]
         public async Task GeographicLevelsAdded_ChangeExists()
         {

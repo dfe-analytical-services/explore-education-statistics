@@ -195,6 +195,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             );
         }
 
+        // TODO EES-6764 - indicator tests here.
+
         [Fact]
         public async Task NextVersion_CorrectFilters_AutoMappedWithSamePublicIds()
         {
@@ -238,7 +240,7 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         }
 
         [Fact]
-        public async Task NextVersion_CorrectFilters_AutoMappedWithOldPublicIds()
+        public async Task NextVersion_CorrectFilters_AutoMappedWithOriginalPublicIds()
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -262,8 +264,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
             {
-                filterMapping.PublicId = $"{filterMapping.PublicId}-old";
-                filterMapping.Source.Label = $"{filterMapping.Source.Label} old";
+                filterMapping.PublicId = $"{filterMapping.PublicId}-orig";
+                filterMapping.Source.Label = $"{filterMapping.Source.Label} original";
             }
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
@@ -279,8 +281,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 {
                     var actualFilter = actualFilters[filterIndex];
 
-                    // Filter gets old public ID as it was auto mapped
-                    expectedFilter.PublicId = $"{expectedFilter.PublicId}-old";
+                    // Filter gets orig public ID as it was auto mapped
+                    expectedFilter.PublicId = $"{expectedFilter.PublicId}-orig";
 
                     AssertFiltersEqual(expectedFilter, actualFilter);
                     AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
@@ -314,8 +316,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
             {
                 filterMapping.Type = MappingType.AutoNone;
-                filterMapping.PublicId = $"{filterMapping.PublicId}-old";
-                filterMapping.Source.Label = $"{filterMapping.Source.Label} old";
+                filterMapping.PublicId = $"{filterMapping.PublicId}-orig";
+                filterMapping.Source.Label = $"{filterMapping.Source.Label} original";
                 filterMapping.CandidateKey = null;
             }
 
@@ -365,8 +367,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
             {
                 filterMapping.Type = MappingType.ManualMapped;
-                filterMapping.PublicId = $"{filterMapping.PublicId}-old";
-                filterMapping.Source.Label = $"{filterMapping.Source.Label} old";
+                filterMapping.PublicId = $"{filterMapping.PublicId}-orig";
+                filterMapping.Source.Label = $"{filterMapping.Source.Label} original";
             }
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
@@ -382,8 +384,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 {
                     var actualFilter = actualFilters[filterIndex];
 
-                    // Filter gets old public ID as it was manually mapped
-                    expectedFilter.PublicId = $"{expectedFilter.PublicId}-old";
+                    // Filter gets orig public ID as it was manually mapped
+                    expectedFilter.PublicId = $"{expectedFilter.PublicId}-orig";
 
                     AssertFiltersEqual(expectedFilter, actualFilter);
                     AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
@@ -417,15 +419,15 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             var academyTypeMapping = mapping.FilterMappingPlan.Mappings["academy_type"];
 
             academyTypeMapping.Type = MappingType.AutoNone;
-            academyTypeMapping.PublicId = $"{academyTypeMapping.PublicId}-old";
-            academyTypeMapping.Source.Label = $"{academyTypeMapping.Source.Label} old";
+            academyTypeMapping.PublicId = $"{academyTypeMapping.PublicId}-orig";
+            academyTypeMapping.Source.Label = $"{academyTypeMapping.Source.Label} original";
             academyTypeMapping.CandidateKey = null;
 
             var ncYearMapping = mapping.FilterMappingPlan.Mappings["ncyear"];
 
             ncYearMapping.Type = MappingType.ManualMapped;
-            ncYearMapping.PublicId = $"{ncYearMapping.PublicId}-old";
-            ncYearMapping.Source.Label = $"{ncYearMapping.Source.Label} old";
+            ncYearMapping.PublicId = $"{ncYearMapping.PublicId}-orig";
+            ncYearMapping.Source.Label = $"{ncYearMapping.Source.Label} original";
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
@@ -440,9 +442,9 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 {
                     var actualFilter = actualFilters[filterIndex];
 
-                    // Filter `ncyear` re-uses old public ID as it was manually mapped.
+                    // Filter `ncyear` re-uses orig public ID as it was manually mapped.
                     expectedFilter.PublicId =
-                        expectedFilter.Column == "ncyear" ? $"{expectedFilter.PublicId}-old" : expectedFilter.PublicId;
+                        expectedFilter.Column == "ncyear" ? $"{expectedFilter.PublicId}-orig" : expectedFilter.PublicId;
 
                     AssertFiltersEqual(expectedFilter, actualFilter);
                     AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
@@ -493,7 +495,7 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         }
 
         [Fact]
-        public async Task NextVersion_CorrectFilterOptions_AutoMappedWithOldPublicIds()
+        public async Task NextVersion_CorrectFilterOptions_AutoMappedWithOriginalPublicIds()
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -519,8 +521,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             {
                 foreach (var (_, optionMapping) in filterMapping.OptionMappings)
                 {
-                    optionMapping.PublicId = $"{optionMapping.PublicId}-old";
-                    optionMapping.Source.Label = $"{optionMapping.Source.Label} old";
+                    optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
+                    optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
                 }
             }
 
@@ -539,10 +541,10 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
                     AssertFiltersEqual(expectedFilter, actualFilter);
 
-                    // Filter options re-use old public IDs as they were auto mapped
+                    // Filter options re-use orig public IDs as they were auto mapped
                     foreach (var optionLink in expectedFilter.OptionLinks)
                     {
-                        optionLink.PublicId = $"{optionLink.PublicId}-old";
+                        optionLink.PublicId = $"{optionLink.PublicId}-orig";
                     }
 
                     AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
@@ -578,8 +580,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 foreach (var (_, optionMapping) in filterMapping.OptionMappings)
                 {
                     optionMapping.Type = MappingType.AutoNone;
-                    optionMapping.PublicId = $"{optionMapping.PublicId}-old";
-                    optionMapping.Source.Label = $"{optionMapping.Source.Label} old";
+                    optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
+                    optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
                     optionMapping.CandidateKey = null;
                 }
             }
@@ -633,8 +635,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 foreach (var (_, optionMapping) in filterMapping.OptionMappings)
                 {
                     optionMapping.Type = MappingType.ManualMapped;
-                    optionMapping.PublicId = $"{optionMapping.PublicId}-old";
-                    optionMapping.Source.Label = $"{optionMapping.Source.Label} old";
+                    optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
+                    optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
                 }
             }
 
@@ -653,10 +655,10 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
                     AssertFiltersEqual(expectedFilter, actualFilter);
 
-                    // Filter options re-use old public IDs as they were manually mapped
+                    // Filter options re-use orig public IDs as they were manually mapped
                     foreach (var optionLink in expectedFilter.OptionLinks)
                     {
-                        optionLink.PublicId = $"{optionLink.PublicId}-old";
+                        optionLink.PublicId = $"{optionLink.PublicId}-orig";
                     }
 
                     AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
@@ -690,16 +692,16 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             foreach (var (_, optionMapping) in mapping.FilterMappingPlan.Mappings["academy_type"].OptionMappings)
             {
                 optionMapping.Type = MappingType.AutoNone;
-                optionMapping.PublicId = $"{optionMapping.PublicId}-old";
-                optionMapping.Source.Label = $"{optionMapping.Source.Label} old";
+                optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
+                optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
                 optionMapping.CandidateKey = null;
             }
 
             foreach (var (_, optionMapping) in mapping.FilterMappingPlan.Mappings["ncyear"].OptionMappings)
             {
                 optionMapping.Type = MappingType.ManualMapped;
-                optionMapping.PublicId = $"{optionMapping.PublicId}-old";
-                optionMapping.Source.Label = $"{optionMapping.Source.Label} old";
+                optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
+                optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
             }
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
@@ -717,11 +719,11 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
                     AssertFiltersEqual(expectedFilter, actualFilter);
 
-                    // Only `ncyear` options re-use old public IDs as they were manually mapped.
+                    // Only `ncyear` options re-use orig public IDs as they were manually mapped.
                     foreach (var optionLink in expectedFilter.OptionLinks)
                     {
                         optionLink.PublicId =
-                            expectedFilter.Column == "ncyear" ? $"{optionLink.PublicId}-old" : optionLink.PublicId;
+                            expectedFilter.Column == "ncyear" ? $"{optionLink.PublicId}-orig" : optionLink.PublicId;
                     }
 
                     AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
@@ -762,17 +764,17 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         }
 
         [Fact]
-        public async Task NextVersion_CorrectIndicators_OldPublicIds()
+        public async Task NextVersion_CorrectIndicators_OriginalPublicIds()
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var existingIndicators = testData
+            var originalIndicators = testData
                 .ExpectedIndicators.Select(i =>
                 {
                     var indicator = i.ShallowClone();
 
                     indicator.Id = 0;
-                    indicator.PublicId = $"{indicator.PublicId}-old";
+                    indicator.PublicId = $"{indicator.PublicId}-orig";
 
                     return indicator;
                 })
@@ -781,7 +783,7 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
                 await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
                     fixture.GetPublicDataDbContext(),
-                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = originalIndicators },
                     nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
                     nextVersionStatus: DataSetVersionStatus.Mapping
                 );
@@ -789,7 +791,13 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id);
+                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
+                .WithIndicatorMappingPlan(
+                    DataFixture.IndicatorMappingPlanFromIndicatorMeta(
+                        sourceIndicators: originalIndicators,
+                        targetIndicators: testData.ExpectedIndicators
+                    )
+                );
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
@@ -809,8 +817,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                         ignoreProperties: [m => m.Id, m => m.PublicId, m => m.DataSetVersionId, m => m.Created]
                     );
 
-                    // Indicators re-use old public IDs of existing indicators.
-                    Assert.Equal($"{expectedIndicator.PublicId}-old", actualIndicator.PublicId);
+                    // Indicators re-use orig public IDs of original indicators.
+                    Assert.Equal($"{expectedIndicator.PublicId}-orig", actualIndicator.PublicId);
                     Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
                     Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
                 }
@@ -823,12 +831,12 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             var testData = ProcessorTestData.AbsenceSchool;
 
             // Set up indicators that are nothing like the test data set's indicators.
-            var existingIndicators = DataFixture.DefaultIndicatorMeta().GenerateList(3);
+            var originalIndicators = DataFixture.DefaultIndicatorMeta().GenerateList(3);
 
             var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
                 await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
                     fixture.GetPublicDataDbContext(),
-                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = originalIndicators },
                     nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
                     nextVersionStatus: DataSetVersionStatus.Mapping
                 );
@@ -856,9 +864,9 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                         ignoreProperties: [m => m.Id, m => m.PublicId, m => m.DataSetVersionId, m => m.Created]
                     );
 
-                    // Indicators get new public IDs offset by number of existing indicators.
+                    // Indicators get new public IDs offset by number of original indicators.
                     Assert.Equal(
-                        SqidEncoder.Encode(expectedIndicator.Id + existingIndicators.Count),
+                        SqidEncoder.Encode(expectedIndicator.Id + originalIndicators.Count),
                         actualIndicator.PublicId
                     );
                     Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
@@ -872,15 +880,15 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            // Set up existing indicators that only differ in column names. Currently,
+            // Set up original indicators that only differ in column names. Currently,
             // indicators can't be mapped so the new indicators must be given new public IDs.
-            var existingIndicators = testData
+            var originalIndicators = testData
                 .ExpectedIndicators.Select(i =>
                 {
                     var indicator = i.ShallowClone();
 
                     indicator.Id = 0;
-                    indicator.Column = $"{indicator.Column}_old";
+                    indicator.Column = $"{indicator.Column}_orig";
 
                     return indicator;
                 })
@@ -889,7 +897,7 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
                 await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
                     fixture.GetPublicDataDbContext(),
-                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = originalIndicators },
                     nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
                     nextVersionStatus: DataSetVersionStatus.Mapping
                 );
@@ -917,9 +925,9 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                         ignoreProperties: [m => m.Id, m => m.PublicId, m => m.DataSetVersionId, m => m.Created]
                     );
 
-                    // Indicators get new public IDs offset by number of existing indicators.
+                    // Indicators get new public IDs offset by number of original indicators.
                     Assert.Equal(
-                        SqidEncoder.Encode(expectedIndicator.Id + existingIndicators.Count),
+                        SqidEncoder.Encode(expectedIndicator.Id + originalIndicators.Count),
                         actualIndicator.PublicId
                     );
                     Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
@@ -933,28 +941,20 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            List<IndicatorMeta> existingIndicators =
+            IndicatorMeta originalIndicatorNotPresentInTargetVersion = DataFixture.DefaultIndicatorMeta();
+
+            // Set up the source data set version's Indicators, including one that will not be present in the
+            // new version.
+            List<IndicatorMeta> originalIndicators =
             [
-                .. testData.ExpectedIndicators.Select(i =>
-                {
-                    var indicator = i.ShallowClone();
-
-                    indicator.Id = 0;
-
-                    return indicator;
-                }),
-                .. DataFixture.DefaultIndicatorMeta().Generate(1),
+                .. ResetIndicatorMetaIds(testData.ExpectedIndicators),
+                originalIndicatorNotPresentInTargetVersion,
             ];
-
-            existingIndicators[2].PublicId = $"{existingIndicators[2].PublicId}-old";
-            existingIndicators[3].PublicId = $"{existingIndicators[3].PublicId}-old";
-
-            existingIndicators[4].Column = $"{existingIndicators[4].PublicId}_old";
 
             var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
                 await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
                     fixture.GetPublicDataDbContext(),
-                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = originalIndicators },
                     nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
                     nextVersionStatus: DataSetVersionStatus.Mapping
                 );
@@ -962,7 +962,18 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id);
+                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
+                .WithIndicatorMappingPlan(
+                    DataFixture.IndicatorMappingPlanFromIndicatorMeta(
+                        sourceIndicators: originalIndicators,
+                        targetIndicators: testData.ExpectedIndicators
+                    )
+                );
+
+            // TODO EES-6764 - remove null-forgiving operator.
+            // Set a couple of the new data set version's Indicators to not be mapped to original Indicators.
+            mapping.IndicatorMappingPlan!.Mappings[originalIndicators[3].Column].Type = MappingType.ManualNone;
+            mapping.IndicatorMappingPlan!.Mappings[originalIndicators[4].Column].Type = MappingType.AutoNone;
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
@@ -972,12 +983,23 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             Assert.Equal(testData.ExpectedIndicators.Count, actualIndicators.Count);
 
-            Assert.Equal(testData.ExpectedIndicators[0].PublicId, actualIndicators[0].PublicId);
-            Assert.Equal(testData.ExpectedIndicators[1].PublicId, actualIndicators[1].PublicId);
-            Assert.Equal($"{testData.ExpectedIndicators[2].PublicId}-old", actualIndicators[2].PublicId);
-            Assert.Equal($"{testData.ExpectedIndicators[3].PublicId}-old", actualIndicators[3].PublicId);
+            // The first 3 Indicators of the target data set version are auto-mapped to original Indicators,
+            // and so they retain the original Indicators' PublicIds for backwards-compatibility.
+            Assert.Equal(originalIndicators[0].PublicId, actualIndicators[0].PublicId);
+            Assert.Equal(originalIndicators[1].PublicId, actualIndicators[1].PublicId);
+            Assert.Equal(originalIndicators[2].PublicId, actualIndicators[2].PublicId);
+
+            // The 4th Indicator in the target data set version has a mapping of "ManualNone", and so
+            // the Indicator receives a new PublicId.
             Assert.Equal(
-                SqidEncoder.Encode(testData.ExpectedIndicators[4].Id + existingIndicators.Count),
+                SqidEncoder.Encode(testData.ExpectedIndicators[3].Id + originalIndicators.Count),
+                actualIndicators[3].PublicId
+            );
+
+            // The 5th Indicator in the target data set version has a mapping of "AutoNone", and so
+            // the Indicator receives a new PublicId.
+            Assert.Equal(
+                SqidEncoder.Encode(testData.ExpectedIndicators[4].Id + originalIndicators.Count),
                 actualIndicators[4].PublicId
             );
         }
@@ -1244,5 +1266,22 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         return DuckDbConnection.CreateFileConnectionReadOnly(
             fixture.GetDataSetVersionPathResolver().DuckDbPath(dataSetVersion)
         );
+    }
+
+    /// <summary>
+    /// Sets IndicatorMeta ids to 0 to allow PostgreSql / sequences to assign them values.
+    /// </summary>
+    private List<IndicatorMeta> ResetIndicatorMetaIds(IEnumerable<IndicatorMeta> indicatorMetas)
+    {
+        return indicatorMetas
+            .Select(originalIndicator =>
+            {
+                var indicatorWithResetId = originalIndicator.ShallowClone();
+
+                indicatorWithResetId.Id = 0;
+
+                return indicatorWithResetId;
+            })
+            .ToList();
     }
 }
