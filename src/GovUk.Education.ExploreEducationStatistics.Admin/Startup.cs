@@ -456,7 +456,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
         services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
         services.AddTransient<IEducationInNumbersContentService, EducationInNumbersContentService>();
-        services.AddTransient<IPublicDataSetRepository, PublicDataSetRepository>();
 
         services.AddTransient<IManageContentPageService, ManageContentPageService>();
         services.AddTransient<IContentBlockService, ContentBlockService>();
@@ -535,6 +534,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
             services.AddTransient<IPreviewTokenService, PreviewTokenService>();
             services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
+            services.AddTransient<IPublicDataSetRepository, PublicDataSetRepository>();
             services.AddScoped<IMappingTypesRepository, MappingTypesRepository>();
         }
         else
@@ -556,6 +556,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
             services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
             services.AddTransient<IDataSetVersionRepository, NoOpDataSetVersionRepository>();
+            services.AddTransient<IPublicDataSetRepository, NoOpPublicDataSetRepository>();
             services.AddScoped<IMappingTypesRepository, NoOpMappingTypesRepository>();
         }
 
@@ -1095,4 +1096,16 @@ internal class NoOpReleasePublishingValidator : IReleasePublishingValidator
         IList<Content.Model.File> dataFileUploads,
         CancellationToken cancellationToken = default
     ) => Task.FromResult(false);
+}
+
+internal class NoOpPublicDataSetRepository : IPublicDataSetRepository
+{
+    public Task<Public.Data.Model.DataSet> GetDataSet(Guid dataSetId, CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
+
+    public Task<IndicatorMeta?> GetIndicatorMeta(
+        Guid dataSetVersionId,
+        string indicatorPublicId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 }
