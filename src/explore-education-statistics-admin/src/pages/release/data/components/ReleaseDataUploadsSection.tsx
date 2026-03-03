@@ -57,14 +57,6 @@ export default function ReleaseDataUploadsSection({
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
 
-  const uploadsWithoutReplacements = allDataSetUploads.filter(
-    upload => !upload.replacingFileId,
-  );
-
-  const uploadsWithReplacements = allDataSetUploads.filter(
-    upload => upload.replacingFileId,
-  );
-
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
@@ -75,6 +67,14 @@ export default function ReleaseDataUploadsSection({
   useEffect(() => {
     onDataFilesChange?.(allDataFiles);
   }, [allDataFiles, onDataFilesChange]);
+
+  const uploadsWithoutReplacements = allDataSetUploads.filter(
+    upload => !upload.replacingFileId,
+  );
+
+  const uploadsWithReplacements = allDataSetUploads.filter(
+    upload => upload.replacingFileId,
+  );
 
   const dataFilesExcludingReplacements = useMemo(
     () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),

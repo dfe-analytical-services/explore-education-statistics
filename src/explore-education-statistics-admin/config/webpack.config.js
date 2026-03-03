@@ -740,6 +740,7 @@ module.exports = webpackEnv => {
             paths.appNodeModules,
             '.cache/.eslintcache',
           ),
+          quiet: true,
           // ESLint class options
           cwd: paths.appPath,
           resolvePluginsRelativeTo: __dirname,
