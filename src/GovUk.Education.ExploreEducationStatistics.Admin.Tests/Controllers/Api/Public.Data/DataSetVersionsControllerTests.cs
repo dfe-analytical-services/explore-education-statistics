@@ -799,7 +799,9 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task Success()
         {
-            var dataSetVersionId = Guid.NewGuid();
+            var dataSetVersion = await SetupDataSetVersionForDeletionData();
+
+            var dataSetVersionId = dataSetVersion.Id;
 
             var processorClientMock = fixture.GetProcessorClientMock();
 
@@ -817,7 +819,9 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var response = await DeleteVersion(Guid.NewGuid(), user: OptimisedTestUsers.Authenticated);
+            var dataSetVersion = await SetupDataSetVersionForDeletionData();
+
+            var response = await DeleteVersion(dataSetVersion.Id, user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
@@ -825,25 +829,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task ProcessorReturns404_Returns404()
         {
-            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await fixture
-                .GetPublicDataDbContext()
-                .AddTestData(context =>
-                {
-                    context.DataSetVersions.Add(dataSetVersion);
-                    context.DataSets.Update(dataSet);
-                });
+            var dataSetVersion = await SetupDataSetVersionForDeletionData();
 
             var processorClientMock = fixture.GetProcessorClientMock();
 
@@ -861,25 +847,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task ProcessorReturns400_Returns400()
         {
-            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await fixture
-                .GetPublicDataDbContext()
-                .AddTestData(context =>
-                {
-                    context.DataSetVersions.Add(dataSetVersion);
-                    context.DataSets.Update(dataSet);
-                });
+            var dataSetVersion = await SetupDataSetVersionForDeletionData();
 
             var processorClientMock = fixture.GetProcessorClientMock();
 
@@ -911,25 +879,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task ProcessorClientThrows_Returns500()
         {
-            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(1, 0)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await fixture
-                .GetPublicDataDbContext()
-                .AddTestData(context =>
-                {
-                    context.DataSetVersions.Add(dataSetVersion);
-                    context.DataSets.Update(dataSet);
-                });
+            var dataSetVersion = await SetupDataSetVersionForDeletionData();
 
             var processorClientMock = fixture.GetProcessorClientMock();
 
@@ -949,6 +899,47 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             var uri = new Uri($"{BaseUrl}/{dataSetVersionId}", UriKind.Relative);
 
             return await client.DeleteAsync(uri);
+        }
+
+        private async Task<DataSetVersion> SetupDataSetVersionForDeletionData()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+            return dataSetVersion;
         }
     }
 

@@ -184,33 +184,28 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccessVoid(async () =>
-                await processorClient.DeleteDataSetVersion(
-                    dataSetVersionId: dataSetVersionId,
+        return await GetVersion(dataSetVersionId, cancellationToken)
+            .OnSuccess(dsv => dsv.Release.ReleaseFileId)
+            .OnSuccess(releaseFileId =>
+                contentDbContext.ReleaseFiles.SingleAsync(
+                    r => r.Id == releaseFileId,
                     cancellationToken: cancellationToken
                 )
-            );
-    }
-
-    public async Task<Either<ActionResult, Unit>> DeleteVersion(
-        Guid dataSetVersionId,
-        Guid releaseVersionId,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var releaseVersion = await contentDbContext
-            .ReleaseVersions.AsNoTracking()
-            .SingleAsync(r => r.Id == releaseVersionId, cancellationToken);
-
-        return await userService
-            .CheckCanUpdateReleaseVersion(releaseVersion)
-            .OnSuccessVoid(async () =>
-                await processorClient.DeleteDataSetVersion(
-                    dataSetVersionId: dataSetVersionId,
-                    cancellationToken: cancellationToken
-                )
+            )
+            .OnSuccess(async releaseFile =>
+                await contentDbContext
+                    .ReleaseVersions.AsNoTracking()
+                    .SingleAsync(r => r.Id == releaseFile.ReleaseVersionId, cancellationToken)
+            )
+            .OnSuccess(async releaseVersion =>
+                await userService
+                    .CheckCanUpdateReleaseVersion(releaseVersion)
+                    .OnSuccessVoid(async () =>
+                        await processorClient.DeleteDataSetVersion(
+                            dataSetVersionId: dataSetVersionId,
+                            cancellationToken: cancellationToken
+                        )
+                    )
             );
     }
 
