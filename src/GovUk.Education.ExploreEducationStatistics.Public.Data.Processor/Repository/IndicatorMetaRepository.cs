@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -32,13 +33,7 @@ public class IndicatorMetaRepository(
         CancellationToken cancellationToken = default
     )
     {
-        var sourceDataSetVersionId = await GetSourceDataSetVersionId(dataSetVersion, cancellationToken);
-
-        var existingPublicIdMappings = sourceDataSetVersionId is not null
-            ? await publicDataDbContext
-                .IndicatorMetas.Where(meta => meta.DataSetVersionId == sourceDataSetVersionId)
-                .ToDictionaryAsync(meta => meta.Column, meta => meta.PublicId, cancellationToken)
-            : [];
+        var publicIdMappings = await GetPublicIdMappings(dataSetVersion, cancellationToken);
 
         var metas = await GetIndicatorMetas(duckDbConnection, dataSetVersion, allowedColumns, cancellationToken);
 
@@ -50,9 +45,11 @@ public class IndicatorMetaRepository(
         foreach (var meta in metas)
         {
             meta.Id = currentId++;
-            meta.PublicId = existingPublicIdMappings.TryGetValue(meta.Column, out var publicId)
-                ? publicId
-                : SqidEncoder.Encode(meta.Id);
+            meta.PublicId = CreatePublicIdForIndicatorMeta(
+                publicIdMappings: publicIdMappings,
+                indicator: meta,
+                defaultPublicIdFn: () => SqidEncoder.Encode(meta.Id)
+            );
         }
 
         publicDataDbContext.IndicatorMetas.AddRange(metas);
@@ -64,6 +61,41 @@ public class IndicatorMetaRepository(
             currentId - 1,
             cancellationToken
         );
+    }
+
+    private static string CreatePublicIdForIndicatorMeta(
+        PublicIdMappings publicIdMappings,
+        IndicatorMeta indicator,
+        Func<string> defaultPublicIdFn
+    )
+    {
+        return publicIdMappings.GetPublicIdForIndicatorCandidate(
+                indicatorCandidateKey: MappingKeyGenerators.IndicatorMeta(indicator)
+            ) ?? defaultPublicIdFn.Invoke();
+    }
+
+    private async Task<PublicIdMappings> GetPublicIdMappings(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        var mappings = await publicDataDbContext
+            .DataSetVersionMappings.Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (mappings is null)
+        {
+            return new PublicIdMappings();
+        }
+
+        // TODO EES-6764 - remove null-forgiving operator.
+        var indicatorMappings = mappings
+            .IndicatorMappingPlan!.Mappings.Where(mapping =>
+                mapping.Value.Type is MappingType.AutoMapped or MappingType.ManualMapped
+            )
+            .ToDictionary(indicator => indicator.Key, indicator => indicator.Value.PublicId);
+
+        return new PublicIdMappings { Indicators = indicatorMappings };
     }
 
     private async Task<List<IndicatorMeta>> GetIndicatorMetas(
@@ -98,14 +130,16 @@ public class IndicatorMetaRepository(
             .ToList();
     }
 
-    private async Task<Guid?> GetSourceDataSetVersionId(
-        DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken
-    )
+    private record PublicIdMappings
     {
-        return await publicDataDbContext
-            .DataSetVersionMappings.Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
-            .Select(mapping => mapping.SourceDataSetVersionId)
-            .SingleOrDefaultAsync(cancellationToken);
+        /// <summary>
+        /// Indicator public IDs mappings by column.
+        /// </summary>
+        public Dictionary<string, string> Indicators { get; init; } = [];
+
+        public string? GetPublicIdForIndicatorCandidate(string indicatorCandidateKey)
+        {
+            return Indicators.GetValueOrDefault(indicatorCandidateKey);
+        }
     }
 }

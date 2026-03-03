@@ -210,6 +210,8 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
             Assert.False(mapping.HasDeletedGeographicLevels);
         }
 
+        // TODO EES-6764 - indicator tests here
+
         [Fact]
         public async Task Success_HasDeletedTimePeriods_True()
         {
@@ -1914,11 +1916,11 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                                 .WithNoMapping()
                         )
                         .AddIndicatorCandidate(
-                            columnName: "indicator_2",
+                            targetKey: "indicator_2",
                             candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2")
                         )
                         .AddIndicatorCandidate(
-                            columnName: "indicator_3",
+                            targetKey: "indicator_3",
                             candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 3")
                         )
                         .Generate()
@@ -1996,11 +1998,11 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                                 .WithNoMapping()
                         )
                         .AddIndicatorCandidate(
-                            columnName: "indicator_1",
+                            targetKey: "indicator_1",
                             candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 1")
                         )
                         .AddIndicatorCandidate(
-                            columnName: "indicator_2",
+                            targetKey: "indicator_2",
                             candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2")
                         )
                         .Generate()
@@ -2071,11 +2073,11 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                                 .WithNoMapping()
                         )
                         .AddIndicatorCandidate(
-                            columnName: "indicator_1",
+                            targetKey: "indicator_1",
                             candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 1")
                         )
                         .AddIndicatorCandidate(
-                            columnName: "indicator_2",
+                            targetKey: "indicator_2",
                             candidate: DataFixture.DefaultMappableIndicator().WithLabel("Indicator 2")
                         )
                         .Generate()
