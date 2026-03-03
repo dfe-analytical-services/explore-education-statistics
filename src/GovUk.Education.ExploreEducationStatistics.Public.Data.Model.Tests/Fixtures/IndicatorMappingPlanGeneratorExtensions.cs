@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -10,69 +11,38 @@ public static class IndicatorMappingPlanGeneratorExtensions
     public static Generator<IndicatorMappingPlan> DefaultIndicatorMappingPlan(this DataFixture fixture) =>
         fixture.Generator<IndicatorMappingPlan>();
 
-    // public static Generator<IndicatorMappingPlan> IndicatorMappingPlanFromIndicatorMeta(
-    //     this DataFixture fixture,
-    //     IEnumerable<IndicatorMeta>? sourceIndicators = null,
-    //     IEnumerable<IndicatorMeta>? targetIndicators = null
-    // )
-    // {
-    //     var filterMappingPlanGenerator = fixture.Generator<IndicatorMappingPlan>();
-    //
-    //     sourceIndicators?.ForEach(sourceIndicator =>
-    //     {
-    //         var autoMappedIndicator = targetIndicators?.SingleOrDefault(f => f.Column == sourceIndicator.Column);
-    //
-    //         var filterMappingGenerator = fixture
-    //             .DefaultIndicatorMapping()
-    //             .WithSource(fixture.DefaultMappableIndicator().WithLabel(sourceIndicator.Label))
-    //             .WithType(autoMappedIndicator is not null ? MappingType.AutoMapped : MappingType.AutoNone)
-    //             .WithCandidateKey(autoMappedIndicator?.Column)
-    //             .WithPublicId(sourceIndicator.PublicId);
-    //
-    //         sourceIndicator.Options.ForEach(option =>
-    //         {
-    //             var sourceKey = MappingKeyGenerators.IndicatorOptionMeta(option);
-    //             var sourceLink = sourceIndicator.OptionLinks.SingleOrDefault(l => l.OptionId == option.Id);
-    //
-    //             var autoMappedOption = autoMappedIndicator?.Options.SingleOrDefault(o =>
-    //                 MappingKeyGenerators.IndicatorOptionMeta(o) == sourceKey
-    //             );
-    //
-    //             filterMappingGenerator.AddOptionMapping(
-    //                 sourceKey: sourceKey,
-    //                 mapping: fixture
-    //                     .DefaultIndicatorOptionMapping()
-    //                     .WithSource(fixture.DefaultMappableIndicatorOption().WithLabel(option.Label))
-    //                     .WithType(autoMappedOption is not null ? MappingType.AutoMapped : MappingType.AutoNone)
-    //                     .WithCandidateKey(
-    //                         autoMappedOption is not null
-    //                             ? MappingKeyGenerators.IndicatorOptionMeta(autoMappedOption)
-    //                             : null
-    //                     )
-    //                     .WithPublicId(sourceLink?.PublicId ?? $"{sourceIndicator.PublicId} :: {option.Label}")
-    //             );
-    //         });
-    //
-    //         filterMappingPlanGenerator.AddIndicatorMapping(sourceIndicator.Column, filterMappingGenerator);
-    //     });
-    //
-    //     targetIndicators?.ForEach(targetIndicator =>
-    //     {
-    //         var filterCandidateGenerator = fixture.DefaultMappableIndicator().WithLabel(targetIndicator.Label);
-    //
-    //         targetIndicator.Options.ForEach(option =>
-    //         {
-    //             filterCandidateGenerator.AddOptionCandidate(
-    //                 targetKey: MappingKeyGenerators.IndicatorOptionMeta(option),
-    //                 candidate: fixture.DefaultMappableIndicatorOption().WithLabel(option.Label)
-    //             );
-    //         });
-    //
-    //         filterMappingPlanGenerator.AddIndicatorCandidate(targetIndicator.Column, filterCandidateGenerator);
-    //     });
-    //
-    //     return filterMappingPlanGenerator;
-    // }
+    public static Generator<IndicatorMappingPlan> IndicatorMappingPlanFromIndicatorMeta(
+        this DataFixture fixture,
+        IEnumerable<IndicatorMeta>? sourceIndicators = null,
+        IEnumerable<IndicatorMeta>? targetIndicators = null
+    )
+    {
+        var indicatorMappingPlanGenerator = fixture.Generator<IndicatorMappingPlan>();
+
+        sourceIndicators?.ForEach(sourceIndicator =>
+        {
+            var autoMappedIndicator = targetIndicators?.SingleOrDefault(f => f.Column == sourceIndicator.Column);
+
+            var indicatorMappingGenerator = fixture
+                .DefaultIndicatorMapping()
+                .WithSource(fixture.DefaultMappableIndicator().WithLabel(sourceIndicator.Label))
+                .WithType(autoMappedIndicator is not null ? MappingType.AutoMapped : MappingType.AutoNone)
+                .WithCandidateKey(autoMappedIndicator?.Column)
+                .WithPublicId(sourceIndicator.PublicId);
+
+            indicatorMappingPlanGenerator.AddIndicatorMapping(sourceIndicator.Column, indicatorMappingGenerator);
+        });
+
+        targetIndicators?.ForEach(targetIndicator =>
+        {
+            indicatorMappingPlanGenerator.AddIndicatorCandidate(
+                targetKey: targetIndicator.Column,
+                candidate: fixture.DefaultMappableIndicator().WithLabel(targetIndicator.Label)
+            );
+        });
+
+        return indicatorMappingPlanGenerator;
+    }
 
     public static Generator<IndicatorMappingPlan> AddIndicatorMapping(
         this Generator<IndicatorMappingPlan> generator,
@@ -82,9 +52,9 @@ public static class IndicatorMappingPlanGeneratorExtensions
 
     public static Generator<IndicatorMappingPlan> AddIndicatorCandidate(
         this Generator<IndicatorMappingPlan> generator,
-        string columnName,
+        string targetKey,
         MappableIndicator candidate
-    ) => generator.ForInstance(s => s.AddIndicatorCandidate(columnName, candidate));
+    ) => generator.ForInstance(s => s.AddIndicatorCandidate(targetKey, candidate));
 
     public static InstanceSetters<IndicatorMappingPlan> AddIndicatorMapping(
         this InstanceSetters<IndicatorMappingPlan> instanceSetter,
@@ -94,9 +64,9 @@ public static class IndicatorMappingPlanGeneratorExtensions
 
     public static InstanceSetters<IndicatorMappingPlan> AddIndicatorCandidate(
         this InstanceSetters<IndicatorMappingPlan> instanceSetter,
-        string columnName,
+        string targetKey,
         MappableIndicator candidate
-    ) => instanceSetter.Set((_, plan) => plan.Candidates.Add(columnName, candidate));
+    ) => instanceSetter.Set((_, plan) => plan.Candidates.Add(targetKey, candidate));
 
     /**
      * IndicatorMapping
