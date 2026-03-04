@@ -77,7 +77,7 @@ export default function ReleaseDataUploadsSection({
     [allDataFiles],
   );
 
-  const validReplacementDataFiles = inProgressReplacementDataFiles?.filter(
+  const validReplacementDataFiles = inProgressReplacementDataFiles.filter(
     originalFile =>
       originalFile.replacedByDataFile?.status === 'COMPLETE' &&
       originalFile.replacedByDataFile?.hasValidReplacementPlan,
