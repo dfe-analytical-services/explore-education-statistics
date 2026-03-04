@@ -98,60 +98,83 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public IEnumerable<ContentSection> GenericContent
     {
         get => Content.Where(section => section.Type == ContentSectionType.Generic).ToImmutableList();
-        set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
+        set
+        {
+            if (value.Any(section => section.Type != ContentSectionType.Generic))
+            {
+                throw new InvalidOperationException(
+                    $"All content sections must be of type {ContentSectionType.Generic}."
+                );
+            }
+            Content.RemoveAll(section => section.Type == ContentSectionType.Generic);
+            Content.AddRange(value);
+        }
     }
 
     [NotMapped]
     public ContentSection? KeyStatisticsSecondarySection
     {
-        get => FindSingleSectionByType(ContentSectionType.KeyStatisticsSecondary);
-        set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, value);
+        get => FindSingleContentSectionByType(ContentSectionType.KeyStatisticsSecondary);
+        set => ReplaceSingleContentSectionOfType(ContentSectionType.KeyStatisticsSecondary, value);
     }
 
     [NotMapped]
     public ContentSection? HeadlinesSection
     {
-        get => FindSingleSectionByType(ContentSectionType.Headlines);
-        set => ReplaceContentSectionsOfType(ContentSectionType.Headlines, value);
+        get => FindSingleContentSectionByType(ContentSectionType.Headlines);
+        set => ReplaceSingleContentSectionOfType(ContentSectionType.Headlines, value);
     }
 
     [NotMapped]
     public ContentSection? SummarySection
     {
-        get => FindSingleSectionByType(ContentSectionType.ReleaseSummary);
-        set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, value);
+        get => FindSingleContentSectionByType(ContentSectionType.ReleaseSummary);
+        set => ReplaceSingleContentSectionOfType(ContentSectionType.ReleaseSummary, value);
     }
 
     [NotMapped]
     public ContentSection? RelatedDashboardsSection
     {
-        get => FindSingleSectionByType(ContentSectionType.RelatedDashboards);
-        set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, value);
+        get => FindSingleContentSectionByType(ContentSectionType.RelatedDashboards);
+        set => ReplaceSingleContentSectionOfType(ContentSectionType.RelatedDashboards, value);
     }
 
     [NotMapped]
     public ContentSection? WarningSection
     {
-        get => FindSingleSectionByType(ContentSectionType.Warning);
-        set => ReplaceContentSectionsOfType(ContentSectionType.Warning, value);
+        get => FindSingleContentSectionByType(ContentSectionType.Warning);
+        set => ReplaceSingleContentSectionOfType(ContentSectionType.Warning, value);
     }
 
     public List<DataBlockVersion> DataBlockVersions { get; set; } = [];
 
-    private ContentSection? FindSingleSectionByType(ContentSectionType type)
+    private ContentSection? FindSingleContentSectionByType(ContentSectionType type)
     {
         return Content.SingleOrDefault(section => section.Type == type);
     }
 
-    private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
+    private void ReplaceSingleContentSectionOfType(ContentSectionType sectionType, ContentSection? replacementSection)
     {
-        Content.RemoveAll(section => section.Type == type);
-        Content.AddRange(replacementSections);
-    }
+        // This method is only intended to be used for the non-generic section types which are unique per release version
+        if (sectionType == ContentSectionType.Generic)
+        {
+            throw new InvalidOperationException(
+                $"This method cannot be used to replace a content section of type {ContentSectionType.Generic}."
+            );
+        }
 
-    private void ReplaceContentSectionsOfType(ContentSectionType type, ContentSection? replacementSection)
-    {
-        Content.RemoveAll(section => section.Type == type);
+        // The replacement section type must match the expected type for the property this method is being called for
+        if (replacementSection != null && replacementSection.Type != sectionType)
+        {
+            throw new InvalidOperationException($"The replacement content section must be of type {sectionType}.");
+        }
+
+        var sectionToRemove = Content.SingleOrDefault(section => section.Type == sectionType);
+        if (sectionToRemove != null)
+        {
+            Content.Remove(sectionToRemove);
+        }
+
         if (replacementSection != null)
         {
             Content.Add(replacementSection);
