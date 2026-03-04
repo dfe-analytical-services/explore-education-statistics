@@ -52,7 +52,7 @@ public abstract class ReleaseContentServiceTests
                     .DefaultKeyStatisticDataBlock()
                     .WithOrder(2)
                     .WithDataBlockParent(keyStatsDataBlockParent)
-                    .WithDataBlock(keyStatsSecondaryDataBlockParent.LatestPublishedVersion!.ContentBlock),
+                    .WithDataBlock(keyStatsDataBlockParent.LatestPublishedVersion!.ContentBlock),
                 _dataFixture.DefaultKeyStatisticText().WithOrder(3),
             ];
 
