@@ -15,8 +15,8 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import { useQuery } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 interface Props {
   publicationId: string;
@@ -31,10 +31,6 @@ export default function ReleaseDataUploadsSection({
   canUpdateRelease,
   onDataFilesChange,
 }: Props) {
-  const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
-  const [allDataSetUploads, setAllDataSetUploads] = useState<DataSetUpload[]>(
-    [],
-  );
   const [isReordering, toggleReordering] = useToggle(false);
 
   // NOTE: When a data set is initially imported, it is first sent to the data screener to check for screener errors and
@@ -44,49 +40,46 @@ export default function ReleaseDataUploadsSection({
   //
   // So "dataSetUploads" are data sets currently being screened via the R docker container, while "dataFiles" are data
   // sets that have moved beyond the screener and are now being imported by the Data.Processor
+  const queryClient = useQueryClient();
+
   const {
-    data: initialDataFiles,
+    data: allDataFiles,
     isError: dataFilesError,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
   const {
-    data: initialDataSetUploads,
+    data: allDataSetUploads,
     isError: dataSetUploadsError,
     isLoading: isLoadingUploads,
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
 
-  // Store the data files on state so we can reliably update them
-  // when the permissions/status change.
   useEffect(() => {
-    setAllDataFiles(initialDataFiles ?? []);
-    setAllDataSetUploads(initialDataSetUploads ?? []);
-  }, [initialDataFiles, initialDataSetUploads]);
-
-  useEffect(() => {
-    onDataFilesChange?.(allDataFiles);
+    if (allDataFiles) {
+      onDataFilesChange?.(allDataFiles);
+    }
   }, [allDataFiles, onDataFilesChange]);
 
-  const uploadsWithoutReplacements = allDataSetUploads.filter(
+  const uploadsWithoutReplacements = allDataSetUploads?.filter(
     upload => !upload.replacingFileId,
   );
 
-  const uploadsWithReplacements = allDataSetUploads.filter(
+  const uploadsWithReplacements = allDataSetUploads?.filter(
     upload => upload.replacingFileId,
   );
 
   const dataFilesExcludingReplacements = useMemo(
-    () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
+    () => allDataFiles?.filter(dataFile => !dataFile.replacedByDataFile),
     [allDataFiles],
   );
 
   const inProgressReplacementDataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => dataFile.replacedByDataFile),
+    () => allDataFiles?.filter(dataFile => dataFile.replacedByDataFile),
     [allDataFiles],
   );
 
-  const validReplacementDataFiles = inProgressReplacementDataFiles.filter(
+  const validReplacementDataFiles = inProgressReplacementDataFiles?.filter(
     originalFile =>
       originalFile.replacedByDataFile?.status === 'COMPLETE' &&
       originalFile.replacedByDataFile?.hasValidReplacementPlan,
@@ -99,24 +92,25 @@ export default function ReleaseDataUploadsSection({
           releaseVersionId,
           dataFile.id,
         );
-
-        setAllDataFiles(currentDataFiles =>
-          currentDataFiles.map(file =>
-            file.id !== dataFile.id
-              ? file
-              : {
-                  ...dataFile,
-                  rows: importStatus.totalRows,
-                  status: importStatus.status,
-                  permissions,
-                },
-          ),
+        queryClient.setQueryData(
+          releaseDataFileQueries.list(releaseVersionId).queryKey,
+          (currentDataFiles: DataFile[] | undefined) =>
+            currentDataFiles?.map(file =>
+              file.id !== dataFile.id
+                ? file
+                : {
+                    ...dataFile,
+                    rows: importStatus.totalRows,
+                    status: importStatus.status,
+                    permissions,
+                  },
+            ),
         );
       } catch {
         refetchDataFiles();
       }
     },
-    [releaseVersionId, setAllDataFiles, refetchDataFiles],
+    [releaseVersionId, queryClient, refetchDataFiles],
   );
 
   const handleReplacementStatusChange = useCallback(
@@ -127,21 +121,23 @@ export default function ReleaseDataUploadsSection({
           updatedDataFile.id,
         );
 
-        setAllDataFiles(currentDataFiles =>
-          currentDataFiles.map(file =>
-            file.id !== updatedDataFile.id
-              ? file
-              : {
-                  ...updatedDataFile,
-                  permissions,
-                },
-          ),
+        queryClient.setQueryData(
+          releaseDataFileQueries.list(releaseVersionId).queryKey,
+          (currentDataFiles: DataFile[] | undefined) =>
+            currentDataFiles?.map(file =>
+              file.id !== updatedDataFile.id
+                ? file
+                : {
+                    ...updatedDataFile,
+                    permissions,
+                  },
+            ),
         );
       } catch {
         refetchDataFiles();
       }
     },
-    [releaseVersionId, setAllDataFiles, refetchDataFiles],
+    [releaseVersionId, queryClient, refetchDataFiles],
   );
 
   const handleDataSetImport = useCallback(
@@ -151,30 +147,39 @@ export default function ReleaseDataUploadsSection({
         dataSetUploadIds,
       );
 
-      setAllDataSetUploads(uploads =>
-        uploads.filter(upload => !dataSetUploadIds.includes(upload.id)),
+      queryClient.setQueryData(
+        releaseDataFileQueries.listUploads(releaseVersionId).queryKey,
+        (uploads: DataSetUpload[] | undefined) =>
+          uploads?.filter(upload => !dataSetUploadIds.includes(upload.id)),
       );
 
-      await refetchDataFiles();
       await refetchDataSetUploads();
+      await refetchDataFiles();
     },
-    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
+    [releaseVersionId, queryClient, refetchDataFiles, refetchDataSetUploads],
   );
 
   const handleDeleteUploadConfirm = useCallback(
     async (deletedUploadId: string) => {
-      setAllDataSetUploads(uploads =>
-        uploads.filter(upload => upload.id !== deletedUploadId),
+      queryClient.setQueryData(
+        releaseDataFileQueries.listUploads(releaseVersionId).queryKey,
+        (uploads: DataSetUpload[] | undefined) =>
+          uploads?.filter(upload => upload.id !== deletedUploadId),
       );
     },
-    [],
+    [queryClient, releaseVersionId],
   );
 
-  const handleDeleteConfirm = useCallback(async (deletedFileId: string) => {
-    setAllDataFiles(files =>
-      files.filter(dataFile => dataFile.id !== deletedFileId),
-    );
-  }, []);
+  const handleDeleteConfirm = useCallback(
+    async (deletedFileId: string) => {
+      queryClient.setQueryData(
+        releaseDataFileQueries.list(releaseVersionId).queryKey,
+        (files: DataFile[] | undefined) =>
+          files?.filter(dataFile => dataFile.id !== deletedFileId),
+      );
+    },
+    [queryClient, releaseVersionId],
+  );
 
   const handleSubmit = async () => {
     await refetchDataFiles();
@@ -183,7 +188,8 @@ export default function ReleaseDataUploadsSection({
 
   const handleConfirmReordering = useCallback(
     async (nextDataFiles: DataFile[]) => {
-      setAllDataFiles(
+      queryClient.setQueryData(
+        releaseDataFileQueries.list(releaseVersionId).queryKey,
         await releaseDataFileService.updateDataFilesOrder(
           releaseVersionId,
           nextDataFiles.map(file => file.id),
@@ -191,16 +197,17 @@ export default function ReleaseDataUploadsSection({
       );
       toggleReordering.off();
     },
-    [releaseVersionId, toggleReordering],
+    [releaseVersionId, queryClient, toggleReordering],
   );
 
   const handleConfirmAllReplacements = async () => {
-    await dataReplacementService.replaceData(
-      releaseVersionId,
-      validReplacementDataFiles.map(file => file.id),
-    );
-
-    await refetchDataFiles();
+    if (validReplacementDataFiles) {
+      await dataReplacementService.replaceData(
+        releaseVersionId,
+        validReplacementDataFiles.map(file => file.id),
+      );
+      await refetchDataFiles();
+    }
   };
 
   const errorFetchingData = dataFilesError || dataSetUploadsError;
@@ -253,7 +260,7 @@ export default function ReleaseDataUploadsSection({
       </WarningMessage>
       {canUpdateRelease ? (
         <DataFileUploadForm
-          dataSetFileTitles={dataFilesExcludingReplacements.map(
+          dataSetFileTitles={dataFilesExcludingReplacements?.map(
             file => file.title,
           )}
           releaseVersionId={releaseVersionId}
@@ -268,25 +275,28 @@ export default function ReleaseDataUploadsSection({
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
       <LoadingSpinner loading={isLoading || isLoadingUploads}>
-        {(allDataFiles.length > 0 || allDataSetUploads.length > 0) &&
-        !errorFetchingData ? (
+        {(allDataFiles && allDataFiles.length > 0) ||
+        (allDataSetUploads &&
+          allDataSetUploads.length > 0 &&
+          !errorFetchingData) ? (
           <>
             <h2>Uploaded data files</h2>
 
-            {!isReordering && allDataFiles.length > 1 && (
+            {!isReordering && allDataFiles && allDataFiles.length > 1 && (
               <div className="dfe-flex dfe-justify-content--space-between">
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {validReplacementDataFiles.length > 1 && (
-                  <Button onClick={handleConfirmAllReplacements}>
-                    Confirm all valid replacements
-                  </Button>
-                )}
+                {validReplacementDataFiles &&
+                  validReplacementDataFiles.length > 1 && (
+                    <Button onClick={handleConfirmAllReplacements}>
+                      Confirm all valid replacements
+                    </Button>
+                  )}
               </div>
             )}
 
-            {isReordering ? (
+            {allDataFiles && isReordering ? (
               <DataFilesReorderableList
                 dataFiles={allDataFiles}
                 onCancelReordering={toggleReordering.off}
@@ -294,40 +304,44 @@ export default function ReleaseDataUploadsSection({
               />
             ) : (
               <>
-                {(inProgressReplacementDataFiles.length > 0 ||
-                  uploadsWithReplacements.length > 0) && (
-                  <DataFilesReplacementTable
-                    canUpdateRelease={canUpdateRelease}
-                    caption="Data file replacements"
-                    dataFiles={inProgressReplacementDataFiles}
-                    dataSetUploads={uploadsWithReplacements}
-                    publicationId={publicationId}
-                    releaseVersionId={releaseVersionId}
-                    testId="Data file replacements table"
-                    onConfirmReplacement={refetchDataFiles}
-                    onDeleteUpload={handleDeleteUploadConfirm}
-                    onDataSetImport={handleDataSetImport}
-                    onReplacementStatusChange={handleReplacementStatusChange}
-                  />
-                )}
+                {inProgressReplacementDataFiles &&
+                  uploadsWithReplacements &&
+                  (inProgressReplacementDataFiles.length > 0 ||
+                    uploadsWithReplacements.length > 0) && (
+                    <DataFilesReplacementTable
+                      canUpdateRelease={canUpdateRelease}
+                      caption="Data file replacements"
+                      dataFiles={inProgressReplacementDataFiles}
+                      dataSetUploads={uploadsWithReplacements}
+                      publicationId={publicationId}
+                      releaseVersionId={releaseVersionId}
+                      testId="Data file replacements table"
+                      onConfirmReplacement={refetchDataFiles}
+                      onDeleteUpload={handleDeleteUploadConfirm}
+                      onDataSetImport={handleDataSetImport}
+                      onReplacementStatusChange={handleReplacementStatusChange}
+                    />
+                  )}
 
-                {(dataFilesExcludingReplacements.length > 0 ||
-                  uploadsWithoutReplacements.length > 0) && (
-                  <DataFilesTable
-                    canUpdateRelease={canUpdateRelease}
-                    caption="Data files"
-                    dataFiles={dataFilesExcludingReplacements}
-                    dataSetUploads={uploadsWithoutReplacements}
-                    publicationId={publicationId}
-                    releaseVersionId={releaseVersionId}
-                    testId="Data files table"
-                    onDeleteFile={handleDeleteConfirm}
-                    onDeleteUpload={handleDeleteUploadConfirm}
-                    onDataSetImport={handleDataSetImport}
-                    onReplaceFile={handleSubmit}
-                    onStatusChange={handleStatusChange}
-                  />
-                )}
+                {dataFilesExcludingReplacements &&
+                  uploadsWithoutReplacements &&
+                  (dataFilesExcludingReplacements.length > 0 ||
+                    uploadsWithoutReplacements.length > 0) && (
+                    <DataFilesTable
+                      canUpdateRelease={canUpdateRelease}
+                      caption="Data files"
+                      dataFiles={dataFilesExcludingReplacements}
+                      dataSetUploads={uploadsWithoutReplacements}
+                      publicationId={publicationId}
+                      releaseVersionId={releaseVersionId}
+                      testId="Data files table"
+                      onDeleteFile={handleDeleteConfirm}
+                      onDeleteUpload={handleDeleteUploadConfirm}
+                      onDataSetImport={handleDataSetImport}
+                      onReplaceFile={handleSubmit}
+                      onStatusChange={handleStatusChange}
+                    />
+                  )}
               </>
             )}
           </>
