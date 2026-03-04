@@ -432,11 +432,6 @@ public static class ReleaseVersionGeneratorExtensions
         var keyStatisticsList = keyStatistics.ToList();
         return setters
             .Set(releaseVersion => releaseVersion.KeyStatistics, [.. keyStatisticsList])
-            // TODO EES-6940 What's this?
-            .Set(
-                releaseVersion => releaseVersion.KeyStatisticsSecondarySection,
-                new ContentSection { Type = ContentSectionType.KeyStatisticsSecondary }
-            )
             .Set(
                 (_, releaseVersion, _) =>
                     keyStatisticsList.ForEach(keyStatistic =>

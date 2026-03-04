@@ -194,6 +194,7 @@ public class ReleaseAmendmentServiceTests
                     new KeyStatisticDataBlock { DataBlock = dataBlock3Parent.LatestPublishedVersion!.ContentBlock }
                 )
             )
+            .WithKeyStatisticsSecondaryContent([])
             .WithReleaseSummaryContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithHeadlinesContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithRelatedDashboardContent(_fixture.DefaultHtmlBlock().Generate(2))
@@ -493,18 +494,14 @@ public class ReleaseAmendmentServiceTests
 
             // Check Key Statistics have been copied over.
             Assert.Equal(2, amendment.KeyStatistics.Count);
-            var amendmentKeyStatText = Assert.IsType<KeyStatisticText>(
-                amendment.KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticText))
-            );
+            var amendmentKeyStatText = amendment.KeyStatistics.OfType<KeyStatisticText>().Single();
             Assert.Equal(
                 (originalReleaseVersion.KeyStatistics[0] as KeyStatisticText)!.Title,
                 amendmentKeyStatText.Title
             );
             Assert.NotEqual(originalReleaseVersion.KeyStatistics[0].Id, amendmentKeyStatText.Id);
 
-            var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(
-                amendment.KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticDataBlock))
-            );
+            var amendmentKeyStatDataBlock = amendment.KeyStatistics.OfType<KeyStatisticDataBlock>().Single();
             Assert.Equal(dataBlock3Parent.LatestDraftVersion!.Name, amendmentKeyStatDataBlock.DataBlock.Name);
             Assert.NotEqual(originalReleaseVersion.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
             Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentKeyStatDataBlock.DataBlockId);
@@ -526,7 +523,7 @@ public class ReleaseAmendmentServiceTests
                 originalReleaseVersion.HeadlinesSection!
             );
 
-            // Check Key Statistics ContentSection has been copied over OK.
+            // Check Key Statistics Secondary section has been copied over OK.
             // TODO - not sure if having a Key Statistics ContentSection serves any purpose now that
             // KeyStatisticsText and KeyStatisticsDataBlock are no longer ContentBlocks themselves.
             AssertAmendedContentSectionCorrect(
