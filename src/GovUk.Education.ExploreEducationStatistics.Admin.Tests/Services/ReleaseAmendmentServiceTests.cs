@@ -761,22 +761,18 @@ public class ReleaseAmendmentServiceTests
         {
             var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
 
-            var amendmentContentBlock1 = amendment
+            var amendmentHtmlBlocks = amendment
                 .Content.SelectMany(section => section.Content)
                 .OfType<HtmlBlock>()
-                .Single(hb => hb.Body.Contains("block 1"));
+                .ToList();
+
+            var amendmentContentBlock1 = amendmentHtmlBlocks.Single(hb => hb.Body.Contains("block 1"));
             Assert.Equal("<p>Content block 1 content</p>", amendmentContentBlock1.Body);
 
-            var amendmentContentBlock2 = amendment
-                .Content.SelectMany(section => section.Content)
-                .OfType<HtmlBlock>()
-                .Single(hb => hb.Body.Contains("block 2"));
+            var amendmentContentBlock2 = amendmentHtmlBlocks.Single(hb => hb.Body.Contains("block 2"));
             Assert.Equal("<p>Content block 2 content</p>", amendmentContentBlock2.Body);
 
-            var amendmentContentBlock3 = amendment
-                .Content.SelectMany(section => section.Content)
-                .OfType<HtmlBlock>()
-                .Single(hb => hb.Body.Contains("block 3"));
+            var amendmentContentBlock3 = amendmentHtmlBlocks.Single(hb => hb.Body.Contains("block 3"));
             Assert.Equal("<p>Content block 3 content</p>", amendmentContentBlock3.Body);
         }
     }
