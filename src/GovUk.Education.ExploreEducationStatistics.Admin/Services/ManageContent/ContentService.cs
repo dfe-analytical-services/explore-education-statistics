@@ -1,3 +1,4 @@
+#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
@@ -77,7 +78,7 @@ public class ContentService : IContentService
                     {
                         var (sectionId, newOrder) = kvp;
 
-                        var matchingSection = contentSections.Find(section => section.Id == sectionId);
+                        var matchingSection = contentSections.SingleOrDefault(section => section.Id == sectionId);
 
                         if (matchingSection is not null)
                         {
@@ -91,7 +92,7 @@ public class ContentService : IContentService
             });
     }
 
-    public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
+    public Task<Either<ActionResult, ContentSectionViewModel>> AddGenericContentSection(
         Guid releaseVersionId,
         ContentSectionAddRequest? request
     )
@@ -109,11 +110,15 @@ public class ContentService : IContentService
                     .FindAll(contentSection => contentSection.Order >= orderForNewSection)
                     .ForEach(contentSection => contentSection.Order++);
 
-                var newContentSection = new ContentSection { Heading = "New section", Order = orderForNewSection };
+                var newContentSection = new ContentSection
+                {
+                    Heading = "New section",
+                    Order = orderForNewSection,
+                    Type = ContentSectionType.Generic,
+                };
 
                 releaseVersion.Content.Add(newContentSection);
 
-                _context.ReleaseVersions.Update(releaseVersion);
                 await _context.SaveChangesAsync();
                 return _mapper.Map<ContentSectionViewModel>(newContentSection);
             });
@@ -139,7 +144,7 @@ public class ContentService : IContentService
             });
     }
 
-    public Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
+    public Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveGenericContentSection(
         Guid releaseVersionId,
         Guid contentSectionId
     )
@@ -149,6 +154,14 @@ public class ContentService : IContentService
             .OnSuccess(async tuple =>
             {
                 var (releaseVersion, sectionToRemove) = tuple;
+
+                // Non-generic section types are always required and cannot be removed
+                if (sectionToRemove.Type != ContentSectionType.Generic)
+                {
+                    throw new InvalidOperationException(
+                        $"Only generic content sections can be removed. Attempted to remove a required section of type {sectionToRemove.Type}."
+                    );
+                }
 
                 await _contentBlockService.DeleteSectionContentBlocks(sectionToRemove.Id);
 
@@ -186,7 +199,7 @@ public class ContentService : IContentService
                     {
                         var (blockId, newOrder) = kvp;
 
-                        var matchingBlock = section.Content.Find(block => block.Id == blockId);
+                        var matchingBlock = section.Content.SingleOrDefault(block => block.Id == blockId);
 
                         if (matchingBlock is not null)
                         {
@@ -233,7 +246,7 @@ public class ContentService : IContentService
             {
                 var (_, section) = tuple;
 
-                var blockToRemove = section.Content.Find(block => block.Id == contentBlockId);
+                var blockToRemove = section.Content.SingleOrDefault(block => block.Id == contentBlockId);
 
                 if (blockToRemove == null)
                 {
@@ -265,7 +278,7 @@ public class ContentService : IContentService
             {
                 var (_, section) = tuple;
 
-                var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
+                var blockToUpdate = section.Content.SingleOrDefault(block => block.Id == contentBlockId);
 
                 if (blockToUpdate == null)
                 {
@@ -294,7 +307,7 @@ public class ContentService : IContentService
             {
                 var (_, section) = tuple;
 
-                var dataBlockVersion = _context.DataBlockVersions.FirstOrDefault(block =>
+                var dataBlockVersion = _context.DataBlockVersions.SingleOrDefault(block =>
                     block.Id == request.ContentBlockId
                 );
 
@@ -323,11 +336,6 @@ public class ContentService : IContentService
         ContentBlock newContentBlock
     )
     {
-        if (section.Content == null)
-        {
-            section.Content = new List<ContentBlock>();
-        }
-
         var orderForNewBlock = OrderValueForNewlyAddedContentBlock(order, section);
 
         section
@@ -378,7 +386,8 @@ public class ContentService : IContentService
     private static ContentBlock CreateContentBlockForType(ContentBlockType type)
     {
         var classType = GetContentBlockClassTypeFromEnumValue(type);
-        return (ContentBlock)Activator.CreateInstance(classType);
+        return Activator.CreateInstance(classType) as ContentBlock
+            ?? throw new InvalidOperationException($"Unable to create content block of type {type}.");
     }
 
     private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)
@@ -406,7 +415,7 @@ public class ContentService : IContentService
                         .ThenInclude(comment => comment.ResolvedBy)
             .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
-                    .ThenInclude(block => (block as EmbedBlockLink).EmbedBlock)
+                    .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
             .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => block.LockedBy);
@@ -421,7 +430,7 @@ public class ContentService : IContentService
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateContentSectionsAndBlocks)
             .OnSuccessCombineWith(releaseVersion =>
                 releaseVersion
-                    .Content.FirstOrDefault(contentSection => contentSection.Id == contentSectionId)
+                    .Content.SingleOrDefault(contentSection => contentSection.Id == contentSectionId)
                     .OrNotFound()
             );
     }

@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class ContentSection
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     public int Order { get; set; }
 
@@ -16,12 +16,12 @@ public class ContentSection
 
     public List<ContentBlock> Content { get; set; } = [];
 
-    public ReleaseVersion ReleaseVersion { get; set; } = null!;
+    public ReleaseVersion ReleaseVersion { get; init; } = null!;
 
-    public Guid ReleaseVersionId { get; set; }
+    public Guid ReleaseVersionId { get; init; }
 
     [JsonIgnore]
-    public ContentSectionType Type { get; set; }
+    public ContentSectionType Type { get; init; } = ContentSectionType.Generic;
 
     public T? FindSingleContentBlockOfType<T>()
         where T : ContentBlock => Content.OfType<T>().SingleOrDefault();
