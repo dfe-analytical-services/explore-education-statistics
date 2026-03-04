@@ -3,6 +3,7 @@ using System.Net.Mime;
 using System.Text.RegularExpressions;
 using Azure;
 using Azure.Identity;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -189,9 +190,14 @@ public abstract partial class BlobStorageService(
 
         var transferManager = new TransferManager(new TransferManagerOptions());
         //var tokenCredential = new DefaultAzureCredential();
-        var blobsProvider =
-            new BlobsStorageResourceProvider( /*tokenCredential*/
-            );
+
+        var keyCredential = new StorageSharedKeyCredential(
+            "devstoreaccount1",
+            "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
+        );
+
+        //var blobsProvider = new BlobsStorageResourceProvider(tokenCredential);
+        var blobsProvider = new BlobsStorageResourceProvider(keyCredential);
 
         var progress = new Progress<TransferProgress>(p =>
         {
