@@ -40,9 +40,9 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     [Obsolete("Use ReleaseVersion.Release.Publication. This will be removed in EES-5818")]
     public Publication Publication { get; set; } = null!;
 
-    public List<Update> Updates { get; set; } = new();
+    public List<Update> Updates { get; set; } = [];
 
-    public List<ReleaseStatus> ReleaseStatuses { get; set; } = new();
+    public List<ReleaseStatus> ReleaseStatuses { get; set; } = [];
 
     public string? LatestInternalReleaseNote
     {
@@ -54,11 +54,11 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
         }
     }
 
-    public List<ContentSection> Content { get; set; } = new();
+    public List<ContentSection> Content { get; set; } = [];
 
-    public List<KeyStatistic> KeyStatistics { get; set; } = new();
+    public List<KeyStatistic> KeyStatistics { get; set; } = [];
 
-    public List<FeaturedTable> FeaturedTables { get; set; } = new();
+    public List<FeaturedTable> FeaturedTables { get; set; } = [];
 
     public string? PreReleaseAccessList { get; set; }
 
@@ -136,7 +136,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
         set => ReplaceContentSectionsOfType(ContentSectionType.Warning, value);
     }
 
-    public List<DataBlockVersion> DataBlockVersions { get; set; } = new();
+    public List<DataBlockVersion> DataBlockVersions { get; set; } = [];
 
     private ContentSection? FindSingleSectionByType(ContentSectionType type)
     {
@@ -184,5 +184,5 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
         }
     }
 
-    public List<Link> RelatedInformation { get; set; } = new();
+    public List<Link> RelatedInformation { get; set; } = [];
 }
