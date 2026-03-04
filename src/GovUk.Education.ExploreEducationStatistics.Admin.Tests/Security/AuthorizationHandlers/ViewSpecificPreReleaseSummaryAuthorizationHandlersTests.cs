@@ -60,7 +60,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
 
     private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
             contentDbContext
         );
 

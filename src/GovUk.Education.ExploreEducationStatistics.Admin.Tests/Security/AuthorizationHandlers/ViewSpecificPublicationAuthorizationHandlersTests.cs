@@ -130,7 +130,9 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         IPreReleaseService? preReleaseService = null
     )
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(context);
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
+            context
+        );
 
         return new ViewSpecificPublicationAuthorizationHandler(
             userReleaseRoleRepository,

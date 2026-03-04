@@ -127,7 +127,7 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
 
     private static IAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
             contentDbContext
         );
 

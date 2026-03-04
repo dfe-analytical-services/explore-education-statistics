@@ -115,24 +115,24 @@ public class UserPublicationRoleRepository(
         return await userPublicationRolesToCreate
             .ToAsyncEnumerable()
             .Where(
-                async (upr, cancellationToken) =>
+                async (upr, ct) =>
                     !await UserHasRoleOnPublication(
                         userId: upr.UserId,
                         publicationId: upr.PublicationId,
                         role: upr.Role,
                         resourceRoleFilter: ResourceRoleFilter.All,
-                        cancellationToken: cancellationToken
+                        cancellationToken: ct
                     )
             )
             .Select(
-                async (upr, cancellationToken) =>
+                async (upr, ct) =>
                     await Create(
                         userId: upr.UserId,
                         publicationId: upr.PublicationId,
                         role: upr.Role,
                         createdById: upr.CreatedById,
                         createdDate: upr.CreatedDate,
-                        cancellationToken: cancellationToken
+                        cancellationToken: ct
                     )
             )
             .WhereNotNull()

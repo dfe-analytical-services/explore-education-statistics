@@ -68,7 +68,7 @@ public class PublishSpecificReleaseAuthorizationHandlerTests
 
     private static PublishSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
             contentDbContext
         );
 

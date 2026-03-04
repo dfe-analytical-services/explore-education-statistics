@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 
-public static class ServiceFactory
+public static class RoleRepositoryFactory
 {
     public static (UserPublicationRoleRepository, UserReleaseRoleRepository) BuildRoleRepositories(
         ContentDbContext contentDbContext

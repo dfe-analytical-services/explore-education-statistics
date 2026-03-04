@@ -108,17 +108,17 @@ public class UserReleaseRoleRepository(
         return await userReleaseRolesToCreate
             .ToAsyncEnumerable()
             .Where(
-                async (urr, cancellationToken) =>
+                async (urr, ct) =>
                     !await UserHasRoleOnReleaseVersion(
                         userId: urr.UserId,
                         releaseVersionId: urr.ReleaseVersionId,
                         role: urr.Role,
                         resourceRoleFilter: ResourceRoleFilter.All,
-                        cancellationToken: cancellationToken
+                        cancellationToken: ct
                     )
             )
             .Select(
-                async (urr, cancellationToken) =>
+                async (urr, ct) =>
                     await Create(
                         userId: urr.UserId,
                         releaseVersionId: urr.ReleaseVersionId,
@@ -126,7 +126,7 @@ public class UserReleaseRoleRepository(
                         // Need to check if all database values are non-null now. Maybe I can migrate this field to be non-nullable?
                         createdById: urr.CreatedById!.Value,
                         createdDate: urr.Created,
-                        cancellationToken: cancellationToken
+                        cancellationToken: ct
                     )
             )
             .ToListAsync(cancellationToken);

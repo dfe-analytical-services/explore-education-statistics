@@ -56,9 +56,8 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
             contentDbContext.Releases.Add(release);
             contentDbContext.SaveChanges();
 
-            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
-                contentDbContext
-            );
+            var (userPublicationRoleRepository, userReleaseRoleRepository) =
+                RoleRepositoryFactory.BuildRoleRepositories(contentDbContext);
 
             return new UpdateSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(

@@ -3515,7 +3515,9 @@ public class PublicationServiceTests
         IPublicationRepository? publicationRepository
     )
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(context);
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
+            context
+        );
 
         return new PublicationRepository(
             context: context,

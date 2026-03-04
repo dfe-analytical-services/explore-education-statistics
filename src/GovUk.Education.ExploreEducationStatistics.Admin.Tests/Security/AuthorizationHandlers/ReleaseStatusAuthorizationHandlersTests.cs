@@ -162,9 +162,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
-            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
-                context
-            );
+            var (userPublicationRoleRepository, userReleaseRoleRepository) =
+                RoleRepositoryFactory.BuildRoleRepositories(context);
 
             return new MarkReleaseAsDraftAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
@@ -314,9 +313,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
-            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
-                context
-            );
+            var (userPublicationRoleRepository, userReleaseRoleRepository) =
+                RoleRepositoryFactory.BuildRoleRepositories(context);
 
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
@@ -438,9 +436,8 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
-            var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
-                context
-            );
+            var (userPublicationRoleRepository, userReleaseRoleRepository) =
+                RoleRepositoryFactory.BuildRoleRepositories(context);
 
             return new MarkReleaseAsApprovedAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,

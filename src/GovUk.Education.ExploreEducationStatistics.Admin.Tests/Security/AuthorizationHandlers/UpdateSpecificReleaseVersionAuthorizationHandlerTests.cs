@@ -148,7 +148,7 @@ public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
 
     private static UpdateSpecificReleaseVersionAuthorizationHandler HandlerSupplier(ContentDbContext contentDbContext)
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = ServiceFactory.BuildRoleRepositories(
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
             contentDbContext
         );
 
