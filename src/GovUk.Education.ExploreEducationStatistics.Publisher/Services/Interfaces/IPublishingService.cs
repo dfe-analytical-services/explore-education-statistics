@@ -2,11 +2,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
 public interface IPublishingService
 {
-    Task PublishStagedReleaseContent();
+    Task PublishStagedReleaseContent(CancellationToken cancellationToken = default);
 
-    Task PublishMethodologyFiles(Guid methodologyId);
+    Task PublishMethodologyFiles(Guid methodologyId, CancellationToken cancellationToken = default);
 
-    Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseVersionId);
+    Task PublishMethodologyFilesIfApplicableForRelease(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    );
 
-    Task PublishReleaseFiles(Guid releaseVersionId);
+    Task PublishReleaseFiles(Guid releaseVersionId, CancellationToken cancellationToken = default);
 }
