@@ -282,16 +282,16 @@ public class ReleaseAmendmentService(
         };
     }
 
-    private List<ContentSection> CopyContent(
+    /// <summary>
+    /// Copies ContentSections, using newly-cloned ContentBlocks in new ContentSections rather than the original ones.
+    /// </summary>
+    private static List<ContentSection> CopyContent(
         ReleaseVersion originalReleaseVersion,
         DateTime createdDate,
         Guid amendmentReleaseVersionId,
         Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
-    )
-    {
-        // Copy ContentSections, using the newly-cloned ContentBlocks and DataBlocks in the new ContentSections
-        // rather than the original ones.
-        var amendedContent = originalReleaseVersion
+    ) =>
+        originalReleaseVersion
             .Content.Select(originalSection =>
             {
                 var contentSectionAmendmentId = Guid.NewGuid();
@@ -319,10 +319,8 @@ public class ReleaseAmendmentService(
                 };
             })
             .ToList();
-        return amendedContent;
-    }
 
-    private List<ContentBlock> CopyContentBlocks(
+    private static List<ContentBlock> CopyContentBlocks(
         List<ContentBlock> originalSectionContent,
         Guid contentSectionAmendmentId,
         Guid amendmentReleaseVersionId,
