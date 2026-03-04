@@ -1,14 +1,11 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.CopyDirectoryCallbacks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
@@ -17,35 +14,36 @@ public class PublishingService(
     IPublicBlobStorageService publicBlobStorageService,
     IMethodologyService methodologyService,
     IReleaseService releaseService,
-    IOptions<AppOptions> appOptions,
     ILogger<PublishingService> logger
 ) : IPublishingService
 {
-    private readonly AppOptions _appOptions = appOptions.Value;
-
-    public async Task PublishStagedReleaseContent()
+    public async Task PublishStagedReleaseContent(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Moving staged release content");
         await publicBlobStorageService.MoveDirectory(
             sourceContainerName: PublicContent,
             sourceDirectoryPath: PublicContentStagingPath(),
             destinationContainerName: PublicContent,
-            destinationDirectoryPath: string.Empty
+            destinationDirectoryPath: string.Empty,
+            cancellationToken: cancellationToken
         );
     }
 
-    public async Task PublishMethodologyFiles(Guid methodologyId)
+    public async Task PublishMethodologyFiles(Guid methodologyId, CancellationToken cancellationToken = default)
     {
         var methodology = await methodologyService.Get(methodologyId);
-        await PublishMethodologyFiles(methodology);
+        await PublishMethodologyFiles(methodology, cancellationToken);
     }
 
-    public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseVersionId)
+    public async Task PublishMethodologyFilesIfApplicableForRelease(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
     {
         var releaseVersion = await releaseService.Get(releaseVersionId);
         var methodologyVersions = await methodologyService.GetLatestVersionByRelease(releaseVersion);
 
-        if (!methodologyVersions.Any())
+        if (methodologyVersions.Count == 0)
         {
             return;
         }
@@ -54,12 +52,12 @@ public class PublishingService(
         {
             if (await methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
             {
-                await PublishMethodologyFiles(methodologyVersion);
+                await PublishMethodologyFiles(methodologyVersion, cancellationToken);
             }
         }
     }
 
-    public async Task PublishReleaseFiles(Guid releaseVersionId)
+    public async Task PublishReleaseFiles(Guid releaseVersionId, CancellationToken cancellationToken = default)
     {
         var releaseVersion = await releaseService.Get(releaseVersionId);
 
@@ -73,37 +71,24 @@ public class PublishingService(
             directoryPath: destinationDirectoryPath
         );
 
-        // Get a list of source directory paths for all the files.
-        // There will be multiple root paths if they were created on different amendment Releases
-        var sourceDirectoryPaths = files.Select(f => $"{f.RootPath}/").Distinct().ToList();
+        var blobNames = files.Select(f => $"{f.RootPath}/{f.Type.ToString().ToLower()}/{f.Id}").ToList();
 
-        // Copy the blobs of those directories in private storage to the destination directory in public storage
-        foreach (var sourceDirectoryPath in sourceDirectoryPaths)
-        {
-            await privateBlobStorageService.CopyDirectory(
-                sourceContainerName: PrivateReleaseFiles,
-                sourceDirectoryPath: sourceDirectoryPath,
-                destinationContainerName: PublicReleaseFiles,
-                destinationDirectoryPath: destinationDirectoryPath,
-                new IBlobStorageService.CopyDirectoryOptions
-                {
-                    DestinationConnectionString = _appOptions.PublicStorageConnectionString,
-                    ShouldTransferCallbackAsync = (source, _) =>
-                        // Filter by blobs with matching file paths
-                        TransferBlobIfFileExistsCallback(
-                            source: source,
-                            files: files,
-                            sourceContainerName: PrivateReleaseFiles,
-                            logger: logger
-                        ),
-                }
-            );
-        }
+        await privateBlobStorageService.CopyBlobs(
+            sourceContainerName: PrivateReleaseFiles,
+            destinationContainerName: PublicReleaseFiles,
+            blobNames,
+            cancellationToken
+        );
     }
 
-    private async Task PublishMethodologyFiles(MethodologyVersion methodologyVersion)
+    private async Task PublishMethodologyFiles(
+        MethodologyVersion methodologyVersion,
+        CancellationToken cancellationToken = default
+    )
     {
         var files = await methodologyService.GetFiles(methodologyVersion.Id, Image);
+
+        var blobNames = files.Select(f => $"{f.RootPath}/{f.Type.ToString().ToLower()}/{f.Id}").ToList();
 
         var directoryPath = $"{methodologyVersion.Id}/";
 
@@ -111,23 +96,11 @@ public class PublishingService(
         await publicBlobStorageService.DeleteBlobs(containerName: PublicMethodologyFiles, directoryPath: directoryPath);
 
         // Copy the blobs from private to public storage
-        await privateBlobStorageService.CopyDirectory(
+        await privateBlobStorageService.CopyBlobs(
             sourceContainerName: PrivateMethodologyFiles,
-            sourceDirectoryPath: directoryPath,
             destinationContainerName: PublicMethodologyFiles,
-            destinationDirectoryPath: directoryPath,
-            new IBlobStorageService.CopyDirectoryOptions
-            {
-                DestinationConnectionString = _appOptions.PublicStorageConnectionString,
-                ShouldTransferCallbackAsync = (source, _) =>
-                    // Filter by blobs with matching file paths
-                    TransferBlobIfFileExistsCallback(
-                        source: source,
-                        files: files,
-                        sourceContainerName: PrivateMethodologyFiles,
-                        logger: logger
-                    ),
-            }
+            blobNames,
+            cancellationToken
         );
     }
 }
