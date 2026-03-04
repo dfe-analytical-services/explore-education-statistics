@@ -1,7 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
@@ -42,9 +42,8 @@ public class PublicationReleaseSeriesAuthorizationHandlersTests
             ContentDbContext contentDbContext
         )
         {
-            var userReleaseRoleRepository = new UserReleaseRoleRepository(contentDbContext);
-
-            var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
+            var (userPublicationRoleRepository, userReleaseRoleRepository) =
+                RoleRepositoryFactory.BuildRoleRepositories(contentDbContext);
 
             return new ManagePublicationReleaseSeriesAuthorizationHandler(
                 new AuthorizationHandlerService(

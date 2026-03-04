@@ -272,12 +272,15 @@ public class ReleaseVersionService(
     {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
-        var releaseRolesToRemove = await userReleaseRoleRepository
-            .Query(ResourceRoleFilter.All)
-            .WhereForReleaseVersion(releaseVersion.Id)
-            .ToListAsync(cancellationToken);
+        var releaseRoleIdsToRemove = (
+            await userReleaseRoleRepository
+                .Query(ResourceRoleFilter.All)
+                .WhereForReleaseVersion(releaseVersion.Id)
+                .Select(urr => urr.Id)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
 
-        await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove, cancellationToken);
+        await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove, cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(ReleaseVersion releaseVersion, CancellationToken cancellationToken)

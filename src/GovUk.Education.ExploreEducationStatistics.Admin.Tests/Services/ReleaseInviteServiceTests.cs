@@ -638,7 +638,7 @@ public abstract class ReleaseInviteServiceTests
             userReleaseRoleRepository
                 .Setup(mock =>
                     mock.RemoveMany(
-                        new[] { userReleaseRoles[0], userReleaseRoles[1], userReleaseRoles[2] },
+                        SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id, userReleaseRoles[2].Id),
                         It.IsAny<CancellationToken>()
                     )
                 )

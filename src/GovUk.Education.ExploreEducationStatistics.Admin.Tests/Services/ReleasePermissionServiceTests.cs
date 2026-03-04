@@ -498,9 +498,7 @@ public class ReleasePermissionServiceTests
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
         // The first role should be removed
         userReleaseRoleRepository
-            .Setup(m =>
-                m.RemoveMany(It.Is<List<UserReleaseRole>>(l => l.Single().Id == userReleaseRoles[0].Id), default)
-            )
+            .Setup(m => m.RemoveMany(SetOf(userReleaseRoles[0].Id), default))
             .Returns(Task.CompletedTask);
         // The third role should be created
         userReleaseRoleRepository
@@ -639,12 +637,7 @@ public class ReleasePermissionServiceTests
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
         userReleaseRoleRepository
             .Setup(m =>
-                m.RemoveMany(
-                    It.Is<List<UserReleaseRole>>(l =>
-                        l.Count == 2 && l[0].Id == userReleaseRoles[0].Id && l[1].Id == userReleaseRoles[1].Id
-                    ),
-                    It.IsAny<CancellationToken>()
-                )
+                m.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), It.IsAny<CancellationToken>())
             )
             .Returns(Task.CompletedTask);
 
