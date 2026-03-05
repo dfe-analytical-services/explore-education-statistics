@@ -46,13 +46,13 @@ export default function getContentErrors(
     : [];
   const invalidLength = characterLimit
     ? checkMaxLength(elementsJson as JsonElement[], characterLimit)
-    : '';
+    : null;
 
   if (
     invalidImages.length ||
     invalidLinks.length ||
     invalidContent.length ||
-    invalidLength.length
+    invalidLength
   ) {
     const invalidImagesMessage =
       invalidImages.length === 1
@@ -71,9 +71,9 @@ export default function getContentErrors(
 
     const errorMessage = `Content errors have been found: ${
       invalidImages.length ? invalidImagesMessage : ''
-    }  ${invalidLinks.length ? invalidLinksMessage : ''} ${
+    } ${invalidLinks.length ? invalidLinksMessage : ''} ${
       invalidContent.length ? invalidContentMessage : ''
-    }  ${invalidLength ? 'Too much content.' : ''}`;
+    } ${invalidLength ? 'Too much content.' : ''}`;
     const contentErrorDetails = (
       <>
         <WarningMessage className="govuk-!-margin-bottom-1">

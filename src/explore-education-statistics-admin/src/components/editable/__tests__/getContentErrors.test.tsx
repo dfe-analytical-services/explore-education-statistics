@@ -1,14 +1,19 @@
 ﻿import { render } from '@testing-library/react';
+import checkMaxLength from '@admin/components/editable/utils/checkMaxLength';
 import getContentErrors from '@admin/components/editable/utils/getContentErrors';
 import getInvalidContent from '@admin/components/editable/utils/getInvalidContent';
 import getInvalidLinks from '@admin/components/editable/utils/getInvalidLinks';
 import getInvalidImages from '@admin/components/editable/utils/getInvalidImages';
 import { Element } from '@admin/types/ckeditor';
 
+jest.mock('@admin/components/editable/utils/checkMaxLength');
 jest.mock('@admin/components/editable/utils/getInvalidImages');
 jest.mock('@admin/components/editable/utils/getInvalidLinks');
 jest.mock('@admin/components/editable/utils/getInvalidContent');
 
+const mockCheckMaxLength = checkMaxLength as jest.MockedFunction<
+  typeof checkMaxLength
+>;
 const mockGetInvalidContent = getInvalidContent as jest.MockedFunction<
   typeof getInvalidContent
 >;
@@ -24,12 +29,16 @@ describe('getContentErrors', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCheckMaxLength.mockReturnValue(null);
     mockGetInvalidContent.mockReturnValue([]);
     mockGetInvalidLinks.mockReturnValue([]);
     mockGetInvalidImages.mockReturnValue([]);
   });
 
-  test('runs all validators when content, links and images checks are enabled', () => {
+  test('runs all validators when max length, content, links and images checks are enabled', () => {
+    mockCheckMaxLength.mockReturnValue(
+      'You have used 320 characters and the limit is 300.',
+    );
     mockGetInvalidContent.mockReturnValue([
       { type: 'boldAsHeading', details: 'content error' },
     ]);
@@ -39,18 +48,20 @@ describe('getContentErrors', () => {
     mockGetInvalidImages.mockReturnValue([{ name: 'image.png' }]);
 
     const result = getContentErrors(elements, {
+      characterLimit: 300,
       checkContent: true,
       checkLinks: true,
       checkImages: true,
     });
 
+    expect(mockCheckMaxLength).toHaveBeenCalledWith(elements, 300);
     expect(mockGetInvalidContent).toHaveBeenCalledWith(elements);
     expect(mockGetInvalidLinks).toHaveBeenCalledWith(elements);
     expect(mockGetInvalidImages).toHaveBeenCalledWith(elements);
 
     expect(result).toBeDefined();
     expect(result?.errorMessage).toContain(
-      'Content errors have been found: 1 image does not have alternative text.  1 link has an invalid URL. 1 accessibility error.',
+      'Content errors have been found: 1 image does not have alternative text. 1 link has an invalid URL. 1 accessibility error. Too much content.',
     );
     expect(result?.contentErrorDetails).toBeTruthy();
   });
@@ -235,6 +246,14 @@ describe('getContentErrors', () => {
       const { container } = render(result!.contentErrorDetails);
 
       expect(container).toMatchSnapshot();
+    });
+  });
+
+  describe('max length', () => {
+    test('does not run when characterLimit is undefined', () => {
+      const result = getContentErrors(elements);
+      expect(mockCheckMaxLength).not.toHaveBeenCalled();
+      expect(result).toBeUndefined();
     });
   });
 });

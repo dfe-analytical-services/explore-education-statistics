@@ -3,7 +3,7 @@ import { JsonElement } from '@admin/types/ckeditor';
 export default function checkMaxLength(
   elements: JsonElement[],
   maxChars: number,
-): string {
+): string | null {
   const contentLength = elements
     .flatMap(element => element.children?.flatMap(child => child))
     .reduce<number>((acc, el) => {
@@ -12,5 +12,5 @@ export default function checkMaxLength(
 
   return contentLength > maxChars
     ? `You have used ${contentLength} characters and the limit is ${maxChars}.`
-    : '';
+    : null;
 }
