@@ -15,7 +15,7 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, Updater } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 interface Props {
@@ -84,30 +84,24 @@ export default function ReleaseDataUploadsSection({
   );
 
   const setAllDataFiles = useCallback(
-    (
-      query: (
-        currentDataFiles: DataFile[] | undefined,
-      ) => DataFile[] | undefined,
-    ) => {
+    (updater: Updater<DataFile[] | undefined, DataFile[] | undefined>) =>
       queryClient.setQueryData(
         releaseDataFileQueries.list(releaseVersionId).queryKey,
-        query,
-      );
-    },
+        updater,
+      ),
     [releaseVersionId, queryClient],
   );
-
   const setAllDataUploads = useCallback(
     (
-      query: (
-        uploads: DataSetUpload[] | undefined,
-      ) => DataSetUpload[] | undefined,
-    ) => {
+      updater: Updater<
+        DataSetUpload[] | undefined,
+        DataSetUpload[] | undefined
+      >,
+    ) =>
       queryClient.setQueryData(
         releaseDataFileQueries.listUploads(releaseVersionId).queryKey,
-        query,
-      );
-    },
+        updater,
+      ),
     [releaseVersionId, queryClient],
   );
 
@@ -119,7 +113,7 @@ export default function ReleaseDataUploadsSection({
           dataFile.id,
         );
         setAllDataFiles(
-          (currentDataFiles: DataFile[] | undefined) =>
+          currentDataFiles =>
             currentDataFiles?.map(file =>
               file.id !== dataFile.id
                 ? file
@@ -146,7 +140,7 @@ export default function ReleaseDataUploadsSection({
           updatedDataFile.id,
         );
         setAllDataFiles(
-          (currentDataFiles: DataFile[] | undefined) =>
+          currentDataFiles =>
             currentDataFiles?.map(file =>
               file.id !== updatedDataFile.id
                 ? file
@@ -171,7 +165,7 @@ export default function ReleaseDataUploadsSection({
       );
 
       setAllDataUploads(
-        (uploads: DataSetUpload[] | undefined) =>
+        uploads =>
           uploads?.filter(upload => !dataSetUploadIds.includes(upload.id)),
       );
 
@@ -189,8 +183,7 @@ export default function ReleaseDataUploadsSection({
   const handleDeleteUploadConfirm = useCallback(
     async (deletedUploadId: string) => {
       setAllDataUploads(
-        (uploads: DataSetUpload[] | undefined) =>
-          uploads?.filter(upload => upload.id !== deletedUploadId),
+        uploads => uploads?.filter(upload => upload.id !== deletedUploadId),
       );
     },
     [setAllDataUploads],
@@ -199,8 +192,7 @@ export default function ReleaseDataUploadsSection({
   const handleDeleteConfirm = useCallback(
     async (deletedFileId: string) => {
       setAllDataFiles(
-        (files: DataFile[] | undefined) =>
-          files?.filter(dataFile => dataFile.id !== deletedFileId),
+        files => files?.filter(dataFile => dataFile.id !== deletedFileId),
       );
     },
     [setAllDataFiles],
