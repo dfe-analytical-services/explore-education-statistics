@@ -678,8 +678,6 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         return (dataSet, dataSetVersion);
     }
 
-    // TODO EES-6764 - indicator tests here
-
     private async Task<DataSetVersion> AddLatestLiveDataSetVersion(DataSet dataSet)
     {
         var (dataFile, _) = await AddDataAndMetadataFiles(dataSet.PublicationId);
