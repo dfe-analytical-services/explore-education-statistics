@@ -10,6 +10,7 @@ public interface INewPermissionsSystemHelper
     /// same user and publication.
     /// </summary>
     /// <param name="existingSetOfPublicationRolesForPublication">All existing publication roles for a user/publication combination.</param>
+    /// <param name="existingSetOfReleaseRolesForPublication">All existing release roles for a user/publication combination.</param>
     /// <param name="publicationRoleToCreate">The publication role to be created for the user/publication combination.</param>
     (
         PublicationRole? newSystemPublicationRoleToRemove,
@@ -25,6 +26,7 @@ public interface INewPermissionsSystemHelper
     /// same user and publication.
     /// </summary>
     /// <param name="existingSetOfPublicationRolesForPublication">All existing publication roles for a user/publication combination.</param>
+    /// <param name="existingSetOfReleaseRolesForPublication">All existing release roles for a user/publication combination.</param>
     /// <param name="releaseRoleToCreate">The release role to be created for the user/publication combination.</param>
     (
         PublicationRole? newSystemPublicationRoleToRemove,

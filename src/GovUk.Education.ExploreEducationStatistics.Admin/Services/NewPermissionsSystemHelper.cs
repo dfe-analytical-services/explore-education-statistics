@@ -109,6 +109,11 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
     {
         var effectiveListOfResultantReleaseRoles = allExistingReleaseRolesForPublication.ToList();
 
+        // There can be duplicates in this list because the role could exist across multiple release versions for the same publication,
+        // so we need to remove only one instance of the release role to remove before creating a resultant HashSet from that.
+        // If multiple of the same role exist, then when we remove one we still want the HashSet to have an entry representing that at least
+        // one of that role still exists for the publication.
+        // If there are no instances of the release role to remove, then we should throw an exception.
         if (!effectiveListOfResultantReleaseRoles.Remove(releaseRoleToRemove))
         {
             throw new ArgumentException(
