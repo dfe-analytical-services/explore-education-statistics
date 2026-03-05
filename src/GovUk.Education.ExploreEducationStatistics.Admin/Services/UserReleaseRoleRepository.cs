@@ -52,8 +52,8 @@ public class UserReleaseRoleRepository(
 
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
-                existingPublicationRoles: allPublicationRolesForUserAndPublication,
-                existingReleaseRoles: allReleaseRolesForUserAndPublication,
+                existingSetOfPublicationRolesForPublication: allPublicationRolesForUserAndPublication,
+                existingSetOfReleaseRolesForPublication: allReleaseRolesForUserAndPublication,
                 releaseRoleToCreate: role
             );
 
@@ -293,13 +293,11 @@ public class UserReleaseRoleRepository(
     {
         var publicationId = await GetPublicationId(userReleaseRole.ReleaseVersionId, cancellationToken);
 
-        var allReleaseRolesForUserAndPublication = (
-            await Query(ResourceRoleFilter.All)
-                .WhereForUser(userReleaseRole.UserId)
-                .WhereForPublication(publicationId)
-                .Select(urr => urr.Role)
-                .ToListAsync(cancellationToken)
-        ).ToHashSet();
+        var allReleaseRolesForUserAndPublication = await Query(ResourceRoleFilter.All)
+            .WhereForUser(userReleaseRole.UserId)
+            .WhereForPublication(publicationId)
+            .Select(urr => urr.Role)
+            .ToListAsync(cancellationToken);
 
         var allUserPublicationRolesForUserAndPublicationByRole = await userPublicationRoleRepository
             .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
@@ -312,8 +310,8 @@ public class UserReleaseRoleRepository(
 
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
-                existingPublicationRoles: allPublicationRolesForUserAndPublication,
-                existingReleaseRoles: allReleaseRolesForUserAndPublication,
+                existingSetOfPublicationRolesForPublication: allPublicationRolesForUserAndPublication,
+                allExistingReleaseRolesForPublication: allReleaseRolesForUserAndPublication,
                 releaseRoleToRemove: userReleaseRole.Role
             );
 

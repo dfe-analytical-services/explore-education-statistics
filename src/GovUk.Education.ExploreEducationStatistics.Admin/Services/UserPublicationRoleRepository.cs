@@ -60,8 +60,8 @@ public class UserPublicationRoleRepository(
 
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
-                existingPublicationRoles: allPublicationRolesForUserAndPublication,
-                existingReleaseRoles: allReleaseRolesForUserAndPublication,
+                existingSetOfPublicationRolesForPublication: allPublicationRolesForUserAndPublication,
+                existingSetOfReleaseRolesForPublication: allReleaseRolesForUserAndPublication,
                 publicationRoleToCreate: role
             );
 
@@ -262,8 +262,8 @@ public class UserPublicationRoleRepository(
 
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
-                existingPublicationRoles: allPublicationRolesForUserAndPublication,
-                existingReleaseRoles: allReleaseRolesForUserAndPublication,
+                existingSetOfPublicationRolesForPublication: allPublicationRolesForUserAndPublication,
+                existingSetOfReleaseRolesForPublication: allReleaseRolesForUserAndPublication,
                 oldPublicationRoleToRemove: userPublicationRole.Role
             );
 
