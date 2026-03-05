@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class NewPermissionsSystemHelperTests
 {
-    // (publicationRoleToCreate, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
+    // (publicationRoleToCreate, existingSetOfPublicationRolesForPublication, existingSetOfReleaseRolesForPublication, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         PublicationRole,
         HashSet<PublicationRole>,
@@ -80,7 +80,7 @@ public class NewPermissionsSystemHelperTests
             // csharpier-ignore-end
         };
 
-    // (releaseRoleToCreate, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
+    // (releaseRoleToCreate, existingSetOfPublicationRolesForPublication, existingSetOfReleaseRolesForPublication, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         ReleaseRole,
         HashSet<PublicationRole>,
@@ -182,7 +182,7 @@ public class NewPermissionsSystemHelperTests
             // csharpier-ignore-end
         };
 
-    // (oldPublicationRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
+    // (oldPublicationRoleToRemove, existingSetOfPublicationRolesForPublication, existingSetOfReleaseRolesForPublication, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         PublicationRole,
         HashSet<PublicationRole>,
@@ -238,11 +238,11 @@ public class NewPermissionsSystemHelperTests
             // csharpier-ignore-end
         };
 
-    // (releaseRoleToRemove, existingPublicationRoles, existingReleaseRoles, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
+    // (releaseRoleToRemove, existingSetOfPublicationRolesForPublication, allExistingReleaseRolesForPublication, expectedNewSystemPublicationRoleToRemove, expectedNewSystemPublicationRoleToCreate)
     public static TheoryData<
         ReleaseRole,
         HashSet<PublicationRole>,
-        HashSet<ReleaseRole>,
+        IReadOnlyList<ReleaseRole>,
         PublicationRole?,
         PublicationRole?
     > ReleaseRoleRemovalData =>
@@ -327,6 +327,60 @@ public class NewPermissionsSystemHelperTests
             { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
             { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
             { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver], null, null},
+
+            // These tests are to check what happens when there are duplicate release roles in the list (maybe due to the same role existing across multiple release versions within the same publication)
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver, ReleaseRole.Approver, ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [], [ReleaseRole.Approver, ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner], [ReleaseRole.Approver, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower], [ReleaseRole.Approver, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Approver, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Approver, ReleaseRole.Approver], null, null},
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], null , null },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Approver, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.Approver], null, null},
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer], null, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Owner], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor], PublicationRole.Approver, PublicationRole.Drafter },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor], null, null},
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, null },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Drafter], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], PublicationRole.Drafter, PublicationRole.Approver },
+            { ReleaseRole.Contributor, [PublicationRole.Owner, PublicationRole.Allower, PublicationRole.Approver], [ReleaseRole.Contributor, ReleaseRole.Contributor, ReleaseRole.Approver], null, null},
             // csharpier-ignore-end
         };
 
@@ -334,8 +388,8 @@ public class NewPermissionsSystemHelperTests
     [MemberData(nameof(PublicationRoleCreationData))]
     public void DetermineNewPermissionsSystemChangesForRoleCreation_ForPublicationRole(
         PublicationRole publicationRoleToCreate,
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        HashSet<ReleaseRole> existingSetOfReleaseRolesForPublication,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
         PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
@@ -345,8 +399,8 @@ public class NewPermissionsSystemHelperTests
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 oldPublicationRoleToCreate: publicationRoleToCreate,
-                existingPublicationRoles: existingPublicationRoles,
-                existingReleaseRoles: existingReleaseRoles
+                existingSetOfPublicationRolesForPublication: existingSetOfPublicationRolesForPublication,
+                existingSetOfReleaseRolesForPublication: existingSetOfReleaseRolesForPublication
             );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
@@ -362,12 +416,17 @@ public class NewPermissionsSystemHelperTests
     {
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
-        Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<ArgumentException>(() =>
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 oldPublicationRoleToCreate: publicationRoleToCreate,
-                existingPublicationRoles: [],
-                existingReleaseRoles: []
+                existingSetOfPublicationRolesForPublication: [],
+                existingSetOfReleaseRolesForPublication: []
             )
+        );
+
+        Assert.Equal(
+            $"Unexpected publication role: '{publicationRoleToCreate}'. Expected an OLD permissions system role.",
+            exception.Message
         );
     }
 
@@ -380,12 +439,17 @@ public class NewPermissionsSystemHelperTests
     {
         var newPermissionsSystemHelper = SetupNewPermissionsSystemHelper();
 
-        Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<ArgumentException>(() =>
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 oldPublicationRoleToCreate: publicationRoleToCreate,
-                existingPublicationRoles: [publicationRoleToCreate],
-                existingReleaseRoles: []
+                existingSetOfPublicationRolesForPublication: [publicationRoleToCreate],
+                existingSetOfReleaseRolesForPublication: []
             )
+        );
+
+        Assert.Equal(
+            $"The publication role '{publicationRoleToCreate}' is already in the existing set of publication roles.",
+            exception.Message
         );
     }
 
@@ -393,8 +457,8 @@ public class NewPermissionsSystemHelperTests
     [MemberData(nameof(ReleaseRoleCreationData))]
     public void DetermineNewPermissionsSystemChangesForRoleCreation_ForReleaseRole(
         ReleaseRole releaseRoleToCreate,
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        HashSet<ReleaseRole> existingSetOfReleaseRolesForPublication,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
         PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
@@ -404,8 +468,8 @@ public class NewPermissionsSystemHelperTests
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleCreation(
                 releaseRoleToCreate: releaseRoleToCreate,
-                existingPublicationRoles: existingPublicationRoles,
-                existingReleaseRoles: existingReleaseRoles
+                existingSetOfPublicationRolesForPublication: existingSetOfPublicationRolesForPublication,
+                existingSetOfReleaseRolesForPublication: existingSetOfReleaseRolesForPublication
             );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
@@ -416,8 +480,8 @@ public class NewPermissionsSystemHelperTests
     [MemberData(nameof(PublicationRoleRemovalData))]
     public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForPublicationRole(
         PublicationRole oldPublicationRoleToRemove,
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        HashSet<ReleaseRole> existingSetOfReleaseRolesForPublication,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
         PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
@@ -427,8 +491,8 @@ public class NewPermissionsSystemHelperTests
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 oldPublicationRoleToRemove: oldPublicationRoleToRemove,
-                existingPublicationRoles: existingPublicationRoles,
-                existingReleaseRoles: existingReleaseRoles
+                existingSetOfPublicationRolesForPublication: existingSetOfPublicationRolesForPublication,
+                existingSetOfReleaseRolesForPublication: existingSetOfReleaseRolesForPublication
             );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
@@ -447,13 +511,13 @@ public class NewPermissionsSystemHelperTests
         var exception = Assert.Throws<ArgumentException>(() =>
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 oldPublicationRoleToRemove: publicationRole,
-                existingPublicationRoles: [],
-                existingReleaseRoles: []
+                existingSetOfPublicationRolesForPublication: [],
+                existingSetOfReleaseRolesForPublication: []
             )
         );
 
         Assert.Equal(
-            $"The publication role '{publicationRole}' is not in the existing list of publication roles.",
+            $"The publication role '{publicationRole}' is not in the existing set of publication roles.",
             exception.Message
         );
     }
@@ -473,8 +537,8 @@ public class NewPermissionsSystemHelperTests
         var exception = Assert.Throws<ArgumentException>(() =>
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 oldPublicationRoleToRemove: publicationRole,
-                existingPublicationRoles: roleExists ? [publicationRole] : [],
-                existingReleaseRoles: []
+                existingSetOfPublicationRolesForPublication: roleExists ? [publicationRole] : [],
+                existingSetOfReleaseRolesForPublication: []
             )
         );
 
@@ -488,8 +552,8 @@ public class NewPermissionsSystemHelperTests
     [MemberData(nameof(ReleaseRoleRemovalData))]
     public void DetermineNewPermissionsSystemChangesForRoleRemoval_ForReleaseRole(
         ReleaseRole releaseRoleToRemove,
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        IReadOnlyList<ReleaseRole> allExistingReleaseRolesForPublication,
         PublicationRole? expectedNewSystemPublicationRoleToRemove,
         PublicationRole? expectedNewSystemPublicationRoleToCreate
     )
@@ -499,8 +563,8 @@ public class NewPermissionsSystemHelperTests
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 releaseRoleToRemove: releaseRoleToRemove,
-                existingPublicationRoles: existingPublicationRoles,
-                existingReleaseRoles: existingReleaseRoles
+                existingSetOfPublicationRolesForPublication: existingSetOfPublicationRolesForPublication,
+                allExistingReleaseRolesForPublication: allExistingReleaseRolesForPublication
             );
 
         Assert.Equal(expectedNewSystemPublicationRoleToRemove, newSystemPublicationRoleToRemove);
@@ -515,8 +579,8 @@ public class NewPermissionsSystemHelperTests
         var exception = Assert.Throws<ArgumentException>(() =>
             newPermissionsSystemHelper.DetermineNewPermissionsSystemChangesForRoleRemoval(
                 releaseRoleToRemove: ReleaseRole.Contributor,
-                existingPublicationRoles: [],
-                existingReleaseRoles: []
+                existingSetOfPublicationRolesForPublication: [],
+                allExistingReleaseRolesForPublication: []
             )
         );
 

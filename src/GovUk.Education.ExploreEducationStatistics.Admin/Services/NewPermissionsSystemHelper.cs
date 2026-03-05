@@ -15,8 +15,8 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleCreation(
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        HashSet<ReleaseRole> existingSetOfReleaseRolesForPublication,
         PublicationRole oldPublicationRoleToCreate
     )
     {
@@ -27,39 +27,40 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
             );
         }
 
-        if (existingPublicationRoles.Contains(oldPublicationRoleToCreate))
+        if (existingSetOfPublicationRolesForPublication.Contains(oldPublicationRoleToCreate))
         {
             throw new ArgumentException(
-                $"The publication role '{oldPublicationRoleToCreate}' is already in the existing list of publication roles."
+                $"The publication role '{oldPublicationRoleToCreate}' is already in the existing set of publication roles."
             );
         }
 
-        var effectiveSetOfResultantPublicationRoles = existingPublicationRoles
+        var effectiveSetOfResultantPublicationRoles = existingSetOfPublicationRolesForPublication
             .Append(oldPublicationRoleToCreate)
             .ToHashSet();
 
-        return DetermineRolesToRemoveAndCreate(effectiveSetOfResultantPublicationRoles, existingReleaseRoles);
+        return DetermineRolesToRemoveAndCreate(
+            effectiveSetOfResultantPublicationRoles,
+            existingSetOfReleaseRolesForPublication
+        );
     }
 
     public (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleCreation(
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        HashSet<ReleaseRole> existingSetOfReleaseRolesForPublication,
         ReleaseRole releaseRoleToCreate
     )
     {
-        if (existingReleaseRoles.Contains(releaseRoleToCreate))
-        {
-            throw new ArgumentException(
-                $"The release role '{releaseRoleToCreate}' is already in the existing list of release roles."
-            );
-        }
+        var effectiveSetOfResultantReleaseRoles = existingSetOfReleaseRolesForPublication
+            .Append(releaseRoleToCreate)
+            .ToHashSet();
 
-        var effectiveSetOfResultantReleaseRoles = existingReleaseRoles.Append(releaseRoleToCreate).ToHashSet();
-
-        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, effectiveSetOfResultantReleaseRoles);
+        return DetermineRolesToRemoveAndCreate(
+            existingSetOfPublicationRolesForPublication,
+            effectiveSetOfResultantReleaseRoles
+        );
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
@@ -67,8 +68,8 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleRemoval(
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        HashSet<ReleaseRole> existingSetOfReleaseRolesForPublication,
         PublicationRole oldPublicationRoleToRemove
     )
     {
@@ -79,18 +80,21 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
             );
         }
 
-        if (!existingPublicationRoles.Contains(oldPublicationRoleToRemove))
+        if (!existingSetOfPublicationRolesForPublication.Contains(oldPublicationRoleToRemove))
         {
             throw new ArgumentException(
-                $"The publication role '{oldPublicationRoleToRemove}' is not in the existing list of publication roles."
+                $"The publication role '{oldPublicationRoleToRemove}' is not in the existing set of publication roles."
             );
         }
 
-        var effectiveSetOfResultantPublicationRoles = existingPublicationRoles
+        var effectiveSetOfResultantPublicationRoles = existingSetOfPublicationRolesForPublication
             .Except([oldPublicationRoleToRemove])
             .ToHashSet();
 
-        return DetermineRolesToRemoveAndCreate(effectiveSetOfResultantPublicationRoles, existingReleaseRoles);
+        return DetermineRolesToRemoveAndCreate(
+            effectiveSetOfResultantPublicationRoles,
+            existingSetOfReleaseRolesForPublication
+        );
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
@@ -98,21 +102,26 @@ public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineNewPermissionsSystemChangesForRoleRemoval(
-        HashSet<PublicationRole> existingPublicationRoles,
-        HashSet<ReleaseRole> existingReleaseRoles,
+        HashSet<PublicationRole> existingSetOfPublicationRolesForPublication,
+        IReadOnlyList<ReleaseRole> allExistingReleaseRolesForPublication,
         ReleaseRole releaseRoleToRemove
     )
     {
-        if (!existingReleaseRoles.Contains(releaseRoleToRemove))
+        var effectiveListOfResultantReleaseRoles = allExistingReleaseRolesForPublication.ToList();
+
+        if (!effectiveListOfResultantReleaseRoles.Remove(releaseRoleToRemove))
         {
             throw new ArgumentException(
                 $"The release role '{releaseRoleToRemove}' is not in the existing list of release roles."
             );
         }
 
-        var effectiveSetOfResultantReleaseRoles = existingReleaseRoles.Except([releaseRoleToRemove]).ToHashSet();
+        var effectiveSetOfResultantReleaseRoles = effectiveListOfResultantReleaseRoles.ToHashSet();
 
-        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, effectiveSetOfResultantReleaseRoles);
+        return DetermineRolesToRemoveAndCreate(
+            existingSetOfPublicationRolesForPublication,
+            effectiveSetOfResultantReleaseRoles
+        );
     }
 
     private static (
