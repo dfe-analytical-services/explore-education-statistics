@@ -113,6 +113,11 @@ export interface GlossaryPlugin extends Plugin {
   addGlossaryItem(item: GlossaryItem): void;
 }
 
+export interface WordCountPlugin extends Plugin {
+  readonly characters: number;
+  readonly words: number;
+}
+
 export type CommentUndoRedoActions =
   | 'undoRemoveComment'
   | 'undoAddComment'
@@ -273,7 +278,8 @@ export type PluginName =
   | 'Table'
   | 'TableToolbar'
   | 'TableCaption'
-  | 'TextTransformation';
+  | 'TextTransformation'
+  | 'WordCount';
 
 export type ToolbarOption =
   | '|'

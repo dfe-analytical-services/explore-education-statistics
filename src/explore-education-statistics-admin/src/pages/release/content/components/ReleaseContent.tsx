@@ -272,6 +272,7 @@ const ReleaseContent = ({
                   <ReleaseEditableBlock
                     allowComments
                     block={block}
+                    characterLimit={250}
                     editButtonLabel={<>Edit warning block</>}
                     label="Warning block"
                     isReleaseWarningBlock
@@ -343,6 +344,7 @@ const ReleaseContent = ({
                     <ReleaseEditableBlock
                       allowComments
                       block={block}
+                      characterLimit={200}
                       editButtonLabel={
                         <>
                           Edit<VisuallyHidden> summary</VisuallyHidden> block

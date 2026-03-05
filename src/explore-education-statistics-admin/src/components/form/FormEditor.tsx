@@ -12,6 +12,7 @@ import {
   PluginName,
   ToolbarGroup,
   ToolbarOption,
+  WordCountPlugin,
 } from '@admin/types/ckeditor';
 import { defaultAllowedHeadings } from '@admin/config/ckEditorConfig';
 import useCKEditorConfig from '@admin/hooks/useCKEditorConfig';
@@ -46,6 +47,7 @@ export interface FormEditorProps {
   allowComments?: boolean;
   allowedHeadings?: string[];
   error?: string;
+  characterLimit?: number;
   focusOnInit?: boolean;
   hideLabel?: boolean;
   hint?: ReactNode | string;
@@ -72,6 +74,7 @@ const FormEditor = ({
   allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
   error,
+  characterLimit,
   focusOnInit,
   hideLabel,
   hint,
@@ -95,6 +98,7 @@ const FormEditor = ({
   const commentsPlugin = useRef<CommentsPlugin>(null);
   const featuredTablesPlugin = useRef<FeaturedTablesPlugin>(null);
   const glossaryPlugin = useRef<GlossaryPlugin>(null);
+  const wordCountPlugin = useRef<WordCountPlugin>(null);
   const editorRef: RefObject<HTMLDivElement | null> = useRef(null);
   const { currentInteraction, selectedComment, setMarkersOrder } =
     useCommentsContext();
@@ -120,13 +124,19 @@ const FormEditor = ({
 
   const [, startBlurTransition] = useTransition();
 
+  const charactersRemaining =
+    characterLimit && wordCountPlugin.current
+      ? characterLimit - wordCountPlugin.current.characters
+      : null;
+
   const describedBy = useMemo(
     () =>
       classNames({
         [`${id}-error`]: !!error,
         [`${id}-hint`]: !!hint,
+        [`${id}-info`]: !!characterLimit,
       }),
-    [error, hint, id],
+    [error, hint, id, characterLimit],
   );
 
   useEffect(() => {
@@ -241,9 +251,20 @@ const FormEditor = ({
         glossaryPlugin.current = editor.plugins.get<GlossaryPlugin>('Glossary');
       }
 
+      if (editor.plugins.has<WordCountPlugin>('WordCount') && characterLimit) {
+        wordCountPlugin.current =
+          editor.plugins.get<WordCountPlugin>('WordCount');
+      }
+
       setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
-    [changeEditingView, focusOnInit, onElementsReady, setMarkersOrder],
+    [
+      changeEditingView,
+      characterLimit,
+      focusOnInit,
+      onElementsReady,
+      setMarkersOrder,
+    ],
   );
 
   useEffect(() => {
@@ -378,6 +399,31 @@ const FormEditor = ({
                   }}
                 />
               </Modal>
+
+              {characterLimit &&
+              wordCountPlugin.current &&
+              charactersRemaining !== null ? (
+                <div
+                  aria-live="polite"
+                  className={classNames(
+                    styles.characterCount,
+                    'govuk-character-count__message',
+                    {
+                      'govuk-hint': charactersRemaining >= 0,
+                      'govuk-error-message': charactersRemaining < 0,
+                    },
+                  )}
+                  id={`${id}-info`}
+                >
+                  {charactersRemaining >= 0
+                    ? `You have ${charactersRemaining} character${
+                        charactersRemaining !== 1 ? 's' : ''
+                      } remaining`
+                    : `You have ${Math.abs(charactersRemaining)} character${
+                        charactersRemaining !== -1 ? 's' : ''
+                      } too many`}
+                </div>
+              ) : null}
             </>
           ) : (
             <textarea
