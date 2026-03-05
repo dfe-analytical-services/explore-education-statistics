@@ -13,6 +13,7 @@ import { DataBlock } from '@common/services/types/blocks';
 export type ContentSectionKeys = keyof Pick<
   ReleaseVersion<EditableContentBlock>,
   | 'summarySection'
+  | 'warningSection'
   | 'keyStatisticsSecondarySection'
   | 'headlinesSection'
   | 'relatedDashboardsSection'

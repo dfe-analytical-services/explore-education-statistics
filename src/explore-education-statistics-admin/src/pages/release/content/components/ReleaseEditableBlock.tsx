@@ -19,6 +19,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import { Comment, EditableBlock } from '@admin/services/types/content';
+import { ToolbarOption, ToolbarGroup } from '@admin/types/ckeditor';
 import Gate from '@common/components/Gate';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
@@ -34,14 +35,16 @@ interface Props {
   block: EditableBlock;
   editable?: boolean;
   editButtonLabel?: ReactNode | string;
+  isReleaseWarningBlock?: boolean;
+  label: string;
   publicationId: string;
   releaseVersionId: string;
   removeButtonLabel?: ReactNode | string;
   sectionId: string;
   sectionKey: ContentSectionKeys;
+  toolbarConfig?: ReadonlyArray<ToolbarOption | ToolbarGroup>;
   visible?: boolean;
   onAfterDeleteBlock?: () => void;
-  label: string;
 }
 
 const ReleaseEditableBlock = ({
@@ -50,14 +53,16 @@ const ReleaseEditableBlock = ({
   block,
   editable = true,
   editButtonLabel,
+  isReleaseWarningBlock,
+  label,
   publicationId,
   releaseVersionId,
   removeButtonLabel,
   sectionId,
   sectionKey,
+  toolbarConfig = releaseToolbarConfigFull,
   visible,
   onAfterDeleteBlock,
-  label,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -409,11 +414,12 @@ const ReleaseEditableBlock = ({
             id={blockId}
             isEditing={isLockedByUser}
             isLoading={isLocking}
+            isReleaseWarningBlock={isReleaseWarningBlock}
             label={label}
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             removeButtonLabel={removeButtonLabel}
-            toolbarConfig={releaseToolbarConfigFull}
+            toolbarConfig={toolbarConfig}
             transformImageAttributes={transformImageAttributes}
             value={block.body || ''}
             onActive={refreshLock}
