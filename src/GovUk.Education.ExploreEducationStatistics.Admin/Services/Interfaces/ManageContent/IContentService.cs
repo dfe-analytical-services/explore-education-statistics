@@ -17,7 +17,7 @@ public interface IContentService
         Dictionary<Guid, int> newSectionOrder
     );
 
-    Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
+    Task<Either<ActionResult, ContentSectionViewModel>> AddGenericContentSection(
         Guid releaseVersionId,
         ContentSectionAddRequest? request
     );
@@ -28,7 +28,7 @@ public interface IContentService
         string newHeading
     );
 
-    Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
+    Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveGenericContentSection(
         Guid releaseVersionId,
         Guid contentSectionId
     );

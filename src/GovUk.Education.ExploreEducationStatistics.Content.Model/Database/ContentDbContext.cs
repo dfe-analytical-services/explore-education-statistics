@@ -116,7 +116,6 @@ public class ContentDbContext : DbContext
         ConfigureFile(modelBuilder);
         ConfigureDataSetFileVersionGeographicLevel(modelBuilder);
         ConfigureContentBlock(modelBuilder);
-        ConfigureContentSection(modelBuilder);
         ConfigureReleaseVersion(modelBuilder);
         ConfigureDataBlock(modelBuilder);
         ConfigureHtmlBlock(modelBuilder);
@@ -476,18 +475,6 @@ public class ContentDbContext : DbContext
             entity
                 .Property(e => e.Locked)
                 .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-        });
-    }
-
-    private static void ConfigureContentSection(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ContentSection>(entity =>
-        {
-            entity
-                .Property(e => e.Type)
-                .HasConversion(new EnumToStringConverter<ContentSectionType>())
-                .HasMaxLength(25);
-            entity.HasIndex(e => e.Type);
         });
     }
 
