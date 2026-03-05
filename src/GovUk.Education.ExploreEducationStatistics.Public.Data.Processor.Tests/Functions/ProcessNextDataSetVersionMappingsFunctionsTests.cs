@@ -210,8 +210,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
             Assert.False(mapping.HasDeletedGeographicLevels);
         }
 
-        // TODO EES-6764 - indicator tests here
-
         [Fact]
         public async Task Success_HasDeletedTimePeriods_True()
         {

@@ -21,13 +21,13 @@ public static class IndicatorMappingPlanGeneratorExtensions
 
         sourceIndicators?.ForEach(sourceIndicator =>
         {
-            var autoMappedIndicator = targetIndicators?.SingleOrDefault(f => f.Column == sourceIndicator.Column);
+            var autoMappedIndicator = targetIndicators?.Any(f => f.Column == sourceIndicator.Column) ?? false;
 
             var indicatorMappingGenerator = fixture
                 .DefaultIndicatorMapping()
                 .WithSource(fixture.DefaultMappableIndicator().WithLabel(sourceIndicator.Label))
-                .WithType(autoMappedIndicator is not null ? MappingType.AutoMapped : MappingType.AutoNone)
-                .WithCandidateKey(autoMappedIndicator?.Column)
+                .WithType(autoMappedIndicator ? MappingType.AutoMapped : MappingType.AutoNone)
+                .WithCandidateKey(autoMappedIndicator ? sourceIndicator.Column : null)
                 .WithPublicId(sourceIndicator.PublicId);
 
             indicatorMappingPlanGenerator.AddIndicatorMapping(sourceIndicator.Column, indicatorMappingGenerator);

@@ -28,19 +28,34 @@ public static class LocationMappingPlanGeneratorExtensions
 
         levels.ForEach(level =>
         {
+            var sourceLevel = sourceLocations?.SingleOrDefault(meta => meta.Level == level);
+            var sourceLocationsForLevel = sourceLevel?.Options;
+            var matchingTargetLevel = targetLocations?.SingleOrDefault(l => l.Level == level);
+
             var levelGenerator = fixture.DefaultLocationLevelMappings();
 
-            var sourceLocationsForLevel = sourceLocations?.SingleOrDefault(meta => meta.Level == level);
-
-            sourceLocationsForLevel?.Options.ForEach(option =>
+            sourceLocationsForLevel?.ForEach(sourceLocation =>
             {
+                var sourceKey = MappingKeyGenerators.LocationOptionMeta(sourceLocation);
+                var sourceLink = sourceLevel?.OptionLinks.SingleOrDefault(l => l.OptionId == sourceLocation.Id);
+
+                var autoMappedOption =
+                    matchingTargetLevel?.Options.Any(o => MappingKeyGenerators.LocationOptionMeta(o) == sourceKey)
+                    ?? false;
+
                 levelGenerator.AddMapping(
-                    sourceKey: MappingKeyGenerators.LocationOptionMeta(option),
+                    sourceKey: sourceKey,
                     mapping: fixture
                         .DefaultLocationOptionMapping()
                         .WithSource(
-                            fixture.DefaultMappableLocationOption().WithLabel(option.Label).WithCodes(option.ToRow())
+                            fixture
+                                .DefaultMappableLocationOption()
+                                .WithLabel(sourceLocation.Label)
+                                .WithCodes(sourceLocation.ToRow())
                         )
+                        .WithType(autoMappedOption ? MappingType.AutoMapped : MappingType.AutoNone)
+                        .WithCandidateKey(autoMappedOption ? sourceKey : null)
+                        .WithPublicId(sourceLink?.PublicId ?? $"{level} :: {sourceLocation.Label}")
                 );
             });
 
