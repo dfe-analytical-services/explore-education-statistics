@@ -2,8 +2,6 @@ using System.IO.Compression;
 using System.Net.Mime;
 using System.Text.RegularExpressions;
 using Azure;
-using Azure.Identity;
-using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -179,25 +177,18 @@ public abstract partial class BlobStorageService(
     }
 
     public async Task<bool> CopyBlobs(
-        IBlobContainer sourceContainerName,
-        IBlobContainer destinationContainerName,
-        List<string> blobNames,
+        IBlobContainer sourceContainer,
+        IBlobContainer destinationContainer,
+        List<string> sourcePathPrefixes,
+        string destinationPathPrefix,
         CancellationToken cancellationToken = default
     )
     {
-        var sourceContainerClient = client.GetBlobContainerClient(sourceContainerName.Name);
-        var destinationContainerClient = client.GetBlobContainerClient(destinationContainerName.Name);
-
-        var transferManager = new TransferManager(new TransferManagerOptions());
-        //var tokenCredential = new DefaultAzureCredential();
-
-        var keyCredential = new StorageSharedKeyCredential(
-            "devstoreaccount1",
-            "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
-        );
-
-        //var blobsProvider = new BlobsStorageResourceProvider(tokenCredential);
-        var blobsProvider = new BlobsStorageResourceProvider(keyCredential);
+        // TODO EES-4202 This would need altering to take into account the possibility that the containers are not in
+        // the same storage account. Also check the server-side copy that DataMovement does using 'Put Blob From URL'
+        // supports copying across accounts.
+        var sourceContainerClient = await GetBlobContainerClient(sourceContainer);
+        var destinationContainerClient = await GetBlobContainerClient(destinationContainer);
 
         var progress = new Progress<TransferProgress>(p =>
         {
@@ -212,68 +203,68 @@ public abstract partial class BlobStorageService(
             );
         });
 
-        var transferOptions = new TransferOptions()
+        var transferOptions = new TransferOptions
         {
-            CreationMode = StorageResourceCreationMode.OverwriteIfExists,
-            ProgressHandlerOptions = new() { ProgressHandler = progress, TrackBytesTransferred = true },
+            CreationMode = StorageResourceCreationMode.Default,
+            ProgressHandlerOptions = new TransferProgressHandlerOptions
+            {
+                ProgressHandler = progress,
+                TrackBytesTransferred = true,
+            },
         };
 
-        //var source = await blobsProvider.FromBlobAsync(new Uri($"{sourceContainerClient.Uri}/{blobName}"));
-        //var destination = await blobsProvider.FromBlobAsync(
-        //    new Uri($"{destinationContainerClient.Uri}/{blobName}")
-        //);
-
-        //var transfer = await transferManager.StartTransferAsync(
-        //    source,
-        //    destination,
-        //    transferOptions,
-        //    cancellationToken
-        //);
-        //await transfer.WaitForCompletionAsync(cancellationToken);
-
-        //var tasks = blobNames.Select(async blobName =>
-        //{
-        //    var source = await blobsProvider.FromBlobAsync(new Uri($"{sourceContainerClient.Uri}/{blobName}"));
-        //    var destination = await blobsProvider.FromBlobAsync(
-        //        new Uri($"{destinationContainerClient.Uri}/{blobName}")
-        //    );
-
-        //    var transferOperation = await transferManager.StartTransferAsync(
-        //        source,
-        //        destination,
-        //        transferOptions,
-        //        cancellationToken
-        //    );
-        //    await transferOperation.WaitForCompletionAsync();
-        //});
-
-        //await Task.WhenAll(tasks);
-
-        transferOptions.ItemTransferFailed += (TransferItemFailedEventArgs args) =>
+        transferOptions.ItemTransferCompleted += args =>
         {
-            using (StreamWriter logStream = File.AppendText("path/to/log/file"))
-            {
-                logStream.WriteLine($"File Completed Transfer: {args.Source.Uri.AbsoluteUri}");
-            }
+            logger.LogInformation(
+                "Item transfer from: {SourceUri}, to: {DestinationUri} COMPLETED",
+                args.Source.Uri.AbsoluteUri,
+                args.Destination.Uri.AbsoluteUri
+            );
+            return Task.CompletedTask;
+        };
+        transferOptions.ItemTransferSkipped += args =>
+        {
+            logger.LogWarning(
+                "Item transfer from: {SourceUri}, to: {DestinationUri} SKIPPED",
+                args.Source.Uri.AbsoluteUri,
+                args.Destination.Uri.AbsoluteUri
+            );
+            return Task.CompletedTask;
+        };
+        transferOptions.ItemTransferFailed += args =>
+        {
+            logger.LogError(
+                args.Exception,
+                "Item transfer from: {SourceUri}, to: {DestinationUri} FAILED",
+                args.Source.Uri.AbsoluteUri,
+                args.Destination.Uri.AbsoluteUri
+            );
             return Task.CompletedTask;
         };
 
-        foreach (var blobName in blobNames)
+        var transferManager = new TransferManager(new TransferManagerOptions());
+        foreach (var sourcePathPrefix in sourcePathPrefixes)
         {
             var transferOperation = await transferManager.StartTransferAsync(
-                sourceResource: await blobsProvider.FromContainerAsync(
-                    sourceContainerClient.Uri,
-                    new BlobStorageResourceContainerOptions() { BlobPrefix = blobName },
-                    cancellationToken
+                sourceResource: BlobsStorageResourceProvider.FromClient(
+                    sourceContainerClient,
+                    new BlobStorageResourceContainerOptions { BlobPrefix = sourcePathPrefix }
                 ),
-                destinationResource: await blobsProvider.FromContainerAsync(
-                    destinationContainerClient.Uri,
-                    new BlobStorageResourceContainerOptions() { BlobPrefix = blobName },
-                    cancellationToken
+                destinationResource: BlobsStorageResourceProvider.FromClient(
+                    destinationContainerClient,
+                    new BlobStorageResourceContainerOptions { BlobPrefix = destinationPathPrefix }
                 ),
                 transferOptions,
                 cancellationToken
             );
+
+            // TODO EES-4202 This fails when run locally with HTTP Error 501
+            // because Azurite does not support API method 'Put Blob From URL'
+            // The 'ItemTransferFailed' event logs an error like
+            // Item transfer from: http://data-storage:10000/devstoreaccount1/releases/a727d495-bb5a-4b5e-0afe-08de7a1e8382/data/2b4c79bc-56a5-4d21-8566-08de7a1e8ee2,
+            // to: http://data-storage:10000/devstoreaccount1/downloads/4cfb9762-2497-4cfa-a257-4e05cf2fd76c/data/2b4c79bc-56a5-4d21-8566-08de7a1e8ee2 FAILED
+            // Exception: Azure.RequestFailedException: Current API is not implemented yet.
+            // See https://github.com/azure/azurite/issues/2353
             await transferOperation.WaitForCompletionAsync(cancellationToken);
         }
 

@@ -63,7 +63,7 @@ public class PublishingService(
 
         var files = await releaseService.GetFiles(releaseVersionId, Ancillary, Chart, FileType.Data, Image);
 
-        var destinationDirectoryPath = $"{releaseVersion.Id}/";
+        var destinationDirectoryPath = $"{releaseVersion.Id}";
 
         // Delete any existing blobs in public storage
         await publicBlobStorageService.DeleteBlobs(
@@ -71,12 +71,15 @@ public class PublishingService(
             directoryPath: destinationDirectoryPath
         );
 
-        var blobNames = files.Select(f => $"{f.RootPath}/{f.Type.ToString().ToLower()}/{f.Id}").ToList();
+        // Get a list of source directory paths for all the files.
+        // There will be multiple root paths if they were created on different amendment Releases
+        var sourceDirectoryPaths = files.Select(f => $"{f.RootPath}").Distinct().ToList();
 
         await privateBlobStorageService.CopyBlobs(
             sourceContainerName: PrivateReleaseFiles,
             destinationContainerName: PublicReleaseFiles,
-            blobNames,
+            sourcePathPrefixes: sourceDirectoryPaths,
+            destinationPathPrefix: destinationDirectoryPath,
             cancellationToken
         );
     }
@@ -86,9 +89,9 @@ public class PublishingService(
         CancellationToken cancellationToken = default
     )
     {
-        var files = await methodologyService.GetFiles(methodologyVersion.Id, Image);
-
-        var blobNames = files.Select(f => $"{f.RootPath}/{f.Type.ToString().ToLower()}/{f.Id}").ToList();
+        // TODO EES-4202 The filtering that took place in the previous implementation still needs restoring
+        //var files = await methodologyService.GetFiles(methodologyVersion.Id, Image);
+        //var blobNames = files.Select(f => $"{f.RootPath}/{f.Type.ToString().ToLower()}/{f.Id}").ToList();
 
         var directoryPath = $"{methodologyVersion.Id}/";
 
@@ -99,7 +102,8 @@ public class PublishingService(
         await privateBlobStorageService.CopyBlobs(
             sourceContainerName: PrivateMethodologyFiles,
             destinationContainerName: PublicMethodologyFiles,
-            blobNames,
+            sourcePathPrefixes: [directoryPath],
+            destinationPathPrefix: directoryPath,
             cancellationToken
         );
     }

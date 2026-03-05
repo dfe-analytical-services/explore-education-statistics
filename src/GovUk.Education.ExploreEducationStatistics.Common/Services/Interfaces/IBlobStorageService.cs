@@ -41,7 +41,8 @@ public interface IBlobStorageService
     Task<bool> CopyBlobs(
         IBlobContainer sourceContainerName,
         IBlobContainer destinationContainerName,
-        List<string> blobNames,
+        List<string> sourcePathPrefixes,
+        string destinationPathPrefix,
         CancellationToken cancellationToken = default
     );
 
