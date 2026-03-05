@@ -3279,8 +3279,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             Assert.Null(actualChange);
         }
 
-        // TODO EES-6764 - add indicator tests here.
-
         [Fact]
         public async Task GeographicLevelsAdded_ChangeExists()
         {
@@ -3957,8 +3955,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
                 AllDataSetVersionFiles.Where(file => file != DataSetFilenames.DuckDbDatabaseFile).ToArray()
             );
         }
-
-        // TODO EES-6764 - add tests for mapped indicators in here.
 
         private async Task CompleteNextDataSetVersionImportProcessing(Guid instanceId)
         {

@@ -195,10 +195,10 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             );
         }
 
-        // TODO EES-6764 - indicator tests here.
-
-        [Fact]
-        public async Task NextVersion_CorrectFilters_AutoMappedWithSamePublicIds()
+        [Theory]
+        [InlineData(MappingType.AutoMapped)]
+        [InlineData(MappingType.ManualMapped)]
+        public async Task NextVersion_CorrectLocations_Mapped_ReuseOriginalPublicIds(MappingType mappingType)
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -213,85 +213,53 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
+                .WithLocationMappingPlan(
+                    DataFixture.LocationMappingPlanFromLocationMeta(
+                        sourceLocations: testData.ExpectedLocations,
+                        targetLocations: testData.ExpectedLocations
                     )
                 );
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
-            Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
-                {
-                    var actualFilter = actualFilters[filterIndex];
-
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectFilters_AutoMappedWithOriginalPublicIds()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
-                    )
-                );
-
-            foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
+            foreach (var locationLevelMapping in mapping.LocationMappingPlan.Levels.Values)
             {
-                filterMapping.PublicId = $"{filterMapping.PublicId}-orig";
-                filterMapping.Source.Label = $"{filterMapping.Source.Label} original";
+                foreach (var optionMapping in locationLevelMapping.Mappings.Values)
+                {
+                    optionMapping.Type = mappingType;
+                    optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
+                    optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
+                }
             }
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
+            var actualLocationLevels = await GetDbLocationMetas(targetDataSetVersion.Id);
 
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
+            Assert.Equal(testData.ExpectedLocations.Count, actualLocationLevels.Count);
             Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
+                testData.ExpectedLocations,
+                (expectedLocationLevel, levelIndex) =>
                 {
-                    var actualFilter = actualFilters[filterIndex];
+                    var actualLocationLevel = actualLocationLevels[levelIndex];
 
-                    // Filter gets orig public ID as it was auto mapped
-                    expectedFilter.PublicId = $"{expectedFilter.PublicId}-orig";
+                    AssertLocationLevelsEqual(expectedLocationLevel, actualLocationLevel);
 
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
+                    // Location options re-use original public IDs as they were mapped.
+                    foreach (var expectedOptionLink in expectedLocationLevel.OptionLinks)
+                    {
+                        expectedOptionLink.PublicId = $"{expectedOptionLink.PublicId}-orig";
+                    }
+
+                    AssertAllLocationOptionLabelsAndPublicIdsEqual(expectedLocationLevel, actualLocationLevel);
                 }
             );
         }
 
-        [Fact]
-        public async Task NextVersion_CorrectFilters_AutoNone()
+        [Theory]
+        [InlineData(MappingType.AutoNone)]
+        [InlineData(MappingType.ManualNone)]
+        public async Task NextVersion_CorrectLocations_NotMapped_NewPublicIds(MappingType mappingType)
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -306,43 +274,47 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
+                .WithLocationMappingPlan(
+                    DataFixture.LocationMappingPlanFromLocationMeta(
+                        sourceLocations: testData.ExpectedLocations,
+                        targetLocations: testData.ExpectedLocations
                     )
                 );
 
-            foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
+            foreach (var optionMapping in mapping.LocationMappingPlan.Levels.Values.SelectMany(l => l.Mappings.Values))
             {
-                filterMapping.Type = MappingType.AutoNone;
-                filterMapping.PublicId = $"{filterMapping.PublicId}-orig";
-                filterMapping.Source.Label = $"{filterMapping.Source.Label} original";
-                filterMapping.CandidateKey = null;
+                optionMapping.Type = mappingType;
+                optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
+                optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
+                optionMapping.CandidateKey = null;
             }
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
+            var actualLocationLevels = await GetDbLocationMetas(targetDataSetVersion.Id);
 
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
+            Assert.Equal(testData.ExpectedLocations.Count, actualLocationLevels.Count);
             Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
+                testData.ExpectedLocations,
+                (expectedLocationLevel, levelIndex) =>
                 {
-                    var actualFilter = actualFilters[filterIndex];
+                    var actualLocationLevel = actualLocationLevels[levelIndex];
 
-                    // Filter gets new public ID as it had no auto mapping
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
+                    // Location level gets a new public ID as it had no mapping.
+                    AssertLocationLevelsEqual(expectedLocationLevel, actualLocationLevel);
+
+                    // Location options get new public IDs as they had no mappings.
+                    AssertAllLocationOptionLabelsAndPublicIdsEqual(expectedLocationLevel, actualLocationLevel);
                 }
             );
         }
 
-        [Fact]
-        public async Task NextVersion_CorrectFilters_ManualMapped()
+        [Theory]
+        [InlineData(MappingType.AutoMapped)]
+        [InlineData(MappingType.ManualMapped)]
+        public async Task NextVersion_CorrectFiltersAndOptions_Mapped_ReuseOriginalPublicIds(MappingType mappingType)
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -366,161 +338,13 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
             {
-                filterMapping.Type = MappingType.ManualMapped;
+                filterMapping.Type = mappingType;
                 filterMapping.PublicId = $"{filterMapping.PublicId}-orig";
                 filterMapping.Source.Label = $"{filterMapping.Source.Label} original";
-            }
 
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
-            Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
-                {
-                    var actualFilter = actualFilters[filterIndex];
-
-                    // Filter gets orig public ID as it was manually mapped
-                    expectedFilter.PublicId = $"{expectedFilter.PublicId}-orig";
-
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectFilters_MixedMappings()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
-                    )
-                );
-
-            var academyTypeMapping = mapping.FilterMappingPlan.Mappings["academy_type"];
-
-            academyTypeMapping.Type = MappingType.AutoNone;
-            academyTypeMapping.PublicId = $"{academyTypeMapping.PublicId}-orig";
-            academyTypeMapping.Source.Label = $"{academyTypeMapping.Source.Label} original";
-            academyTypeMapping.CandidateKey = null;
-
-            var ncYearMapping = mapping.FilterMappingPlan.Mappings["ncyear"];
-
-            ncYearMapping.Type = MappingType.ManualMapped;
-            ncYearMapping.PublicId = $"{ncYearMapping.PublicId}-orig";
-            ncYearMapping.Source.Label = $"{ncYearMapping.Source.Label} original";
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
-            Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
-                {
-                    var actualFilter = actualFilters[filterIndex];
-
-                    // Filter `ncyear` re-uses orig public ID as it was manually mapped.
-                    expectedFilter.PublicId =
-                        expectedFilter.Column == "ncyear" ? $"{expectedFilter.PublicId}-orig" : expectedFilter.PublicId;
-
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectFilterOptions_AutoMappedWithSamePublicIds()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
-                    )
-                );
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
-            Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
-                {
-                    var actualFilter = actualFilters[filterIndex];
-
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectFilterOptions_AutoMappedWithOriginalPublicIds()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
-                    )
-                );
-
-            foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
-            {
                 foreach (var (_, optionMapping) in filterMapping.OptionMappings)
                 {
+                    optionMapping.Type = mappingType;
                     optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
                     optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
                 }
@@ -539,21 +363,26 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 {
                     var actualFilter = actualFilters[filterIndex];
 
+                    // Filter gets original public ID as it was mapped
+                    expectedFilter.PublicId = $"{expectedFilter.PublicId}-orig";
+
                     AssertFiltersEqual(expectedFilter, actualFilter);
 
-                    // Filter options re-use orig public IDs as they were auto mapped
-                    foreach (var optionLink in expectedFilter.OptionLinks)
+                    // Filter options re-use original public IDs as they were mapped
+                    foreach (var expectedOptionLink in expectedFilter.OptionLinks)
                     {
-                        optionLink.PublicId = $"{optionLink.PublicId}-orig";
+                        expectedOptionLink.PublicId = $"{expectedOptionLink.PublicId}-orig";
                     }
 
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
+                    AssertAllFilterOptionLabelsAndPublicIdsEqual(expectedFilter, actualFilter);
                 }
             );
         }
 
-        [Fact]
-        public async Task NextVersion_CorrectFilterOptions_AutoNoneOptions()
+        [Theory]
+        [InlineData(MappingType.AutoNone)]
+        [InlineData(MappingType.ManualNone)]
+        public async Task NextVersion_CorrectFiltersAndOptions_NotMapped_NewPublicIds(MappingType mappingType)
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -577,9 +406,14 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
             {
+                filterMapping.Type = mappingType;
+                filterMapping.PublicId = $"{filterMapping.PublicId}-orig";
+                filterMapping.Source.Label = $"{filterMapping.Source.Label} original";
+                filterMapping.CandidateKey = null;
+
                 foreach (var (_, optionMapping) in filterMapping.OptionMappings)
                 {
-                    optionMapping.Type = MappingType.AutoNone;
+                    optionMapping.Type = mappingType;
                     optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
                     optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
                     optionMapping.CandidateKey = null;
@@ -599,134 +433,11 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 {
                     var actualFilter = actualFilters[filterIndex];
 
+                    // Filter gets new public ID as it had no mapping
                     AssertFiltersEqual(expectedFilter, actualFilter);
 
-                    // Filter options get new public ID as it they have no auto mapping
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectFilterOptions_ManualMappedOptions()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
-                    )
-                );
-
-            foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
-            {
-                foreach (var (_, optionMapping) in filterMapping.OptionMappings)
-                {
-                    optionMapping.Type = MappingType.ManualMapped;
-                    optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
-                    optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
-                }
-            }
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
-            Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
-                {
-                    var actualFilter = actualFilters[filterIndex];
-
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-
-                    // Filter options re-use orig public IDs as they were manually mapped
-                    foreach (var optionLink in expectedFilter.OptionLinks)
-                    {
-                        optionLink.PublicId = $"{optionLink.PublicId}-orig";
-                    }
-
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectFilterOptions_MixedOptionMappings()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
-                    )
-                );
-
-            foreach (var (_, optionMapping) in mapping.FilterMappingPlan.Mappings["academy_type"].OptionMappings)
-            {
-                optionMapping.Type = MappingType.AutoNone;
-                optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
-                optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
-                optionMapping.CandidateKey = null;
-            }
-
-            foreach (var (_, optionMapping) in mapping.FilterMappingPlan.Mappings["ncyear"].OptionMappings)
-            {
-                optionMapping.Type = MappingType.ManualMapped;
-                optionMapping.PublicId = $"{optionMapping.PublicId}-orig";
-                optionMapping.Source.Label = $"{optionMapping.Source.Label} original";
-            }
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
-            Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
-                {
-                    var actualFilter = actualFilters[filterIndex];
-
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-
-                    // Only `ncyear` options re-use orig public IDs as they were manually mapped.
-                    foreach (var optionLink in expectedFilter.OptionLinks)
-                    {
-                        optionLink.PublicId =
-                            expectedFilter.Column == "ncyear" ? $"{optionLink.PublicId}-orig" : optionLink.PublicId;
-                    }
-
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
+                    // Filter options get new public IDs as they had no mapping
+                    AssertAllFilterOptionLabelsAndPublicIdsEqual(expectedFilter, actualFilter);
                 }
             );
         }
@@ -763,19 +474,18 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             );
         }
 
-        [Fact]
-        public async Task NextVersion_CorrectIndicators_OriginalPublicIds()
+        [Theory]
+        [InlineData(MappingType.AutoMapped)]
+        [InlineData(MappingType.ManualMapped)]
+        public async Task NextVersion_CorrectIndicators_Mapped_ReuseOriginalPublicIds(MappingType mappingType)
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var originalIndicators = testData
-                .ExpectedIndicators.Select(i =>
+            var originalIndicators = ResetIndicatorMetaIds(testData.ExpectedIndicators)
+                .Select(i =>
                 {
                     var indicator = i.ShallowClone();
-
-                    indicator.Id = 0;
                     indicator.PublicId = $"{indicator.PublicId}-orig";
-
                     return indicator;
                 })
                 .ToList();
@@ -799,6 +509,11 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                     )
                 );
 
+            foreach (var indicatorMapping in mapping.IndicatorMappingPlan!.Mappings.Values)
+            {
+                indicatorMapping.Type = mappingType;
+            }
+
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
@@ -817,7 +532,7 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                         ignoreProperties: [m => m.Id, m => m.PublicId, m => m.DataSetVersionId, m => m.Created]
                     );
 
-                    // Indicators re-use orig public IDs of original indicators.
+                    // Indicators re-use original public IDs of original indicators.
                     Assert.Equal($"{expectedIndicator.PublicId}-orig", actualIndicator.PublicId);
                     Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
                     Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
@@ -825,119 +540,10 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             );
         }
 
-        [Fact]
-        public async Task NextVersion_CorrectIndicators_NewPublicIds()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            // Set up indicators that are nothing like the test data set's indicators.
-            var originalIndicators = DataFixture.DefaultIndicatorMeta().GenerateList(3);
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = originalIndicators },
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id);
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualIndicators = await GetDbIndicatorMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedIndicators.Count, actualIndicators.Count);
-            Assert.All(
-                testData.ExpectedIndicators,
-                (expectedIndicator, index) =>
-                {
-                    var actualIndicator = actualIndicators[index];
-
-                    actualIndicator.AssertDeepEqualTo(
-                        expectedIndicator,
-                        ignoreProperties: [m => m.Id, m => m.PublicId, m => m.DataSetVersionId, m => m.Created]
-                    );
-
-                    // Indicators get new public IDs offset by number of original indicators.
-                    Assert.Equal(
-                        SqidEncoder.Encode(expectedIndicator.Id + originalIndicators.Count),
-                        actualIndicator.PublicId
-                    );
-                    Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
-                    Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectIndicators_NewPublicIdsWhenColumnsChange()
-        {
-            var testData = ProcessorTestData.AbsenceSchool;
-
-            // Set up original indicators that only differ in column names. Currently,
-            // indicators can't be mapped so the new indicators must be given new public IDs.
-            var originalIndicators = testData
-                .ExpectedIndicators.Select(i =>
-                {
-                    var indicator = i.ShallowClone();
-
-                    indicator.Id = 0;
-                    indicator.Column = $"{indicator.Column}_orig";
-
-                    return indicator;
-                })
-                .ToList();
-
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
-                    fixture.GetPublicDataDbContext(),
-                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = originalIndicators },
-                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                    nextVersionStatus: DataSetVersionStatus.Mapping
-                );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id);
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            var actualIndicators = await GetDbIndicatorMetas(targetDataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedIndicators.Count, actualIndicators.Count);
-            Assert.All(
-                testData.ExpectedIndicators,
-                (expectedIndicator, index) =>
-                {
-                    var actualIndicator = actualIndicators[index];
-
-                    actualIndicator.AssertDeepEqualTo(
-                        expectedIndicator,
-                        ignoreProperties: [m => m.Id, m => m.PublicId, m => m.DataSetVersionId, m => m.Created]
-                    );
-
-                    // Indicators get new public IDs offset by number of original indicators.
-                    Assert.Equal(
-                        SqidEncoder.Encode(expectedIndicator.Id + originalIndicators.Count),
-                        actualIndicator.PublicId
-                    );
-                    Assert.Equal(targetDataSetVersion.Id, actualIndicator.DataSetVersionId);
-                    Assert.NotEqual(expectedIndicator.Created, actualIndicator.Created);
-                }
-            );
-        }
-
-        [Fact]
-        public async Task NextVersion_CorrectIndicators_MixtureHaveCorrectPublicIds()
+        [Theory]
+        [InlineData(MappingType.AutoNone)]
+        [InlineData(MappingType.ManualNone)]
+        public async Task NextVersion_CorrectIndicators_NotMapped_NewPublicIds(MappingType mappingType)
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -972,8 +578,10 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             // TODO EES-6764 - remove null-forgiving operator.
             // Set a couple of the new data set version's Indicators to not be mapped to original Indicators.
-            mapping.IndicatorMappingPlan!.Mappings[originalIndicators[3].Column].Type = MappingType.ManualNone;
-            mapping.IndicatorMappingPlan!.Mappings[originalIndicators[4].Column].Type = MappingType.AutoNone;
+            foreach (var indicatorMapping in mapping.IndicatorMappingPlan!.Mappings.Values)
+            {
+                indicatorMapping.Type = mappingType;
+            }
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
@@ -983,25 +591,13 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             Assert.Equal(testData.ExpectedIndicators.Count, actualIndicators.Count);
 
-            // The first 3 Indicators of the target data set version are auto-mapped to original Indicators,
-            // and so they retain the original Indicators' PublicIds for backwards-compatibility.
-            Assert.Equal(originalIndicators[0].PublicId, actualIndicators[0].PublicId);
-            Assert.Equal(originalIndicators[1].PublicId, actualIndicators[1].PublicId);
-            Assert.Equal(originalIndicators[2].PublicId, actualIndicators[2].PublicId);
-
-            // The 4th Indicator in the target data set version has a mapping of "ManualNone", and so
-            // the Indicator receives a new PublicId.
-            Assert.Equal(
-                SqidEncoder.Encode(testData.ExpectedIndicators[3].Id + originalIndicators.Count),
-                actualIndicators[3].PublicId
-            );
-
-            // The 5th Indicator in the target data set version has a mapping of "AutoNone", and so
-            // the Indicator receives a new PublicId.
-            Assert.Equal(
-                SqidEncoder.Encode(testData.ExpectedIndicators[4].Id + originalIndicators.Count),
-                actualIndicators[4].PublicId
-            );
+            for (var i = 0; i < actualIndicators.Count; i++)
+            {
+                Assert.Equal(
+                    SqidEncoder.Encode(testData.ExpectedIndicators[i].Id + originalIndicators.Count),
+                    actualIndicators[i].PublicId
+                );
+            }
         }
     }
 
@@ -1209,6 +805,16 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         await fixture.Function.ImportMetadata(instanceId, CancellationToken.None);
     }
 
+    private async Task<List<LocationMeta>> GetDbLocationMetas(Guid dataSetVersionId) =>
+        await fixture
+            .GetPublicDataDbContext()
+            .LocationMetas.Include(level => level.Options.OrderBy(o => o.Id))
+            .Include(level => level.OptionLinks.OrderBy(l => l.OptionId))
+                .ThenInclude(location => location.Option)
+            .Where(level => level.DataSetVersionId == dataSetVersionId)
+            .OrderBy(level => level.Id)
+            .ToListAsync();
+
     private async Task<List<FilterMeta>> GetDbFilterMetas(Guid dataSetVersionId) =>
         await fixture
             .GetPublicDataDbContext()
@@ -1226,7 +832,38 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
             .OrderBy(im => im.Label)
             .ToListAsync();
 
-    private static void AssertAllFilterOptionsEqual(FilterMeta expectedFilter, FilterMeta actualFilter)
+    private static void AssertLocationLevelsEqual(LocationMeta expectedLocationLevel, LocationMeta actualLocationLevel)
+    {
+        actualLocationLevel.AssertDeepEqualTo(
+            expectedLocationLevel,
+            ignoreProperties: [m => m.DataSetVersionId, m => m.Options, m => m.OptionLinks, m => m.Created]
+        );
+    }
+
+    private static void AssertAllLocationOptionLabelsAndPublicIdsEqual(
+        LocationMeta expectedLocationLevel,
+        LocationMeta actualLocationLevel
+    )
+    {
+        Assert.Equal(expectedLocationLevel.Options.Count, actualLocationLevel.Options.Count);
+        Assert.Equal(expectedLocationLevel.OptionLinks.Count, actualLocationLevel.OptionLinks.Count);
+
+        Assert.All(
+            expectedLocationLevel.OptionLinks,
+            (expectedOptionLink, linkIndex) =>
+            {
+                var actualOptionLink = actualLocationLevel.OptionLinks[linkIndex];
+
+                Assert.Equal(expectedOptionLink.PublicId, actualOptionLink.PublicId);
+
+                var expectedOption = expectedLocationLevel.Options[linkIndex];
+
+                Assert.Equal(expectedOption.Label, actualOptionLink.Option.Label);
+            }
+        );
+    }
+
+    private static void AssertAllFilterOptionLabelsAndPublicIdsEqual(FilterMeta expectedFilter, FilterMeta actualFilter)
     {
         Assert.Equal(expectedFilter.Options.Count, actualFilter.Options.Count);
         Assert.Equal(expectedFilter.OptionLinks.Count, actualFilter.OptionLinks.Count);

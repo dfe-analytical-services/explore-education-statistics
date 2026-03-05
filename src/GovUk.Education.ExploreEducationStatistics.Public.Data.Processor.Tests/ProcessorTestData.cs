@@ -103,6 +103,15 @@ public record ProcessorTestData
                             Label = "Kingston upon Thames / Richmond upon Thames",
                         },
                     ],
+                    OptionLinks = Enumerable
+                        .Range(1, 4)
+                        .Select(i => new LocationOptionMetaLink
+                        {
+                            MetaId = 1,
+                            OptionId = i,
+                            PublicId = SqidEncoder.Encode(i),
+                        })
+                        .ToList(),
                 },
                 new LocationMeta
                 {
@@ -118,6 +127,15 @@ public record ProcessorTestData
                             Label = "England",
                         },
                     ],
+                    OptionLinks = Enumerable
+                        .Range(5, 1)
+                        .Select(i => new LocationOptionMetaLink
+                        {
+                            MetaId = 2,
+                            OptionId = i,
+                            PublicId = SqidEncoder.Encode(i),
+                        })
+                        .ToList(),
                 },
                 new LocationMeta
                 {
@@ -139,6 +157,15 @@ public record ProcessorTestData
                             Label = "Outer London",
                         },
                     ],
+                    OptionLinks = Enumerable
+                        .Range(6, 2)
+                        .Select(i => new LocationOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = i,
+                            PublicId = SqidEncoder.Encode(i),
+                        })
+                        .ToList(),
                 },
                 new LocationMeta
                 {
@@ -204,6 +231,15 @@ public record ProcessorTestData
                             Label = "Greenhill Primary School",
                         },
                     ],
+                    OptionLinks = Enumerable
+                        .Range(8, 8)
+                        .Select(i => new LocationOptionMetaLink
+                        {
+                            MetaId = 4,
+                            OptionId = i,
+                            PublicId = SqidEncoder.Encode(i),
+                        })
+                        .ToList(),
                 },
             ],
             ExpectedFilters =
