@@ -668,7 +668,7 @@ public class ReleaseVersionService(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId)
                 );
             })
-            .OnSuccessDo(async deletePlan => await DeleteDraftApiDataSetVersion(deletePlan))
+            .OnSuccessDo(DeleteDraftApiDataSetVersion)
             .OnSuccessVoid(() => releaseDataFileService.Delete(releaseVersionId, fileId));
     }
 

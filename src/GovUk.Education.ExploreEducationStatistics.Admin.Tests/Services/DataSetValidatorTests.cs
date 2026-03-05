@@ -112,7 +112,7 @@ public class DataSetValidatorTests
     }
 
     [Fact]
-    public async Task UserOnPublicationTeam_ValidateDataSet_Success()
+    public async Task ValidateDataSet_UserOnPublicationTeam_ReturnsDataSetObject()
     {
         // Arrange
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
@@ -191,7 +191,7 @@ public class DataSetValidatorTests
     }
 
     [Fact]
-    public async Task UserNotOnPublicationTeam_ValidateDataSet_ReturnsErrorDetails()
+    public async Task ValidateDataSet_UserNotOnPublicationTeam_ReturnsErrorDetails()
     {
         // Arrange
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
