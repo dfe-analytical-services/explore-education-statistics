@@ -242,7 +242,6 @@ export default function FormComboBox({
           className={classNames(styles.optionsContainer, {
             [styles.overflowContainer]: overflowContainer,
           })}
-          role="alert"
         >
           {typeof listBoxLabel === 'function'
             ? listBoxLabel({ selectedOption, value })
