@@ -80,7 +80,7 @@ describe('ReleasePageIntro', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the link to all releases in series', () => {
+  test('renders the links to all releases in series, download data and create tables', () => {
     render(
       <ReleasePageIntro
         publicationSummary={testPublicationSummary}
@@ -93,6 +93,16 @@ describe('ReleasePageIntro', () => {
         name: 'All releases in this series',
       }),
     ).toHaveAttribute('href', '/find-statistics/publication-slug/releases');
+    expect(
+      screen.getByRole('link', {
+        name: 'Download all data (ZIP)',
+      }),
+    ).toHaveAttribute('id', 'download-all-data-link');
+    expect(
+      screen.getByRole('link', {
+        name: 'Create your own tables',
+      }),
+    ).toHaveAttribute('href', '/data-tables/publication-slug');
   });
 
   test('renders superseded warning text when publication is superseded', () => {
