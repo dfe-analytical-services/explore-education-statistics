@@ -707,6 +707,15 @@ public class ReleaseVersionService(
             .OnSuccessDo(ValidateDataFilesStatusForDeletion)
             .OnSuccessDo(async releaseFile =>
             {
+                // replacements will have a mapping, which we need to remove
+                var mappings = await context
+                    .DataSetMappings.Where(mapping => mapping.ReplacementDataSetId == releaseFile.File.SubjectId)
+                    .ToListAsync();
+                context.DataSetMappings.RemoveRange(mappings);
+                await context.SaveChangesAsync();
+            })
+            .OnSuccessDo(async releaseFile =>
+            {
                 // Delete any replacement that might exist
                 if (releaseFile.File.ReplacedById.HasValue)
                 {

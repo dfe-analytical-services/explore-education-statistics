@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -28,6 +29,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using IndicatorMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.IndicatorMapping;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -171,6 +173,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -197,7 +200,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -380,6 +383,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -416,7 +420,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -753,6 +757,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -782,7 +787,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
             Assert.False(replacementPlan.Valid);
@@ -939,6 +944,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -968,7 +974,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
             Assert.False(replacementPlan.Valid);
@@ -1144,6 +1150,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1177,7 +1184,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
             Assert.False(replacementPlan.Valid);
@@ -1343,6 +1350,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1372,7 +1380,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -1530,6 +1538,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1543,7 +1552,7 @@ public class ReplacementPlanServiceTests
                 timePeriodService: timePeriodService.Object,
                 locationRepository: locationRepository.Object,
                 releaseFileRepository: releaseFileRepository.Object,
-                dataSetVersionMappingService: dataSetVersionMappingService.Object
+                apiDataSetVersionMappingService: dataSetVersionMappingService.Object
             );
 
             var result = await replacementPlanService.GetReplacementPlan(
@@ -1551,7 +1560,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(dataSetVersionService);
+            VerifyAllMocks(dataSetVersionService, locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -1818,6 +1827,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1859,7 +1869,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -1886,6 +1896,8 @@ public class ReplacementPlanServiceTests
             Assert.Equal(originalIndicator.Label, dataBlockIndicatorPlan.Label);
             Assert.Equal(originalIndicator.Name, dataBlockIndicatorPlan.Name);
             Assert.Equal(replacementIndicator.Id, dataBlockIndicatorPlan.Target);
+            // valid because generated mapping auto mapped originalIndicator -> replacementIndicator
+            // generated mapping tested elsewhere
             Assert.True(dataBlockIndicatorPlan.Valid);
 
             Assert.Equal(2, dataBlockPlan.Filters.Count);
@@ -2079,6 +2091,8 @@ public class ReplacementPlanServiceTests
             Assert.Equal(originalIndicator.Label, footnoteForIndicatorIndicatorPlan.Label);
             Assert.Equal(originalIndicator.Name, footnoteForIndicatorIndicatorPlan.Name);
             Assert.Equal(replacementIndicator.Id, footnoteForIndicatorIndicatorPlan.Target);
+            // valid because generated mapping auto mapped originalIndicator -> replacementIndicator
+            // the generated mapping is tested elsewhere
             Assert.True(footnoteForIndicatorIndicatorPlan.Valid);
 
             Assert.True(footnoteForIndicatorPlan.Valid);
@@ -2095,6 +2109,526 @@ public class ReplacementPlanServiceTests
             Assert.Null(replacementPlan.ApiDataSetVersionPlan);
 
             Assert.True(replacementPlan.Valid);
+        }
+    }
+
+    [Fact]
+    public async Task GetReplacementPlan_CustomMapping_IndicatorMappedThatAppearsInDataBlockAndFootnote_ReplacementValid()
+    {
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
+
+        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(statsReleaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
+
+        var replacementFile = new File
+        {
+            Type = FileType.Data,
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+
+        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+
+        var originalIndicatorA = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator A",
+            Name = "indicator_a",
+        };
+
+        var replacementIndicatorAUpdated = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator A updated",
+            Name = "indicator_a_updated",
+        };
+
+        var originalIndicatorToBeRemoved = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator to be removed",
+            Name = "indicator_to_be_removed",
+        };
+
+        var replacementNewIndicator = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "New indicator",
+            Name = "new_indicator",
+        };
+
+        var originalIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = originalReleaseSubject.Subject,
+            Indicators = new List<Indicator> { originalIndicatorA, originalIndicatorToBeRemoved },
+        };
+
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = replacementReleaseSubject.Subject,
+            Indicators = new List<Indicator> { replacementIndicatorAUpdated, replacementNewIndicator },
+        };
+
+        var location = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.Country,
+            Country = _england,
+        };
+
+        var timePeriod = new TimePeriodQuery
+        {
+            StartYear = 2019,
+            StartCode = CalendarYear,
+            EndYear = 2020,
+            EndCode = CalendarYear,
+        };
+
+        var dataBlock = new DataBlock
+        {
+            Name = "Test DataBlock",
+            Query = new FullTableQuery
+            {
+                SubjectId = originalReleaseSubject.SubjectId,
+                Filters = [],
+                Indicators = [originalIndicatorA.Id],
+                LocationIds = ListOf(location.Id),
+                TimePeriod = timePeriod,
+            },
+            ReleaseVersion = releaseVersion,
+        };
+
+        var footnoteForIndicator = CreateFootnote(
+            statsReleaseVersion,
+            "Test footnote for Filter item",
+            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicatorA } }
+        );
+
+        var locationRepository = new Mock<ILocationRepository>(Strict);
+        locationRepository
+            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(new List<Location> { location });
+
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+        timePeriodService
+            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(
+                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
+            );
+
+        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+        releaseFileRepository
+            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
+            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalReleaseSubject.SubjectId,
+            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicatorA.Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicatorA.Id,
+                        OriginalLabel = originalIndicatorA.Label,
+                        OriginalColumnName = originalIndicatorA.Name,
+                        OriginalGroupId = originalIndicatorGroup.Id,
+                        OriginalGroupLabel = originalIndicatorGroup.Label,
+                        ReplacementId = replacementIndicatorAUpdated.Id,
+                        ReplacementLabel = replacementIndicatorAUpdated.Label,
+                        ReplacementGroupId = replacementIndicatorAUpdated.IndicatorGroupId,
+                        Status = MapStatus.ManuallySet,
+                    }
+                },
+                {
+                    originalIndicatorToBeRemoved.Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicatorToBeRemoved.Id,
+                        OriginalLabel = originalIndicatorToBeRemoved.Label,
+                        OriginalColumnName = originalIndicatorToBeRemoved.Name,
+                        OriginalGroupId = originalIndicatorGroup.Id,
+                        OriginalGroupLabel = originalIndicatorGroup.Label,
+                        ReplacementId = null,
+                        ReplacementLabel = null,
+                        ReplacementGroupId = null,
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+            UnsetReplacementIndicators =
+            [
+                new UnsetIndicator
+                {
+                    Id = replacementNewIndicator.Id,
+                    Label = replacementNewIndicator.Label,
+                    GroupId = replacementIndicatorGroup.Id,
+                    GroupLabel = replacementIndicatorGroup.Label,
+                },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            statisticsDbContext.Location.AddRange(location);
+            statisticsDbContext.Footnote.AddRange(footnoteForIndicator);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var replacementPlanService = BuildReplacementPlanService(
+                contentDbContext,
+                statisticsDbContext,
+                locationRepository: locationRepository.Object,
+                timePeriodService: timePeriodService.Object,
+                releaseFileRepository: releaseFileRepository.Object
+            );
+
+            var result = await replacementPlanService.GetReplacementPlan(
+                releaseVersionId: releaseVersion.Id,
+                originalFileId: originalFile.Id
+            );
+
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+
+            var replacementPlan = result.AssertRight();
+
+            Assert.Equal(originalReleaseSubject.SubjectId, replacementPlan.OriginalSubjectId);
+            Assert.Equal(replacementReleaseSubject.SubjectId, replacementPlan.ReplacementSubjectId);
+
+            Assert.Single(replacementPlan.DataBlocks);
+            var dataBlockPlan = replacementPlan.DataBlocks.First();
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
+
+            Assert.Single(dataBlockPlan.IndicatorGroups);
+
+            var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
+
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
+            Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
+            Assert.True(dataBlockIndicatorGroupPlan.Value.Valid);
+
+            var dataBlockIndicatorPlan = dataBlockIndicatorGroupPlan.Value.Indicators.First();
+
+            Assert.Equal(originalIndicatorA.Id, dataBlockIndicatorPlan.Id);
+            Assert.Equal(originalIndicatorA.Label, dataBlockIndicatorPlan.Label);
+            Assert.Equal(originalIndicatorA.Name, dataBlockIndicatorPlan.Name);
+            Assert.Equal(replacementIndicatorAUpdated.Id, dataBlockIndicatorPlan.Target);
+            Assert.True(dataBlockIndicatorPlan.Valid);
+
+            var footnoteForIndicatorPlan = replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForIndicator.Id);
+            Assert.Equal(footnoteForIndicator.Content, footnoteForIndicatorPlan.Content);
+
+            Assert.Empty(footnoteForIndicatorPlan.Filters);
+            Assert.Empty(footnoteForIndicatorPlan.FilterGroups);
+            Assert.Empty(footnoteForIndicatorPlan.FilterItems);
+            Assert.Single(footnoteForIndicatorPlan.IndicatorGroups);
+
+            var footnoteForIndicatorIndicatorGroupPlan = footnoteForIndicatorPlan.IndicatorGroups.First();
+
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Id, footnoteForIndicatorIndicatorGroupPlan.Key);
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
+            Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
+            Assert.True(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
+
+            var footnoteForIndicatorIndicatorPlan = footnoteForIndicatorIndicatorGroupPlan.Value.Indicators.First();
+
+            Assert.Equal(originalIndicatorA.Id, footnoteForIndicatorIndicatorPlan.Id);
+            Assert.Equal(originalIndicatorA.Label, footnoteForIndicatorIndicatorPlan.Label);
+            Assert.Equal(originalIndicatorA.Name, footnoteForIndicatorIndicatorPlan.Name);
+            Assert.Equal(replacementIndicatorAUpdated.Id, footnoteForIndicatorIndicatorPlan.Target);
+            Assert.True(footnoteForIndicatorIndicatorPlan.Valid);
+
+            Assert.True(footnoteForIndicatorPlan.Valid);
+
+            Assert.True(replacementPlan.Valid);
+        }
+    }
+
+    [Fact]
+    public async Task GetReplacementPlan_CustomMapping_IndicatorUnmappedThatIsUsedInDataBlockAndFootnote_ReplacementInvalid()
+    {
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
+
+        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(statsReleaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
+
+        var replacementFile = new File
+        {
+            Type = FileType.Data,
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+
+        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+
+        var originalIndicatorA = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator A",
+            Name = "indicator_a",
+        };
+
+        var replacementIndicatorAUpdated = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator A updated",
+            Name = "indicator_a_updated",
+        };
+
+        var originalIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = originalReleaseSubject.Subject,
+            Indicators = new List<Indicator> { originalIndicatorA },
+        };
+
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = replacementReleaseSubject.Subject,
+            Indicators = new List<Indicator> { replacementIndicatorAUpdated },
+        };
+
+        var location = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.Country,
+            Country = _england,
+        };
+
+        var timePeriod = new TimePeriodQuery
+        {
+            StartYear = 2019,
+            StartCode = CalendarYear,
+            EndYear = 2020,
+            EndCode = CalendarYear,
+        };
+
+        var dataBlock = new DataBlock
+        {
+            Name = "Test DataBlock",
+            Query = new FullTableQuery
+            {
+                SubjectId = originalReleaseSubject.SubjectId,
+                Filters = [],
+                Indicators = [originalIndicatorA.Id],
+                LocationIds = ListOf(location.Id),
+                TimePeriod = timePeriod,
+            },
+            ReleaseVersion = releaseVersion,
+        };
+
+        var footnoteForIndicator = CreateFootnote(
+            statsReleaseVersion,
+            "Test footnote for Filter item",
+            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicatorA } }
+        );
+
+        var locationRepository = new Mock<ILocationRepository>(Strict);
+        locationRepository
+            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(new List<Location> { location });
+
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+        timePeriodService
+            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(
+                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
+            );
+
+        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+        releaseFileRepository
+            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
+            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalReleaseSubject.SubjectId,
+            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicatorA.Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicatorA.Id,
+                        OriginalLabel = originalIndicatorA.Label,
+                        OriginalColumnName = originalIndicatorA.Name,
+                        OriginalGroupId = originalIndicatorGroup.Id,
+                        OriginalGroupLabel = originalIndicatorGroup.Label,
+                        // not mapped to anything despite being included in data block/footnote, so plan should be invalid
+                        ReplacementId = null,
+                        ReplacementLabel = null,
+                        ReplacementGroupId = null,
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+            UnsetReplacementIndicators =
+            [
+                new UnsetIndicator
+                {
+                    Id = replacementIndicatorAUpdated.Id,
+                    Label = replacementIndicatorAUpdated.Label,
+                    GroupId = replacementIndicatorGroup.Id,
+                    GroupLabel = replacementIndicatorGroup.Label,
+                },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            statisticsDbContext.Location.AddRange(location);
+            statisticsDbContext.Footnote.AddRange(footnoteForIndicator);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var replacementPlanService = BuildReplacementPlanService(
+                contentDbContext,
+                statisticsDbContext,
+                locationRepository: locationRepository.Object,
+                timePeriodService: timePeriodService.Object,
+                releaseFileRepository: releaseFileRepository.Object
+            );
+
+            var result = await replacementPlanService.GetReplacementPlan(
+                releaseVersionId: releaseVersion.Id,
+                originalFileId: originalFile.Id
+            );
+
+            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+
+            var replacementPlan = result.AssertRight();
+
+            Assert.Equal(originalReleaseSubject.SubjectId, replacementPlan.OriginalSubjectId);
+            Assert.Equal(replacementReleaseSubject.SubjectId, replacementPlan.ReplacementSubjectId);
+
+            Assert.Single(replacementPlan.DataBlocks);
+            var dataBlockPlan = replacementPlan.DataBlocks.First();
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
+
+            Assert.Single(dataBlockPlan.IndicatorGroups);
+
+            var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
+
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
+            Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
+            Assert.False(dataBlockIndicatorGroupPlan.Value.Valid);
+
+            var dataBlockIndicatorPlan = dataBlockIndicatorGroupPlan.Value.Indicators.First();
+
+            Assert.Equal(originalIndicatorA.Id, dataBlockIndicatorPlan.Id);
+            Assert.Equal(originalIndicatorA.Label, dataBlockIndicatorPlan.Label);
+            Assert.Equal(originalIndicatorA.Name, dataBlockIndicatorPlan.Name);
+            Assert.Null(dataBlockIndicatorPlan.Target);
+            Assert.False(dataBlockIndicatorPlan.Valid);
+
+            var footnoteForIndicatorPlan = replacementPlan.Footnotes.Single(plan => plan.Id == footnoteForIndicator.Id);
+            Assert.Equal(footnoteForIndicator.Content, footnoteForIndicatorPlan.Content);
+
+            Assert.Empty(footnoteForIndicatorPlan.Filters);
+            Assert.Empty(footnoteForIndicatorPlan.FilterGroups);
+            Assert.Empty(footnoteForIndicatorPlan.FilterItems);
+            Assert.Single(footnoteForIndicatorPlan.IndicatorGroups);
+
+            var footnoteForIndicatorIndicatorGroupPlan = footnoteForIndicatorPlan.IndicatorGroups.First();
+
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Id, footnoteForIndicatorIndicatorGroupPlan.Key);
+            Assert.Equal(originalIndicatorA.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
+            Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
+            Assert.False(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
+
+            var footnoteForIndicatorIndicatorPlan = footnoteForIndicatorIndicatorGroupPlan.Value.Indicators.First();
+
+            Assert.Equal(originalIndicatorA.Id, footnoteForIndicatorIndicatorPlan.Id);
+            Assert.Equal(originalIndicatorA.Label, footnoteForIndicatorIndicatorPlan.Label);
+            Assert.Equal(originalIndicatorA.Name, footnoteForIndicatorIndicatorPlan.Name);
+            Assert.Null(footnoteForIndicatorIndicatorPlan.Target);
+            Assert.False(footnoteForIndicatorIndicatorPlan.Valid);
+
+            Assert.False(footnoteForIndicatorPlan.Valid);
+
+            Assert.False(replacementPlan.Valid);
         }
     }
 
@@ -2129,7 +2663,8 @@ public class ReplacementPlanServiceTests
         ILocationRepository? locationRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
-        IDataSetVersionMappingService? dataSetVersionMappingService = null,
+        IDataSetMappingService? dataSetMappingService = null,
+        IDataSetVersionMappingService? apiDataSetVersionMappingService = null,
         IReleaseFileRepository? releaseFileRepository = null
     )
     {
@@ -2137,13 +2672,13 @@ public class ReplacementPlanServiceTests
             contentDbContext,
             statisticsDbContext,
             new FilterRepository(statisticsDbContext),
-            new IndicatorRepository(statisticsDbContext),
             locationRepository ?? Mock.Of<ILocationRepository>(Strict),
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             AlwaysTrueUserService().Object,
-            dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
+            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext),
+            apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );
     }
