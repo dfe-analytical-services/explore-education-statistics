@@ -105,6 +105,36 @@ interface LocationsMappingUpdateResponse {
   }[];
 }
 
+export interface IndicatorSource {
+  label: string;
+}
+
+export type IndicatorCandidate = IndicatorSource;
+
+export type IndicatorMapping = Mapping<IndicatorSource>;
+
+export interface IndicatorsMapping {
+  candidates: Dictionary<IndicatorSource>;
+  mappings: Dictionary<IndicatorMapping>;
+}
+
+export interface IndicatorMappingUpdate {
+  candidateKey?: string;
+  sourceKey: string;
+  type: MappingType;
+}
+
+interface IndicatorsMappingUpdateRequest {
+  updates: IndicatorMappingUpdate[];
+}
+
+interface IndicatorsMappingUpdateResponse {
+  updates: {
+    sourceKey: string;
+    mapping: LocationMapping;
+  }[];
+}
+
 export interface ListVersionsParams {
   dataSetId: string;
   page?: number;
