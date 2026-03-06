@@ -41,16 +41,4 @@ public class NotifierClient(string connectionString) : INotifierClient
             cancellationToken
         );
     }
-
-    public async Task NotifyEinTilesRequireUpdate(
-        IReadOnlyList<EinTilesRequireUpdateMessage> messages,
-        CancellationToken cancellationToken = default
-    )
-    {
-        await _queueServiceClient.SendMessagesAsJson(
-            NotifierQueueStorage.EinTilesRequireUpdate,
-            messages,
-            cancellationToken
-        );
-    }
 }

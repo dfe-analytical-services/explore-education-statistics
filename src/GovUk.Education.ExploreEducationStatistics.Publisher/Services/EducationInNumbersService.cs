@@ -1,47 +1,53 @@
+using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using LinqToDB.Internal.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
 public class EducationInNumbersService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
-    INotifierClient notifierClient
+    IEmailService emailService,
+    IOptions<AppOptions> appOptions
 ) : IEducationInNumbersService
 {
+    private readonly AppOptions _appOptions = appOptions.Value;
+
     public async Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate, CancellationToken cancellationToken = default)
     {
         if (releaseVersionIdsToUpdate.Length == 0)
+        {
             return;
+        }
 
         var updatedPublicationIds = await contentDbContext
             .ReleaseVersions.AsNoTracking()
+            .Where(rv => releaseVersionIdsToUpdate.Contains(rv.Id))
             .Select(rv => rv.Release.PublicationId)
+            .Distinct()
             .ToListAsync(cancellationToken);
 
         var dataSets = await publicDataDbContext
             .DataSets.Include(ds => ds.LatestLiveVersion)
             .Where(ds => updatedPublicationIds.Contains(ds.PublicationId) && ds.LatestLiveVersion != null)
-            .ToListAsync(cancellationToken);
-
-        var dataSetIds = dataSets.Select(ds => ds.Id).ToList();
+            .ToDictionaryAsync(ds => ds.Id, cancellationToken);
 
         var apiQueryTiles = await contentDbContext
             .EinTiles.Include(t => t.EinParentBlock.EinContentSection.EducationInNumbersPage)
             .OfType<EinApiQueryStatTile>()
-            .Where(t => t.DataSetId != null && dataSetIds.Contains(t.DataSetId.Value))
+            .Where(t => t.DataSetId != null && dataSets.Keys.Contains(t.DataSetId.Value))
             .ToListAsync(cancellationToken);
 
         List<EinApiQueryStatTile> updatedTiles = [];
         foreach (var tile in apiQueryTiles)
         {
-            var dataSet = dataSets.Single(ds => ds.Id == tile.DataSetId);
+            var dataSet = dataSets[tile.DataSetId!.Value];
             var dataSetLatestVersionId = dataSet.LatestLiveVersionId;
 
             if (tile.DataSetVersionId != dataSetLatestVersionId)
@@ -55,7 +61,7 @@ public class EducationInNumbersService(
         }
         await contentDbContext.SaveChangesAsync(cancellationToken);
 
-        await SendBauEmail(updatedTiles, dataSets, cancellationToken);
+        await SendBauEmail(updatedTiles, [.. dataSets.Values], cancellationToken);
     }
 
     private async Task SendBauEmail(
@@ -92,37 +98,35 @@ public class EducationInNumbersService(
             .Distinct()
             .ToList();
 
-        if (pagesToBeInEmail.IsNullOrEmpty())
+        if (pagesToBeInEmail.Count == 0)
+        {
             return;
+        }
 
-        var pagesMessage = pagesToBeInEmail
-            .Select(updatedPage =>
+        var bulletsStr = new StringBuilder();
+        foreach (var page in pagesToBeInEmail)
+        {
+            bulletsStr.Append($"* [{page.Title}]({_appOptions.AdminAppUrl}/education-in-numbers/{page.Id}/content)\n");
+
+            foreach (var tile in updatedTiles)
             {
-                var tilesMessage = updatedTiles
-                    .Where(t => t.EinParentBlock.EinContentSection.EducationInNumbersPageId == updatedPage.Id)
-                    .Select(updatedTile => new EinTileRequiresUpdate
-                    {
-                        Title = updatedTile.Title,
-                        ContentSectionTitle = updatedTile.EinParentBlock.EinContentSection.Heading,
-                        DataSetFileId = dataSets
-                            .Single(dataSet => dataSet.Id == updatedTile.DataSetId)
-                            .LatestLiveVersion!.Release.DataSetFileId,
-                    })
-                    .ToList();
-
-                return new EinPageRequiresUpdate
+                // sub-bullets for each tile associated with a particular page
+                if (page.Id != tile.EinParentBlock.EinContentSection.EducationInNumbersPageId)
                 {
-                    Id = updatedPage.Id,
-                    Title = updatedPage.Title,
-                    Tiles = tilesMessage,
-                };
-            })
-            .ToList();
+                    continue;
+                }
 
-        var message = new EinTilesRequireUpdateMessage { Pages = pagesMessage };
-        await notifierClient.NotifyEinTilesRequireUpdate(
-            new List<EinTilesRequireUpdateMessage> { message },
-            cancellationToken
-        );
+                var contentSectionTitle = tile.EinParentBlock.EinContentSection.Heading;
+                var dataSetFileId = dataSets
+                    .Single(dataSet => dataSet.Id == tile.DataSetId)
+                    .LatestLiveVersion!.Release.DataSetFileId;
+
+                bulletsStr.Append(
+                    $"  * Tile titled '{tile.Title}' in section '{contentSectionTitle}', which uses [this data set]({_appOptions.PublicAppUrl}/data-catalogue/data-set/{dataSetFileId})\n"
+                );
+            }
+        }
+
+        emailService.NotifyEinTilesRequireUpdate(_appOptions.BauEmail, bulletsStr.ToString());
     }
 }

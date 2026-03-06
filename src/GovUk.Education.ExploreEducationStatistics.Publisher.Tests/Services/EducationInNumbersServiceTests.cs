@@ -2,10 +2,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -105,35 +106,20 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
             dataSet.LatestLiveVersionId = latestDataSetVersion.Id; // cannot be set earlier due to db referential integration
         });
 
+        var appOptions = GetRequiredService<IOptions<AppOptions>>().Value;
+
         // tiles from previous pages aren't included in the bau email
-        var expectedMessage = new EinTilesRequireUpdateMessage
-        {
-            Pages =
-            [
-                new EinPageRequiresUpdate
-                {
-                    Id = einApiQueryStatTile.EinParentBlock.EinContentSection.EducationInNumbersPageId,
-                    Title = einApiQueryStatTile.EinParentBlock.EinContentSection.EducationInNumbersPage.Title,
-                    Tiles =
-                    [
-                        new EinTileRequiresUpdate
-                        {
-                            Title = einApiQueryStatTile.Title,
-                            ContentSectionTitle = einApiQueryStatTile.EinParentBlock.EinContentSection.Heading,
-                            DataSetFileId = dataSet.LatestLiveVersion!.Release.DataSetFileId,
-                        },
-                    ],
-                },
-            ],
-        };
-        _fixture
-            .NotifierClient.Setup(mock =>
-                mock.NotifyEinTilesRequireUpdate(
-                    It.Is<List<EinTilesRequireUpdateMessage>>(messages => AssertMessage(messages, expectedMessage)),
-                    CancellationToken.None
-                )
+        var expectedMessage = $"""
+            * [Ein page title]({appOptions.AdminAppUrl}/education-in-numbers/{einApiQueryStatTile.EinParentBlock.EinContentSection.EducationInNumbersPageId}/content)
+              * Tile titled '{einApiQueryStatTile.Title}' in section '{einApiQueryStatTile.EinParentBlock.EinContentSection.Heading}', which uses [this data set]({appOptions.PublicAppUrl}/data-catalogue/data-set/{dataSet.LatestLiveVersion!.Release.DataSetFileId})
+
+            """;
+        _fixture.EmailService.Setup(mock =>
+            mock.NotifyEinTilesRequireUpdate(
+                "bau@example.com",
+                It.Is<string>(message => AssertMessage(message, expectedMessage))
             )
-            .Returns(Task.CompletedTask);
+        );
 
         var einService = GetRequiredService<Publisher.Services.Interfaces.IEducationInNumbersService>();
         await einService.UpdateEinTiles([releaseVersion.Id]);
@@ -235,31 +221,9 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
         Assert.Equal(dataSetVersionId, apiQueryStatTile.LatestDataSetVersionId); // no update
     }
 
-    private static bool AssertMessage(
-        List<EinTilesRequireUpdateMessage> messages,
-        EinTilesRequireUpdateMessage expectedMessage
-    )
+    private static bool AssertMessage(string message, string expectedMessage)
     {
-        var message = Assert.Single(messages);
-        Assert.Equal(expectedMessage.Pages.Count, message.Pages.Count);
-        var actualPages = message.Pages;
-        for (var i = 0; i < message.Pages.Count; i++)
-        {
-            var expectedPage = expectedMessage.Pages[i];
-            var actualPage = actualPages[i];
-            Assert.Equal(expectedPage.Tiles.Count, actualPage.Tiles.Count);
-            Assert.Equal(expectedPage.Id, actualPage.Id);
-            Assert.Equal(expectedPage.Title, actualPage.Title);
-            for (var j = 0; j < actualPage.Tiles.Count; j++)
-            {
-                var expectedTile = expectedPage.Tiles[j];
-                var actualTile = actualPage.Tiles[j];
-                Assert.Equal(expectedTile.ContentSectionTitle, actualTile.ContentSectionTitle);
-                Assert.Equal(expectedTile.Title, actualTile.Title);
-                Assert.Equal(expectedTile.DataSetFileId, actualTile.DataSetFileId);
-            }
-        }
-
+        Assert.Equal(message, expectedMessage);
         return true;
     }
 }

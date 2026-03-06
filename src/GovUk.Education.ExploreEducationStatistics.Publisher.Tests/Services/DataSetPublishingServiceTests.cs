@@ -68,7 +68,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                 .NotifierClient.Setup(mock =>
                     mock.NotifyApiSubscribers(
                         It.Is<List<ApiNotificationMessage>>(messages => AssertMessage(messages, expectedMessage)),
-                        CancellationToken.None
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .Returns(Task.CompletedTask);

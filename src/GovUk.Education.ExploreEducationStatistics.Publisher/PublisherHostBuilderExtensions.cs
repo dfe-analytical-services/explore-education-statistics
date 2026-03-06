@@ -34,6 +34,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Notify.Client;
+using Notify.Interfaces;
 using EducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.EducationInNumbersService;
 using IEducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IEducationInNumbersService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
@@ -159,6 +161,12 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IRedirectsService, RedirectsService>()
                     .AddEventGridClient(configuration)
                     .AddScoped<IPublisherEventRaiser, PublisherEventRaiser>()
+                    .AddTransient<INotificationClient>(s =>
+                    {
+                        var notifyOptions = s.GetRequiredService<IOptions<NotifyOptions>>();
+                        return new NotificationClient(notifyOptions.Value.ApiKey);
+                    })
+                    .AddTransient<IEmailService, EmailService>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString
                     ))

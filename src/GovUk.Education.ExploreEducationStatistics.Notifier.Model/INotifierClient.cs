@@ -2,6 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 
 public interface INotifierClient
 {
+    // NOTE: If you want to send an email directly to GOVUK Notify rather than through EES.Notifier, use IEmailService
     Task NotifyPublicationSubscribers(
         IReadOnlyList<ReleaseNotificationMessage> messages,
         CancellationToken cancellationToken = default
@@ -14,11 +15,6 @@ public interface INotifierClient
 
     Task NotifyReleasePublishingFeedbackUsers(
         IReadOnlyList<ReleasePublishingFeedbackMessage> messages,
-        CancellationToken cancellationToken = default
-    );
-
-    Task NotifyEinTilesRequireUpdate(
-        IReadOnlyList<EinTilesRequireUpdateMessage> messages,
         CancellationToken cancellationToken = default
     );
 }
