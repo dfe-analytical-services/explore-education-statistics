@@ -682,7 +682,6 @@ public class ReleaseVersionService(
         {
             return Unit.Instance;
         }
-
         return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
     }
 

@@ -256,6 +256,8 @@ const DataFileReplacementPlan = ({
             and footnotes.
           </WarningMessage>
 
+          {hasDataSetVersionPlan && <>{locationsAndFiltersErrorTags}</>}
+
           <h3 className="govuk-heading-m">
             <Tag colour={hasInvalidDataBlocks ? 'red' : 'green'}>
               {`Data blocks: ${hasInvalidDataBlocks ? 'ERROR' : 'OK'}`}
@@ -555,8 +557,6 @@ const DataFileReplacementPlan = ({
               </Details>
             );
           })}
-
-          {hasDataSetVersionPlan && <>{locationsAndFiltersErrorTags}</>}
 
           <ButtonGroup className="govuk-!-margin-top-8">
             {plan.valid &&
