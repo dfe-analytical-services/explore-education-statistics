@@ -9,16 +9,16 @@ import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetChangelogRoute,
   releaseApiDataSetFiltersMappingRoute,
-  releaseApiDataSetVersionHistoryRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
   releaseApiDataSetsRoute,
+  releaseApiDataSetVersionHistoryRoute,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
   ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
-  releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
 } from '@admin/routes/releaseRoutes';
 import { ApiDataSet, DataSetStatus } from '@admin/services/apiDataSetService';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
@@ -29,13 +29,13 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag, { TagProps } from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
-import TaskListItem from '@common/components/TaskListItem';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import InsetText from '@common/components/InsetText';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
+import DataSetMappingTaskListItem from '@admin/pages/release/data/components/DataSetMappingTaskListItem';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -377,94 +377,53 @@ export default function ReleaseApiDataSetDetailsPage() {
                   </p>
 
                   <TaskList className="govuk-!-margin-bottom-8">
-                    <TaskListItem
+                    <DataSetMappingTaskListItem
                       id="map-locations-task"
-                      status={
-                        <Tag
-                          colour={
-                            (
-                              dataSet.draftVersion.mappingStatus
-                                ?.locationsComplete && isPatch
-                                ? dataSet.draftVersion.mappingStatus
-                                    ?.locationsHaveMajorChange
-                                : !dataSet.draftVersion.mappingStatus
-                                    ?.locationsComplete
-                            )
-                              ? 'red'
-                              : 'blue'
-                          }
-                        >
-                          {dataSet.draftVersion.mappingStatus?.locationsComplete
-                            ? getCompleteText(
-                                showRejectedError,
-                                dataSet.draftVersion.mappingStatus
-                                  ?.locationsHaveMajorChange,
-                              )
-                            : 'Incomplete'}
-                        </Tag>
+                      isPatch
+                      showRejectedError
+                      mappingComplete={
+                        dataSet.draftVersion.mappingStatus?.locationsComplete ??
+                        false
                       }
-                      hint="Define the changes to locations in this version."
-                    >
-                      {props => (
-                        <Link
-                          {...props}
-                          to={generatePath<ReleaseDataSetRouteParams>(
-                            releaseApiDataSetLocationsMappingRoute.path,
-                            {
-                              publicationId: releaseVersion.publicationId,
-                              releaseVersionId: releaseVersion.id,
-                              dataSetId,
-                            },
-                          )}
-                        >
-                          Map locations
-                        </Link>
+                      majorChanges={
+                        dataSet.draftVersion.mappingStatus
+                          ?.locationsHaveMajorChange ?? false
+                      }
+                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
+                        releaseApiDataSetLocationsMappingRoute.path,
+                        {
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
+                          dataSetId,
+                        },
                       )}
-                    </TaskListItem>
-                    <TaskListItem
+                      mappingText="Map locations"
+                      mappingHintText="Define the changes to locations in this version."
+                    />
+
+                    <DataSetMappingTaskListItem
                       id="map-filters-task"
-                      status={
-                        <Tag
-                          colour={
-                            (
-                              dataSet.draftVersion.mappingStatus
-                                ?.filtersComplete && isPatch
-                                ? dataSet.draftVersion.mappingStatus
-                                    ?.filtersHaveMajorChange
-                                : !dataSet.draftVersion.mappingStatus
-                                    ?.filtersComplete
-                            )
-                              ? 'red'
-                              : 'blue'
-                          }
-                        >
-                          {dataSet.draftVersion.mappingStatus?.filtersComplete
-                            ? getCompleteText(
-                                showRejectedError,
-                                dataSet.draftVersion.mappingStatus
-                                  ?.filtersHaveMajorChange,
-                              )
-                            : 'Incomplete'}
-                        </Tag>
+                      isPatch
+                      showRejectedError
+                      mappingComplete={
+                        dataSet.draftVersion.mappingStatus?.filtersComplete ??
+                        false
                       }
-                      hint="Define the changes to filters in this version."
-                    >
-                      {props => (
-                        <Link
-                          {...props}
-                          to={generatePath<ReleaseDataSetRouteParams>(
-                            releaseApiDataSetFiltersMappingRoute.path,
-                            {
-                              publicationId: releaseVersion.publicationId,
-                              releaseVersionId: releaseVersion.id,
-                              dataSetId,
-                            },
-                          )}
-                        >
-                          Map filters
-                        </Link>
+                      majorChanges={
+                        dataSet.draftVersion.mappingStatus
+                          ?.filtersHaveMajorChange ?? false
+                      }
+                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
+                        releaseApiDataSetFiltersMappingRoute.path,
+                        {
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
+                          dataSetId,
+                        },
                       )}
-                    </TaskListItem>
+                      mappingText="Map filters"
+                      mappingHintText="Define the changes to filters in this version."
+                    />
                   </TaskList>
                 </div>
               </div>
@@ -531,15 +490,6 @@ export default function ReleaseApiDataSetDetailsPage() {
       </LoadingSpinner>
     </>
   );
-
-  function getCompleteText(
-    rejectedErrorShown: boolean,
-    majorVersionFound: boolean,
-  ): React.ReactNode {
-    return rejectedErrorShown && majorVersionFound
-      ? 'Major Change'
-      : 'Complete';
-  }
 }
 
 function getDataSetStatusColour(status: DataSetStatus): TagProps['colour'] {
