@@ -150,129 +150,100 @@ public class ReplacementService(
 
         contentDbContext.Update(dataBlock);
 
-        dataBlock.Query.SubjectId = replacementSubjectId;
-
-        var filterItemTargets = replacementPlan
-            .Filters.SelectMany(filter => filter.Value.Groups.SelectMany(group => group.Value.Filters))
-            .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
-
-        ReplaceDataBlockQueryFilters(filterItemTargets, dataBlock);
-
         var filterTargets = replacementPlan
             .Filters.Where(plan => plan.Value.Target != null)
             .ToDictionary(plan => plan.Value.Id, plan => plan.Value.Target!.Value);
-
-        ReplaceDataBlockQueryFilterHierarchiesOptions(filterTargets, filterItemTargets, dataBlock);
-        ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
-        ReplaceDataBlockQueryLocations(replacementPlan, dataBlock);
-
-        var indicatorTargets = replacementPlan
+        var filterItemTargets = replacementPlan
+            .Filters.SelectMany(filter => filter.Value.Groups.SelectMany(group => group.Value.Filters))
+            .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
+        var indicatorTargets = replacementPlan // @MarkFix get indicator targets from saved mappings instead
             .IndicatorGroups.SelectMany(group => group.Value.Indicators)
             .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
         var locationTargets = replacementPlan
             .Locations.Values.SelectMany(group => group.LocationAttributes)
             .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
 
-        ReplaceDataBlockTableHeaders(
+        dataBlock.Query.SubjectId = replacementSubjectId;
+
+        ReplaceDataBlockQuery(
+            dataBlock,
+            filterTargets: filterTargets,
             filterItemTargets: filterItemTargets,
             indicatorTargets: indicatorTargets,
-            locationTargets: locationTargets,
-            dataBlock
+            locationTargets: locationTargets
+        );
+        ReplaceDataBlockTableHeaders(
+            dataBlock,
+            filterItemTargets: filterItemTargets,
+            indicatorTargets: indicatorTargets,
+            locationTargets: locationTargets
         );
         ReplaceDataBlockCharts(
+            dataBlock,
             filterItemTargets: filterItemTargets,
             indicatorTargets: indicatorTargets,
-            locationTargets: locationTargets,
-            dataBlock
+            locationTargets: locationTargets
         );
     }
 
-    private static void ReplaceDataBlockQueryFilters(Dictionary<Guid, Guid> filterItemTargets, DataBlock dataBlock)
+    private static void ReplaceDataBlockQuery(
+        DataBlock dataBlock,
+        IReadOnlyDictionary<Guid, Guid> filterTargets,
+        IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+        IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+        IReadOnlyDictionary<Guid, Guid> locationTargets
+    )
     {
-        var originalFilterItemIds = dataBlock.Query.GetNonHierarchicalFilterItemIds();
-        dataBlock.Query.Filters = originalFilterItemIds
+        // filters
+        dataBlock.Query.Filters = dataBlock
+            .Query.GetNonHierarchicalFilterItemIds()
             .Select(originalFilterItemId => filterItemTargets[originalFilterItemId])
+            .ToList();
+
+        // filter hierarchies
+        var originalFilterHierarchiesOptions = dataBlock.Query.FilterHierarchiesOptions;
+        dataBlock.Query.FilterHierarchiesOptions =
+            originalFilterHierarchiesOptions == null || originalFilterHierarchiesOptions.Count == 0
+                ? null
+                : originalFilterHierarchiesOptions
+                    .Select(originalHierarchyOptions =>
+                    {
+                        var originalOptions = originalHierarchyOptions.Options;
+                        var replacementOptions = originalOptions
+                            .Select(originalOption =>
+                                // A filter hierarchy option (which represents a checkbox in the UI) is a list of
+                                // filterItemIds. Each filterItemId in an option relates to one filter/tier
+                                originalOption
+                                    .Select(originalFilterItemId => filterItemTargets[originalFilterItemId])
+                                    .ToList()
+                            )
+                            .ToList();
+
+                        var replacementFilterId = filterTargets[originalHierarchyOptions.LeafFilterId];
+                        return new FilterHierarchyOptions
+                        {
+                            LeafFilterId = replacementFilterId,
+                            Options = replacementOptions,
+                        };
+                    })
+                    .ToList();
+
+        // indicators
+        dataBlock.Query.Indicators = dataBlock
+            .Query.Indicators.Select(originalIndicatorId => indicatorTargets[originalIndicatorId])
+            .ToList();
+
+        // locations
+        dataBlock.Query.LocationIds = dataBlock
+            .Query.LocationIds.Select(originalLocationId => locationTargets[originalLocationId])
             .ToList();
     }
 
-    private static void ReplaceDataBlockQueryFilterHierarchiesOptions(
-        Dictionary<Guid, Guid> filterTargets,
-        Dictionary<Guid, Guid> filterItemTargets,
-        DataBlock dataBlock
-    )
-    {
-        var originalFilterHierarchiesOptions = dataBlock.Query.FilterHierarchiesOptions;
-        if (originalFilterHierarchiesOptions is null || originalFilterHierarchiesOptions.Count == 0)
-        {
-            dataBlock.Query.FilterHierarchiesOptions = null;
-            return;
-        }
-
-        var newFilterHierarchiesOptions = new List<FilterHierarchyOptions>();
-
-        foreach (var originalHierarchyOptions in originalFilterHierarchiesOptions) // for each filter hierarchy
-        {
-            var originalOptions = originalHierarchyOptions.Options;
-            var newOptions = originalOptions
-                .Select(originalOption =>
-                    originalOption // a filter hierarchy option is a list of filterItemIds, one per filter/tier
-                        .Select(originalFilterItemId => filterItemTargets[originalFilterItemId])
-                        .ToList()
-                )
-                .ToList();
-
-            var replacementFilterId = filterTargets[originalHierarchyOptions.LeafFilterId];
-            newFilterHierarchiesOptions.Add(
-                new FilterHierarchyOptions { LeafFilterId = replacementFilterId, Options = newOptions }
-            );
-        }
-
-        dataBlock.Query.FilterHierarchiesOptions = newFilterHierarchiesOptions;
-    }
-
-    private static void ReplaceDataBlockQueryIndicators(
-        DataBlockReplacementPlanViewModel replacementPlan,
-        DataBlock dataBlock
-    )
-    {
-        var indicators = dataBlock.Query.Indicators.ToList();
-
-        replacementPlan
-            .IndicatorGroups.SelectMany(group => group.Value.Indicators)
-            .ToList()
-            .ForEach(plan =>
-            {
-                indicators.Remove(plan.Id);
-                indicators.Add(plan.TargetValue);
-            });
-
-        dataBlock.Query.Indicators = indicators;
-    }
-
-    private static void ReplaceDataBlockQueryLocations(
-        DataBlockReplacementPlanViewModel replacementPlan,
-        DataBlock dataBlock
-    )
-    {
-        var locations = dataBlock.Query.LocationIds.ToList();
-
-        replacementPlan
-            .Locations.Values.SelectMany(group => group.LocationAttributes)
-            .ToList()
-            .ForEach(plan =>
-            {
-                locations.Remove(plan.Id);
-                locations.Add(plan.TargetValue);
-            });
-
-        dataBlock.Query.LocationIds = locations;
-    }
-
     private static void ReplaceDataBlockTableHeaders(
+        DataBlock dataBlock,
         IReadOnlyDictionary<Guid, Guid> filterItemTargets,
         IReadOnlyDictionary<Guid, Guid> indicatorTargets,
-        IReadOnlyDictionary<Guid, Guid> locationTargets,
-        DataBlock dataBlock
+        IReadOnlyDictionary<Guid, Guid> locationTargets
     )
     {
         var tableHeaders = dataBlock.Table.TableHeaders;
@@ -363,10 +334,10 @@ public class ReplacementService(
     }
 
     private static void ReplaceDataBlockCharts(
+        DataBlock dataBlock,
         IReadOnlyDictionary<Guid, Guid> filterItemTargets,
         IReadOnlyDictionary<Guid, Guid> indicatorTargets,
-        IReadOnlyDictionary<Guid, Guid> locationTargets,
-        DataBlock dataBlock
+        IReadOnlyDictionary<Guid, Guid> locationTargets
     )
     {
         dataBlock.Charts.ForEach(chart =>
@@ -586,7 +557,7 @@ public class ReplacementService(
             .FilterItems.ToAsyncEnumerable()
             .ForEachAwaitAsync(async plan => await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
 
-        await replacementPlan
+        await replacementPlan // @MarkFix indicators for footnotes
             .IndicatorGroups.SelectMany(group => group.Value.Indicators)
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async plan => await ReplaceIndicatorFootnote(replacementPlan.Id, plan));

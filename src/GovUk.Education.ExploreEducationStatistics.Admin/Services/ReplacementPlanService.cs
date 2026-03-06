@@ -123,6 +123,16 @@ public class ReplacementPlanService(
                 var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
                 var originalSubjectId = originalReleaseFile.File.SubjectId!.Value;
 
+                var mapping = contentDbContext.DataSetMappings.SingleOrDefault(mapping =>
+                    mapping.ReplacementDataSetId == replacementSubjectId
+                    && mapping.OriginalDataSetId == originalSubjectId
+                );
+
+                if (mapping is null)
+                {
+                    // @MarkFix generate mapping
+                }
+
                 var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
 
                 var releaseVersionId = replacementReleaseFile.ReleaseVersionId;
@@ -214,7 +224,8 @@ public class ReplacementPlanService(
     private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(
         Guid releaseVersionId,
         Guid subjectId,
-        ReplacementSubjectMeta replacementSubjectMeta
+        ReplacementSubjectMeta replacementSubjectMeta,
+        DataSetMapping mapping
     )
     {
         return contentDbContext
@@ -222,30 +233,25 @@ public class ReplacementPlanService(
             .OfType<DataBlock>()
             .ToList()
             .Where(dataBlock => dataBlock.Query.SubjectId == subjectId)
-            .Select(dataBlock => ValidateDataBlock(dataBlock, replacementSubjectMeta))
+            .Select(dataBlock =>
+            {
+                var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+                var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+                var indicatorGroups = ValidateIndicatorGroupsForDataBlock(dataBlock, replacementSubjectMeta); // @MarkFix check saved db mapping has targetIds for all indicators that are used in data blocks/footnotes
+                var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
+                var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
+
+                return new DataBlockReplacementPlanViewModel(
+                    dataBlock.Id,
+                    dataBlock.Name,
+                    existingFilters,
+                    newlyIntroducedFilters,
+                    indicatorGroups,
+                    locations,
+                    timePeriods
+                );
+            })
             .ToList();
-    }
-
-    private DataBlockReplacementPlanViewModel ValidateDataBlock(
-        DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta
-    )
-    {
-        var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
-        var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
-        var indicatorGroups = ValidateIndicatorGroupsForDataBlock(dataBlock, replacementSubjectMeta);
-        var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
-        var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
-
-        return new DataBlockReplacementPlanViewModel(
-            dataBlock.Id,
-            dataBlock.Name,
-            existingFilters,
-            newlyIntroducedFilters,
-            indicatorGroups,
-            locations,
-            timePeriods
-        );
     }
 
     private async Task<List<FootnoteReplacementPlanViewModel>> ValidateFootnotes(
@@ -449,7 +455,8 @@ public class ReplacementPlanService(
 
     private Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForDataBlock(
         DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta
+        ReplacementSubjectMeta replacementSubjectMeta,
+        DataSetMapping mapping
     )
     {
         return statisticsDbContext
@@ -464,7 +471,12 @@ public class ReplacementPlanService(
                     id: group.Key.Id,
                     label: group.Key.Label,
                     indicators: group
-                        .Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
+                        .Select(indicator => new IndicatorReplacementViewModel(
+                            id: indicator.Id,
+                            name: indicator.Name,
+                            label: indicator.Label,
+                            target: mapping.IndicatorMappings[indicator.Id].ReplacementId // @MarkFiX YOU FINISHED HERE!!!
+                        ))
                         .OrderBy(indicator => indicator.Label, LabelComparer)
                 )
             );
@@ -557,6 +569,19 @@ public class ReplacementPlanService(
                 filterItem.FilterGroup.Label,
                 filterItem.Label
             )?.Id
+        );
+    }
+
+    private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(
+        Indicator indicator,
+        DataSetMapping mapping
+    )
+    {
+        return new IndicatorReplacementViewModel(
+            id: indicator.Id,
+            name: indicator.Name,
+            label: indicator.Label,
+            target: mapping.IndicatorMappings[indicator.Id].ReplacementId
         );
     }
 

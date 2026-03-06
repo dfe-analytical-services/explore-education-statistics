@@ -40,6 +40,8 @@ public static class MetaViewModelBuilderUtils
         where TId : notnull
     {
         // TODO EES-1238 improve this to use the source list as the iteration base and throw exception if no ordering?
+        // @MarkFix This assumes that `sequences` contains all `values` - and values that aren't included aren't included.
+        // I think we'd prefer for this code to blow up if elements of `values` aren't in `sequences`
         var valueMap = values.ToDictionary(idSelector);
         foreach (var sequence in sequences)
         {

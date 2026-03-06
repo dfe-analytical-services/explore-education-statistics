@@ -43,7 +43,7 @@ public class DataBlockReplacementPlanViewModel
     public string Name { get; }
     public Dictionary<Guid, FilterReplacementViewModel> Filters { get; }
     private List<FilterReplacementViewModel> NewlyIntroducedFilters { get; }
-    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; }
+    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; } // @MarkFix either remove this or set it from the saved indicator mapping we'll have in the db
     public Dictionary<string, LocationReplacementViewModel> Locations { get; }
     public TimePeriodRangeReplacementViewModel? TimePeriods { get; }
 

@@ -179,10 +179,16 @@ public class ReplacementServiceHelper
 
     public static List<IndicatorGroupSequenceEntry>? ReplaceIndicatorSequence(
         List<IndicatorGroup> originalIndicatorGroups,
-        List<IndicatorGroup> replacementIndicatorGroups,
+        List<IndicatorGroup> replacementIndicatorGroups, // @MarkFix gets replaced with saved db mapping
         ReleaseFile originalReleaseFile
     )
     {
+        // @MarkFix fetch label and group names for indicator being mapped?
+        // @MarkFix sort between those that have the same group label vs. those that have moved to a different group label
+
+        // @MarkFix translate IndicatorSequence for those that are in the same group
+        // @MarkFix add movedIndicators to the bottom of their respective groups
+
         // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
         if (originalReleaseFile.IndicatorSequence == null)
         {
@@ -204,39 +210,36 @@ public class ReplacementServiceHelper
         replacementIndicatorGroups.ForEach(replacementIndicatorGroup =>
         {
             if (
-                originalIndicatorGroupsLabelMap.TryGetValue(
+                !originalIndicatorGroupsLabelMap.TryGetValue(
                     replacementIndicatorGroup.Label,
                     out var originalIndicatorGroup
                 )
             )
             {
-                indicatorGroupsMap.Add(originalIndicatorGroup.Id, replacementIndicatorGroup.Id);
-                var originalIndicatorsNameMap = originalIndicatorGroup.Indicators.ToDictionary(i => i.Name);
-                replacementIndicatorGroup.Indicators.ForEach(replacementIndicator =>
-                {
-                    if (originalIndicatorsNameMap.TryGetValue(replacementIndicator.Name, out var originalIndicator))
-                    {
-                        indicatorsMap.Add(originalIndicator.Id, replacementIndicator.Id);
-                    }
-                    else
-                    {
-                        if (
-                            newlyAddedIndicators.TryGetValue(originalIndicatorGroup.Id, out var newlyAddedIndicatorList)
-                        )
-                        {
-                            newlyAddedIndicatorList.Add(replacementIndicator);
-                        }
-                        else
-                        {
-                            newlyAddedIndicators.Add(originalIndicatorGroup.Id, ListOf(replacementIndicator));
-                        }
-                    }
-                });
-            }
-            else
-            {
                 newlyAddedIndicatorGroups.Add(replacementIndicatorGroup);
+                return;
             }
+
+            indicatorGroupsMap.Add(originalIndicatorGroup.Id, replacementIndicatorGroup.Id);
+            var originalIndicatorsNameMap = originalIndicatorGroup.Indicators.ToDictionary(i => i.Name);
+            replacementIndicatorGroup.Indicators.ForEach(replacementIndicator =>
+            {
+                // @MarkFix here we could check the saved db mapping instead, but we'd also need to check the mapping
+                // belongs to the same indicatorGroup - if it doesn't, then we need
+                if (!originalIndicatorsNameMap.TryGetValue(replacementIndicator.Name, out var originalIndicator))
+                {
+                    if (newlyAddedIndicators.TryGetValue(originalIndicatorGroup.Id, out var newlyAddedIndicatorList))
+                    {
+                        newlyAddedIndicatorList.Add(replacementIndicator);
+                        return;
+                    }
+
+                    newlyAddedIndicators.Add(originalIndicatorGroup.Id, ListOf(replacementIndicator));
+                    return;
+                }
+
+                indicatorsMap.Add(originalIndicator.Id, replacementIndicator.Id);
+            });
         });
 
         // Step 2: Create a new sequence based on the original:
