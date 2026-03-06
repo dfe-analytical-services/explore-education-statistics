@@ -91,6 +91,7 @@ public class ContentDbContext : DbContext
     public virtual DbSet<EinContentSection> EinContentSections { get; set; }
     public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
     public virtual DbSet<EinTile> EinTiles { get; set; }
+    public virtual DbSet<DataSetMapping> DataSetMappings { get; set; }
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> ReleaseFilesFreeTextTable(string searchTerm) =>

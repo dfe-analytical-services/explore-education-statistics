@@ -707,6 +707,18 @@ public class ReleaseVersionService(
             .OnSuccessDo(ValidateDataFilesStatusForDeletion)
             .OnSuccessDo(async releaseFile =>
             {
+                // Remove any mapping that exists for the data set
+                var mappings = await context
+                    .DataSetMappings.Where(mapping =>
+                        mapping.OriginalDataSetId == releaseFile.File.SubjectId
+                        || mapping.ReplacementDataSetId == releaseFile.File.SubjectId
+                    )
+                    .ToListAsync();
+                context.DataSetMappings.RemoveRange(mappings);
+                await context.SaveChangesAsync();
+            })
+            .OnSuccessDo(async releaseFile =>
+            {
                 // Delete any replacement that might exist
                 if (releaseFile.File.ReplacedById.HasValue)
                 {

@@ -399,12 +399,19 @@ public abstract class ReleaseVersionServiceTests
                 .WithReleaseVersion(releaseVersion)
                 .WithFile(replacementFile);
 
+            DataSetMapping mapping = new DataSetMapping
+            {
+                OriginalDataSetId = subject.Id,
+                ReplacementDataSetId = replacementSubject.Id,
+            };
+
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
+                contentDbContext.DataSetMappings.Add(mapping);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.AddRange(subject, replacementSubject);
@@ -505,6 +512,12 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // any related mapping should have been removed
+                Assert.Empty(context.DataSetMappings.ToList());
             }
         }
 

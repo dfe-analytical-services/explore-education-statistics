@@ -470,6 +470,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReplacementService, ReplacementService>();
         services.AddTransient<IReplacementBatchService, ReplacementBatchService>();
         services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
+        services.AddTransient<IDataSetMappingService, DataSetMappingService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
         services.AddTransient<UserReleaseRoleQueryRepository>();
