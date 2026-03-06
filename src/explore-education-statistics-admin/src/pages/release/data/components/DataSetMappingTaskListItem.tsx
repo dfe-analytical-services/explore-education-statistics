@@ -6,33 +6,36 @@ import React from 'react';
 interface Props {
   id: string;
   isPatch: boolean;
-  mappingComplete: boolean;
-  majorChanges: boolean;
+  mappingCompleteForFacet: boolean;
+  majorChangesForFacet: boolean;
   mappingPageRoute: string;
   mappingText: string;
   mappingHintText: string;
-  showRejectedError: boolean;
+  majorVersionRejected: boolean;
 }
 
 export default function DataSetMappingTaskListItem({
   id,
   isPatch,
-  mappingComplete,
-  majorChanges,
+  mappingCompleteForFacet,
+  majorChangesForFacet,
   mappingPageRoute,
   mappingText,
   mappingHintText,
-  showRejectedError,
+  majorVersionRejected,
 }: Props) {
-  const warning = mappingComplete && isPatch ? majorChanges : !mappingComplete;
+  const warning =
+    mappingCompleteForFacet && isPatch
+      ? majorChangesForFacet
+      : !mappingCompleteForFacet;
 
   return (
     <TaskListItem
       id={id}
       status={
         <Tag colour={warning ? 'red' : 'blue'}>
-          {mappingComplete
-            ? getMappingCompleteText(showRejectedError, majorChanges)
+          {mappingCompleteForFacet
+            ? getMappingCompleteText(majorVersionRejected, majorChangesForFacet)
             : 'Incomplete'}
         </Tag>
       }

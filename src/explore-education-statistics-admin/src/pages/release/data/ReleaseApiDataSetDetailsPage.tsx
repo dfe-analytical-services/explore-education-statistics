@@ -9,6 +9,7 @@ import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetChangelogRoute,
   releaseApiDataSetFiltersMappingRoute,
+  releaseApiDataSetIndicatorsMappingRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
@@ -74,7 +75,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const isPatch = isPatchVersion(dataSet?.draftVersion?.version);
 
-  const shouldShowRejectedError = (
+  const isMajorVersionRejected = (
     apiDataSet: ApiDataSet | undefined,
     isPatchDataSetVersion: boolean,
   ): boolean => {
@@ -252,7 +253,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
-  const showRejectedError = shouldShowRejectedError(dataSet, isPatch);
+  const majorVersionRejected = isMajorVersionRejected(dataSet, isPatch);
 
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
@@ -337,7 +338,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
-            {showRejectedError
+            {majorVersionRejected
               ? majorVersionErrorSummary
               : mappingComplete &&
                 dataSet.draftVersion && (
@@ -379,13 +380,13 @@ export default function ReleaseApiDataSetDetailsPage() {
                   <TaskList className="govuk-!-margin-bottom-8">
                     <DataSetMappingTaskListItem
                       id="map-locations-task"
-                      isPatch
-                      showRejectedError
-                      mappingComplete={
+                      isPatch={isPatch}
+                      majorVersionRejected={majorVersionRejected}
+                      mappingCompleteForFacet={
                         dataSet.draftVersion.mappingStatus?.locationsComplete ??
                         false
                       }
-                      majorChanges={
+                      majorChangesForFacet={
                         dataSet.draftVersion.mappingStatus
                           ?.locationsHaveMajorChange ?? false
                       }
@@ -403,13 +404,13 @@ export default function ReleaseApiDataSetDetailsPage() {
 
                     <DataSetMappingTaskListItem
                       id="map-filters-task"
-                      isPatch
-                      showRejectedError
-                      mappingComplete={
+                      isPatch={isPatch}
+                      majorVersionRejected={majorVersionRejected}
+                      mappingCompleteForFacet={
                         dataSet.draftVersion.mappingStatus?.filtersComplete ??
                         false
                       }
-                      majorChanges={
+                      majorChangesForFacet={
                         dataSet.draftVersion.mappingStatus
                           ?.filtersHaveMajorChange ?? false
                       }
@@ -423,6 +424,30 @@ export default function ReleaseApiDataSetDetailsPage() {
                       )}
                       mappingText="Map filters"
                       mappingHintText="Define the changes to filters in this version."
+                    />
+
+                    <DataSetMappingTaskListItem
+                      id="map-indicators-task"
+                      isPatch={isPatch}
+                      majorVersionRejected={majorVersionRejected}
+                      mappingCompleteForFacet={
+                        dataSet.draftVersion.mappingStatus
+                          ?.indicatorsComplete ?? false
+                      }
+                      majorChangesForFacet={
+                        dataSet.draftVersion.mappingStatus
+                          ?.indicatorsHaveMajorChange ?? false
+                      }
+                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
+                        releaseApiDataSetIndicatorsMappingRoute.path,
+                        {
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
+                          dataSetId,
+                        },
+                      )}
+                      mappingText="Map indicators"
+                      mappingHintText="Define the changes to indicators in this version."
                     />
                   </TaskList>
                 </div>
