@@ -1,12 +1,14 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using LinqToDB;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class ReplacementServiceHelper
+public abstract class ReplacementServiceHelper
 {
     private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
@@ -177,106 +179,149 @@ public class ReplacementServiceHelper
         return filterSequence;
     }
 
-    public static List<IndicatorGroupSequenceEntry>? ReplaceIndicatorSequence(
-        List<IndicatorGroup> originalIndicatorGroups,
-        List<IndicatorGroup> replacementIndicatorGroups,
-        ReleaseFile originalReleaseFile
+    public static List<IndicatorGroupSequenceEntry> ReplaceIndicatorSequence(
+        DataSetMapping mapping,
+        Dictionary<Guid, string> originalGroupIdToLabelMap,
+        Dictionary<string, Guid> replacementGroupLabelToIdMap,
+        List<IndicatorGroupSequenceEntry> originalSequence
     )
     {
-        // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
-        if (originalReleaseFile.IndicatorSequence == null)
-        {
-            return null;
-        }
+        // The below code to create replacementSequence can be summarised as "Create all replacement groups, and as
+        // we create each group, ensure it contains all replacement indicators belonging to that group, preserving
+        // as much of the original ordering as we can."
+        //
+        // We create all replacementSequence groups in three broad steps:
+        // - Add replacement groups that can be mapped from originalSequence (by group label)
+        // - Then add new replacement groups from mapping.IndicatorMappings that haven't been mapped from
+        //   originalSequence
+        // - Finally, add any new replacement groups from mapping.CandidateIndicatorReplacements that haven't yet been
+        //   added to replacementSequence.
+        //
+        // As we add replacement groups to replacementSequence, we must ensure that all replacement indicators belonging
+        // to each group are added. This is because it's possible that are new indicators in the replacement and/or an
+        // indicator was moved to a different group in the replacement. For example, after creating a group mapped from
+        // originalSequence, we add replacement indicators that can be mapped from entries in that originalSequenceGroup
+        // first (preserving the ordering as possible) but then also need to add other indicators belonging to that
+        // replacement group from IndicationMappings (i.e. those that have moved group) and CandidateIndicatorReplacements.
+        //
+        // Follow comments 1-6 in the code below to track the creation of all replacement sequence groups and indicators:
+        // - Create all replacement groups with a label matching an originalSequence group (1,2,3)
+        // - Create new groups for mapped indicators that previously belonged to an original group, but moved to a new
+        //   group (4,5)
+        // - Create new groups for unmapped candidate indicators (6)
 
-        var originalIndicatorGroupsLabelMap = originalIndicatorGroups.ToDictionary(
-            indicatorGroup => indicatorGroup.Label,
-            indicatorGroup => indicatorGroup
-        );
-
-        // Step 1: Create id to replacement-id maps and work out newly added indicator groups and indicators
-
-        var indicatorGroupsMap = new Dictionary<Guid, Guid>();
-        var indicatorsMap = new Dictionary<Guid, Guid>();
-        var newlyAddedIndicatorGroups = new List<IndicatorGroup>();
-        var newlyAddedIndicators = new Dictionary<Guid, List<Indicator>>();
-
-        replacementIndicatorGroups.ForEach(replacementIndicatorGroup =>
-        {
-            if (
-                originalIndicatorGroupsLabelMap.TryGetValue(
-                    replacementIndicatorGroup.Label,
-                    out var originalIndicatorGroup
-                )
-            )
+        var replacementSequence = originalSequence
+            .Select(originalGroupSequence =>
             {
-                indicatorGroupsMap.Add(originalIndicatorGroup.Id, replacementIndicatorGroup.Id);
-                var originalIndicatorsNameMap = originalIndicatorGroup.Indicators.ToDictionary(i => i.Name);
-                replacementIndicatorGroup.Indicators.ForEach(replacementIndicator =>
+                var originalGroupLabel = originalGroupIdToLabelMap[originalGroupSequence.Id];
+                if (!replacementGroupLabelToIdMap.TryGetValue(originalGroupLabel, out var replacementGroupId))
                 {
-                    if (originalIndicatorsNameMap.TryGetValue(replacementIndicator.Name, out var originalIndicator))
-                    {
-                        indicatorsMap.Add(originalIndicator.Id, replacementIndicator.Id);
-                    }
-                    else
-                    {
-                        if (
-                            newlyAddedIndicators.TryGetValue(originalIndicatorGroup.Id, out var newlyAddedIndicatorList)
-                        )
-                        {
-                            newlyAddedIndicatorList.Add(replacementIndicator);
-                        }
-                        else
-                        {
-                            newlyAddedIndicators.Add(originalIndicatorGroup.Id, ListOf(replacementIndicator));
-                        }
-                    }
-                });
-            }
-            else
-            {
-                newlyAddedIndicatorGroups.Add(replacementIndicatorGroup);
-            }
-        });
-
-        // Step 2: Create a new sequence based on the original:
-        // - Remove any entries that don't exist in the replacement
-        // - Swap the remaining id's with their replacements
-        // - Append new entries that were added in the replacement
-
-        var indicatorSequence = originalReleaseFile
-            .IndicatorSequence.Where(indicatorGroup => indicatorGroupsMap.ContainsKey(indicatorGroup.Id))
-            .Select(indicatorGroup =>
-            {
-                var newIndicatorGroupSequenceEntry = new IndicatorGroupSequenceEntry(
-                    indicatorGroupsMap[indicatorGroup.Id],
-                    indicatorGroup
-                        .ChildSequence.Where(indicator => indicatorsMap.ContainsKey(indicator))
-                        .Select(indicator => indicatorsMap[indicator])
-                        .ToList()
-                );
-
-                if (newlyAddedIndicators.TryGetValue(indicatorGroup.Id, out var newlyAddedIndicatorList))
-                {
-                    newIndicatorGroupSequenceEntry.ChildSequence.AddRange(
-                        newlyAddedIndicatorList.OrderBy(i => i.Label, LabelComparer).Select(i => i.Id)
-                    );
+                    // No replacement group matching the label of the original group, so skip this originalGroupSequence
+                    return null;
                 }
 
-                return newIndicatorGroupSequenceEntry;
+                var mappingsForGroupWithReplacementSet = mapping
+                    .IndicatorMappings.Values.Where(map => map.ReplacementGroupId == replacementGroupId)
+                    .ToList();
+
+                var candidatesForGroup = mapping
+                    .CandidateIndicatorReplacements.Where(candidate => candidate.GroupId == replacementGroupId)
+                    .ToList();
+
+                if (mappingsForGroupWithReplacementSet.Count + candidatesForGroup.Count == 0)
+                {
+                    // There should never be an IndicatorGroup with no Indicators, but if there was,
+                    // this prevents an entry for that group being created in IndicatorSequence.
+                    return null;
+                }
+
+                // 1. Create indicators for replacement group that can be mapped from originalSequence
+                var replacementChildSequence = originalGroupSequence
+                    .ChildSequence.Select(originalIndicatorId =>
+                        mappingsForGroupWithReplacementSet.SingleOrDefault(map => map.OriginalId == originalIndicatorId)
+                    )
+                    .WhereNotNull()
+                    .Select(map => map.ReplacementId!.Value)
+                    .ToList();
+
+                // 2. Other mapped indicators for this group which weren't mapped from originalGroupSequence. These
+                // indicators originally belonged to a different group but moved into this group in the replacement
+                var newChildren = mappingsForGroupWithReplacementSet
+                    .Where(map => !replacementChildSequence.Contains(map.ReplacementId!.Value))
+                    .Select(map => new
+                    {
+                        ReplacementId = map.ReplacementId!.Value,
+                        ReplacementLabel = map.ReplacementLabel!,
+                    })
+                    .ToList();
+
+                // 3. Unmapped candidate replacement indicators that belong to this group
+                newChildren.AddRange(
+                    candidatesForGroup.Select(candidate => new
+                    {
+                        ReplacementId = candidate.Id,
+                        ReplacementLabel = candidate.Label,
+                    })
+                );
+
+                replacementChildSequence.AddRange(
+                    newChildren.OrderBy(child => child.ReplacementLabel).Select(child => child.ReplacementId)
+                );
+
+                return new IndicatorGroupSequenceEntry(replacementGroupId, replacementChildSequence);
             })
+            .WhereNotNull()
             .ToList();
 
-        indicatorSequence.AddRange(
-            newlyAddedIndicatorGroups
-                .OrderBy(ig => ig.Label, LabelComparer)
-                .Select(ig => new IndicatorGroupSequenceEntry(
-                    ig.Id,
-                    ig.Indicators.OrderBy(i => i.Label, LabelComparer).Select(i => i.Id).ToList()
-                ))
-        );
+        var mappingsInNewGroups = mapping
+            .IndicatorMappings.Values.Where(map =>
+                map.ReplacementGroupId is not null
+                && !replacementSequence.Select(groupSeq => groupSeq.Id).ToList().Contains(map.ReplacementGroupId.Value)
+            )
+            .GroupBy(map => new { GroupId = map.OriginalGroupId, GroupLabel = map.OriginalGroupLabel })
+            .OrderBy(group => group.Key.GroupLabel)
+            .ToList();
 
-        return indicatorSequence;
+        foreach (var group in mappingsInNewGroups)
+        {
+            // 4. Mapped replacement indicator that moved from an original preexisting group to a new group in the replacement
+            var childSequence = group
+                .Select(map => new
+                {
+                    ReplacementId = map.ReplacementId!.Value,
+                    ReplacementLabel = map.ReplacementLabel!,
+                })
+                .ToList();
+
+            // 5. Unmapped candidate replacement indicators that belong to this group
+            childSequence.AddRange(
+                mapping
+                    .CandidateIndicatorReplacements.Where(candidate => candidate.GroupId == group.Key.GroupId)
+                    .Select(candidate => new { ReplacementId = candidate.Id, ReplacementLabel = candidate.Label })
+            );
+
+            replacementSequence.Add(
+                new IndicatorGroupSequenceEntry(
+                    group.Key.GroupId,
+                    childSequence.OrderBy(child => child.ReplacementLabel).Select(child => child.ReplacementId).ToList()
+                )
+            );
+        }
+
+        // 6. Finally, add any candidate replacement indicators that belong to a new group
+        var candidatesInNewGroups = mapping
+            .CandidateIndicatorReplacements.Where(candidate =>
+                !replacementSequence.Select(groupSeq => groupSeq.Id).ToList().Contains(candidate.GroupId)
+            )
+            .GroupBy(candidate => new { candidate.GroupId, candidate.GroupLabel })
+            .OrderBy(grouping => grouping.Key.GroupLabel)
+            .Select(grouping => new IndicatorGroupSequenceEntry(
+                Id: grouping.Key.GroupId,
+                ChildSequence: grouping.OrderBy(candidate => candidate.Label).Select(candidate => candidate.Id).ToList()
+            ));
+        replacementSequence.AddRange(candidatesInNewGroups);
+
+        return replacementSequence;
     }
 
     private static bool IsTotal(string input)
