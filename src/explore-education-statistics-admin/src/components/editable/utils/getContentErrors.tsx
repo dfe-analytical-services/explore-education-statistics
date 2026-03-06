@@ -1,29 +1,35 @@
 ﻿import React, { ReactNode } from 'react';
+import InvalidContentDetails from '@admin/components/editable/InvalidContentDetails';
+import checkMaxLength from '@admin/components/editable/utils/checkMaxLength';
+import getInvalidContent from '@admin/components/editable/utils/getInvalidContent';
 import getInvalidImages from '@admin/components/editable/utils/getInvalidImages';
-import { Element, JsonElement } from '@admin/types/ckeditor';
 import getInvalidLinks, {
   InvalidUrl,
 } from '@admin/components/editable/utils/getInvalidLinks';
-import getInvalidContent from '@admin/components/editable/utils/getInvalidContent';
+import { Element, JsonElement } from '@admin/types/ckeditor';
 import WarningMessage from '@common/components/WarningMessage';
-import InvalidContentDetails from '@admin/components/editable/InvalidContentDetails';
+
+interface ContentErrorOptions {
+  characterLimit?: number;
+  checkLinks?: boolean;
+  checkImages?: boolean;
+  checkContent?: boolean;
+}
+
+interface ContentErrorResult {
+  errorMessage: string;
+  contentErrorDetails: ReactNode;
+}
 
 export default function getContentErrors(
   elements: Element[],
   {
-    checkLinks,
-    checkImages,
-    checkContent,
-  }: {
-    checkLinks?: boolean;
-    checkImages?: boolean;
-    checkContent?: boolean;
-  } = {
-    checkLinks: true,
-    checkImages: true,
-    checkContent: true,
-  },
-): { errorMessage: string; contentErrorDetails: ReactNode } | undefined {
+    characterLimit,
+    checkLinks = true,
+    checkImages = true,
+    checkContent = true,
+  }: ContentErrorOptions = {},
+): ContentErrorResult | undefined {
   // Convert to json to make it easier to process and test.
   // Have to convert from Record<string | unknown> to unknown then to our
   // JsonElement type to be able to access object properties
@@ -38,8 +44,16 @@ export default function getContentErrors(
   const invalidContent = checkContent
     ? getInvalidContent(elementsJson as JsonElement[])
     : [];
+  const invalidLength = characterLimit
+    ? checkMaxLength(elementsJson as JsonElement[], characterLimit)
+    : null;
 
-  if (invalidImages.length || invalidLinks.length || invalidContent.length) {
+  if (
+    invalidImages.length ||
+    invalidLinks.length ||
+    invalidContent.length ||
+    invalidLength
+  ) {
     const invalidImagesMessage =
       invalidImages.length === 1
         ? '1 image does not have alternative text.'
@@ -57,9 +71,9 @@ export default function getContentErrors(
 
     const errorMessage = `Content errors have been found: ${
       invalidImages.length ? invalidImagesMessage : ''
-    }  ${invalidLinks.length ? invalidLinksMessage : ''} ${
+    } ${invalidLinks.length ? invalidLinksMessage : ''} ${
       invalidContent.length ? invalidContentMessage : ''
-    }`;
+    } ${invalidLength ? 'Too much content.' : ''}`;
     const contentErrorDetails = (
       <>
         <WarningMessage className="govuk-!-margin-bottom-1">
@@ -72,6 +86,7 @@ export default function getContentErrors(
         {!!invalidContent.length && (
           <InvalidContentDetails errors={invalidContent} />
         )}
+        {!!invalidLength && <p>{invalidLength}</p>}
       </>
     );
     return { errorMessage, contentErrorDetails };

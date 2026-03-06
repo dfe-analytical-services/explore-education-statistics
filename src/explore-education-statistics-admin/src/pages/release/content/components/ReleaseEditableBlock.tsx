@@ -33,6 +33,7 @@ interface Props {
   allowComments?: boolean;
   allowImages?: boolean;
   block: EditableBlock;
+  characterLimit?: number;
   editable?: boolean;
   editButtonLabel?: ReactNode | string;
   isReleaseWarningBlock?: boolean;
@@ -51,6 +52,7 @@ const ReleaseEditableBlock = ({
   allowComments = false,
   allowImages = false,
   block,
+  characterLimit,
   editable = true,
   editButtonLabel,
   isReleaseWarningBlock,
@@ -408,6 +410,7 @@ const ReleaseEditableBlock = ({
           <EditableContentBlock
             actionThrottle={lockThrottle}
             allowComments={allowComments}
+            characterLimit={characterLimit}
             editable={editable && !isBrowser('IE')}
             editButtonLabel={editButtonLabel}
             hideLabel

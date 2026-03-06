@@ -3,10 +3,12 @@
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 import {
+  Alignment,
   Autosave,
   Autoformat,
   BlockQuote,
   Bold,
+  ClassicEditor,
   Essentials,
   Heading,
   Image,
@@ -25,8 +27,7 @@ import {
   TableToolbar,
   TableCaption,
   TextTransformation,
-  Alignment,
-  ClassicEditor,
+  WordCount,
 } from 'ckeditor5';
 import Comments from '../plugins/comments/Comments';
 import FeaturedTables from '../plugins/featuredTables/FeaturedTables';
@@ -62,6 +63,7 @@ Editor.builtinPlugins = [
   TableToolbar,
   TableCaption,
   TextTransformation,
+  WordCount,
 ];
 
 export default Editor;

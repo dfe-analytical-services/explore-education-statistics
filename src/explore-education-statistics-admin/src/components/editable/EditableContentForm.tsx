@@ -1,6 +1,7 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
+import getContentErrors from '@admin/components/editable/utils/getContentErrors';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import { Element, ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';
 import {
@@ -31,7 +32,6 @@ import React, {
   useState,
 } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
-import getContentErrors from '@admin/components/editable/utils/getContentErrors';
 
 interface FormValues {
   content: string;
@@ -40,6 +40,7 @@ interface FormValues {
 export interface Props {
   actionThrottle?: number;
   allowComments?: boolean;
+  characterLimit?: number;
   content: string;
   customSanitizeOptions?: SanitizeHtmlOptions;
   hideLabel?: boolean;
@@ -62,6 +63,7 @@ export interface Props {
 const EditableContentForm = ({
   actionThrottle = 5_000,
   allowComments = false,
+  characterLimit,
   content,
   customSanitizeOptions,
   hideLabel = false,
@@ -166,7 +168,9 @@ const EditableContentForm = ({
                 if (!elements?.length) {
                   return true;
                 }
-                const contentErrors = getContentErrors(elements);
+                const contentErrors = getContentErrors(elements, {
+                  characterLimit,
+                });
 
                 if (contentErrors) {
                   const { errorMessage, contentErrorDetails } = contentErrors;
@@ -193,6 +197,7 @@ const EditableContentForm = ({
               >
                 <FormFieldEditor<FormValues>
                   allowComments={allowComments}
+                  characterLimit={characterLimit}
                   contentErrorDetails={invalidContentErrors}
                   error={
                     autoSaveError || submitError

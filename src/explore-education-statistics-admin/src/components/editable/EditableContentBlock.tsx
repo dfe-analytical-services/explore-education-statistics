@@ -30,6 +30,7 @@ import React, { ReactNode, useMemo, useRef } from 'react';
 interface EditableContentBlockProps {
   actionThrottle?: number;
   allowComments?: boolean;
+  characterLimit?: number;
   editable?: boolean;
   editButtonLabel?: ReactNode | string;
   id: string;
@@ -64,6 +65,7 @@ interface EditableContentBlockProps {
 const EditableContentBlock = ({
   actionThrottle,
   allowComments = false,
+  characterLimit,
   editable = true,
   editButtonLabel,
   id,
@@ -128,6 +130,7 @@ const EditableContentBlock = ({
       <EditableContentForm
         actionThrottle={actionThrottle}
         allowComments={allowComments}
+        characterLimit={characterLimit}
         content={value ? sanitizeHtml(value, sanitizeOptions) : ''}
         customSanitizeOptions={
           isReleaseWarningBlock ? releaseWarningBlockSanitizeOptions : undefined
