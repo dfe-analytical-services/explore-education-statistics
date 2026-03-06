@@ -5,6 +5,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests
 
 public static class DataSetVersionStatusTheoryData
 {
+    private static readonly List<DataSetVersionStatus> AllStatuses = EnumUtil.GetEnums<DataSetVersionStatus>();
+
+    private static readonly List<DataSetVersionStatus> PostMappingStatuses =
+    [
+        DataSetVersionStatus.Finalising,
+        DataSetVersionStatus.Published,
+        DataSetVersionStatus.Withdrawn,
+    ];
+
+    private static readonly List<DataSetVersionStatus> PreMappingsFinalisedMappingStatuses = AllStatuses
+        .Except(PostMappingStatuses)
+        .ToList();
+
     private static readonly List<DataSetVersionStatus> DeletableStatusList =
     [
         DataSetVersionStatus.Failed,
@@ -12,6 +25,8 @@ public static class DataSetVersionStatusTheoryData
         DataSetVersionStatus.Draft,
         DataSetVersionStatus.Cancelled,
     ];
+
+    public static readonly TheoryData<DataSetVersionStatus> PostMappingStatusesTheoryData = new(PostMappingStatuses);
 
     public static readonly TheoryData<DataSetVersionStatus> DeletableStatuses = new(DeletableStatusList);
 
@@ -21,5 +36,9 @@ public static class DataSetVersionStatusTheoryData
 
     public static readonly TheoryData<DataSetVersionStatus> StatusesExceptMapping = new(
         EnumUtil.GetEnums<DataSetVersionStatus>().Except([DataSetVersionStatus.Mapping])
+    );
+
+    public static readonly TheoryData<DataSetVersionStatus> PreMappingsFinalisedStatusesTheoryData = new(
+        PreMappingsFinalisedMappingStatuses
     );
 }

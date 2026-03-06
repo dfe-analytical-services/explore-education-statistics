@@ -32,6 +32,22 @@ public record ProcessorTestData
 
     private string DirectoryPath => Path.Combine(DataFilesDirectoryPath, Name);
 
+    public DataSetVersionMeta ToDataSetVersionMeta()
+    {
+        return new DataSetVersionMeta
+        {
+            FilterMetas = ExpectedFilters,
+            IndicatorMetas = ExpectedIndicators,
+            LocationMetas = ExpectedLocations,
+            GeographicLevelMeta = new GeographicLevelMeta
+            {
+                Levels = ExpectedGeographicLevels,
+                DataSetVersionId = Guid.Empty,
+            },
+            TimePeriodMetas = ExpectedTimePeriods,
+        };
+    }
+
     public static ProcessorTestData AbsenceSchool =>
         new()
         {
