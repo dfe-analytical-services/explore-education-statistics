@@ -151,6 +151,10 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
           </section>
         )}
 
+        {warningSection.content && warningSection.content.length > 0 && (
+          <ReleaseWarningBlock block={warningSection.content[0]} />
+        )}
+
         {hasSummarySection && (
           <ReleasePageContentSection
             heading="Background information"
@@ -170,10 +174,6 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
               </div>
             ))}
           </ReleasePageContentSection>
-        )}
-
-        {warningSection.content && warningSection.content.length > 0 && (
-          <ReleaseWarningBlock block={warningSection.content[0]} />
         )}
 
         <ReleaseHeadlinesRedesign

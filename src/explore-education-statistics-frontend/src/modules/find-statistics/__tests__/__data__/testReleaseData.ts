@@ -495,6 +495,16 @@ export const testReleaseHomeContent: ReleaseVersionHomeContent = {
       },
     ],
   },
+  warningSection: {
+    id: 'test-warning-section-id',
+    content: [
+      {
+        type: 'HtmlBlock',
+        body: '<p>Warning section text</p>',
+        id: 'test-warning-section-block-1-id',
+      },
+    ],
+  },
 };
 
 export const testReleaseDataContent: ReleaseVersionDataContent = {

@@ -281,6 +281,7 @@ export interface ReleaseVersionHomeContent<
   releaseId: string;
   releaseVersionId: string;
   summarySection: ReleaseVersionHomeSection<HtmlBlockType>;
+  warningSection: ReleaseVersionHomeSection<HtmlBlockType>;
 }
 
 export interface ReleaseVersionDataContent {

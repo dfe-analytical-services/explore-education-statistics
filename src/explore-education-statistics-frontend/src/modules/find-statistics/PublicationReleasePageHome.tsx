@@ -7,6 +7,8 @@ import ContactUsSection from '@common/modules/find-statistics/components/Contact
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
+import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
+
 import {
   PublicationSummaryRedesign,
   ReleaseVersionHomeContent,
@@ -36,6 +38,7 @@ const PublicationReleasePage = ({
     keyStatistics,
     keyStatisticsSecondarySection,
     summarySection,
+    warningSection,
   } = homeContent;
 
   const { isMedia: isMobileMedia } = useMobileMedia();
@@ -132,6 +135,10 @@ const PublicationReleasePage = ({
             }
           />
         </section>
+      )}
+
+      {warningSection.content && warningSection.content.length > 0 && (
+        <ReleaseWarningBlock block={warningSection.content[0]} />
       )}
 
       {summarySection.content?.length > 0 && (
