@@ -26,6 +26,7 @@ import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
 import ReleasePublishChecklistPage from '@admin/pages/release/ReleaseChecklistPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
+import ReleaseApiDataSetIndicatorsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetIndicatorsMappingPage';
 
 export type ReleaseRouteParams = {
   publicationId: string;
@@ -136,6 +137,13 @@ export const releaseApiDataSetFiltersMappingRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/filters-mapping',
   title: 'API data set filters mapping',
   component: ReleaseApiDataSetFiltersMappingPage,
+  protectionAction: permissions => permissions.isBauUser,
+};
+
+export const releaseApiDataSetIndicatorsMappingRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/indicators-mapping',
+  title: 'API data set indicators mapping',
+  component: ReleaseApiDataSetIndicatorsMappingPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
