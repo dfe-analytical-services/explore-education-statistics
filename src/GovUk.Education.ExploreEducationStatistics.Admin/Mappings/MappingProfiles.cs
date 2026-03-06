@@ -26,7 +26,6 @@ using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admi
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 using OrganisationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.OrganisationViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.ReleaseNoteViewModel;
 using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 using ReleaseVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
@@ -138,8 +137,8 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Published, m => m.MapFrom(releaseVersion => releaseVersion.PublishedDisplayDate))
             .ForMember(dest => dest.Content, m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
             .ForMember(dest => dest.KeyStatistics, m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)))
-            .ForMember(dest => dest.Updates, m => m.MapFrom(rv => rv.Updates.OrderByDescending(update => update.On)))
             .ForMember(dest => dest.Publication, m => m.Ignore())
+            .ForMember(dest => dest.Updates, m => m.Ignore())
             .ForMember(
                 dest => dest.LatestRelease,
                 m => m.MapFrom(rv => rv.Release.Publication.LatestPublishedReleaseVersionId == rv.Id)
@@ -159,8 +158,6 @@ public class MappingProfiles : CommonMappingProfile
                 dest => dest.PublishingOrganisations,
                 m => m.MapFrom(rv => rv.PublishingOrganisations.OrderBy(o => o.Title))
             );
-
-        CreateMap<Update, ReleaseNoteViewModel>();
 
         CreateMap<Comment, CommentViewModel>()
             .ForMember(
