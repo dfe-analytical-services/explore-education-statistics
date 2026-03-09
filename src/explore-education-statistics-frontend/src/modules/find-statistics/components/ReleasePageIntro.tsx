@@ -14,6 +14,7 @@ import {
 import Link from '@frontend/components/Link';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageIntro.module.scss';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import classNames from 'classnames';
 import React, { Fragment } from 'react';
 
 interface Props {
@@ -58,46 +59,74 @@ const ReleasePageIntro = ({
         </WarningMessage>
       )}
 
-      <div className={styles.container}>
-        {!supersededByPublication && (
-          <>
-            {releaseVersionSummary.isLatestRelease ? (
-              <Tag>Latest release</Tag>
-            ) : (
-              <>
-                <Tag colour="orange">Not the latest release</Tag>
-                <Link
-                  className="govuk-!-display-none-print"
-                  unvisited
-                  to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}?redesign=true`} // TODO EES-6449 remove query param when live
-                >
-                  View latest release: {latestRelease.title}
-                </Link>
-              </>
-            )}
-          </>
-        )}
-
-        {releaseVersionSummary.isLatestRelease &&
-          isValidPartialDate(nextReleaseDate) && (
-            <p className="govuk-!-margin-bottom-0">
-              Next release{' '}
-              <time
-                className="govuk-!-font-weight-bold"
-                data-testid="Next release"
-              >
-                {formatPartialDate(nextReleaseDate)}
-              </time>
-            </p>
+      <div
+        className={classNames([styles.container, 'govuk-!-margin-bottom-5'])}
+      >
+        <div className={classNames([styles.container, 'dfe-flex-grow--1'])}>
+          {!supersededByPublication && (
+            <>
+              {releaseVersionSummary.isLatestRelease ? (
+                <Tag>Latest release</Tag>
+              ) : (
+                <>
+                  <Tag colour="orange">Not the latest release</Tag>
+                  <Link
+                    className="govuk-!-display-none-print"
+                    unvisited
+                    to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}?redesign=true`} // TODO EES-6449 remove query param when live
+                  >
+                    View latest release: {latestRelease.title}
+                  </Link>
+                </>
+              )}
+            </>
           )}
 
-        <Link
-          to={`/find-statistics/${publicationSummary.slug}/releases`}
-          className="govuk-!-display-none-print"
-          prefetch={false}
-        >
-          All releases in this series
-        </Link>
+          {releaseVersionSummary.isLatestRelease &&
+            isValidPartialDate(nextReleaseDate) && (
+              <p className="govuk-!-margin-bottom-0">
+                Next release{' '}
+                <time
+                  className="govuk-!-font-weight-bold"
+                  data-testid="Next release"
+                >
+                  {formatPartialDate(nextReleaseDate)}
+                </time>
+              </p>
+            )}
+
+          <Link
+            to={`/find-statistics/${publicationSummary.slug}/releases`}
+            className="govuk-!-display-none-print"
+            prefetch={false}
+          >
+            All releases in this series
+          </Link>
+        </div>
+
+        <div className={styles.container}>
+          <Link
+            to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+            onClick={() => {
+              logEvent({
+                category: 'Downloads',
+                action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
+              });
+            }}
+            id="download-all-data-link"
+          >
+            Download all data (ZIP)
+          </Link>
+          <Link
+            to={
+              releaseVersionSummary.isLatestRelease
+                ? `/data-tables/${publicationSummary.slug}`
+                : `/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}`
+            }
+          >
+            Create your own tables
+          </Link>
+        </div>
       </div>
 
       {!isMobileMedia && (
