@@ -8,11 +8,11 @@ import {
   NameType,
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
-import { TooltipProps } from 'recharts/types/component/Tooltip';
+import { TooltipContentProps } from 'recharts/types/component/Tooltip';
 import orderBy from 'lodash/orderBy';
 import styles from './CustomTooltip.module.scss';
 
-interface CustomTooltipProps extends TooltipProps<ValueType, NameType> {
+interface CustomTooltipProps extends TooltipContentProps<ValueType, NameType> {
   dataSetCategories: DataSetCategory[];
   dataSetCategoryConfigs: DataSetCategoryConfig[];
   order?: 'default' | 'reverse' | 'value';

@@ -138,7 +138,6 @@ const LineChartBlock = ({
     >
       <ResponsiveContainer height={height || 300}>
         <LineChart
-          accessibilityLayer
           aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           margin={{
