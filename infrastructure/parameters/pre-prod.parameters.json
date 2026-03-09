@@ -93,7 +93,7 @@
       "value": 1073741824
     },
     "maxStatsDbSizeBytes": {
-      "value": 536870912000
+      "value": 805306368000
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
