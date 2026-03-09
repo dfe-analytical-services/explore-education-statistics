@@ -121,6 +121,10 @@ public class ManageContentPageService : IManageContentPageService
                             }
                             : null,
                 };
+                releaseViewModel.Updates = releaseVersion
+                    .Updates.OrderByDescending(u => u.On)
+                    .Select(ReleaseNoteViewModel.FromUpdate)
+                    .ToList();
 
                 return new ManageContentPageViewModel
                 {
