@@ -192,6 +192,20 @@ const apiDataSetVersionService = {
       data,
     );
   },
+  getIndicatorsMapping(dataSetVersionId: string): Promise<IndicatorsMapping> {
+    return client.get(
+      `/public-data/data-set-versions/${dataSetVersionId}/mapping/indicators`,
+    );
+  },
+  updateIndicatorsMapping(
+    dataSetVersionId: string,
+    data: IndicatorsMappingUpdateRequest,
+  ): Promise<IndicatorsMappingUpdateResponse> {
+    return client.patch(
+      `/public-data/data-set-versions/${dataSetVersionId}/mapping/indicators`,
+      data,
+    );
+  },
   getChanges(dataSetVersionId: string): Promise<ApiDataSetVersionChanges> {
     return client.get(
       `/public-data/data-set-versions/${dataSetVersionId}/changes`,
