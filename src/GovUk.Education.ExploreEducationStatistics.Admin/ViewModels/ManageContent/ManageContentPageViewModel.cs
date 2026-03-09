@@ -44,7 +44,7 @@ public record ManageContentPageViewModel
 
         public required List<OrganisationViewModel> PublishingOrganisations { get; init; }
 
-        public required List<ReleaseNoteViewModel> Updates { get; set; } // TODO EES-6974 revert this to init-only
+        public required List<ReleaseNoteViewModel> Updates { get; init; }
 
         public required List<ContentSectionViewModel> Content { get; init; }
 
