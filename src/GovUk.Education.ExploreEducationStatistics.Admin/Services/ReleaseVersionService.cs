@@ -79,9 +79,15 @@ public class ReleaseVersionService(
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .AnyAsync();
 
+                var publishingOrganisations = releaseVersion
+                    .PublishingOrganisations.OrderBy(o => o.Title)
+                    .Select(OrganisationViewModel.FromOrganisation)
+                    .ToList();
+
                 return mapper.Map<ReleaseVersionViewModel>(releaseVersion) with
                 {
                     PreReleaseUsersOrInvitesAdded = prereleaseRolesAdded,
+                    PublishingOrganisations = publishingOrganisations,
                 };
             });
     }

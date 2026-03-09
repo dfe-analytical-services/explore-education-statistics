@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -19,12 +18,8 @@ using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.View
 using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
-using KeyStatisticDataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticDataBlockViewModel;
-using KeyStatisticTextViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticTextViewModel;
-using KeyStatisticViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticViewModel;
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
-using OrganisationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.OrganisationViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 using ReleaseVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionViewModel;
@@ -63,10 +58,7 @@ public class MappingProfiles : CommonMappingProfile
                         rv.PublishScheduled.HasValue ? rv.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
                     )
             )
-            .ForMember(
-                dest => dest.PublishingOrganisations,
-                m => m.MapFrom(rv => rv.PublishingOrganisations.OrderBy(o => o.Title))
-            )
+            .ForMember(dest => dest.PublishingOrganisations, m => m.Ignore())
             .ForMember(dest => dest.Label, m => m.MapFrom(rv => rv.Release.Label));
 
         CreateMap<ReleaseVersion, ReleaseVersionSummaryViewModel>()
@@ -108,13 +100,6 @@ public class MappingProfiles : CommonMappingProfile
         CreateMap<DataBlockUpdateRequest, DataBlock>()
             .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery(default, default)));
 
-        CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
-        CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();
-        CreateMap<KeyStatistic, KeyStatisticViewModel>().IncludeAllDerived();
-
-        CreateMap<KeyStatisticDataBlockCreateRequest, KeyStatisticDataBlock>();
-        CreateMap<KeyStatisticTextCreateRequest, KeyStatisticText>();
-
         CreateMap<FeaturedTable, FeaturedTableViewModel>();
         CreateMap<FeaturedTableCreateRequest, FeaturedTable>();
 
@@ -124,39 +109,6 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(
                 dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order))
-            );
-
-        CreateMap<Organisation, OrganisationViewModel>();
-
-        CreateMap<ReleaseVersion, ManageContentPageViewModel.ReleaseViewModel>()
-            .ForMember(dest => dest.CoverageTitle, m => m.MapFrom(rv => rv.Release.TimePeriodCoverage.GetEnumLabel()))
-            .ForMember(dest => dest.ReleaseName, m => m.MapFrom(rv => rv.Release.Year.ToString()))
-            .ForMember(dest => dest.Slug, m => m.MapFrom(rv => rv.Release.Slug))
-            .ForMember(dest => dest.Title, m => m.MapFrom(rv => rv.Release.Title))
-            .ForMember(dest => dest.YearTitle, m => m.MapFrom(rv => rv.Release.YearTitle))
-            .ForMember(dest => dest.Published, m => m.MapFrom(releaseVersion => releaseVersion.PublishedDisplayDate))
-            .ForMember(dest => dest.Content, m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
-            .ForMember(dest => dest.KeyStatistics, m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)))
-            .ForMember(dest => dest.Publication, m => m.Ignore())
-            .ForMember(dest => dest.Updates, m => m.Ignore())
-            .ForMember(
-                dest => dest.LatestRelease,
-                m => m.MapFrom(rv => rv.Release.Publication.LatestPublishedReleaseVersionId == rv.Id)
-            )
-            .ForMember(
-                dest => dest.HasPreReleaseAccessList,
-                m => m.MapFrom(rv => !rv.PreReleaseAccessList.IsNullOrEmpty())
-            )
-            .ForMember(
-                model => model.PublishScheduled,
-                m =>
-                    m.MapFrom(rv =>
-                        rv.PublishScheduled.HasValue ? rv.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
-                    )
-            )
-            .ForMember(
-                dest => dest.PublishingOrganisations,
-                m => m.MapFrom(rv => rv.PublishingOrganisations.OrderBy(o => o.Title))
             );
 
         CreateMap<Comment, CommentViewModel>()

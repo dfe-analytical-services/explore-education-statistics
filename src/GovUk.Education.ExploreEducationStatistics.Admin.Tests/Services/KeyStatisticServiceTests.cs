@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -1334,8 +1333,7 @@ public class KeyStatisticServiceTests
             contentDbContext,
             new PersistenceHelper<ContentDbContext>(contentDbContext),
             dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
-            userService ?? MockUtils.AlwaysTrueUserService(_userId).Object,
-            AdminMapper()
+            userService ?? MockUtils.AlwaysTrueUserService(_userId).Object
         );
     }
 }
