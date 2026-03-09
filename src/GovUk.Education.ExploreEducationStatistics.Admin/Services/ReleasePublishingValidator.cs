@@ -1,5 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -28,27 +29,32 @@ public class ReleasePublishingValidator(IDataSetService dataSetService) : IRelea
             releaseVersion.Release.PublicationId,
             cancellationToken
         );
-        var existingDataSets = existingDataSetsForPublication.Right;
 
-        if (existingDataSets.Count == 0)
+        var allPublicationDataSets = existingDataSetsForPublication.Right;
+        var dataSetsNotUpdatedInThisReleaseVersion = new List<DataSetSummaryViewModel>(allPublicationDataSets);
+        var dataUploadsNotAssociatedToApiDataSetCount = dataFileUploads.Count;
+
+        if (allPublicationDataSets.Count == 0)
         {
             return false;
         }
 
-        var draftVersionFileIds = existingDataSets
-            .Where(ds => ds.DraftVersion?.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Draft)
-            .Select(d => d.DraftVersion.File.Id)
-            .ToList();
-
-        foreach (var upload in dataFileUploads)
+        foreach (var dataSet in allPublicationDataSets)
         {
-            if (!draftVersionFileIds.Contains((Guid)upload.DataSetFileId) && !releaseVersion.Live)
+            // If the API data set has been updated in the current release, it will be in a transitory state.
+            // If the condition is met, since one upload is needed to update one API data set, we remove one of each.
+            // If both lists are empty at the end, it means that each upload has been correctly associated to a new version of an API data set, and no warning is shown.
+            if (
+                dataSet.DraftVersion?.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Draft
+                && dataSet.DraftVersion.ReleaseVersion.Id == releaseVersion.Id
+            )
             {
-                return true;
+                dataSetsNotUpdatedInThisReleaseVersion.Remove(dataSet);
+                dataUploadsNotAssociatedToApiDataSetCount--;
             }
         }
 
-        return false;
+        return dataSetsNotUpdatedInThisReleaseVersion.Count > 0 && dataUploadsNotAssociatedToApiDataSetCount > 0;
     }
 
     private static bool IsNewRelease(ReleaseVersion releaseVersion) =>
