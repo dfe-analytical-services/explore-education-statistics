@@ -184,7 +184,6 @@ const VerticalBarBlock = ({
         ref={containerRef}
       >
         <BarChart
-          accessibilityLayer
           aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           margin={{
@@ -229,13 +228,14 @@ const VerticalBarBlock = ({
           />
 
           <Tooltip
-            content={
+            content={props => (
               <CustomTooltip
+                {...props}
                 dataSetCategories={dataSetCategories}
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
                 order={stacked ? 'reverse' : 'default'}
               />
-            }
+            )}
             wrapperStyle={{ zIndex: 1000 }}
           />
 
@@ -260,12 +260,22 @@ const VerticalBarBlock = ({
                       fontSize: 14,
                       offset: 5,
                       position: 'top',
-                      formatter: (value: string | number) =>
-                        formatPretty(
+                      formatter: (
+                        value: string | number | boolean | null | undefined,
+                      ) => {
+                        if (
+                          typeof value !== 'string' &&
+                          typeof value !== 'number'
+                        ) {
+                          return '';
+                        }
+
+                        return formatPretty(
                           value.toString(),
                           dataSet.indicator.unit,
                           dataSet.indicator.decimalPlaces,
-                        ),
+                        );
+                      },
                     }
                   : undefined
               }
