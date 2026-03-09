@@ -547,6 +547,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             services.AddTransient<IProcessorClient, NoOpProcessorClient>();
 
+            services.AddTransient<IPublicDataApiClient, NoOpPublicDataApiClient>();
+
             // TODO EES-5073 Remove this once PublicDataDbContext is configured in ALL Azure environments.
             // This is allowing for the PublicDataDbContext to be null.
             services.AddTransient<IDataSetService, DataSetService>(provider => new DataSetService(
@@ -1112,6 +1114,22 @@ internal class NoOpPublicDataSetRepository : IPublicDataSetRepository
     public Task<IndicatorMeta?> GetIndicatorMeta(
         Guid dataSetVersionId,
         string indicatorPublicId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+}
+
+internal class NoOpPublicDataApiClient : IPublicDataApiClient
+{
+    public Task<Either<ActionResult, HttpResponseMessage>> GetDataSetVersionChanges(
+        Guid dataSetId,
+        string dataSetVersion,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+
+    public Task<Either<ActionResult, Public.Data.ViewModels.DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
+        Guid dataSetId,
+        string dataSetVersion,
+        string queryBody,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 }
