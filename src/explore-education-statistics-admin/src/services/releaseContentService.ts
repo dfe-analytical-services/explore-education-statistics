@@ -47,10 +47,16 @@ const releaseContentService = {
       `/releaseVersions/${releaseVersionId}/data-content`,
     );
   },
-  getContent(releaseId: string, isPrerelease = false): Promise<ReleaseContent> {
-    return client.get<ReleaseContent>(`/release/${releaseId}/content`, {
-      params: { isPrerelease },
-    });
+  getContent(
+    releaseVersionId: string,
+    isPrerelease = false,
+  ): Promise<ReleaseContent> {
+    return client.get<ReleaseContent>(
+      `/releaseVersions/${releaseVersionId}/content`,
+      {
+        params: { isPrerelease },
+      },
+    );
   },
   addContentSection(
     releaseId: string,
