@@ -258,7 +258,8 @@ export default function ReleaseApiDataSetDetailsPage() {
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
     dataSet.draftVersion.mappingStatus.filtersComplete &&
-    dataSet.draftVersion.mappingStatus.locationsComplete;
+    dataSet.draftVersion.mappingStatus.locationsComplete &&
+    dataSet.draftVersion.mappingStatus.indicatorsComplete;
 
   const showDraftVersionTasks =
     dataSet?.draftVersion?.status !== 'Processing' &&

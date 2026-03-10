@@ -4,7 +4,7 @@ import getApiDataSetIndicatorMappings, {
   IndicatorCandidateWithKey,
   MappableIndicator,
 } from '@admin/pages/release/data/utils/getApiDataSetIndicatorMappings';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import { useParams } from 'react-router-dom';
 import {
@@ -28,6 +28,9 @@ import compact from 'lodash/compact';
 import ButtonLink from '@admin/components/ButtonLink';
 import NotificationBanner from '@common/components/NotificationBanner';
 import getUnmappedIndicatorErrors from '@admin/pages/release/data/utils/getUnmappedIndicatorErrors';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import omit from 'lodash/omit';
 
 export const sectionIds = {
   mappableIndicators: 'mappable-indicators',
@@ -82,28 +85,120 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
 
   const totalAutoMappedIndicators = autoMappedIndicators.length;
 
-  const navItems: NavItem[] = useMemo(() => {
-    return [
-      {
-        id: sectionIds.mappableIndicators,
-        text: 'Indicators not found in new data set',
-      },
-      {
-        id: sectionIds.newIndicators,
-        text: 'Indicators not found in old dataset',
-      },
-      {
-        id: sectionIds.autoMappedIndicators,
-        text: 'Indicators found in both',
-      },
-    ];
-  }, [mappableIndicators, newIndicators, autoMappedIndicators]);
+  const navItems: NavItem[] = [
+    {
+      id: sectionIds.mappableIndicators,
+      text: 'Indicators not found in new data set',
+    },
+    {
+      id: sectionIds.newIndicators,
+      text: 'Indicators not found in old dataset',
+    },
+    {
+      id: sectionIds.autoMappedIndicators,
+      text: 'Indicators found in both',
+    },
+  ];
 
-  // const updateMappingState
+  const updateMappingState = useCallback(
+    (updates: PendingMappingUpdate[]) => {
+      updateMappableIndicators(draft => {
+        updates.forEach(
+          ({ candidateKey, previousMapping, sourceKey, type }) => {
+            const candidate = candidateKey
+              ? newIndicators.find(indicator => indicator.key === candidateKey)
+              : undefined;
 
-  // const [handleUpdate]
+            if (previousMapping.type === 'AutoMapped') {
+              const updated = draft ?? [];
+              updated.push({
+                candidate,
+                mapping: { ...previousMapping, candidateKey, type },
+              });
+            } else {
+              const indicatorToUpdate = draft.find(
+                indicator => indicator.mapping.sourceKey === sourceKey,
+              );
 
-  // const handleUpdateMapping
+              if (indicatorToUpdate) {
+                indicatorToUpdate.candidate = candidate;
+                indicatorToUpdate.mapping = {
+                  ...previousMapping,
+                  candidateKey,
+                  type,
+                };
+              }
+            }
+          },
+        );
+
+        // New indicators - remove mapped candidates, add unmapped candidates
+        updateNewIndicators(draftNewIndicators => {
+          updates.forEach(({ candidateKey, previousCandidate }) => {
+            if (candidateKey) {
+              // Remove candidates that have been mapped
+              draftNewIndicators.forEach((indicator, index) => {
+                if (indicator.key === candidateKey) {
+                  draftNewIndicators.splice(index, 1);
+                }
+              });
+            } else if (previousCandidate) {
+              const updated = draftNewIndicators ?? [];
+              updated.push(previousCandidate);
+            }
+          });
+        });
+      });
+
+      // AutoMapped - remove previously AutoMapped ones
+      updateAutoMappedIndicators(draft => {
+        updates.forEach(({ sourceKey, previousMapping }) => {
+          if (previousMapping.type !== 'AutoMapped') {
+            return;
+          }
+
+          draft.forEach((indicator, index) => {
+            if (indicator.mapping.sourceKey === sourceKey) {
+              draft.splice(index, 1);
+            }
+          });
+        });
+      });
+    },
+    [
+      newIndicators,
+      updateAutoMappedIndicators,
+      updateMappableIndicators,
+      updateNewIndicators,
+    ],
+  );
+
+  // Batch up and debounce so can set indicators to 'no mapping'
+  // in quick succession.
+  const [handleUpdate] = useDebouncedCallback(async () => {
+    if (!dataSet?.draftVersion?.id || !pendingUpdates.length) {
+      return;
+    }
+
+    await apiDataSetVersionService.updateIndicatorsMapping(
+      dataSet.draftVersion?.id,
+      {
+        updates: pendingUpdates.map(update =>
+          omit({ ...update }, 'previousCandidate', 'previousMapping'),
+        ),
+      },
+    );
+    updateMappingState(pendingUpdates);
+    setPendingUpdates([]);
+  }, 1000);
+
+  const handleUpdateMapping = useCallback(
+    async (update: PendingMappingUpdate) => {
+      setPendingUpdates(current => [...current, update]);
+      handleUpdate();
+    },
+    [handleUpdate],
+  );
 
   const unmappedIndicatorErrors =
     getUnmappedIndicatorErrors(mappableIndicators);
@@ -155,36 +250,22 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
             </p>
 
             <h3 className="govuk-heading-l" id={sectionIds.mappableIndicators}>
-              Indicators not found in new data set
+              Indicators not found in new data set ({mappableIndicators.length})
             </h3>
 
             {mappableIndicators.length > 0 ? (
               <ApiDataSetMappableTable
                 key="indicator-mappings"
-                groupKey="indicator-mappings"
                 itemLabel="indicator"
                 itemPluralLabel="indicators"
-                groupLabel="Indicators"
+                groupLabel="Mappable indicators"
                 mappableItems={mappableIndicators}
                 newItems={newIndicators}
                 pendingUpdates={pendingUpdates}
                 renderCandidate={candidate => candidate.label}
-                renderCaptionEnd={
-                  <>
-                    <br />
-                    <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
-                      Column:{' '}
-                      <code className="govuk-!-font-weight-regular">
-                        "Indicator - TODO EES-6764"
-                      </code>
-                    </div>
-                  </>
-                }
+                // TODO EES-6764 - no renderCaptionEnd here as there are no groupings for indicators
                 renderSource={source => source.label}
-                onUpdate={_ => {
-                  // TODO - handleUpdateMapping
-                  return Promise.resolve();
-                }}
+                onUpdate={handleUpdateMapping}
               />
             ) : (
               <p>No indicators.</p>
@@ -206,19 +287,13 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 return (
                 <AccordionSection
                   backToTop={false}
-                  caption={
-                    <>
-                      <strong>Column:</strong>{' '}
-                      <code>TODO EES-6764 - code here</code>
-                    </>
-                  }
+                  caption="" // TODO EES-6764 - no caption here are indicators aren't grouped
                   heading={`New indicators (${newIndicators.length})`}
                   headingTag="h4"
                   id="new-indicators"
                   key="new-indicators"
                 >
                   <ApiDataSetNewItemsTable
-                    groupKey="new-indicators"
                     groupLabel="New indicators"
                     itemPluralLabel="indicators"
                     newItems={newIndicators}
@@ -260,8 +335,6 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                     key="mapped-indicators"
                   >
                     <ApiDataSetAutoMappedTable
-                      groupKey="mapped-indicators"
-                      groupLabel="Mapped indicators"
                       itemLabel="indicator"
                       autoMappedItems={autoMappedIndicators}
                       newItems={newIndicators}
@@ -282,10 +355,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                           });
                         })
                       }
-                      // onUpdate={handleUpdateMapping} // TODO
-                      onUpdate={_ => {
-                        return Promise.resolve();
-                      }}
+                      onUpdate={handleUpdateMapping}
                     />
                   </AccordionSection>
                   );

@@ -5,8 +5,8 @@ import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import React, { ReactNode } from 'react';
 
 interface Props {
-  groupKey: LocationLevelKey | string;
-  groupLabel: string;
+  groupKey?: LocationLevelKey | string;
+  groupLabel?: string;
   itemPluralLabel: string;
   newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
   renderItem: (

@@ -32,8 +32,8 @@ interface Props {
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => ReactNode;
-  groupKey: LocationLevelKey | string;
-  groupLabel: string;
+  groupKey?: LocationLevelKey | string;
+  groupLabel?: string;
   itemLabel: string;
   newItems?: LocationCandidateWithKey[] | FilterOptionCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
@@ -82,7 +82,7 @@ export default function ApiDataSetAutoMappedTable({
   const totalFilteredItems = filteredItems.length;
   const totalPages = filteredItemsChunks.length;
 
-  const tableId = autoMappedTableId(groupKey);
+  const tableId = autoMappedTableId(groupKey ?? 'default');
 
   const [handleSearch] = useDebouncedCallback((term: string) => {
     setSearchTerm(term);
