@@ -29,7 +29,7 @@ import useMountedRef from '@common/hooks/useMountedRef';
 import React, { ReactNode, useMemo } from 'react';
 import { generatePath } from 'react-router';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
-import { useAuthContext } from '@admin/contexts/AuthContext';
+import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import Link from '@admin/components/Link';
 import isPatchVersion from '@common/utils/isPatchVersion';
 
@@ -78,9 +78,11 @@ const DataFileReplacementPlan = ({
     hasDataSetVersionPlan,
     hasIncompleteLocationMapping,
     hasIncompleteFilterMapping,
+    hasIncompleteIndicatorMapping,
     isNotReadyToPublish,
     hasMajorLocationMapping,
     hasMajorFilterMapping,
+    hasMajorIndicatorMapping,
   } = useMemo(() => {
     return {
       hasDataSetVersionPlan: !!plan?.apiDataSetVersionPlan,
@@ -88,10 +90,14 @@ const DataFileReplacementPlan = ({
         !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
       hasIncompleteFilterMapping:
         !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
+      hasIncompleteIndicatorMapping:
+        !plan?.apiDataSetVersionPlan?.mappingStatus?.indicatorsComplete,
       hasMajorLocationMapping:
         plan?.apiDataSetVersionPlan?.mappingStatus?.locationsHaveMajorChange,
       hasMajorFilterMapping:
         plan?.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
+      hasMajorIndicatorMapping:
+        plan?.apiDataSetVersionPlan?.mappingStatus?.indicatorsHaveMajorChange,
       isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
     };
   }, [plan]);
@@ -110,14 +116,6 @@ const DataFileReplacementPlan = ({
         : undefined,
     [releaseVersionId, publicationId, dataSetId],
   );
-
-  const apiDataSetsTabRoute =
-    user?.permissions.isBauUser && releaseRouteParams
-      ? `${generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          releaseRouteParams,
-        )}`
-      : undefined;
 
   if (error) {
     return (
@@ -139,98 +137,47 @@ const DataFileReplacementPlan = ({
 
   const isPatch = isPatchVersion(plan?.apiDataSetVersionPlan?.version);
 
+  const apiDataSetsTabRoute =
+    user?.permissions.isBauUser && releaseRouteParams
+      ? `${generatePath<ReleaseDataSetRouteParams>(
+          releaseApiDataSetDetailsRoute.path,
+          releaseRouteParams,
+        )}`
+      : undefined;
+
   const linkToApiDetailsTab = apiDataSetsTabRoute && (
     <Link to={apiDataSetsTabRoute} unvisited>
       go to the API data sets tab
     </Link>
   );
 
-  const linkNotAvailableToNonBauText = (
-    <p>
-      Please contact the EES team for support at{' '}
-      <a href="mailto:explore.statistics@education.gov.uk">
-        explore.statistics@education.gov.uk
-      </a>
-      . Your user account does not have the role required access to the API
-      details page which can help resolve this issue.
-    </p>
-  );
-  const instructionToGoToApiDetailsTabForLocations = user?.permissions
-    .isBauUser ? (
-    <p>
-      Please {linkToApiDetailsTab} and complete manual mapping process for
-      locations.
-    </p>
-  ) : (
-    linkNotAvailableToNonBauText
-  );
-
-  const instructionToGoToApiDetailsTabForFilters = user?.permissions
-    .isBauUser ? (
-    <p>
-      Please {linkToApiDetailsTab} and complete manual mapping process for
-      filters.
-    </p>
-  ) : (
-    linkNotAvailableToNonBauText
-  );
-
-  const instructionToGoToApiDetailsTabForFinalization = user?.permissions
-    .isBauUser ? (
-    <p>
-      Please {linkToApiDetailsTab} and finalize the data set version mapping
-      process.
-    </p>
-  ) : (
-    linkNotAvailableToNonBauText
-  );
-
-  const locationsAndFiltersErrorTags = (
+  const apiDataSetMappingProgressTags = (
     <>
-      <h3 className="govuk-heading-m govuk-!-padding-top-4">
-        <Tag
-          colour={
-            hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch)
-              ? 'red'
-              : 'green'
-          }
-        >
-          {`API data set Locations: ${
-            hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch)
-              ? 'ERROR'
-              : 'OK'
-          }`}
-        </Tag>
-      </h3>
-
-      {hasIncompleteLocationMapping || (hasMajorLocationMapping && isPatch) ? (
-        instructionToGoToApiDetailsTabForLocations
-      ) : (
-        <p>No manual mapping required for API data set locations.</p>
+      {getApiDataSetMappingProgressTag(
+        'locations',
+        hasIncompleteLocationMapping,
+        hasMajorLocationMapping,
+        isPatch,
+        user!,
+        linkToApiDetailsTab,
       )}
-
-      <h3 className="govuk-heading-m govuk-!-padding-top-4">
-        <Tag
-          colour={
-            hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch)
-              ? 'red'
-              : 'green'
-          }
-        >
-          {`API data set Filters: ${
-            hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch)
-              ? 'ERROR'
-              : 'OK'
-          }`}
-        </Tag>
-      </h3>
-
-      {hasIncompleteFilterMapping || (hasMajorFilterMapping && isPatch) ? (
-        instructionToGoToApiDetailsTabForFilters
-      ) : (
-        <p>No manual mapping required for API data set filters.</p>
+      ,
+      {getApiDataSetMappingProgressTag(
+        'filters',
+        hasIncompleteFilterMapping,
+        hasMajorFilterMapping,
+        isPatch,
+        user!,
+        linkToApiDetailsTab,
       )}
-
+      {getApiDataSetMappingProgressTag(
+        'indicators',
+        hasIncompleteIndicatorMapping,
+        hasMajorIndicatorMapping,
+        isPatch,
+        user!,
+        linkToApiDetailsTab,
+      )}
       <h3 className="govuk-heading-m govuk-!-padding-top-4">
         <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
           {`API data set has to be finalized: ${
@@ -238,10 +185,15 @@ const DataFileReplacementPlan = ({
           }`}
         </Tag>
       </h3>
-
-      {isNotReadyToPublish ? (
-        instructionToGoToApiDetailsTabForFinalization
-      ) : (
+      {isNotReadyToPublish && user?.permissions.isBauUser && (
+        <p>
+          Please {linkToApiDetailsTab} and finalize the data set version mapping
+          process.
+        </p>
+      )}
+      {isNotReadyToPublish &&
+        user?.permissions.isBauUser && { mappingLinkNotAvailableToNonBauText }}
+      {!isNotReadyToPublish && (
         <p>No actions required for API data set version mapping.</p>
       )}
     </>
@@ -559,27 +511,29 @@ const DataFileReplacementPlan = ({
           })}
 
           <ButtonGroup className="govuk-!-margin-top-8">
-            {plan.valid && (
-              <Button
-                disabled={isSubmitting}
-                onClick={async () => {
-                  toggleSubmitting.on();
+            {plan.valid &&
+              ((hasDataSetVersionPlan && user?.permissions.isBauUser) ||
+                !hasDataSetVersionPlan) && (
+                <Button
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    toggleSubmitting.on();
 
-                  await dataReplacementService.replaceData(releaseVersionId, [
-                    fileId,
-                  ]);
+                    await dataReplacementService.replaceData(releaseVersionId, [
+                      fileId,
+                    ]);
 
-                  if (onReplacement) {
-                    onReplacement();
-                  }
-                  if (isMounted.current) {
-                    toggleSubmitting.off();
-                  }
-                }}
-              >
-                Confirm data replacement
-              </Button>
-            )}
+                    if (onReplacement) {
+                      onReplacement();
+                    }
+                    if (isMounted.current) {
+                      toggleSubmitting.off();
+                    }
+                  }}
+                >
+                  Confirm data replacement
+                </Button>
+              )}
             {cancelButton}
           </ButtonGroup>
         </>
@@ -587,5 +541,61 @@ const DataFileReplacementPlan = ({
     </LoadingSpinner>
   );
 };
+
+const mappingLinkNotAvailableToNonBauText = (
+  <p>
+    Please contact the EES team for support at{' '}
+    <a href="mailto:explore.statistics@education.gov.uk">
+      explore.statistics@education.gov.uk
+    </a>
+    . Your user account does not have the role required access to the API
+    details page which can help resolve this issue.
+  </p>
+);
+
+function getApiDataSetMappingProgressTag(
+  mappableType: string,
+  hasIncompleteMapping: boolean,
+  hasMajorMapping: boolean | undefined,
+  isPatch: boolean,
+  user: User,
+  linkToApiDetailsTab: ReactNode | undefined,
+) {
+  const mappingRequired = hasIncompleteMapping || (hasMajorMapping && isPatch);
+
+  return (
+    <>
+      <h3 className="govuk-heading-m govuk-!-padding-top-4">
+        <Tag
+          colour={
+            hasIncompleteMapping || (hasMajorMapping && isPatch)
+              ? 'red'
+              : 'green'
+          }
+        >
+          {`API data set ${mappableType}: ${
+            hasIncompleteMapping || (hasMajorMapping && isPatch)
+              ? 'ERROR'
+              : 'OK'
+          }`}
+        </Tag>
+      </h3>
+
+      {mappingRequired && user.permissions.isBauUser && (
+        <p>
+          Please {linkToApiDetailsTab} and complete manual mapping process for{' '}
+          {mappableType}.
+        </p>
+      )}
+
+      {mappingRequired &&
+        !user.permissions.isBauUser && { mappingLinkNotAvailableToNonBauText }}
+
+      {!mappingRequired && (
+        <p>No manual mapping required for API data set ${mappableType}.</p>
+      )}
+    </>
+  );
+}
 
 export default DataFileReplacementPlan;

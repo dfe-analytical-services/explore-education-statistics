@@ -42,12 +42,15 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
   const [autoMappedIndicators, updateAutoMappedIndicators] = useImmer<
     AutoMappedIndicator[]
   >([]);
+
   const [newIndicators, updateNewIndicators] = useImmer<
     IndicatorCandidateWithKey[]
   >([]);
+
   const [mappableIndicators, updateMappableIndicators] = useImmer<
     MappableIndicator[]
   >([]);
+
   const [pendingUpdates, setPendingUpdates] = useState<PendingMappingUpdate[]>(
     [],
   );
@@ -80,10 +83,6 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
     updateMappableIndicators,
     updateNewIndicators,
   ]);
-
-  const totalNewIndicators = newIndicators.length;
-
-  const totalAutoMappedIndicators = autoMappedIndicators.length;
 
   const navItems: NavItem[] = [
     {
@@ -275,11 +274,11 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newIndicators}
             >
-              Indicators not found in old dataset ({totalNewIndicators}){' '}
+              Indicators not found in old dataset ({newIndicators.length}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
-            {totalNewIndicators > 0 ? (
+            {newIndicators.length > 0 ? (
               <Accordion
                 id={`${sectionIds.newIndicators}-accordion`}
                 testId={`${sectionIds.newIndicators}-accordion`}
@@ -310,11 +309,11 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.autoMappedIndicators}
             >
-              Indicators found in both ({totalAutoMappedIndicators}){' '}
+              Indicators found in both ({autoMappedIndicators.length}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
-            {totalAutoMappedIndicators > 0 ? (
+            {autoMappedIndicators.length > 0 ? (
               <>
                 <p>
                   These indicators have been mapped automatically.{' '}
