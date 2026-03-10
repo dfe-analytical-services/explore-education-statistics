@@ -147,13 +147,14 @@ const LineChartBlock = ({
           }}
         >
           <Tooltip
-            content={
+            content={props => (
               <CustomTooltip
+                {...props}
                 dataSetCategories={dataSetCategories}
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
                 order="value"
               />
-            }
+            )}
             wrapperStyle={{ zIndex: 1000 }}
           />
           {legend.position !== 'none' && legend.position !== 'inline' && (
