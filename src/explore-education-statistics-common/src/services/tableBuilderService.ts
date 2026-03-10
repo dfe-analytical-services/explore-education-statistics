@@ -176,6 +176,7 @@ export interface LocationsOrTimePeriodsQuery {
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
+  dataSetFileId: string;
   locations: Dictionary<LocationOption[] | LocationGeoJsonOption[]>;
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];

@@ -470,6 +470,7 @@ export const testMapTableData: TableDataResponse & {
     ],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     timePeriodRange: [{ code: 'AY', label: '2016/17', year: 2016 }],
     geoJsonAvailable: true,
     isCroppedTable: false,
@@ -1046,5 +1047,6 @@ export const testSubjectMeta: FullTableMeta = {
   locations: [testLocation1, testLocation2, testLocation3],
   publicationName: 'Publication 1',
   subjectName: 'Subject 1',
+  dataSetFileId: 'file-id',
   timePeriodRange: [testTimePeriod1],
 };

@@ -170,6 +170,7 @@ export const testChartTableData: TableDataResponse = {
     ],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       { code: 'AY', label: '2012/13', year: 2012 },
       { code: 'AY', label: '2013/14', year: 2013 },
@@ -320,6 +321,7 @@ export const testEmptyChartTableData: TableDataResponse = {
     ],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       { code: 'AY', label: '2020/21', year: 2020 },
       { code: 'AY', label: '2021/22', year: 2021 },

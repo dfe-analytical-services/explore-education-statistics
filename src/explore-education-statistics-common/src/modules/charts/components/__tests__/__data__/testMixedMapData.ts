@@ -124,6 +124,7 @@ export const testMixedMeta: FullTableMeta = {
   ],
   publicationName: 'Categorical data maps',
   subjectName: 'Mixed',
+  dataSetFileId: 'file-id',
   timePeriodRange: [
     new TimePeriodFilter({
       year: 2024,

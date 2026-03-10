@@ -93,6 +93,7 @@ describe('EditableKeyStat', () => {
       subjectMeta: {
         publicationName: 'Test publication',
         subjectName: 'Test subject',
+        dataSetFileId: 'file-id',
         geoJsonAvailable: false,
         isCroppedTable: false,
         filters: {

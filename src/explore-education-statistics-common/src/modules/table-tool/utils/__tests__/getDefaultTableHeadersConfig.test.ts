@@ -101,6 +101,7 @@ describe('getDefaultTableHeadersConfig', () => {
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
+      dataSetFileId: 'file-id',
       timePeriodRange: [
         { label: '2014/15', code: 'AY', year: 2014 },
         { label: '2015/16', code: 'AY', year: 2015 },

@@ -65,6 +65,7 @@ export const testTableData: TableDataResponse = {
     boundaryLevels: [],
     footnotes: [],
     subjectName: 'Subject 1',
+    dataSetFileId: 'file-id',
     geoJsonAvailable: false,
     isCroppedTable: false,
     locations: {

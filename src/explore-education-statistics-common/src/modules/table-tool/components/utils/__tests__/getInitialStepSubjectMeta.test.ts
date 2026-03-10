@@ -164,6 +164,7 @@ describe('getInitialStepSubjectMeta', () => {
       subjectMeta: {
         publicationName: 'Test publication',
         subjectName: 'Test subject',
+        dataSetFileId: 'file-id',
         geoJsonAvailable: false,
         isCroppedTable: false,
         footnotes: [],
@@ -275,6 +276,7 @@ describe('getInitialStepSubjectMeta', () => {
       subjectMeta: {
         publicationName: 'Test publication',
         subjectName: 'Test subject',
+        dataSetFileId: 'file-id',
         geoJsonAvailable: false,
         isCroppedTable: false,
         footnotes: [],
