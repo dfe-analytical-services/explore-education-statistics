@@ -117,7 +117,7 @@ public class ManageContentPageService(
                     ReleaseName = releaseVersion.Release.Year.ToString(),
                     Slug = releaseVersion.Release.Slug,
                     Type = releaseVersion.Type,
-                    Published = releaseVersion.PublishedDisplayDate,
+                    Published = releaseVersion.Published,
                     PublishScheduled = releaseVersion.PublishScheduled?.ToUkDateOnly(),
                     PublicationId = publication.Id,
                     Publication = publicationViewModel,

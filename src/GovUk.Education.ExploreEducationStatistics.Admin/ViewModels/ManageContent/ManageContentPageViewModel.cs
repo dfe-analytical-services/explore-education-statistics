@@ -26,7 +26,15 @@ public record ManageContentPageViewModel
 
         public required string ReleaseName { get; init; }
 
+        /// <summary>
+        /// The actual date this version was published, if published, mapped from <see cref="ReleaseVersion.Published"/>.
+        /// </summary>
         public required DateTimeOffset? Published { get; init; }
+
+        /// <summary>
+        /// The date that the release version is scheduled to be published, mapped from <see cref="ReleaseVersion.PublishScheduled"/>.
+        /// </summary>
+        public required DateOnly? PublishScheduled { get; init; }
 
         public required string Slug { get; init; }
 
@@ -65,8 +73,6 @@ public record ManageContentPageViewModel
         public required bool HasPreReleaseAccessList { get; init; }
 
         public bool HasDataGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
-
-        public required DateOnly? PublishScheduled { get; init; }
 
         public required PartialDate? NextReleaseDate { get; init; }
 
