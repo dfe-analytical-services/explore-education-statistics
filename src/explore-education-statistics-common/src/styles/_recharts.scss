@@ -58,5 +58,19 @@
 }
 // workaround for recharts legend sharing the same color as chart lines
 .recharts-legend-item-text {
-  color: #000 !important;
+  color: #fff !important;
+}
+
+/* High Contrast Mode Detection */
+@media (prefers-contrast: more) {
+  .recharts-cartesian-grid-horizontal line,
+  .recharts-cartesian-grid-vertical line {
+    stroke: #fff; /* High visibility grid */
+    stroke-width: 2;
+  }
+
+  .recharts-text {
+    fill: #fff !important;
+    font-weight: bold;
+  }
 }
