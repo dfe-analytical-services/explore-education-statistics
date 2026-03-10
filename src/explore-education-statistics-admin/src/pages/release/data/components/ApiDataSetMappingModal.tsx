@@ -26,7 +26,7 @@ interface Props {
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => ReactNode;
-  groupKey: string;
+  groupKey?: string;
   itemLabel: string;
   mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
   newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
