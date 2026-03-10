@@ -31,6 +31,7 @@ export const testInitialTableSubjectMeta: FullTable['subjectMeta'] = {
   boundaryLevels: [],
   publicationName: 'Publication name',
   subjectName: 'Subject name',
+  dataSetFileId: 'file-id',
   timePeriodRange: [],
   geoJsonAvailable: true,
   isCroppedTable: false,

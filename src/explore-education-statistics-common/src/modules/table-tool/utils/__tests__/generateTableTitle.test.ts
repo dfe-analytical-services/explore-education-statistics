@@ -13,6 +13,7 @@ describe('generateTableTitle', () => {
     isCroppedTable: false,
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     footnotes: [],
     boundaryLevels: [],
     filters: {

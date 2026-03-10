@@ -82,6 +82,7 @@ describe('createDataSetCategories', () => {
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
+      dataSetFileId: 'file-id',
       timePeriodRange: [
         { code: 'AY', label: '2014/15', year: 2014 },
         { code: 'AY', label: '2015/16', year: 2015 },
@@ -1340,6 +1341,7 @@ describe('createDataSetCategories', () => {
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence by geographic level',
+        dataSetFileId: 'file-id',
         timePeriodRange: [{ code: 'AY', label: '2015/16', year: 2015 }],
         geoJsonAvailable: true,
         isCroppedTable: false,

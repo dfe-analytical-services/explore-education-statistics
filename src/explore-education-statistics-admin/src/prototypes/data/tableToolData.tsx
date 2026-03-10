@@ -1231,6 +1231,7 @@ export const tableData: TableDataResponse = {
     publicationName: 'Characteristics of children in need',
     subjectName:
       'A1 National time series of children in need, referrals and assessments, England 2013 to 2021',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       {
         code: 'RY',

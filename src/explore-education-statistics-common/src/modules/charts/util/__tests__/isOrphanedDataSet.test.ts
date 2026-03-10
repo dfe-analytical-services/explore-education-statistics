@@ -96,6 +96,7 @@ describe('isOrphanedDataSet', () => {
       ],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
+      dataSetFileId: 'file-id',
       timePeriodRange: [
         { code: 'AY', label: '2013/14', year: 2013 },
         { code: 'AY', label: '2014/15', year: 2014 },

@@ -96,6 +96,7 @@ describe('TableToolPage', () => {
         ],
         publicationName: 'Test publication',
         subjectName: 'data 1',
+        dataSetFileId: 'file-id',
         timePeriodRange: [{ code: 'TY', label: '2018-19', year: 2018 }],
         geoJsonAvailable: true,
         isCroppedTable: false,

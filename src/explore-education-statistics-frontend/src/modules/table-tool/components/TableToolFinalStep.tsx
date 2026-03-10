@@ -94,6 +94,7 @@ const TableToolFinalStep = ({
             fullTable={table}
             query={query}
             tableHeadersConfig={tableHeaders}
+            releaseVersionId={selectedPublication.selectedRelease.id}
             tableHeadersForm={
               <TableHeadersForm
                 initialValues={tableHeaders}

@@ -299,6 +299,7 @@ describe('ReleaseContentPage', () => {
       boundaryLevels: [],
       publicationName: 'Pupil absence',
       subjectName: 'Absence by characteristic',
+      dataSetFileId: 'file-id',
       timePeriodRange: [{ code: 'AY', label: '2014/15', year: 2014 }],
       geoJsonAvailable: false,
       isCroppedTable: false,
