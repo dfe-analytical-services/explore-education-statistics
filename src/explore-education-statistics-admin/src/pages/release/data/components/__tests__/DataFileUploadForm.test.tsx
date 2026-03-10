@@ -234,6 +234,17 @@ describe('DataFileUploadForm', () => {
     );
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toContainElement(
+        screen.getByText('Upload complete'),
+      );
+      expect(
+        screen.getByText(
+          "Click 'View details' on the item pending review in order to continue import.",
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   test('form submits and calls the correct endpoint when a zip file is used', async () => {
@@ -273,8 +284,18 @@ describe('DataFileUploadForm', () => {
       title: 'Test title',
       zipFile: file,
     });
-
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toContainElement(
+        screen.getByText('Upload complete'),
+      );
+      expect(
+        screen.getByText(
+          "Click 'View details' on the item pending review in order to continue import.",
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   test('form submits and calls the correct endpoint when a bulk zip file is used', async () => {
@@ -312,6 +333,17 @@ describe('DataFileUploadForm', () => {
     ).toHaveBeenCalledWith('release-version-id', file);
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toContainElement(
+        screen.getByText('Upload complete'),
+      );
+      expect(
+        screen.getByText(
+          "Click 'View details' on the item pending review in order to continue import.",
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   test('shows validation message when bulk ZIP file is empty', async () => {
