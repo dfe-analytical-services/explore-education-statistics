@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -142,7 +143,34 @@ public record ReleaseVersionSummaryViewModel
 
     public Guid? PreviousVersionId { get; init; }
 
-    public ReleasePermissions? Permissions { get; set; }
+    public ReleasePermissions? Permissions { get; init; }
 
-    public PublicationSummaryViewModel? Publication { get; set; }
+    public PublicationSummaryViewModel? Publication { get; init; }
+
+    public static ReleaseVersionSummaryViewModel FromReleaseVersion(
+        ReleaseVersion releaseVersion,
+        ReleasePermissions? permissions = null,
+        PublicationSummaryViewModel? publicationSummary = null
+    ) =>
+        new()
+        {
+            Id = releaseVersion.Id,
+            ReleaseId = releaseVersion.ReleaseId,
+            Title = releaseVersion.Release.Title,
+            Slug = releaseVersion.Release.Slug,
+            Label = releaseVersion.Release.Label,
+            Year = releaseVersion.Release.Year,
+            YearTitle = releaseVersion.Release.YearTitle,
+            TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
+            ApprovalStatus = releaseVersion.ApprovalStatus,
+            Published = releaseVersion.PublishedDisplayDate,
+            PublishScheduled = releaseVersion.PublishScheduled?.ToUkDateOnly(),
+            NextReleaseDate = releaseVersion.NextReleaseDate,
+            Type = releaseVersion.Type,
+            Amendment = releaseVersion.Amendment,
+            LatestRelease = false, // TODO EES-6974 Wasn't previously mapped and doesn't appear to be used?
+            PreviousVersionId = releaseVersion.PreviousVersionId,
+            Permissions = permissions,
+            Publication = publicationSummary,
+        };
 }

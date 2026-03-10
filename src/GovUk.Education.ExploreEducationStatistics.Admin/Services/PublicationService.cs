@@ -473,17 +473,21 @@ public class PublicationService(
 
                 return await releaseVersions
                     .ToAsyncEnumerable()
-                    .SelectAwait(async releaseVersion =>
-                    {
-                        await context.ReleaseVersions.Entry(releaseVersion).Reference(rv => rv.Release).LoadAsync();
-
-                        return mapper.Map<ReleaseVersionSummaryViewModel>(releaseVersion) with
+                    .Select(
+                        async (releaseVersion, ct) =>
                         {
-                            Permissions = includePermissions
+                            await context
+                                .ReleaseVersions.Entry(releaseVersion)
+                                .Reference(rv => rv.Release)
+                                .LoadAsync(cancellationToken: ct);
+
+                            var permissions = includePermissions
                                 ? await PermissionsUtils.GetReleasePermissions(userService, releaseVersion)
-                                : null,
-                        };
-                    })
+                                : null;
+
+                            return ReleaseVersionSummaryViewModel.FromReleaseVersion(releaseVersion, permissions);
+                        }
+                    )
                     .ToListAsync();
             });
     }

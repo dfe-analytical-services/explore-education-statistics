@@ -21,7 +21,6 @@ using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 using ReleaseVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
 
@@ -60,22 +59,6 @@ public class MappingProfiles : CommonMappingProfile
             )
             .ForMember(dest => dest.PublishingOrganisations, m => m.Ignore())
             .ForMember(dest => dest.Label, m => m.MapFrom(rv => rv.Release.Label));
-
-        CreateMap<ReleaseVersion, ReleaseVersionSummaryViewModel>()
-            .ForMember(dest => dest.Slug, m => m.MapFrom(rv => rv.Release.Slug))
-            .ForMember(dest => dest.Label, m => m.MapFrom(rv => rv.Release.Label))
-            .ForMember(dest => dest.TimePeriodCoverage, m => m.MapFrom(rv => rv.Release.TimePeriodCoverage))
-            .ForMember(dest => dest.Title, m => m.MapFrom(rv => rv.Release.Title))
-            .ForMember(dest => dest.Year, m => m.MapFrom(rv => rv.Release.Year))
-            .ForMember(dest => dest.YearTitle, m => m.MapFrom(rv => rv.Release.YearTitle))
-            .ForMember(dest => dest.Published, m => m.MapFrom(releaseVersion => releaseVersion.PublishedDisplayDate))
-            .ForMember(
-                dest => dest.PublishScheduled,
-                m =>
-                    m.MapFrom(model =>
-                        model.PublishScheduled.HasValue ? model.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
-                    )
-            );
 
         CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
             .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp))
