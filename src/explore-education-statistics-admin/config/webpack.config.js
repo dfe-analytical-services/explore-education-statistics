@@ -742,6 +742,7 @@ module.exports = webpackEnv => {
           ),
           quiet: true,
           // ESLint class options
+          quiet: true,
           cwd: paths.appPath,
           resolvePluginsRelativeTo: __dirname,
           // EES - We have our own ESLint config, so we comment this out.

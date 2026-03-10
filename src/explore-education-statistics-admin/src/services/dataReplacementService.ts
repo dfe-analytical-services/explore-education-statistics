@@ -95,6 +95,7 @@ export interface MappingStatus {
   locationsHaveMajorChange: boolean;
   filtersComplete: boolean;
   filtersHaveMajorChange: boolean;
+  // TODO EES-6764 - add indicators here?
   isMajorVersionUpdate: boolean;
 }
 
