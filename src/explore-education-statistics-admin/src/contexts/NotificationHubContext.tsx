@@ -36,6 +36,10 @@ export function NotificationHubContextProvider({
     undefined | string
   >(undefined);
 
+  const [notificationTime, setNotificationTime] = useState<undefined | string>(
+    undefined,
+  );
+
   const { hub, status } = hubState || {};
 
   useEffect(() => {
@@ -44,8 +48,9 @@ export function NotificationHubContextProvider({
     }
     const subscription = hub.subscribe(
       'ServiceAnnouncement',
-      (message: string) => {
+      (message: string, dateTime: string) => {
         setNotificationMessage(message);
+        setNotificationTime(dateTime);
       },
     );
 
@@ -72,7 +77,10 @@ export function NotificationHubContextProvider({
       <Modal
         title="Service announcement"
         showClose
-        onExit={() => setNotificationMessage('')}
+        onExit={() => {
+          setNotificationMessage('');
+          setNotificationTime(undefined);
+        }}
         open={!!notificationMessage}
       >
         <InsetText>
@@ -80,7 +88,7 @@ export function NotificationHubContextProvider({
             className="govuk-!-font-weight-bold"
             format="d MMM yyyy, HH:mm"
           >
-            {new Date()}
+            {notificationTime ? new Date(notificationTime) : ''}
           </FormattedDate>
           <p>{notificationMessage}</p>
         </InsetText>
