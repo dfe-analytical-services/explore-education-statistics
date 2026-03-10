@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -21,7 +20,6 @@ using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
@@ -34,31 +32,6 @@ public class MappingProfiles : CommonMappingProfile
     public MappingProfiles()
     {
         CreateMap<User, UserDetailsViewModel>();
-
-        CreateMap<ReleaseVersion, ReleaseVersionViewModel>()
-            .ForMember(dest => dest.ReleaseId, m => m.MapFrom(rv => rv.ReleaseId))
-            .ForMember(dest => dest.Slug, m => m.MapFrom(rv => rv.Release.Slug))
-            .ForMember(dest => dest.TimePeriodCoverage, m => m.MapFrom(rv => rv.Release.TimePeriodCoverage))
-            .ForMember(dest => dest.Title, m => m.MapFrom(rv => rv.Release.Title))
-            .ForMember(dest => dest.Year, m => m.MapFrom(rv => rv.Release.Year))
-            .ForMember(dest => dest.YearTitle, m => m.MapFrom(rv => rv.Release.YearTitle))
-            .ForMember(dest => dest.Published, m => m.MapFrom(releaseVersion => releaseVersion.PublishedDisplayDate))
-            .ForMember(
-                dest => dest.LatestRelease,
-                m => m.MapFrom(rv => rv.Release.Publication.LatestPublishedReleaseVersionId == rv.Id)
-            )
-            .ForMember(dest => dest.PublicationTitle, m => m.MapFrom(rv => rv.Release.Publication.Title))
-            .ForMember(dest => dest.PublicationId, m => m.MapFrom(rv => rv.Release.Publication.Id))
-            .ForMember(dest => dest.PublicationSlug, m => m.MapFrom(rv => rv.Release.Publication.Slug))
-            .ForMember(
-                dest => dest.PublishScheduled,
-                m =>
-                    m.MapFrom(rv =>
-                        rv.PublishScheduled.HasValue ? rv.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
-                    )
-            )
-            .ForMember(dest => dest.PublishingOrganisations, m => m.Ignore())
-            .ForMember(dest => dest.Label, m => m.MapFrom(rv => rv.Release.Label));
 
         CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
             .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp))

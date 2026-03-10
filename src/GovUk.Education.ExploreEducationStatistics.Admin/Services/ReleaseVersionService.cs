@@ -86,11 +86,11 @@ public class ReleaseVersionService(
                     .Select(OrganisationViewModel.FromOrganisation)
                     .ToList();
 
-                return mapper.Map<ReleaseVersionViewModel>(releaseVersion) with
-                {
-                    PreReleaseUsersOrInvitesAdded = prereleaseRolesAdded,
-                    PublishingOrganisations = publishingOrganisations,
-                };
+                return ReleaseVersionViewModel.FromReleaseVersion(
+                    releaseVersion,
+                    prereleaseRolesAdded,
+                    publishingOrganisations
+                );
             });
     }
 
