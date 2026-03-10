@@ -19,86 +19,71 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
-public class ManageContentPageService : IManageContentPageService
+public class ManageContentPageService(
+    ContentDbContext contentDbContext,
+    IPersistenceHelper<ContentDbContext> persistenceHelper,
+    IMapper mapper,
+    IDataBlockService dataBlockService,
+    IMethodologyVersionRepository methodologyVersionRepository,
+    IReleaseFileService releaseFileService,
+    IReleaseRepository releaseRepository,
+    IUserService userService
+) : IManageContentPageService
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IMapper _mapper;
-    private readonly IDataBlockService _dataBlockService;
-    private readonly IMethodologyVersionRepository _methodologyVersionRepository;
-    private readonly IReleaseFileService _releaseFileService;
-    private readonly IReleaseRepository _releaseRepository;
-    private readonly IUserService _userService;
-
-    public ManageContentPageService(
-        ContentDbContext contentDbContext,
-        IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IMapper mapper,
-        IDataBlockService dataBlockService,
-        IMethodologyVersionRepository methodologyVersionRepository,
-        IReleaseFileService releaseFileService,
-        IReleaseRepository releaseRepository,
-        IUserService userService
-    )
-    {
-        _contentDbContext = contentDbContext;
-        _persistenceHelper = persistenceHelper;
-        _mapper = mapper;
-        _dataBlockService = dataBlockService;
-        _methodologyVersionRepository = methodologyVersionRepository;
-        _releaseFileService = releaseFileService;
-        _releaseRepository = releaseRepository;
-        _userService = userService;
-    }
-
     public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
         Guid releaseVersionId,
-        bool isPrerelease = false
-    )
-    {
-        return await _persistenceHelper
+        bool isPrerelease = false,
+        CancellationToken cancellationToken = default
+    ) =>
+        await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseQuery)
-            .OnSuccess(_userService.CheckCanViewReleaseVersion)
-            .OnSuccessCombineWith(_ => _dataBlockService.GetUnattachedDataBlocks(releaseVersionId))
-            .OnSuccessCombineWith(_ => _releaseFileService.ListAll(releaseVersionId, Ancillary, FileType.Data))
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
+            .OnSuccessCombineWith(_ => dataBlockService.GetUnattachedDataBlocks(releaseVersionId))
+            .OnSuccessCombineWith(_ => releaseFileService.ListAll(releaseVersionId, Ancillary, FileType.Data))
             .OnSuccess(async releaseVersionBlocksAndFiles =>
             {
                 var (releaseVersion, unattachedDataBlocks, files) = releaseVersionBlocksAndFiles;
 
                 var publication = releaseVersion.Release.Publication;
 
-                var methodologyVersions = await _methodologyVersionRepository.GetLatestVersionByPublication(
+                var methodologyVersions = await methodologyVersionRepository.GetLatestVersionByPublication(
                     publication.Id
                 );
 
                 if (isPrerelease)
                 {
-                    // Get latest approved version
+                    // Get latest approved methodology version
                     methodologyVersions = await methodologyVersions
                         .ToAsyncEnumerable()
-                        .SelectAwait(async version =>
-                        {
-                            if (version.Status == MethodologyApprovalStatus.Approved)
+                        .Select(
+                            async (methodologyVersion, ct) =>
                             {
-                                return version;
-                            }
+                                if (methodologyVersion.Status == MethodologyApprovalStatus.Approved)
+                                {
+                                    return methodologyVersion;
+                                }
 
-                            if (version.PreviousVersionId == null)
-                            {
-                                return null;
-                            }
+                                if (methodologyVersion.PreviousVersionId == null)
+                                {
+                                    return null;
+                                }
 
-                            // If there is a previous version, it must be approved, because cannot
-                            // create an amendment for an unpublished version
-                            return await _contentDbContext.MethodologyVersions.FirstAsync(mv =>
-                                mv.Id == version.PreviousVersionId
-                            );
-                        })
+                                // If there is a previous version, it must be approved, because cannot
+                                // create an amendment for an unpublished version
+                                return await contentDbContext.MethodologyVersions.SingleAsync(
+                                    mv => mv.Id == methodologyVersion.PreviousVersionId,
+                                    cancellationToken: ct
+                                );
+                            }
+                        )
                         .WhereNotNull()
-                        .ToListAsync();
+                        .ToListAsync(cancellationToken);
                 }
 
-                var publishedReleases = await _releaseRepository.ListPublishedReleases(publication.Id);
+                var publishedReleases = await releaseRepository.ListPublishedReleases(
+                    publication.Id,
+                    cancellationToken
+                );
 
                 var publicationViewModel = new ManageContentPageViewModel.PublicationViewModel
                 {
@@ -155,18 +140,18 @@ public class ManageContentPageService : IManageContentPageService
                         .Updates.OrderByDescending(u => u.On)
                         .Select(ReleaseNoteViewModel.FromUpdate)
                         .ToList(),
-                    Content = _mapper.Map<List<ContentSectionViewModel>>(
+                    Content = mapper.Map<List<ContentSectionViewModel>>(
                         releaseVersion.GenericContent.OrderBy(cs => cs.Order)
                     ),
-                    SummarySection = _mapper.Map<ContentSectionViewModel>(releaseVersion.SummarySection!),
-                    HeadlinesSection = _mapper.Map<ContentSectionViewModel>(releaseVersion.HeadlinesSection!),
-                    KeyStatisticsSecondarySection = _mapper.Map<ContentSectionViewModel>(
+                    SummarySection = mapper.Map<ContentSectionViewModel>(releaseVersion.SummarySection!),
+                    HeadlinesSection = mapper.Map<ContentSectionViewModel>(releaseVersion.HeadlinesSection!),
+                    KeyStatisticsSecondarySection = mapper.Map<ContentSectionViewModel>(
                         releaseVersion.KeyStatisticsSecondarySection!
                     ),
-                    RelatedDashboardsSection = _mapper.Map<ContentSectionViewModel>(
+                    RelatedDashboardsSection = mapper.Map<ContentSectionViewModel>(
                         releaseVersion.RelatedDashboardsSection!
                     ),
-                    WarningSection = _mapper.Map<ContentSectionViewModel>(releaseVersion.WarningSection!),
+                    WarningSection = mapper.Map<ContentSectionViewModel>(releaseVersion.WarningSection!),
                 };
 
                 return new ManageContentPageViewModel
@@ -175,7 +160,6 @@ public class ManageContentPageService : IManageContentPageService
                     UnattachedDataBlocks = unattachedDataBlocks,
                 };
             });
-    }
 
     private static List<ReleaseSeriesItemViewModel> BuildReleaseSeriesItemViewModels(
         Publication publication,
@@ -210,14 +194,13 @@ public class ManageContentPageService : IManageContentPageService
             .ToList();
     }
 
-    private IQueryable<ReleaseVersion> HydrateReleaseQuery(IQueryable<ReleaseVersion> queryable)
-    {
-        // Using `AsSplitQuery` as the generated SQL without it is incredibly
-        // inefficient. Previously, we had dealt with this by splitting out
-        // individual queries and hydrating the release manually.
-        // We should keep an eye on this in case `AsSplitQuery` is not as
-        // performant as running individual queries, and revert this if required.
-        return queryable
+    private static IQueryable<ReleaseVersion> HydrateReleaseQuery(IQueryable<ReleaseVersion> queryable) =>
+        queryable
+            // Using `AsSplitQuery` as the generated SQL without it is incredibly
+            // inefficient. Previously, we had dealt with this by splitting out
+            // individual queries and hydrating the release manually.
+            // We should keep an eye on this in case `AsSplitQuery` is not as
+            // performant as running individual queries, and revert this if required.
             .AsSplitQuery()
             .Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
@@ -238,5 +221,4 @@ public class ManageContentPageService : IManageContentPageService
                     .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
             .Include(rv => rv.KeyStatistics)
             .Include(rv => rv.Updates);
-    }
 }
