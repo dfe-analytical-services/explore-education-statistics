@@ -84,8 +84,6 @@ public record ReleaseVersionViewModel
 
     public Guid? PreviousVersionId { get; init; }
 
-    public ReleasePermissions? Permissions { get; init; }
-
     public bool UpdatePublishedDisplayDate { get; init; }
 
     public static ReleaseVersionViewModel FromReleaseVersion(
@@ -120,7 +118,6 @@ public record ReleaseVersionViewModel
             LatestInternalReleaseNote = releaseVersion.LatestInternalReleaseNote,
             Amendment = releaseVersion.Amendment,
             PreviousVersionId = releaseVersion.PreviousVersionId,
-            Permissions = null, // TODO EES-6974 Wasn't previously mapped. Is it used?
             UpdatePublishedDisplayDate = releaseVersion.UpdatePublishedDisplayDate,
         };
 }
@@ -175,8 +172,6 @@ public record ReleaseVersionSummaryViewModel
 
     public bool Amendment { get; init; }
 
-    public bool LatestRelease { get; init; }
-
     public Guid? PreviousVersionId { get; init; }
 
     public ReleasePermissions? Permissions { get; init; }
@@ -204,7 +199,6 @@ public record ReleaseVersionSummaryViewModel
             NextReleaseDate = releaseVersion.NextReleaseDate,
             Type = releaseVersion.Type,
             Amendment = releaseVersion.Amendment,
-            LatestRelease = false, // TODO EES-6974 Wasn't previously mapped and doesn't appear to be used?
             PreviousVersionId = releaseVersion.PreviousVersionId,
             Permissions = permissions,
             Publication = publicationSummary,

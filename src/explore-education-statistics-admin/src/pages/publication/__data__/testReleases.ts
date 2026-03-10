@@ -18,7 +18,6 @@ export const testReleaseSummaries: ReleaseVersionSummary[] = [
     yearTitle: '2023/24',
     live: false,
     amendment: false,
-    latestRelease: false,
   },
   {
     id: 'release-2-version-1',
@@ -35,7 +34,6 @@ export const testReleaseSummaries: ReleaseVersionSummary[] = [
     yearTitle: '2022/23',
     live: false,
     amendment: false,
-    latestRelease: false,
   },
   {
     id: 'release-3-version-1',
@@ -53,7 +51,6 @@ export const testReleaseSummaries: ReleaseVersionSummary[] = [
     yearTitle: '2021/22',
     live: true,
     amendment: false,
-    latestRelease: false,
   },
 ];
 
