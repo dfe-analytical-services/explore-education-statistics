@@ -173,12 +173,13 @@ const HorizontalBarBlock = ({
           />
 
           <Tooltip
-            content={
+            content={props => (
               <CustomTooltip
+                {...props}
                 dataSetCategories={dataSetCategories}
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
               />
-            }
+            )}
             position={isMobileMedia ? { x: 0 } : undefined}
             wrapperStyle={{ zIndex: 1000 }}
           />
@@ -212,12 +213,22 @@ const HorizontalBarBlock = ({
                         dataLabelPosition === 'inside'
                           ? 'insideRight'
                           : 'right',
-                      formatter: (value: string | number) =>
-                        formatPretty(
+                      formatter: (
+                        value: string | number | boolean | null | undefined,
+                      ) => {
+                        if (
+                          typeof value !== 'string' &&
+                          typeof value !== 'number'
+                        ) {
+                          return '';
+                        }
+
+                        return formatPretty(
                           value.toString(),
                           dataSet.indicator.unit,
                           dataSet.indicator.decimalPlaces,
-                        ),
+                        );
+                      },
                     }
                   : undefined
               }

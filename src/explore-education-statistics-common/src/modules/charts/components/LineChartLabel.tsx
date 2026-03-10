@@ -6,6 +6,7 @@ import {
 } from '@common/modules/charts/types/legend';
 import formatPretty from '@common/utils/number/formatPretty';
 import React from 'react';
+import { RenderableText } from 'recharts/types/component/Text';
 
 interface Props {
   colour: string;
@@ -19,7 +20,7 @@ interface Props {
   name: string;
   position?: LineChartDataLabelPosition | LegendInlinePosition;
   unit?: string;
-  value?: string | number;
+  value?: RenderableText;
   x?: string | number;
   y?: string | number;
 }
@@ -62,7 +63,8 @@ export default function LineChartLabel({
         y={y}
       >
         <tspan>
-          {typeof value !== 'undefined' &&
+          {value &&
+            typeof value !== 'boolean' &&
             formatPretty(value, unit, decimalPlaces)}
         </tspan>
       </text>
