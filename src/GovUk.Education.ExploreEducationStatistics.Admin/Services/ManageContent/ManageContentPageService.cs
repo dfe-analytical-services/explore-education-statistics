@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -99,9 +100,7 @@ public class ManageContentPageService : IManageContentPageService
 
                 var publishedReleases = await _releaseRepository.ListPublishedReleases(publication.Id);
 
-                var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
-                releaseViewModel.DownloadFiles = files.ToList();
-                releaseViewModel.Publication = new ManageContentPageViewModel.PublicationViewModel
+                var publicationViewModel = new ManageContentPageViewModel.PublicationViewModel
                 {
                     Id = publication.Id,
                     Summary = publication.Summary,
@@ -121,10 +120,54 @@ public class ManageContentPageService : IManageContentPageService
                             }
                             : null,
                 };
-                releaseViewModel.Updates = releaseVersion
-                    .Updates.OrderByDescending(u => u.On)
-                    .Select(ReleaseNoteViewModel.FromUpdate)
-                    .ToList();
+
+                var downloadFiles = files.ToList();
+
+                var releaseViewModel = new ManageContentPageViewModel.ReleaseViewModel
+                {
+                    Id = releaseVersion.Id,
+                    Title = releaseVersion.Release.Title,
+                    YearTitle = releaseVersion.Release.YearTitle,
+                    CoverageTitle = releaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
+                    ReleaseName = releaseVersion.Release.Year.ToString(),
+                    Slug = releaseVersion.Release.Slug,
+                    Type = releaseVersion.Type,
+                    Published = releaseVersion.PublishedDisplayDate,
+                    PublishScheduled = releaseVersion.PublishScheduled?.ToUkDateOnly(),
+                    PublicationId = publication.Id,
+                    Publication = publicationViewModel,
+                    ApprovalStatus = releaseVersion.ApprovalStatus,
+                    LatestRelease =
+                        releaseVersion.Release.Publication.LatestPublishedReleaseVersionId == releaseVersion.Id,
+                    DownloadFiles = downloadFiles,
+                    HasPreReleaseAccessList = !releaseVersion.PreReleaseAccessList.IsNullOrEmpty(),
+                    KeyStatistics = releaseVersion
+                        .KeyStatistics.OrderBy(ks => ks.Order)
+                        .Select(KeyStatisticViewModel.FromKeyStatistic)
+                        .ToList(),
+                    PublishingOrganisations = releaseVersion
+                        .PublishingOrganisations.OrderBy(o => o.Title)
+                        .Select(OrganisationViewModel.FromOrganisation)
+                        .ToList(),
+                    NextReleaseDate = releaseVersion.NextReleaseDate,
+                    RelatedInformation = releaseVersion.RelatedInformation,
+                    Updates = releaseVersion
+                        .Updates.OrderByDescending(u => u.On)
+                        .Select(ReleaseNoteViewModel.FromUpdate)
+                        .ToList(),
+                    Content = _mapper.Map<List<ContentSectionViewModel>>(
+                        releaseVersion.GenericContent.OrderBy(cs => cs.Order)
+                    ),
+                    SummarySection = _mapper.Map<ContentSectionViewModel>(releaseVersion.SummarySection!),
+                    HeadlinesSection = _mapper.Map<ContentSectionViewModel>(releaseVersion.HeadlinesSection!),
+                    KeyStatisticsSecondarySection = _mapper.Map<ContentSectionViewModel>(
+                        releaseVersion.KeyStatisticsSecondarySection!
+                    ),
+                    RelatedDashboardsSection = _mapper.Map<ContentSectionViewModel>(
+                        releaseVersion.RelatedDashboardsSection!
+                    ),
+                    WarningSection = _mapper.Map<ContentSectionViewModel>(releaseVersion.WarningSection!),
+                };
 
                 return new ManageContentPageViewModel
                 {

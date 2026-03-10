@@ -20,7 +20,6 @@ describe('DraftReleasesTable', () => {
     {
       id: 'release-1-version-1',
       releaseId: 'release-1',
-      latestRelease: true,
       slug: 'release-1-slug',
       title: 'Release 1',
       year: 2020,
@@ -62,7 +61,6 @@ describe('DraftReleasesTable', () => {
     {
       id: 'release-2-version-1',
       releaseId: 'release-2',
-      latestRelease: true,
       slug: 'release-2-slug',
       title: 'Release 2',
       year: 2021,
@@ -105,7 +103,6 @@ describe('DraftReleasesTable', () => {
     {
       id: 'release-3-version-1',
       releaseId: 'release-3',
-      latestRelease: false,
       slug: 'release-3-slug',
       title: 'Release 3',
       year: 2022,
@@ -147,7 +144,6 @@ describe('DraftReleasesTable', () => {
     {
       id: 'release-4-version-1',
       releaseId: 'release-4',
-      latestRelease: true,
       slug: 'release-4-slug',
       title: 'Release 4',
       year: 2023,
