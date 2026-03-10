@@ -1,5 +1,9 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -45,22 +49,69 @@ public class EinTileGroupBlock : EinContentBlock
 public class EinTile
 {
     public Guid Id { get; set; }
+
+    public string? Title { get; set; }
+
     public int Order { get; set; }
+
     public Guid EinParentBlockId { get; set; }
     public EinTileGroupBlock EinParentBlock { get; set; } = null!;
+
+    internal class EinTileConfig : IEntityTypeConfiguration<EinTile>
+    {
+        public void Configure(EntityTypeBuilder<EinTile> builder)
+        {
+            builder
+                .HasDiscriminator<string>("Type")
+                .HasValue<EinFreeTextStatTile>("FreeTextStatTile")
+                .HasValue<EinApiQueryStatTile>("ApiQueryStatTile");
+
+            builder.Property(o => o.Title).HasMaxLength(2048);
+        }
+    }
 }
 
 public enum EinTileType
 {
     // NOTE: Update ContentDbContext.ConfigureEinTile if you add a new type!
     FreeTextStatTile,
+    ApiQueryStatTile,
 }
 
 public class EinFreeTextStatTile : EinTile
 {
-    public string Title { get; set; } = string.Empty;
-    public string Statistic { get; set; } = string.Empty;
-    public string Trend { get; set; } = string.Empty;
+    public string? Statistic { get; set; }
+    public string? Trend { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
+}
+
+public class EinApiQueryStatTile : EinTile
+{
+    public Guid? DataSetId { get; set; }
+
+    public string? Version { get; set; }
+    public Guid? DataSetVersionId { get; set; }
+
+    // NOTE: This records the latest version of DataSetId, not necessarily used in the query
+    // This is so we can determine if the tile's query is using a data set version which is out-of-date
+    public Guid? LatestDataSetVersionId { get; set; }
+    public string? Query { get; set; }
+    public string? Statistic { get; set; }
+    public IndicatorUnit? IndicatorUnit { get; set; }
+    public int? DecimalPlaces { get; set; }
+    public string? QueryResult { get; set; } // TODO: Once Admin has switched to System.Text.Json, use view model instead of string
+    public Guid? ReleaseId { get; set; }
+    public Release? Release { get; set; }
+
+    internal class EinApiQueryStatTileConfig : IEntityTypeConfiguration<EinApiQueryStatTile>
+    {
+        public void Configure(EntityTypeBuilder<EinApiQueryStatTile> builder)
+        {
+            builder.Property(e => e.IndicatorUnit).HasConversion(new EnumToStringConverter<IndicatorUnit>());
+
+            builder.Property(o => o.Version).HasMaxLength(32);
+            builder.Property(o => o.Statistic).HasMaxLength(64);
+        }
+    }
 }

@@ -44,7 +44,7 @@ public record ManageContentPageViewModel
 
         public required List<OrganisationViewModel> PublishingOrganisations { get; init; }
 
-        public required List<ReleaseNoteViewModel> Updates { get; init; }
+        public required List<ReleaseNoteViewModel> Updates { get; set; } // TODO EES-6974 revert this to init-only
 
         public required List<ContentSectionViewModel> Content { get; init; }
 
@@ -57,6 +57,8 @@ public record ManageContentPageViewModel
         public required ContentSectionViewModel KeyStatisticsSecondarySection { get; init; }
 
         public required ContentSectionViewModel RelatedDashboardsSection { get; init; }
+
+        public required ContentSectionViewModel WarningSection { get; init; }
 
         public IEnumerable<FileInfo> DownloadFiles { get; set; } = [];
 
@@ -89,13 +91,4 @@ public record ManageContentPageViewModel
 
         public required ExternalMethodology? ExternalMethodology { get; init; }
     }
-}
-
-public class ReleaseNoteViewModel
-{
-    public Guid Id { get; set; }
-
-    public string Reason { get; set; }
-
-    public DateTime On { get; set; }
 }

@@ -3,6 +3,7 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
+import { toolbarConfigLinkOnly } from '@admin/config/ckEditorConfig';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -32,6 +33,7 @@ import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
+import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import React, {
@@ -68,6 +70,7 @@ const ReleaseContent = ({
   const { addContentSectionBlock } = useReleaseContentActions();
 
   const addSummaryBlockButton = useRef<HTMLButtonElement>(null);
+  const addWarningBlockButton = useRef<HTMLButtonElement>(null);
 
   const blockRouteChange = useMemo(() => {
     if (unsavedBlocks.length > 0) {
@@ -80,6 +83,25 @@ const ReleaseContent = ({
 
     return blocksWithCommentDeletions.length > 0;
   }, [unsavedBlocks, unsavedCommentDeletions]);
+
+  const addWarningBlock = useCallback(async () => {
+    if (!release.warningSection) {
+      return;
+    }
+
+    const newBlock = await addContentSectionBlock({
+      releaseVersionId: release.id,
+      sectionId: release.warningSection.id,
+      sectionKey: 'warningSection',
+      block: {
+        type: 'HtmlBlock',
+        order: 0,
+        body: '',
+      },
+    });
+
+    focusAddedSectionBlockButton(newBlock.id);
+  }, [addContentSectionBlock, release.id, release.warningSection]);
 
   const addSummaryBlock = useCallback(async () => {
     const newBlock = await addContentSectionBlock({
@@ -177,6 +199,12 @@ const ReleaseContent = ({
     }, 100);
   };
 
+  const onAfterDeleteWarningBlock = () => {
+    setTimeout(() => {
+      addWarningBlockButton.current?.focus();
+    }, 100);
+  };
+
   return (
     <>
       <RouteLeavingGuard
@@ -235,6 +263,46 @@ const ReleaseContent = ({
             }
             trackScroll
           />
+          {editingMode === 'edit' && (
+            <div id="releaseWarning" data-testid="release-warning">
+              <EditableSectionBlocks
+                blocks={release.warningSection.content}
+                renderBlock={block => <ReleaseWarningBlock block={block} />}
+                renderEditableBlock={block => (
+                  <ReleaseEditableBlock
+                    allowComments
+                    block={block}
+                    characterLimit={250}
+                    editButtonLabel={<>Edit warning block</>}
+                    label="Warning block"
+                    isReleaseWarningBlock
+                    publicationId={release.publication.id}
+                    releaseVersionId={release.id}
+                    removeButtonLabel={
+                      <>
+                        Remove<VisuallyHidden> warning</VisuallyHidden> block
+                      </>
+                    }
+                    sectionId={release.warningSection.id}
+                    sectionKey="warningSection"
+                    toolbarConfig={toolbarConfigLinkOnly}
+                    onAfterDeleteBlock={onAfterDeleteWarningBlock}
+                  />
+                )}
+              />
+              {release.warningSection.content?.length === 0 && (
+                <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+                  <Button
+                    variant="secondary"
+                    onClick={addWarningBlock}
+                    ref={addWarningBlockButton}
+                  >
+                    Add a warning text block
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           <div id="releaseSummary" data-testid="release-summary">
             {editingMode === 'edit' && (
@@ -276,6 +344,7 @@ const ReleaseContent = ({
                     <ReleaseEditableBlock
                       allowComments
                       block={block}
+                      characterLimit={200}
                       editButtonLabel={
                         <>
                           Edit<VisuallyHidden> summary</VisuallyHidden> block

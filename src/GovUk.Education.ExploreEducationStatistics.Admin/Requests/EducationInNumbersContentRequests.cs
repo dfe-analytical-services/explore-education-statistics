@@ -1,4 +1,8 @@
 #nullable enable
+using System.Text.Json;
+using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -39,9 +43,39 @@ public record EinTileAddRequest
 
 public record EinFreeTextStatTileUpdateRequest
 {
-    public string Title { get; set; } = string.Empty;
-    public string Statistic { get; set; } = string.Empty;
-    public string Trend { get; set; } = string.Empty;
-    public string? LinkUrl { get; set; }
-    public string? LinkText { get; set; }
+    public string Title { get; init; } = string.Empty;
+    public string Statistic { get; init; } = string.Empty;
+    public string Trend { get; init; } = string.Empty;
+    public string? LinkUrl { get; init; }
+    public string? LinkText { get; init; }
+
+    public class Validator : AbstractValidator<EinFreeTextStatTileUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(r => r.Title).NotEmpty().MaximumLength(2048);
+            RuleFor(r => r.Statistic).NotEmpty();
+            RuleFor(r => r.LinkUrl).IsValidUrl().When(r => r.LinkUrl != null && r.LinkText != null);
+            RuleFor(r => r.LinkText).MinimumLength(1).When(r => r.LinkText != null && r.LinkUrl != null);
+        }
+    }
+}
+
+public record EinApiQueryStatTileUpdateRequest
+{
+    public string Title { get; init; } = string.Empty;
+    public Guid DataSetId { get; init; }
+    public string Version { get; init; } = string.Empty;
+    public string Query { get; init; } = string.Empty;
+
+    public class Validator : AbstractValidator<EinApiQueryStatTileUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(r => r.Title).NotEmpty().MaximumLength(2048);
+            RuleFor(r => r.DataSetId).NotEmpty();
+            RuleFor(r => r.Version).NotEmpty().MaximumLength(32);
+            RuleFor(r => r.Query).NotEmpty().IsValidJson();
+        }
+    }
 }

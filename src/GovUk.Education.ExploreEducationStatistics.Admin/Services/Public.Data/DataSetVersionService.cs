@@ -130,8 +130,12 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
+        var releaseFile = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.ReleaseVersion)
+            .SingleAsync(r => r.Id == releaseFileId, cancellationToken);
+
         return await userService
-            .CheckIsBauUser()
+            .CheckCanUpdateReleaseVersion(releaseFile.ReleaseVersion)
             .OnSuccess(async () =>
                 await processorClient.CreateNextDataSetVersionMappings(
                     dataSetId: dataSetId,
@@ -180,13 +184,28 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccessVoid(async () =>
-                await processorClient.DeleteDataSetVersion(
-                    dataSetVersionId: dataSetVersionId,
+        return await GetVersion(dataSetVersionId, cancellationToken)
+            .OnSuccess(dsv => dsv.Release.ReleaseFileId)
+            .OnSuccess(releaseFileId =>
+                contentDbContext.ReleaseFiles.SingleAsync(
+                    r => r.Id == releaseFileId,
                     cancellationToken: cancellationToken
                 )
+            )
+            .OnSuccess(async releaseFile =>
+                await contentDbContext
+                    .ReleaseVersions.AsNoTracking()
+                    .SingleAsync(r => r.Id == releaseFile.ReleaseVersionId, cancellationToken)
+            )
+            .OnSuccess(async releaseVersion =>
+                await userService
+                    .CheckCanUpdateReleaseVersion(releaseVersion)
+                    .OnSuccessVoid(async () =>
+                        await processorClient.DeleteDataSetVersion(
+                            dataSetVersionId: dataSetVersionId,
+                            cancellationToken: cancellationToken
+                        )
+                    )
             );
     }
 

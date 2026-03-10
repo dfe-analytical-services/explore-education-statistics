@@ -1,3 +1,5 @@
+#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -6,49 +8,44 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
 
-[Route("api")]
+[Route("api/release/{releaseVersionId:guid}/content/release-note")]
 [ApiController]
 [Authorize]
-public class ReleaseNoteController : ControllerBase
+public class ReleaseNoteController(IReleaseNoteService releaseNoteService) : ControllerBase
 {
-    private readonly IReleaseNoteService _releaseNoteService;
-
-    public ReleaseNoteController(IReleaseNoteService releaseNoteService)
-    {
-        _releaseNoteService = releaseNoteService;
-    }
-
-    [HttpPost("release/{releaseVersionId:guid}/content/release-note")]
-    public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(
-        ReleaseNoteSaveRequest saveRequest,
-        Guid releaseVersionId
-    )
-    {
-        return await _releaseNoteService
-            .AddReleaseNoteAsync(releaseVersionId, saveRequest)
-            .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
-    }
-
-    [HttpPut("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
-    public async Task<ActionResult<List<ReleaseNoteViewModel>>> UpdateReleaseNote(
-        ReleaseNoteSaveRequest saveRequest,
+    [HttpPost]
+    public async Task<ActionResult<List<ReleaseNoteViewModel>>> CreateReleaseNote(
+        ReleaseNoteCreateRequest createRequest,
         Guid releaseVersionId,
-        Guid releaseNoteId
-    )
-    {
-        return await _releaseNoteService
-            .UpdateReleaseNoteAsync(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId, saveRequest)
-            .HandleFailuresOrOk();
-    }
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseNoteService
+            .CreateReleaseNote(releaseVersionId: releaseVersionId, createRequest, cancellationToken)
+            .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
 
-    [HttpDelete("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
+    [HttpPut("{releaseNoteId:guid}")]
+    public async Task<ActionResult<List<ReleaseNoteViewModel>>> UpdateReleaseNote(
+        ReleaseNoteUpdateRequest updateRequest,
+        Guid releaseVersionId,
+        Guid releaseNoteId,
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseNoteService
+            .UpdateReleaseNote(
+                releaseVersionId: releaseVersionId,
+                releaseNoteId: releaseNoteId,
+                updateRequest,
+                cancellationToken
+            )
+            .HandleFailuresOrOk();
+
+    [HttpDelete("{releaseNoteId:guid}")]
     public async Task<ActionResult<List<ReleaseNoteViewModel>>> DeleteReleaseNote(
         Guid releaseVersionId,
-        Guid releaseNoteId
-    )
-    {
-        return await _releaseNoteService
-            .DeleteReleaseNoteAsync(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId)
+        Guid releaseNoteId,
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseNoteService
+            .DeleteReleaseNote(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId, cancellationToken)
             .HandleFailuresOrOk();
-    }
 }

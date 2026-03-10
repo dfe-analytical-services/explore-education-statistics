@@ -237,7 +237,6 @@ const ReleaseExploreDataPage = ({
                   }}
                   unvisited
                   className="govuk-!-display-inline-block govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-1"
-                  id="download-all-data-link"
                 >
                   Download all data (ZIP)
                 </Link>

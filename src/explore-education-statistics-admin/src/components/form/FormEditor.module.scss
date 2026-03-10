@@ -56,6 +56,11 @@ $active-colour: lighten(govuk-colour('orange'), 10);
   }
 }
 
+.characterCount {
+  background: govuk-colour('white');
+  padding: govuk-spacing(2);
+}
+
 // Comments in the editor
 :global(.commentStyle) {
   background: govuk-colour('yellow');

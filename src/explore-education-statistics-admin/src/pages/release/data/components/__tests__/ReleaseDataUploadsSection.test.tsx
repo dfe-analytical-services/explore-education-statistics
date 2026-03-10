@@ -125,6 +125,10 @@ describe('ReleaseDataUploadsSection', () => {
     },
   };
 
+  beforeEach(() => {
+    releaseDataFileService.getDataSetUploads.mockResolvedValue([]);
+  });
+
   test('renders uploaded data files table', async () => {
     releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
@@ -366,6 +370,28 @@ describe('ReleaseDataUploadsSection', () => {
 
     expect(
       await screen.findByText('No data files have been uploaded.'),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByText('Uploaded data files')).not.toBeInTheDocument();
+  });
+
+  test('renders error message when fetch request fails', async () => {
+    releaseDataFileService.getDataFiles.mockRejectedValue(
+      new Error('Something went wrong'),
+    );
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByText('Failed to fetch data files.'),
     ).toBeInTheDocument();
 
     expect(screen.queryByText('Uploaded data files')).not.toBeInTheDocument();

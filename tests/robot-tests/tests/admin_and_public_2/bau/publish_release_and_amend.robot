@@ -968,12 +968,13 @@ Override release published date to past date
     ${EXPECTED_PUBLISHED_DATE}=    get london date    offset_days=-1000
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
-Verify published date on publication page is overriden with past date
+Verify published date on publication page is overridden with past date
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
-Verify public published date is overriden with past date
+Verify public published date is overridden with past date
+    user waits for caches to expire
     user navigates to    ${PUBLIC_RELEASE_LINK}
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}

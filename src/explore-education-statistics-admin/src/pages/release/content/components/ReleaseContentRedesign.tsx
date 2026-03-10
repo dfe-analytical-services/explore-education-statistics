@@ -7,6 +7,8 @@ import ReleasePageTabMethodology from '@admin/pages/release/content/components/R
 import ReleasePageTitle from '@admin/pages/release/content/components/ReleasePageTitle';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import releaseFileService from '@admin/services/releaseFileService';
+import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -78,23 +80,35 @@ const ReleaseContent = ({
       />
 
       <div className="dfe-flex dfe-flex-wrap dfe-align-items--center dfe-gap-4 govuk-!-margin-bottom-6">
-        <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
+        <div className="dfe-flex dfe-flex-wrap dfe-align-items--center dfe-gap-4 dfe-flex-grow--1">
+          <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
 
-        {isValidPartialDate(nextReleaseDate) && (
-          <p className="govuk-!-margin-bottom-0">
-            Next release{' '}
-            <time
-              className="govuk-!-font-weight-bold"
-              data-testid="Next release"
-            >
-              {formatPartialDate(nextReleaseDate)}
-            </time>
-          </p>
-        )}
+          {isValidPartialDate(nextReleaseDate) && (
+            <p className="govuk-!-margin-bottom-0">
+              Next release{' '}
+              <time
+                className="govuk-!-font-weight-bold"
+                data-testid="Next release"
+              >
+                {formatPartialDate(nextReleaseDate)}
+              </time>
+            </p>
+          )}
 
-        <span className="govuk-!-display-none-print">
-          All releases in this series
-        </span>
+          <span className="govuk-!-display-none-print">
+            All releases in this series
+          </span>
+        </div>
+
+        <div className="dfe-flex dfe-flex-wrap dfe-align-items--center dfe-gap-4">
+          <ButtonText
+            preventDoubleClick
+            onClick={() => releaseFileService.downloadFilesAsZip(release.id)}
+          >
+            Download all data (ZIP)
+          </ButtonText>
+          <span>Create your own tables</span>
+        </div>
       </div>
 
       {!isMobileMedia && (

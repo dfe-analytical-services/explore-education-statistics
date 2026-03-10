@@ -17,6 +17,7 @@ import ContactUsSection, {
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
+import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import React, { Fragment, useEffect, useMemo } from 'react';
 
 interface Props {
@@ -33,6 +34,7 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
     summarySection,
     type,
     updates,
+    warningSection,
   } = release;
 
   const { isMedia: isMobileMedia } = useMobileMedia();
@@ -147,6 +149,10 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
               renderSubscribeLink={<span>Get email alerts</span>}
             />
           </section>
+        )}
+
+        {warningSection.content && warningSection.content.length > 0 && (
+          <ReleaseWarningBlock block={warningSection.content[0]} />
         )}
 
         {hasSummarySection && (

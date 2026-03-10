@@ -184,6 +184,7 @@ export interface ReleaseVersion<
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
+  warningSection: ContentSection<ContentBlockType>;
   keyStatistics: KeyStatistic[];
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
@@ -280,6 +281,7 @@ export interface ReleaseVersionHomeContent<
   releaseId: string;
   releaseVersionId: string;
   summarySection: ReleaseVersionHomeSection<HtmlBlockType>;
+  warningSection: ReleaseVersionHomeSection<HtmlBlockType>;
 }
 
 export interface ReleaseVersionDataContent {

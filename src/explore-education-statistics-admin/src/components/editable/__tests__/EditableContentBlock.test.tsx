@@ -92,6 +92,38 @@ describe('EditableContentBlock', () => {
     ).not.toBeInTheDocument();
   });
 
+  // isReleaseWarningBlock sets different parse options, to strip out <p> elements
+  test('renders non-editable version correctly when isReleaseWarningBlock', () => {
+    render(
+      <EditableContentBlock
+        id="test-id"
+        label="Block content"
+        value="<p>Test content</p>"
+        editable={false}
+        isReleaseWarningBlock
+        onEditing={noop}
+        onCancel={noop}
+        onSubmit={noop}
+        onDelete={noop}
+      />,
+    );
+
+    expect(
+      screen.queryByText('Test content', { selector: 'p' }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText('Test content', { selector: 'div' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit block' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove block' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders non-editable version without orphaned comments', () => {
     render(
       <EditableContentBlock

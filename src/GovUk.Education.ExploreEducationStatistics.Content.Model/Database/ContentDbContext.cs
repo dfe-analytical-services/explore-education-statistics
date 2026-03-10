@@ -116,7 +116,6 @@ public class ContentDbContext : DbContext
         ConfigureFile(modelBuilder);
         ConfigureDataSetFileVersionGeographicLevel(modelBuilder);
         ConfigureContentBlock(modelBuilder);
-        ConfigureContentSection(modelBuilder);
         ConfigureReleaseVersion(modelBuilder);
         ConfigureDataBlock(modelBuilder);
         ConfigureHtmlBlock(modelBuilder);
@@ -134,7 +133,6 @@ public class ContentDbContext : DbContext
         ConfigurePageFeedback(modelBuilder);
         ConfigureReleasePublishingFeedback(modelBuilder);
         ConfigureEinContentBlock(modelBuilder);
-        ConfigureEinTile(modelBuilder);
 
         // Apply model configuration for types which implement IEntityTypeConfiguration
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -477,18 +475,6 @@ public class ContentDbContext : DbContext
             entity
                 .Property(e => e.Locked)
                 .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-        });
-    }
-
-    private static void ConfigureContentSection(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ContentSection>(entity =>
-        {
-            entity
-                .Property(e => e.Type)
-                .HasConversion(new EnumToStringConverter<ContentSectionType>())
-                .HasMaxLength(25);
-            entity.HasIndex(e => e.Type);
         });
     }
 
@@ -850,14 +836,6 @@ public class ContentDbContext : DbContext
             .HasDiscriminator<string>("Type")
             .HasValue<EinHtmlBlock>("HtmlBlock")
             .HasValue<EinTileGroupBlock>("TileGroupBlock");
-    }
-
-    private static void ConfigureEinTile(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .Entity<EinTile>()
-            .HasDiscriminator<string>("Type")
-            .HasValue<EinFreeTextStatTile>("FreeTextStatTile");
     }
 }
 

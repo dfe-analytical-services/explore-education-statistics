@@ -42,7 +42,7 @@ describe('ReleaseExploreDataPage', () => {
       screen.getByRole('link', {
         name: 'Download all data (ZIP)',
       }),
-    ).toHaveAttribute('id', 'download-all-data-link');
+    ).toBeInTheDocument();
     const linksList = screen.getByTestId('links-grid');
     const listItems = within(linksList).getAllByRole('listitem');
     expect(listItems).toHaveLength(6);

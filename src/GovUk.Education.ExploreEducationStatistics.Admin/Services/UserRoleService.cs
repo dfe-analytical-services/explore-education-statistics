@@ -426,14 +426,23 @@ public class UserRoleService(
         return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(() => FindUserPublicationRole(userPublicationRoleId))
-            .OnSuccessVoid(async role =>
+            .OnSuccessDo(async userPublicationRole =>
             {
-                await userPublicationRoleRepository.Remove(role);
+                var removed = await userPublicationRoleRepository.RemoveById(userPublicationRole.Id);
 
-                var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForPublicationRole(role.Role);
+                if (!removed)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to remove User Publication Role with ID {userPublicationRole.Id}"
+                    );
+                }
+            })
+            .OnSuccessVoid(async userPublicationRole =>
+            {
+                var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForPublicationRole(userPublicationRole.Role);
 
                 await usersAndRolesPersistenceHelper
-                    .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
+                    .CheckEntityExists<ApplicationUser, string>(userPublicationRole.UserId.ToString())
                     .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
             });
     }
@@ -447,10 +456,19 @@ public class UserRoleService(
                     userReleaseRole.Role
                 )
             )
+            .OnSuccessDo(async userReleaseRole =>
+            {
+                var removed = await userReleaseRoleRepository.RemoveById(userReleaseRole.Id);
+
+                if (!removed)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to remove User Release Role with ID {userReleaseRole.Id}"
+                    );
+                }
+            })
             .OnSuccessVoid(async userReleaseRole =>
             {
-                await userReleaseRoleRepository.Remove(userReleaseRole);
-
                 var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(userReleaseRole.Role);
 
                 await usersAndRolesPersistenceHelper

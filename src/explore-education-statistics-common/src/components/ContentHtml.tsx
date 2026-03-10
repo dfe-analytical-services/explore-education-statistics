@@ -14,6 +14,7 @@ import classNames from 'classnames';
 import { Element, isTag } from 'domhandler';
 import parseHtmlString, {
   DOMNode,
+  HTMLReactParserOptions,
   attributesToProps,
   domToReact,
 } from 'html-react-parser';
@@ -25,6 +26,7 @@ export interface ContentHtmlProps {
   formatLinks?: boolean;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   html: string;
+  parseOptions?: HTMLReactParserOptions;
   sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
@@ -38,6 +40,7 @@ export default function ContentHtml({
   formatLinks = true,
   getGlossaryEntry,
   html,
+  parseOptions,
   sanitizeOptions = defaultSanitizeOptions,
   testId,
   trackGlossaryLinks,
@@ -55,7 +58,7 @@ export default function ContentHtml({
     return sanitizeHtml(html, opts);
   }, [html, sanitizeOptions]);
 
-  const parsedContent = parseHtmlString(cleanHtml, {
+  const defaultParseOptions = {
     replace: (node: DOMNode) => {
       if (!isTag(node)) {
         return undefined;
@@ -135,7 +138,12 @@ export default function ContentHtml({
 
       return undefined;
     },
-  });
+  };
+
+  const parsedContent = parseHtmlString(
+    cleanHtml,
+    parseOptions ?? defaultParseOptions,
+  );
 
   return (
     <Wrapper

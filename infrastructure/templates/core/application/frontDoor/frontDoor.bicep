@@ -1,5 +1,5 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
-import { replaceMultiple } from '../../../common/functions.bicep'  
+import { replaceMultiple } from '../../../common/functions.bicep'
 
 @description('Environment: Subscription name. Used as a prefix for created resources.')
 @allowed([

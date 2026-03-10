@@ -41,6 +41,7 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
             .EducationInNumbersPages.Include(page => page.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
+                        .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
             .Where(page => page.Slug == slug && page.Published != null)
             .OrderByDescending(page => page.Version)
             .Select(page => EinPageViewModel.FromModel(page))
