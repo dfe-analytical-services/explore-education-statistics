@@ -15,7 +15,7 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                        Public API - patch manual changes public site %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                        Public API - patch manual changes public %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                          Financial year 3000-01
 ${SUBJECT_1_NAME}=                          ${PUBLICATION_NAME} - Subject 1
 ${MAPPABLE_INDICATORS_TABLE_SELECTOR}=      testid:mappable-table-default
@@ -363,9 +363,6 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
 Navigate to api data set on public frontend website
-    user clicks link    Explore and download data
-    user waits until h2 is visible    Explore data used in this release
-    user waits until h2 is visible    Data sets: download or create tables
     user clicks link    Data catalogue
     user waits until h1 is visible    Data catalogue
     user clicks link    ${PUBLICATION_NAME} - Subject 1
