@@ -214,7 +214,7 @@ describe('DataFilesReplacementTableRow', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not show confirm button when user has no permission to edit (not BAU user and data file is linked to API)', async () => {
+  test('shows confirm button when user is an analyst and data file is linked to API', async () => {
     releaseDataFileService.getDataFile.mockResolvedValue({
       ...testReplacementDataFile,
       status: 'COMPLETE',
@@ -265,8 +265,8 @@ describe('DataFilesReplacementTableRow', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
-    ).not.toBeInTheDocument();
+      within(cells[3]).getByRole('button', { name: 'Confirm replacement' }),
+    ).toBeInTheDocument();
     expect(
       within(cells[3]).getByRole('button', { name: 'Cancel replacement' }),
     ).toBeInTheDocument();
