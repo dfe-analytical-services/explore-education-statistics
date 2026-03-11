@@ -80,6 +80,7 @@ public class ReleasePublishingValidatorTests
         {
             new() { DataSetFileId = dataSets[0].DraftVersion!.File.Id },
             new() { DataSetFileId = dataSets[1].DraftVersion!.File.Id },
+            new() { DataSetFileId = Guid.NewGuid() }, // Spare unassociated upload should not affect result
         };
 
         var dataSetService = new Mock<IDataSetService>();
