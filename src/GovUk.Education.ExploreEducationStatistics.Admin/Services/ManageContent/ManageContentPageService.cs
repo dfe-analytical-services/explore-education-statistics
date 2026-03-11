@@ -108,6 +108,8 @@ public class ManageContentPageService(
 
                 var downloadFiles = files.ToList();
 
+                var publishedDisplayDate = await CalculatePublishedDisplayDate(releaseVersion, cancellationToken);
+
                 var releaseViewModel = new ManageContentPageViewModel.ReleaseViewModel
                 {
                     Id = releaseVersion.Id,
@@ -118,6 +120,7 @@ public class ManageContentPageService(
                     Slug = releaseVersion.Release.Slug,
                     Type = releaseVersion.Type,
                     Published = releaseVersion.Published,
+                    PublishedDisplayDate = publishedDisplayDate,
                     PublishScheduled = releaseVersion.PublishScheduled?.ToUkDateOnly(),
                     PublicationId = publication.Id,
                     Publication = publicationViewModel,
@@ -221,4 +224,61 @@ public class ManageContentPageService(
                     .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
             .Include(rv => rv.KeyStatistics)
             .Include(rv => rv.Updates);
+
+    /// <summary>
+    /// Determines the date displayed as the published date for the release version. This depends on whether the release
+    /// version is published and its approval status.
+    /// </summary>
+    private async Task<DateTimeOffset?> CalculatePublishedDisplayDate(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        if (releaseVersion.PublishedDisplayDate != null)
+        {
+            // The release version has a published display date value because it's already been published, so use it.
+            return releaseVersion.PublishedDisplayDate.Value;
+        }
+
+        // If the release version is approved but not yet published, return the published display date that will be set
+        // when publishing completes. This is required for the preview and pre-release views.
+        if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
+        {
+            if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDisplayDate)
+            {
+                // The published display date will be set to the current date when publishing completes,
+                // so return the scheduled published date as an approximation of this.
+                return releaseVersion.PublishScheduled
+                    ?? throw new ArgumentException(
+                        $"Expected approved release version '{releaseVersion.Id}' to have a publish scheduled date."
+                    );
+            }
+
+            // The published display date will be inherited from the previous version when publishing
+            // completes, so return that value.
+            return await GetPreviousReleaseVersionPublishedDisplayDate(releaseVersion, cancellationToken);
+        }
+
+        // The release version is neither published nor approved, so the published display date cannot be determined.
+        return null;
+    }
+
+    private async Task<DateTimeOffset> GetPreviousReleaseVersionPublishedDisplayDate(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        await contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync(cancellationToken);
+
+        var previousVersion =
+            releaseVersion.PreviousVersion
+            ?? throw new ArgumentException(
+                $"Expected release version '{releaseVersion.Id}' (v{releaseVersion.Version}) to have a previous version."
+            );
+
+        return previousVersion.PublishedDisplayDate
+            ?? throw new ArgumentException(
+                $"Expected previous release version '{previousVersion.Id}' to be published."
+            );
+    }
 }
