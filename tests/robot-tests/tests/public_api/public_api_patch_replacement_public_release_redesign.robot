@@ -6,7 +6,7 @@ Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-common.robot
 Resource            ../libs/public-api-common.robot
 
-Force Tags          Admin    PublicApi    Local    Dev    AltersData
+Force Tags          Admin    PublicApi    Local    Dev    AltersData    ReleaseRedesign
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -15,7 +15,7 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                        Public API - patch manual changes FE %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                        Public API - patch manual changes public %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                          Financial year 3000-01
 ${SUBJECT_1_NAME}=                          ${PUBLICATION_NAME} - Subject 1
 ${MAPPABLE_INDICATORS_TABLE_SELECTOR}=      testid:mappable-table-default
@@ -363,6 +363,9 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
 Navigate to api data set on public frontend website
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
     user clicks link    Data catalogue
     user waits until h1 is visible    Data catalogue
     user clicks link    ${PUBLICATION_NAME} - Subject 1
@@ -373,13 +376,19 @@ Verify the highest patch version is displayed in the data set public frontend pa
 
 Verify that the two patch versions are collated on a single page
     user clicks link    API data set changelog
-    user waits until h3 is visible    Patch changes for version 1.0.2
-    user waits until h3 is visible    Patch changes for version 1.0.1
+
     # This change log is from 1.0.2
+    user waits until h3 is visible    Patch changes for version 1.0.2
     user waits until li is visible    label changed to: Hull
+    user waits until li is visible    label changed to: Enrolments
+    user waits until li is visible    column changed to: enrolments
+
     # This change log is from 1.0.1
+    user waits until h3 is visible    Patch changes for version 1.0.1
     user waits until li is visible    label changed to: State-funded primary and secondary
     user waits until li is visible    label changed to: Yorkshire
+    user waits until li is visible    label changed to: Number of enrolments
+    user waits until li is visible    column changed to: number_of_enrolments
 
 
 *** Keywords ***
