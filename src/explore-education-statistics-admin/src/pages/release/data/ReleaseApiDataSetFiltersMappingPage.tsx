@@ -152,7 +152,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
         : []),
       {
         id: sectionIds.newFilterOptions,
-        text: 'Filter options not found in old dataset',
+        text: 'Filter options not found in old data set',
         subNavItems: Object.keys(newFilterOptions).map(filterKey => {
           return {
             id: sectionIds.newFilterOptionsGroup(filterKey),
@@ -423,7 +423,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newFilterOptions}
             >
-              Filter options not found in old dataset ({totalNewFilterOptions}){' '}
+              Filter options not found in old data set ({totalNewFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 

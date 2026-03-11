@@ -91,7 +91,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
     },
     {
       id: sectionIds.newIndicators,
-      text: 'Indicators not found in old dataset',
+      text: 'Indicators not found in old data set',
     },
     {
       id: sectionIds.autoMappedIndicators,
@@ -257,12 +257,11 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 key="indicator-mappings"
                 itemLabel="indicator"
                 itemPluralLabel="indicators"
-                groupLabel="Mappable indicators"
+                groupLabel="Indicators that require mapping"
                 mappableItems={mappableIndicators}
                 newItems={newIndicators}
                 pendingUpdates={pendingUpdates}
                 renderCandidate={candidate => candidate.label}
-                // TODO EES-6764 - no renderCaptionEnd here as there are no groupings for indicators
                 renderSource={source => source.label}
                 onUpdate={handleUpdateMapping}
               />
@@ -274,33 +273,17 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newIndicators}
             >
-              Indicators not found in old dataset ({newIndicators.length}){' '}
+              Indicators not found in old data set ({newIndicators.length}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
             {newIndicators.length > 0 ? (
-              <Accordion
-                id={`${sectionIds.newIndicators}-accordion`}
-                testId={`${sectionIds.newIndicators}-accordion`}
-              >
-                return (
-                <AccordionSection
-                  backToTop={false}
-                  caption="" // TODO EES-6764 - no caption here are indicators aren't grouped
-                  heading={`New indicators (${newIndicators.length})`}
-                  headingTag="h4"
-                  id="new-indicators"
-                  key="new-indicators"
-                >
-                  <ApiDataSetNewItemsTable
-                    groupLabel="New indicators"
-                    itemPluralLabel="indicators"
-                    newItems={newIndicators}
-                    renderItem={item => item.label}
-                  />
-                </AccordionSection>
-                );
-              </Accordion>
+              <ApiDataSetNewItemsTable
+                groupLabel="New indicators"
+                itemPluralLabel="indicators"
+                newItems={newIndicators}
+                renderItem={item => item.label}
+              />
             ) : (
               <p>No new indicators.</p>
             )}
@@ -313,53 +296,53 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               <Tag colour="grey">No action required</Tag>
             </h3>
 
+            {/* TODO EES-6764 - is it OK to have an Accordion that always only has 1 section? */}
             {autoMappedIndicators.length > 0 ? (
-              <>
-                <p>
-                  These indicators have been mapped automatically.{' '}
-                  <strong>There is no action required.</strong>
-                </p>
-                <Accordion
-                  id={`${sectionIds.autoMappedIndicators}-accordion`}
-                  showOpenAll={false}
-                  testId={`${sectionIds.autoMappedIndicators}-accordion`}
+              <Accordion
+                id={`${sectionIds.autoMappedIndicators}-accordion`}
+                showOpenAll={false}
+                testId={`${sectionIds.autoMappedIndicators}-accordion`}
+              >
+                return (
+                <AccordionSection
+                  backToTop={false}
+                  caption={
+                    <p>
+                      These indicators have been mapped automatically.{' '}
+                      <strong>There is no action required.</strong>
+                    </p>
+                  }
+                  heading="Mapped indicators"
+                  headingTag="h4"
+                  id={sectionIds.autoMappedIndicators}
+                  key="mapped-indicators"
                 >
-                  return (
-                  <AccordionSection
-                    backToTop={false}
-                    caption="" // TODO EES-6764 - empty caption, as only have a single accordion section.
-                    heading={`Mapped indicators (${autoMappedIndicators.length})`}
-                    headingTag="h4"
-                    id={sectionIds.autoMappedIndicators}
-                    key="mapped-indicators"
-                  >
-                    <ApiDataSetAutoMappedTable
-                      itemLabel="indicator"
-                      autoMappedItems={autoMappedIndicators}
-                      newItems={newIndicators}
-                      pendingUpdates={pendingUpdates}
-                      renderCandidate={candidate => candidate.label}
-                      renderSource={source => source.label}
-                      searchFilter={searchTerm =>
-                        autoMappedIndicators.filter(item => {
-                          const { candidate, mapping } = item;
+                  <ApiDataSetAutoMappedTable
+                    itemLabel="indicator"
+                    autoMappedItems={autoMappedIndicators}
+                    newItems={newIndicators}
+                    pendingUpdates={pendingUpdates}
+                    renderCandidate={candidate => candidate.label}
+                    renderSource={source => source.label}
+                    searchFilter={searchTerm =>
+                      autoMappedIndicators.filter(item => {
+                        const { candidate, mapping } = item;
 
-                          const searchFields = compact([
-                            candidate.label,
-                            mapping.source.label,
-                          ]);
+                        const searchFields = compact([
+                          candidate.label,
+                          mapping.source.label,
+                        ]);
 
-                          return searchFields.some(field => {
-                            return field?.toLowerCase().includes(searchTerm);
-                          });
-                        })
-                      }
-                      onUpdate={handleUpdateMapping}
-                    />
-                  </AccordionSection>
-                  );
-                </Accordion>
-              </>
+                        return searchFields.some(field => {
+                          return field?.toLowerCase().includes(searchTerm);
+                        });
+                      })
+                    }
+                    onUpdate={handleUpdateMapping}
+                  />
+                </AccordionSection>
+                );
+              </Accordion>
             ) : (
               <p>No indicators found in both.</p>
             )}

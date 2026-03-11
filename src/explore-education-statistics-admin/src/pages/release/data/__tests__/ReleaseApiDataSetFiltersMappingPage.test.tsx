@@ -111,7 +111,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // new filter options
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in old dataset (1) No action required',
+        name: 'Filter options not found in old data set (1) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -205,7 +205,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       within(navItems[3]).getByRole('link', {
-        name: 'Filter options not found in old dataset',
+        name: 'Filter options not found in old data set',
       }),
     ).toHaveAttribute('href', '#new-filter-options');
     const newSubItems = within(navItems[3]).getAllByRole('listitem');
@@ -399,7 +399,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in old dataset (0) No action required',
+        name: 'Filter options not found in old data set (0) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -505,7 +505,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // new filter1 table
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (1) No action required',
+          name: 'Filter options not found in old data set (1) No action required',
         }),
       ).toBeInTheDocument();
       const newFilterOptionsAccordion = within(
@@ -594,7 +594,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Remove from new filter options
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (0) No action required',
+          name: 'Filter options not found in old data set (0) No action required',
         }),
       ).toBeInTheDocument();
       expect(
@@ -807,7 +807,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // new filter options table
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (1) No action required',
+          name: 'Filter options not found in old data set (1) No action required',
         }),
       ).toBeInTheDocument();
       const newFilterOptionsAccordion = within(
@@ -896,7 +896,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Add to new filter options table
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (2) No action required',
+          name: 'Filter options not found in old data set (2) No action required',
         }),
       ).toBeInTheDocument();
       expect(
@@ -1169,7 +1169,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       expect(
         within(navItems[3]).getByRole('link', {
-          name: 'Filter options not found in old dataset',
+          name: 'Filter options not found in old data set',
         }),
       ).toHaveAttribute('href', '#new-filter-options');
 
