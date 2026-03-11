@@ -108,6 +108,7 @@ public class ManageContentPageService(
 
                 var downloadFiles = files.ToList();
 
+                var lastUpdated = CalculateLastUpdated(releaseVersion);
                 var publishedDisplayDate = await CalculatePublishedDisplayDate(releaseVersion, cancellationToken);
 
                 var releaseViewModel = new ManageContentPageViewModel.ReleaseViewModel
@@ -119,6 +120,7 @@ public class ManageContentPageService(
                     ReleaseName = releaseVersion.Release.Year.ToString(),
                     Slug = releaseVersion.Release.Slug,
                     Type = releaseVersion.Type,
+                    LastUpdated = lastUpdated,
                     Published = releaseVersion.Published,
                     PublishedDisplayDate = publishedDisplayDate,
                     PublishScheduled = releaseVersion.PublishScheduled?.ToUkDateOnly(),
@@ -224,6 +226,32 @@ public class ManageContentPageService(
                     .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
             .Include(rv => rv.KeyStatistics)
             .Include(rv => rv.Updates);
+
+    /// <summary>
+    /// Determines the date displayed as the last updated date for the release version.
+    /// This depends on whether the release version is published and its approval status.
+    /// </summary>
+    private static DateTimeOffset? CalculateLastUpdated(ReleaseVersion releaseVersion)
+    {
+        if (releaseVersion.Published != null)
+        {
+            // Use the actual published date because the release version is already published.
+            return releaseVersion.Published.Value;
+        }
+
+        // If the release version is approved but not yet published, return the scheduled published date as an approximation
+        // of when publishing will complete. This is required for the preview and pre-release views.
+        if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
+        {
+            return releaseVersion.PublishScheduled
+                ?? throw new ArgumentException(
+                    $"Expected approved release version '{releaseVersion.Id}' to have a publish scheduled date."
+                );
+        }
+
+        // The release version is neither published nor approved, so a value cannot be determined.
+        return null;
+    }
 
     /// <summary>
     /// Determines the date displayed as the published date for the release version. This depends on whether the release
