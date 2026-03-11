@@ -90,10 +90,10 @@ public class IndicatorMetaRepository(
 
         // TODO EES-6764 - remove null-forgiving operator.
         var indicatorMappings = mappings
-            .IndicatorMappingPlan!.Mappings.Where(mapping =>
-                mapping.Value.Type is MappingType.AutoMapped or MappingType.ManualMapped
+            .IndicatorMappingPlan!.Mappings.Values.Where(mapping =>
+                mapping.Type is MappingType.AutoMapped or MappingType.ManualMapped
             )
-            .ToDictionary(indicator => indicator.Key, indicator => indicator.Value.PublicId);
+            .ToDictionary(mapping => mapping.CandidateKey!, mapping => mapping.PublicId);
 
         return new PublicIdMappings { Indicators = indicatorMappings };
     }

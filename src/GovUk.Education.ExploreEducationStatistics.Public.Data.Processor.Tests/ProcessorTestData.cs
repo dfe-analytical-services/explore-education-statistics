@@ -428,6 +428,33 @@ public record ProcessorTestData
             ],
         };
 
+    /// <summary>
+    /// This data set represents an update to the <see cref="AbsenceSchool" /> data set
+    /// using amended metadata.
+    /// </summary>
+    public static ProcessorTestData AbsenceSchoolWithAmendments()
+    {
+        // Update the "enrolments" / "Enrolments" Indicator to be "enrolment_numbers" / "Enrolment numbers".
+        var amendedIndicators = AbsenceSchool.ExpectedIndicators;
+        amendedIndicators[0].Column = "enrolment_numbers";
+        amendedIndicators[0].Label = "Enrolment numbers";
+
+        var amendedFilters = AbsenceSchool.ExpectedFilters;
+
+        var nationalCurriculumYearFilter = amendedFilters[1];
+
+        // Update the "Year 10" Filter Option to be "Year 10 (Final)".
+        var year10FilterOption = nationalCurriculumYearFilter.Options.Single(option => option.Label == "Year 10");
+        year10FilterOption.Label = "Year 10 (Final)";
+
+        return AbsenceSchool with
+        {
+            Name = nameof(AbsenceSchoolWithAmendments),
+            ExpectedIndicators = amendedIndicators,
+            ExpectedFilters = amendedFilters,
+        };
+    }
+
     public static ProcessorTestData FilterDefaultOptions =>
         new()
         {

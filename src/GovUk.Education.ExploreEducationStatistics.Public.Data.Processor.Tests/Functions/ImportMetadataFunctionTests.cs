@@ -316,7 +316,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         [InlineData(MappingType.ManualMapped)]
         public async Task NextVersion_CorrectFiltersAndOptions_Mapped_ReuseOriginalPublicIds(MappingType mappingType)
         {
-            var testData = ProcessorTestData.AbsenceSchool;
+            var originalData = ProcessorTestData.AbsenceSchool;
+            var nextData = ProcessorTestData.AbsenceSchoolWithAmendments();
 
             var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
                 await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
@@ -331,10 +332,20 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id)
                 .WithFilterMappingPlan(
                     DataFixture.FilterMappingPlanFromFilterMeta(
-                        sourceFilters: testData.ExpectedFilters,
-                        targetFilters: testData.ExpectedFilters
+                        sourceFilters: originalData.ExpectedFilters,
+                        targetFilters: originalData.ExpectedFilters
                     )
                 );
+
+            // Manually set the "National Curriculum year" Filter's "Year 10" Filter Option's candidate key
+            // to point to the renamed "Year 10 (Final)" Filter Option.
+            var nationalCurriculumFilterMapping = mapping.FilterMappingPlan.Mappings[
+                originalData.ExpectedFilters[1].Column
+            ];
+            var year10FilterOption = nationalCurriculumFilterMapping.OptionMappings.Values.Single(option =>
+                option.Source.Label == "Year 10"
+            );
+            year10FilterOption.CandidateKey = "Year 10 (Final)";
 
             foreach (var (_, filterMapping) in mapping.FilterMappingPlan.Mappings)
             {
@@ -352,13 +363,13 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
+            await ImportMetadata(nextData, targetDataSetVersion, instanceId);
 
             var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
 
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
+            Assert.Equal(originalData.ExpectedFilters.Count, actualFilters.Count);
             Assert.All(
-                testData.ExpectedFilters,
+                nextData.ExpectedFilters,
                 (expectedFilter, filterIndex) =>
                 {
                     var actualFilter = actualFilters[filterIndex];
@@ -479,9 +490,10 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
         [InlineData(MappingType.ManualMapped)]
         public async Task NextVersion_CorrectIndicators_Mapped_ReuseOriginalPublicIds(MappingType mappingType)
         {
-            var testData = ProcessorTestData.AbsenceSchool;
+            var originalData = ProcessorTestData.AbsenceSchool;
+            var nextData = ProcessorTestData.AbsenceSchoolWithAmendments();
 
-            var originalIndicators = ResetIndicatorMetaIds(testData.ExpectedIndicators)
+            var originalIndicators = ResetIndicatorMetaIds(originalData.ExpectedIndicators)
                 .Select(i =>
                 {
                     var indicator = i.ShallowClone();
@@ -505,9 +517,15 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                 .WithIndicatorMappingPlan(
                     DataFixture.IndicatorMappingPlanFromIndicatorMeta(
                         sourceIndicators: originalIndicators,
-                        targetIndicators: testData.ExpectedIndicators
+                        targetIndicators: nextData.ExpectedIndicators
                     )
                 );
+
+            // Manually set the original "Enrolments" Indicator's candidate key to point to the
+            // renamed "Enrolment numbers" Indicator.
+            mapping.IndicatorMappingPlan!.Mappings[originalIndicators[0].Column].CandidateKey = nextData
+                .ExpectedIndicators[0]
+                .Column;
 
             foreach (var indicatorMapping in mapping.IndicatorMappingPlan!.Mappings.Values)
             {
@@ -516,13 +534,13 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
-            await ImportMetadata(testData, targetDataSetVersion, instanceId);
+            await ImportMetadata(nextData, targetDataSetVersion, instanceId);
 
             var actualIndicators = await GetDbIndicatorMetas(targetDataSetVersion.Id);
 
-            Assert.Equal(testData.ExpectedIndicators.Count, actualIndicators.Count);
+            Assert.Equal(originalData.ExpectedIndicators.Count, actualIndicators.Count);
             Assert.All(
-                testData.ExpectedIndicators,
+                nextData.ExpectedIndicators,
                 (expectedIndicator, index) =>
                 {
                     var actualIndicator = actualIndicators[index];
