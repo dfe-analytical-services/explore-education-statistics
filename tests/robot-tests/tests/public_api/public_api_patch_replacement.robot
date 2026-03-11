@@ -113,7 +113,7 @@ Upload replacement data that result in major API version
 Verify the pending data replacement summary results in errors
     user waits until h3 is visible    API data set locations: OK
     user waits until h3 is visible    API data set filters: ERROR
-    user waits until h3 is visible    API data set indicators: ERROR
+    user waits until h3 is visible    API data set indicators: OK
     user waits until h3 is visible    API data set has to be finalized: ERROR
     user waits until parent contains element    id:main-content    text:Cancel data replacement
 

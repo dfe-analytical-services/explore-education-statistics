@@ -1,5 +1,5 @@
 /**
- * Check if a {@param str} is null or whitespace.
+ * Choose between prefixing a noun with "a" or "an".
  */
 
 const vowels = ['a', 'e', 'i', 'o', 'u'];
