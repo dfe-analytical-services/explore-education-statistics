@@ -32,7 +32,34 @@ public record ManageContentPageViewModel
         public required DateTimeOffset? Published { get; init; }
 
         /// <summary>
-        /// The date that the release version is scheduled to be published, mapped from <see cref="ReleaseVersion.PublishScheduled"/>.
+        /// The date displayed as the published date for the release version. This depends on whether the release
+        /// version is published and its approval status.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// If published, the value is mapped from <see cref="ReleaseVersion.PublishedDisplayDate"/>.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// If not yet published but approved, the value is the expected published display date.
+        /// This is based on the scheduled date or the previous version's published display date,
+        /// depending on whether the date will be updated when publishing completes.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// If neither published nor approved, the value is <c>null</c> because it cannot yet be determined.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public required DateTimeOffset? PublishedDisplayDate { get; init; }
+
+        /// <summary>
+        /// The date that the release version is (or was) scheduled to be published, mapped from <see cref="ReleaseVersion.PublishScheduled"/>.
         /// </summary>
         public required DateOnly? PublishScheduled { get; init; }
 
