@@ -931,7 +931,7 @@ describe('DataReplacementPlan', () => {
     ).toBeInTheDocument();
   });
 
-  test('does not render confirm button when user is not bau and replacement is linked to an API', async () => {
+  test('renders confirm button when user is not bau and replacement is linked to an API', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
     );
@@ -954,9 +954,7 @@ describe('DataReplacementPlan', () => {
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
     });
 
-    expect(
-      screen.queryByText('Confirm data replacement'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByText('Confirm data replacement')).toBeInTheDocument();
   });
 
   test('renders confirm button when user is bau and replacement is linked to an API', async () => {
