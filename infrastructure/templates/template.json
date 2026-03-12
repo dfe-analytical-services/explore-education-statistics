@@ -3625,7 +3625,7 @@
         "App__BauEmail": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-bau-email'), '2018-02-14').secretUriWithVersion, ')')]",
         "App__AdminAppUrl": "[variables('adminAppUrl')]",
         "App__PublicAppUrl": "[variables('publicAppUrl')]",
-        "Notify__NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
+        "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
         "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
         "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
