@@ -10,6 +10,7 @@ public static class Constants
 
     public static class ContainerNames
     {
+        public const string Images = "images";
         public const string PrivateReleaseFiles = "releases";
         public const string PrivateReleaseTempFiles = "releases-temp";
         public const string PublicReleaseFiles = "downloads";
