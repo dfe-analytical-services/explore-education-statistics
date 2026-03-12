@@ -37,8 +37,7 @@ public abstract class ReleaseDataContentServiceTests
             releaseVersion.FeaturedTables = _dataFixture.DefaultFeaturedTable().GenerateList(2);
 
             releaseVersion.RelatedDashboardsSection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.RelatedDashboards)
+                .DefaultContentSection(ContentSectionType.RelatedDashboards)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Data dashboards</p>")]);
 
             var dataSets = _dataFixture

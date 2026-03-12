@@ -57,23 +57,19 @@ public abstract class ReleaseContentServiceTests
             ];
 
             releaseVersion.HeadlinesSection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.Headlines)
+                .DefaultContentSection(ContentSectionType.Headlines)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Headlines content</p>")]);
 
             releaseVersion.KeyStatisticsSecondarySection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.KeyStatisticsSecondary)
+                .DefaultContentSection(ContentSectionType.KeyStatisticsSecondary)
                 .WithContentBlocks([keyStatsSecondaryDataBlockParent.LatestPublishedVersion!.ContentBlock]);
 
             releaseVersion.SummarySection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.ReleaseSummary)
+                .DefaultContentSection(ContentSectionType.ReleaseSummary)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Summary content</p>")]);
 
             releaseVersion.WarningSection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.Warning)
+                .DefaultContentSection(ContentSectionType.Warning)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Warning content</p>")]);
 
             releaseVersion.GenericContent =
@@ -429,16 +425,13 @@ public abstract class ReleaseContentServiceTests
 
         private void InitialiseNonGenericSectionsForReleaseVersion(ReleaseVersion releaseVersion)
         {
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
+            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
+            releaseVersion.KeyStatisticsSecondarySection = _dataFixture.DefaultContentSection(
                 ContentSectionType.KeyStatisticsSecondary
             );
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
-            releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
+            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.WarningSection = _dataFixture.DefaultContentSection(ContentSectionType.Warning);
         }
-
-        private ContentSection CreateContentSection(ContentSectionType type) =>
-            _dataFixture.DefaultContentSection().WithType(type);
 
         private static void AssertContentSectionEqual(ContentSection expected, ContentSectionDto actual)
         {
