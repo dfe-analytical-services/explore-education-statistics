@@ -333,9 +333,6 @@ public partial class ReleaseService(
             publicationSlug: publicationSlug
         );
 
-        // Update publication cache (view-model contains release related data that has now been updated)
-        await publicationCacheService.UpdatePublication(publicationSlug);
-
         return Unit.Instance;
     }
 

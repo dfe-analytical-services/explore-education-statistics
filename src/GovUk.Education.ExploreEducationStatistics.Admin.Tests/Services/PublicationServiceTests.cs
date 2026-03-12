@@ -935,8 +935,6 @@ public class PublicationServiceTests
         }
 
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationTree();
-        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationEntry("new-title");
-        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         AssertOnPublicationChangedEventsNotRaised();
     }
 
@@ -1045,8 +1043,6 @@ public class PublicationServiceTests
         }
 
         _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationTree();
-        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationEntry("new-title");
-        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
     }
 
     [Theory]
@@ -1132,82 +1128,6 @@ public class PublicationServiceTests
         }
     }
 
-    [Fact]
-    public async Task UpdatePublication_CacheInvalidatedForSupersededPublications()
-    {
-        Theme theme = _dataFixture.DefaultTheme();
-
-        Publication publication = _dataFixture
-            .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: false)])
-            .WithTheme(theme);
-
-        // These publications are superseded by the publication being updated
-        var (supersededPublication1, supersededPublication2) = _dataFixture
-            .DefaultPublication()
-            .WithSupersededBy(publication)
-            .WithTheme(theme)
-            .GenerateTuple2();
-
-        // This is another publication not superseded by the publication being updated
-        Publication notSupersededPublication = _dataFixture.DefaultPublication();
-
-        var contextId = Guid.NewGuid().ToString();
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.Themes.Add(theme);
-            context.Publications.AddRange(
-                publication,
-                supersededPublication1,
-                supersededPublication2,
-                notSupersededPublication
-            );
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var publicationService = BuildPublicationService(
-                context,
-                methodologyCacheService: new Mock<IMethodologyCacheService>(Default).Object,
-                redirectsCacheService: new Mock<IRedirectsCacheService>(Default).Object
-            );
-
-            await publicationService.UpdatePublication(
-                publication.Id,
-                new PublicationSaveRequest
-                {
-                    Title = publication.Title,
-                    Slug = publication.Slug,
-                    Summary = publication.Summary,
-                    ThemeId = publication.ThemeId,
-                    SupersededById = null,
-                }
-            );
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var updatedPublication = await context.Publications.SingleAsync(p => p.Id == publication.Id);
-
-            // Ensure the cache was only invalidated for the updated and superseded publications
-            Publication[] expectedInvalidatedPublications =
-            [
-                updatedPublication,
-                supersededPublication1,
-                supersededPublication2,
-            ];
-            foreach (var expected in expectedInvalidatedPublications)
-            {
-                _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationEntry(expected.Slug);
-            }
-
-            _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationEntry(
-                notSupersededPublication.Slug
-            );
-        }
-    }
-
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -1279,14 +1199,8 @@ public class PublicationServiceTests
                 );
 
             publicationCacheService
-                .Setup(mock => mock.UpdatePublication("new-title"))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            publicationCacheService
                 .Setup(mock => mock.UpdatePublicationTree())
                 .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-
-            publicationCacheService.Setup(mock => mock.RemovePublication("old-title")).ReturnsAsync(Unit.Instance);
 
             redirectsCacheService
                 .Setup(mock => mock.UpdateRedirects())
@@ -1413,97 +1327,6 @@ public class PublicationServiceTests
     }
 
     [Fact]
-    public async Task UpdatePublication_RemovesSupersededPublicationCacheBlobs()
-    {
-        var publication = new Publication
-        {
-            Title = "Test title",
-            Slug = "test-slug",
-            Theme = new Theme { Title = "Test theme" },
-            LatestPublishedReleaseVersion = new ReleaseVersion(),
-        };
-
-        var supersededPublication1 = new Publication
-        {
-            Title = "Superseded title 1",
-            Slug = "superseded-slug-1",
-            SupersededBy = publication,
-        };
-
-        var supersededPublication2 = new Publication
-        {
-            Title = "Superseded title 2",
-            Slug = "superseded-slug-2",
-            SupersededBy = publication,
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.AddRange(publication, supersededPublication1, supersededPublication2);
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(supersededPublication1.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(supersededPublication2.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-
-            methodologyCacheService
-                .Setup(mock => mock.UpdateSummariesTree())
-                .ReturnsAsync(
-                    new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                        new List<AllMethodologiesThemeViewModel>()
-                    )
-                );
-
-            var publicationService = BuildPublicationService(
-                context,
-                publicationCacheService: publicationCacheService.Object,
-                methodologyCacheService: methodologyCacheService.Object
-            );
-
-            var result = await publicationService.UpdatePublication(
-                publication.Id,
-                new PublicationSaveRequest
-                {
-                    Title = "Test title",
-                    Slug = "test-slug",
-                    ThemeId = publication.ThemeId,
-                }
-            );
-
-            VerifyAllMocks(methodologyCacheService, publicationCacheService, publicationCacheService);
-
-            var viewModel = result.AssertRight();
-            Assert.Equal(publication.Id, viewModel.Id);
-            Assert.Equal("Test title", viewModel.Title);
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var updatedPublication = await context.Publications.FirstAsync(p => p.Title == "Test title");
-            Assert.NotNull(updatedPublication);
-        }
-    }
-
-    [Fact]
     public async Task UpdatePublication_FailsWithNonExistingTheme()
     {
         var publication = new Publication
@@ -1582,10 +1405,6 @@ public class PublicationServiceTests
             publicationCacheService
                 .Setup(mock => mock.UpdatePublicationTree())
                 .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication("new-title"))
-                .ReturnsAsync(new PublicationCacheViewModel());
-            publicationCacheService.Setup(mock => mock.RemovePublication("current-title")).ReturnsAsync(Unit.Instance);
 
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
@@ -1679,10 +1498,6 @@ public class PublicationServiceTests
             publicationCacheService
                 .Setup(mock => mock.UpdatePublicationTree())
                 .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication("older-title"))
-                .ReturnsAsync(new PublicationCacheViewModel());
-            publicationCacheService.Setup(mock => mock.RemovePublication("title")).ReturnsAsync(Unit.Instance);
 
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
@@ -1976,15 +1791,7 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(s => s.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var service = BuildPublicationService(
-                context: contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var service = BuildPublicationService(context: contentDbContext);
 
             var result = await service.UpdateExternalMethodology(
                 publication.Id,
@@ -1994,8 +1801,6 @@ public class PublicationServiceTests
                     Url = "http://test.external.methodology/new",
                 }
             );
-
-            VerifyAllMocks(publicationCacheService);
 
             var externalMethodology = result.AssertRight();
 
@@ -2052,18 +1857,9 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(s => s.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-            var service = BuildPublicationService(
-                context: contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var service = BuildPublicationService(context: contentDbContext);
 
             var result = await service.RemoveExternalMethodology(publication.Id);
-
-            VerifyAllMocks(publicationCacheService);
 
             result.AssertRight();
         }
@@ -2165,15 +1961,7 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(s => s.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var service = BuildPublicationService(
-                context: contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var service = BuildPublicationService(context: contentDbContext);
 
             var updatedContact = new ContactSaveRequest
             {
@@ -2228,15 +2016,7 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(s => s.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var service = BuildPublicationService(
-                context: contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var service = BuildPublicationService(context: contentDbContext);
 
             var updatedContact = new ContactSaveRequest
             {
@@ -2288,15 +2068,7 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(s => s.UpdatePublication(publication1.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var service = BuildPublicationService(
-                context: contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var service = BuildPublicationService(context: contentDbContext);
 
             var updatedContact = new ContactSaveRequest
             {
@@ -2803,15 +2575,7 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var publicationService = BuildPublicationService(
-                contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var publicationService = BuildPublicationService(contentDbContext);
 
             var result = await publicationService.AddReleaseSeriesLegacyLink(
                 publication.Id,
@@ -2819,7 +2583,6 @@ public class PublicationServiceTests
             );
 
             var viewModels = result.AssertRight();
-            VerifyAllMocks(publicationCacheService);
 
             Assert.Equal(3, viewModels.Count);
 
@@ -2879,22 +2642,12 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var publicationService = BuildPublicationService(
-                contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var publicationService = BuildPublicationService(contentDbContext);
 
             var result = await publicationService.AddReleaseSeriesLegacyLink(
                 publication.Id,
                 new ReleaseSeriesLegacyLinkAddRequest { Description = "New legacy link", Url = "https://test.com/new" }
             );
-
-            VerifyAllMocks(publicationCacheService);
 
             var viewModels = result.AssertRight();
 
@@ -2955,15 +2708,7 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var publicationService = BuildPublicationService(
-                contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var publicationService = BuildPublicationService(contentDbContext);
 
             // Let's swap the order of the oldest two releases to 2022, 2020, 2021 and insert a legacy link.
             var result = await publicationService.UpdateReleaseSeries(
@@ -2980,8 +2725,6 @@ public class PublicationServiceTests
                     new ReleaseSeriesItemUpdateRequest { ReleaseId = release2021.Id },
                 ]
             );
-
-            VerifyAllMocks(publicationCacheService);
 
             var viewModels = result.AssertRight();
             Assert.Equal(4, viewModels.Count);
@@ -3093,11 +2836,6 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
             releaseCacheService
                 .Setup(mock =>
@@ -3107,7 +2845,6 @@ public class PublicationServiceTests
 
             var publicationService = BuildPublicationService(
                 contentDbContext,
-                publicationCacheService: publicationCacheService.Object,
                 releaseCacheService: releaseCacheService.Object
             );
 
@@ -3121,7 +2858,7 @@ public class PublicationServiceTests
                 ]
             );
 
-            VerifyAllMocks(publicationCacheService, releaseCacheService);
+            VerifyAllMocks(releaseCacheService);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -3218,11 +2955,6 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
             releaseCacheService
                 .Setup(mock =>
@@ -3232,7 +2964,6 @@ public class PublicationServiceTests
 
             var publicationService = BuildPublicationService(
                 contentDbContext,
-                publicationCacheService: publicationCacheService.Object,
                 releaseCacheService: releaseCacheService.Object
             );
 
@@ -3246,7 +2977,7 @@ public class PublicationServiceTests
                 ]
             );
 
-            VerifyAllMocks(publicationCacheService, releaseCacheService);
+            VerifyAllMocks(releaseCacheService);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -3307,19 +3038,9 @@ public class PublicationServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublication(publication.Slug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            var publicationService = BuildPublicationService(
-                contentDbContext,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var publicationService = BuildPublicationService(contentDbContext);
 
             var result = await publicationService.UpdateReleaseSeries(publication.Id, updatedReleaseSeriesItems: []);
-
-            VerifyAllMocks(publicationCacheService);
 
             var viewModels = result.AssertRight();
 
@@ -3490,16 +3211,13 @@ public class PublicationServiceTests
         IReleaseCacheService? releaseCacheService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null
-    )
-    {
-        publicationRepository ??= CreatePublicationRepository(context, publicationRepository);
-
-        return new(
+    ) =>
+        new(
             context,
             AdminMapper(),
             new PersistenceHelper<ContentDbContext>(context),
             userService ?? AlwaysTrueUserService().Object,
-            publicationRepository,
+            publicationRepository ?? CreatePublicationRepository(context),
             releaseVersionRepository ?? new ReleaseVersionRepository(context),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),
@@ -3508,12 +3226,8 @@ public class PublicationServiceTests
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             _adminEventRaiserMockBuilder.Build()
         );
-    }
 
-    private static PublicationRepository CreatePublicationRepository(
-        ContentDbContext context,
-        IPublicationRepository? publicationRepository
-    )
+    private static PublicationRepository CreatePublicationRepository(ContentDbContext context)
     {
         var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
             context

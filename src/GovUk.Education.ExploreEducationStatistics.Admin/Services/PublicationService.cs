@@ -241,16 +241,13 @@ public class PublicationService(
                 {
                     await methodologyCacheService.UpdateSummariesTree();
                     await publicationCacheService.UpdatePublicationTree();
-                    await publicationCacheService.UpdatePublication(publication.Slug);
 
                     if (slugChanged)
                     {
-                        await publicationCacheService.RemovePublication(previousSlug);
                         await redirectsCacheService.UpdateRedirects();
                     }
 
                     await RaiseEventIfSupersededByChanged(publication, previousSupersededById);
-                    await UpdateCachedSupersededPublications(publication);
                 }
 
                 if (publication.Live && (titleChanged || slugChanged || summaryChanged))
@@ -308,19 +305,6 @@ public class PublicationService(
             : null;
     }
 
-    private async Task UpdateCachedSupersededPublications(Publication publication)
-    {
-        // NOTE: When a publication is updated, any publication that is superseded by it can be affected, so
-        // update any superseded publications that are cached
-        var supersededPublications = await context
-            .Publications.Where(p => p.SupersededById == publication.Id)
-            .ToListAsync();
-
-        await supersededPublications
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(p => publicationCacheService.UpdatePublication(p.Slug));
-    }
-
     private async Task<Either<ActionResult, Unit>> ValidateSelectedTheme(Guid themeId)
     {
         var theme = await context.Themes.FindAsync(themeId);
@@ -372,9 +356,6 @@ public class PublicationService(
                 publication.ExternalMethodology.Url = updatedExternalMethodology.Url;
                 await context.SaveChangesAsync();
 
-                // Update publication cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
-                await publicationCacheService.UpdatePublication(publication.Slug);
-
                 return new ExternalMethodologyViewModel(publication.ExternalMethodology);
             });
     }
@@ -389,9 +370,6 @@ public class PublicationService(
                 context.Update(publication);
                 publication.ExternalMethodology = null;
                 await context.SaveChangesAsync();
-
-                // Clear cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
-                await publicationCacheService.UpdatePublication(publication.Slug);
 
                 return Unit.Instance;
             });
@@ -429,9 +407,6 @@ public class PublicationService(
                 publication.Contact.TeamName = updatedContact.TeamName;
                 publication.Contact.TeamEmail = updatedContact.TeamEmail;
                 await context.SaveChangesAsync();
-
-                // Clear cache because Contact is in Content.Services.ViewModels.PublicationViewModel
-                await publicationCacheService.UpdatePublication(publication.Slug);
 
                 return mapper.Map<ContactViewModel>(publication.Contact);
             });
@@ -566,8 +541,6 @@ public class PublicationService(
                 context.Publications.Update(publication);
                 await context.SaveChangesAsync();
 
-                await publicationCacheService.UpdatePublication(publication.Slug);
-
                 return await GetReleaseSeries(publication.Id);
             });
     }
@@ -670,9 +643,6 @@ public class PublicationService(
                     .ToList();
 
                 await context.SaveChangesAsync();
-
-                // Update the cached publication
-                await publicationCacheService.UpdatePublication(publication.Slug);
 
                 // If the publication's latest published release version has changed,
                 // update the publication's cached latest release version
