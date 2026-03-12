@@ -35,6 +35,7 @@ interface Props {
   groupKey?: LocationLevelKey | string;
   groupLabel?: string;
   itemLabel: string;
+  itemPluralLabel: string;
   newItems?: LocationCandidateWithKey[] | FilterOptionCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
   renderCandidate: (
@@ -56,6 +57,7 @@ export default function ApiDataSetAutoMappedTable({
   groupKey,
   groupLabel,
   itemLabel,
+  itemPluralLabel,
   newItems = [],
   pendingUpdates = [],
   renderCandidate,
@@ -133,7 +135,9 @@ export default function ApiDataSetAutoMappedTable({
           id={tableId}
         >
           <caption className="govuk-visually-hidden">
-            {`Table showing auto mapped options for ${groupLabel}`}
+            {`Table showing auto mapped ${itemPluralLabel}${
+              groupLabel ? ` for ${groupLabel}` : ''
+            }`}
           </caption>
           <thead>
             <tr>

@@ -35,7 +35,7 @@ import omit from 'lodash/omit';
 export const sectionIds = {
   mappableIndicators: 'mappable-indicators',
   newIndicators: 'new-indicators',
-  autoMappedIndicators: 'auto-mapped-locations',
+  autoMappedIndicators: 'auto-mapped-indicators',
 } as const;
 
 export default function ReleaseApiDataSetIndicatorsMappingPage() {
@@ -266,7 +266,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 onUpdate={handleUpdateMapping}
               />
             ) : (
-              <p>No indicators.</p>
+              <p>No mappable indicators.</p>
             )}
 
             <h3
@@ -279,7 +279,6 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
 
             {newIndicators.length > 0 ? (
               <ApiDataSetNewItemsTable
-                groupLabel="New indicators"
                 itemPluralLabel="indicators"
                 newItems={newIndicators}
                 renderItem={item => item.label}
@@ -319,6 +318,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 >
                   <ApiDataSetAutoMappedTable
                     itemLabel="indicator"
+                    itemPluralLabel="indicators"
                     autoMappedItems={autoMappedIndicators}
                     newItems={newIndicators}
                     pendingUpdates={pendingUpdates}

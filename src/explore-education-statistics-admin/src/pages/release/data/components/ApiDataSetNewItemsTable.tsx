@@ -24,7 +24,9 @@ export default function ApiDataSetNewItemsTable({
   return (
     <table data-testid={`new-items-table-${groupKey ?? 'default'}`}>
       <caption className="govuk-visually-hidden">
-        {`Table showing new ${itemPluralLabel} for ${groupLabel}`}
+        {`Table showing new ${itemPluralLabel}${
+          groupLabel ? ` for ${groupLabel}` : ''
+        }`}
       </caption>
       <thead>
         <tr>

@@ -158,8 +158,8 @@ const DataFileReplacementPlan = ({
         hasIncompleteLocationMapping,
         hasMajorLocationMapping,
         isPatch,
-        user!,
         linkToApiDetailsTab,
+        user,
       )}
       ,
       {getApiDataSetMappingProgressTag(
@@ -167,16 +167,16 @@ const DataFileReplacementPlan = ({
         hasIncompleteFilterMapping,
         hasMajorFilterMapping,
         isPatch,
-        user!,
         linkToApiDetailsTab,
+        user,
       )}
       {getApiDataSetMappingProgressTag(
         'indicators',
         hasIncompleteIndicatorMapping,
         hasMajorIndicatorMapping,
         isPatch,
-        user!,
         linkToApiDetailsTab,
+        user,
       )}
       <h3 className="govuk-heading-m govuk-!-padding-top-4">
         <Tag colour={isNotReadyToPublish ? 'red' : 'green'}>
@@ -191,7 +191,7 @@ const DataFileReplacementPlan = ({
           process.
         </p>
       )}
-      {isNotReadyToPublish && user?.permissions.isBauUser && (
+      {isNotReadyToPublish && !user?.permissions.isBauUser && (
         <>{mappingLinkNotAvailableToNonBauText}</>
       )}
       {!isNotReadyToPublish && (
@@ -559,8 +559,8 @@ function getApiDataSetMappingProgressTag(
   hasIncompleteMapping: boolean,
   hasMajorMapping: boolean | undefined,
   isPatch: boolean,
-  user: User,
   linkToApiDetailsTab: ReactNode | undefined,
+  user?: User,
 ) {
   const mappingRequired = hasIncompleteMapping || (hasMajorMapping && isPatch);
 
@@ -582,14 +582,14 @@ function getApiDataSetMappingProgressTag(
         </Tag>
       </h3>
 
-      {mappingRequired && user.permissions.isBauUser && (
+      {mappingRequired && user?.permissions.isBauUser && (
         <p>
           Please {linkToApiDetailsTab} and complete manual mapping process for{' '}
           {mappableType}.
         </p>
       )}
 
-      {mappingRequired && !user.permissions.isBauUser && (
+      {mappingRequired && !user?.permissions.isBauUser && (
         <>{mappingLinkNotAvailableToNonBauText}</>
       )}
 

@@ -404,7 +404,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                 ))}
               </>
             ) : (
-              <p>No filter options.</p>
+              <p>No mappable filter options.</p>
             )}
 
             {Object.keys(newFilters).length > 0 && (
@@ -513,6 +513,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                             groupKey={filterKey}
                             groupLabel={filterLabel}
                             itemLabel="filter option"
+                            itemPluralLabel="filter options"
                             autoMappedItems={autoMappedFilterOptions[filterKey]}
                             newItems={newFilterOptions[filterKey]}
                             pendingUpdates={pendingUpdates}
