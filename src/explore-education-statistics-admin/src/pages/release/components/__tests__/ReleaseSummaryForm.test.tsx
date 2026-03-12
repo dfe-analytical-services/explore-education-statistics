@@ -86,7 +86,7 @@ describe('ReleaseSummaryForm', () => {
     );
     expect(inputYear).toBeInTheDocument();
 
-    const inputReleaseLabel = screen.getByLabelText('Release label');
+    const inputReleaseLabel = screen.getByLabelText('Release label (optional)');
     expect(inputReleaseLabel).toBeInTheDocument();
 
     const releaseTypeRadios = within(
@@ -174,7 +174,7 @@ describe('ReleaseSummaryForm', () => {
     );
     expect(inputYear).toBeInTheDocument();
 
-    const inputReleaseLabel = screen.getByLabelText('Release label');
+    const inputReleaseLabel = screen.getByLabelText('Release label (optional)');
     expect(inputReleaseLabel).toBeInTheDocument();
 
     const releaseTypeRadios = within(
@@ -458,7 +458,7 @@ describe('ReleaseSummaryForm', () => {
     );
     expect(inputYear).toHaveNumericValue(1966);
 
-    const inputReleaseLabel = screen.getByLabelText('Release label');
+    const inputReleaseLabel = screen.getByLabelText('Release label (optional)');
     expect(inputReleaseLabel).toHaveValue('initial');
 
     const releaseTypeRadios = within(
@@ -558,7 +558,7 @@ describe('ReleaseSummaryForm', () => {
     );
     await userEvent.type(inputYear, '1966');
 
-    const inputReleaseLabel = screen.getByLabelText('Release label');
+    const inputReleaseLabel = screen.getByLabelText('Release label (optional)');
     await userEvent.type(inputReleaseLabel, 'initial');
 
     const radioOptionReleaseTypeNationalStats = screen.getByLabelText(
@@ -615,7 +615,7 @@ describe('ReleaseSummaryForm', () => {
     );
     await userEvent.type(inputYear, '2020');
 
-    const inputReleaseLabel = screen.getByLabelText('Release label');
+    const inputReleaseLabel = screen.getByLabelText('Release label (optional)');
     await userEvent.type(
       inputReleaseLabel,
       'aaaaaaaaaaaaaaaaaaaaa', // 21 characters
@@ -785,7 +785,9 @@ describe('ReleaseSummaryForm', () => {
       );
       expect(inputYear).toBeDisabled();
 
-      const inputReleaseLabel = screen.getByLabelText('Release label');
+      const inputReleaseLabel = screen.getByLabelText(
+        'Release label (optional)',
+      );
       expect(inputReleaseLabel).toBeDisabled();
     },
   );

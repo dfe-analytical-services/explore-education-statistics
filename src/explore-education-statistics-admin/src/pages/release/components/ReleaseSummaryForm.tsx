@@ -201,9 +201,9 @@ export default function ReleaseSummaryForm({
             <FormFieldTextInput
               id="releaseLabel"
               name="releaseLabel"
-              label="Release label"
+              label="Release label (optional)"
               labelSize="m"
-              hint="Unique label for the release, use if needed to distinguish it from other releases that share the same period."
+              hint='Additional label for the release (appended to the release time period). Only use if needed to distinguish this release from other releases in this series that share the same time period. Examples may include "Provisional", "Revised", or "Final".'
               width={20}
               disabled={disableReleaseSlugChange}
             />
