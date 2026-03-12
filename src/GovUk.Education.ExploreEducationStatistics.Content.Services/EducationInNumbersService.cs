@@ -21,12 +21,13 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
 
         return await uniqueSlugs
             .ToAsyncEnumerable()
-            .SelectAwait(async slug =>
-                await contentDbContext
-                    .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
-                    .OrderByDescending(page => page.Version)
-                    .Select(page => EinNavItemViewModel.FromModel(page))
-                    .FirstAsync(cancellationToken: cancellationToken)
+            .Select(
+                async (slug, ct) =>
+                    await contentDbContext
+                        .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
+                        .OrderByDescending(page => page.Version)
+                        .Select(page => EinNavItemViewModel.FromModel(page))
+                        .FirstAsync(cancellationToken: ct)
             )
             .OrderBy(navItem => navItem.Order)
             .ToListAsync(cancellationToken: cancellationToken);

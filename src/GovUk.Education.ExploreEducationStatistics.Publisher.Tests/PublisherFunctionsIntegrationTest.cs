@@ -2,9 +2,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +24,12 @@ public abstract class PublisherFunctionsIntegrationTest(PublisherFunctionsIntegr
 {
     public async Task InitializeAsync()
     {
+        fixture.NotifierClient.Invocations.Clear();
+        fixture.NotifierClient.Reset();
+
+        fixture.EmailService.Invocations.Clear();
+        fixture.EmailService.Reset();
+
         ResetDbContext<ContentDbContext>();
         await ClearTestData<PublicDataDbContext>();
     }
@@ -40,6 +48,10 @@ public abstract class PublisherFunctionsIntegrationTest(PublisherFunctionsIntegr
 // ReSharper disable once ClassNeverInstantiated.Global
 public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
 {
+    public readonly Mock<INotifierClient> NotifierClient = new(MockBehavior.Strict);
+
+    public readonly Mock<IEmailService> EmailService = new(MockBehavior.Strict);
+
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder("postgres:16.1-alpine").Build();
 
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder(
@@ -73,7 +85,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             .ConfigureAppConfiguration(builder =>
             {
                 builder
-                    .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile("appsettings.IntegrationTest.json", optional: false, reloadOnChange: false)
                     .AddInMemoryCollection(
                         new Dictionary<string, string?>
                         {
@@ -102,27 +114,37 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                         }
                     );
             })
-            .ConfigureServices(services =>
-            {
-                services.MockService<IPublicBlobCacheService>(MockBehavior.Loose);
+            .ConfigureServices(
+                (context, services) =>
+                {
+                    services.MockService<IPublicBlobCacheService>(MockBehavior.Loose);
 
-                services.UseInMemoryDbContext<ContentDbContext>(Guid.NewGuid().ToString());
+                    services.ReplaceService(NotifierClient);
 
-                services.AddDbContext<PublicDataDbContext>(options =>
-                    options.UseNpgsql(
-                        _postgreSqlContainer.GetConnectionString(),
-                        psqlOptions => psqlOptions.EnableRetryOnFailure()
-                    )
-                );
+                    services.ReplaceService(EmailService);
 
-                using var serviceScope = services
-                    .BuildServiceProvider()
-                    .GetRequiredService<IServiceScopeFactory>()
-                    .CreateScope();
+                    services.UseInMemoryDbContext<ContentDbContext>(Guid.NewGuid().ToString());
 
-                using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
-                context.Database.Migrate();
-            });
+                    services.AddDbContext<PublicDataDbContext>(options =>
+                        options.UseNpgsql(
+                            _postgreSqlContainer.GetConnectionString(),
+                            psqlOptions => psqlOptions.EnableRetryOnFailure()
+                        )
+                    );
+
+                    services.Configure<AppOptions>(context.Configuration.GetSection("App"));
+                    services.Configure<NotifyOptions>(context.Configuration.GetSection("Notify"));
+
+                    using var serviceScope = services
+                        .BuildServiceProvider()
+                        .GetRequiredService<IServiceScopeFactory>()
+                        .CreateScope();
+
+                    using var publicDataDbContext =
+                        serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
+                    publicDataDbContext.Database.Migrate();
+                }
+            );
     }
 
     protected override IEnumerable<Type> GetFunctionTypes()

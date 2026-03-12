@@ -415,6 +415,9 @@ public class PublishingServiceTests
             PublisherStorageConnectionString = string.Empty,
             PublishScheduledReleasesFunctionCronSchedule = string.Empty,
             StageScheduledReleasesFunctionCronSchedule = string.Empty,
+            AdminAppUrl = string.Empty,
+            PublicAppUrl = string.Empty,
+            BauEmail = string.Empty,
         }.ToOptionsWrapper();
     }
 }
