@@ -157,12 +157,14 @@ Validate the summary contents inside the 'draft version details' table
     user checks summary list does not contain    Filters    School type    id:draft-version-summary
     user checks summary list contains    Actions    Remove draft version    id:draft-version-summary
 
-Validate that location and filter mappings are complete
+Validate that location, filter and indicator mappings are complete
     user waits until h3 is visible    Draft version tasks
     user waits until parent contains element    testid:map-locations-task    link:Map locations
     user waits until parent contains element    id:map-locations-task-status    text:Complete
     user waits until parent contains element    testid:map-filters-task    link:Map filters
     user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Complete
 
 Confirm finalization of this API data set version
     user clicks button    Finalise this data set version

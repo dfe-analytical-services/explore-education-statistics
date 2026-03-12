@@ -26,7 +26,7 @@ interface Props {
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => ReactNode;
-  groupKey: string;
+  groupKey?: string;
   itemLabel: string;
   mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
   newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
@@ -55,7 +55,7 @@ export default function ApiDataSetMappingModal({
       title={`Map existing ${itemLabel}`}
       triggerButton={
         <ButtonText className="govuk-!-margin-left-2" onClick={toggleOpen.on}>
-          Map option
+          Map {itemLabel}
           <VisuallyHidden> for {mapping.source.label}</VisuallyHidden>
         </ButtonText>
       }

@@ -202,6 +202,7 @@ describe('ApiDataSetAutoMappedTable', () => {
         groupKey="localAuthority"
         groupLabel="Local Authorities"
         itemLabel="location"
+        itemPluralLabel="locations"
         newItems={[]}
         renderCandidate={candidate => candidate.label}
         renderSource={source => source.label}
@@ -226,7 +227,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
-        name: 'Map option for Location 1',
+        name: 'Map location for Location 1',
       }),
     ).toBeInTheDocument();
 
@@ -237,7 +238,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row2Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row2Cells[3]).getByRole('button', {
-        name: 'Map option for Location 2',
+        name: 'Map location for Location 2',
       }),
     ).toBeInTheDocument();
 
@@ -248,7 +249,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row3Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row3Cells[3]).getByRole('button', {
-        name: 'Map option for Location 3',
+        name: 'Map location for Location 3',
       }),
     ).toBeInTheDocument();
 
@@ -259,7 +260,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row4Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row4Cells[3]).getByRole('button', {
-        name: 'Map option for Location 4',
+        name: 'Map location for Location 4',
       }),
     ).toBeInTheDocument();
 
@@ -270,7 +271,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row5Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row5Cells[3]).getByRole('button', {
-        name: 'Map option for Location 5',
+        name: 'Map location for Location 5',
       }),
     ).toBeInTheDocument();
 
@@ -281,7 +282,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row6Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row6Cells[3]).getByRole('button', {
-        name: 'Map option for Location 6',
+        name: 'Map location for Location 6',
       }),
     ).toBeInTheDocument();
 
@@ -292,7 +293,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row7Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row7Cells[3]).getByRole('button', {
-        name: 'Map option for Location 7',
+        name: 'Map location for Location 7',
       }),
     ).toBeInTheDocument();
 
@@ -303,7 +304,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row8Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row8Cells[3]).getByRole('button', {
-        name: 'Map option for Location 8',
+        name: 'Map location for Location 8',
       }),
     ).toBeInTheDocument();
 
@@ -314,7 +315,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row9Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row9Cells[3]).getByRole('button', {
-        name: 'Map option for Location 9',
+        name: 'Map location for Location 9',
       }),
     ).toBeInTheDocument();
 
@@ -325,7 +326,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row10Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row10Cells[3]).getByRole('button', {
-        name: 'Map option for Location 10',
+        name: 'Map location for Location 10',
       }),
     ).toBeInTheDocument();
 
@@ -352,6 +353,7 @@ describe('ApiDataSetAutoMappedTable', () => {
         groupKey="localAuthority"
         groupLabel="Local Authorities"
         itemLabel="location"
+        itemPluralLabel="locations"
         newItems={[]}
         renderCandidate={candidate => candidate.label}
         renderSource={source => source.label}
@@ -403,7 +405,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
-        name: 'Map option for Location 3',
+        name: 'Map location for Location 3',
       }),
     ).toBeInTheDocument();
 
@@ -419,6 +421,7 @@ describe('ApiDataSetAutoMappedTable', () => {
         groupKey="localAuthority"
         groupLabel="Local Authorities"
         itemLabel="location"
+        itemPluralLabel="locations"
         newItems={[]}
         renderCandidate={candidate => candidate.label}
         renderSource={source => source.label}
@@ -449,7 +452,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     expect(row1Cells[2]).toHaveTextContent('Minor');
     expect(
       within(row1Cells[3]).getByRole('button', {
-        name: 'Map option for Location 11',
+        name: 'Map location for Location 11',
       }),
     ).toBeInTheDocument();
 
@@ -468,6 +471,7 @@ describe('ApiDataSetAutoMappedTable', () => {
         groupKey="localAuthority"
         groupLabel="Local Authorities"
         itemLabel="location"
+        itemPluralLabel="locations"
         newItems={[]}
         pendingUpdates={[
           {
@@ -488,7 +492,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(
       within(row2Cells[3]).queryByRole('button', {
-        name: 'Map option for Location 2',
+        name: 'Map location for Location 2',
       }),
     ).not.toBeInTheDocument();
   });

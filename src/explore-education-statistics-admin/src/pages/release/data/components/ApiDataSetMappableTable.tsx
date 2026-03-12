@@ -1,6 +1,8 @@
 import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import {
   FilterOptionSource,
+  IndicatorCandidate,
+  IndicatorSource,
   LocationCandidate,
   MappingType,
 } from '@admin/services/apiDataSetVersionService';
@@ -22,29 +24,47 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
+import {
+  IndicatorCandidateWithKey,
+  MappableIndicator,
+} from '@admin/pages/release/data/utils/getApiDataSetIndicatorMappings';
 
 interface Props {
   candidateHint?: (
-    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
+    candidate:
+      | FilterOptionCandidateWithKey
+      | LocationCandidateWithKey
+      | IndicatorCandidateWithKey,
   ) => ReactNode;
   candidateIsMajorMapping?: (
     candidate: LocationCandidateWithKey,
     mapping: LocationMappingWithKey,
   ) => boolean;
-  groupKey: string;
-  groupLabel: string;
+  groupKey?: string;
+  groupLabel?: string;
   itemLabel: string;
   itemPluralLabel: string;
-  mappableItems: MappableFilterOption[] | MappableLocation[];
-  newItems?: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
+  mappableItems:
+    | MappableFilterOption[]
+    | MappableLocation[]
+    | MappableIndicator[];
+  newItems?:
+    | FilterOptionCandidateWithKey[]
+    | LocationCandidateWithKey[]
+    | IndicatorCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
   renderCandidate: (
-    candidate: LocationCandidateWithKey | FilterOptionCandidateWithKey,
+    candidate:
+      | LocationCandidateWithKey
+      | FilterOptionCandidateWithKey
+      | IndicatorCandidateWithKey,
   ) => ReactNode;
   renderCaptionEnd?: ReactNode;
-  renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
+  renderSource: (
+    source: LocationCandidate | FilterOptionSource | IndicatorSource,
+  ) => ReactNode;
   renderSourceDetails?: (
-    source: FilterOptionSource | LocationCandidate,
+    source: FilterOptionSource | LocationCandidate | IndicatorCandidate,
   ) => ReactNode;
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
@@ -70,7 +90,7 @@ export default function ApiDataSetMappableTable({
   ).length;
   const totalManuallyMapped = mappableItems.length - totalUnmapped;
 
-  const tableId = mappableTableId(groupKey);
+  const tableId = mappableTableId(groupKey ?? 'default');
 
   return (
     <table

@@ -414,7 +414,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                 })}
               </>
             ) : (
-              <p>No locations.</p>
+              <p>No mappable locations.</p>
             )}
 
             {Object.keys(newLocationGroups).length > 0 && (
@@ -517,6 +517,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                           groupKey={level}
                           groupLabel={groupLabel}
                           itemLabel="location"
+                          itemPluralLabel="locations"
                           autoMappedItems={levelAutoMappedLocations}
                           newItems={newLocations[level]}
                           pendingUpdates={pendingUpdates}

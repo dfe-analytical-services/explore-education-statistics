@@ -32,9 +32,10 @@ interface Props {
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => ReactNode;
-  groupKey: LocationLevelKey | string;
-  groupLabel: string;
+  groupKey?: LocationLevelKey | string;
+  groupLabel?: string;
   itemLabel: string;
+  itemPluralLabel: string;
   newItems?: LocationCandidateWithKey[] | FilterOptionCandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
   renderCandidate: (
@@ -56,6 +57,7 @@ export default function ApiDataSetAutoMappedTable({
   groupKey,
   groupLabel,
   itemLabel,
+  itemPluralLabel,
   newItems = [],
   pendingUpdates = [],
   renderCandidate,
@@ -82,7 +84,7 @@ export default function ApiDataSetAutoMappedTable({
   const totalFilteredItems = filteredItems.length;
   const totalPages = filteredItemsChunks.length;
 
-  const tableId = autoMappedTableId(groupKey);
+  const tableId = autoMappedTableId(groupKey ?? 'default');
 
   const [handleSearch] = useDebouncedCallback((term: string) => {
     setSearchTerm(term);
@@ -133,7 +135,9 @@ export default function ApiDataSetAutoMappedTable({
           id={tableId}
         >
           <caption className="govuk-visually-hidden">
-            {`Table showing auto mapped options for ${groupLabel}`}
+            {`Table showing auto mapped ${itemPluralLabel}${
+              groupLabel ? ` for ${groupLabel}` : ''
+            }`}
           </caption>
           <thead>
             <tr>

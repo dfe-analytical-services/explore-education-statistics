@@ -5,8 +5,8 @@ import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import React, { ReactNode } from 'react';
 
 interface Props {
-  groupKey: LocationLevelKey | string;
-  groupLabel: string;
+  groupKey?: LocationLevelKey | string;
+  groupLabel?: string;
   itemPluralLabel: string;
   newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
   renderItem: (
@@ -22,9 +22,11 @@ export default function ApiDataSetNewItemsTable({
   renderItem,
 }: Props) {
   return (
-    <table data-testid={`new-items-table-${groupKey}`}>
+    <table data-testid={`new-items-table-${groupKey ?? 'default'}`}>
       <caption className="govuk-visually-hidden">
-        {`Table showing new ${itemPluralLabel} for ${groupLabel}`}
+        {`Table showing new ${itemPluralLabel}${
+          groupLabel ? ` for ${groupLabel}` : ''
+        }`}
       </caption>
       <thead>
         <tr>

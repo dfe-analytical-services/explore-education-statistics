@@ -18,6 +18,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
+import prefixNoun from '@common/utils/string/prefixNoun';
 
 const noMappingValue = 'noMapping';
 
@@ -30,7 +31,7 @@ interface Props {
   candidateHint?: (
     candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
   ) => ReactNode;
-  groupKey: string;
+  groupKey?: string;
   itemLabel: string;
   mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
   newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
@@ -48,6 +49,8 @@ export default function ApiDataSetMappingForm({
   onCancel,
   onSubmit,
 }: Props) {
+  const itemLabelPrefix = prefixNoun(itemLabel);
+
   const handleSubmit = async ({ nextItem }: FormValues) => {
     await onSubmit({
       candidateKey: nextItem !== noMappingValue ? nextItem : undefined,
@@ -59,11 +62,11 @@ export default function ApiDataSetMappingForm({
     });
   };
 
-  const options: RadioOption<string>[] = [
+  const options: RadioOption[] = [
     {
       label: 'No mapping available',
       value: noMappingValue,
-      divider: `Select a ${itemLabel}:`,
+      divider: `Select ${itemLabelPrefix} ${itemLabel}:`,
     },
     ...(candidate
       ? [
@@ -94,10 +97,13 @@ export default function ApiDataSetMappingForm({
     >
       {({ formState }) => {
         return (
-          <Form id={`mapping-${groupKey}-form`} onSubmit={handleSubmit}>
+          <Form
+            id={`mapping-${groupKey ?? 'default'}-form`}
+            onSubmit={handleSubmit}
+          >
             <FormFieldRadioSearchGroup<FormValues>
               alwaysShowOptions={[noMappingValue]}
-              hint={`Choose a ${itemLabel} that will be mapped to the current data set ${itemLabel} (see above).`}
+              hint={`Choose ${itemLabelPrefix} ${itemLabel} that will be mapped to the current data set ${itemLabel} (see above).`}
               legend={`Next data set ${itemLabel}`}
               name="nextItem"
               options={options}

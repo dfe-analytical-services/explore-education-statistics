@@ -11,9 +11,13 @@ import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 
 export interface PendingMappingUpdate {
   candidateKey?: string;
-  groupKey: LocationLevelKey | string;
+  groupKey?: LocationLevelKey | string;
   sourceKey: string;
   type: MappingType;
   previousCandidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
   previousMapping: FilterOptionMappingWithKey | LocationMappingWithKey;
+}
+
+export interface PendingGroupableMappingUpdate extends PendingMappingUpdate {
+  groupKey: LocationLevelKey | string;
 }
