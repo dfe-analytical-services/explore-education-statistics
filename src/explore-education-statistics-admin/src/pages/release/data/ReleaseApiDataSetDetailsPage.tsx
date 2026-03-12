@@ -36,7 +36,7 @@ import { generatePath, useHistory, useParams } from 'react-router-dom';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import InsetText from '@common/components/InsetText';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
-import DataSetMappingTaskListItem from '@admin/pages/release/data/components/DataSetMappingTaskListItem';
+import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -379,10 +379,9 @@ export default function ReleaseApiDataSetDetailsPage() {
                   </p>
 
                   <TaskList className="govuk-!-margin-bottom-8">
-                    <DataSetMappingTaskListItem
+                    <ApiDataSetMappingTaskListItem
                       id="map-locations-task"
                       isPatch={isPatch}
-                      majorVersionRejected={majorVersionRejected}
                       mappingCompleteForFacet={
                         dataSet.draftVersion.mappingStatus?.locationsComplete ??
                         false
@@ -399,14 +398,13 @@ export default function ReleaseApiDataSetDetailsPage() {
                           dataSetId,
                         },
                       )}
-                      mappingText="Map locations"
-                      mappingHintText="Define the changes to locations in this version."
+                      taskText="Map locations"
+                      taskHintText="Define the changes to locations in this version."
                     />
 
-                    <DataSetMappingTaskListItem
+                    <ApiDataSetMappingTaskListItem
                       id="map-filters-task"
                       isPatch={isPatch}
-                      majorVersionRejected={majorVersionRejected}
                       mappingCompleteForFacet={
                         dataSet.draftVersion.mappingStatus?.filtersComplete ??
                         false
@@ -423,14 +421,13 @@ export default function ReleaseApiDataSetDetailsPage() {
                           dataSetId,
                         },
                       )}
-                      mappingText="Map filters"
-                      mappingHintText="Define the changes to filters in this version."
+                      taskText="Map filters"
+                      taskHintText="Define the changes to filters in this version."
                     />
 
-                    <DataSetMappingTaskListItem
+                    <ApiDataSetMappingTaskListItem
                       id="map-indicators-task"
                       isPatch={isPatch}
-                      majorVersionRejected={majorVersionRejected}
                       mappingCompleteForFacet={
                         dataSet.draftVersion.mappingStatus
                           ?.indicatorsComplete ?? false
@@ -447,8 +444,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                           dataSetId,
                         },
                       )}
-                      mappingText="Map indicators"
-                      mappingHintText="Define the changes to indicators in this version."
+                      taskText="Map indicators"
+                      taskHintText="Define the changes to indicators in this version."
                     />
                   </TaskList>
                 </div>
