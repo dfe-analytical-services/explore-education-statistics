@@ -4,17 +4,6 @@ import React from 'react';
 import { MemoryRouter } from 'react-router';
 import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 
-interface Props {
-  id: string;
-  isPatch: boolean;
-  mappingCompleteForFacet: boolean;
-  majorChangesForFacet: boolean;
-  mappingPageRoute: string;
-  mappingText: string;
-  mappingHintText: string;
-  majorVersionRejected: boolean;
-}
-
 describe('ApiDataSetMappingTaskListItem', () => {
   test('renders "Incomplete" when mapping for facet is incomplete', () => {
     render(

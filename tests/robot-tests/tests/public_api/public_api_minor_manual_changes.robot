@@ -191,7 +191,7 @@ Validate the row headings and its contents in the 'Regions' section
     user checks table cell contains    1    3    N/A
 
 User edits location mapping
-    user clicks button in table cell    1    4    Map option
+    user clicks button in table cell    1    4    Map location
 
     ${modal}=    user waits until modal is visible    Map existing location
     user clicks radio    Yorkshire
@@ -247,7 +247,7 @@ Validate the row headings and its contents in the 'filter options' section
     user checks table cell contains    1    3    N/A
 
 User edits filter mapping
-    user clicks button in table cell    1    4    Map option
+    user clicks button in table cell    1    4    Map filter option
 
     ${modal}=    user waits until modal is visible    Map existing filter option
     user clicks radio    State-funded primary and secondary
@@ -346,7 +346,7 @@ Validate the row headings and its contents in the 'new indicators' section after
     user checks table cell contains    1    3    Minor    ${NEW_INDICATORS_TABLE_SELECTOR}
 
 User maps original indicator to an indicator in the new data set version
-    user clicks button in table cell    1    4    Map option    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user clicks button in table cell    1    4    Map indicator    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
 
     ${modal}=    user waits until modal is visible    Map existing indicator
     user clicks radio    Number of enrolments

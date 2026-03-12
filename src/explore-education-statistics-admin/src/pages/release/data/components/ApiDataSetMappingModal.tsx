@@ -55,7 +55,7 @@ export default function ApiDataSetMappingModal({
       title={`Map existing ${itemLabel}`}
       triggerButton={
         <ButtonText className="govuk-!-margin-left-2" onClick={toggleOpen.on}>
-          Map option
+          Map {itemLabel}
           <VisuallyHidden> for {mapping.source.label}</VisuallyHidden>
         </ButtonText>
       }

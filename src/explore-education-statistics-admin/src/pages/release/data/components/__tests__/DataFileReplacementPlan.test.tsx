@@ -328,9 +328,11 @@ describe('DataReplacementPlan', () => {
       mappingStatus: {
         locationsComplete: false,
         filtersComplete: false,
+        indicatorsComplete: false,
         isMajorVersionUpdate: false,
         locationsHaveMajorChange: false,
         filtersHaveMajorChange: false,
+        indicatorsHaveMajorChange: false,
       },
       readyToPublish: false,
       valid: false,
@@ -390,9 +392,11 @@ describe('DataReplacementPlan', () => {
       mappingStatus: {
         locationsComplete: true,
         filtersComplete: true,
+        indicatorsComplete: true,
         isMajorVersionUpdate: false,
         locationsHaveMajorChange: false,
         filtersHaveMajorChange: false,
+        indicatorsHaveMajorChange: false,
       },
       readyToPublish: true,
       valid: true,
@@ -404,6 +408,8 @@ describe('DataReplacementPlan', () => {
     /Please go to the API data sets tab and complete manual mapping process for locations\./;
   const filtersBauInstruction =
     /Please go to the API data sets tab and complete manual mapping process for filters\./;
+  const indicatorsBauInstruction =
+    /Please go to the API data sets tab and complete manual mapping process for indicators\./;
   const bauFinalisationMessage =
     /Please go to the API data sets tab and finalize the data set version mapping process\./;
   const noAccessApiDetailsMessage =
@@ -433,6 +439,11 @@ describe('DataReplacementPlan', () => {
       );
       const locationsParagraph =
         locationsHeading.closest('h3')?.nextElementSibling;
+      const indicatorsHeading = screen.getByText(
+        'API data set indicators: ERROR',
+      );
+      const indicatorsParagraph =
+        indicatorsHeading.closest('h3')?.nextElementSibling;
       const finalizationHeading = screen.getByText(
         'API data set has to be finalized: ERROR',
       );
@@ -469,6 +480,21 @@ describe('DataReplacementPlan', () => {
         '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
       );
 
+      expect(indicatorsHeading).toBeInTheDocument();
+      expect(indicatorsParagraph).toBeInTheDocument();
+      expect(indicatorsParagraph).toHaveTextContent(
+        /Please go to the API data sets tab and complete manual mapping process for indicators\./,
+      );
+      expect(
+        within(filtersParagraph as HTMLElement).getByRole('link', {
+          name: 'go to the API data sets tab',
+          hidden: false,
+        }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+      );
+
       expect(finalizationHeading).toBeInTheDocument();
       expect(finalizationParagraph).toBeInTheDocument();
       expect(finalizationParagraph).toHaveTextContent(bauFinalisationMessage);
@@ -485,7 +511,7 @@ describe('DataReplacementPlan', () => {
   });
 
   it.each([true, false])(
-    'renders the API errors section correctly when the locations is valid and the filters is not and bau user is %s',
+    'renders the API errors section correctly when the filters are not complete but other mapping types are and bau user is %s',
     async bauUser => {
       dataReplacementService.getReplacementPlan.mockResolvedValue({
         ...testReplacementPlan,
@@ -498,9 +524,11 @@ describe('DataReplacementPlan', () => {
           mappingStatus: {
             locationsComplete: true,
             filtersComplete: false,
+            indicatorsComplete: true,
             isMajorVersionUpdate: true,
             locationsHaveMajorChange: false,
             filtersHaveMajorChange: true,
+            indicatorsHaveMajorChange: false,
           },
           readyToPublish: false,
           valid: false,
@@ -525,6 +553,11 @@ describe('DataReplacementPlan', () => {
         const locationsHeading = screen.getByText('API data set locations: OK');
         const locationsParagraph =
           locationsHeading.closest('h3')?.nextElementSibling;
+        const indicatorsHeading = screen.getByText(
+          'API data set indicators: OK',
+        );
+        const indicatorsParagraph =
+          indicatorsHeading.closest('h3')?.nextElementSibling;
         const finalizationHeading = screen.getByText(
           'API data set has to be finalized: ERROR',
         );
@@ -535,6 +568,12 @@ describe('DataReplacementPlan', () => {
         expect(locationsParagraph).toBeInTheDocument();
         expect(locationsParagraph).toHaveTextContent(
           /No manual mapping required for API data set locations\./,
+        );
+
+        expect(indicatorsHeading).toBeInTheDocument();
+        expect(indicatorsParagraph).toBeInTheDocument();
+        expect(indicatorsParagraph).toHaveTextContent(
+          /No manual mapping required for API data set indicators\./,
         );
 
         expect(filtersHeading).toBeInTheDocument();
@@ -555,9 +594,8 @@ describe('DataReplacementPlan', () => {
   );
 
   it.each([true, false])(
-    'renders the API errors section correctly when the filters is valid and the locations is not and bau user is %s',
-    async () => {
-      const bauUser = false;
+    'renders the API errors section correctly when the locations are not complete but other mapping types are and bau user is %s',
+    async bauUser => {
       dataReplacementService.getReplacementPlan.mockResolvedValue({
         ...testReplacementPlan,
         apiDataSetVersionPlan: {
@@ -569,9 +607,11 @@ describe('DataReplacementPlan', () => {
           mappingStatus: {
             locationsComplete: false,
             filtersComplete: true,
+            indicatorsComplete: true,
             isMajorVersionUpdate: true,
             locationsHaveMajorChange: true,
             filtersHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
           },
           readyToPublish: false,
           valid: false,
@@ -598,6 +638,11 @@ describe('DataReplacementPlan', () => {
         );
         const locationsParagraph =
           locationsHeading.closest('h3')?.nextElementSibling;
+        const indicatorsHeading = screen.getByText(
+          'API data set indicators: OK',
+        );
+        const indicatorsParagraph =
+          indicatorsHeading.closest('h3')?.nextElementSibling;
         const finalizationHeading = screen.getByText(
           'API data set has to be finalized: ERROR',
         );
@@ -612,6 +657,13 @@ describe('DataReplacementPlan', () => {
         expect(filtersParagraph).toHaveTextContent(
           /No manual mapping required for API data set filters\./,
         );
+
+        expect(indicatorsHeading).toBeInTheDocument();
+        expect(indicatorsParagraph).toBeInTheDocument();
+        expect(indicatorsParagraph).toHaveTextContent(
+          /No manual mapping required for API data set indicators\./,
+        );
+
         expect(finalizationHeading).toBeInTheDocument();
         expect(finalizationParagraph).toBeInTheDocument();
         if (bauUser) {
@@ -621,6 +673,96 @@ describe('DataReplacementPlan', () => {
           );
         } else {
           expect(locationsParagraph).toHaveTextContent(
+            noAccessApiDetailsMessage,
+          );
+          expect(finalizationParagraph).toHaveTextContent(
+            noAccessApiDetailsMessage,
+          );
+        }
+      });
+    },
+  );
+
+  it.each([true, false])(
+    'renders the API errors section correctly when the indicators are not complete but other mapping types are and bau user is %s',
+    async bauUser => {
+      dataReplacementService.getReplacementPlan.mockResolvedValue({
+        ...testReplacementPlan,
+        apiDataSetVersionPlan: {
+          id: 'version-1',
+          dataSetId: 'data-set-1',
+          name: 'Version 1',
+          version: '1.0',
+          status: 'Draft',
+          mappingStatus: {
+            locationsComplete: true,
+            filtersComplete: true,
+            indicatorsComplete: false,
+            isMajorVersionUpdate: true,
+            locationsHaveMajorChange: false,
+            filtersHaveMajorChange: false,
+            indicatorsHaveMajorChange: true,
+          },
+          readyToPublish: false,
+          valid: false,
+        },
+      });
+      renderWithTestConfig(
+        <MemoryRouter>
+          <DataFileReplacementPlan
+            cancelButton={<button type="button">Cancel</button>}
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            fileId="file-1"
+            replacementFileId="file-2"
+          />
+        </MemoryRouter>,
+        bauUser,
+      );
+      await waitFor(() => {
+        const filtersHeading = screen.getByText('API data set filters: OK');
+        const filtersParagraph =
+          filtersHeading.closest('h3')?.nextElementSibling;
+        const locationsHeading = screen.getByText('API data set locations: OK');
+        const locationsParagraph =
+          locationsHeading.closest('h3')?.nextElementSibling;
+        const indicatorsHeading = screen.getByText(
+          'API data set indicators: ERROR',
+        );
+        const indicatorsParagraph =
+          indicatorsHeading.closest('h3')?.nextElementSibling;
+        const finalizationHeading = screen.getByText(
+          'API data set has to be finalized: ERROR',
+        );
+        const finalizationParagraph =
+          finalizationHeading.closest('h3')?.nextElementSibling;
+
+        expect(locationsHeading).toBeInTheDocument();
+        expect(locationsParagraph).toBeInTheDocument();
+
+        expect(filtersHeading).toBeInTheDocument();
+        expect(filtersParagraph).toBeInTheDocument();
+        expect(filtersParagraph).toHaveTextContent(
+          /No manual mapping required for API data set filters\./,
+        );
+
+        expect(locationsHeading).toBeInTheDocument();
+        expect(locationsParagraph).toBeInTheDocument();
+        expect(locationsParagraph).toHaveTextContent(
+          /No manual mapping required for API data set locations\./,
+        );
+
+        expect(finalizationHeading).toBeInTheDocument();
+        expect(finalizationParagraph).toBeInTheDocument();
+        if (bauUser) {
+          expect(indicatorsParagraph).toHaveTextContent(
+            indicatorsBauInstruction,
+          );
+          expect(finalizationParagraph).toHaveTextContent(
+            bauFinalisationMessage,
+          );
+        } else {
+          expect(indicatorsParagraph).toHaveTextContent(
             noAccessApiDetailsMessage,
           );
           expect(finalizationParagraph).toHaveTextContent(
