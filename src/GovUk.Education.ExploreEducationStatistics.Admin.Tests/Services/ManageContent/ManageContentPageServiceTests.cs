@@ -203,8 +203,10 @@ public abstract class ManageContentPageServiceTests
                 Assert.True(contentRelease.LatestRelease);
                 Assert.Equal(releaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
                 Assert.Equal(releaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
-                Assert.Equal(releaseVersion.PublishScheduled?.ToUkDateOnly(), contentRelease.PublishScheduled);
+                Assert.Equal(releaseVersion.Published, contentRelease.LastUpdated);
                 Assert.Equal(releaseVersion.Published, contentRelease.Published);
+                Assert.Equal(releaseVersion.PublishedDisplayDate, contentRelease.PublishedDisplayDate);
+                Assert.Equal(releaseVersion.PublishScheduled?.ToUkDateOnly(), contentRelease.PublishScheduled);
                 Assert.Equal(publication.Id, contentRelease.PublicationId);
                 Assert.Equal(releaseVersion.Release.Slug, contentRelease.Slug);
                 Assert.Equal(releaseVersion.Release.Title, contentRelease.Title);
@@ -570,6 +572,350 @@ public abstract class ManageContentPageServiceTests
                 Assert.Equal(user1.Id, contentBlock.LockedBy!.Id);
                 Assert.Equal("Jane Doe", contentBlock.LockedBy!.DisplayName);
                 Assert.Equal("jane@test.com", contentBlock.LockedBy!.Email);
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionIsPublished_DatePropertiesAreMappedCorrectly()
+        {
+            var releaseVersionPublishScheduledDate = new DateOnly(2026, 3, 1).GetUkStartOfDayUtc();
+            var releaseVersionPublishedDate = DateTimeOffset.Parse("2026-03-01T09:30:00 +00:00");
+            var releaseVersionPublishedDisplayDate = DateTimeOffset.Parse("2026-01-01T09:30:00 +00:00");
+
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(releaseVersionPublishScheduledDate)
+                .WithPublished(releaseVersionPublishedDate)
+                .WithPublishedDisplayDate(releaseVersionPublishedDisplayDate);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease().WithVersions(_ => [releaseVersion])]);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService
+                .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(new List<DataBlockViewModel>());
+            methodologyVersionRepository
+                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
+                .ReturnsAsync(new List<MethodologyVersion>());
+            releaseFileService
+                .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object
+                );
+
+                var outcome = await service.GetManageContentPageViewModel(releaseVersion.Id);
+                var result = outcome.AssertRight();
+                var contentRelease = result.Release;
+
+                // For a published version, last updated should use the actual published date.
+                Assert.Equal(releaseVersionPublishedDate, contentRelease.LastUpdated);
+
+                Assert.Equal(releaseVersionPublishedDate, contentRelease.Published);
+
+                Assert.Equal(releaseVersionPublishedDisplayDate, contentRelease.PublishedDisplayDate);
+
+                Assert.Equal(releaseVersionPublishScheduledDate.ToUkDateOnly(), contentRelease.PublishScheduled);
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionIsNotPublishedAndApproved_InitialVersion_DatePropertiesAreMappedCorrectly()
+        {
+            var releaseVersionPublishScheduledDate = new DateOnly(2026, 3, 1).GetUkStartOfDayUtc();
+
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(releaseVersionPublishScheduledDate);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease().WithVersions(_ => [releaseVersion])]);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService
+                .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(new List<DataBlockViewModel>());
+            methodologyVersionRepository
+                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
+                .ReturnsAsync(new List<MethodologyVersion>());
+            releaseFileService
+                .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object
+                );
+
+                var outcome = await service.GetManageContentPageViewModel(releaseVersion.Id);
+                var result = outcome.AssertRight();
+                var contentRelease = result.Release;
+
+                // For an approved but not yet published version, last updated should use the scheduled date as an
+                // approximation of when publishing will complete.
+                Assert.Equal(releaseVersionPublishScheduledDate, contentRelease.LastUpdated);
+
+                Assert.Null(contentRelease.Published);
+
+                // For the initial version, the published display date should also use the scheduled
+                // date as an approximation of what it will be set to when publishing completes.
+                Assert.Equal(releaseVersionPublishScheduledDate, contentRelease.PublishedDisplayDate);
+
+                Assert.Equal(releaseVersionPublishScheduledDate.ToUkDateOnly(), contentRelease.PublishScheduled);
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionIsNotPublishedAndApproved_UpdatePublishedDisplayDateIsTrue_DatePropertiesAreMappedCorrectly()
+        {
+            var releaseVersionPublishScheduledDate = new DateOnly(2026, 3, 1).GetUkStartOfDayUtc();
+
+            ReleaseVersion previousReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(DateTimeOffset.UtcNow)
+                .WithPublished(DateTimeOffset.UtcNow)
+                .WithPublishedDisplayDate(DateTimeOffset.UtcNow)
+                .WithVersion(0);
+
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(releaseVersionPublishScheduledDate)
+                .WithPublished(null)
+                .WithPublishedDisplayDate(null)
+                .WithUpdatePublishedDisplayDate(true)
+                .WithPreviousVersion(previousReleaseVersion)
+                .WithVersion(1);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ =>
+                    [_dataFixture.DefaultRelease().WithVersions(_ => [previousReleaseVersion, releaseVersion])]
+                );
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService
+                .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(new List<DataBlockViewModel>());
+            methodologyVersionRepository
+                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
+                .ReturnsAsync(new List<MethodologyVersion>());
+            releaseFileService
+                .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object
+                );
+
+                var result = await service.GetManageContentPageViewModel(releaseVersion.Id);
+                var release = result.AssertRight().Release;
+
+                // For an approved but not yet published version, last updated should use the scheduled date as an
+                // approximation of when publishing will complete.
+                Assert.Equal(releaseVersion.PublishScheduled, release.LastUpdated);
+
+                Assert.Null(release.Published);
+
+                // When UpdatePublishedDisplayDate is true, the published display date should also use the scheduled
+                // date as an approximation of what it will be set to when publishing completes.
+                Assert.Equal(releaseVersionPublishScheduledDate, release.PublishedDisplayDate);
+
+                Assert.Equal(releaseVersionPublishScheduledDate.ToUkDateOnly(), release.PublishScheduled);
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionIsNotPublishedAndApproved_UpdatePublishedDisplayDateIsFalse_DatePropertiesAreMappedCorrectly()
+        {
+            var previousReleaseVersionPublishedDisplayDate = DateTimeOffset.Parse("2026-01-01T09:30:00 +00:00");
+            var releaseVersionPublishScheduledDate = new DateOnly(2026, 3, 1).GetUkStartOfDayUtc();
+
+            ReleaseVersion previousReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(DateTimeOffset.UtcNow)
+                .WithPublished(DateTimeOffset.UtcNow)
+                .WithPublishedDisplayDate(previousReleaseVersionPublishedDisplayDate)
+                .WithVersion(0);
+
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(releaseVersionPublishScheduledDate)
+                .WithPublished(null)
+                .WithPublishedDisplayDate(null)
+                .WithUpdatePublishedDisplayDate(false)
+                .WithPreviousVersion(previousReleaseVersion)
+                .WithVersion(1);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ =>
+                    [_dataFixture.DefaultRelease().WithVersions(_ => [previousReleaseVersion, releaseVersion])]
+                );
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService
+                .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(new List<DataBlockViewModel>());
+            methodologyVersionRepository
+                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
+                .ReturnsAsync(new List<MethodologyVersion>());
+            releaseFileService
+                .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object
+                );
+
+                var outcome = await service.GetManageContentPageViewModel(releaseVersion.Id);
+                var result = outcome.AssertRight();
+                var contentRelease = result.Release;
+
+                // For an approved but not yet published version, last updated should use the scheduled date as an
+                // approximation of when publishing will complete.
+                Assert.Equal(releaseVersion.PublishScheduled, contentRelease.LastUpdated);
+
+                Assert.Null(contentRelease.Published);
+
+                // When UpdatePublishedDisplayDate is false, the published display date will be inherited from the
+                // previous version when publishing completes, so expect this value.
+                Assert.Equal(previousReleaseVersionPublishedDisplayDate, contentRelease.PublishedDisplayDate);
+
+                Assert.Equal(releaseVersionPublishScheduledDate.ToUkDateOnly(), contentRelease.PublishScheduled);
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionIsNotPublishedAndNotApproved_DatePropertiesAreNull()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var releaseVersion = publication.Releases.Single().Versions.Single();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService
+                .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(new List<DataBlockViewModel>());
+            methodologyVersionRepository
+                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
+                .ReturnsAsync(new List<MethodologyVersion>());
+            releaseFileService
+                .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object
+                );
+
+                var outcome = await service.GetManageContentPageViewModel(releaseVersion.Id);
+                var result = outcome.AssertRight();
+                var contentRelease = result.Release;
+
+                Assert.Null(contentRelease.LastUpdated);
+                Assert.Null(contentRelease.Published);
+                Assert.Null(contentRelease.PublishedDisplayDate);
+                Assert.Null(contentRelease.PublishScheduled);
             }
 
             MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
