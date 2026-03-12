@@ -4,11 +4,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixture
 
 public static class ContentSectionGeneratorExtensions
 {
-    public static Generator<ContentSection> DefaultContentSection(this DataFixture fixture) =>
-        fixture.Generator<ContentSection>().WithDefaults();
+    public static Generator<ContentSection> DefaultContentSection(
+        this DataFixture fixture,
+        ContentSectionType? type = null
+    ) => fixture.Generator<ContentSection>().WithDefaults(type);
 
-    public static Generator<ContentSection> WithDefaults(this Generator<ContentSection> generator) =>
-        generator.ForInstance(s => s.SetDefaults());
+    public static Generator<ContentSection> WithDefaults(
+        this Generator<ContentSection> generator,
+        ContentSectionType? type = null
+    ) => generator.ForInstance(s => s.SetDefaults(type));
 
     public static Generator<ContentSection> WithContentBlocks(
         this Generator<ContentSection> generator,
@@ -26,12 +30,15 @@ public static class ContentSectionGeneratorExtensions
         ContentSectionType type
     ) => generator.ForInstance(s => s.SetType(type));
 
-    public static InstanceSetters<ContentSection> SetDefaults(this InstanceSetters<ContentSection> setters) =>
+    public static InstanceSetters<ContentSection> SetDefaults(
+        this InstanceSetters<ContentSection> setters,
+        ContentSectionType? type = null
+    ) =>
         setters
             .SetDefault(cs => cs.Id)
             .SetDefault(cs => cs.Heading)
             .SetDefault(cs => cs.Order)
-            .Set(cs => cs.Type, ContentSectionType.Generic);
+            .SetType(type ?? ContentSectionType.Generic);
 
     public static InstanceSetters<ContentSection> SetContentBlocks(
         this InstanceSetters<ContentSection> setters,

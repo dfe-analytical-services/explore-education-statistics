@@ -30,13 +30,11 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var releaseVersion = release.Versions[0];
 
             releaseVersion.HeadlinesSection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.Headlines)
+                .DefaultContentSection(ContentSectionType.Headlines)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Headlines content</p>")]);
 
             releaseVersion.SummarySection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.ReleaseSummary)
+                .DefaultContentSection(ContentSectionType.ReleaseSummary)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Summary content</p>")]);
 
             releaseVersion.GenericContent =
@@ -121,8 +119,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
 
             DataBlockParent contentDataBlockParent = _dataFixture
                 .DefaultDataBlockParent()
@@ -219,8 +217,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
 
             // Initialise the release version with an empty section headed "Section 1", containing no HTML blocks
             releaseVersion.GenericContent =
@@ -279,8 +277,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
             releaseVersion.GenericContent =
             [
                 _dataFixture
@@ -359,8 +357,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
             releaseVersion.GenericContent =
             [
                 _dataFixture
@@ -448,8 +446,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var releaseVersion = release.Versions[0];
 
             // Initialise the release version with empty sections to match how a newly created release would be configured
-            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -569,9 +567,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             ];
         }
     }
-
-    private ContentSection CreateContentSection(ContentSectionType type) =>
-        _dataFixture.DefaultContentSection().WithType(type);
 
     private static ReleaseSearchableDocumentsService BuildService(ContentDbContext contentDbContext) =>
         new(contentDbContext);
