@@ -55,6 +55,11 @@ public static class PublisherHostBuilderExtensions
                 {
                     configBuilder
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                        .AddJsonFile(
+                            $"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json",
+                            optional: true,
+                            reloadOnChange: false
+                        )
                         .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                         .AddEnvironmentVariables()
                         .AddConfiguration(hostBuilderContext.Configuration);
@@ -163,8 +168,20 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IPublisherEventRaiser, PublisherEventRaiser>()
                     .AddTransient<INotificationClient>(s =>
                     {
-                        var notifyOptions = s.GetRequiredService<IOptions<NotifyOptions>>();
-                        return new NotificationClient(notifyOptions.Value.ApiKey);
+                        var apiKey = s.GetRequiredService<IOptions<NotifyOptions>>().Value.ApiKey;
+                        if (apiKey.IsNullOrEmpty())
+                        {
+                            if (hostEnvironment.IsDevelopment()) // allow devs to not provide an api key when running Publisher locally
+                            {
+                                return new LoggingNotificationClient(
+                                    s.GetRequiredService<ILogger<LoggingNotificationClient>>()
+                                );
+                            }
+
+                            throw new InvalidOperationException("No NotifyOptions.ApiKey is has been set!");
+                        }
+
+                        return new NotificationClient(apiKey);
                     })
                     .AddTransient<IEmailService, EmailService>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
