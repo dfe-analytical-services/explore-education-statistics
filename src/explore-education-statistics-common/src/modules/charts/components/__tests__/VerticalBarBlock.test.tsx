@@ -10,7 +10,13 @@ import VerticalBarBlock, {
 } from '@common/modules/charts/components/VerticalBarBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  logDOM,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import React, { ReactNode } from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
@@ -261,16 +267,9 @@ describe('VerticalBarBlock', () => {
   test('can change height of chart', () => {
     const { container } = render(<VerticalBarBlock {...props} height={200} />);
 
-    const responsiveContainer = container.querySelector(
-      '.recharts-responsive-container',
-    );
+    const responsiveContainer = container.querySelector('.recharts-wrapper');
 
-    expect(responsiveContainer).toHaveProperty('style');
-
-    if (responsiveContainer) {
-      const div = responsiveContainer as HTMLElement;
-      expect(div.style.height).toEqual('200px');
-    }
+    expect(responsiveContainer).toHaveStyle({ height: '200px' });
   });
 
   test('can limit range of minor ticks to default', () => {

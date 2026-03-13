@@ -262,16 +262,9 @@ describe('HorizontalBarBlock', () => {
       <HorizontalBarBlock {...props} height={200} />,
     );
 
-    const responsiveContainer = container.querySelector(
-      '.recharts-responsive-container',
-    );
+    const responsiveContainer = container.querySelector('.recharts-wrapper');
 
-    expect(responsiveContainer).toHaveProperty('style');
-
-    if (responsiveContainer) {
-      const div = responsiveContainer as HTMLElement;
-      expect(div.style.height).toEqual('200px');
-    }
+    expect(responsiveContainer).toHaveStyle({ height: '200px' });
   });
 
   test('can limit range of minor ticks to default', () => {
