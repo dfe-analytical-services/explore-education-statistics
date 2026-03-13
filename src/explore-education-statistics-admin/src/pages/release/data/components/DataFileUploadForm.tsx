@@ -18,6 +18,7 @@ import {
 import Yup from '@common/validation/yup';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
+import Panel from '@common/components/Panel';
 
 type FileType = 'csv' | 'zip' | 'bulkZip';
 
@@ -384,6 +385,17 @@ export default function DataFileUploadForm({
                   Cancel
                 </ButtonText>
               </ButtonGroup>
+
+              <div role="status">
+                {formState.isSubmitSuccessful && (
+                  <Panel headingTag="h2" title="Upload complete">
+                    <p>
+                      Click 'View details' on the item pending review in order
+                      to continue import.
+                    </p>
+                  </Panel>
+                )}
+              </div>
             </div>
           </Form>
         );
