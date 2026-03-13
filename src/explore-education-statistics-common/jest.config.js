@@ -26,6 +26,7 @@ const config = {
     '^@common/(.*)$': '<rootDir>/src/$1',
     '^@common-test/(.*)$': '<rootDir>/test/$1',
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
+    '^recharts$': '<rootDir>/node_modules/recharts/umd/Recharts.js',
     '^@hello-pangea/dnd$':
       '<rootDir>/node_modules/@hello-pangea/dnd/dist/dnd.js',
   },
