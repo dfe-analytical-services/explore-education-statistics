@@ -14,6 +14,7 @@ import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
+import createLegendItemSorter from '@common/modules/charts/util/createLegendItemSorter';
 import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
@@ -26,7 +27,14 @@ import parseNumber from '@common/utils/number/parseNumber';
 import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Bar,
   BarChart,
@@ -137,6 +145,10 @@ const VerticalBarBlock = ({
     ...perpendicularMajorAxisReferenceLines,
   ];
 
+  const legendItemSorter = useMemo(() => {
+    return createLegendItemSorter(dataSetCategoryConfigs);
+  }, [dataSetCategoryConfigs]);
+
   const resizeTicks = useCallback(
     (containerWidth: number) => {
       // Set x axis tick width based on the number of ticks. 20 is to add some spacing.
@@ -240,7 +252,12 @@ const VerticalBarBlock = ({
           />
 
           {legend.position !== 'none' && (
-            <Legend content={renderLegend} align="left" layout="vertical" />
+            <Legend
+              content={renderLegend}
+              align="left"
+              layout="vertical"
+              itemSorter={legendItemSorter}
+            />
           )}
 
           {dataSetCategoryConfigs.map(({ config, dataKey, dataSet }) => (

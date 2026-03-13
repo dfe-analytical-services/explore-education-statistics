@@ -18,6 +18,7 @@ import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
+import createLegendItemSorter from '@common/modules/charts/util/createLegendItemSorter';
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import {
   getMajorAxisDomainTicks,
@@ -30,7 +31,7 @@ import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
 import LineChartLabel from '@common/modules/charts/components/LineChartLabel';
 import getUnit from '@common/modules/charts/util/getUnit';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   CartesianGrid,
   Legend,
@@ -116,6 +117,10 @@ const LineChartBlock = ({
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
+  const legendItemSorter = useMemo(() => {
+    return createLegendItemSorter(dataSetCategoryConfigs);
+  }, [dataSetCategoryConfigs]);
+
   const rightMargin =
     legend.position === 'inline' &&
     legend.items.some(legendItem => legendItem.inlinePosition === 'right')
@@ -158,7 +163,12 @@ const LineChartBlock = ({
             wrapperStyle={{ zIndex: 1000 }}
           />
           {legend.position !== 'none' && legend.position !== 'inline' && (
-            <Legend content={renderLegend} align="left" layout="vertical" />
+            <Legend
+              content={renderLegend}
+              align="left"
+              layout="vertical"
+              itemSorter={legendItemSorter}
+            />
           )}
           <CartesianGrid
             strokeDasharray="3 3"
