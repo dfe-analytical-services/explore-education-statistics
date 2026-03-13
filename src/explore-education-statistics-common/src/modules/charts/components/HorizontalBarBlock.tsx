@@ -14,6 +14,7 @@ import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
+import createLegendItemSorter from '@common/modules/charts/util/createLegendItemSorter';
 import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
@@ -25,7 +26,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import parseNumber from '@common/utils/number/parseNumber';
 import formatPretty from '@common/utils/number/formatPretty';
 import getAccessibleTextColour from '@common/utils/colour/getAccessibleTextColour';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   Bar,
   BarChart,
@@ -108,6 +109,10 @@ const HorizontalBarBlock = ({
     meta,
   });
 
+  const legendItemSorter = useMemo(() => {
+    return createLegendItemSorter(dataSetCategoryConfigs);
+  }, [dataSetCategoryConfigs]);
+
   const minorAxisDecimals = getMinorAxisDecimalPlaces(
     dataSetCategoryConfigs,
     axes.minor.decimalPlaces,
@@ -185,7 +190,12 @@ const HorizontalBarBlock = ({
           />
 
           {legend.position !== 'none' && (
-            <Legend content={renderLegend} align="left" layout="vertical" />
+            <Legend
+              content={renderLegend}
+              align="left"
+              layout="vertical"
+              itemSorter={legendItemSorter}
+            />
           )}
 
           {dataSetCategoryConfigs.map(({ config, dataKey, dataSet }) => (
