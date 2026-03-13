@@ -32,6 +32,7 @@ const config = {
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
     '^@hello-pangea/dnd$':
       '<rootDir>/node_modules/@hello-pangea/dnd/dist/dnd.js',
+    '^recharts$': '<rootDir>/node_modules/recharts/umd/Recharts.js',
     // Stub out CKEditor to prevent errors from its CSS build polluting the
     // test output.
     '^explore-education-statistics-ckeditor$': '<rootDir>/test/stub.js',

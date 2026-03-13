@@ -31,7 +31,9 @@ beforeEach(() => {
 
   window.matchMedia = jest.fn(() => {
     return {
+      addEventListener: jest.fn(),
       addListener: jest.fn(),
+      removeEventListener: jest.fn(),
       removeListener: jest.fn(),
       matches: true,
     };
