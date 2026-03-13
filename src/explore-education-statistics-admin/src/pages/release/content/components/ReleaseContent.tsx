@@ -344,7 +344,6 @@ const ReleaseContent = ({
                     <ReleaseEditableBlock
                       allowComments
                       block={block}
-                      characterLimit={200}
                       editButtonLabel={
                         <>
                           Edit<VisuallyHidden> summary</VisuallyHidden> block
