@@ -94,9 +94,16 @@ export default function ReleaseSummarySection({
 
         {(isEditing || lastUpdated) && (
           <SummaryListItem term="Last updated">
-            {lastUpdated && <FormattedDate>{lastUpdated}</FormattedDate>}
-            {renderReleaseNotes}
+            {lastUpdated ? (
+              <FormattedDate>{lastUpdated}</FormattedDate>
+            ) : (
+              <p>TBA</p>
+            )}
           </SummaryListItem>
+        )}
+
+        {renderReleaseNotes && (
+          <SummaryListItem term="Updates">{renderReleaseNotes}</SummaryListItem>
         )}
 
         <SummaryListItem term="Release type">
