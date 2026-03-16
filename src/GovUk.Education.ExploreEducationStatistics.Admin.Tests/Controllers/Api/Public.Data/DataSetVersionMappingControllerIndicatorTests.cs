@@ -23,7 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-// TODO EES-6764 - remove null-forgiving operators when IndicatorMappings are non-nullable.
+// TODO EES-6993 - remove null-forgiving operators when IndicatorMappings are non-nullable.
 // ReSharper disable once ClassNeverInstantiated.Global
 public class DataSetVersionMappingControllerIndicatorTestsFixture()
     : OptimisedAdminCollectionFixture(

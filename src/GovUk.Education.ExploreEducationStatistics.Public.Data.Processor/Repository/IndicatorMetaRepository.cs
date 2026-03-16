@@ -45,11 +45,7 @@ public class IndicatorMetaRepository(
         foreach (var meta in metas)
         {
             meta.Id = currentId++;
-            meta.PublicId = CreatePublicIdForIndicatorMeta(
-                publicIdMappings: publicIdMappings,
-                indicator: meta,
-                defaultPublicIdFn: () => SqidEncoder.Encode(meta.Id)
-            );
+            meta.PublicId = GetOrCreatePublicIdForIndicatorMeta(publicIdMappings: publicIdMappings, indicator: meta);
         }
 
         publicDataDbContext.IndicatorMetas.AddRange(metas);
@@ -63,15 +59,14 @@ public class IndicatorMetaRepository(
         );
     }
 
-    private static string CreatePublicIdForIndicatorMeta(
+    private static string GetOrCreatePublicIdForIndicatorMeta(
         PublicIdMappings publicIdMappings,
-        IndicatorMeta indicator,
-        Func<string> defaultPublicIdFn
+        IndicatorMeta indicator
     )
     {
         return publicIdMappings.GetPublicIdForIndicatorCandidate(
                 indicatorCandidateKey: MappingKeyGenerators.IndicatorMeta(indicator)
-            ) ?? defaultPublicIdFn.Invoke();
+            ) ?? SqidEncoder.Encode(indicator.Id);
     }
 
     private async Task<PublicIdMappings> GetPublicIdMappings(
@@ -88,7 +83,7 @@ public class IndicatorMetaRepository(
             return new PublicIdMappings();
         }
 
-        // TODO EES-6764 - remove null-forgiving operator.
+        // TODO EES-6993 - remove null-forgiving operator.
         var indicatorMappings = mappings
             .IndicatorMappingPlan!.Mappings.Values.Where(mapping =>
                 mapping.Type is MappingType.AutoMapped or MappingType.ManualMapped

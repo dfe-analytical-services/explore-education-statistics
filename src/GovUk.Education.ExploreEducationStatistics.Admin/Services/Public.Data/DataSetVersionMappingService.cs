@@ -70,7 +70,7 @@ public class DataSetVersionMappingService(
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
 
-    // TODO EES-6764 - remove null-forgiving operator.
+    // TODO EES-6993 - remove null-forgiving operator.
     public Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default
@@ -403,8 +403,8 @@ public class DataSetVersionMappingService(
     {
         return await request
             .Updates.ToAsyncEnumerable()
-            .SelectAwait(
-                async (updateRequest, index) =>
+            .Select(
+                async (updateRequest, index, ct) =>
                     updateRequest.CandidateKey is null
                         ? Unit.Instance
                         : await ValidateMappingCandidate(
@@ -418,7 +418,7 @@ public class DataSetVersionMappingService(
                                 nameof(LocationLevelMappings.Candidates),
                             ],
                             updateRequest.CandidateKey,
-                            cancellationToken
+                            cancellationToken: ct
                         )
             )
             .ToListAsync(cancellationToken);
@@ -438,8 +438,8 @@ public class DataSetVersionMappingService(
     {
         return await request
             .Updates.ToAsyncEnumerable()
-            .SelectAwait(
-                async (updateRequest, index) =>
+            .Select(
+                async (updateRequest, index, ct) =>
                     await UpdateMapping<
                         LocationOptionMapping,
                         MappableLocationOption,
@@ -463,7 +463,7 @@ public class DataSetVersionMappingService(
                             SourceKey = updateRequest.SourceKey,
                             Mapping = mappingUpdate,
                         },
-                        cancellationToken
+                        cancellationToken: ct
                     )
             )
             .ToListAsync(cancellationToken);
@@ -487,8 +487,8 @@ public class DataSetVersionMappingService(
 
         return await request
             .Updates.ToAsyncEnumerable()
-            .SelectAwait(
-                async (updateRequest, index) =>
+            .Select(
+                async (updateRequest, index, ct) =>
                 {
                     var candidateFilterForOwningFilter = filterMappings[updateRequest.FilterKey];
 
@@ -517,7 +517,7 @@ public class DataSetVersionMappingService(
                                 nameof(FilterMappingCandidate.Options),
                             ],
                             updateRequest.CandidateKey,
-                            cancellationToken
+                            cancellationToken: ct
                         );
                 }
             )
@@ -536,8 +536,8 @@ public class DataSetVersionMappingService(
     {
         return await request
             .Updates.ToAsyncEnumerable()
-            .SelectAwait(
-                async (updateRequest, index) =>
+            .Select(
+                async (updateRequest, index, ct) =>
                     updateRequest.CandidateKey is null
                         ? Unit.Instance
                         : await ValidateMappingCandidate(
@@ -546,7 +546,7 @@ public class DataSetVersionMappingService(
                             jsonbColumnName: nameof(DataSetVersionMapping.IndicatorMappingPlan),
                             jsonPathSegments: [nameof(DataSetVersionMapping.IndicatorMappingPlan.Candidates)],
                             updateRequest.CandidateKey,
-                            cancellationToken
+                            cancellationToken: ct
                         )
             )
             .ToListAsync(cancellationToken);
@@ -566,9 +566,9 @@ public class DataSetVersionMappingService(
 
         return await filterKeys
             .ToAsyncEnumerable()
-            .ToDictionaryAwaitAsync(
-                keySelector: ValueTask.FromResult,
-                elementSelector: async filterKey =>
+            .ToDictionaryAsync(
+                keySelector: (filterKey, _) => ValueTask.FromResult(filterKey),
+                elementSelector: async (filterKey, ct) =>
                 {
                     var candidateKeyPath = new JsonbPathRequest<Guid>
                     {
@@ -587,7 +587,7 @@ public class DataSetVersionMappingService(
                     return await postgreSqlRepository.GetJsonbFromPath<PublicDataDbContext, Guid, string>(
                         context: publicDataDbContext,
                         request: candidateKeyPath,
-                        cancellationToken: cancellationToken
+                        cancellationToken: ct
                     );
                 },
                 cancellationToken: cancellationToken
@@ -608,8 +608,8 @@ public class DataSetVersionMappingService(
     {
         return await request
             .Updates.ToAsyncEnumerable()
-            .SelectAwait(
-                async (updateRequest, index) =>
+            .Select(
+                async (updateRequest, index, ct) =>
                     await UpdateMapping<
                         FilterOptionMapping,
                         MappableFilterOption,
@@ -633,7 +633,7 @@ public class DataSetVersionMappingService(
                             SourceKey = updateRequest.SourceKey,
                             Mapping = mappingUpdate,
                         },
-                        cancellationToken
+                        cancellationToken: ct
                     )
             )
             .ToListAsync(cancellationToken);
@@ -653,8 +653,8 @@ public class DataSetVersionMappingService(
     {
         return await request
             .Updates.ToAsyncEnumerable()
-            .SelectAwait(
-                async (updateRequest, index) =>
+            .Select(
+                async (updateRequest, index, ct) =>
                     await UpdateMapping<
                         IndicatorMapping,
                         MappableIndicator,
@@ -675,7 +675,7 @@ public class DataSetVersionMappingService(
                             SourceKey = updateRequest.SourceKey,
                             Mapping = mappingUpdate,
                         },
-                        cancellationToken
+                        cancellationToken: ct
                     )
             )
             .ToListAsync(cancellationToken);
