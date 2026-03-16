@@ -45,11 +45,6 @@ public static class DataSetVersionMappingGeneratorExtensions
         IndicatorMappingPlan indicatorMappingPlan
     ) => generator.ForInstance(s => s.SetIndicatorMappingPlan(indicatorMappingPlan));
 
-    public static Generator<DataSetVersionMapping> WithHasDeletedIndicators(
-        this Generator<DataSetVersionMapping> generator,
-        bool hasDeletedIndicators
-    ) => generator.ForInstance(s => s.SetHasDeletedIndicators(hasDeletedIndicators));
-
     public static Generator<DataSetVersionMapping> WithHasDeletedGeographicLevels(
         this Generator<DataSetVersionMapping> generator,
         bool hasDeletedGeographicLevels
@@ -126,11 +121,6 @@ public static class DataSetVersionMappingGeneratorExtensions
         this InstanceSetters<DataSetVersionMapping> instanceSetter,
         IndicatorMappingPlan indicatorMappingPlan
     ) => instanceSetter.Set(mapping => mapping.IndicatorMappingPlan, indicatorMappingPlan);
-
-    public static InstanceSetters<DataSetVersionMapping> SetHasDeletedIndicators(
-        this InstanceSetters<DataSetVersionMapping> instanceSetter,
-        bool hasDeletedIndicators
-    ) => instanceSetter.Set(mapping => mapping.HasDeletedIndicators, hasDeletedIndicators);
 
     public static InstanceSetters<DataSetVersionMapping> SetHasDeletedGeographicLevels(
         this InstanceSetters<DataSetVersionMapping> instanceSetter,

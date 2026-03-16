@@ -138,8 +138,7 @@ internal class DataSetVersionMappingService(
         AutoMapLocations(mapping.LocationMappingPlan);
         AutoMapFilters(mapping.FilterMappingPlan);
 
-        // EES-6993 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
-        AutoMapIndicators(mapping.IndicatorMappingPlan!);
+        AutoMapIndicators(mapping.IndicatorMappingPlan);
 
         mapping.LocationMappingsComplete = !mapping
             .LocationMappingPlan.Levels
@@ -157,8 +156,7 @@ internal class DataSetVersionMappingService(
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
-        // EES-6993 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
-        mapping.IndicatorMappingsComplete = !mapping.IndicatorMappingPlan!.Mappings.Any(indicatorMapping =>
+        mapping.IndicatorMappingsComplete = !mapping.IndicatorMappingPlan.Mappings.Any(indicatorMapping =>
             IncompleteMappingTypes.Contains(indicatorMapping.Value.Type)
         );
 
@@ -183,8 +181,7 @@ internal class DataSetVersionMappingService(
 
     private static bool IsMajorVersionUpdate(DataSetVersionMapping mapping)
     {
-        // TODO EES-6993 - remove once the flag is no longer populated.
-        if (mapping.HasDeletedIndicators || mapping.HasDeletedGeographicLevels || mapping.HasDeletedTimePeriods)
+        if (mapping.HasDeletedGeographicLevels || mapping.HasDeletedTimePeriods)
         {
             return true;
         }
@@ -207,9 +204,18 @@ internal class DataSetVersionMappingService(
             return true;
         }
 
-        return mapping
+        var hasUnmappedFilterOptions = mapping
             .FilterMappingPlan.Mappings.SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
+
+        if (hasUnmappedFilterOptions)
+        {
+            return true;
+        }
+
+        return mapping.IndicatorMappingPlan.Mappings.Any(indicatorMapping =>
+            NoMappingTypes.Contains(indicatorMapping.Value.Type)
+        );
     }
 
     public Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(

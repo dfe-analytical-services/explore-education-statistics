@@ -719,15 +719,11 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(draftReleaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            var mappings = new DataSetVersionMapping
-            {
-                SourceDataSetVersionId = liveDataSetVersion.Id,
-                TargetDataSetVersionId = draftDataSetVersion.Id,
-                LocationMappingPlan = new LocationMappingPlan(),
-                FilterMappingPlan = new FilterMappingPlan(),
-                LocationMappingsComplete = false,
-                FilterMappingsComplete = true,
-            };
+            DataSetVersionMapping mappings = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(liveDataSetVersion.Id)
+                .WithTargetDataSetVersionId(draftDataSetVersion.Id)
+                .WithFilterMappingsComplete();
 
             await fixture
                 .GetPublicDataDbContext()
