@@ -138,7 +138,7 @@ internal class DataSetVersionMappingService(
         AutoMapLocations(mapping.LocationMappingPlan);
         AutoMapFilters(mapping.FilterMappingPlan);
 
-        // EES-6764 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
+        // EES-6993 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
         AutoMapIndicators(mapping.IndicatorMappingPlan!);
 
         mapping.LocationMappingsComplete = !mapping
@@ -157,9 +157,9 @@ internal class DataSetVersionMappingService(
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
-        // EES-6764 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
-        mapping.IndicatorMappingsComplete = mapping.IndicatorMappingPlan!.Mappings.All(indicatorMapping =>
-            indicatorMapping.Value.Type == MappingType.AutoMapped
+        // EES-6993 - remove null-forgiving operator when IndicatorMappingPlans ahve been set in migrations.
+        mapping.IndicatorMappingsComplete = !mapping.IndicatorMappingPlan!.Mappings.Any(indicatorMapping =>
+            IncompleteMappingTypes.Contains(indicatorMapping.Value.Type)
         );
 
         if (!isReplacement && IsMajorVersionUpdate(mapping))
@@ -183,7 +183,7 @@ internal class DataSetVersionMappingService(
 
     private static bool IsMajorVersionUpdate(DataSetVersionMapping mapping)
     {
-        // TODO EES-6764 - remove once the flag is no longer populated.
+        // TODO EES-6993 - remove once the flag is no longer populated.
         if (mapping.HasDeletedIndicators || mapping.HasDeletedGeographicLevels || mapping.HasDeletedTimePeriods)
         {
             return true;
@@ -570,23 +570,6 @@ internal class DataSetVersionMappingService(
                 .ThenInclude(link => link.Option)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
-    }
-
-    private async Task<bool> HasDeletedIndicators(
-        Guid dataSetVersionId,
-        IEnumerable<IndicatorMeta> newIndicatorMetas,
-        CancellationToken cancellationToken
-    )
-    {
-        return (
-            await publicDataDbContext
-                .IndicatorMetas.AsNoTracking()
-                .Where(meta => meta.DataSetVersionId == dataSetVersionId)
-                .Select(meta => meta.Column)
-                .ToListAsync(cancellationToken)
-        )
-            .Except(newIndicatorMetas.Select(meta => meta.Column))
-            .Any();
     }
 
     private async Task<bool> HasDeletedGeographicLevels(

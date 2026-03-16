@@ -576,7 +576,7 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                     )
                 );
 
-            // TODO EES-6764 - remove null-forgiving operator.
+            // TODO EES-6993 - remove null-forgiving operator.
             // Set a couple of the new data set version's Indicators to not be mapped to original Indicators.
             foreach (var indicatorMapping in mapping.IndicatorMappingPlan!.Mappings.Values)
             {
