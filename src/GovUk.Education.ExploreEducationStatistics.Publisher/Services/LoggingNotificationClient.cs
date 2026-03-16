@@ -1,9 +1,11 @@
+#nullable disable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
 using Notify.Models;
 using Notify.Models.Responses;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
 public class LoggingNotificationClient : INotificationClient
 {
