@@ -209,7 +209,7 @@ const DataFileReplacementPlan = ({
             and footnotes.
           </WarningMessage>
 
-          {hasDataSetVersionPlan && <>{locationsAndFiltersErrorTags}</>}
+          {hasDataSetVersionPlan && <>{apiDataSetMappingProgressTags}</>}
 
           <h3 className="govuk-heading-m">
             <Tag colour={hasInvalidDataBlocks ? 'red' : 'green'}>
