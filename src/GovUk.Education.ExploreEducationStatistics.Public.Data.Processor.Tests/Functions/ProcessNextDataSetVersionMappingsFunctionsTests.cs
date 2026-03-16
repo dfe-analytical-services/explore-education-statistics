@@ -548,7 +548,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 }
             );
 
-            // TODO EES-6764 - remove null-forgiving operator.
+            // TODO EES-6993 - remove null-forgiving operator.
             mapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
                 expectedIndicatorMappings,
                 ignoreCollectionOrders: true
@@ -574,7 +574,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 elementSelector: indicator => new MappableIndicator { Label = indicator.Label }
             );
 
-            // TODO EES-6764 - remove null-forgiving operator.
+            // TODO EES-6993 - remove null-forgiving operator.
             mapping.IndicatorMappingPlan!.Candidates.AssertDeepEqualTo(
                 expectedIndicatorTargets,
                 ignoreCollectionOrders: true

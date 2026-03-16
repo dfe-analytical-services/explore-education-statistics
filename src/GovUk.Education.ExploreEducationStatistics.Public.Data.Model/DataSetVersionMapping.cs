@@ -25,14 +25,13 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
 
     public FilterMappingPlan FilterMappingPlan { get; set; } = null!;
 
-    // TODO EES-6764 - make non-nullable when migrations are complete.
+    // TODO EES-6993 - make non-nullable when migrations are complete.
     public IndicatorMappingPlan? IndicatorMappingPlan { get; set; }
 
     public bool LocationMappingsComplete { get; set; }
 
     public bool FilterMappingsComplete { get; set; }
 
-    // TODO EES-6764 - set in migrations.
     public bool IndicatorMappingsComplete { get; set; }
 
     // Use boolean flags to describe meta types that have been deleted and cannot be
@@ -40,7 +39,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
     // We've gone with this approach for simplicity and expedience, but we may need to
     // migrate away from this approach later e.g. for indicator mappings.
 
-    // TODO EES-6764 - remove.
+    // TODO EES-6993 - remove.
     public bool HasDeletedIndicators { get; set; }
 
     public bool HasDeletedGeographicLevels { get; set; }
@@ -71,7 +70,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
         return GetFilterMapping(filterKey).OptionMappings[filterOptionKey];
     }
 
-    // TODO EES-6764 - make required when migrations are complete.
+    // TODO EES-6993 - make required when migrations are complete.
     public IndicatorMapping? GetIndicatorMapping(string indicatorColumn)
     {
         return IndicatorMappingPlan?.Mappings[indicatorColumn];
@@ -112,7 +111,7 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
             builder
                 .Property(p => p.IndicatorMappingPlan)
                 .HasColumnType("jsonb")
-                .IsRequired(false) // TODO EES-6764 - make required when migrations are complete.
+                .IsRequired(false) // TODO EES-6993 - make required when migrations are complete.
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
                     v => JsonSerializer.Deserialize<IndicatorMappingPlan>(v, (JsonSerializerOptions)null!)!

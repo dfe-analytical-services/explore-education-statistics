@@ -137,7 +137,7 @@ public class LocationMetaRepository(
                         (option, index) =>
                             new LocationOptionMetaLink
                             {
-                                PublicId = CreatePublicIdForLocationOptionMetaLink(publicIdMappings, meta, option),
+                                PublicId = GetOrCreatePublicIdForLocationOptionMetaLink(publicIdMappings, meta, option),
                                 MetaId = meta.Id,
                                 OptionId = option.Id,
                             }
@@ -165,7 +165,7 @@ public class LocationMetaRepository(
         }
     }
 
-    private static string CreatePublicIdForLocationOptionMetaLink(
+    private static string GetOrCreatePublicIdForLocationOptionMetaLink(
         PublicIdMappings publicIdMappings,
         GeographicLevel level,
         LocationOptionMetaRow option
