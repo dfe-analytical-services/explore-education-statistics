@@ -45,7 +45,7 @@ const ListItem = ({ children, term, testId = term }: ListItemProps) => {
 
 interface Props {
   isEditing?: boolean;
-  lastUpdated?: string | Date;
+  lastUpdated?: string;
   publishingOrganisations?: Organisation[];
   releaseDate?: string;
   releaseType: ReleaseType;
@@ -112,7 +112,11 @@ export default function ReleaseSummaryBlock({
 
           {(isEditing || lastUpdated) && (
             <ListItem term="Last updated">
-              {lastUpdated && <FormattedDate>{lastUpdated}</FormattedDate>}
+              {lastUpdated ? (
+                <FormattedDate>{parseISO(lastUpdated)}</FormattedDate>
+              ) : (
+                <p className="govuk-!-margin-bottom-0">TBA</p>
+              )}
             </ListItem>
           )}
         </dl>

@@ -30,7 +30,7 @@ const releaseTypesToIcons: Partial<Record<ReleaseType, ReleaseTypeIcon>> = {
 
 interface Props {
   isEditing?: boolean;
-  lastUpdated?: Date;
+  lastUpdated?: string | Date;
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
   publishingOrganisations?: Organisation[];

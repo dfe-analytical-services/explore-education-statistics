@@ -64,7 +64,7 @@ export default function ReleaseApiDataSetsSection() {
           data by creating their own tables.
         </p>
 
-        {!releaseVersion.published && (
+        {!releaseVersion.live && (
           <strong>
             Changes will not be made in the public API until this release has
             been published.

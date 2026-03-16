@@ -30,7 +30,7 @@ const ReleaseContentPageLoaded = () => {
   const [previewFeaturedTableId, setPreviewFeaturedTableId] =
     useState<string>();
   const canPreviewRelease =
-    canUpdateRelease || (!canUpdateRelease && !release.published);
+    canUpdateRelease || (!canUpdateRelease && !release.lastUpdated);
 
   const previewRedesign =
     new URLSearchParams(window.location.search).get('redesign') === 'true';

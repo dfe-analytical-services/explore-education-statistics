@@ -11,7 +11,7 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   isEditing?: boolean;
-  lastUpdated?: string | Date;
+  lastUpdated?: string;
   publishingOrganisations?: Organisation[];
   releaseDate?: string;
   releaseType: ReleaseType;

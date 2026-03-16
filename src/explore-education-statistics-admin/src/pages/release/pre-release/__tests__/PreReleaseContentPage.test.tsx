@@ -112,6 +112,8 @@ describe('PreReleaseContentPage', () => {
       },
       methodologies: [],
     },
+    lastUpdated: '2020-03-03T00:00:00+00:00',
+    publishedDisplayDate: '2020-02-20T09:55:33.5735725+00:00',
     publishScheduled: '2020-03-03',
     relatedInformation: [],
     slug: '2020-21',
@@ -173,8 +175,12 @@ describe('PreReleaseContentPage', () => {
       screen.getByRole('heading', { name: 'Publication 1' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByTestId('Published-value')).toHaveTextContent(
+    expect(screen.getByTestId('Last updated-value')).toHaveTextContent(
       '3 March 2020',
+    );
+
+    expect(screen.getByTestId('Published-value')).toHaveTextContent(
+      '20 February 2020',
     );
 
     expect(screen.getByTestId('Release type-value')).toHaveTextContent(

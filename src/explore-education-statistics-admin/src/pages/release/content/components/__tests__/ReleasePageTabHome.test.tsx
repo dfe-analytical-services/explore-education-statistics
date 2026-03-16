@@ -52,7 +52,15 @@ describe('ReleasePageTabHome', () => {
 
   test('renders summary block and publication summary on mobile with updates info', () => {
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabHome />);
+    renderWithContext(
+      <ReleasePageTabHome />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          lastUpdated: '2025-08-10T09:30:00+01:00',
+          publishedDisplayDate: '2025-08-10T09:30:00+01:00',
+        }),
+      }),
+    );
 
     expect(
       screen.getByRole('heading', {
@@ -91,7 +99,8 @@ describe('ReleasePageTabHome', () => {
       <ReleasePageTabHome />,
       generateReleaseContent({
         release: generateEditableRelease({
-          published: '2025-08-10T09:30:00+01:00',
+          lastUpdated: '2025-08-10T09:30:00+01:00',
+          publishedDisplayDate: '2025-08-10T09:30:00+01:00',
           updates: [],
         }),
       }),
