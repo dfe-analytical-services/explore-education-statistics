@@ -407,7 +407,7 @@ Verify Explore and Download data
     ...    Data guidance
     ...    Data catalogue
 
-    user clicks link    Download all data from this release (ZIP)
+    user clicks link    Download all data (ZIP)
     Wait Until Keyword Succeeds    10    1    File Should Exist
     ...    ${DOWNLOAD_DIR}/seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
 
