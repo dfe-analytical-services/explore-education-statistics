@@ -120,8 +120,8 @@ user opens data set details for subject
     ...    Click Element    xpath=${toggle_xpath}
 
 user checks main links for page 'Explore and download data' are present
-    [Arguments]    @{expected_link_texts}
-    FOR    ${link_text}    IN    @{expected_link_texts}
+    [Arguments]    @{expected_card_link_texts}
+    FOR    ${link_text}    IN    @{expected_card_link_texts}
         ${button_xpath}=    Set Variable
         ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
         Page Should Contain Element

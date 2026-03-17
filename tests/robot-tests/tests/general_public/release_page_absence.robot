@@ -403,7 +403,6 @@ Verify Explore and Download data
     ...    Contact us
     ...    Back to top
     user checks main links for page 'Explore and download data' are present
-    ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
     ...    Data catalogue

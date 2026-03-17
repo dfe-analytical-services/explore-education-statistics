@@ -301,7 +301,6 @@ Verify release associated files
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
     user checks main links for page 'Explore and download data' are present
-    ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
     ...    Data catalogue
@@ -757,9 +756,7 @@ Verify amendment files
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
-
     user checks main links for page 'Explore and download data' are present
-    ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
     ...    Data catalogue
