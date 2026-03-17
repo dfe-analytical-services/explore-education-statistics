@@ -7,7 +7,7 @@ Suite Setup         user signs in as analyst1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          Admin    Local    Dev    ReleaseRedesign
+Force Tags          Admin    Local    Dev
 
 
 *** Test Cases ***

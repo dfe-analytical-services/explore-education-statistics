@@ -12,8 +12,6 @@ Force Tags
 ...                 Local
 ...                 Dev
 ...                 Preprod
-...                 ReleaseRedesign
-#TODO EES-6843: remove ReleaseRedesign tag when EES-6843 is complete
 
 
 *** Variables ***

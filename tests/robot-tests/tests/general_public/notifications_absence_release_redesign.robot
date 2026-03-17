@@ -2,7 +2,7 @@
 Resource            ../libs/common.robot
 Resource            ../seed_data/seed_data_theme_1_constants.robot
 
-Force Tags          GeneralPublic    Local    Dev    Test    Preprod    ReleaseRedesign
+Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
