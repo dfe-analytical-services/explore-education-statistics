@@ -119,9 +119,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
-
             DataBlockParent contentDataBlockParent = _dataFixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(
@@ -217,9 +214,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
-
             // Initialise the release version with an empty section headed "Section 1", containing no HTML blocks
             releaseVersion.GenericContent =
             [
@@ -277,8 +271,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
             releaseVersion.GenericContent =
             [
                 _dataFixture
@@ -357,8 +349,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
             releaseVersion.GenericContent =
             [
                 _dataFixture
@@ -443,11 +433,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             var release = publication.Releases[0];
-            var releaseVersion = release.Versions[0];
-
-            // Initialise the release version with empty sections to match how a newly created release would be configured
-            releaseVersion.HeadlinesSection = _dataFixture.DefaultContentSection(ContentSectionType.Headlines);
-            releaseVersion.SummarySection = _dataFixture.DefaultContentSection(ContentSectionType.ReleaseSummary);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))

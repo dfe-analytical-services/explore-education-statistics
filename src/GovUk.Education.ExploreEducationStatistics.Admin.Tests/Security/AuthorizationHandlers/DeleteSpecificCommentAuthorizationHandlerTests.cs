@@ -24,7 +24,7 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-            .WithContent([
+            .WithGenericContent([
                 _dataFixture.DefaultContentSection().WithContentBlocks([new DataBlock { Comments = [comment] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));

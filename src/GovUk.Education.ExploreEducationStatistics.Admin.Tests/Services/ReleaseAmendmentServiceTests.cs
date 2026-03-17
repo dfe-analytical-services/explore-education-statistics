@@ -123,7 +123,7 @@ public class ReleaseAmendmentServiceTests
                     new KeyStatisticDataBlock { DataBlock = dataBlock3Parent.LatestPublishedVersion!.ContentBlock }
                 )
             )
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .ForIndex(
@@ -166,26 +166,13 @@ public class ReleaseAmendmentServiceTests
                                 ListOf<ContentBlock>(_fixture.DefaultHtmlBlock().WithBody("<div></div>"))
                             )
                     )
-                    .ForIndex(
-                        2,
-                        s =>
-                            s.SetType(ContentSectionType.RelatedDashboards)
-                                .SetContentBlocks(
-                                    _fixture
-                                        .DefaultHtmlBlock()
-                                        .WithComments(
-                                            ListOf(
-                                                new Comment
-                                                {
-                                                    Id = Guid.NewGuid(),
-                                                    Content = "RelatedDashboards comment",
-                                                }
-                                            )
-                                        )
-                                        .Generate(1)
-                                )
-                    )
                     .GenerateList()
+            )
+            .WithRelatedDashboardContent(
+                _fixture
+                    .DefaultHtmlBlock()
+                    .WithComments([new Comment { Id = Guid.NewGuid(), Content = "RelatedDashboards comment" }])
+                    .Generate(1)
             )
             .WithDataBlockVersions(dataBlockParents.Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
             .WithKeyStatistics(
@@ -194,7 +181,6 @@ public class ReleaseAmendmentServiceTests
                     new KeyStatisticDataBlock { DataBlock = dataBlock3Parent.LatestPublishedVersion!.ContentBlock }
                 )
             )
-            .WithKeyStatisticsSecondaryContent([])
             .WithReleaseSummaryContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithHeadlinesContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithRelatedDashboardContent(_fixture.DefaultHtmlBlock().Generate(2))
@@ -475,7 +461,7 @@ public class ReleaseAmendmentServiceTests
             var amendmentContentBlock2 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock2Parent);
             var amendmentContentBlock3 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock3Parent);
 
-            var amendmentContentBlock1InContent = amendment.Content[0].Content[0];
+            var amendmentContentBlock1InContent = amendment.GenericContent.ToList()[0].Content[0];
 
             // Check that the DataBlock that is included in this Release amendment's Content is successfully
             // identified as the exact same DataBlock that is attached to the Release amendment through the
@@ -559,7 +545,9 @@ public class ReleaseAmendmentServiceTests
                 .Include(embedBlockLink => embedBlockLink.EmbedBlock)
                 .SingleAsync(block => block.ReleaseVersionId == amendment.Id);
 
-            var originalEmbedBlockLink = Assert.IsType<EmbedBlockLink>(originalReleaseVersion.Content[0].Content[2]);
+            var originalEmbedBlockLink = Assert.IsType<EmbedBlockLink>(
+                originalReleaseVersion.GenericContent.ToList()[0].Content[2]
+            );
             Assert.NotEqual(originalEmbedBlockLink.Id, amendmentEmbedBlockLink.Id);
             Assert.NotEqual(originalEmbedBlockLink.EmbedBlockId, amendmentEmbedBlockLink.EmbedBlockId);
             Assert.Equal(originalEmbedBlockLink.EmbedBlock.Title, amendmentEmbedBlockLink.EmbedBlock.Title);
@@ -703,7 +691,7 @@ public class ReleaseAmendmentServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .WithCreated(createdById: _userId)
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .ForIndex(
@@ -781,7 +769,7 @@ public class ReleaseAmendmentServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .WithCreated(createdById: _userId)
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .WithContentBlocks(_fixture.DefaultHtmlBlock().WithBody(null!).GenerateList(1))
@@ -834,7 +822,7 @@ public class ReleaseAmendmentServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .WithCreated(createdById: _userId)
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .WithContentBlocks(_fixture.DefaultHtmlBlock().WithBody(null!).GenerateList(1))
