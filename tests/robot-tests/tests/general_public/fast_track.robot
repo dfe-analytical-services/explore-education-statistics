@@ -16,9 +16,7 @@ Navigate to publication release page
 
 Click fast track link for 'Pupil absence rates' data block
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user opens accordion section    Pupil absence rates    id:content
-    user scrolls to accordion section    Pupil absence rates    id:content
-    user scrolls to element    testid:Data block - Generic data block - National
+    user scrolls to element    id:section-pupil-absence-rates
     user waits until h3 is visible    Explore and edit this data online
     user clicks link containing text    Explore data    testid:Data block - Generic data block - National
 
