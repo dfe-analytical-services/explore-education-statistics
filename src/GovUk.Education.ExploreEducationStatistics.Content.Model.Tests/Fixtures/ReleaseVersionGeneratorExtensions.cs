@@ -81,10 +81,10 @@ public static class ReleaseVersionGeneratorExtensions
         string? dataGuidance
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetDataGuidance(dataGuidance));
 
-    public static Generator<ReleaseVersion> WithContent(
+    public static Generator<ReleaseVersion> WithGenericContent(
         this Generator<ReleaseVersion> generator,
         IEnumerable<ContentSection> content
-    ) => generator.ForInstance(releaseVersion => releaseVersion.SetContentBlocks(content));
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetGenericContent(content));
 
     public static Generator<ReleaseVersion> WithReleaseStatuses(
         this Generator<ReleaseVersion> generator,
@@ -205,6 +205,19 @@ public static class ReleaseVersionGeneratorExtensions
             .SetDefault(p => p.PublicationId)
             .SetDefault(p => p.ReleaseId)
             .SetApprovalStatus(ReleaseApprovalStatus.Draft)
+            .Set(
+                p => p.Content,
+                (_, releaseVersion, context) =>
+                    context
+                        .Fixture.DefaultContentSection()
+                        .WithReleaseVersion(releaseVersion)
+                        .ForIndex(0, s => s.SetType(ContentSectionType.Headlines))
+                        .ForIndex(1, s => s.SetType(ContentSectionType.KeyStatisticsSecondary))
+                        .ForIndex(2, s => s.SetType(ContentSectionType.RelatedDashboards))
+                        .ForIndex(3, s => s.SetType(ContentSectionType.ReleaseSummary))
+                        .ForIndex(4, s => s.SetType(ContentSectionType.Warning))
+                        .GenerateList()
+            )
             .SetDefault(p => p.PreReleaseAccessList)
             .Set(
                 p => p.NextReleaseDate,
@@ -304,10 +317,10 @@ public static class ReleaseVersionGeneratorExtensions
         string? dataGuidance
     ) => setters.Set(releaseVersion => releaseVersion.DataGuidance, dataGuidance);
 
-    public static InstanceSetters<ReleaseVersion> SetContentBlocks(
+    public static InstanceSetters<ReleaseVersion> SetGenericContent(
         this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ContentSection> content
-    ) => setters.Set(releaseVersion => releaseVersion.Content, content.ToList());
+    ) => setters.Set(releaseVersion => releaseVersion.GenericContent, content);
 
     public static InstanceSetters<ReleaseVersion> SetPublished(
         this InstanceSetters<ReleaseVersion> setters,
@@ -519,7 +532,16 @@ public static class ReleaseVersionGeneratorExtensions
     {
         var contentList = content.ToList();
         return setters
-            .Set(field, new ContentSection { Content = contentList, Type = type })
+            .Set(
+                field,
+                (_, releaseVersion, faker) =>
+                    faker
+                        .Fixture.DefaultContentSection(type)
+                        .WithReleaseVersion(releaseVersion)
+                        .WithContentBlocks(contentList)
+                        .WithHeading(null)
+                        .WithOrder(0)
+            )
             .Set(
                 (_, releaseVersion, _) =>
                     contentList.ForEach(contentBlock =>
