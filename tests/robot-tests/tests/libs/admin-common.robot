@@ -622,6 +622,7 @@ user uploads subject replacement
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
+    user clicks button    Upload data files
 
 user confirms upload to complete import
     [Arguments]
