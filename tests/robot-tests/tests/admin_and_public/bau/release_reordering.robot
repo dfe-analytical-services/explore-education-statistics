@@ -211,7 +211,8 @@ Reorder the publication releases
     user presses keys    ${SPACE}
 
     user clicks button    Confirm order
-    sleep    2
+    # TODO EES-6433 check if this wait can be removed after the publication cache is removed
+    user waits for caches to expire
 
 Validate reordered publication releases
     user waits until page contains button    Reorder releases
@@ -232,7 +233,6 @@ Validate reordered publication releases
     user checks table cell contains    3    1    ${RELEASE_1_NAME}
     user checks table cell contains    3    2    ${PUBLIC_RELEASE_1_URL}
     user checks table cell contains    3    3    Latest release
-    user waits for caches to expire
 
 Navigate to first published release on public frontend after reordering
     user navigates to    ${PUBLIC_RELEASE_1_URL}
@@ -391,6 +391,8 @@ Delete first legacy release
     ${modal}=    user waits until modal is visible    Delete legacy release
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Delete legacy release
+    # TODO EES-6433 check if this wait can be removed after the publication cache is removed
+    user waits for caches to expire
 
 Validate first legacy release is deleted from publication release order
     user waits until page contains button    Reorder releases
@@ -441,7 +443,8 @@ Reorder the publication releases so the first release is the latest release
     user presses keys    ${SPACE}
 
     user clicks button    Confirm order
-    sleep    2
+    # TODO EES-6433 check if this wait can be removed after the publication cache is removed
+    user waits for caches to expire
 
 Validate first release has latest release status in publication release order after reordering
     user waits until page contains button    Reorder releases
