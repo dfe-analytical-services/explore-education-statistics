@@ -3,6 +3,7 @@ import EditablePageModeToggle from '@admin/components/editable/EditablePageModeT
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
+import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
 import {
   ReleaseContentProvider,
   ReleaseContentContextState,
@@ -22,7 +23,6 @@ import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
 
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release, featuredTables } =
@@ -31,9 +31,6 @@ const ReleaseContentPageLoaded = () => {
     useState<string>();
   const canPreviewRelease =
     canUpdateRelease || (!canUpdateRelease && !release.lastUpdated);
-
-  const previewRedesign =
-    new URLSearchParams(window.location.search).get('redesign') === 'true';
 
   return (
     <EditingContextProvider
@@ -115,10 +112,9 @@ const ReleaseContentPageLoaded = () => {
             <div
               className={classNames({
                 [`govuk-width-container ${styles.container}`]:
-                  editingMode === 'edit' ||
-                  (editingMode === 'preview' && !previewRedesign),
+                  editingMode === 'edit',
                 'govuk-width-container dfe-width-container--wide':
-                  editingMode === 'preview' && previewRedesign,
+                  editingMode === 'preview',
               })}
             >
               <div
@@ -130,7 +126,7 @@ const ReleaseContentPageLoaded = () => {
               >
                 {editingMode !== 'table-preview' && (
                   <>
-                    {previewRedesign && editingMode === 'preview' ? (
+                    {editingMode === 'preview' ? (
                       <ReleaseContentRedesign
                         handleFeaturedTableItemClick={
                           canPreviewRelease

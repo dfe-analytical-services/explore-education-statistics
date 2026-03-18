@@ -27,7 +27,7 @@ const performTest = ({ buildId }: PublicPageSetupData) =>
   testPageAndDataUrls({
     buildId,
     mainPageUrl: {
-      url: `${releasePageUrl}?redesign=true`,
+      url: releasePageUrl,
       prefetch: false,
       successCheck: response =>
         check(response, {

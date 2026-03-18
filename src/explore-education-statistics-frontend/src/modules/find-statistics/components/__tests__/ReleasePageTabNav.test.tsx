@@ -19,8 +19,8 @@ describe('ReleasePageTabNav', () => {
       within(heading).getByRole('link', { name: 'Release home' }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/test-slug?redesign=true#content',
-    ); // TODO EES-6449 - remove query param
+      '/find-statistics/test-publication/test-slug#content',
+    );
     expect(
       within(heading).getByRole('link', { name: 'Release home' }),
     ).not.toHaveAttribute('aria-current', 'page');
