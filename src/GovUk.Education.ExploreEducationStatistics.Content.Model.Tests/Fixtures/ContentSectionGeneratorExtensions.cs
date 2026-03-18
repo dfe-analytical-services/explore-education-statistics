@@ -4,34 +4,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixture
 
 public static class ContentSectionGeneratorExtensions
 {
-    public static Generator<ContentSection> DefaultContentSection(this DataFixture fixture) =>
-        fixture.Generator<ContentSection>().WithDefaults();
+    public static Generator<ContentSection> DefaultContentSection(
+        this DataFixture fixture,
+        ContentSectionType? type = null
+    ) => fixture.Generator<ContentSection>().WithDefaults(type);
 
-    public static Generator<ContentSection> WithDefaults(this Generator<ContentSection> generator) =>
-        generator.ForInstance(s => s.SetDefaults());
+    public static Generator<ContentSection> WithDefaults(
+        this Generator<ContentSection> generator,
+        ContentSectionType? type = null
+    ) => generator.ForInstance(s => s.SetDefaults(type));
 
     public static Generator<ContentSection> WithContentBlocks(
         this Generator<ContentSection> generator,
         IEnumerable<ContentBlock> blocks
     ) => generator.ForInstance(s => s.SetContentBlocks(blocks));
 
-    public static Generator<ContentSection> WithHeading(this Generator<ContentSection> generator, string heading) =>
+    public static Generator<ContentSection> WithHeading(this Generator<ContentSection> generator, string? heading) =>
         generator.ForInstance(s => s.SetHeading(heading));
 
     public static Generator<ContentSection> WithOrder(this Generator<ContentSection> generator, int order) =>
         generator.ForInstance(s => s.SetOrder(order));
+
+    public static Generator<ContentSection> WithReleaseVersion(
+        this Generator<ContentSection> generator,
+        ReleaseVersion releaseVersion
+    ) => generator.ForInstance(d => d.SetReleaseVersion(releaseVersion));
+
+    public static Generator<ContentSection> WithReleaseVersionId(
+        this Generator<ContentSection> generator,
+        Guid releaseVersionId
+    ) => generator.ForInstance(d => d.SetReleaseVersionId(releaseVersionId));
 
     public static Generator<ContentSection> WithType(
         this Generator<ContentSection> generator,
         ContentSectionType type
     ) => generator.ForInstance(s => s.SetType(type));
 
-    public static InstanceSetters<ContentSection> SetDefaults(this InstanceSetters<ContentSection> setters) =>
+    public static InstanceSetters<ContentSection> SetDefaults(
+        this InstanceSetters<ContentSection> setters,
+        ContentSectionType? type = null
+    ) =>
         setters
             .SetDefault(cs => cs.Id)
             .SetDefault(cs => cs.Heading)
             .SetDefault(cs => cs.Order)
-            .Set(cs => cs.Type, ContentSectionType.Generic);
+            .SetType(type ?? ContentSectionType.Generic);
 
     public static InstanceSetters<ContentSection> SetContentBlocks(
         this InstanceSetters<ContentSection> setters,
@@ -40,11 +57,21 @@ public static class ContentSectionGeneratorExtensions
 
     public static InstanceSetters<ContentSection> SetHeading(
         this InstanceSetters<ContentSection> setters,
-        string heading
+        string? heading
     ) => setters.Set(cs => cs.Heading, heading);
 
     public static InstanceSetters<ContentSection> SetOrder(this InstanceSetters<ContentSection> setters, int order) =>
         setters.Set(cs => cs.Order, order);
+
+    public static InstanceSetters<ContentSection> SetReleaseVersion(
+        this InstanceSetters<ContentSection> setters,
+        ReleaseVersion releaseVersion
+    ) => setters.Set(cs => cs.ReleaseVersion, releaseVersion).SetReleaseVersionId(releaseVersion.Id);
+
+    public static InstanceSetters<ContentSection> SetReleaseVersionId(
+        this InstanceSetters<ContentSection> setters,
+        Guid releaseVersionId
+    ) => setters.Set(cs => cs.ReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<ContentSection> SetType(
         this InstanceSetters<ContentSection> setters,

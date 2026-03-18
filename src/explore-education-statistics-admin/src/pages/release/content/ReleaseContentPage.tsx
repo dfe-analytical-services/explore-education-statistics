@@ -30,7 +30,7 @@ const ReleaseContentPageLoaded = () => {
   const [previewFeaturedTableId, setPreviewFeaturedTableId] =
     useState<string>();
   const canPreviewRelease =
-    canUpdateRelease || (!canUpdateRelease && !release.published);
+    canUpdateRelease || (!canUpdateRelease && !release.lastUpdated);
 
   return (
     <EditingContextProvider

@@ -745,7 +745,9 @@ describe('ReleaseContentPage', () => {
       const testPublishedRelease: EditableRelease = {
         ...testReleaseContent.release,
         approvalStatus: 'Approved',
+        lastUpdated: '2023-01-01',
         published: '2023-01-01',
+        publishedDisplayDate: '2023-01-01',
       };
       releaseContentService.getContent.mockResolvedValue({
         ...testReleaseContent,

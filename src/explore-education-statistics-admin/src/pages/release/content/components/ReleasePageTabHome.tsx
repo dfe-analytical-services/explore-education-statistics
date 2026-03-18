@@ -108,12 +108,10 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
             <p className="govuk-body-l">{publication.summary}</p>
 
             <ReleaseSummaryBlockMobile
-              lastUpdated={showUpdatesInfo ? updates[0].on : undefined}
+              lastUpdated={showUpdatesInfo ? release.lastUpdated : undefined}
               publishingOrganisations={publishingOrganisations}
               releaseDate={
-                !showUpdatesInfo
-                  ? release.published ?? release.publishScheduled
-                  : undefined
+                !showUpdatesInfo ? release.publishedDisplayDate : undefined
               }
               releaseType={type}
               renderProducerLink={

@@ -166,7 +166,7 @@ public class ReleaseChecklistServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
-            .WithContent(DefaultContentSections())
+            .WithGenericContent(DefaultContentSections())
             .WithPreReleaseAccessList(string.Empty);
 
         releaseVersion.Content.Add(
@@ -262,7 +262,7 @@ public class ReleaseChecklistServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
-            .WithContent(DefaultContentSections())
+            .WithGenericContent(DefaultContentSections())
             .WithPreReleaseAccessList(string.Empty);
 
         var contextId = Guid.NewGuid().ToString();
@@ -383,7 +383,7 @@ public class ReleaseChecklistServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
-            .WithContent(DefaultContentSections())
+            .WithGenericContent(DefaultContentSections())
             .WithPreReleaseAccessList(string.Empty);
 
         var methodologyVersion = new MethodologyVersion { Status = Draft };
