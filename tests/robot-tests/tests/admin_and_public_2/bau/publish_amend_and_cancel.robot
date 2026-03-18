@@ -455,17 +455,15 @@ Verify that release content is unchanged
     user waits until page finishes loading
     user waits until page finishes loading
 
-    user checks there are x accordion sections    3    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Dates data block    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Test text    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Test embedded dashboard section    3
-    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user waits until parent contains element    testid:home-content    css:[data-testid="home-content-section"]
+    ...    count=3
+    user checks section is in position    Dates data block    1    testid:home-content
+    user checks section is in position    Test text    2    testid:home-content
+    user checks section is in position    Test embedded dashboard section    3    testid:home-content
 
 Verify that the Dates data block accordion is unchanged
-    user scrolls to accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    ${section}=    user gets accordion section content element    Dates data block
-    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user scrolls to element    id:heading-dates-data-block
+    ${section}=    Get WebElement    id:section-dates-data-block
 
     user checks chart title contains    ${section}    Dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
@@ -477,11 +475,8 @@ Verify that the Dates data block accordion is unchanged
     user checks table column heading contains    1    1    2020 Week 13    ${section}
     user checks headed table body row cell contains    Number of open settings    1    22,900    ${section}
     user checks headed table body row cell contains    Proportion of settings open    1    1%    ${section}
-    user closes accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-Verify that the Dates data block table footnotes are unchanged
-    ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${section}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
@@ -492,16 +487,11 @@ Verify that the Dates data block table footnotes are unchanged
     ...    ${data_block_table}
 
 Verify that the Test text accordion is unchanged
-    user opens accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    ${section}=    user gets accordion section content element    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text !"]
-    user closes accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user waits until parent contains element    id:section-test-text    xpath:.//p[text()="Some test text !"]
 
 Verify that the Embedded URL accordion section is unchanged
-    user opens accordion section    Test embedded dashboard section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    ${section}=    user gets accordion section content element    Test embedded dashboard section
-    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
+    user waits until parent contains element    id:section-test-embedded-dashboard-section
+    ...    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
     user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}
