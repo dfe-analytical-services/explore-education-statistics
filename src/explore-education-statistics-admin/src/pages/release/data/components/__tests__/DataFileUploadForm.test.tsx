@@ -255,14 +255,13 @@ describe('DataFileUploadForm', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
-      expect(screen.getByRole('status')).toContainElement(
-        screen.getByText('Upload complete'),
-      );
-      expect(
+      const status = screen.getByRole('status');
+      expect(status).toContainElement(
         screen.getByText(
-          "Click 'View details' on the item pending review in order to continue import.",
+          "Upload complete. Click 'View details' on the item pending review in order to continue import.",
         ),
-      ).toBeInTheDocument();
+      );
+      expect(status).toHaveClass('govuk-visually-hidden');
     });
   });
 
@@ -309,14 +308,13 @@ describe('DataFileUploadForm', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
-      expect(screen.getByRole('status')).toContainElement(
-        screen.getByText('Upload complete'),
-      );
-      expect(
+      const status = screen.getByRole('status');
+      expect(status).toContainElement(
         screen.getByText(
-          "Click 'View details' on the item pending review in order to continue import.",
+          "Upload complete. Click 'View details' on the item pending review in order to continue import.",
         ),
-      ).toBeInTheDocument();
+      );
+      expect(status).toHaveClass('govuk-visually-hidden');
     });
   });
 
@@ -360,14 +358,13 @@ describe('DataFileUploadForm', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
-      expect(screen.getByRole('status')).toContainElement(
-        screen.getByText('Upload complete'),
-      );
-      expect(
+      const status = screen.getByRole('status');
+      expect(status).toContainElement(
         screen.getByText(
-          "Click 'View details' on the item pending review in order to continue import.",
+          "Upload complete. Click 'View details' on the item pending review in order to continue import.",
         ),
-      ).toBeInTheDocument();
+      );
+      expect(status).toHaveClass('govuk-visually-hidden');
     });
   });
 
