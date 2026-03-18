@@ -82,38 +82,36 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
             releaseDate={releaseVersion.published}
             releaseType={releaseVersion.type}
             renderReleaseNotes={
-              <>
-                {releaseUpdates.length > 0 && (
-                  <Details
-                    id="releaseLastUpdates"
-                    summary={`See all updates (${releaseUpdates.length})`}
-                    hiddenText={`for ${releaseVersion.title}`}
-                    onToggle={open => {
-                      if (open) {
-                        logEvent({
-                          category: 'Last Updates',
-                          action: 'Release page last updates dropdown opened',
-                          label: window.location.pathname,
-                        });
-                      }
-                    }}
-                  >
-                    <ol className="govuk-list" data-testid="all-updates">
-                      {releaseUpdates.map(update => (
-                        <li key={update.id}>
-                          <FormattedDate
-                            className="govuk-body govuk-!-font-weight-bold"
-                            testId="update-on"
-                          >
-                            {update.on}
-                          </FormattedDate>
-                          <p data-testid="update-reason">{update.reason}</p>
-                        </li>
-                      ))}
-                    </ol>
-                  </Details>
-                )}
-              </>
+              releaseUpdates.length > 0 ? (
+                <Details
+                  id="releaseLastUpdates"
+                  summary={`See all updates (${releaseUpdates.length})`}
+                  hiddenText={`for ${releaseVersion.title}`}
+                  onToggle={open => {
+                    if (open) {
+                      logEvent({
+                        category: 'Last Updates',
+                        action: 'Release page last updates dropdown opened',
+                        label: window.location.pathname,
+                      });
+                    }
+                  }}
+                >
+                  <ol className="govuk-list" data-testid="all-updates">
+                    {releaseUpdates.map(update => (
+                      <li key={update.id}>
+                        <FormattedDate
+                          className="govuk-body govuk-!-font-weight-bold"
+                          testId="update-on"
+                        >
+                          {update.on}
+                        </FormattedDate>
+                        <p data-testid="update-reason">{update.reason}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </Details>
+              ) : undefined
             }
             renderStatusTags={
               <>
@@ -188,7 +186,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
           />
 
           <VisuallyHidden as="h2">
-            {/** 
+            {/**
               Visually hidden h2 as currently the release intro editor only starts from h3
               meaning that this breaks sequential heading order.
               @see {@link https://dfedigital.atlassian.net/browse/EES-3541}

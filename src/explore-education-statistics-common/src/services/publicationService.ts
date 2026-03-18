@@ -177,29 +177,31 @@ export interface ReleaseVersion<
   DataBlockType extends DataBlock = DataBlock,
   EmbedBlockType extends EmbedBlock = EmbedBlock,
 > {
-  id: string;
-  title: string;
-  yearTitle: string;
+  content: ContentSection<ContentBlockType | DataBlockType | EmbedBlockType>[];
   coverageTitle: string;
-  published: string;
-  slug: string;
-  summarySection: ContentSection<ContentBlockType>;
-  warningSection: ContentSection<ContentBlockType>;
+  downloadFiles: FileInfo[];
+  hasDataGuidance: boolean;
+  hasPreReleaseAccessList: boolean;
+  headlinesSection: ContentSection<ContentBlockType>;
+  id: string;
   keyStatistics: KeyStatistic[];
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
-  headlinesSection: ContentSection<ContentBlockType>;
-  relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
-  publication: Publication;
-  publishingOrganisations?: Organisation[];
+  lastUpdated?: string;
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
+  publication: Publication;
+  published: string;
+  publishedDisplayDate?: string;
+  publishingOrganisations?: Organisation[];
+  relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
   relatedInformation: BasicLink[];
+  slug: string;
+  summarySection: ContentSection<ContentBlockType>;
+  title: string;
   type: ReleaseType;
   updates: ReleaseNote[];
-  content: ContentSection<ContentBlockType | DataBlockType | EmbedBlockType>[];
-  downloadFiles: FileInfo[];
-  hasPreReleaseAccessList: boolean;
-  hasDataGuidance: boolean;
+  warningSection: ContentSection<ContentBlockType>;
+  yearTitle: string;
 }
 
 // Used for the redesigned release pages
