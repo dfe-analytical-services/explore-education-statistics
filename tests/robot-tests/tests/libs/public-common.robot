@@ -79,12 +79,23 @@ user opens data set details for subject
 
 user checks main links for page 'Explore and download data' are present
     [Arguments]    @{expected_card_link_texts}
+    ${explore_data_used_in_this_release_section_xpath}=    Set Variable
+    ...    //section[@data-testid="explore-section"]
+
+    # Verify the 'Download all data (ZIP)' link is present
+    ${download_all_data_zip_link_xpath}=    Set Variable
+    ...    ${explore_data_used_in_this_release_section_xpath}//a[text()="Download all data (ZIP)"]
+    Page Should Contain Element
+    ...    xpath=${download_all_data_zip_link_xpath}
+    ...    Page is missing "${download_all_data_zip_link_xpath}" link
+
+    # Verify that all expected links are present in the 'More options' cards grid
     FOR    ${link_text}    IN    @{expected_card_link_texts}
-        ${button_xpath}=    Set Variable
-        ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
+        ${link_xpath}=    Set Variable
+        ...    ${explore_data_used_in_this_release_section_xpath}//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
         Page Should Contain Element
-        ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
+        ...    xpath=${link_xpath}
+        ...    Page is missing "${link_xpath}" link
     END
 
 User checks page 'Explore and download data' data set available properties
