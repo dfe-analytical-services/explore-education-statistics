@@ -286,6 +286,8 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
 Validate public prerelease access list as Analyst user
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Pre-release access list
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
