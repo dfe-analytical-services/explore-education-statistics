@@ -92,7 +92,7 @@ User checks page 'Explore and download data' data set available properties
     ...    ${expected_row_count}
     ...    ${expected_time_period}
     ...    ${PUBLICATION_TITLE}
-    ...    ${expected_data_guidance}="${data_set_name} data guidance content"
+    ...    ${expected_data_guidance}=${data_set_name} data guidance content
 
     ${dataset_xpath}=    Set Variable
     ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
