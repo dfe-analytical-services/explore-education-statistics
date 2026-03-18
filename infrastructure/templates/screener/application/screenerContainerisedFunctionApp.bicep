@@ -94,7 +94,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     functionAppDockerImageTag: screenerDockerImageTag
     location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    healthCheckPath: '/api/screen'
+    healthCheckPath: '/api/healthcheck'
     appServicePlanName: resourceNames.screener.screenerFunction
     appSettings: [
       {
@@ -104,6 +104,18 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
       {
         name: 'STORAGE_CONTAINER_NAME'
         value: 'releases-temp'
+      }
+      {
+        name: 'LOG_DIR'
+        value: '/tmp'
+      }
+      {
+        name: 'AzureWebJobs_StartScreening__queueServiceUri'
+        value: 'https://${resourceNames.screener.screenerFunctionStorageAccount}.queue.core.windows.net'
+      }
+      {
+        name: 'AzureWebJobs_StartScreening__credential'
+        value: 'managedidentity'
       }
     ]
     functionAppExists: functionAppExists
