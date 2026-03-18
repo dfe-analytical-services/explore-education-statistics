@@ -108,37 +108,32 @@ Get public release link
 
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
-    user waits until page finishes loading
-    user clicks link    Data guidance
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Verify the variables and descriptions only contain one filter.
-    user clicks button    Show all sections
-    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    ...    testid:accordionSection
-    user opens details dropdown    Variable names and descriptions    ${subject_1_content}
+    user goes to explore and download data and navigates to data set details page    ${SUBJECT_1_NAME}
 
-    ${subject_1_variables}=    get child element    ${subject_1_content}    testid:Variables
-    user checks table body has x rows    2    ${subject_1_variables}
+    user checks table body has x rows    2    testid:variables-table
 
-    user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
-    user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
 
-    user checks table cell contains    1    1    course_title    ${subject_1_variables}
-    user checks table cell contains    1    2    Name of course being studied    ${subject_1_variables}
+    user checks table cell contains    1    1    course_title    testid:variables-table
+    user checks table cell contains    1    2    Name of course being studied    testid:variables-table
     # Below is an indicator not a filter
-    user checks table cell contains    2    1    enrollment_count    ${subject_1_variables}
-    user checks table cell contains    2    2    Number of students enrolled    ${subject_1_variables}
+    user checks table cell contains    2    1    enrollment_count    testid:variables-table
+    user checks table cell contains    2    2    Number of students enrolled    testid:variables-table
+
+Go back to Explore and download data page
+    user goes back
+    user waits until h2 is visible    Explore data used in this release
 
 Create a new table using the table tool
-    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
-    user waits until page finishes loading
-    user clicks link    View or create your own tables
-    user waits until h1 is visible    Create your own tables
+    user opens data set details for subject    ${SUBJECT_1_NAME}
 
-    user waits until table tool wizard step is available    2    Select a data set
-    user clicks radio    ${SUBJECT_1_NAME}
-    user clicks element    id:publicationDataStepForm-submit
+    ${dataset_xpath}=    Set Variable
+    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${SUBJECT_1_NAME}"]]
+    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
 
     user waits until table tool wizard step is available    3    Choose locations
     user clicks button    Local authority
