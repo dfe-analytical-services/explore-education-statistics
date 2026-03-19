@@ -32,6 +32,7 @@ import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import Link from '@admin/components/Link';
 import isPatchVersion from '@common/utils/isPatchVersion';
+import DataFileReplacementDifferences from './DataFileReplacementDifferences';
 
 interface Props {
   cancelButton: ReactNode;
@@ -210,6 +211,14 @@ const DataFileReplacementPlan = ({
           </WarningMessage>
 
           {hasDataSetVersionPlan && <>{apiDataSetMappingProgressTags}</>}
+
+          {!hasInvalidDataBlocks && !hasInvalidFootnotes ? null : (
+            <DataFileReplacementDifferences
+              releaseVersionId={releaseVersionId}
+              fileId={fileId}
+              mappings={plan.mappings}
+            />
+          )}
 
           <h3 className="govuk-heading-m">
             <Tag colour={hasInvalidDataBlocks ? 'red' : 'green'}>

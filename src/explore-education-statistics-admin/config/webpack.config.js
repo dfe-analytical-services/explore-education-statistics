@@ -165,6 +165,11 @@ module.exports = webpackEnv => {
   };
 
   return {
+    devServer: {
+      client: {
+        overlay: true,
+      },
+    },
     target: ['browserslist'],
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
