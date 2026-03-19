@@ -11,6 +11,8 @@ import FixedMultiHeaderDataTable from '@common/modules/table-tool/components/Fix
 import mapTableToJson from '@common/modules/table-tool/utils/mapTableToJson';
 import TableExportMenu from '@common/modules/find-statistics/components/TableExportMenu';
 import React, { memo, ReactNode, Ref, RefObject } from 'react';
+import ButtonText from '@common/components/ButtonText';
+import downloadService from '@common/services/downloadService';
 
 interface Props {
   captionTitle?: string;
@@ -64,6 +66,9 @@ const TimePeriodDataTable = ({
       ? `dataTableCaption-${dataBlockId}`
       : 'dataTableCaption';
 
+    const coalescedReleaseVersionId =
+      releaseVersionId ?? query?.releaseVersionId;
+
     return (
       <>
         {hasMissingRowsOrColumns && (
@@ -76,7 +81,20 @@ const TimePeriodDataTable = ({
           <WarningMessage testId="missing-data-warning">
             The selected options return too many rows to be displayed here and
             so the table shows only a subset of the data provided by your
-            selections.
+            selections.{' '}
+            {coalescedReleaseVersionId && (
+              <ButtonText
+                className="govuk-!-margin-bottom-0"
+                onClick={async () => {
+                  await downloadService.downloadFiles(
+                    coalescedReleaseVersionId,
+                    [subjectMeta.dataSetFileId],
+                  );
+                }}
+              >
+                Download full data set (ZIP)
+              </ButtonText>
+            )}
           </WarningMessage>
         )}
         {dataBlockId && query && (

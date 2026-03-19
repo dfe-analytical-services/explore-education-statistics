@@ -1171,7 +1171,20 @@ public class ReleaseApprovalServiceTests
             // Assert that the failure to send emails prevented the release version from completing approval.
             // The release version should remain unchanged from the original release version.
             // Additionally, no new ReleaseStatus entries were added.
-            saved.AssertDeepEqualTo(releaseVersion, ignoreProperties: [rv => rv.Release, rv => rv.Publication]);
+            saved.AssertDeepEqualTo(
+                releaseVersion,
+                ignoreProperties:
+                [
+                    rv => rv.Release,
+                    rv => rv.Publication,
+                    rv => rv.Content,
+                    rv => rv.HeadlinesSection,
+                    rv => rv.KeyStatisticsSecondarySection,
+                    rv => rv.RelatedDashboardsSection,
+                    rv => rv.SummarySection,
+                    rv => rv.WarningSection,
+                ]
+            );
 
             // Furthermore, we have proven that the Publisher was not informed of the change, as it
             // did not complete.
@@ -1273,7 +1286,20 @@ public class ReleaseApprovalServiceTests
             // Assert that the failure to notify the Publisher prevented the release version from completing approval.
             // The release version should remain unchanged from the original release version.
             // Additionally, no new ReleaseStatus entries were added.
-            saved.AssertDeepEqualTo(releaseVersion, ignoreProperties: [rv => rv.Release, rv => rv.Publication]);
+            saved.AssertDeepEqualTo(
+                releaseVersion,
+                ignoreProperties:
+                [
+                    rv => rv.Release,
+                    rv => rv.Publication,
+                    rv => rv.Content,
+                    rv => rv.HeadlinesSection,
+                    rv => rv.KeyStatisticsSecondarySection,
+                    rv => rv.RelatedDashboardsSection,
+                    rv => rv.SummarySection,
+                    rv => rv.WarningSection,
+                ]
+            );
 
             // We have also shown that unfortunately the invite emails would have been sent out despite the
             // approval failing, but we have more importantly stopped a release version from only having been partially

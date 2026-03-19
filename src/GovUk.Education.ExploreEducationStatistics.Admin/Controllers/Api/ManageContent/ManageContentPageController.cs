@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -9,23 +10,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
 [Route("api")]
 [ApiController]
 [Authorize]
-public class ManageContentPageController : ControllerBase
+public class ManageContentPageController(IManageContentPageService manageContentPageService) : ControllerBase
 {
-    private readonly IManageContentPageService _manageContentPageService;
-
-    public ManageContentPageController(IManageContentPageService manageContentPageService)
-    {
-        _manageContentPageService = manageContentPageService;
-    }
-
-    [HttpGet("release/{releaseVersionId:guid}/content")]
+    [HttpGet("releaseVersions/{releaseVersionId:guid}/content")]
     public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(
         Guid releaseVersionId,
-        [FromQuery] bool isPrerelease = false
-    )
-    {
-        return await _manageContentPageService
-            .GetManageContentPageViewModel(releaseVersionId, isPrerelease)
+        [FromQuery] bool isPrerelease = false,
+        CancellationToken cancellationToken = default
+    ) =>
+        await manageContentPageService
+            .GetManageContentPageViewModel(releaseVersionId, isPrerelease, cancellationToken)
             .HandleFailuresOrOk();
-    }
 }

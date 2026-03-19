@@ -89,6 +89,7 @@ export const testData1Table: TableDataResponse = {
     boundaryLevels: [],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       { label: '2013/14', code: 'AY', year: 2013 },
       { label: '2014/15', code: 'AY', year: 2014 },
@@ -392,6 +393,7 @@ export const testData2Table: TableDataResponse = {
     boundaryLevels: [],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       { label: '2013/14', code: 'AY', year: 2013 },
       { label: '2014/15', code: 'AY', year: 2014 },
@@ -643,6 +645,7 @@ export const testData3Table: TableDataResponse = {
     boundaryLevels: [],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
   },
   results: [
@@ -792,6 +795,7 @@ export const testDataNoFiltersTable: TableDataResponse = {
     boundaryLevels: [],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence in prus',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       { label: '2014/15', code: 'AY', year: 2014 },
       { label: '2015/16', code: 'AY', year: 2015 },
@@ -952,6 +956,7 @@ export const testDataFiltersWithNoResults: TableDataResponse = {
     boundaryLevels: [],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       { label: '2013/14', year: 2013, code: 'AY' },
       { label: '2014/15', year: 2014, code: 'AY' },

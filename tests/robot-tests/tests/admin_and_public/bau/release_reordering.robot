@@ -137,24 +137,25 @@ Navigate to first published release on public frontend
     user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release on public frontend is the latest release
-    user checks page contains    This is the latest release
+    user checks page contains    Latest release
 
 Validate other releases section of first published release includes legacy releases
-    user checks number of other releases is correct    2
-    ${view_releases}=    user opens details dropdown    View releases (2)
+    user clicks link    All releases in this series
+    user waits until page finishes loading
 
-    user checks other release is shown in position    ${LEGACY_RELEASE_1_DESCRIPTION}    1
-    user checks other release is shown in position    ${LEGACY_RELEASE_2_DESCRIPTION}    2
+    user checks table body has x rows    3    testid:release-updates-table
+
+    user checks table cell contains    1    1    ${RELEASE_1_NAME}    testid:release-updates-table
+    user checks table cell contains    2    1    ${LEGACY_RELEASE_1_DESCRIPTION}    testid:release-updates-table
+    user checks table cell contains    3    1    ${LEGACY_RELEASE_2_DESCRIPTION}    testid:release-updates-table
 
     user checks page contains link with text and url
     ...    ${LEGACY_RELEASE_1_DESCRIPTION}
     ...    ${LEGACY_RELEASE_1_URL}
-    ...    ${view_releases}
 
     user checks page contains link with text and url
     ...    ${LEGACY_RELEASE_2_DESCRIPTION}
     ...    ${LEGACY_RELEASE_2_URL}
-    ...    ${view_releases}
 
 Update first legacy release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
@@ -210,7 +211,8 @@ Reorder the publication releases
     user presses keys    ${SPACE}
 
     user clicks button    Confirm order
-    sleep    2
+    # TODO EES-6433 check if this wait can be removed after the publication cache is removed
+    user waits for caches to expire
 
 Validate reordered publication releases
     user waits until page contains button    Reorder releases
@@ -231,30 +233,31 @@ Validate reordered publication releases
     user checks table cell contains    3    1    ${RELEASE_1_NAME}
     user checks table cell contains    3    2    ${PUBLIC_RELEASE_1_URL}
     user checks table cell contains    3    3    Latest release
-    user waits for caches to expire
 
 Navigate to first published release on public frontend after reordering
     user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release is the latest release after reordering
-    user checks page contains    This is the latest release
+    user checks page contains    Latest release
 
 Validate other releases section of first published release contains updated legacy release in expected order
-    user checks number of other releases is correct    2
-    ${view_releases}=    user opens details dropdown    View releases (2)
+    user clicks link    All releases in this series
+    user waits until page finishes loading
 
-    user checks other release is shown in position    ${LEGACY_RELEASE_2_DESCRIPTION}    1
-    user checks other release is shown in position    ${LEGACY_RELEASE_1_DESCRIPTION_UPDATED}    2
+    user checks table body has x rows    3    testid:release-updates-table
+
+    user checks table cell contains    1    1    ${LEGACY_RELEASE_2_DESCRIPTION}    testid:release-updates-table
+    user checks table cell contains    2    1    ${LEGACY_RELEASE_1_DESCRIPTION_UPDATED}
+    ...    testid:release-updates-table
+    user checks table cell contains    3    1    ${RELEASE_1_NAME}    testid:release-updates-table
 
     user checks page contains link with text and url
     ...    ${LEGACY_RELEASE_1_DESCRIPTION_UPDATED}
     ...    ${LEGACY_RELEASE_1_URL_UPDATED}
-    ...    ${view_releases}
 
     user checks page contains link with text and url
     ...    ${LEGACY_RELEASE_2_DESCRIPTION}
     ...    ${LEGACY_RELEASE_2_URL}
-    ...    ${view_releases}
 
 Create second release via api
     user creates test release via api    ${PUBLICATION_ID}    AYQ1    2022
@@ -328,15 +331,18 @@ Navigate to second published release on public frontend
     user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate second published release is the latest release
-    user checks page contains    This is the latest release
+    user checks page contains    Latest release
 
 Validate other releases section of second published release includes first release with expected order
-    user checks number of other releases is correct    3
-    ${view_releases}=    user opens details dropdown    View releases (3)
+    user clicks link    All releases in this series
+    user waits until page finishes loading
 
-    user checks other release is shown in position    ${LEGACY_RELEASE_2_DESCRIPTION}    1
-    user checks other release is shown in position    ${LEGACY_RELEASE_1_DESCRIPTION_UPDATED}    2
-    user checks other release is shown in position    ${RELEASE_1_NAME}    3
+    user checks table body has x rows    4    testid:release-updates-table
+
+    user checks table cell contains    1    1    ${RELEASE_2_NAME}    testid:release-updates-table
+    user checks table cell contains    2    1    ${LEGACY_RELEASE_2_DESCRIPTION}    testid:release-updates-table
+    user checks table cell contains    3    1    ${LEGACY_RELEASE_1_DESCRIPTION}    testid:release-updates-table
+    user checks table cell contains    4    1    ${RELEASE_1_NAME}    testid:release-updates-table
 
 Create amendment of second release
     user navigates to admin dashboard    Bau1
@@ -385,6 +391,8 @@ Delete first legacy release
     ${modal}=    user waits until modal is visible    Delete legacy release
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Delete legacy release
+    # TODO EES-6433 check if this wait can be removed after the publication cache is removed
+    user waits for caches to expire
 
 Validate first legacy release is deleted from publication release order
     user waits until page contains button    Reorder releases
@@ -408,11 +416,14 @@ Navigate to second published release on public frontend after deleting legacy re
     user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate other releases section of second published release does not include first legacy release
-    user checks number of other releases is correct    2
-    ${view_releases}=    user opens details dropdown    View releases (2)
+    user clicks link    All releases in this series
+    user waits until page finishes loading
 
-    user checks other release is shown in position    ${LEGACY_RELEASE_2_DESCRIPTION}    1
-    user checks other release is shown in position    ${RELEASE_1_NAME}    2
+    user checks table body has x rows    3    testid:release-updates-table
+
+    user checks table cell contains    1    1    ${RELEASE_2_NAME}    testid:release-updates-table
+    user checks table cell contains    2    1    ${LEGACY_RELEASE_2_DESCRIPTION}    testid:release-updates-table
+    user checks table cell contains    3    1    ${RELEASE_1_NAME}    testid:release-updates-table
 
 Reorder the publication releases so the first release is the latest release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
@@ -432,7 +443,8 @@ Reorder the publication releases so the first release is the latest release
     user presses keys    ${SPACE}
 
     user clicks button    Confirm order
-    sleep    2
+    # TODO EES-6433 check if this wait can be removed after the publication cache is removed
+    user waits for caches to expire
 
 Validate first release has latest release status in publication release order after reordering
     user waits until page contains button    Reorder releases
@@ -456,7 +468,7 @@ Navigate to first published release on public frontend after changing the latest
     user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release is the latest release after changing the latest release
-    user checks page contains    This is the latest release
+    user checks page contains    Latest release
 
 Navigate to second published release on public frontend after changing the latest release
     user navigates to    ${PUBLIC_RELEASE_2_URL}
@@ -464,5 +476,5 @@ Navigate to second published release on public frontend after changing the lates
 Validate second published release is not the latest release after changing the latest release
     user waits for caches to expire
     user reloads page
-    user checks page contains    This is not the latest release
-    user checks page contains    View latest data: ${RELEASE_1_NAME}
+    user checks page contains    Not the latest release
+    user checks page contains    View latest release: ${RELEASE_1_NAME}

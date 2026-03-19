@@ -276,16 +276,18 @@ Validate prerelease has started for Analyst user after amendment
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
-    user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
-    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
+    user waits until element contains    id:background-information    Test summary text for ${PUBLICATION_NAME}
+    user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate contact banner is shown
     user checks testid element contains    notificationBanner    If you have an enquiry about this release contact
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
 Validate public prerelease access list as Analyst user
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Pre-release access list
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}

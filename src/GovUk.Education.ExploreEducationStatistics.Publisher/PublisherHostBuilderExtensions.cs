@@ -34,6 +34,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Notify.Client;
+using Notify.Interfaces;
 using EducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.EducationInNumbersService;
 using IEducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IEducationInNumbersService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
@@ -53,6 +55,11 @@ public static class PublisherHostBuilderExtensions
                 {
                     configBuilder
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                        .AddJsonFile(
+                            $"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json",
+                            optional: true,
+                            reloadOnChange: false
+                        )
                         .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
                         .AddEnvironmentVariables()
                         .AddConfiguration(hostBuilderContext.Configuration);
@@ -159,6 +166,24 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IRedirectsService, RedirectsService>()
                     .AddEventGridClient(configuration)
                     .AddScoped<IPublisherEventRaiser, PublisherEventRaiser>()
+                    .AddTransient<INotificationClient>(s =>
+                    {
+                        var apiKey = s.GetRequiredService<IOptions<NotifyOptions>>().Value.ApiKey;
+                        if (apiKey.IsNullOrEmpty())
+                        {
+                            if (hostEnvironment.IsDevelopment()) // allow devs to not provide an api key when running Publisher locally
+                            {
+                                return new LoggingNotificationClient(
+                                    s.GetRequiredService<ILogger<LoggingNotificationClient>>()
+                                );
+                            }
+
+                            throw new InvalidOperationException("No NotifyOptions.ApiKey is has been set!");
+                        }
+
+                        return new NotificationClient(apiKey);
+                    })
+                    .AddTransient<IEmailService, EmailService>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString
                     ))
@@ -167,7 +192,8 @@ public static class PublisherHostBuilderExtensions
                     ))
                     .AddSingleton<DateTimeProvider>()
                     .AddSingleton(TimeProvider.System)
-                    .Configure<AppOptions>(configuration.GetSection(AppOptions.Section));
+                    .Configure<AppOptions>(configuration.GetSection(AppOptions.Section))
+                    .Configure<NotifyOptions>(configuration.GetSection(NotifyOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)

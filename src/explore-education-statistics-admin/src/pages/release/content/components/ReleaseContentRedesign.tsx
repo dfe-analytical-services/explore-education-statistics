@@ -113,9 +113,9 @@ const ReleaseContent = ({
 
       {!isMobileMedia && (
         <ReleaseSummaryBlock
-          lastUpdated={updates[0]?.on}
+          lastUpdated={release.lastUpdated}
           publishingOrganisations={release.publishingOrganisations}
-          releaseDate={release.published ?? release.publishScheduled}
+          releaseDate={release.publishedDisplayDate}
           releaseType={release.type}
           renderProducerLink={
             publishingOrganisations?.length ? (

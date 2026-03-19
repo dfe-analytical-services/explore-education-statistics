@@ -226,7 +226,7 @@ public class ContentServiceTests
     [Fact]
     public async Task RemoveGenericContentSection_SectionTypeIsNotGeneric_ThrowsException()
     {
-        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithHeadlinesContent([]);
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
 
         var sectionToRemove = releaseVersion.HeadlinesSection!;
 

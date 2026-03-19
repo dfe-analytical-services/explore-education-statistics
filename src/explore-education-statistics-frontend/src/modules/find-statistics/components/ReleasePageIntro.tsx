@@ -73,7 +73,7 @@ const ReleasePageIntro = ({
                   <Link
                     className="govuk-!-display-none-print"
                     unvisited
-                    to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}?redesign=true`} // TODO EES-6449 remove query param when live
+                    to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}`}
                   >
                     View latest release: {latestRelease.title}
                   </Link>

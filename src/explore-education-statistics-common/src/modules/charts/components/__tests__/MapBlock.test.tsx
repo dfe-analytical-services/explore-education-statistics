@@ -129,6 +129,7 @@ describe('MapBlock', () => {
       ],
       publicationName: 'Publication 1',
       subjectName: 'Subject 1',
+      dataSetFileId: 'file-id',
       timePeriodRange: [
         new TimePeriodFilter({
           year: 2024,

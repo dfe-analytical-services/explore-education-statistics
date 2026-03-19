@@ -71,6 +71,7 @@ describe('getMapDataSetCategoryConfigs', () => {
     locations: [testLocation1],
     publicationName: 'Publication 1',
     subjectName: 'Subject 1',
+    dataSetFileId: 'file-id',
     timePeriodRange: [testTimePeriod],
   };
 

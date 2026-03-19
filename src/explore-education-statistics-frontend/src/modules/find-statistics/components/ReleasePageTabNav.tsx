@@ -66,10 +66,7 @@ const ReleasePageTabNavLink = ({
     <li ref={itemRef} className={styles.navItem}>
       <Link
         className={styles.navItemLink}
-        // TODO EES-6449 - remove redesign query param
-        to={`${ensureTrailingSlash(releaseUrlBase)}${
-          slug || '?redesign=true'
-        }#content`}
+        to={`${ensureTrailingSlash(releaseUrlBase)}${slug}#content`}
         aria-current={activePage === pageKey ? 'page' : undefined}
         unvisited
         prefetch={false}

@@ -26,7 +26,67 @@ public record ManageContentPageViewModel
 
         public required string ReleaseName { get; init; }
 
+        /// <summary>
+        /// The date displayed as the last updated date for the release version. This depends on whether the release
+        /// version is published and its approval status.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// If published, the value is the actual date this version was published, which is the same as <see cref="Published"/>.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// If not yet published but approved, the value is the scheduled published date, mapped from <see cref="ReleaseVersion.PublishScheduled"/>.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// If neither published nor approved, the value is <c>null</c> because it cannot yet be determined.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public required DateTimeOffset? LastUpdated { get; init; }
+
+        /// <summary>
+        /// The actual date this version was published, if published, mapped from <see cref="ReleaseVersion.Published"/>.
+        /// </summary>
         public required DateTimeOffset? Published { get; init; }
+
+        /// <summary>
+        /// The date displayed as the published date for the release version. This depends on whether the release
+        /// version is published and its approval status.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// If published, the value is mapped from <see cref="ReleaseVersion.PublishedDisplayDate"/>.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// If not yet published but approved, the value is the expected published display date.
+        /// This is based on the scheduled date or the previous version's published display date,
+        /// depending on whether the date will be updated when publishing completes.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// If neither published nor approved, the value is <c>null</c> because it cannot yet be determined.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public required DateTimeOffset? PublishedDisplayDate { get; init; }
+
+        /// <summary>
+        /// The date that the release version is (or was) scheduled to be published, mapped from <see cref="ReleaseVersion.PublishScheduled"/>.
+        /// </summary>
+        public required DateOnly? PublishScheduled { get; init; }
 
         public required string Slug { get; init; }
 
@@ -44,7 +104,7 @@ public record ManageContentPageViewModel
 
         public required List<OrganisationViewModel> PublishingOrganisations { get; init; }
 
-        public required List<ReleaseNoteViewModel> Updates { get; set; } // TODO EES-6974 revert this to init-only
+        public required List<ReleaseNoteViewModel> Updates { get; init; }
 
         public required List<ContentSectionViewModel> Content { get; init; }
 
@@ -65,8 +125,6 @@ public record ManageContentPageViewModel
         public required bool HasPreReleaseAccessList { get; init; }
 
         public bool HasDataGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
-
-        public required DateOnly? PublishScheduled { get; init; }
 
         public required PartialDate? NextReleaseDate { get; init; }
 

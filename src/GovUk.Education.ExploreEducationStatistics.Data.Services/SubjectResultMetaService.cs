@@ -142,6 +142,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                     Locations = locationViewModels,
                     BoundaryLevels = boundaryLevelViewModels,
                     PublicationName = publicationTitle,
+                    DataSetFileId = releaseFile.FileId,
                     SubjectName = releaseFile.Name!,
                     TimePeriodRange = timePeriodViewModels,
                     IsCroppedTable = isCroppedTable,

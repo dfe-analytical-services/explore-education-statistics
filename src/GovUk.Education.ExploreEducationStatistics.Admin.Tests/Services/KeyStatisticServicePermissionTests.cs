@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -108,8 +107,7 @@ public class KeyStatisticServicePermissionTests
             contentDbContext ?? new Mock<ContentDbContext>().Object,
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             dataBlockService ?? Mock.Of<IDataBlockService>(),
-            userService ?? Mock.Of<IUserService>(),
-            AdminMapper()
+            userService ?? Mock.Of<IUserService>()
         );
     }
 

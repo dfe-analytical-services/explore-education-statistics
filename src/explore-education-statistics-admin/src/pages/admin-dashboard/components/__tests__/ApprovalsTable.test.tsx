@@ -59,7 +59,6 @@ describe('ApprovalsTable', () => {
         day: '',
       },
       live: false,
-      latestRelease: false,
       timePeriodCoverage: {
         value: 'AY',
         label: 'Academic year',
@@ -102,7 +101,6 @@ describe('ApprovalsTable', () => {
       },
       publishScheduled: '2048-11-16',
       live: false,
-      latestRelease: false,
       timePeriodCoverage: {
         value: 'AY',
         label: 'Academic year',

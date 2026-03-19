@@ -220,11 +220,11 @@ const ReleaseContent = ({
         <div className="govuk-grid-column-two-thirds">
           <ReleaseSummarySection
             isEditing={editingMode === 'edit'}
-            lastUpdated={release.updates[0]?.on}
+            lastUpdated={release.lastUpdated}
             latestRelease={release.latestRelease}
             publishingOrganisations={release.publishingOrganisations}
             nextReleaseDate={release.nextReleaseDate}
-            releaseDate={release.published ?? release.publishScheduled}
+            releaseDate={release.publishedDisplayDate}
             releaseType={release.type}
             renderReleaseNotes={<ReleaseNotesSection release={release} />}
             renderStatusTags={

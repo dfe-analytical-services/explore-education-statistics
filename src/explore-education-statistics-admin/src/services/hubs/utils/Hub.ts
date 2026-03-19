@@ -23,7 +23,13 @@ export default class Hub {
 
   async start(): Promise<void> {
     if (this.connection.state !== 'Connected') {
-      await this.connection.start();
+      try {
+        await this.connection.start();
+      } catch (error) {
+        if (!this.connection.baseUrl.includes('hubs/service-announcement')) {
+          throw error;
+        }
+      }
     }
   }
 

@@ -112,6 +112,8 @@ describe('PreReleaseContentPage', () => {
       },
       methodologies: [],
     },
+    lastUpdated: '2020-03-03T00:00:00+00:00',
+    publishedDisplayDate: '2020-02-20T09:55:33.5735725+00:00',
     publishScheduled: '2020-03-03',
     relatedInformation: [],
     slug: '2020-21',
@@ -173,8 +175,12 @@ describe('PreReleaseContentPage', () => {
       screen.getByRole('heading', { name: 'Publication 1' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByTestId('Published-value')).toHaveTextContent(
+    expect(screen.getByTestId('Last updated-value')).toHaveTextContent(
       '3 March 2020',
+    );
+
+    expect(screen.getByTestId('Published-value')).toHaveTextContent(
+      '20 February 2020',
     );
 
     expect(screen.getByTestId('Release type-value')).toHaveTextContent(
@@ -189,92 +195,6 @@ describe('PreReleaseContentPage', () => {
     );
 
     renderPage();
-
-    await waitFor(() => {
-      expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
-    });
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Headline facts and figures - 2020/21',
-      }),
-    ).toBeInTheDocument();
-
-    expect(screen.getByText('Headlines content')).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Explore data and files used in this release',
-      }),
-    ).toBeInTheDocument();
-
-    const contentAccordion = screen.getAllByTestId('accordion')[0];
-    const contentAccordionSections =
-      within(contentAccordion).getAllByTestId('accordionSection');
-
-    expect(contentAccordionSections).toHaveLength(2);
-
-    expect(
-      await within(contentAccordionSections[0]).findByRole('button', {
-        name: /Section 1/,
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      within(contentAccordionSections[0]).getByText('Section 1 content'),
-    ).toBeInTheDocument();
-
-    expect(
-      within(contentAccordionSections[1]).getByRole('button', {
-        name: /Section 2/,
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(contentAccordionSections[1]).getByText('Section 2 content'),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Help and support',
-      }),
-    ).toBeInTheDocument();
-  });
-
-  test('transforms featured table links', async () => {
-    releaseContentService.getContent.mockResolvedValue(testReleaseContent);
-    featuredTableService.listFeaturedTables.mockResolvedValue(
-      testFeaturedTables,
-    );
-
-    renderPage();
-
-    await waitFor(() => {
-      expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
-    });
-
-    expect(
-      await screen.findByRole('button', {
-        name: /Section 1/,
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('link', { name: 'featured table link' }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-1/prerelease/table-tool/data-block-1',
-    );
-  });
-
-  test('renders the redesigned content', async () => {
-    releaseContentService.getContent.mockResolvedValue(testReleaseContent);
-    featuredTableService.listFeaturedTables.mockResolvedValue(
-      testFeaturedTables,
-    );
-
-    renderPage();
-
-    window.history.pushState({}, '', '?redesign=true');
 
     await waitFor(() => {
       expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
@@ -301,6 +221,26 @@ describe('PreReleaseContentPage', () => {
     expect(
       within(sections[0]).getByRole('heading', { level: 2 }),
     ).toHaveTextContent('Section 1');
+  });
+
+  test('transforms featured table links', async () => {
+    releaseContentService.getContent.mockResolvedValue(testReleaseContent);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('link', { name: 'featured table link' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/prerelease/table-tool/data-block-1',
+    );
   });
 
   const renderPage = (

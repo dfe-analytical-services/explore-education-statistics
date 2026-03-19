@@ -542,7 +542,7 @@
         "description": "Number of days to retain blobs after delete"
       }
     },
-    "autoscalePublicApplication": {
+    "autoscaleAppServices": {
       "type": "bool",
       "defaultValue": false
     },
@@ -830,6 +830,7 @@
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
+    "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public-site')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public-site')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
@@ -1307,18 +1308,10 @@
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
+    "ees-publisher-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-govuknotify-api-key')]",
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
-    "ees-notifier-templateid-release-amendment-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-amendment-published')]",
-    "ees-notifier-templateid-release-amendment-published-superseded-subscribers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-amendment-published-superseded-subscribers')]",
-    "ees-notifier-templateid-release-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-published')]",
-    "ees-notifier-templateid-release-published-superseded-subscribers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-published-superseded-subscribers')]",
-    "ees-notifier-templateid-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-confirmation')]",
-    "ees-notifier-templateid-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-verification')]",
-    "ees-notifier-templateid-api-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-confirmation')]",
-    "ees-notifier-templateid-api-subscription-major-data-set-version-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-major-data-set-version-published')]",
-    "ees-notifier-templateid-api-subscription-data-set-version-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-data-set-version-published')]",
-    "ees-notifier-templateid-api-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-verification')]",
+    "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
     "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
@@ -3629,6 +3622,10 @@
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App__PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "App__BauEmail": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-bau-email'), '2018-02-14').secretUriWithVersion, ')')]",
+        "App__AdminAppUrl": "[variables('adminAppUrl')]",
+        "App__PublicAppUrl": "[variables('publicAppUrl')]",
+        "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
         "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
         "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
@@ -4253,6 +4250,74 @@
       }
     },
     {
+      "name": "[concat(variables('adminAppName'), '-autoscale')]",
+      "apiVersion": "2014-04-01",
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "properties": {
+        "name": "[concat(variables('adminAppName'), '-autoscale')]",
+        "enabled": "[parameters('autoscaleAppServices')]",
+        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "profiles": [
+          {
+            "name": "Auto created scale condition",
+            "capacity": {
+              "minimum": 2,
+              "maximum": 10,
+              "default": 2
+            },
+            "rules": [
+              {
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+                  "operator": "GreaterThan",
+                  "statistic": "Average",
+                  "threshold": 70,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+                  "operator": "LessThan",
+                  "statistic": "Average",
+                  "threshold": 30,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              }
+            ]
+          }
+        ],
+        "notifications": [],
+        "targetResourceLocation": ""
+      }
+    },
+    {
       "name": "[concat(variables('dataAppName'), '-autoscale')]",
       "apiVersion": "2014-04-01",
       "type": "Microsoft.Insights/autoscaleSettings",
@@ -4260,7 +4325,7 @@
       "tags": {},
       "properties": {
         "name": "[concat(variables('dataAppName'), '-autoscale')]",
-        "enabled": "[parameters('autoscalePublicApplication')]",
+        "enabled": "[parameters('autoscaleAppServices')]",
         "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
         "profiles": [
           {
@@ -4328,7 +4393,7 @@
       "tags": {},
       "properties": {
         "name": "[concat(variables('contentAppName'), '-autoscale')]",
-        "enabled": "[parameters('autoscalePublicApplication')]",
+        "enabled": "[parameters('autoscaleAppServices')]",
         "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('contentPlanName'))]",
         "profiles": [
           {
@@ -4396,7 +4461,7 @@
       "tags": {},
       "properties": {
         "name": "[concat(variables('publicAppName'), '-autoscale')]",
-        "enabled": "[parameters('autoscalePublicApplication')]",
+        "enabled": "[parameters('autoscaleAppServices')]",
         "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
         "profiles": [
           {

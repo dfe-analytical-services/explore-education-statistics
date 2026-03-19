@@ -65,7 +65,6 @@ Add text block with link to absence glossary entry to accordion section
 
 Check glossary info icon appears on release preview
     user clicks radio    Preview release page
-    user opens accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until page contains button    Absence
 
 Click glossary info icon and validate glossary entry
@@ -89,25 +88,18 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Check latest release is correct
-    user checks page contains    This is the latest release
+    user checks page contains    Latest release
 
-Check latest release contains related dashboards section
-    user checks there are x accordion sections    1    id:data-accordion
-    user checks accordion is in position    View related dashboard(s)    1    id:data-accordion
-    user checks element contains    id:related-dashboards-content    Related dashboards test text
+Check latest release contains related data dashboards section
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data dashboards
+    user checks section with ID contains elements and back to top link    data-dashboards-section
+    ...    Related dashboards test text
 
-Check quick links navigation contains link to related dashboards
-    user checks element contains link    testid:quick-links    View related dashboard(s)
-
-Check related dashboard link opens accordion section
-    user verifies accordion is closed    View related dashboard(s)
-    user clicks link    View related dashboard(s)    testid:quick-links
-    user verifies accordion is open    View related dashboard(s)
-    user closes accordion section    View related dashboard(s)    id:data-accordion
-
-Check latest release contains glossary info icon
-    user opens accordion section    Test section    css:#content
-    user waits until page contains button    Absence
+Navigate back to the release home tab
+    user clicks link    Release home
+    user waits until h2 is visible    Headline facts and figures
 
 Click glossary info icon and verify entry is correct
     user clicks button    Absence
