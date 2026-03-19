@@ -47,79 +47,84 @@ export default function LiveApiDataSetsTable({
   const orderedDataSets = orderBy(dataSets, dataSet => dataSet.title);
 
   return (
-    <table className={styles.table} data-testid="live-api-data-sets">
-      <thead>
-        <tr>
-          <th scope="col" style={{ width: `${columnWidth * 2}px` }}>
-            Version
-          </th>
-          <th scope="col">Name</th>
-          <th className="govuk-!-width-one-third" scope="col">
-            Actions
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {orderedDataSets.map(({ latestLiveVersion, ...dataSet }) => (
-          <tr key={dataSet.id}>
-            <td>
-              <Tag>{`v${latestLiveVersion.version}`}</Tag>
-            </td>
-            <td>{dataSet.title}</td>
-            <td>
-              <ButtonGroup
-                className="govuk-!-margin-bottom-0"
-                horizontalSpacing="l"
-              >
-                <Link
-                  to={generatePath<ReleaseDataSetRouteParams>(
-                    releaseApiDataSetDetailsRoute.path,
-                    {
-                      publicationId,
-                      releaseVersionId,
-                      dataSetId: dataSet.id,
-                    },
-                  )}
-                >
-                  View details
-                  <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
-                </Link>
-                {canUpdateRelease &&
-                  !dataSet.previousReleaseIds.includes(releaseId) && (
-                    <ApiDataSetCreateModal
-                      buttonText={
-                        <>
-                          Create new version
-                          <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
-                        </>
-                      }
-                      publicationId={publicationId}
-                      releaseVersionId={releaseVersionId}
-                      submitText="Confirm new data set version"
-                      title="Create a new API data set version"
-                      onSubmit={async ({ releaseFileId }) => {
-                        await apiDataSetVersionService.createVersion({
-                          dataSetId: dataSet.id,
-                          releaseFileId,
-                        });
-                        history.push(
-                          generatePath<ReleaseDataSetRouteParams>(
-                            releaseApiDataSetDetailsRoute.path,
-                            {
-                              publicationId,
-                              releaseVersionId,
-                              dataSetId: dataSet.id,
-                            },
-                          ),
-                        );
-                      }}
-                    />
-                  )}
-              </ButtonGroup>
-            </td>
+    <div className="container-with-horizontal-scroll">
+      <table className={styles.table} data-testid="live-api-data-sets">
+        <thead>
+          <tr>
+            <th scope="col" style={{ width: `${columnWidth * 2}px` }}>
+              Version
+            </th>
+            <th scope="col">Name</th>
+            <th className="govuk-!-width-one-third" scope="col">
+              Actions
+            </th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {orderedDataSets.map(({ latestLiveVersion, ...dataSet }) => (
+            <tr key={dataSet.id}>
+              <td>
+                <Tag>{`v${latestLiveVersion.version}`}</Tag>
+              </td>
+              <td>{dataSet.title}</td>
+              <td>
+                <ButtonGroup
+                  className="govuk-!-margin-bottom-0"
+                  horizontalSpacing="l"
+                >
+                  <Link
+                    to={generatePath<ReleaseDataSetRouteParams>(
+                      releaseApiDataSetDetailsRoute.path,
+                      {
+                        publicationId,
+                        releaseVersionId,
+                        dataSetId: dataSet.id,
+                      },
+                    )}
+                  >
+                    View details
+                    <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
+                  </Link>
+                  {canUpdateRelease &&
+                    !dataSet.previousReleaseIds.includes(releaseId) && (
+                      <ApiDataSetCreateModal
+                        buttonText={
+                          <>
+                            Create new version
+                            <VisuallyHidden>
+                              {' '}
+                              for {dataSet.title}
+                            </VisuallyHidden>
+                          </>
+                        }
+                        publicationId={publicationId}
+                        releaseVersionId={releaseVersionId}
+                        submitText="Confirm new data set version"
+                        title="Create a new API data set version"
+                        onSubmit={async ({ releaseFileId }) => {
+                          await apiDataSetVersionService.createVersion({
+                            dataSetId: dataSet.id,
+                            releaseFileId,
+                          });
+                          history.push(
+                            generatePath<ReleaseDataSetRouteParams>(
+                              releaseApiDataSetDetailsRoute.path,
+                              {
+                                publicationId,
+                                releaseVersionId,
+                                dataSetId: dataSet.id,
+                              },
+                            ),
+                          );
+                        }}
+                      />
+                    )}
+                </ButtonGroup>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

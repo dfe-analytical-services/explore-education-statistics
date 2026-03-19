@@ -156,45 +156,47 @@ const MethodologyStatusPage = () => {
                     loading={!methodologyStatuses}
                     text="Loading methodology status history"
                   >
-                    <table data-testid="methodology-status-history">
-                      <thead>
-                        <tr>
-                          <th scope="col">Date</th>
-                          <th scope="col">Status</th>
-                          <th scope="col">Internal note</th>
-                          <th scope="col">Methodology version</th>
-                          <th scope="col">By user</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {methodologyStatuses.map(status => (
-                          <tr key={status.methodologyStatusId}>
-                            <td>
-                              {status.created ? (
-                                <FormattedDate format="d MMMM yyyy HH:mm">
-                                  {status.created}
-                                </FormattedDate>
-                              ) : (
-                                'Not available'
-                              )}
-                            </td>
-                            <td>{status.approvalStatus}</td>
-                            <td>{status.internalReleaseNote}</td>
-                            <td>{`${status.methodologyVersion + 1}`}</td>
-                            {/* +1 because version starts from 0 in DB */}
-                            <td>
-                              {status.createdByEmail ? (
-                                <a href={`mailto:${status.createdByEmail}`}>
-                                  {status.createdByEmail}
-                                </a>
-                              ) : (
-                                'Not available'
-                              )}
-                            </td>
+                    <div className="container-with-horizontal-scroll">
+                      <table data-testid="methodology-status-history">
+                        <thead>
+                          <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Internal note</th>
+                            <th scope="col">Methodology version</th>
+                            <th scope="col">By user</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {methodologyStatuses.map(status => (
+                            <tr key={status.methodologyStatusId}>
+                              <td>
+                                {status.created ? (
+                                  <FormattedDate format="d MMMM yyyy HH:mm">
+                                    {status.created}
+                                  </FormattedDate>
+                                ) : (
+                                  'Not available'
+                                )}
+                              </td>
+                              <td>{status.approvalStatus}</td>
+                              <td>{status.internalReleaseNote}</td>
+                              <td>{`${status.methodologyVersion + 1}`}</td>
+                              {/* +1 because version starts from 0 in DB */}
+                              <td>
+                                {status.createdByEmail ? (
+                                  <a href={`mailto:${status.createdByEmail}`}>
+                                    {status.createdByEmail}
+                                  </a>
+                                ) : (
+                                  'Not available'
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </LoadingSpinner>
                 </>
               )}

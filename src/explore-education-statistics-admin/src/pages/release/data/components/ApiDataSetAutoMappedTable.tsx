@@ -116,6 +116,7 @@ export default function ApiDataSetAutoMappedTable({
         </div>
       </div>
       {filteredItemsChunks.length > 0 ? (
+<<<<<<< HEAD
         <table
           className="dfe-table--vertical-align-middle"
           data-testid={tableId}
@@ -175,6 +176,67 @@ export default function ApiDataSetAutoMappedTable({
             )}
           </tbody>
         </table>
+=======
+        <div className="container-with-horizontal-scroll">
+          <table
+            className="dfe-table--vertical-align-middle"
+            data-testid={tableId}
+            id={tableId}
+          >
+            <caption className="govuk-visually-hidden">
+              {`Table showing auto mapped options for ${groupLabel}`}
+            </caption>
+            <thead>
+              <tr>
+                <th className="govuk-!-width-one-third">Current data set</th>
+                <th className="govuk-!-width-one-third">New data set</th>
+                <th>Type</th>
+                <th className="govuk-!-text-align-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItemsChunks[currentPage - 1].map(
+                ({ candidate, mapping }) => {
+                  const isPendingUpdate = !!pendingUpdates.find(
+                    update => update.sourceKey === mapping.sourceKey,
+                  );
+                  return (
+                    <tr key={`mapping-${mapping.sourceKey}`}>
+                      <td>{renderSource(mapping.source)}</td>
+                      <td>{renderCandidate(candidate)}</td>
+                      <td>
+                        <Tag colour="grey">Minor</Tag>
+                      </td>
+                      <td className="govuk-!-text-align-right">
+                        {isPendingUpdate ? (
+                          <LoadingSpinner
+                            alert
+                            hideText
+                            inline
+                            size="sm"
+                            text={`Updating auto-mapping for ${mapping.source.label}`}
+                          />
+                        ) : (
+                          <ApiDataSetMappingModal
+                            candidate={candidate}
+                            candidateHint={candidateHint}
+                            groupKey={groupKey}
+                            itemLabel={itemLabel}
+                            mapping={mapping}
+                            newItems={newItems}
+                            renderSourceDetails={renderSourceDetails}
+                            onSubmit={onUpdate}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  );
+                },
+              )}
+            </tbody>
+          </table>
+        </div>
+>>>>>>> 41ee416730 (EES-6564 - Wrap tables in a horizontally scrollable container to improve handling of overflow issues.)
       ) : (
         'No results found.'
       )}

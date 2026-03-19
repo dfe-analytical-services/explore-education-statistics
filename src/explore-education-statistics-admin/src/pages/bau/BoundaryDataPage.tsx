@@ -103,38 +103,40 @@ const BoundaryDataPage = () => {
           Upload boundary data file
         </Link>
 
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Level</th>
-              <th scope="col">Label</th>
-              <th scope="col">Published</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          {boundaryLevels && (
-            <tbody>
-              {boundaryLevels.map(boundaryLevel => (
-                <tr key={boundaryLevel.id}>
-                  <td>{locationLevelsMap[boundaryLevel.level].code}</td>
-                  <td>{boundaryLevel.label}</td>
-                  <td>
-                    <FormattedDate format="d MMM yyyy">
-                      {boundaryLevel.published}
-                    </FormattedDate>
-                  </td>
-                  <td>
-                    <Link
-                      to={`boundary-data/boundary-level/${boundaryLevel.id}`}
-                    >
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
+        <div className="container-with-horizontal-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Level</th>
+                <th scope="col">Label</th>
+                <th scope="col">Published</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            {boundaryLevels && (
+              <tbody>
+                {boundaryLevels.map(boundaryLevel => (
+                  <tr key={boundaryLevel.id}>
+                    <td>{locationLevelsMap[boundaryLevel.level].code}</td>
+                    <td>{boundaryLevel.label}</td>
+                    <td>
+                      <FormattedDate format="d MMM yyyy">
+                        {boundaryLevel.published}
+                      </FormattedDate>
+                    </td>
+                    <td>
+                      <Link
+                        to={`boundary-data/boundary-level/${boundaryLevel.id}`}
+                      >
+                        Edit
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
+          </table>
+        </div>
       </LoadingSpinner>
     </Page>
   );

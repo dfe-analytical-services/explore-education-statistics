@@ -41,44 +41,46 @@ export default function DataFilesTable({
   onStatusChange,
 }: Props) {
   return (
-    <table className={styles.table} data-testid={testId}>
-      <caption className="govuk-table__caption--m">{caption}</caption>
+    <div className="container-with-horizontal-scroll">
+      <table className={styles.table} data-testid={testId}>
+        <caption className="govuk-table__caption--m">{caption}</caption>
 
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Size</th>
-          <th scope="col">Status</th>
-          <th className={styles.actionsColumn} scope="col">
-            Actions
-          </th>
-        </tr>
-      </thead>
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Size</th>
+            <th scope="col">Status</th>
+            <th className={styles.actionsColumn} scope="col">
+              Actions
+            </th>
+          </tr>
+        </thead>
 
-      <tbody>
-        {dataFiles.map(dataFile => (
-          <DataFilesTableRow
-            canUpdateRelease={canUpdateRelease}
-            dataFile={dataFile}
-            key={dataFile.id}
-            publicationId={publicationId}
-            releaseVersionId={releaseVersionId}
-            onConfirmDelete={onDeleteFile}
-            onReplaceFile={onReplaceFile}
-            onStatusChange={onStatusChange}
-          />
-        ))}
-        {dataSetUploads.map(upload => (
-          <DataFilesTableUploadRow
-            canUpdateRelease={canUpdateRelease}
-            dataSetUpload={upload}
-            key={upload.id}
-            releaseVersionId={releaseVersionId}
-            onConfirmDelete={onDeleteUpload}
-            onConfirmImport={onDataSetImport}
-          />
-        ))}
-      </tbody>
-    </table>
+        <tbody>
+          {dataFiles.map(dataFile => (
+            <DataFilesTableRow
+              canUpdateRelease={canUpdateRelease}
+              dataFile={dataFile}
+              key={dataFile.id}
+              publicationId={publicationId}
+              releaseVersionId={releaseVersionId}
+              onConfirmDelete={onDeleteFile}
+              onReplaceFile={onReplaceFile}
+              onStatusChange={onStatusChange}
+            />
+          ))}
+          {dataSetUploads.map(upload => (
+            <DataFilesTableUploadRow
+              canUpdateRelease={canUpdateRelease}
+              dataSetUpload={upload}
+              key={upload.id}
+              releaseVersionId={releaseVersionId}
+              onConfirmDelete={onDeleteUpload}
+              onConfirmImport={onDataSetImport}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

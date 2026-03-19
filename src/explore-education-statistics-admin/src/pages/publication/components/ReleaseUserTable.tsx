@@ -27,83 +27,85 @@ const ReleaseUserTable = ({
   caption,
 }: Props) => {
   return (
-    <table data-testid={testId}>
-      {caption && (
-        <caption className="govuk-visually-hidden">{caption}</caption>
-      )}
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Email</th>
-          {(onUserRemove || onUserInvitesRemove) && (
-            <th className={styles.actions} scope="col">
-              Actions
-            </th>
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {users.map(user => (
-          <tr key={user.userId}>
-            <td>{user.userDisplayName}</td>
-            <td>{user.userEmail}</td>
-            {onUserRemove && (
-              <td>
-                <ModalConfirm
-                  title="Confirm user removal"
-                  triggerButton={
-                    <ButtonText variant="warning">
-                      Remove
-                      <VisuallyHidden> {user.userDisplayName}</VisuallyHidden>
-                    </ButtonText>
-                  }
-                  onConfirm={async () => {
-                    await onUserRemove(user.userId);
-                  }}
-                >
-                  <p>
-                    Are you sure you want to remove{' '}
-                    <strong>{user?.userDisplayName}</strong> from all releases
-                    in this publication?
-                  </p>
-                </ModalConfirm>
-              </td>
+    <div className="container-with-horizontal-scroll">
+      <table data-testid={testId}>
+        {caption && (
+          <caption className="govuk-visually-hidden">{caption}</caption>
+        )}
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            {(onUserRemove || onUserInvitesRemove) && (
+              <th className={styles.actions} scope="col">
+                Actions
+              </th>
             )}
           </tr>
-        ))}
-        {invites.map(invite => (
-          <tr key={invite.email}>
-            <td />
-            <td>
-              {invite.email}
-              <Tag className="govuk-!-margin-left-3">Pending invite</Tag>
-            </td>
-            {onUserInvitesRemove && (
+        </thead>
+        <tbody>
+          {users.map(user => (
+            <tr key={user.userId}>
+              <td>{user.userDisplayName}</td>
+              <td>{user.userEmail}</td>
+              {onUserRemove && (
+                <td>
+                  <ModalConfirm
+                    title="Confirm user removal"
+                    triggerButton={
+                      <ButtonText variant="warning">
+                        Remove
+                        <VisuallyHidden> {user.userDisplayName}</VisuallyHidden>
+                      </ButtonText>
+                    }
+                    onConfirm={async () => {
+                      await onUserRemove(user.userId);
+                    }}
+                  >
+                    <p>
+                      Are you sure you want to remove{' '}
+                      <strong>{user?.userDisplayName}</strong> from all releases
+                      in this publication?
+                    </p>
+                  </ModalConfirm>
+                </td>
+              )}
+            </tr>
+          ))}
+          {invites.map(invite => (
+            <tr key={invite.email}>
+              <td />
               <td>
-                <ModalConfirm
-                  title="Confirm cancelling of user invites"
-                  triggerButton={
-                    <ButtonText variant="warning">
-                      Cancel invite
-                      <VisuallyHidden>{` for ${invite.email}`}</VisuallyHidden>
-                    </ButtonText>
-                  }
-                  onConfirm={async () => {
-                    await onUserInvitesRemove(invite.email);
-                  }}
-                >
-                  <p>
-                    Are you sure you want to cancel all invites to releases
-                    under this publication for email address{' '}
-                    <strong>{invite?.email}</strong>?
-                  </p>
-                </ModalConfirm>
+                {invite.email}
+                <Tag className="govuk-!-margin-left-3">Pending invite</Tag>
               </td>
-            )}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+              {onUserInvitesRemove && (
+                <td>
+                  <ModalConfirm
+                    title="Confirm cancelling of user invites"
+                    triggerButton={
+                      <ButtonText variant="warning">
+                        Cancel invite
+                        <VisuallyHidden>{` for ${invite.email}`}</VisuallyHidden>
+                      </ButtonText>
+                    }
+                    onConfirm={async () => {
+                      await onUserInvitesRemove(invite.email);
+                    }}
+                  >
+                    <p>
+                      Are you sure you want to cancel all invites to releases
+                      under this publication for email address{' '}
+                      <strong>{invite?.email}</strong>?
+                    </p>
+                  </ModalConfirm>
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

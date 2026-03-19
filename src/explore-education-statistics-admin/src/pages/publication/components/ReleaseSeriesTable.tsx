@@ -72,127 +72,129 @@ export default function ReleaseSeriesTable({
   }
 
   return (
-    <table data-testid="release-series">
-      <caption className="govuk-visually-hidden">
-        Table showing the ordered releases for this publication.
-      </caption>
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th className="govuk-!-width-one-half">URL</th>
-          <th>Status</th>
-          {canManageReleaseSeries && <th>Actions</th>}
-        </tr>
-      </thead>
-      <tbody>
-        {releaseSeries.map(seriesItem => (
-          <tr key={seriesItem.id}>
-            <td>
-              <span className="govuk-!-display-block">
-                {seriesItem.description}
-              </span>
-            </td>
-            <td className="govuk-!-width-one-half">
-              {seriesItem.isLegacyLink && (
-                <a
-                  className="govuk-link--no-visited-state"
-                  href={seriesItem.legacyLinkUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {seriesItem.legacyLinkUrl} (opens in new tab)
-                </a>
-              )}
-
-              {!seriesItem.isLegacyLink && seriesItem.isPublished && (
-                <Link
-                  to={`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
-                  className="govuk-link--no-visited-state"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}{' '}
-                  (opens in new tab)
-                </Link>
-              )}
-              {!seriesItem.isLegacyLink &&
-                !seriesItem.isPublished &&
-                `${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
-            </td>
-
-            <td>
-              {seriesItem.isLegacyLink ? (
-                <Tag colour="grey">Legacy release</Tag>
-              ) : (
-                <>
-                  {seriesItem.isLatest && <Tag>Latest release</Tag>}
-                  {!seriesItem.isPublished && <Tag>Unpublished</Tag>}
-                </>
-              )}
-            </td>
-
-            {canManageReleaseSeries && (
+    <div className="container-with-horizontal-scroll">
+      <table data-testid="release-series">
+        <caption className="govuk-visually-hidden">
+          Table showing the ordered releases for this publication.
+        </caption>
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th className="govuk-!-width-one-half">URL</th>
+            <th>Status</th>
+            {canManageReleaseSeries && <th>Actions</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {releaseSeries.map(seriesItem => (
+            <tr key={seriesItem.id}>
               <td>
+                <span className="govuk-!-display-block">
+                  {seriesItem.description}
+                </span>
+              </td>
+              <td className="govuk-!-width-one-half">
                 {seriesItem.isLegacyLink && (
-                  <ButtonGroup className="govuk-!-margin-bottom-0">
-                    <ModalConfirm
-                      confirmText="OK"
-                      title="Edit legacy release"
-                      triggerButton={
-                        <ButtonText>
-                          Edit
-                          <VisuallyHidden>
-                            {` ${seriesItem.description}`}
-                          </VisuallyHidden>
-                        </ButtonText>
-                      }
-                      onConfirm={() => {
-                        history.push(
-                          generatePath<PublicationEditReleaseSeriesLegacyLinkRouteParams>(
-                            publicationEditReleaseSeriesLegacyLinkRoute.path,
-                            {
-                              publicationId,
-                              releaseSeriesItemId: seriesItem.id,
-                            },
-                          ),
-                        );
-                      }}
-                    >
-                      <WarningMessage>
-                        All changes made to legacy releases appear immediately
-                        on the public website.
-                      </WarningMessage>
-                    </ModalConfirm>
+                  <a
+                    className="govuk-link--no-visited-state"
+                    href={seriesItem.legacyLinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {seriesItem.legacyLinkUrl} (opens in new tab)
+                  </a>
+                )}
 
-                    <ModalConfirm
-                      title="Delete legacy release"
-                      triggerButton={
-                        <ButtonText variant="warning">
-                          Delete
-                          <VisuallyHidden>
-                            {` ${seriesItem.description}`}
-                          </VisuallyHidden>
-                        </ButtonText>
-                      }
-                      onConfirm={async () => {
-                        await onDelete(seriesItem.id);
-                      }}
-                    >
-                      <p>
-                        Are you sure you want to delete this legacy release?
-                      </p>
-                      <p>
-                        All changes made to legacy releases appear immediately
-                        on the public website.
-                      </p>
-                    </ModalConfirm>
-                  </ButtonGroup>
+                {!seriesItem.isLegacyLink && seriesItem.isPublished && (
+                  <Link
+                    to={`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
+                    className="govuk-link--no-visited-state"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}{' '}
+                    (opens in new tab)
+                  </Link>
+                )}
+                {!seriesItem.isLegacyLink &&
+                  !seriesItem.isPublished &&
+                  `${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
+              </td>
+
+              <td>
+                {seriesItem.isLegacyLink ? (
+                  <Tag colour="grey">Legacy release</Tag>
+                ) : (
+                  <>
+                    {seriesItem.isLatest && <Tag>Latest release</Tag>}
+                    {!seriesItem.isPublished && <Tag>Unpublished</Tag>}
+                  </>
                 )}
               </td>
-            )}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+
+              {canManageReleaseSeries && (
+                <td>
+                  {seriesItem.isLegacyLink && (
+                    <ButtonGroup className="govuk-!-margin-bottom-0">
+                      <ModalConfirm
+                        confirmText="OK"
+                        title="Edit legacy release"
+                        triggerButton={
+                          <ButtonText>
+                            Edit
+                            <VisuallyHidden>
+                              {` ${seriesItem.description}`}
+                            </VisuallyHidden>
+                          </ButtonText>
+                        }
+                        onConfirm={() => {
+                          history.push(
+                            generatePath<PublicationEditReleaseSeriesLegacyLinkRouteParams>(
+                              publicationEditReleaseSeriesLegacyLinkRoute.path,
+                              {
+                                publicationId,
+                                releaseSeriesItemId: seriesItem.id,
+                              },
+                            ),
+                          );
+                        }}
+                      >
+                        <WarningMessage>
+                          All changes made to legacy releases appear immediately
+                          on the public website.
+                        </WarningMessage>
+                      </ModalConfirm>
+
+                      <ModalConfirm
+                        title="Delete legacy release"
+                        triggerButton={
+                          <ButtonText variant="warning">
+                            Delete
+                            <VisuallyHidden>
+                              {` ${seriesItem.description}`}
+                            </VisuallyHidden>
+                          </ButtonText>
+                        }
+                        onConfirm={async () => {
+                          await onDelete(seriesItem.id);
+                        }}
+                      >
+                        <p>
+                          Are you sure you want to delete this legacy release?
+                        </p>
+                        <p>
+                          All changes made to legacy releases appear immediately
+                          on the public website.
+                        </p>
+                      </ModalConfirm>
+                    </ButtonGroup>
+                  )}
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

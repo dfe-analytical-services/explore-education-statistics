@@ -29,35 +29,37 @@ const PublicationDraftReleases = ({
 
   return (
     <>
-      <table
-        className="dfe-hide-empty-cells"
-        data-testid="publication-draft-releases"
-      >
-        <caption className="govuk-visually-hidden">
-          Table showing the draft releases for this publication.
-        </caption>
-        <thead>
-          <tr>
-            <th className="govuk-!-width-one-third">Release period</th>
-            <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
-              Status
-            </th>
-            <th className="dfe-white-space--nowrap">Errors</th>
-            <th className="dfe-white-space--nowrap">Warnings</th>
-            <th className="govuk-!-width-one-quarter">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {releases.map(release => (
-            <DraftReleaseRow
-              key={release.id}
-              publicationId={publicationId}
-              release={release}
-              onAmendmentDelete={onAmendmentDelete}
-            />
-          ))}
-        </tbody>
-      </table>
+      <div className="container-with-horizontal-scroll">
+        <table
+          className="dfe-hide-empty-cells"
+          data-testid="publication-draft-releases"
+        >
+          <caption className="govuk-visually-hidden">
+            Table showing the draft releases for this publication.
+          </caption>
+          <thead>
+            <tr>
+              <th className="govuk-!-width-one-third">Release period</th>
+              <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
+                Status
+              </th>
+              <th className="dfe-white-space--nowrap">Errors</th>
+              <th className="dfe-white-space--nowrap">Warnings</th>
+              <th className="govuk-!-width-one-quarter">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {releases.map(release => (
+              <DraftReleaseRow
+                key={release.id}
+                publicationId={publicationId}
+                release={release}
+                onAmendmentDelete={onAmendmentDelete}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
       <ButtonGroup
         className={showBackToTopLink ? 'govuk-!-margin-bottom-4' : undefined}
       >

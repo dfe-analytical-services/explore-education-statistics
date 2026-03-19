@@ -72,88 +72,90 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
 
         {dataSetVersions?.length ? (
           <>
-            <table>
-              <caption className="govuk-visually-hidden">
-                Table showing versions of the API data set
-              </caption>
-              <thead>
-                <tr>
-                  <th>Version</th>
-                  <th>Related release</th>
-                  <th>Status</th>
-                  <th className="govuk-!-text-align-right">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dataSetVersions.map((dataSetVersion, index) => {
-                  return (
-                    <tr key={dataSetVersion.id}>
-                      <td>{dataSetVersion.version}</td>
-                      <td>
-                        <Link
-                          to={generatePath<ReleaseRouteParams>(
-                            releaseSummaryRoute.path,
-                            {
-                              publicationId,
-                              releaseVersionId:
-                                dataSetVersion.releaseVersion.id,
-                            },
-                          )}
-                        >
-                          {dataSetVersion.releaseVersion.title}
-                        </Link>
-                      </td>
-
-                      <td>
-                        <TagGroup>
-                          <Tag>{dataSetVersion.status}</Tag>
-                          {currentPage === 1 && index === 0 && (
-                            <Tag>Latest version</Tag>
-                          )}
-                        </TagGroup>
-                      </td>
-
-                      <td className="govuk-!-text-align-right">
-                        {dataSetVersion.version !== '1.0' && (
+            <div className="container-with-horizontal-scroll">
+              <table>
+                <caption className="govuk-visually-hidden">
+                  Table showing versions of the API data set
+                </caption>
+                <thead>
+                  <tr>
+                    <th>Version</th>
+                    <th>Related release</th>
+                    <th>Status</th>
+                    <th className="govuk-!-text-align-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataSetVersions.map((dataSetVersion, index) => {
+                    return (
+                      <tr key={dataSetVersion.id}>
+                        <td>{dataSetVersion.version}</td>
+                        <td>
                           <Link
-                            to={generatePath<ReleaseDataSetChangelogRouteParams>(
-                              releaseApiDataSetChangelogRoute.path,
+                            to={generatePath<ReleaseRouteParams>(
+                              releaseSummaryRoute.path,
                               {
                                 publicationId,
                                 releaseVersionId:
                                   dataSetVersion.releaseVersion.id,
-                                dataSetId,
-                                dataSetVersionId: dataSetVersion.id,
                               },
                             )}
                           >
-                            View changelog
+                            {dataSetVersion.releaseVersion.title}
+                          </Link>
+                        </td>
+
+                        <td>
+                          <TagGroup>
+                            <Tag>{dataSetVersion.status}</Tag>
+                            {currentPage === 1 && index === 0 && (
+                              <Tag>Latest version</Tag>
+                            )}
+                          </TagGroup>
+                        </td>
+
+                        <td className="govuk-!-text-align-right">
+                          {dataSetVersion.version !== '1.0' && (
+                            <Link
+                              to={generatePath<ReleaseDataSetChangelogRouteParams>(
+                                releaseApiDataSetChangelogRoute.path,
+                                {
+                                  publicationId,
+                                  releaseVersionId:
+                                    dataSetVersion.releaseVersion.id,
+                                  dataSetId,
+                                  dataSetVersionId: dataSetVersion.id,
+                                },
+                              )}
+                            >
+                              View changelog
+                              <VisuallyHidden>
+                                {' '}
+                                for version {dataSetVersion.version}
+                              </VisuallyHidden>
+                            </Link>
+                          )}
+
+                          <a
+                            className="govuk-!-margin-left-2"
+                            href={`${publicAppUrl}/data-catalogue/data-set/${dataSetVersion.file.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View live data set
                             <VisuallyHidden>
                               {' '}
                               for version {dataSetVersion.version}
-                            </VisuallyHidden>
-                          </Link>
-                        )}
-
-                        <a
-                          className="govuk-!-margin-left-2"
-                          href={`${publicAppUrl}/data-catalogue/data-set/${dataSetVersion.file.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          View live data set
-                          <VisuallyHidden>
-                            {' '}
-                            for version {dataSetVersion.version}
-                          </VisuallyHidden>{' '}
-                          (opens in new tab)
-                        </a>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                            </VisuallyHidden>{' '}
+                            (opens in new tab)
+                          </a>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
             {paging && (
               <Pagination
                 currentPage={currentPage}

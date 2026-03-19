@@ -126,31 +126,33 @@ const FootnotesList = ({
               summary="See matching criteria"
               className="govuk-!-margin-0"
             >
-              <table className={styles.footnoteSelectionTable}>
-                <caption className="govuk-visually-hidden">
-                  Table showing the subjects, indicators and filters that this
-                  footnote applies to.
-                </caption>
-                <thead>
-                  <tr>
-                    <th>Subjects</th>
-                    <th>Indicators</th>
-                    <th>Filters</th>
-                  </tr>
-                </thead>
-                <tbody className="govuk-body-s">
-                  {Object.entries(footnote.subjects).map(
-                    ([subjectId, selection]) => (
-                      <FootnoteSubjectSelection
-                        key={subjectId}
-                        subjectId={subjectId}
-                        subject={selection}
-                        footnoteMetaGetters={footnoteMetaGetters}
-                      />
-                    ),
-                  )}
-                </tbody>
-              </table>
+              <div className="container-with-horizontal-scroll">
+                <table className={styles.footnoteSelectionTable}>
+                  <caption className="govuk-visually-hidden">
+                    Table showing the subjects, indicators and filters that this
+                    footnote applies to.
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th>Subjects</th>
+                      <th>Indicators</th>
+                      <th>Filters</th>
+                    </tr>
+                  </thead>
+                  <tbody className="govuk-body-s">
+                    {Object.entries(footnote.subjects).map(
+                      ([subjectId, selection]) => (
+                        <FootnoteSubjectSelection
+                          key={subjectId}
+                          subjectId={subjectId}
+                          subject={selection}
+                          footnoteMetaGetters={footnoteMetaGetters}
+                        />
+                      ),
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </Details>
           </div>
         );

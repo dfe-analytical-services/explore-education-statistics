@@ -4,9 +4,11 @@
 
 table {
   @extend .govuk-table;
-  display: block;
+}
+
+.container-with-horizontal-scroll {
+  width: 100%;
   overflow-x: auto;
-  white-space: nowrap;
 }
 
 table,

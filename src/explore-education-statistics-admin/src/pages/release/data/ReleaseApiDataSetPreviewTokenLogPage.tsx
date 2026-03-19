@@ -84,86 +84,94 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
         </div>
 
         {previewTokens?.length ? (
-          <table>
-            <caption>
-              <VisuallyHidden>
-                Table showing preview tokens for the API data set
-              </VisuallyHidden>
-            </caption>
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>User</th>
-                <th>Activates</th>
-                <th>Status</th>
-                <th>Expires</th>
-                <th className="govuk-!-text-align-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {previewTokens.map(token => {
-                return (
-                  <tr key={token.id}>
-                    <td>{token.label}</td>
-                    <td>{token.createdByEmail}</td>
-                    <td>
-                      <FormattedDate usingUkTime format="d MMMM yyyy, HH:mm">
-                        {token.activates}
-                      </FormattedDate>{' '}
-                      (UK time)
-                    </td>
-                    <td>
-                      <Tag colour={getPreviewTokenTagColour(token.status)}>
-                        {token.status}
-                      </Tag>
-                    </td>
-                    <td>
-                      <FormattedDate usingUkTime format="d MMMM yyyy, HH:mm">
-                        {token.expires}
-                      </FormattedDate>{' '}
-                      (UK time)
-                    </td>
-                    <td className="govuk-!-text-align-right">
-                      {(token.status === 'Active' ||
-                        token.status === 'Pending') && (
-                        <>
-                          <Link
-                            to={generatePath<ReleaseDataSetPreviewTokenRouteParams>(
-                              releaseApiDataSetPreviewTokenRoute.path,
-                              {
-                                publicationId,
-                                releaseVersionId,
-                                dataSetId,
-                                previewTokenId: token.id,
-                              },
-                            )}
-                          >
-                            View details
-                            <VisuallyHidden> for {token.label}</VisuallyHidden>
-                          </Link>
-                          <ModalConfirm
-                            title="Revoke preview token"
-                            triggerButton={
-                              <ButtonText className="govuk-!-margin-left-2">
-                                Revoke
-                                <VisuallyHidden> {token.label}</VisuallyHidden>
-                              </ButtonText>
-                            }
-                            onConfirm={() => handleRevoke(token.id)}
-                          >
-                            <p>
-                              Are you sure you want to revoke this preview
-                              token?
-                            </p>
-                          </ModalConfirm>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="container-with-horizontal-scroll">
+            <table>
+              <caption>
+                <VisuallyHidden>
+                  Table showing preview tokens for the API data set
+                </VisuallyHidden>
+              </caption>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>User</th>
+                  <th>Activates</th>
+                  <th>Status</th>
+                  <th>Expires</th>
+                  <th className="govuk-!-text-align-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {previewTokens.map(token => {
+                  return (
+                    <tr key={token.id}>
+                      <td>{token.label}</td>
+                      <td>{token.createdByEmail}</td>
+                      <td>
+                        <FormattedDate usingUkTime format="d MMMM yyyy, HH:mm">
+                          {token.activates}
+                        </FormattedDate>{' '}
+                        (UK time)
+                      </td>
+                      <td>
+                        <Tag colour={getPreviewTokenTagColour(token.status)}>
+                          {token.status}
+                        </Tag>
+                      </td>
+                      <td>
+                        <FormattedDate usingUkTime format="d MMMM yyyy, HH:mm">
+                          {token.expires}
+                        </FormattedDate>{' '}
+                        (UK time)
+                      </td>
+                      <td className="govuk-!-text-align-right">
+                        {(token.status === 'Active' ||
+                          token.status === 'Pending') && (
+                          <>
+                            <Link
+                              to={generatePath<ReleaseDataSetPreviewTokenRouteParams>(
+                                releaseApiDataSetPreviewTokenRoute.path,
+                                {
+                                  publicationId,
+                                  releaseVersionId,
+                                  dataSetId,
+                                  previewTokenId: token.id,
+                                },
+                              )}
+                            >
+                              View details
+                              <VisuallyHidden>
+                                {' '}
+                                for {token.label}
+                              </VisuallyHidden>
+                            </Link>
+                            <ModalConfirm
+                              title="Revoke preview token"
+                              triggerButton={
+                                <ButtonText className="govuk-!-margin-left-2">
+                                  Revoke
+                                  <VisuallyHidden>
+                                    {' '}
+                                    {token.label}
+                                  </VisuallyHidden>
+                                </ButtonText>
+                              }
+                              onConfirm={() => handleRevoke(token.id)}
+                            >
+                              <p>
+                                Are you sure you want to revoke this preview
+                                token?
+                              </p>
+                            </ModalConfirm>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p>No preview tokens have been created.</p>
         )}

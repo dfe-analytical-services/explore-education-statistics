@@ -35,43 +35,45 @@ export default function DataFilesReplacementTable({
   onReplacementStatusChange,
 }: Props) {
   return (
-    <table className={styles.table} data-testid={testId}>
-      <caption className="govuk-table__caption--m">{caption}</caption>
+    <div className="container-with-horizontal-scroll">
+      <table className={styles.table} data-testid={testId}>
+        <caption className="govuk-table__caption--m">{caption}</caption>
 
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Size</th>
-          <th scope="col">Replacement status</th>
-          <th className={styles.actionsColumn} scope="col">
-            Actions
-          </th>
-        </tr>
-      </thead>
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Size</th>
+            <th scope="col">Replacement status</th>
+            <th className={styles.actionsColumn} scope="col">
+              Actions
+            </th>
+          </tr>
+        </thead>
 
-      <tbody>
-        {dataFiles.map(dataFile => (
-          <DataFileReplacementTableRow // These are rows for data sets that have passed the screener and been/being imported
-            dataFile={dataFile}
-            key={dataFile.title}
-            publicationId={publicationId}
-            releaseVersionId={releaseVersionId}
-            onConfirmAction={onConfirmReplacement}
-            onReplacementStatusChange={onReplacementStatusChange}
-          />
-        ))}
-        {dataSetUploads.map((upload, index) => (
-          <DataFilesTableUploadRow // These are rows for data sets that have been put through the screener
-            canUpdateRelease={canUpdateRelease}
-            dataSetUpload={upload}
-            key={upload.id}
-            releaseVersionId={releaseVersionId}
-            onConfirmDelete={onDeleteUpload}
-            onConfirmImport={onDataSetImport}
-            testId={`data-set-upload-row-${index + 1}`}
-          />
-        ))}
-      </tbody>
-    </table>
+        <tbody>
+          {dataFiles.map(dataFile => (
+            <DataFileReplacementTableRow // These are rows for data sets that have passed the screener and been/being imported
+              dataFile={dataFile}
+              key={dataFile.title}
+              publicationId={publicationId}
+              releaseVersionId={releaseVersionId}
+              onConfirmAction={onConfirmReplacement}
+              onReplacementStatusChange={onReplacementStatusChange}
+            />
+          ))}
+          {dataSetUploads.map((upload, index) => (
+            <DataFilesTableUploadRow // These are rows for data sets that have been put through the screener
+              canUpdateRelease={canUpdateRelease}
+              dataSetUpload={upload}
+              key={upload.id}
+              releaseVersionId={releaseVersionId}
+              onConfirmDelete={onDeleteUpload}
+              onConfirmImport={onDataSetImport}
+              testId={`data-set-upload-row-${index + 1}`}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

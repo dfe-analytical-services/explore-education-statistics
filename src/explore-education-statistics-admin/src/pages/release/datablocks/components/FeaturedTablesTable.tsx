@@ -100,47 +100,49 @@ export default function FeaturedTablesTable({
         )}
       </div>
 
-      <table data-testid="featuredTables">
-        <thead>
-          <tr>
-            <th scope="col" className="govuk-!-width-one-quarter">
-              Data block name
-            </th>
-            <th scope="col">Has chart</th>
-            <th scope="col">In content</th>
-            <th scope="col">Featured table name</th>
-            <th scope="col">Created date</th>
-            <th scope="col" className="govuk-table__header--actions">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentFeaturedTables.map(featuredTable => {
-            const dataBlock = dataBlocks.find(
-              block => block.id === featuredTable.dataBlockId,
-            );
-            return dataBlock ? (
-              <FeaturedTablesRow
-                canUpdateRelease={canUpdateRelease}
-                dataBlock={dataBlock}
-                featuredTable={featuredTable}
-                key={featuredTable.id}
-                link={generatePath<ReleaseDataBlockRouteParams>(
-                  releaseDataBlockEditRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    dataBlockId: featuredTable.dataBlockId,
-                  },
-                )}
-                releaseVersionId={releaseVersionId}
-                handleDeleteConfirm={handleDeleteConfirm}
-              />
-            ) : null;
-          })}
-        </tbody>
-      </table>
+      <div className="container-with-horizontal-scroll">
+        <table data-testid="featuredTables">
+          <thead>
+            <tr>
+              <th scope="col" className="govuk-!-width-one-quarter">
+                Data block name
+              </th>
+              <th scope="col">Has chart</th>
+              <th scope="col">In content</th>
+              <th scope="col">Featured table name</th>
+              <th scope="col">Created date</th>
+              <th scope="col" className="govuk-table__header--actions">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentFeaturedTables.map(featuredTable => {
+              const dataBlock = dataBlocks.find(
+                block => block.id === featuredTable.dataBlockId,
+              );
+              return dataBlock ? (
+                <FeaturedTablesRow
+                  canUpdateRelease={canUpdateRelease}
+                  dataBlock={dataBlock}
+                  featuredTable={featuredTable}
+                  key={featuredTable.id}
+                  link={generatePath<ReleaseDataBlockRouteParams>(
+                    releaseDataBlockEditRoute.path,
+                    {
+                      publicationId,
+                      releaseVersionId,
+                      dataBlockId: featuredTable.dataBlockId,
+                    },
+                  )}
+                  releaseVersionId={releaseVersionId}
+                  handleDeleteConfirm={handleDeleteConfirm}
+                />
+              ) : null;
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

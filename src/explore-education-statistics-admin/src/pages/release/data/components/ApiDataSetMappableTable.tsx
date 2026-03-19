@@ -60,6 +60,7 @@ export default function ApiDataSetMappableTable({
   const tableId = mappableTableId(groupKey ?? 'default');
 
   return (
+<<<<<<< HEAD
     <table
       className="dfe-table--vertical-align-middle dfe-table--row-highlights"
       id={tableId}
@@ -98,87 +99,131 @@ export default function ApiDataSetMappableTable({
           const isPendingUpdate = pendingUpdates.some(
             update => update.sourceKey === mapping.sourceKey,
           );
+=======
+    <div className="container-with-horizontal-scroll">
+      <table
+        className="dfe-table--vertical-align-middle dfe-table--row-highlights"
+        id={tableId}
+        data-testid={tableId}
+      >
+        <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
+          {groupLabel}{' '}
+          <TagGroup className="govuk-!-margin-left-2">
+            {totalUnmapped > 0 && (
+              <Tag colour="red">
+                {`${totalUnmapped} unmapped ${
+                  totalUnmapped > 1 ? itemPluralLabel : itemLabel
+                } `}
+              </Tag>
+            )}
+            {totalManuallyMapped > 0 && (
+              <Tag colour="blue">
+                {`${totalManuallyMapped} mapped ${
+                  totalManuallyMapped > 1 ? itemPluralLabel : itemLabel
+                } `}
+              </Tag>
+            )}
+          </TagGroup>
+          {renderCaptionEnd}
+        </caption>
+        <thead>
+          <tr>
+            <th className="govuk-!-width-one-third">Current data set</th>
+            <th className="govuk-!-width-one-third">New data set</th>
+            <th>Type</th>
+            <th className="govuk-!-text-align-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.values(mappableItems).map(({ candidate, mapping }) => {
+            const isPendingUpdate = pendingUpdates.some(
+              update => update.sourceKey === mapping.sourceKey,
+            );
+>>>>>>> 41ee416730 (EES-6564 - Wrap tables in a horizontally scrollable container to improve handling of overflow issues.)
 
-          const isMajorMapping =
-            candidate && candidateIsMajorMapping
-              ? candidateIsMajorMapping(candidate, mapping)
-              : false;
+            const isMajorMapping =
+              candidate && candidateIsMajorMapping
+                ? candidateIsMajorMapping(candidate, mapping)
+                : false;
 
-          return (
-            <tr
-              key={`mapping-${mapping.sourceKey}`}
-              className={classNames({
-                'rowHighlight--alert': mapping.type === 'AutoNone',
-              })}
-            >
-              <td>{renderSource(mapping.source)}</td>
-              <td>
-                {!candidate ? (
-                  <>
-                    {mapping.type === 'AutoNone' ? (
-                      <Tag colour="red">Unmapped</Tag>
-                    ) : (
-                      'No mapping available'
-                    )}
-                  </>
-                ) : (
-                  <>{renderCandidate(candidate)}</>
-                )}
-              </td>
-              <td>
-                <Tag colour={getUpdateTagColour(mapping.type, isMajorMapping)}>
-                  {getUpdateTagText(mapping.type, isMajorMapping)}
-                </Tag>
-              </td>
-              <td className="govuk-!-text-align-right">
-                {isPendingUpdate ? (
-                  <LoadingSpinner
-                    alert
-                    hideText
-                    inline
-                    size="sm"
-                    text={`Updating mapping for ${mapping.source.label}`}
-                  />
-                ) : (
-                  <>
-                    {mapping.type !== 'ManualNone' && (
-                      <ButtonText
-                        onClick={async () => {
-                          await onUpdate({
-                            groupKey,
-                            previousCandidate: candidate,
-                            previousMapping: mapping,
-                            sourceKey: mapping.sourceKey,
-                            type: 'ManualNone',
-                          });
-                        }}
-                      >
-                        No mapping
-                        <VisuallyHidden>
-                          {' '}
-                          for {mapping.source.label}
-                        </VisuallyHidden>
-                      </ButtonText>
-                    )}
-
-                    <ApiDataSetMappingModal
-                      candidate={candidate}
-                      candidateHint={candidateHint}
-                      groupKey={groupKey}
-                      itemLabel={itemLabel}
-                      mapping={mapping}
-                      newItems={newItems}
-                      renderSourceDetails={renderSourceDetails}
-                      onSubmit={onUpdate}
+            return (
+              <tr
+                key={`mapping-${mapping.sourceKey}`}
+                className={classNames({
+                  'rowHighlight--alert': mapping.type === 'AutoNone',
+                })}
+              >
+                <td>{renderSource(mapping.source)}</td>
+                <td>
+                  {!candidate ? (
+                    <>
+                      {mapping.type === 'AutoNone' ? (
+                        <Tag colour="red">Unmapped</Tag>
+                      ) : (
+                        'No mapping available'
+                      )}
+                    </>
+                  ) : (
+                    <>{renderCandidate(candidate)}</>
+                  )}
+                </td>
+                <td>
+                  <Tag
+                    colour={getUpdateTagColour(mapping.type, isMajorMapping)}
+                  >
+                    {getUpdateTagText(mapping.type, isMajorMapping)}
+                  </Tag>
+                </td>
+                <td className="govuk-!-text-align-right">
+                  {isPendingUpdate ? (
+                    <LoadingSpinner
+                      alert
+                      hideText
+                      inline
+                      size="sm"
+                      text={`Updating mapping for ${mapping.source.label}`}
                     />
-                  </>
-                )}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+                  ) : (
+                    <>
+                      {mapping.type !== 'ManualNone' && (
+                        <ButtonText
+                          onClick={async () => {
+                            await onUpdate({
+                              groupKey,
+                              previousCandidate: candidate,
+                              previousMapping: mapping,
+                              sourceKey: mapping.sourceKey,
+                              type: 'ManualNone',
+                            });
+                          }}
+                        >
+                          No mapping
+                          <VisuallyHidden>
+                            {' '}
+                            for {mapping.source.label}
+                          </VisuallyHidden>
+                        </ButtonText>
+                      )}
+
+                      <ApiDataSetMappingModal
+                        candidate={candidate}
+                        candidateHint={candidateHint}
+                        groupKey={groupKey}
+                        itemLabel={itemLabel}
+                        mapping={mapping}
+                        newItems={newItems}
+                        renderSourceDetails={renderSourceDetails}
+                        onSubmit={onUpdate}
+                      />
+                    </>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

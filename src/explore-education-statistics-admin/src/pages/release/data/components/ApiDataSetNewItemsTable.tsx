@@ -19,32 +19,34 @@ export default function ApiDataSetNewItemsTable({
   renderItem,
 }: Props) {
   return (
-    <table data-testid={`new-items-table-${groupKey ?? 'default'}`}>
+    <div className="container-with-horizontal-scroll">
+      <table data-testid={`new-items-table-${groupKey}`}>
       <caption className="govuk-visually-hidden">
         {`Table showing new ${itemPluralLabel}${
           groupLabel ? ` for ${groupLabel}` : ''
         }`}
-      </caption>
-      <thead>
-        <tr>
-          <th className="govuk-!-width-one-third">Current data set</th>
-          <th className="govuk-!-width-one-third">New data set</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {newItems.map(item => {
-          return (
-            <tr key={item.key}>
-              <td>Not applicable</td>
-              <td>{renderItem(item)}</td>
-              <td>
-                <Tag colour="grey">Minor</Tag>
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+        </caption>
+        <thead>
+          <tr>
+            <th className="govuk-!-width-one-third">Current data set</th>
+            <th className="govuk-!-width-one-third">New data set</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {newItems.map(item => {
+            return (
+              <tr key={item.key}>
+                <td>Not applicable</td>
+                <td>{renderItem(item)}</td>
+                <td>
+                  <Tag colour="grey">Minor</Tag>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
