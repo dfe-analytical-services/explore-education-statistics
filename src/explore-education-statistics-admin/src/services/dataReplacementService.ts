@@ -111,6 +111,49 @@ export interface ApiDataSetVersionPlan {
   valid: boolean;
 }
 
+type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet';
+
+interface Mapping<TSource> {
+  type: MappingType;
+  source: TSource;
+  candidateKey?: string;
+}
+
+export type UpdateMappingPayload = {
+  sourceKey: string;
+  candidateKey?: string;
+};
+export type UpdateMappingPayloadMultiple = UpdateMappingPayload[];
+
+interface MappingsPlan<TSource> {
+  candidates: Dictionary<TSource>;
+  mappings: Dictionary<Mapping<TSource>>;
+}
+
+export type MappingWithKey<TSource> = { sourceKey: string } & Mapping<TSource>;
+
+interface IndicatorSource {
+  label: string;
+}
+
+export type IndicatorCandidate = IndicatorSource;
+
+export type IndicatorMapping = Mapping<IndicatorSource>;
+export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;
+
+export type IndicatorsMappingsPlan = MappingsPlan<IndicatorSource>;
+
+export type PlanMappings = {
+  indicators: IndicatorsMappingsPlan;
+  // filters: FiltersMappingsPlan;
+  // locations: LocationsMappingsPlan;
+};
+
+export interface IndicatorsMapping {
+  candidates: Dictionary<IndicatorCandidate>;
+  mappings: Dictionary<IndicatorMapping>;
+}
+
 export interface DataReplacementPlan {
   originalSubjectId: string;
   replacementSubjectId: string;
@@ -118,16 +161,83 @@ export interface DataReplacementPlan {
   footnotes: FootnoteReplacementPlan[];
   apiDataSetVersionPlan: ApiDataSetVersionPlan;
   valid: boolean;
+  mappings: PlanMappings;
 }
 
 const dataReplacementService = {
-  getReplacementPlan(
+  async getReplacementPlan(
     releaseVersionId: string,
     originalFileId: string,
   ): Promise<DataReplacementPlan> {
-    return client.get(
+    // TODO 6913
+    const dummyIndicatorsMappings: IndicatorsMapping = {
+      mappings: {
+        enrolments_again: {
+          source: {
+            label: 'Enrolments_Again',
+          },
+          type: 'Unset',
+        },
+        enrolments: {
+          source: {
+            label: 'Enrolments',
+          },
+          type: 'Unset',
+        },
+        sess_possible: {
+          source: {
+            label: 'Number of possible sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_possible',
+        },
+        sess_authorised: {
+          source: {
+            label: 'Number of authorised sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_authorised',
+        },
+        sess_unauthorised: {
+          source: {
+            label: 'Number of unauthorised sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_unauthorised',
+        },
+        sess_unauthorised_percent: {
+          source: {
+            label: 'Percentage of unauthorised sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_unauthorised_percent',
+        },
+      },
+      candidates: {
+        sess_possible: {
+          label: 'Number of possible sessions',
+        },
+        sess_authorised: {
+          label: 'Number of authorised sessions',
+        },
+        sess_unauthorised: {
+          label: 'Number of unauthorised sessions',
+        },
+        number_of_enrolments_again: {
+          label: 'Number of enrolments again',
+        },
+        number_of_enrolments: {
+          label: 'Number of enrolments',
+        },
+        sess_unauthorised_percent: {
+          label: 'Percentage of unauthorised sessions',
+        },
+      },
+    };
+    const plan: DataReplacementPlan = await client.get(
       `releases/${releaseVersionId}/data/${originalFileId}/replacement-plan`,
     );
+    return { ...plan, mappings: { indicators: dummyIndicatorsMappings } };
   },
   replaceData(
     releaseVersionId: string,
