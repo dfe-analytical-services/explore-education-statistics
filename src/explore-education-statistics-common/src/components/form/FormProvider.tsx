@@ -38,6 +38,29 @@ export interface FormProviderProps<TFormValues extends FieldValues> {
   validationSchema?: ObjectSchema<TFormValues> & Schema<TFormValues>;
 }
 
+const resetFileInputDropZones = (
+  containerReference: React.RefObject<HTMLDivElement | null>,
+) => {
+  // Visually, the enhanced file uploads don't seem to reset after `onSubmit` method completes
+  // The UI still displays the files submitted. When you re-submit these files in the form again,
+  // it throws a 'no files attached' error. The logic below resets the enhanced file uploads so
+  // that it displays the default view for when there are no files attached.
+  const dropZones =
+    containerReference.current?.querySelectorAll('.govuk-drop-zone');
+  dropZones?.forEach(dropZone => {
+    const button = dropZone.querySelector('.govuk-file-upload-button');
+    if (button) {
+      button.classList.add('govuk-file-upload-button--empty');
+      const statusSpan = button.querySelector(
+        '.govuk-file-upload-button__status',
+      );
+      if (statusSpan) {
+        statusSpan.textContent = 'No file chosen';
+      }
+    }
+  });
+};
+
 export default function FormProvider<TFormValues extends FieldValues>({
   children,
   enableReinitialize,
@@ -60,6 +83,8 @@ export default function FormProvider<TFormValues extends FieldValues>({
   });
 
   const { handleError } = useErrorControl();
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const previousInitialValues = useRef(initialValues);
 
@@ -87,6 +112,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
           await onValid(values, event);
           if (resetAfterSubmit) {
             form.reset();
+            resetFileInputDropZones(containerRef);
           }
         } catch (error) {
           if (isServerValidationError(error) && error.response?.data) {
@@ -158,7 +184,9 @@ export default function FormProvider<TFormValues extends FieldValues>({
 
   return (
     <RHFFormProvider {...providerProps}>
-      {typeof children === 'function' ? children(providerProps) : children}
+      <div ref={containerRef}>
+        {typeof children === 'function' ? children(providerProps) : children}
+      </div>
     </RHFFormProvider>
   );
 }

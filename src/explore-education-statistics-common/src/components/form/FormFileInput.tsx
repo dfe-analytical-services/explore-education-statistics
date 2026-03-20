@@ -46,24 +46,26 @@ const FormFileInput = ({
         </div>
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-      <input
-        aria-describedby={
-          classNames({
-            [`${id}-error`]: !!error,
-            [`${id}-hint`]: !!hint,
-          }) || undefined
-        }
-        className="govuk-file-upload"
-        id={id}
-        type="file"
-        disabled={disabled}
-        name={name}
-        accept={accept}
-        onBlur={onBlur}
-        onChange={onChange}
-        onClick={onClick}
-        onKeyPress={onKeyPress}
-      />
+      <div className="govuk-drop-zone" data-module="govuk-file-upload">
+        <input
+          aria-describedby={
+            classNames({
+              [`${id}-error`]: !!error,
+              [`${id}-hint`]: !!hint,
+            }) || undefined
+          }
+          className="govuk-file-upload"
+          id={id}
+          type="file"
+          disabled={disabled}
+          name={name}
+          accept={accept}
+          onBlur={onBlur}
+          onChange={onChange}
+          onClick={onClick}
+          onKeyPress={onKeyPress}
+        />
+      </div>
     </>
   );
 };
