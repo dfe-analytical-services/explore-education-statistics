@@ -19,7 +19,9 @@ public class ServiceAnnouncementController(IHubContext<NotificationHub> hubConte
         CancellationToken cancellationToken
     )
     {
-        await hubContext.Clients.AllExcept(connectionId).SendAsync("ServiceAnnouncement", message, cancellationToken);
+        await hubContext
+            .Clients.AllExcept(connectionId)
+            .SendAsync("ServiceAnnouncement", message, DateTimeOffset.UtcNow, cancellationToken);
 
         return Ok();
     }

@@ -21,6 +21,7 @@ public class PublishingCompletionServiceTests
     private readonly RedirectsCacheServiceMockBuilder _redirectsCacheService = new();
     private readonly DataSetPublishingServiceMockBuilder _dataSetPublishingService = new();
     private readonly PublisherEventRaiserMockBuilder _publisherEventRaiser = new();
+    private readonly EducationInNumbersServiceMockBuilder _educationInNumbersService = new();
 
     /// <summary>
     /// Ensure that GetSUT is called immediate before the ACT phase.
@@ -38,7 +39,8 @@ public class PublishingCompletionServiceTests
             _releaseService.Build(),
             _redirectsCacheService.Build(),
             _dataSetPublishingService.Build(),
-            _publisherEventRaiser.Build()
+            _publisherEventRaiser.Build(),
+            _educationInNumbersService.Build()
         );
 
     public class BasicTests : PublishingCompletionServiceTests
@@ -846,6 +848,23 @@ public class PublishingCompletionServiceTests
                     _publisherEventRaiser.Assert.ReleaseVersionPublishedEventWasRaised(info =>
                         info.PublicationId == _releaseVersion1.Release.PublicationId && info.IsPublicationArchived
                     );
+                }
+            }
+
+            public class EducationInNumbersServiceTests : ReadyTests
+            {
+                [Fact]
+                public async Task EinTilesUpdated()
+                {
+                    // ARRANGE
+                    var readyKeys = SetupHappyPath();
+                    var sut = GetSut();
+
+                    // ACT
+                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
+
+                    // ASSERT
+                    _educationInNumbersService.Assert.UpdateEinTilesCalled();
                 }
             }
 

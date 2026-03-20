@@ -2,6 +2,7 @@ import ReleasePageContentSection from '@common/modules/find-statistics/component
 import { Contact } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
 import React from 'react';
+import { DfeOpeningHours, DfeTelephoneLine } from './ContactUsSection';
 
 export const contactUsNavItem = {
   id: 'contact-us-section',
@@ -99,13 +100,11 @@ const ContactUsSection = ({
             If you have a general enquiry about the Department for Education
             (DfE) or education:
           </p>
-          <p>Telephone: 037 0000 2288</p>
+          <p>{DfeTelephoneLine}</p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             Opening times
           </h3>
-          <p className="govuk-!-margin-top-0">
-            Monday to Friday from 9.30am to 5pm (excluding bank holidays)
-          </p>
+          <p className="govuk-!-margin-top-0">{DfeOpeningHours}</p>
         </>
       )}
     </ReleasePageContentSection>

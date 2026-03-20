@@ -209,14 +209,6 @@ public class TableBuilderService : ITableBuilderService
 
         var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
 
-        if (
-            query.AllowCropping
-            && await matchedObservationIds.CountAsync(cancellationToken) > _options.CroppedTableMaxRows
-        )
-        {
-            matchedObservationIds = matchedObservationIds.Take(_options.CroppedTableMaxRows);
-        }
-
         var results = _statisticsDbContext
             .Observation.AsNoTracking()
             .Include(o => o.Location)

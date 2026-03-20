@@ -73,7 +73,7 @@ describe('PublicationReleaseListPage', () => {
     expect(row1Link).toBeInTheDocument();
     expect(row1Link).toHaveAttribute(
       'href',
-      '/find-statistics/publication-slug/test-release-slug-3?redesign=true', // TODO EES-6449 remove query param when live
+      '/find-statistics/publication-slug/test-release-slug-3',
     );
     expect(
       within(row1Cells[1]).getByText('10 August 2025'),
@@ -91,7 +91,7 @@ describe('PublicationReleaseListPage', () => {
     expect(row2link).toBeInTheDocument();
     expect(row2link).toHaveAttribute(
       'href',
-      '/find-statistics/publication-slug/test-release-slug-2?redesign=true', // TODO EES-6449 remove query param when live
+      '/find-statistics/publication-slug/test-release-slug-2',
     );
     expect(within(row2Cells[1]).getByText('1 July 2025')).toBeInTheDocument();
     expect(

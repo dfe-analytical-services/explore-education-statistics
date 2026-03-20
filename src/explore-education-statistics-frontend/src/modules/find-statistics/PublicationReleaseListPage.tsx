@@ -86,7 +86,7 @@ const PublicationReleaseListPage = ({
                   <tr key={release.releaseId}>
                     <td>
                       <Link
-                        to={`/find-statistics/${publicationSummary.slug}/${release.slug}?redesign=true`} // TODO EES-6449 remove query param when live
+                        to={`/find-statistics/${publicationSummary.slug}/${release.slug}`}
                       >
                         {release.title}
                       </Link>

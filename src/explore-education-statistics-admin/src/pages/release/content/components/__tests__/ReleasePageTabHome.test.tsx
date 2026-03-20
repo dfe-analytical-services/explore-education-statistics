@@ -52,7 +52,15 @@ describe('ReleasePageTabHome', () => {
 
   test('renders summary block and publication summary on mobile with updates info', () => {
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabHome />);
+    renderWithContext(
+      <ReleasePageTabHome />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          lastUpdated: '2025-08-10T09:30:00+01:00',
+          publishedDisplayDate: '2025-08-10T09:30:00+01:00',
+        }),
+      }),
+    );
 
     expect(
       screen.getByRole('heading', {
@@ -91,7 +99,8 @@ describe('ReleasePageTabHome', () => {
       <ReleasePageTabHome />,
       generateReleaseContent({
         release: generateEditableRelease({
-          published: '2025-08-10T09:30:00+01:00',
+          lastUpdated: '2025-08-10T09:30:00+01:00',
+          publishedDisplayDate: '2025-08-10T09:30:00+01:00',
           updates: [],
         }),
       }),
@@ -156,6 +165,32 @@ describe('ReleasePageTabHome', () => {
         level: 2,
         name: 'Background information',
       }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders warning section if warning content exists', () => {
+    renderWithContext(<ReleasePageTabHome />);
+
+    expect(screen.getByTestId('release-warning-block')).toBeInTheDocument();
+  });
+
+  test('does not render warning section if no warning content', () => {
+    renderWithContext(
+      <ReleasePageTabHome />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          warningSection: {
+            id: 'warning-section-id',
+            content: [],
+            heading: 'Warning block heading',
+            order: 0,
+          },
+        }),
+      }),
+    );
+
+    expect(
+      screen.queryByTestId('release-warning-block'),
     ).not.toBeInTheDocument();
   });
 

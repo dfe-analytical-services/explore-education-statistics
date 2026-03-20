@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -248,7 +247,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
         services.AddCors();
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         AddPersistenceHelper<StatisticsDbContext>(services);
         AddPersistenceHelper<ContentDbContext>(services);

@@ -105,6 +105,38 @@ describe('PublicationReleasePageHome', () => {
     mockIsMedia = false;
   });
 
+  test('renders warning section if warning content exists', () => {
+    render(
+      <PublicationReleasePageHome
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={testReleaseVersionSummary}
+        homeContent={testReleaseHomeContent}
+      />,
+    );
+
+    expect(screen.getByTestId('release-warning-block')).toBeInTheDocument();
+  });
+
+  test('does not render warning section if no warning content', () => {
+    render(
+      <PublicationReleasePageHome
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={testReleaseVersionSummary}
+        homeContent={{
+          ...testReleaseHomeContent,
+          warningSection: {
+            ...testReleaseHomeContent.warningSection,
+            content: [],
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.queryByTestId('release-warning-block'),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders summary section if summary content exists', async () => {
     render(
       <PublicationReleasePageHome

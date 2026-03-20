@@ -125,7 +125,7 @@ Add comment to Test section one
     ${block}    user starts editing accordion section text block    Test section one    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    user presses keys    CTRL+a
+    user selects all text
     user adds comment to selected text    ${block}    Test comment 1
     user checks list item contains    testid:comments-unresolved    1    Test comment 1    ${block}
     user saves autosaving text block    ${block}

@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
@@ -31,6 +32,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using OrganisationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.OrganisationViewModel;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -79,10 +81,16 @@ public class ReleaseVersionService(
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .AnyAsync();
 
-                return mapper.Map<ReleaseVersionViewModel>(releaseVersion) with
-                {
-                    PreReleaseUsersOrInvitesAdded = prereleaseRolesAdded,
-                };
+                var publishingOrganisations = releaseVersion
+                    .PublishingOrganisations.OrderBy(o => o.Title)
+                    .Select(OrganisationViewModel.FromOrganisation)
+                    .ToList();
+
+                return ReleaseVersionViewModel.FromReleaseVersion(
+                    releaseVersion,
+                    prereleaseRolesAdded,
+                    publishingOrganisations
+                );
             });
     }
 
@@ -272,12 +280,15 @@ public class ReleaseVersionService(
     {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
-        var releaseRolesToRemove = await userReleaseRoleRepository
-            .Query(ResourceRoleFilter.All)
-            .WhereForReleaseVersion(releaseVersion.Id)
-            .ToListAsync(cancellationToken);
+        var releaseRoleIdsToRemove = (
+            await userReleaseRoleRepository
+                .Query(ResourceRoleFilter.All)
+                .WhereForReleaseVersion(releaseVersion.Id)
+                .Select(urr => urr.Id)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
 
-        await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove, cancellationToken);
+        await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove, cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -473,10 +484,25 @@ public class ReleaseVersionService(
             {
                 return await releaseVersions
                     .ToAsyncEnumerable()
-                    .SelectAwait(async releaseVersion =>
-                        mapper.Map<ReleaseVersionSummaryViewModel>(releaseVersion) with
+                    .Select(
+                        async (releaseVersion, ct) =>
                         {
-                            Permissions = await PermissionsUtils.GetReleasePermissions(userService, releaseVersion),
+                            await context
+                                .ReleaseVersions.Entry(releaseVersion)
+                                .Reference(rv => rv.Release)
+                                .LoadAsync(cancellationToken: ct);
+
+                            var permissions = await PermissionsUtils.GetReleasePermissions(userService, releaseVersion);
+
+                            var publicationSummary = new PublicationSummaryViewModel(
+                                releaseVersion.Release.Publication
+                            );
+
+                            return ReleaseVersionSummaryViewModel.FromReleaseVersion(
+                                releaseVersion,
+                                permissions,
+                                publicationSummary
+                            );
                         }
                     )
                     .ToListAsync();
@@ -514,7 +540,14 @@ public class ReleaseVersionService(
             )
             .ToListAsync();
 
-        return mapper.Map<List<ReleaseVersionSummaryViewModel>>(releaseVersionsForApproval);
+        return releaseVersionsForApproval
+            .Select(releaseVersion =>
+                ReleaseVersionSummaryViewModel.FromReleaseVersion(
+                    releaseVersion,
+                    publicationSummary: new PublicationSummaryViewModel(releaseVersion.Release.Publication)
+                )
+            )
+            .ToList();
     }
 
     public async Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases()
@@ -537,15 +570,27 @@ public class ReleaseVersionService(
             .OnSuccess(async releaseVersions =>
                 await releaseVersions
                     .ToAsyncEnumerable()
-                    .SelectAwait(async releaseVersion =>
-                    {
-                        var releaseViewModel = mapper.Map<ReleaseVersionSummaryViewModel>(releaseVersion);
-                        releaseViewModel.Permissions = await PermissionsUtils.GetReleasePermissions(
-                            userService,
-                            releaseVersion
-                        );
-                        return releaseViewModel;
-                    })
+                    .Select(
+                        async (releaseVersion, ct) =>
+                        {
+                            await context
+                                .ReleaseVersions.Entry(releaseVersion)
+                                .Reference(rv => rv.Release)
+                                .LoadAsync(cancellationToken: ct);
+
+                            var permissions = await PermissionsUtils.GetReleasePermissions(userService, releaseVersion);
+
+                            var publicationSummary = new PublicationSummaryViewModel(
+                                releaseVersion.Release.Publication
+                            );
+
+                            return ReleaseVersionSummaryViewModel.FromReleaseVersion(
+                                releaseVersion,
+                                permissions,
+                                publicationSummary
+                            );
+                        }
+                    )
                     .ToListAsync()
             );
     }
@@ -679,7 +724,6 @@ public class ReleaseVersionService(
         {
             return Unit.Instance;
         }
-
         return await dataSetVersionService.DeleteVersion(deletePlan.ApiDataSetVersionPlan!.Id);
     }
 

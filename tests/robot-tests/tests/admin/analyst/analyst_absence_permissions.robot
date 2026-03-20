@@ -131,22 +131,32 @@ Validate Analyst1 can see 'Content' page key stats
 
     user checks element count is x    css:[data-testid="keyStat"]    3
 
-Validate Analyst1 can see 'Content' page accordion sections
-    user checks accordion is in position    About these statistics    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Pupil absence rates    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Persistent absence    3    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Reasons for absence    4    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Distribution of absence    5    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Absence by pupil characteristics    6
-    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Absence for 4-year-olds    7    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Pupil referral unit absence    8    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion is in position    Regional and local authority (LA) breakdown    9
-    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
-    user checks there are x accordion sections    9    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+Validate Analyst1 can see 'Content' page sections
+    user checks section is in position    About these statistics    1
+    user checks section is in position    Pupil absence rates    2
+    user checks section is in position    Persistent absence    3
+    user checks section is in position    Reasons for absence    4
+    user checks section is in position    Distribution of absence    5
+    user checks section is in position    Absence by pupil characteristics    6
+    user checks section is in position    Absence for 4-year-olds    7
+    user checks section is in position    Pupil referral unit absence    8
+    user checks section is in position    Regional and local authority (LA) breakdown    9
 
-Validate Analyst1 can see help and support section
-    user checks page contains    Help and support
-    user checks page contains    Methodology
-    user checks page contains    Official statistics
-    user checks page contains    Contact us
+Validate navigation tabs are present
+    user checks the page contains the tabs
+    ...    Release home
+    ...    Explore and download data
+    ...    Methodology
+    ...    Help and related information
+
+
+*** Keywords ***
+user checks the page contains the tabs
+    [Arguments]    @{expected_nav_items}
+    FOR    ${nav_item}    IN    @{expected_nav_items}
+        ${nav_item_xpath}=    Set Variable
+        ...    //div[@id="release-page-tabs"]//a[contains(text(), "${nav_item}")]
+        Page Should Contain Element
+        ...    xpath=${nav_item_xpath}
+        ...    Page is missing "${nav_item}" nav item
+    END

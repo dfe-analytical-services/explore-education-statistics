@@ -30,6 +30,7 @@ describe('DownloadTable', () => {
     isCroppedTable: false,
     publicationName: '',
     subjectName: 'The subject',
+    dataSetFileId: 'file-id',
     footnotes: [],
     boundaryLevels: [],
     filters: {

@@ -114,7 +114,6 @@ describe('ReleaseContentPage', () => {
         },
       ],
     },
-
     id: 'release-id',
     keyStatistics: [],
     keyStatisticsSecondarySection: {
@@ -162,6 +161,12 @@ describe('ReleaseContentPage', () => {
     title: 'Academic year 2020/21',
     type: 'OfficialStatistics',
     updates: [],
+    warningSection: {
+      id: 'warning-section-id',
+      order: 0,
+      content: [],
+      heading: '',
+    },
     yearTitle: '2020/21',
   };
 
@@ -294,6 +299,7 @@ describe('ReleaseContentPage', () => {
       boundaryLevels: [],
       publicationName: 'Pupil absence',
       subjectName: 'Absence by characteristic',
+      dataSetFileId: 'file-id',
       timePeriodRange: [{ code: 'AY', label: '2014/15', year: 2014 }],
       geoJsonAvailable: false,
       isCroppedTable: false,
@@ -458,57 +464,6 @@ describe('ReleaseContentPage', () => {
     expect(radios[2]).toEqual(screen.getByLabelText('Preview table tool'));
   });
 
-  test('maintains the open state of accordions when switching between edit and preview mode', async () => {
-    releaseContentService.getContent.mockResolvedValue(testReleaseContent);
-    featuredTableService.listFeaturedTables.mockResolvedValue(
-      testFeaturedTables,
-    );
-    permissionService.canUpdateRelease.mockResolvedValue(true);
-
-    renderPage();
-
-    await waitFor(() => {
-      expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
-    });
-
-    const contentAccordion = screen.getAllByTestId('accordion')[0];
-    const contentAccordionSections =
-      within(contentAccordion).getAllByTestId('accordionSection');
-
-    const section1Button = await within(contentAccordionSections[0]).findByRole(
-      'button',
-      {
-        name: /Section 1, show/,
-      },
-    );
-
-    expect(section1Button).toHaveAttribute('aria-expanded', 'false');
-
-    await userEvent.click(section1Button);
-
-    expect(section1Button).toHaveAttribute('aria-expanded', 'true');
-
-    await userEvent.click(screen.getByLabelText('Preview release page'));
-
-    await waitFor(() =>
-      expect(screen.queryByText('Add note')).not.toBeInTheDocument(),
-    );
-
-    expect(section1Button).toHaveAttribute('aria-expanded', 'true');
-
-    await userEvent.click(section1Button);
-
-    expect(section1Button).toHaveAttribute('aria-expanded', 'false');
-
-    await userEvent.click(screen.getByLabelText('Edit content'));
-
-    await waitFor(() =>
-      expect(screen.getByText('Add note')).toBeInTheDocument(),
-    );
-
-    expect(section1Button).toHaveAttribute('aria-expanded', 'false');
-  });
-
   describe('edit content mode', () => {
     test('renders the release content in edit mode', async () => {
       releaseContentService.getContent.mockResolvedValue(testReleaseContent);
@@ -618,16 +573,6 @@ describe('ReleaseContentPage', () => {
       expect(
         screen.getByRole('heading', { name: 'Publication 1' }),
       ).toBeInTheDocument();
-
-      expect(screen.getByTestId('Published-value')).toHaveTextContent('TBA');
-
-      expect(screen.getByTestId('Release type-value')).toHaveTextContent(
-        'Official statistics',
-      );
-
-      expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
-        'Department for Education and Other Organisation',
-      );
 
       expect(
         screen.queryByRole('button', { name: 'Add secondary stats' }),
@@ -800,7 +745,9 @@ describe('ReleaseContentPage', () => {
       const testPublishedRelease: EditableRelease = {
         ...testReleaseContent.release,
         approvalStatus: 'Approved',
+        lastUpdated: '2023-01-01',
         published: '2023-01-01',
+        publishedDisplayDate: '2023-01-01',
       };
       releaseContentService.getContent.mockResolvedValue({
         ...testReleaseContent,

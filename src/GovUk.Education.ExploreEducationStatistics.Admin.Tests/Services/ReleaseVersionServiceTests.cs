@@ -34,7 +34,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -1833,7 +1832,7 @@ public abstract class ReleaseVersionServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
             userReleaseRoleRepository
-                .Setup(mock => mock.RemoveMany(ListOf(userReleaseRoles[0], userReleaseRoles[1]), default))
+                .Setup(mock => mock.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
@@ -2191,7 +2190,7 @@ public abstract class ReleaseVersionServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
             userReleaseRoleRepository
-                .Setup(mock => mock.RemoveMany(ListOf(userReleaseRoles[0], userReleaseRoles[1]), default))
+                .Setup(mock => mock.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);

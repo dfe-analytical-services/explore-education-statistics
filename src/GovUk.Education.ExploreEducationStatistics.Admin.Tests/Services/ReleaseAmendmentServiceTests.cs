@@ -123,7 +123,7 @@ public class ReleaseAmendmentServiceTests
                     new KeyStatisticDataBlock { DataBlock = dataBlock3Parent.LatestPublishedVersion!.ContentBlock }
                 )
             )
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .ForIndex(
@@ -166,26 +166,13 @@ public class ReleaseAmendmentServiceTests
                                 ListOf<ContentBlock>(_fixture.DefaultHtmlBlock().WithBody("<div></div>"))
                             )
                     )
-                    .ForIndex(
-                        2,
-                        s =>
-                            s.SetType(ContentSectionType.RelatedDashboards)
-                                .SetContentBlocks(
-                                    _fixture
-                                        .DefaultHtmlBlock()
-                                        .WithComments(
-                                            ListOf(
-                                                new Comment
-                                                {
-                                                    Id = Guid.NewGuid(),
-                                                    Content = "RelatedDashboards comment",
-                                                }
-                                            )
-                                        )
-                                        .Generate(1)
-                                )
-                    )
                     .GenerateList()
+            )
+            .WithRelatedDashboardContent(
+                _fixture
+                    .DefaultHtmlBlock()
+                    .WithComments([new Comment { Id = Guid.NewGuid(), Content = "RelatedDashboards comment" }])
+                    .Generate(1)
             )
             .WithDataBlockVersions(dataBlockParents.Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
             .WithKeyStatistics(
@@ -197,6 +184,7 @@ public class ReleaseAmendmentServiceTests
             .WithReleaseSummaryContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithHeadlinesContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithRelatedDashboardContent(_fixture.DefaultHtmlBlock().Generate(2))
+            .WithWarningContent(_fixture.DefaultHtmlBlock().Generate(2))
             .WithFeaturedTables(
                 ListOf<FeaturedTable>(
                     new()
@@ -404,6 +392,7 @@ public class ReleaseAmendmentServiceTests
                     r => r.KeyStatisticsSecondarySection,
                     r => r.RelatedDashboardsSection,
                     r => r.SummarySection,
+                    r => r.WarningSection,
                     r => r.FeaturedTables,
                 ]
             );
@@ -472,7 +461,7 @@ public class ReleaseAmendmentServiceTests
             var amendmentContentBlock2 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock2Parent);
             var amendmentContentBlock3 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock3Parent);
 
-            var amendmentContentBlock1InContent = amendment.Content[0].Content[0];
+            var amendmentContentBlock1InContent = amendment.GenericContent.ToList()[0].Content[0];
 
             // Check that the DataBlock that is included in this Release amendment's Content is successfully
             // identified as the exact same DataBlock that is attached to the Release amendment through the
@@ -491,18 +480,14 @@ public class ReleaseAmendmentServiceTests
 
             // Check Key Statistics have been copied over.
             Assert.Equal(2, amendment.KeyStatistics.Count);
-            var amendmentKeyStatText = Assert.IsType<KeyStatisticText>(
-                amendment.KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticText))
-            );
+            var amendmentKeyStatText = amendment.KeyStatistics.OfType<KeyStatisticText>().Single();
             Assert.Equal(
                 (originalReleaseVersion.KeyStatistics[0] as KeyStatisticText)!.Title,
                 amendmentKeyStatText.Title
             );
             Assert.NotEqual(originalReleaseVersion.KeyStatistics[0].Id, amendmentKeyStatText.Id);
 
-            var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(
-                amendment.KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticDataBlock))
-            );
+            var amendmentKeyStatDataBlock = amendment.KeyStatistics.OfType<KeyStatisticDataBlock>().Single();
             Assert.Equal(dataBlock3Parent.LatestDraftVersion!.Name, amendmentKeyStatDataBlock.DataBlock.Name);
             Assert.NotEqual(originalReleaseVersion.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
             Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentKeyStatDataBlock.DataBlockId);
@@ -524,7 +509,7 @@ public class ReleaseAmendmentServiceTests
                 originalReleaseVersion.HeadlinesSection!
             );
 
-            // Check Key Statistics ContentSection has been copied over OK.
+            // Check Key Statistics Secondary section has been copied over OK.
             // TODO - not sure if having a Key Statistics ContentSection serves any purpose now that
             // KeyStatisticsText and KeyStatisticsDataBlock are no longer ContentBlocks themselves.
             AssertAmendedContentSectionCorrect(
@@ -540,11 +525,18 @@ public class ReleaseAmendmentServiceTests
                 originalReleaseVersion.RelatedDashboardsSection!
             );
 
-            // Check Summary section has been copied over OK.
+            // Check the Summary section has been copied over OK.
             AssertAmendedContentSectionCorrect(
                 amendment,
                 amendment.SummarySection!,
                 originalReleaseVersion.SummarySection!
+            );
+
+            // Check the Warning section has been copied over OK.
+            AssertAmendedContentSectionCorrect(
+                amendment,
+                amendment.WarningSection!,
+                originalReleaseVersion.WarningSection!
             );
 
             // Check EmbedBlocks have been copied over OK.
@@ -553,7 +545,9 @@ public class ReleaseAmendmentServiceTests
                 .Include(embedBlockLink => embedBlockLink.EmbedBlock)
                 .SingleAsync(block => block.ReleaseVersionId == amendment.Id);
 
-            var originalEmbedBlockLink = Assert.IsType<EmbedBlockLink>(originalReleaseVersion.Content[0].Content[2]);
+            var originalEmbedBlockLink = Assert.IsType<EmbedBlockLink>(
+                originalReleaseVersion.GenericContent.ToList()[0].Content[2]
+            );
             Assert.NotEqual(originalEmbedBlockLink.Id, amendmentEmbedBlockLink.Id);
             Assert.NotEqual(originalEmbedBlockLink.EmbedBlockId, amendmentEmbedBlockLink.EmbedBlockId);
             Assert.Equal(originalEmbedBlockLink.EmbedBlock.Title, amendmentEmbedBlockLink.EmbedBlock.Title);
@@ -681,67 +675,23 @@ public class ReleaseAmendmentServiceTests
     [Fact]
     public async Task FiltersCommentsFromContent()
     {
-        var htmlBlock1Body = @"
-                <p>
-                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
-                </p>
-                <ul>
-                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
-                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
-                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
-                </ul>".TrimIndent();
+        const string htmlBlock1Body = """
+            <p><comment-start name="comment-1"></comment-start>Content block 1 content<comment-end name="comment-1"></comment-end></p>
+            """;
 
-        var expectedHtmlBlock1Body = @"
-                <p>
-                    Content 1 goes here
-                </p>
-                <ul>
-                    <li>Content 2</li>
-                    <li>Content 3</li>
-                    <li>Content 4</li>
-                </ul>".TrimIndent();
+        const string htmlBlock2Body = """
+            <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Content block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
+            """;
 
-        var htmlBlock2Body = @"
-                    <p>
-                        Content block 2
-                        <comment-start name=""comment-1""></comment-start>
-                            Content 1
-                        <comment-end name=""comment-1""></comment-end>
-
-                        Content 2
-                    </p>".TrimIndent();
-
-        var expectedHtmlBlock2Body = @"
-                    <p>
-                        Content block 2
-                        
-                            Content 1
-                        
-
-                        Content 2
-                    </p>".TrimIndent();
-
-        var htmlBlock3Body = @"
-                    <p>
-                        Content block 3
-                        <comment-start name=""comment-1""></comment-start>
-                            Content 1
-                        <comment-end name=""comment-1""></comment-end>
-                    </p>".TrimIndent();
-
-        var expectedHtmlBlock3Body = @"
-                    <p>
-                        Content block 3
-                        
-                            Content 1
-                        
-                    </p>".TrimIndent();
+        const string htmlBlock3Body = """
+            <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Content block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
+            """;
 
         ReleaseVersion originalReleaseVersion = _fixture
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .WithCreated(createdById: _userId)
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .ForIndex(
@@ -755,12 +705,11 @@ public class ReleaseAmendmentServiceTests
                                     .GenerateList()
                             )
                     )
-                    // Test that we are amending content across multiple sections.
+                    // Test that we are filtering comments across multiple sections.
                     .ForIndex(
                         1,
                         s => s.SetContentBlocks(_fixture.DefaultHtmlBlock().WithBody(htmlBlock3Body).Generate(1))
                     )
-                    .ForIndex(2, s => s.SetType(ContentSectionType.RelatedDashboards))
                     .GenerateList()
             );
 
@@ -785,12 +734,10 @@ public class ReleaseAmendmentServiceTests
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            // Method under test
             var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
-            var amendment = result.AssertRight();
+            amendmentId = result.AssertRight().Id;
 
-            Assert.NotEqual(originalReleaseVersion.Id, amendment.Id);
-            amendmentId = amendment.Id;
+            Assert.NotEqual(originalReleaseVersion.Id, amendmentId);
         }
 
         VerifyAllMocks(userReleaseRoleRepository);
@@ -799,22 +746,19 @@ public class ReleaseAmendmentServiceTests
         {
             var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
 
-            Assert.Equal(3, amendment.Content.Count);
-            Assert.Equal(ContentSectionType.Generic, amendment.Content[0].Type);
-            Assert.Equal(ContentSectionType.Generic, amendment.Content[1].Type);
-            Assert.Equal(ContentSectionType.RelatedDashboards, amendment.Content[2].Type);
+            var amendmentHtmlBlocks = amendment
+                .Content.SelectMany(section => section.Content)
+                .OfType<HtmlBlock>()
+                .ToList();
 
-            var amendmentContentSection1 = amendment.Content[0];
-            var amendmentContentSection2 = amendment.Content[1];
+            var amendmentContentBlock1 = amendmentHtmlBlocks.Single(hb => hb.Body.Contains("block 1"));
+            Assert.Equal("<p>Content block 1 content</p>", amendmentContentBlock1.Body);
 
-            Assert.Equal(2, amendmentContentSection1.Content.Count);
-            var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(amendmentContentSection1.Content[0]);
-            var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(amendmentContentSection1.Content[1]);
-            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection2.Content));
+            var amendmentContentBlock2 = amendmentHtmlBlocks.Single(hb => hb.Body.Contains("block 2"));
+            Assert.Equal("<p>Content block 2 content</p>", amendmentContentBlock2.Body);
 
-            Assert.Equal(expectedHtmlBlock1Body, amendmentContentBlock1.Body);
-            Assert.Equal(expectedHtmlBlock2Body, amendmentContentBlock2.Body);
-            Assert.Equal(expectedHtmlBlock3Body, amendmentContentBlock3.Body);
+            var amendmentContentBlock3 = amendmentHtmlBlocks.Single(hb => hb.Body.Contains("block 3"));
+            Assert.Equal("<p>Content block 3 content</p>", amendmentContentBlock3.Body);
         }
     }
 
@@ -825,7 +769,7 @@ public class ReleaseAmendmentServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .WithCreated(createdById: _userId)
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .WithContentBlocks(_fixture.DefaultHtmlBlock().WithBody(null!).GenerateList(1))
@@ -872,61 +816,13 @@ public class ReleaseAmendmentServiceTests
     }
 
     [Fact]
-    public async Task CreatesRelatedDashboardsSectionIfNotOnOriginal()
-    {
-        ReleaseVersion originalReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-            .WithCreated(createdById: _userId);
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
-            contentDbContext.Users.Add(_fixture.DefaultUser().WithId(_userId));
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
-        Guid? amendmentId;
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var releaseAmendmentService = BuildService(
-                contentDbContext,
-                statisticsDbContext: InMemoryStatisticsDbContext(),
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
-            );
-
-            // Method under test
-            var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
-            var amendment = result.AssertRight();
-
-            Assert.NotEqual(originalReleaseVersion.Id, amendment.Id);
-            amendmentId = amendment.Id;
-        }
-
-        VerifyAllMocks(userReleaseRoleRepository);
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
-
-            var relatedDashboardsSection = Assert.Single(amendment.Content);
-            Assert.Equal(ContentSectionType.RelatedDashboards, relatedDashboardsSection.Type);
-        }
-    }
-
-    [Fact]
     public async Task CopyFootnotes()
     {
         ReleaseVersion originalReleaseVersion = _fixture
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .WithCreated(createdById: _userId)
-            .WithContent(
+            .WithGenericContent(
                 _fixture
                     .DefaultContentSection()
                     .WithContentBlocks(_fixture.DefaultHtmlBlock().WithBody(null!).GenerateList(1))
@@ -1138,9 +1034,7 @@ public class ReleaseAmendmentServiceTests
     {
         Assert.Equal(amendment, amendedSection.ReleaseVersion);
         Assert.Equal(amendment.Id, amendedSection.ReleaseVersionId);
-        Assert.True(amendedSection.Id != Guid.Empty);
-        Assert.NotEqual(originalSection.Id, amendedSection.Id);
-
+        Assert.NotEqual(Guid.Empty, amendedSection.Id);
         Assert.NotEqual(originalSection.Id, amendedSection.Id);
         Assert.Equal(originalSection.Heading, amendedSection.Heading);
         Assert.Equal(originalSection.Order, amendedSection.Order);

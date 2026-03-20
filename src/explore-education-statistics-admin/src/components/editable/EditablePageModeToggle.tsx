@@ -18,7 +18,7 @@ export default function EditablePageModeToggle({
   showTablePreviewOption = false,
 }: Props) {
   const { activeSection, editingMode, setEditingMode } = useEditingContext();
-  const [isOpen, toggleOpen] = useToggle(true);
+  const [isOpen, toggleOpen] = useToggle(false);
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   const options = [

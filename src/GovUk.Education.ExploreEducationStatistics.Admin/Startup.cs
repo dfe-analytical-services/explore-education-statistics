@@ -24,7 +24,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionsMigration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -415,9 +414,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
         services.AddTransient<IMethodologyRepository, MethodologyRepository>();
 
-        // TODO EES-6885 Remove after the Release Versions migration is complete.
-        services.AddTransient<IReleaseVersionsMigrationService, ReleaseVersionsMigrationService>();
-
         services.AddTransient<IReleaseDataContentService, ReleaseDataContentService>();
         services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
@@ -475,6 +471,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
+        services.AddTransient<UserReleaseRoleQueryRepository>();
+        services.AddTransient<INewPermissionsSystemHelper, NewPermissionsSystemHelper>();
         services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
         services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
@@ -538,11 +536,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
             services.AddTransient<IPreviewTokenService, PreviewTokenService>();
             services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
+            services.AddTransient<IPublicDataSetRepository, PublicDataSetRepository>();
             services.AddScoped<IMappingTypesRepository, MappingTypesRepository>();
         }
         else
         {
             services.AddTransient<IProcessorClient, NoOpProcessorClient>();
+
+            services.AddTransient<IPublicDataApiClient, NoOpPublicDataApiClient>();
 
             // TODO EES-5073 Remove this once PublicDataDbContext is configured in ALL Azure environments.
             // This is allowing for the PublicDataDbContext to be null.
@@ -559,6 +560,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
             services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
             services.AddTransient<IDataSetVersionRepository, NoOpDataSetVersionRepository>();
+            services.AddTransient<IPublicDataSetRepository, NoOpPublicDataSetRepository>();
             services.AddScoped<IMappingTypesRepository, NoOpMappingTypesRepository>();
         }
 
@@ -1098,4 +1100,32 @@ internal class NoOpReleasePublishingValidator : IReleasePublishingValidator
         IList<Content.Model.File> dataFileUploads,
         CancellationToken cancellationToken = default
     ) => Task.FromResult(false);
+}
+
+internal class NoOpPublicDataSetRepository : IPublicDataSetRepository
+{
+    public Task<Public.Data.Model.DataSet> GetDataSet(Guid dataSetId, CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
+
+    public Task<IndicatorMeta?> GetIndicatorMeta(
+        Guid dataSetVersionId,
+        string indicatorPublicId,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+}
+
+internal class NoOpPublicDataApiClient : IPublicDataApiClient
+{
+    public Task<Either<ActionResult, HttpResponseMessage>> GetDataSetVersionChanges(
+        Guid dataSetId,
+        string dataSetVersion,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+
+    public Task<Either<ActionResult, Public.Data.ViewModels.DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
+        Guid dataSetId,
+        string dataSetVersion,
+        string queryBody,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
 }

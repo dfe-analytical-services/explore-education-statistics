@@ -13,6 +13,7 @@ import { Dictionary } from '@common/types';
 export interface FullTableMeta {
   publicationName: string;
   subjectName: string;
+  dataSetFileId: string;
   locations: LocationFilter[];
   timePeriodRange: TimePeriodFilter[];
   filters: Dictionary<{

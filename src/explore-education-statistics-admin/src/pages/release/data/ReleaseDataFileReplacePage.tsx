@@ -28,7 +28,6 @@ const ReleaseDataFileReplacePage = ({
     value: dataFile,
     isLoading: dataFileLoading,
     setState: setDataFile,
-    retry: fetchDataFile,
   } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFile(releaseVersionId, fileId),
     [releaseVersionId, fileId],
@@ -124,7 +123,6 @@ const ReleaseDataFileReplacePage = ({
               publicationId={publicationId}
               releaseVersionId={releaseVersionId}
               history={history}
-              fetchDataFile={fetchDataFile}
               publicApiDataSetId={dataFile.publicApiDataSetId}
             />
           </>

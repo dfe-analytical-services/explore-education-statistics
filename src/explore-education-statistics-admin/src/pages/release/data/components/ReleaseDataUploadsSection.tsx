@@ -1,6 +1,7 @@
 import DataFilesReorderableList from '@admin/pages/release/data/components/DataFilesReorderableList';
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
+import dataReplacementService from '@admin/services/dataReplacementService';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   DataFile,
@@ -14,9 +15,8 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import { useQuery } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import dataReplacementService from '@admin/services/dataReplacementService';
+import { useQuery, useQueryClient, Updater } from '@tanstack/react-query';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 interface Props {
   publicationId: string;
@@ -31,10 +31,6 @@ export default function ReleaseDataUploadsSection({
   canUpdateRelease,
   onDataFilesChange,
 }: Props) {
-  const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
-  const [allDataSetUploads, setAllDataSetUploads] = useState<DataSetUpload[]>(
-    [],
-  );
   const [isReordering, toggleReordering] = useToggle(false);
 
   // NOTE: When a data set is initially imported, it is first sent to the data screener to check for screener errors and
@@ -44,16 +40,24 @@ export default function ReleaseDataUploadsSection({
   //
   // So "dataSetUploads" are data sets currently being screened via the R docker container, while "dataFiles" are data
   // sets that have moved beyond the screener and are now being imported by the Data.Processor
+  const queryClient = useQueryClient();
+
   const {
-    data: initialDataFiles,
+    data: allDataFiles = [],
+    isError: dataFilesError,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
   const {
-    data: initialDataSetUploads,
+    data: allDataSetUploads = [],
+    isError: dataSetUploadsError,
     isLoading: isLoadingUploads,
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
+
+  useEffect(() => {
+    onDataFilesChange?.(allDataFiles);
+  }, [allDataFiles, onDataFilesChange]);
 
   const uploadsWithoutReplacements = allDataSetUploads.filter(
     upload => !upload.replacingFileId,
@@ -62,17 +66,6 @@ export default function ReleaseDataUploadsSection({
   const uploadsWithReplacements = allDataSetUploads.filter(
     upload => upload.replacingFileId,
   );
-
-  // Store the data files on state so we can reliably update them
-  // when the permissions/status change.
-  useEffect(() => {
-    setAllDataFiles(initialDataFiles ?? []);
-    setAllDataSetUploads(initialDataSetUploads ?? []);
-  }, [initialDataFiles, initialDataSetUploads]);
-
-  useEffect(() => {
-    onDataFilesChange?.(allDataFiles);
-  }, [allDataFiles, onDataFilesChange]);
 
   const dataFilesExcludingReplacements = useMemo(
     () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
@@ -90,6 +83,28 @@ export default function ReleaseDataUploadsSection({
       originalFile.replacedByDataFile?.hasValidReplacementPlan,
   );
 
+  const setAllDataFiles = useCallback(
+    (updater: Updater<DataFile[] | undefined, DataFile[] | undefined>) =>
+      queryClient.setQueryData(
+        releaseDataFileQueries.list(releaseVersionId).queryKey,
+        updater,
+      ),
+    [releaseVersionId, queryClient],
+  );
+  const setAllDataUploads = useCallback(
+    (
+      updater: Updater<
+        DataSetUpload[] | undefined,
+        DataSetUpload[] | undefined
+      >,
+    ) =>
+      queryClient.setQueryData(
+        releaseDataFileQueries.listUploads(releaseVersionId).queryKey,
+        updater,
+      ),
+    [releaseVersionId, queryClient],
+  );
+
   const handleStatusChange = useCallback(
     async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
       try {
@@ -97,18 +112,18 @@ export default function ReleaseDataUploadsSection({
           releaseVersionId,
           dataFile.id,
         );
-
-        setAllDataFiles(currentDataFiles =>
-          currentDataFiles.map(file =>
-            file.id !== dataFile.id
-              ? file
-              : {
-                  ...dataFile,
-                  rows: importStatus.totalRows,
-                  status: importStatus.status,
-                  permissions,
-                },
-          ),
+        setAllDataFiles(
+          currentDataFiles =>
+            currentDataFiles?.map(file =>
+              file.id !== dataFile.id
+                ? file
+                : {
+                    ...dataFile,
+                    rows: importStatus.totalRows,
+                    status: importStatus.status,
+                    permissions,
+                  },
+            ),
         );
       } catch {
         refetchDataFiles();
@@ -124,16 +139,16 @@ export default function ReleaseDataUploadsSection({
           releaseVersionId,
           updatedDataFile.id,
         );
-
-        setAllDataFiles(currentDataFiles =>
-          currentDataFiles.map(file =>
-            file.id !== updatedDataFile.id
-              ? file
-              : {
-                  ...updatedDataFile,
-                  permissions,
-                },
-          ),
+        setAllDataFiles(
+          currentDataFiles =>
+            currentDataFiles?.map(file =>
+              file.id !== updatedDataFile.id
+                ? file
+                : {
+                    ...updatedDataFile,
+                    permissions,
+                  },
+            ),
         );
       } catch {
         refetchDataFiles();
@@ -149,30 +164,39 @@ export default function ReleaseDataUploadsSection({
         dataSetUploadIds,
       );
 
-      setAllDataSetUploads(uploads =>
-        uploads.filter(upload => !dataSetUploadIds.includes(upload.id)),
+      setAllDataUploads(
+        uploads =>
+          uploads?.filter(upload => !dataSetUploadIds.includes(upload.id)),
       );
 
-      await refetchDataFiles();
       await refetchDataSetUploads();
+      await refetchDataFiles();
     },
-    [releaseVersionId, refetchDataFiles, refetchDataSetUploads],
+    [
+      releaseVersionId,
+      setAllDataUploads,
+      refetchDataFiles,
+      refetchDataSetUploads,
+    ],
   );
 
   const handleDeleteUploadConfirm = useCallback(
     async (deletedUploadId: string) => {
-      setAllDataSetUploads(uploads =>
-        uploads.filter(upload => upload.id !== deletedUploadId),
+      setAllDataUploads(
+        uploads => uploads?.filter(upload => upload.id !== deletedUploadId),
       );
     },
-    [],
+    [setAllDataUploads],
   );
 
-  const handleDeleteConfirm = useCallback(async (deletedFileId: string) => {
-    setAllDataFiles(files =>
-      files.filter(dataFile => dataFile.id !== deletedFileId),
-    );
-  }, []);
+  const handleDeleteConfirm = useCallback(
+    async (deletedFileId: string) => {
+      setAllDataFiles(
+        files => files?.filter(dataFile => dataFile.id !== deletedFileId),
+      );
+    },
+    [setAllDataFiles],
+  );
 
   const handleSubmit = async () => {
     await refetchDataFiles();
@@ -181,15 +205,15 @@ export default function ReleaseDataUploadsSection({
 
   const handleConfirmReordering = useCallback(
     async (nextDataFiles: DataFile[]) => {
-      setAllDataFiles(
-        await releaseDataFileService.updateDataFilesOrder(
-          releaseVersionId,
-          nextDataFiles.map(file => file.id),
-        ),
+      await releaseDataFileService.updateDataFilesOrder(
+        releaseVersionId,
+        nextDataFiles.map(file => file.id),
       );
+
+      setAllDataFiles(() => nextDataFiles);
       toggleReordering.off();
     },
-    [releaseVersionId, toggleReordering],
+    [releaseVersionId, setAllDataFiles, toggleReordering],
   );
 
   const handleConfirmAllReplacements = async () => {
@@ -197,9 +221,10 @@ export default function ReleaseDataUploadsSection({
       releaseVersionId,
       validReplacementDataFiles.map(file => file.id),
     );
-
     await refetchDataFiles();
   };
+
+  const errorFetchingData = dataFilesError || dataSetUploadsError;
 
   return (
     <>
@@ -264,7 +289,8 @@ export default function ReleaseDataUploadsSection({
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
       <LoadingSpinner loading={isLoading || isLoadingUploads}>
-        {allDataFiles.length > 0 || allDataSetUploads.length > 0 ? (
+        {(allDataFiles.length > 0 || allDataSetUploads.length > 0) &&
+        !errorFetchingData ? (
           <>
             <h2>Uploaded data files</h2>
 
@@ -327,7 +353,13 @@ export default function ReleaseDataUploadsSection({
             )}
           </>
         ) : (
-          <InsetText>No data files have been uploaded.</InsetText>
+          <>
+            {errorFetchingData ? (
+              <WarningMessage>Failed to fetch data files.</WarningMessage>
+            ) : (
+              <InsetText>No data files have been uploaded.</InsetText>
+            )}
+          </>
         )}
       </LoadingSpinner>
     </>

@@ -33,7 +33,7 @@ local page_requests = {
         requests = {
             -- This is an HTML request.
             {
-                url = release_page_url .. "?redesign=true",
+                url = release_page_url,
                 prefetch = false,
             },
             -- This is a prefetch request.

@@ -81,10 +81,10 @@ public static class ReleaseVersionGeneratorExtensions
         string? dataGuidance
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetDataGuidance(dataGuidance));
 
-    public static Generator<ReleaseVersion> WithContent(
+    public static Generator<ReleaseVersion> WithGenericContent(
         this Generator<ReleaseVersion> generator,
         IEnumerable<ContentSection> content
-    ) => generator.ForInstance(releaseVersion => releaseVersion.SetContentBlocks(content));
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetGenericContent(content));
 
     public static Generator<ReleaseVersion> WithReleaseStatuses(
         this Generator<ReleaseVersion> generator,
@@ -164,6 +164,11 @@ public static class ReleaseVersionGeneratorExtensions
         IEnumerable<KeyStatistic> keyStatistics
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetKeyStatistics(keyStatistics));
 
+    public static Generator<ReleaseVersion> WithKeyStatisticsSecondaryContent(
+        this Generator<ReleaseVersion> generator,
+        IEnumerable<ContentBlock> content
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetKeyStatisticsSecondaryContent(content));
+
     public static Generator<ReleaseVersion> WithReleaseSummaryContent(
         this Generator<ReleaseVersion> generator,
         IEnumerable<ContentBlock> content
@@ -178,6 +183,11 @@ public static class ReleaseVersionGeneratorExtensions
         this Generator<ReleaseVersion> generator,
         IEnumerable<ContentBlock> content
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetRelatedDashboardsContent(content));
+
+    public static Generator<ReleaseVersion> WithWarningContent(
+        this Generator<ReleaseVersion> generator,
+        IEnumerable<ContentBlock> content
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetWarningContent(content));
 
     public static Generator<ReleaseVersion> WithFeaturedTables(
         this Generator<ReleaseVersion> generator,
@@ -195,6 +205,19 @@ public static class ReleaseVersionGeneratorExtensions
             .SetDefault(p => p.PublicationId)
             .SetDefault(p => p.ReleaseId)
             .SetApprovalStatus(ReleaseApprovalStatus.Draft)
+            .Set(
+                p => p.Content,
+                (_, releaseVersion, context) =>
+                    context
+                        .Fixture.DefaultContentSection()
+                        .WithReleaseVersion(releaseVersion)
+                        .ForIndex(0, s => s.SetType(ContentSectionType.Headlines))
+                        .ForIndex(1, s => s.SetType(ContentSectionType.KeyStatisticsSecondary))
+                        .ForIndex(2, s => s.SetType(ContentSectionType.RelatedDashboards))
+                        .ForIndex(3, s => s.SetType(ContentSectionType.ReleaseSummary))
+                        .ForIndex(4, s => s.SetType(ContentSectionType.Warning))
+                        .GenerateList()
+            )
             .SetDefault(p => p.PreReleaseAccessList)
             .Set(
                 p => p.NextReleaseDate,
@@ -294,10 +317,10 @@ public static class ReleaseVersionGeneratorExtensions
         string? dataGuidance
     ) => setters.Set(releaseVersion => releaseVersion.DataGuidance, dataGuidance);
 
-    public static InstanceSetters<ReleaseVersion> SetContentBlocks(
+    public static InstanceSetters<ReleaseVersion> SetGenericContent(
         this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ContentSection> content
-    ) => setters.Set(releaseVersion => releaseVersion.Content, content.ToList());
+    ) => setters.Set(releaseVersion => releaseVersion.GenericContent, content);
 
     public static InstanceSetters<ReleaseVersion> SetPublished(
         this InstanceSetters<ReleaseVersion> setters,
@@ -421,11 +444,7 @@ public static class ReleaseVersionGeneratorExtensions
     {
         var keyStatisticsList = keyStatistics.ToList();
         return setters
-            .Set(releaseVersion => releaseVersion.KeyStatistics, keyStatisticsList.ToList())
-            .Set(
-                releaseVersion => releaseVersion.KeyStatisticsSecondarySection,
-                new ContentSection { Type = ContentSectionType.KeyStatisticsSecondary }
-            )
+            .Set(releaseVersion => releaseVersion.KeyStatistics, [.. keyStatisticsList])
             .Set(
                 (_, releaseVersion, _) =>
                     keyStatisticsList.ForEach(keyStatistic =>
@@ -435,6 +454,16 @@ public static class ReleaseVersionGeneratorExtensions
                     })
             );
     }
+
+    public static InstanceSetters<ReleaseVersion> SetKeyStatisticsSecondaryContent(
+        this InstanceSetters<ReleaseVersion> setters,
+        IEnumerable<ContentBlock> content
+    ) =>
+        setters.SetTopLevelContentSection(
+            releaseVersion => releaseVersion.KeyStatisticsSecondarySection,
+            ContentSectionType.KeyStatisticsSecondary,
+            content
+        );
 
     public static InstanceSetters<ReleaseVersion> SetReleaseSummaryContent(
         this InstanceSetters<ReleaseVersion> setters,
@@ -466,6 +495,16 @@ public static class ReleaseVersionGeneratorExtensions
             content
         );
 
+    public static InstanceSetters<ReleaseVersion> SetWarningContent(
+        this InstanceSetters<ReleaseVersion> setters,
+        IEnumerable<ContentBlock> content
+    ) =>
+        setters.SetTopLevelContentSection(
+            releaseVersion => releaseVersion.WarningSection,
+            ContentSectionType.Warning,
+            content
+        );
+
     public static InstanceSetters<ReleaseVersion> SetFeaturedTables(
         this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<FeaturedTable> featuredTables
@@ -493,7 +532,16 @@ public static class ReleaseVersionGeneratorExtensions
     {
         var contentList = content.ToList();
         return setters
-            .Set(field, new ContentSection { Type = type })
+            .Set(
+                field,
+                (_, releaseVersion, faker) =>
+                    faker
+                        .Fixture.DefaultContentSection(type)
+                        .WithReleaseVersion(releaseVersion)
+                        .WithContentBlocks(contentList)
+                        .WithHeading(null)
+                        .WithOrder(0)
+            )
             .Set(
                 (_, releaseVersion, _) =>
                     contentList.ForEach(contentBlock =>

@@ -13,6 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=                    Publish data %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_LOWER_CASE}=         publish data %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                      Financial year 3000-01
 ${RELEASE_2_NAME}=                      Financial year 3001-02 provisional
 ${SUBJECT_1_NAME}=                      UI test subject 1
@@ -50,7 +51,7 @@ Add public prerelease access list
     user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Create public pre-release access list
-    user presses keys    CTRL+a+BACKSPACE
+    user selects all text and hits backspace
     user presses keys    Test public access list
     user clicks button    Save access list
     user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
@@ -500,7 +501,7 @@ Add text block with link to a featured table to accordion section
     ${block}=    user starts editing accordion section text block    Test section    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    # We add text to avoid the "Enter content" error displaying when clicking the `Insert` toolbar button, which was causing the toolbar menu to not    open
+    # We add text to avoid the "Enter content" error displaying when clicking the `Insert` toolbar button, which was causing the toolbar menu to not open
     user presses keys    Test content block text
 
     ${toolbar}=    get editor toolbar    ${block}
@@ -529,24 +530,23 @@ Get public release link
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
-Check latest release is correct
-    user checks page contains    This is the latest release
-    user checks page contains    View releases (1)
+Check latest release is correct and the other releases are correct
+    user checks page contains    Latest release
+    user clicks link    All releases in this series
+    user waits until page finishes loading
 
-    user opens details dropdown    View releases (1)
-    user waits until page contains other release    ${RELEASE_1_NAME}
-    user checks page does not contain other release    ${RELEASE_2_NAME}
+    user checks table body has x rows    2    testid:release-updates-table
+    user checks table cell contains    1    1    ${RELEASE_2_NAME}    testid:release-updates-table
+    user checks table cell contains    2    1    ${RELEASE_1_NAME}    testid:release-updates-table
 
-    user clicks link    ${RELEASE_1_NAME}
+    user clicks link in table cell    2    1    ${RELEASE_1_NAME}    testid:release-updates-table
 
 Check other release is correct
     user waits until page contains title caption    ${RELEASE_1_NAME}
+    user checks page contains    Not the latest release
 
-    user waits until page contains link    View latest data: ${RELEASE_2_NAME}
-    user checks page contains    View releases (1)
-    user waits until page contains other release    ${RELEASE_2_NAME}
-    user checks page does not contain other release    ${RELEASE_1_NAME}
-    user clicks link    View latest data: ${RELEASE_2_NAME}
+    user waits until page contains link    View latest release: ${RELEASE_2_NAME}
+    user clicks link    View latest release: ${RELEASE_2_NAME}
     user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_SMALL}
 
 Go to Table Tool page
@@ -710,114 +710,114 @@ Go to release page
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
-Go to data guidance document
-    user clicks link    Data guidance
-
-    user waits until page contains title caption    ${RELEASE_2_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-    user waits until h2 is visible    Data guidance
-
-Validate data guidance document file details
-    user waits until page contains accordion section    ${SUBJECT_1_NAME}
-    user waits until page contains accordion section    ${SUBJECT_2_NAME}
-    user checks there are x accordion sections    2
-
-    user opens accordion section    ${SUBJECT_1_NAME}
-
-    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    user checks summary list contains    Filename    tiny-two-filters.csv    ${subject_1_content}
-    user checks summary list contains    Geographic levels    National    ${subject_1_content}
-    user checks summary list contains    Time period    2017/18    ${subject_1_content}
-    user checks summary list contains    Content    UI test subject 1 data guidance content    ${subject_1_content}
-
-    user opens accordion section    ${SUBJECT_2_NAME}
-
-    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
-    user checks summary list contains    Filename    upload-file-test.csv    ${subject_2_content}
+Validate data guidance data set details variables and footnotes
+    user goes to explore and download data and navigates to data set details page    ${SUBJECT_1_NAME}
+    Page Should Contain    UI test subject 1 data guidance content
     user checks summary list contains    Geographic levels
-    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
-    ...    ${subject_2_content}
-    user checks summary list contains    Time period    2005 to 2020    ${subject_2_content}
-    user checks summary list contains    Content    UI test subject 2 data guidance content    ${subject_2_content}
+    ...    National
+    ...    id:dataSetDetails
 
-Validate data guidance document variables
-    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    user opens details dropdown    Variable names and descriptions    ${subject_1_content}
+    user checks summary list contains    Time period
+    ...    2017/18
+    ...    id:dataSetDetails
 
-    ${subject_1_variables}=    get child element    ${subject_1_content}    testid:Variables
-    user checks table body has x rows    9    ${subject_1_variables}
+    user clicks button    Show all 9 variables
+    user checks table body has x rows    9    testid:variables-table
 
-    user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
-    user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
 
-    user checks table cell contains    1    1    colour    ${subject_1_variables}
-    user checks table cell contains    1    2    Colour    ${subject_1_variables}
+    user checks table cell contains    1    1    colour    testid:variables-table
+    user checks table cell contains    1    2    Colour    testid:variables-table
 
-    user checks table cell contains    2    1    enrolments    ${subject_1_variables}
-    user checks table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+    user checks table cell contains    2    1    enrolments    testid:variables-table
+    user checks table cell contains    2    2    Number of pupil enrolments    testid:variables-table
 
-    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
-    user checks table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    testid:variables-table
+    user checks table cell contains    4    2    Percentage of persistent absentees    testid:variables-table
 
-    user checks table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
-    user checks table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+    user checks table cell contains    8    1    sess_overall_percent    testid:variables-table
+    user checks table cell contains    8    2    Overall absence rate    testid:variables-table
 
-    user checks table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
-    user checks table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+    user checks table cell contains    9    1    sess_unauthorised_percent    testid:variables-table
+    user checks table cell contains    9    2    Unauthorised absence rate    testid:variables-table
 
-    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
-    user opens details dropdown    Variable names and descriptions    ${subject_2_content}
+    user scrolls to element    id:dataSetFootnotes
+    Footnotes Should Equal    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    ...    ${FOOTNOTE_ALL}
+    ...    ${FOOTNOTE_ALL_FILTER}
+    ...    ${FOOTNOTE_SUBJECT_1}
+    ...    ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    ...    ${FOOTNOTE_SUBJECT_1_FILTER}
+    ...    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    ...    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    ...    ${FOOTNOTE_SUBJECT_1_MIXTURE}
 
-    ${subject_2_variables}=    get child element    ${subject_2_content}    testid:Variables
-    user checks table body has x rows    2    ${subject_2_variables}
+    user goes back
+    user waits until h2 is visible    Explore data used in this release
 
-    user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
-    user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
+    user opens data set details for subject    ${SUBJECT_2_NAME}
+    Page Should Contain Link    Data set information page
+    user clicks element
+    ...    xpath://li[.//h4[normalize-space()='${SUBJECT_2_NAME}']]//a[starts-with(normalize-space(.), 'Data set information page')]
 
-    user checks table cell contains    1    1    admission_numbers    ${subject_2_variables}
-    user checks table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+    user waits until h1 is visible    ${SUBJECT_2_NAME}
 
-    user checks table cell contains    2    1    some_filter    ${subject_2_variables}
-    user checks table cell contains    2    2    Random Filter    ${subject_2_variables}
+    user checks table body has x rows    2    testid:variables-table
 
-Validate data guidance document footnotes
-    ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    user opens details dropdown    Footnotes    ${subject_1_content}
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
 
-    user checks list has x items    testid:Footnotes    9    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    ...    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL}    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    4    ${FOOTNOTE_SUBJECT_1}    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    5    ${FOOTNOTE_SUBJECT_1_INDICATOR}    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    6    ${FOOTNOTE_SUBJECT_1_FILTER}    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    7    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
-    ...    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    8    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
-    ...    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    9    ${FOOTNOTE_SUBJECT_1_MIXTURE}    ${subject_1_content}
+    user checks table cell contains    1    1    admission_numbers    testid:variables-table
+    user checks table cell contains    1    2    Admission Numbers    testid:variables-table
 
-    ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
-    user opens details dropdown    Footnotes    ${subject_2_content}
+    user checks table cell contains    2    1    some_filter    testid:variables-table
+    user checks table cell contains    2    2    Random Filter    testid:variables-table
 
-    user checks list has x items    testid:Footnotes    3    ${subject_2_content}
-    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    ...    ${subject_2_content}
-    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL}    ${subject_2_content}
-    user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
+    user scrolls to element    id:dataSetFootnotes
+    Footnotes Should Equal    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    ...    ${FOOTNOTE_ALL}
+    ...    ${FOOTNOTE_ALL_FILTER}
 
-Go back to release page
-    user clicks link    ${PUBLICATION_NAME}
+Validate the number of featured tables and featured table link
+    user goes back
+    user waits until h2 is visible    Explore data used in this release
 
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
-    user waits until page contains title caption    ${RELEASE_2_NAME}
+    user waits until h3 is visible    2 featured tables
+    user waits until parent contains element    id:featured-tables-section
+    ...    css:[data-testid="release-data-list-item"]    count=2
 
-Validate featured table link
-    user opens accordion section    Test section    css:#content
-    user waits until page contains link    Test highlight name 2
-    user clicks link    Test highlight name 2
-    user waits until h1 is visible    Create your own tables
+    user clicks element
+    ...    xpath://li[.//h4[normalize-space()='Test highlight name 1']]//a[starts-with(normalize-space(.), 'View, edit or download')]
+    user waits until h1 is visible    Create your own tables on ${PUBLICATION_NAME_LOWER_CASE}
+    user waits until results table appears    %{WAIT_LONG}
+    user waits until page contains element
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for 'UI test subject 2' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]
+
+    user goes back
+    user waits until h2 is visible    Explore data used in this release
+
+    user clicks element
+    ...    xpath://li[.//h4[normalize-space()='Test highlight name 2']]//a[starts-with(normalize-space(.), 'View, edit or download')]
+    user waits until h1 is visible    Create your own tables on ${PUBLICATION_NAME_LOWER_CASE}
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for 'UI test subject 2' for Not specified in Bolton 001 between 2009 and 2017"]
+
+
+*** Keywords ***
+Footnotes Should Equal
+    [Arguments]    @{expected}
+    @{items}=    Get WebElements
+    ...    xpath=//section[@id='dataSetFootnotes']//div[contains(@class,'dfe-content')]
+    @{item_texts}=    Create List
+    FOR    ${item}    IN    @{items}
+        ${text}=    Get Text    ${item}
+        Append To List    ${item_texts}    ${text}
+    END
+    ${expected_length}=    Get Length    ${expected}
+    Length Should Be    ${item_texts}    ${expected_length}
+
+    FOR    ${i}    ${value}    IN ENUMERATE    @{expected}
+        Should Be Equal    ${item_texts}[${i}]    ${value}
+    END

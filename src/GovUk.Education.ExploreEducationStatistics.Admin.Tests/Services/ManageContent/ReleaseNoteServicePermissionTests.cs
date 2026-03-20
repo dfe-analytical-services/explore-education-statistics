@@ -1,91 +1,123 @@
 #nullable enable
-using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent;
 
 public class ReleaseNoteServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
+    private readonly DataFixture _dataFixture = new();
 
     [Fact]
-    public void AddReleaseNoteAsync()
+    public async Task AddReleaseNote()
     {
-        AssertSecurityPoliciesChecked(
-            service => service.AddReleaseNoteAsync(_releaseVersion.Id, new ReleaseNoteSaveRequest()),
-            SecurityPolicies.CanUpdateSpecificReleaseVersion
-        );
+        // Arrange
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+
+        // Act & Assert
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    contentDbContext.ReleaseVersions.Add(releaseVersion);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var sut = BuildService(contentDbContext, userService.Object);
+
+                    return await sut.CreateReleaseNote(
+                        releaseVersionId: releaseVersion.Id,
+                        new ReleaseNoteCreateRequest { Reason = "" }
+                    );
+                }
+            });
     }
 
     [Fact]
-    public void DeleteReleaseNoteAsync()
+    public async Task DeleteReleaseNote()
     {
-        AssertSecurityPoliciesChecked(
-            service =>
-                service.DeleteReleaseNoteAsync(releaseVersionId: _releaseVersion.Id, releaseNoteId: Guid.NewGuid()),
-            SecurityPolicies.CanUpdateSpecificReleaseVersion
-        );
+        // Arrange
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        var releaseNoteId = Guid.NewGuid();
+
+        // Act & Assert
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    contentDbContext.ReleaseVersions.Add(releaseVersion);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var sut = BuildService(contentDbContext, userService.Object);
+
+                    return await sut.DeleteReleaseNote(
+                        releaseVersionId: releaseVersion.Id,
+                        releaseNoteId: releaseNoteId
+                    );
+                }
+            });
     }
 
     [Fact]
-    public void UpdateReleaseNoteAsync()
+    public async Task UpdateReleaseNote()
     {
-        AssertSecurityPoliciesChecked(
-            service =>
-                service.UpdateReleaseNoteAsync(
-                    releaseVersionId: _releaseVersion.Id,
-                    releaseNoteId: Guid.NewGuid(),
-                    new ReleaseNoteSaveRequest()
-                ),
-            SecurityPolicies.CanUpdateSpecificReleaseVersion
-        );
+        // Arrange
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        var releaseNoteId = Guid.NewGuid();
+
+        // Act & Assert
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    contentDbContext.ReleaseVersions.Add(releaseVersion);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var sut = BuildService(contentDbContext, userService.Object);
+
+                    return await sut.UpdateReleaseNote(
+                        releaseVersionId: releaseVersion.Id,
+                        releaseNoteId: releaseNoteId,
+                        new ReleaseNoteUpdateRequest { Reason = "", On = DateTimeOffset.UtcNow }
+                    );
+                }
+            });
     }
 
-    private void AssertSecurityPoliciesChecked<T>(
-        Func<ReleaseNoteService, Task<Either<ActionResult, T>>> protectedAction,
-        params SecurityPolicies[] policies
-    )
-    {
-        var (mapper, contentDbContext, releaseHelper, userService) = Mocks();
-
-        var service = new ReleaseNoteService(
-            mapper.Object,
-            contentDbContext.Object,
-            releaseHelper.Object,
-            userService.Object
-        );
-
-        PermissionTestUtil.AssertSecurityPoliciesChecked(
-            protectedAction,
-            _releaseVersion,
-            userService,
-            service,
-            policies
-        );
-    }
-
-    private (
-        Mock<IMapper>,
-        Mock<ContentDbContext>,
-        Mock<IPersistenceHelper<ContentDbContext>>,
-        Mock<IUserService>
-    ) Mocks()
-    {
-        return (
-            new Mock<IMapper>(),
-            new Mock<ContentDbContext>(),
-            MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion),
-            new Mock<IUserService>()
-        );
-    }
+    private static ReleaseNoteService BuildService(ContentDbContext contentDbContext, IUserService userService) =>
+        new(contentDbContext: contentDbContext, userService: userService);
 }

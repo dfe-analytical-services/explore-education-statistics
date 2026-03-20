@@ -53,10 +53,6 @@ describe('ReleaseContentRedesign', () => {
     expect(releaseSummaryBlock).toBeInTheDocument();
 
     expect(
-      within(releaseSummaryBlock).getByTestId('Last updated-value'),
-    ).toBeInTheDocument();
-
-    expect(
       within(releaseSummaryBlock).getByTestId('Published-value'),
     ).toHaveTextContent('TBA');
   });
@@ -66,7 +62,9 @@ describe('ReleaseContentRedesign', () => {
       <ReleaseContentRedesign />,
       generateReleaseContent({
         release: generateEditableRelease({
+          publishScheduled: '2025-08-12T09:30:00+01:00',
           published: '2025-08-10T09:30:00+01:00',
+          publishedDisplayDate: '2025-08-10T09:30:00+01:00',
           updates: [],
         }),
       }),
@@ -89,7 +87,9 @@ describe('ReleaseContentRedesign', () => {
       <ReleaseContentRedesign />,
       generateReleaseContent({
         release: generateEditableRelease({
+          lastUpdated: '2025-08-10T09:30:00+01:00',
           publishScheduled: '2025-08-10T09:30:00+01:00',
+          publishedDisplayDate: '2025-08-10T09:30:00+01:00',
         }),
       }),
     );
@@ -111,8 +111,10 @@ describe('ReleaseContentRedesign', () => {
       <ReleaseContentRedesign />,
       generateReleaseContent({
         release: generateEditableRelease({
+          lastUpdated: '2025-08-12T09:30:00+01:00',
           publishScheduled: '2025-08-12T09:30:00+01:00',
           published: '2025-08-10T09:30:00+01:00',
+          publishedDisplayDate: '2025-08-10T09:30:00+01:00',
         }),
       }),
     );

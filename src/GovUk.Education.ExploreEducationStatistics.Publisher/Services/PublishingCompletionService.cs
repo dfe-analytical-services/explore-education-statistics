@@ -17,7 +17,8 @@ public class PublishingCompletionService(
     IReleaseService releaseService,
     IRedirectsCacheService redirectsCacheService,
     IDataSetPublishingService dataSetPublishingService,
-    IPublisherEventRaiser publisherEventRaiser
+    IPublisherEventRaiser publisherEventRaiser,
+    IEducationInNumbersService educationInNumbersService
 ) : IPublishingCompletionService
 {
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -93,6 +94,8 @@ public class PublishingCompletionService(
         await redirectsCacheService.UpdateRedirects();
 
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
+
+        await educationInNumbersService.UpdateEinTiles(releaseVersionIdsToUpdate);
 
         await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
 

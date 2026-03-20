@@ -131,8 +131,16 @@ export function handleLogout() {
 }
 
 export function acquireTokenSilent(): Promise<AuthenticationResult> {
-  return getMsalInstance().acquireTokenSilent({
+  const instance = getMsalInstance();
+  const accounts = instance.getAllAccounts();
+
+  if (!accounts || accounts.length === 0) {
+    handleLogin(window.location.pathname);
+    return Promise.reject(new Error('No account available'));
+  }
+
+  return instance.acquireTokenSilent({
     scopes: [adminApiScope],
-    account: msalInstance.getAllAccounts()[0],
+    account: accounts[0],
   });
 }

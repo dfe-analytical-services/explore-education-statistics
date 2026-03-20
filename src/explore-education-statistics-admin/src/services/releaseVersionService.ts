@@ -49,7 +49,6 @@ export interface ReleaseVersion {
   preReleaseUsersOrInvitesAdded?: boolean;
   year: number;
   yearTitle: string;
-  permissions?: ReleaseVersionPermissions;
 }
 
 export interface ReleaseVersionSummary {
@@ -68,7 +67,6 @@ export interface ReleaseVersionSummary {
   nextReleaseDate?: PartialDate;
   type: ReleaseType;
   amendment: boolean;
-  latestRelease: boolean;
   previousVersionId?: string;
   permissions?: ReleaseVersionPermissions;
   publication?: PublicationSummary;

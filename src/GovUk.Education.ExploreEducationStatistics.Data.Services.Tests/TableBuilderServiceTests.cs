@@ -1275,7 +1275,7 @@ public class TableBuilderServiceTests
 
     private static IOptions<TableBuilderOptions> DefaultTableBuilderOptions()
     {
-        return new TableBuilderOptions { MaxTableCellsAllowed = 25000, CroppedTableMaxRows = 1000 }.ToOptionsWrapper();
+        return new TableBuilderOptions { MaxTableCellsAllowed = 25000 }.ToOptionsWrapper();
     }
 
     private static IOptions<LocationsOptions> DefaultLocationOptions()

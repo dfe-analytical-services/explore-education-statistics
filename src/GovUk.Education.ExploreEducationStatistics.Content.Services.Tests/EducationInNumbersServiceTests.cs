@@ -1,5 +1,8 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.ViewModels.EducationInNumbersContentViewModels;
@@ -8,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 
 public class EducationInNumbersServiceTests
 {
+    private readonly DataFixture _fixture = new();
+
     [Fact]
     public async Task ListEinPages_ReturnsLatestVersionOfEachUniqueSlug_Success()
     {
@@ -129,6 +134,43 @@ public class EducationInNumbersServiceTests
                         [
                             new EinHtmlBlock { Order = 1, Body = "EinHtmlBlock 2" },
                             new EinHtmlBlock { Order = 0, Body = "EinHtmlBlock 1" },
+                            new EinTileGroupBlock
+                            {
+                                Title = "tile group block",
+                                Order = 2,
+                                Tiles =
+                                [
+                                    new EinFreeTextStatTile
+                                    {
+                                        Title = "free text stat tile",
+                                        Order = 1,
+                                        Statistic = "Over 9000!",
+                                        Trend = "It's up!",
+                                        LinkText = "Link text",
+                                        LinkUrl = "https://example.com/",
+                                    },
+                                    new EinApiQueryStatTile
+                                    {
+                                        Title = "api query stat tile",
+                                        Order = 0,
+                                        Statistic = "9393",
+                                        DecimalPlaces = 2,
+                                        IndicatorUnit = IndicatorUnit.MillionPounds,
+                                        DataSetId = Guid.NewGuid(),
+                                        DataSetVersionId = Guid.NewGuid(),
+                                        LatestDataSetVersionId = Guid.NewGuid(),
+                                        Query = "some query",
+                                        Version = "1.0.0",
+                                        QueryResult = "some query result",
+                                        Release = _fixture
+                                            .DefaultRelease()
+                                            .WithSlug("release-slug")
+                                            .WithPublication(
+                                                _fixture.DefaultPublication().WithSlug("publication-slug")
+                                            ),
+                                    },
+                                ],
+                            },
                         ],
                     },
                 ],
@@ -167,7 +209,7 @@ public class EducationInNumbersServiceTests
             Assert.Equal(0, section.Order);
 
             var blocks = section.Content;
-            Assert.Equal(2, blocks.Count);
+            Assert.Equal(3, blocks.Count);
 
             var block1 = blocks[0];
             var einHtmlBlock1 = Assert.IsType<EinHtmlBlockViewModel>(block1);
@@ -178,6 +220,29 @@ public class EducationInNumbersServiceTests
             var einHtmlBlock2 = Assert.IsType<EinHtmlBlockViewModel>(block2);
             Assert.Equal("EinHtmlBlock 2", einHtmlBlock2.Body);
             Assert.Equal(1, einHtmlBlock2.Order);
+
+            var block3 = blocks[2];
+            var einTileGroupBlock = Assert.IsType<EinTileGroupBlockViewModel>(block3);
+            Assert.Equal("tile group block", einTileGroupBlock.Title);
+
+            Assert.Equal(2, einTileGroupBlock.Tiles.Count);
+
+            var tile1 = Assert.IsType<EinApiQueryStatTileViewModel>(einTileGroupBlock.Tiles[0]);
+            Assert.Equal("api query stat tile", tile1.Title);
+            Assert.Equal("9393", tile1.Statistic);
+            Assert.Equal("some query", tile1.Query);
+            Assert.Equal("1.0.0", tile1.Version);
+            Assert.Equal(IndicatorUnit.MillionPounds, tile1.IndicatorUnit);
+            Assert.False(tile1.IsLatestVersion);
+            Assert.Equal("publication-slug", tile1.PublicationSlug);
+            Assert.Equal("release-slug", tile1.ReleaseSlug);
+
+            var tile2 = Assert.IsType<EinFreeTextStatTileViewModel>(einTileGroupBlock.Tiles[1]);
+            Assert.Equal("free text stat tile", tile2.Title);
+            Assert.Equal("Over 9000!", tile2.Statistic);
+            Assert.Equal("It's up!", tile2.Trend);
+            Assert.Equal("Link text", tile2.LinkText);
+            Assert.Equal("https://example.com/", tile2.LinkUrl);
         }
     }
 

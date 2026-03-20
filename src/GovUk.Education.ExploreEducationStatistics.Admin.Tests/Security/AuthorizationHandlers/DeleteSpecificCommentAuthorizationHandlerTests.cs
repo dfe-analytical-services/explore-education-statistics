@@ -1,7 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -24,7 +24,7 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-            .WithContent([
+            .WithGenericContent([
                 _dataFixture.DefaultContentSection().WithContentBlocks([new DataBlock { Comments = [comment] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
@@ -41,9 +41,9 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
 
     private static DeleteSpecificCommentAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(contentDbContext);
-
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
+        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
+            contentDbContext
+        );
 
         return new DeleteSpecificCommentAuthorizationHandler(
             contentDbContext,

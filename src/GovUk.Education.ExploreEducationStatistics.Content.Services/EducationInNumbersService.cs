@@ -21,12 +21,13 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
 
         return await uniqueSlugs
             .ToAsyncEnumerable()
-            .SelectAwait(async slug =>
-                await contentDbContext
-                    .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
-                    .OrderByDescending(page => page.Version)
-                    .Select(page => EinNavItemViewModel.FromModel(page))
-                    .FirstAsync(cancellationToken: cancellationToken)
+            .Select(
+                async (slug, ct) =>
+                    await contentDbContext
+                        .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
+                        .OrderByDescending(page => page.Version)
+                        .Select(page => EinNavItemViewModel.FromModel(page))
+                        .FirstAsync(cancellationToken: ct)
             )
             .OrderBy(navItem => navItem.Order)
             .ToListAsync(cancellationToken: cancellationToken);
@@ -41,6 +42,7 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
             .EducationInNumbersPages.Include(page => page.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
+                        .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
             .Where(page => page.Slug == slug && page.Published != null)
             .OrderByDescending(page => page.Version)
             .Select(page => EinPageViewModel.FromModel(page))

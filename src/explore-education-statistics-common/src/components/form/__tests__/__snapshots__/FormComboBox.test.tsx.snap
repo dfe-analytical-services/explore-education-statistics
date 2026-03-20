@@ -43,9 +43,7 @@ exports[`FormComboBox renders with options in correct order when input changes 1
          type="text"
          value="Test"
   >
-  <div class="optionsContainer overflowContainer"
-       role="alert"
-  >
+  <div class="optionsContainer overflowContainer">
     <ul class="options"
         id="test-combobox-options"
         role="listbox"

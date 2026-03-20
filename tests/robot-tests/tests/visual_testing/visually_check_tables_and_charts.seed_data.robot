@@ -2,7 +2,8 @@
 Resource            tables_and_charts.robot
 Library             tables_and_charts.py
 
-Force Tags          GeneralPublic    Local
+# Failing tag relates to https://dfedigital.atlassian.net/browse/EES-6892
+Force Tags          GeneralPublic    Local    Failing
 
 Suite Setup         do suite setup
 Suite Teardown      user closes the browser

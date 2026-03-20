@@ -88,6 +88,7 @@ export const testTable: FullTable = {
     ],
     publicationName: 'Test publication',
     subjectName: 'dates',
+    dataSetFileId: 'file-id',
     timePeriodRange: [
       new TimePeriodFilter({
         label: '2020 Week 23',
@@ -268,6 +269,12 @@ export const testPublicationRelease: ReleaseVersion = {
     content: [],
   },
   relatedDashboardsSection: {
+    id: '',
+    order: 0,
+    heading: '',
+    content: [],
+  },
+  warningSection: {
     id: '',
     order: 0,
     heading: '',

@@ -15,7 +15,7 @@ Navigate to Absence publication
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
 Go to Notify me page for Absence publication
-    user clicks link    Sign up for email alerts
+    user clicks link    Get email alerts
 
     user waits until page contains title caption    Notify me    %{WAIT_LONG}
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}

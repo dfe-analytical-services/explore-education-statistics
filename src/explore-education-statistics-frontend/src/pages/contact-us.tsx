@@ -1,4 +1,8 @@
 import InsetText from '@common/components/InsetText';
+import {
+  DfeOpeningHours,
+  DfeTelephoneLine,
+} from '@common/modules/find-statistics/components/ContactUsSection';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
@@ -38,10 +42,9 @@ function ContactPage() {
             </h2>
             <p>Call the DfE public enquiries line:</p>
             <InsetText>
-              Phone: 0370 000 2288
+              {DfeTelephoneLine}
               <br />
-              Opening hours: Monday to Friday, 9.30am to 5pm (closed on bank
-              holidays)
+              Opening hours: {DfeOpeningHours}
             </InsetText>
           </section>
 

@@ -134,7 +134,7 @@ const PrototypeReleaseContent = ({
         <div className="govuk-grid-column-two-thirds">
           <ReleaseSummarySection
             isEditing={editingMode === 'edit'}
-            lastUpdated={release.updates[0]?.on}
+            lastUpdated={release.lastUpdated}
             latestRelease={release.latestRelease}
             nextReleaseDate={release.nextReleaseDate}
             releaseDate={release.published ?? release.publishScheduled}

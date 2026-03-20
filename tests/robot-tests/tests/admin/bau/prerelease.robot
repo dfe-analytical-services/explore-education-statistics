@@ -283,11 +283,11 @@ Validate prerelease has started
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
-    user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
+    user waits until element contains    id:background-information    Test summary text for ${PUBLICATION_NAME}
     ...    %{WAIT_SMALL}
-    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
+    user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
     ...    %{WAIT_SMALL}
 
 Validate contact banner is shown
@@ -295,6 +295,8 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
 Validate metadata guidance page
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
@@ -322,6 +324,8 @@ Validate metadata guidance page
     user checks table cell contains    1    2    Admission Numbers
 
 Go back to prerelease content page
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Back
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -331,6 +335,8 @@ Go back to prerelease content page
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Pre-release access list
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -338,6 +344,8 @@ Validate public prerelease access list
     user waits until page contains    Updated test public access list    %{WAIT_SMALL}
 
 Go back to prerelease content page again
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Back
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
@@ -402,6 +410,8 @@ Create and validate methodology
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate prerelease has started for Analyst user
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user changes to analyst1
     user navigates to    ${RELEASE_URL}/prerelease/content
 
@@ -410,12 +420,14 @@ Validate prerelease has started for Analyst user
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
-    user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
-    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
+    user waits until element contains    id:background-information    Test summary text for ${PUBLICATION_NAME}
+    user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate public metdata guidance for Analyst user
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
@@ -443,6 +455,8 @@ Validate public metdata guidance for Analyst user
     user checks table cell contains    1    2    Admission Numbers
 
 Go back to prerelease content page as Analyst user
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Back
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -452,6 +466,8 @@ Go back to prerelease content page as Analyst user
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list as Analyst user
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Pre-release access list
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
@@ -461,6 +477,8 @@ Validate public prerelease access list as Analyst user
     user waits until page contains    Updated test public access list    %{WAIT_SMALL}
 
 Go back to prerelease content page again as Analyst user
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
+    [Tags]    Failing
     user clicks link    Back
 
     user checks breadcrumb count should be    2

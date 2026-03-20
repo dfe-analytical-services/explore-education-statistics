@@ -325,7 +325,7 @@ user starts editing text block
 user adds content to autosaving text block
     [Arguments]    ${parent}    ${content}    ${save}=True
     user starts editing text block    ${parent}
-    user presses keys    CTRL+a
+    user selects all text
     user presses keys    BACKSPACE
     user presses keys    ${content}
     IF    ${save}
@@ -375,7 +375,7 @@ user adds content to accordion section text block
     ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
 
     IF    "${append}" == "${False}"
-        user presses keys    CTRL+a
+        user selects all text
         user presses keys    BACKSPACE
     ELSE
         user presses keys    END

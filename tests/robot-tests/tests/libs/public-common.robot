@@ -4,48 +4,6 @@ Library     public-utilities.py
 
 
 *** Keywords ***
-user checks headline summary contains
-    [Arguments]    ${text}
-    user waits until element is visible    xpath://*[@id="releaseHeadlines-summary"]//li[text()="${text}"]
-
-user checks number of release updates
-    [Arguments]    ${count}
-    user waits until page contains element    id:releaseLastUpdates
-    user waits until page contains element    css:#releaseLastUpdates li    limit=${count}
-
-user checks release update
-    [Arguments]    ${number}    ${date}    ${text}
-    user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) time    ${date}
-    user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) p    ${text}
-
-user waits until details dropdown contains publication
-    [Arguments]    ${details_heading}    ${publication_name}    ${publication_type}=National and official statistics
-    ${details}=    user gets details content element    ${details_heading}
-    user checks publication appears under correct publication type heading
-    ...    ${details}
-    ...    ${publication_type}
-    ...    ${publication_name}
-
-user checks publication appears under correct publication type heading
-    [Arguments]    ${parent}    ${publication_type}    ${publication_name}
-    ${publication_type}=    get child element
-    ...    ${parent}
-    ...    xpath:.//div[@data-testid="publication-type" and descendant::h3[text()="${publication_type}"]]
-    ${publications}=    get child element    ${publication_type}    css:ul
-    user checks element should contain    ${publications}    ${publication_name}
-
-user goes to release page via breadcrumb
-    [Arguments]    ${publication}    ${release}
-    user clicks link    ${publication}
-
-    user checks breadcrumb count should be    3
-    user checks nth breadcrumb contains    1    Home
-    user checks nth breadcrumb contains    2    Find statistics and data
-    user checks nth breadcrumb contains    3    ${publication}
-
-    user waits until h1 is visible    ${publication}
-    user waits until page contains title caption    ${release}
-
 user navigates to public release page
     [Arguments]    ${public_release_url}    ${publication_name}    ${release_name}=${EMPTY}
     user navigates to    ${public_release_url}
@@ -120,13 +78,24 @@ user opens data set details for subject
     ...    Click Element    xpath=${toggle_xpath}
 
 user checks main links for page 'Explore and download data' are present
-    [Arguments]    @{expected_link_texts}
-    FOR    ${link_text}    IN    @{expected_link_texts}
-        ${button_xpath}=    Set Variable
-        ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
+    [Arguments]    @{expected_card_link_texts}
+    ${explore_data_used_in_this_release_section_xpath}=    Set Variable
+    ...    //section[@data-testid="explore-section"]
+
+    # Verify the 'Download all data (ZIP)' link is present
+    ${download_all_data_zip_link_xpath}=    Set Variable
+    ...    ${explore_data_used_in_this_release_section_xpath}//a[text()="Download all data (ZIP)"]
+    Page Should Contain Element
+    ...    xpath=${download_all_data_zip_link_xpath}
+    ...    Page is missing "${download_all_data_zip_link_xpath}" link
+
+    # Verify that all expected links are present in the 'More options' cards grid
+    FOR    ${link_text}    IN    @{expected_card_link_texts}
+        ${link_xpath}=    Set Variable
+        ...    ${explore_data_used_in_this_release_section_xpath}//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
         Page Should Contain Element
-        ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
+        ...    xpath=${link_xpath}
+        ...    Page is missing "${link_xpath}" link
     END
 
 User checks page 'Explore and download data' data set available properties
@@ -134,7 +103,7 @@ User checks page 'Explore and download data' data set available properties
     ...    ${expected_row_count}
     ...    ${expected_time_period}
     ...    ${PUBLICATION_TITLE}
-    ...    ${expected_data_guidance}="${data_set_name} data guidance content"
+    ...    ${expected_data_guidance}=${data_set_name} data guidance content
 
     ${dataset_xpath}=    Set Variable
     ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]

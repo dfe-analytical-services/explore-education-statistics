@@ -15,4 +15,10 @@ public class AppOptions
     public required string PublishScheduledReleasesFunctionCronSchedule { get; init; }
 
     public required string StageScheduledReleasesFunctionCronSchedule { get; init; }
+
+    public required string BauEmail { get; init; }
+
+    public required string AdminAppUrl { get; init; }
+
+    public required string PublicAppUrl { get; init; }
 }

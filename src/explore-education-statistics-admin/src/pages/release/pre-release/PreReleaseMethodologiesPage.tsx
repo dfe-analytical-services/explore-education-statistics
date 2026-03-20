@@ -38,7 +38,10 @@ const PreReleaseMethodologiesPage = ({
     return {
       externalMethodology,
       methodologyVersions: latestMethodologyVersions.filter(
-        // Include amendments as previous version may be published and available for prerelease
+        // TODO Check if this filtering and the logic further down are necessary - looks like this
+        // may all be handled in the backend and so all methodologyVersions should be approved...
+        // ---
+        // Include amendments as previous version may be published and available for prerelease.
         methodologyVersion =>
           methodologyVersion.status === 'Approved' ||
           methodologyVersion.amendment,

@@ -789,8 +789,22 @@ user chooses file
 user clears element text
     [Arguments]    ${selector}
     user clicks element    ${selector}
-    press keys    ${selector}    CTRL+a+BACKSPACE
+    user selects all text and hits backspace
     sleep    0.3
+
+user selects all text
+    ${os}=    Evaluate    platform.system()    modules=platform
+    IF    '${os}' == 'Darwin'
+        ${modifier}=    Set Variable    COMMAND
+    ELSE
+        ${modifier}=    Set Variable    CTRL
+    END
+    Press Keys    none    ${modifier}+a
+    sleep    0.3
+
+user selects all text and hits backspace
+    user selects all text
+    Press Keys    none    BACKSPACE
 
 user presses keys
     [Arguments]    @{keys}

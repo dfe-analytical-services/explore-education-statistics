@@ -26,6 +26,7 @@ describe('ChartDataSetsConfiguration', () => {
   const testMeta: TableDataSubjectMeta = {
     publicationName: '',
     subjectName: '',
+    dataSetFileId: '',
     geoJsonAvailable: false,
     isCroppedTable: false,
     footnotes: [],

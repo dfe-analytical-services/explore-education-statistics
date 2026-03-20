@@ -120,22 +120,22 @@ public class ReleasePermissionService(
             )
             .OnSuccessVoid(async releaseVersion =>
             {
-                var releaseContributorReleaseRolesByUserId = await userReleaseRoleRepository
+                var releaseContributorReleaseRoleIdsByUserId = await userReleaseRoleRepository
                     .Query()
                     .WhereForReleaseVersion(releaseVersion.Id)
                     .WhereRolesIn(ReleaseRole.Contributor)
-                    .ToDictionaryAsync(urr => urr.UserId);
+                    .ToDictionaryAsync(urr => urr.UserId, urr => urr.Id);
 
-                var releaseRolesToBeRemoved = releaseContributorReleaseRolesByUserId
+                var releaseRoleIdsToBeRemoved = releaseContributorReleaseRoleIdsByUserId
                     .Where(kv => !userIds.Contains(kv.Key))
                     .Select(kv => kv.Value)
-                    .ToList();
+                    .ToHashSet();
 
                 var usersToBeAdded = userIds
-                    .Where(userId => !releaseContributorReleaseRolesByUserId.ContainsKey(userId))
+                    .Where(userId => !releaseContributorReleaseRoleIdsByUserId.ContainsKey(userId))
                     .ToList();
 
-                await userReleaseRoleRepository.RemoveMany(releaseRolesToBeRemoved);
+                await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToBeRemoved);
 
                 var newUserReleaseRoles = usersToBeAdded
                     .Select(userId => new UserReleaseRole
@@ -162,14 +162,17 @@ public class ReleasePermissionService(
             .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
             .OnSuccessVoid(async publication =>
             {
-                var releaseRolesToRemove = await userReleaseRoleRepository
-                    .Query()
-                    .WhereForUser(userId)
-                    .WhereForPublication(publicationId)
-                    .WhereRolesIn(ReleaseRole.Contributor)
-                    .ToListAsync();
+                var releaseRoleIdsToRemove = (
+                    await userReleaseRoleRepository
+                        .Query()
+                        .WhereForUser(userId)
+                        .WhereForPublication(publicationId)
+                        .WhereRolesIn(ReleaseRole.Contributor)
+                        .Select(urr => urr.Id)
+                        .ToListAsync()
+                ).ToHashSet();
 
-                await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove);
+                await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove);
             });
     }
 }

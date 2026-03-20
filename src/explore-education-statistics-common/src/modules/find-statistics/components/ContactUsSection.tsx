@@ -2,6 +2,10 @@ import { Contact } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
 import React from 'react';
 
+export const DfeTelephoneLine = 'Phone: 0370 000 2288';
+export const DfeOpeningHours =
+  'Monday to Friday from 9.30am to 5.30pm (closed on bank holidays)';
+
 const ContactUsSection = ({
   publicationContact,
   publicationTitle,
@@ -85,10 +89,10 @@ const ContactUsSection = ({
             If you have a general enquiry about the Department for Education
             (DfE) or education:
           </p>
-          <p>Telephone: 037 0000 2288</p>
+          <p>{DfeTelephoneLine}</p>
           <p>
             Opening times: <br />
-            Monday to Friday from 9.30am to 5pm (excluding bank holidays)
+            {DfeOpeningHours}
           </p>
         </>
       )}

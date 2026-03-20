@@ -38,7 +38,6 @@ describe('PublicationReleaseAccess', () => {
     yearTitle: '2000/01',
     live: false,
     amendment: false,
-    latestRelease: false,
   };
 
   const testContributors: UserReleaseRole[] = [

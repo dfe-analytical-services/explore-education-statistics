@@ -86,6 +86,44 @@ public class PublicDataApiClientTests
         }
     }
 
+    public class QueryDataSetPost : PublicDataApiClientTests
+    {
+        [Fact]
+        public async Task HttpClientSuccess()
+        {
+            var dataSetId = Guid.NewGuid();
+            var dataSetVersion = "1.1";
+            var queryBody = "{}";
+
+            var uri = new Uri(BaseUri, $"v1/data-sets/{dataSetId}/query?dataSetVersion={dataSetVersion}");
+
+            _mockHttp
+                .Expect(HttpMethod.Post, uri.AbsoluteUri)
+                .Respond(
+                    HttpStatusCode.OK,
+                    "application/json",
+                    """
+{"warnings": [], "paging": {"page": 1, "pageSize": 123, "totalResults": 0, "totalPages": 1}, "results": []}
+"""
+                );
+
+            var publicDataApiClient = BuildService();
+
+            var response = await publicDataApiClient.QueryDataSetPost(
+                dataSetId: dataSetId,
+                dataSetVersion: dataSetVersion,
+                queryBody: queryBody
+            );
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var result = response.AssertRight();
+            Assert.NotNull(result);
+            Assert.Empty(result.Results);
+            Assert.Equal(123, result.Paging.PageSize);
+        }
+    }
+
     private PublicDataApiClient BuildService(
         IHttpClientAzureAuthenticationManager<PublicDataApiOptions>? azureAuthenticationManager = null
     )

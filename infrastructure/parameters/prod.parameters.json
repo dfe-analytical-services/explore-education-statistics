@@ -44,7 +44,7 @@
     "deploySubnets": {
       "value": true
     },
-    "autoscalePublicApplication": {
+    "autoscaleAppServices": {
       "value": true
     },
     "domain": {

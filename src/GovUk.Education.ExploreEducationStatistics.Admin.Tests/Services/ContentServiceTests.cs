@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -16,8 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -40,7 +39,7 @@ public class ContentServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
 
             var result = await service.GetContentBlocks<HtmlBlock>(releaseVersion.Id);
 
@@ -55,10 +54,11 @@ public class ContentServiceTests
     {
         var releaseVersion = new ReleaseVersion
         {
-            Content = ListOf(
+            Content =
+            [
                 new ContentSection { Heading = "New section", Order = 1 },
-                new ContentSection { Heading = "New section", Order = 2 }
-            ),
+                new ContentSection { Heading = "New section", Order = 2 },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -71,7 +71,7 @@ public class ContentServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
 
             var result = await service.GetContentBlocks<HtmlBlock>(releaseVersion.Id);
 
@@ -89,30 +89,33 @@ public class ContentServiceTests
         var releaseVersion = new ReleaseVersion
         {
             Id = releaseVersionId,
-            Content = ListOf(
+            Content =
+            [
                 new ContentSection
                 {
                     Heading = "New section",
                     Order = 1,
-                    Content = ListOf<ContentBlock>(
+                    Content =
+                    [
                         new HtmlBlock { Body = "Test html block 1", ReleaseVersionId = releaseVersionId },
                         new HtmlBlock { Body = "Test html block 2", ReleaseVersionId = releaseVersionId },
-                        new DataBlock { Name = "Test data block 1", ReleaseVersionId = releaseVersionId }
-                    ),
+                        new DataBlock { Name = "Test data block 1", ReleaseVersionId = releaseVersionId },
+                    ],
                     ReleaseVersionId = releaseVersionId,
                 },
                 new ContentSection
                 {
                     Heading = "New section",
                     Order = 2,
-                    Content = ListOf<ContentBlock>(
+                    Content =
+                    [
                         new HtmlBlock { Body = "Test html block 3", ReleaseVersionId = releaseVersionId },
                         new HtmlBlock { Body = "Test html block 4", ReleaseVersionId = releaseVersionId },
-                        new DataBlock { Name = "Test data block 2", ReleaseVersionId = releaseVersionId }
-                    ),
+                        new DataBlock { Name = "Test data block 2", ReleaseVersionId = releaseVersionId },
+                    ],
                     ReleaseVersionId = releaseVersionId,
-                }
-            ),
+                },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -124,7 +127,7 @@ public class ContentServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
 
             var result = await service.GetContentBlocks<HtmlBlock>(releaseVersion.Id);
 
@@ -144,15 +147,15 @@ public class ContentServiceTests
     }
 
     [Fact]
-    public async Task RemoveContentSection()
+    public async Task RemoveGenericContentSection()
     {
         var releaseVersion = new ReleaseVersion();
 
         var contentSectionToRemove = new ContentSection
         {
             Order = 1,
-            Content = new List<ContentBlock>
-            {
+            Content =
+            [
                 new HtmlBlock { ReleaseVersion = releaseVersion },
                 new DataBlock { ReleaseVersion = releaseVersion },
                 new EmbedBlockLink
@@ -160,23 +163,14 @@ public class ContentServiceTests
                     EmbedBlock = new EmbedBlock { Title = "title", Url = "url" },
                     ReleaseVersion = releaseVersion,
                 },
-            },
+            ],
             ReleaseVersion = releaseVersion,
+            Type = ContentSectionType.Generic,
         };
 
-        var contentSection2 = new ContentSection
-        {
-            Order = 2,
-            Content = new List<ContentBlock>(),
-            ReleaseVersion = releaseVersion,
-        };
+        var contentSection2 = new ContentSection { Order = 2, ReleaseVersion = releaseVersion };
 
-        var contentSection3 = new ContentSection
-        {
-            Order = 3,
-            Content = new List<ContentBlock>(),
-            ReleaseVersion = releaseVersion,
-        };
+        var contentSection3 = new ContentSection { Order = 3, ReleaseVersion = releaseVersion };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -188,8 +182,8 @@ public class ContentServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
-            var result = await service.RemoveContentSection(
+            var service = BuildService(contentDbContext: contentDbContext);
+            var result = await service.RemoveGenericContentSection(
                 releaseVersionId: contentSectionToRemove.ReleaseVersionId,
                 contentSectionId: contentSectionToRemove.Id
             );
@@ -230,57 +224,83 @@ public class ContentServiceTests
     }
 
     [Fact]
-    public async Task RemoveContentSection_NoRelease()
+    public async Task RemoveGenericContentSection_SectionTypeIsNotGeneric_ThrowsException()
     {
-        var contentSection = new ContentSection
-        {
-            Content = new List<ContentBlock> { new HtmlBlock() },
-            ReleaseVersion = new ReleaseVersion(),
-        };
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
+
+        var sectionToRemove = releaseVersion.HeadlinesSection!;
+
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ContentSections.AddAsync(contentSection);
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
-            var result = await service.RemoveContentSection(Guid.NewGuid(), contentSection.Id);
+            var service = BuildService(contentDbContext: contentDbContext);
+
+            var result = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.RemoveGenericContentSection(
+                    releaseVersionId: releaseVersion.Id,
+                    contentSectionId: sectionToRemove.Id
+                )
+            );
+            Assert.Equal(
+                $"Only generic content sections can be removed. Attempted to remove a required section of type {sectionToRemove.Type}.",
+                result.Message
+            );
+        }
+    }
+
+    [Fact]
+    public async Task RemoveGenericContentSection_NoRelease()
+    {
+        var contentSection = new ContentSection
+        {
+            ReleaseVersion = new ReleaseVersion(),
+            Type = ContentSectionType.Generic,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ContentSections.Add(contentSection);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext: contentDbContext);
+            var result = await service.RemoveGenericContentSection(
+                releaseVersionId: Guid.NewGuid(),
+                contentSectionId: contentSection.Id
+            );
 
             result.AssertNotFound();
         }
     }
 
     [Fact]
-    public async Task RemoveContentSection_ContentSectionBelongsToAnotherRelease()
+    public async Task RemoveGenericContentSection_ContentSectionBelongsToAnotherRelease()
     {
         var releaseVersion = new ReleaseVersion();
         var otherReleaseVersion = new ReleaseVersion();
-        var relatedContentSection = new ContentSection
-        {
-            Content = new List<ContentBlock> { new HtmlBlock { ReleaseVersion = releaseVersion } },
-            ReleaseVersion = releaseVersion,
-        };
-        var unrelatedContentSection = new ContentSection
-        {
-            Id = Guid.NewGuid(),
-            Content = new List<ContentBlock> { new HtmlBlock { ReleaseVersion = otherReleaseVersion } },
-            ReleaseVersion = otherReleaseVersion,
-        };
+        var relatedContentSection = new ContentSection { ReleaseVersion = releaseVersion };
+        var unrelatedContentSection = new ContentSection { ReleaseVersion = otherReleaseVersion };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ContentSections.AddRangeAsync(relatedContentSection, unrelatedContentSection);
+            contentDbContext.ContentSections.AddRange(relatedContentSection, unrelatedContentSection);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
-            var result = await service.RemoveContentSection(
+            var service = BuildService(contentDbContext: contentDbContext);
+            var result = await service.RemoveGenericContentSection(
                 releaseVersionId: releaseVersion.Id,
                 contentSectionId: unrelatedContentSection.Id
             );
@@ -297,11 +317,11 @@ public class ContentServiceTests
         var blockToRemove = new HtmlBlock
         {
             Order = 0,
-            Comments = new List<Comment>
-            {
-                new() { Content = "Comment to be removed 1" },
-                new() { Content = "Comment to be removed 2" },
-            },
+            Comments =
+            [
+                new Comment { Content = "Comment to be removed 1" },
+                new Comment { Content = "Comment to be removed 2" },
+            ],
         };
 
         var dataBlockVersionId = Guid.NewGuid();
@@ -312,11 +332,7 @@ public class ContentServiceTests
             {
                 Id = dataBlockVersionId,
                 Order = 1,
-                Comments = new List<Comment>
-                {
-                    new() { Content = "Comment 1" },
-                    new() { Content = "Comment 2" },
-                },
+                Comments = [new Comment { Content = "Comment 1" }, new Comment { Content = "Comment 2" }],
             },
             DataBlockParentId = Guid.NewGuid(),
         };
@@ -324,26 +340,21 @@ public class ContentServiceTests
         var contentSection = new ContentSection
         {
             Id = contentSectionId,
-            Content = new List<ContentBlock>
-            {
-                blockToRemove,
-                dataBlockVersion.ContentBlock,
-                new HtmlBlock { Order = 2 },
-            },
+            Content = [blockToRemove, dataBlockVersion.ContentBlock, new HtmlBlock { Order = 2 }],
             ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ContentSections.AddRangeAsync(contentSection);
-            await contentDbContext.DataBlockVersions.AddRangeAsync(dataBlockVersion);
+            contentDbContext.ContentSections.AddRange(contentSection);
+            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: contentSectionId,
@@ -384,25 +395,20 @@ public class ContentServiceTests
         var contentBlockId = Guid.NewGuid();
         var contentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
-                new HtmlBlock { Id = contentBlockId },
-                new DataBlock(),
-                new HtmlBlock(),
-            },
+            Content = [new HtmlBlock { Id = contentBlockId }, new DataBlock(), new HtmlBlock()],
             ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ContentSections.AddRangeAsync(contentSection);
+            contentDbContext.ContentSections.AddRange(contentSection);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
             var result = await service.RemoveContentBlock(Guid.NewGuid(), contentSection.Id, contentBlockId);
 
             result.AssertNotFound();
@@ -416,24 +422,24 @@ public class ContentServiceTests
         var contentBlockId = Guid.NewGuid();
         var contentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
+            Content =
+            [
                 new HtmlBlock { Id = contentBlockId, ReleaseVersion = releaseVersion },
                 new DataBlock { ReleaseVersion = releaseVersion },
                 new HtmlBlock { ReleaseVersion = releaseVersion },
-            },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ContentSections.AddRangeAsync(contentSection);
+            contentDbContext.ContentSections.AddRange(contentSection);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: Guid.NewGuid(),
@@ -450,25 +456,20 @@ public class ContentServiceTests
         var contentBlockId = Guid.NewGuid();
         var contentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
-                new HtmlBlock { Id = contentBlockId },
-                new DataBlock(),
-                new HtmlBlock(),
-            },
+            Content = [new HtmlBlock { Id = contentBlockId }, new DataBlock(), new HtmlBlock()],
             ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ContentSections.AddRangeAsync(contentSection);
+            contentDbContext.ContentSections.AddRange(contentSection);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: contentSection.Id,
@@ -487,26 +488,22 @@ public class ContentServiceTests
         var incorrectContentBlockId = Guid.NewGuid();
         var incorrectContentSection = new ContentSection
         {
-            Content = new List<ContentBlock> { new HtmlBlock { Id = incorrectContentBlockId } },
+            Content = [new HtmlBlock { Id = incorrectContentBlockId }],
             ReleaseVersion = releaseVersion,
         };
 
-        var contentSection = new ContentSection
-        {
-            Content = new List<ContentBlock> { new HtmlBlock() },
-            ReleaseVersion = releaseVersion,
-        };
+        var contentSection = new ContentSection { Content = [new HtmlBlock()], ReleaseVersion = releaseVersion };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.ContentSections.AddRangeAsync(contentSection, incorrectContentSection);
+            contentDbContext.ContentSections.AddRange(contentSection, incorrectContentSection);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
             var result = await service.RemoveContentBlock(
                 releaseVersionId: contentSection.ReleaseVersionId,
                 contentSectionId: contentSection.Id,
@@ -546,13 +543,13 @@ public class ContentServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await contentDbContext.DataBlockParents.AddRangeAsync(dataBlockParent);
+            contentDbContext.DataBlockParents.AddRange(dataBlockParent);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupContentService(contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
             var result = await service.AttachDataBlock(
                 releaseVersionId: releaseVersion.Id,
                 contentSectionId: releaseVersion.Content[0].Id,
@@ -584,23 +581,21 @@ public class ContentServiceTests
         }
     }
 
-    private static ContentService SetupContentService(
+    private static ContentService BuildService(
         ContentDbContext contentDbContext,
-        IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-        IContentSectionRepository contentSectionRepository = null,
-        IContentBlockService contentBlockService = null,
-        IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
-        IUserService userService = null
-    )
-    {
-        return new ContentService(
+        IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+        IContentSectionRepository? contentSectionRepository = null,
+        IContentBlockService? contentBlockService = null,
+        IHubContext<ReleaseContentHub, IReleaseContentHubClient>? hubContext = null,
+        IUserService? userService = null
+    ) =>
+        new(
             contentDbContext,
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             contentSectionRepository ?? new ContentSectionRepository(contentDbContext),
             contentBlockService ?? new ContentBlockService(contentDbContext),
             hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(MockBehavior.Strict),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
-            AdminMapper(contentDbContext)
+            MapperUtils.AdminMapper(contentDbContext)
         );
-    }
 }

@@ -13,11 +13,13 @@ import {
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import ContentHtml from '@common/components/ContentHtml';
 import Tooltip from '@common/components/Tooltip';
+import { releaseWarningBlockParseOptions } from '@common/modules/release/components/ReleaseWarningBlock';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   commentTagAttributes,
   commentTags,
   defaultSanitizeOptions,
+  releaseWarningBlockSanitizeOptions,
   SanitizeHtmlOptions,
   TagFilter,
 } from '@common/utils/sanitizeHtml';
@@ -28,12 +30,14 @@ import React, { ReactNode, useMemo, useRef } from 'react';
 interface EditableContentBlockProps {
   actionThrottle?: number;
   allowComments?: boolean;
+  characterLimit?: number;
   editable?: boolean;
   editButtonLabel?: ReactNode | string;
   id: string;
   idleTimeout?: number;
   isEditing?: boolean;
   isLoading?: boolean;
+  isReleaseWarningBlock?: boolean;
   label: string;
   locked?: string;
   lockedBy?: UserDetails;
@@ -61,12 +65,14 @@ interface EditableContentBlockProps {
 const EditableContentBlock = ({
   actionThrottle,
   allowComments = false,
+  characterLimit,
   editable = true,
   editButtonLabel,
   id,
   idleTimeout,
-  isLoading,
   isEditing,
+  isLoading,
+  isReleaseWarningBlock = false,
   label,
   locked,
   lockedBy,
@@ -93,36 +99,42 @@ const EditableContentBlock = ({
     const commentTagFilter: TagFilter = frame =>
       comments.every(comment => comment.id !== frame.attribs.name);
 
-    return {
-      ...defaultSanitizeOptions,
-      allowedTags: [
-        ...(defaultSanitizeOptions.allowedTags ?? []),
-        ...commentTags,
-      ],
-      allowedAttributes: {
-        ...(defaultSanitizeOptions.allowedAttributes ?? {}),
-        ...commentTagAttributes,
-      },
-      filterTags: mapValues(commentTagAttributes, () => commentTagFilter),
-      transformTags: {
-        img: (tagName, attribs) => {
-          return {
-            tagName,
-            attribs: transformImageAttributes
-              ? transformImageAttributes(attribs)
-              : attribs,
-          };
-        },
-      },
-    };
-  }, [comments, transformImageAttributes]);
+    return isReleaseWarningBlock
+      ? releaseWarningBlockSanitizeOptions
+      : {
+          ...defaultSanitizeOptions,
+          allowedTags: [
+            ...(defaultSanitizeOptions.allowedTags ?? []),
+            ...commentTags,
+          ],
+          allowedAttributes: {
+            ...(defaultSanitizeOptions.allowedAttributes ?? {}),
+            ...commentTagAttributes,
+          },
+          filterTags: mapValues(commentTagAttributes, () => commentTagFilter),
+          transformTags: {
+            img: (tagName, attribs) => {
+              return {
+                tagName,
+                attribs: transformImageAttributes
+                  ? transformImageAttributes(attribs)
+                  : attribs,
+              };
+            },
+          },
+        };
+  }, [comments, isReleaseWarningBlock, transformImageAttributes]);
 
   if (isEditing && !lockedBy) {
     return (
       <EditableContentForm
         actionThrottle={actionThrottle}
         allowComments={allowComments}
+        characterLimit={characterLimit}
         content={value ? sanitizeHtml(value, sanitizeOptions) : ''}
+        customSanitizeOptions={
+          isReleaseWarningBlock ? releaseWarningBlockSanitizeOptions : undefined
+        }
         label={label}
         hideLabel={hideLabel}
         id={id}
@@ -183,6 +195,11 @@ const EditableContentBlock = ({
                 <ContentHtml
                   getGlossaryEntry={glossaryService.getEntry}
                   html={value || '<p>This section is empty</p>'}
+                  parseOptions={
+                    isReleaseWarningBlock
+                      ? releaseWarningBlockParseOptions
+                      : undefined
+                  }
                   sanitizeOptions={sanitizeOptions}
                 />
               </div>

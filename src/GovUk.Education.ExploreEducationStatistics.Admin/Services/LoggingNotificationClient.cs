@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Notify.Interfaces;
 using Notify.Models;
 using Notify.Models.Responses;
@@ -19,9 +20,16 @@ public class LoggingNotificationClient : INotificationClient
         Dictionary<string, dynamic> personalisation = null,
         string clientReference = null,
         string emailReplyToId = null,
+        // ReSharper disable once InconsistentNaming
         string oneClickUnsubscribeURL = null
     )
     {
+        _logger.LogInformation(
+            "Email sent to {EmailAddress} with template {TemplateId} with values: {PersonalisationKeys}",
+            emailAddress,
+            templateId,
+            personalisation == null ? "No personalisation provided" : personalisation.Keys.JoinToString(',')
+        );
         return new EmailNotificationResponse();
     }
 
@@ -78,6 +86,7 @@ public class LoggingNotificationClient : INotificationClient
         string status = "",
         string reference = "",
         string olderThanId = "",
+        // ReSharper disable once MethodOverloadWithOptionalParameter
         bool includeSpreadsheetUploads = false
     )
     {

@@ -414,7 +414,7 @@ user creates public prerelease access list
     user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Create public pre-release access list
-    user presses keys    CTRL+a
+    user selects all text
     user presses keys    BACKSPACE
     user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
@@ -425,7 +425,7 @@ user updates public prerelease access list
     [Arguments]    ${content}
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Edit public pre-release access list
-    user presses keys    CTRL+a
+    user selects all text
     user presses keys    BACKSPACE
     user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
@@ -933,7 +933,7 @@ user waits until modal is visible
     ...    ${modal_text}=${EMPTY}
     ...    ${wait}=${timeout}
 
-    user waits until parent contains element    ${MODAL_SELECTOR}    xpath://h2[.="${modal_title}"]
+    user waits until parent contains element    ${MODAL_SELECTOR}    //h2[span[normalize-space(.)='${modal_title}']]
     ...    timeout=${wait}
     IF    "${modal_text}" != "${EMPTY}"
         user waits until parent contains element    ${MODAL_SELECTOR}    xpath://*[.="${modal_text}"]
