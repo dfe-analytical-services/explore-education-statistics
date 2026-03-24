@@ -512,29 +512,27 @@ const DataFileReplacementPlan = ({
           })}
 
           <ButtonGroup className="govuk-!-margin-top-8">
-            {plan.valid &&
-              ((hasDataSetVersionPlan && user?.permissions.isBauUser) ||
-                !hasDataSetVersionPlan) && (
-                <Button
-                  disabled={isSubmitting}
-                  onClick={async () => {
-                    toggleSubmitting.on();
+            {plan.valid && (
+              <Button
+                disabled={isSubmitting}
+                onClick={async () => {
+                  toggleSubmitting.on();
 
-                    await dataReplacementService.replaceData(releaseVersionId, [
-                      fileId,
-                    ]);
+                  await dataReplacementService.replaceData(releaseVersionId, [
+                    fileId,
+                  ]);
 
-                    if (onReplacement) {
-                      onReplacement();
-                    }
-                    if (isMounted.current) {
-                      toggleSubmitting.off();
-                    }
-                  }}
-                >
-                  Confirm data replacement
-                </Button>
-              )}
+                  if (onReplacement) {
+                    onReplacement();
+                  }
+                  if (isMounted.current) {
+                    toggleSubmitting.off();
+                  }
+                }}
+              >
+                Confirm data replacement
+              </Button>
+            )}
             {cancelButton}
           </ButtonGroup>
         </>

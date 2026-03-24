@@ -1,13 +1,5 @@
-import {
-  FilterOptionCandidateWithKey,
-  FilterOptionMappingWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import styles from '@admin/pages/release/data/components/ApiDataSetMappingModal.module.scss';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
-import {
-  LocationCandidateWithKey,
-  LocationMappingWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -19,6 +11,10 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
 import prefixNoun from '@common/utils/string/prefixNoun';
+import {
+  CandidateWithKey,
+  MappingWithKey,
+} from '@admin/pages/release/data/utils/mappingTypes';
 
 const noMappingValue = 'noMapping';
 
@@ -27,14 +23,12 @@ interface FormValues {
 }
 
 interface Props {
-  candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
-  candidateHint?: (
-    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => ReactNode;
+  candidate?: CandidateWithKey;
+  candidateHint?: (candidate: CandidateWithKey) => ReactNode;
   groupKey?: string;
   itemLabel: string;
-  mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
-  newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
+  mapping: MappingWithKey;
+  newItems: CandidateWithKey[];
   onCancel?: () => void;
   onSubmit: (update: PendingMappingUpdate) => Promise<void>;
 }
@@ -139,8 +133,8 @@ function getInitialValues({
   candidate,
   mapping,
 }: {
-  candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
-  mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
+  candidate?: CandidateWithKey;
+  mapping: MappingWithKey;
 }) {
   if (candidate) {
     return { nextItem: candidate.key };

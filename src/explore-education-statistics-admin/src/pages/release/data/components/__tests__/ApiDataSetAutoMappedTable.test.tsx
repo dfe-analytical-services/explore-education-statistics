@@ -213,7 +213,7 @@ describe('ApiDataSetAutoMappedTable', () => {
 
     // Search
     expect(
-      screen.getByLabelText(/Search auto mapped options/),
+      screen.getByLabelText(/Search auto mapped locations/),
     ).toBeInTheDocument();
 
     // Table
@@ -389,7 +389,7 @@ describe('ApiDataSetAutoMappedTable', () => {
     ).toBeInTheDocument();
 
     await user.type(
-      screen.getByLabelText(/Search auto mapped options/),
+      screen.getByLabelText(/Search auto mapped locations/),
       'location 3',
     );
 

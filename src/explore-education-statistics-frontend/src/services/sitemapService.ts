@@ -8,9 +8,6 @@ import dataSetService, {
   DataSetSitemapItem,
 } from '@common/services/dataSetService';
 import { ISitemapField } from 'next-sitemap';
-import educationInNumbersService, {
-  EinPageSitemapItem,
-} from '@frontend/services/educationInNumbersService';
 
 export default async function getSitemapFields(): Promise<ISitemapField[]> {
   const methodologies = await methodologyService.listSitemapItems();
@@ -132,12 +129,5 @@ function buildDataSetRoutes(dataSets: DataSetSitemapItem[]): ISitemapField[] {
       process.env.PROD_PUBLIC_URL
     }/data-catalogue/data-set/${dataSet.id.toLowerCase()}`,
     lastmod: dataSet.lastModified,
-  }));
-}
-
-function buildEinPageRoutes(einPages: EinPageSitemapItem[]): ISitemapField[] {
-  return einPages.map(page => ({
-    loc: `${process.env.PROD_PUBLIC_URL}/education-in-numbers/${page.slug}`,
-    lastmod: page.lastModified,
   }));
 }
