@@ -14,6 +14,7 @@ import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
+import createLegendItemSorter from '@common/modules/charts/util/createLegendItemSorter';
 import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
@@ -25,7 +26,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import parseNumber from '@common/utils/number/parseNumber';
 import formatPretty from '@common/utils/number/formatPretty';
 import getAccessibleTextColour from '@common/utils/colour/getAccessibleTextColour';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   Bar,
   BarChart,
@@ -108,6 +109,10 @@ const HorizontalBarBlock = ({
     meta,
   });
 
+  const legendItemSorter = useMemo(() => {
+    return createLegendItemSorter(dataSetCategoryConfigs);
+  }, [dataSetCategoryConfigs]);
+
   const minorAxisDecimals = getMinorAxisDecimalPlaces(
     dataSetCategoryConfigs,
     axes.minor.decimalPlaces,
@@ -132,7 +137,6 @@ const HorizontalBarBlock = ({
     >
       <ResponsiveContainer height={height || 300}>
         <BarChart
-          accessibilityLayer
           aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           layout="vertical"
@@ -174,18 +178,24 @@ const HorizontalBarBlock = ({
           />
 
           <Tooltip
-            content={
+            content={props => (
               <CustomTooltip
+                {...props}
                 dataSetCategories={dataSetCategories}
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
               />
-            }
+            )}
             position={isMobileMedia ? { x: 0 } : undefined}
             wrapperStyle={{ zIndex: 1000 }}
           />
 
           {legend.position !== 'none' && (
-            <Legend content={renderLegend} align="left" layout="vertical" />
+            <Legend
+              content={renderLegend}
+              align="left"
+              layout="vertical"
+              itemSorter={legendItemSorter}
+            />
           )}
 
           {dataSetCategoryConfigs.map(({ config, dataKey, dataSet }) => (
@@ -213,12 +223,22 @@ const HorizontalBarBlock = ({
                         dataLabelPosition === 'inside'
                           ? 'insideRight'
                           : 'right',
-                      formatter: (value: string | number) =>
-                        formatPretty(
+                      formatter: (
+                        value: string | number | boolean | null | undefined,
+                      ) => {
+                        if (
+                          typeof value !== 'string' &&
+                          typeof value !== 'number'
+                        ) {
+                          return '';
+                        }
+
+                        return formatPretty(
                           value.toString(),
                           dataSet.indicator.unit,
                           dataSet.indicator.decimalPlaces,
-                        ),
+                        );
+                      },
                     }
                   : undefined
               }

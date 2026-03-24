@@ -65,24 +65,24 @@ user checks chart legend item contains
     user waits until element contains    ${element}    ${text}
 
 user checks chart inline legend item contains
-    [Arguments]    ${locator}    ${item}    ${text}
+    [Arguments]    ${locator}    ${text}
     user waits until parent contains element    ${locator}
-    ...    xpath://*[@class="recharts-layer recharts-line"][${item}]//*[@class="recharts-layer recharts-label-list"]//*[normalize-space() = "${text}"]
+    ...    xpath://*[@class="recharts-layer recharts-label-list"]//*[normalize-space() = "${text}"]
 
 user checks chart y axis tick contains
     [Arguments]    ${locator}    ${tick}    ${text}
     user waits until parent contains element    ${locator}
-    ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ...    css:.recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-label:nth-of-type(${tick})
     ${element}=    get child element    ${locator}
-    ...    css:.recharts-yAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ...    css:.recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-label:nth-of-type(${tick})
     user waits until element contains    ${element}    ${text}
 
 user checks chart x axis tick contains
     [Arguments]    ${locator}    ${tick}    ${text}
     user waits until parent contains element    ${locator}
-    ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ...    css:.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-label:nth-of-type(${tick})
     ${element}=    get child element    ${locator}
-    ...    css:.recharts-xAxis .recharts-cartesian-axis-tick:nth-of-type(${tick})
+    ...    css:.recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-label:nth-of-type(${tick})
     user waits until element contains    ${element}    ${text}
 
 user checks chart y axis ticks
