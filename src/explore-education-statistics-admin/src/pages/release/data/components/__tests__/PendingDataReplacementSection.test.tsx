@@ -76,11 +76,6 @@ const bau: AuthContextState['user'] = {
   permissions: defaultPermissions,
 };
 
-const analyst: AuthContextState['user'] = {
-  ...bau,
-  permissions: { ...defaultPermissions, isBauUser: false },
-};
-
 describe('PendingDataReplacementSection', () => {
   afterEach(() => {
     jest.clearAllMocks();

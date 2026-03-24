@@ -1,18 +1,11 @@
-import {
-  AutoMappedLocation,
-  LocationCandidateWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import {
-  AutoMappedFilterOption,
-  FilterOptionCandidateWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import { autoMappedTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import {
-  FilterOptionSource,
-  LocationCandidate,
-} from '@admin/services/apiDataSetVersionService';
+  AutoMappedItem,
+  CandidateWithKey,
+  MappableSourceItem,
+} from '@admin/pages/release/data/utils/mappingTypes';
 import Tag from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import Pagination from '@common/components/Pagination';
@@ -28,26 +21,18 @@ const itemsPerPage = 10;
 const formId = 'auto-mapped-search';
 
 interface Props {
-  autoMappedItems: AutoMappedLocation[] | AutoMappedFilterOption[];
-  candidateHint?: (
-    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => ReactNode;
+  autoMappedItems: AutoMappedItem[];
+  candidateHint?: (candidate: CandidateWithKey) => ReactNode;
   groupKey?: LocationLevelKey | string;
   groupLabel?: string;
   itemLabel: string;
   itemPluralLabel: string;
-  newItems?: LocationCandidateWithKey[] | FilterOptionCandidateWithKey[];
+  newItems?: CandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
-  renderCandidate: (
-    candidate: LocationCandidateWithKey | FilterOptionCandidateWithKey,
-  ) => ReactNode;
-  renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
-  renderSourceDetails?: (
-    source: FilterOptionSource | LocationCandidate,
-  ) => ReactNode;
-  searchFilter: (
-    searchTerm: string,
-  ) => AutoMappedLocation[] | AutoMappedFilterOption[];
+  renderCandidate: (candidate: CandidateWithKey) => ReactNode;
+  renderSource: (source: MappableSourceItem) => ReactNode;
+  renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
+  searchFilter: (searchTerm: string) => AutoMappedItem[];
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
@@ -107,8 +92,10 @@ export default function ApiDataSetAutoMappedTable({
                 id={`${formId}-search`}
                 label={
                   <>
-                    Search auto mapped options
-                    <VisuallyHidden>{`for ${groupLabel}`}</VisuallyHidden>
+                    Search auto mapped {itemPluralLabel}
+                    {groupLabel && (
+                      <VisuallyHidden>{`for ${groupLabel}`}</VisuallyHidden>
+                    )}
                   </>
                 }
                 labelSize="s"

@@ -1,21 +1,12 @@
 import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
-import {
-  FilterOptionSource,
-  IndicatorCandidate,
-  IndicatorSource,
-  LocationCandidate,
-  MappingType,
-} from '@admin/services/apiDataSetVersionService';
-import {
-  FilterOptionCandidateWithKey,
-  MappableFilterOption,
-} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import { MappingType } from '@admin/services/apiDataSetVersionService';
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import {
-  LocationCandidateWithKey,
-  LocationMappingWithKey,
-  MappableLocation,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+  CandidateWithKey,
+  MappableItem,
+  MappableSourceItem,
+  MappingWithKey,
+} from '@admin/pages/release/data/utils/mappingTypes';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import Tag, { TagProps } from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
@@ -24,48 +15,24 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
-import {
-  IndicatorCandidateWithKey,
-  MappableIndicator,
-} from '@admin/pages/release/data/utils/getApiDataSetIndicatorMappings';
 
 interface Props {
-  candidateHint?: (
-    candidate:
-      | FilterOptionCandidateWithKey
-      | LocationCandidateWithKey
-      | IndicatorCandidateWithKey,
-  ) => ReactNode;
+  candidateHint?: (candidate: CandidateWithKey) => ReactNode;
   candidateIsMajorMapping?: (
-    candidate: LocationCandidateWithKey,
-    mapping: LocationMappingWithKey,
+    candidate: CandidateWithKey,
+    mapping: MappingWithKey,
   ) => boolean;
   groupKey?: string;
-  groupLabel?: string;
+  tableCaptionText: string;
   itemLabel: string;
   itemPluralLabel: string;
-  mappableItems:
-    | MappableFilterOption[]
-    | MappableLocation[]
-    | MappableIndicator[];
-  newItems?:
-    | FilterOptionCandidateWithKey[]
-    | LocationCandidateWithKey[]
-    | IndicatorCandidateWithKey[];
+  mappableItems: MappableItem[];
+  newItems?: CandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
-  renderCandidate: (
-    candidate:
-      | LocationCandidateWithKey
-      | FilterOptionCandidateWithKey
-      | IndicatorCandidateWithKey,
-  ) => ReactNode;
+  renderCandidate: (candidate: CandidateWithKey) => ReactNode;
   renderCaptionEnd?: ReactNode;
-  renderSource: (
-    source: LocationCandidate | FilterOptionSource | IndicatorSource,
-  ) => ReactNode;
-  renderSourceDetails?: (
-    source: FilterOptionSource | LocationCandidate | IndicatorCandidate,
-  ) => ReactNode;
+  renderSource: (source: MappableSourceItem) => ReactNode;
+  renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
@@ -73,7 +40,7 @@ export default function ApiDataSetMappableTable({
   candidateHint,
   candidateIsMajorMapping,
   groupKey,
-  groupLabel,
+  tableCaptionText,
   itemLabel,
   itemPluralLabel,
   mappableItems,
@@ -99,7 +66,7 @@ export default function ApiDataSetMappableTable({
       data-testid={tableId}
     >
       <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
-        {groupLabel}{' '}
+        {tableCaptionText}{' '}
         <TagGroup className="govuk-!-margin-left-2">
           {totalUnmapped > 0 && (
             <Tag colour="red">

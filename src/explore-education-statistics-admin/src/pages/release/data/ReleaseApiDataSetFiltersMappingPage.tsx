@@ -382,7 +382,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                     groupKey={filterKey}
                     itemLabel="filter option"
                     itemPluralLabel="filter options"
-                    groupLabel={filtersMapping.mappings[filterKey].source.label}
+                    tableCaptionText={
+                      filtersMapping.mappings[filterKey].source.label
+                    }
                     mappableItems={mappableFilterOptions[filterKey]}
                     newItems={newFilterOptions[filterKey]}
                     pendingUpdates={pendingUpdates}

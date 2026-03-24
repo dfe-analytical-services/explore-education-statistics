@@ -62,7 +62,7 @@ describe('ApiDataSetMappableTable', () => {
     render(
       <ApiDataSetMappableTable
         groupKey="Filter1Key"
-        groupLabel="Filter 1"
+        tableCaptionText="Filter 1"
         itemLabel="filter option"
         itemPluralLabel="filter options"
         mappableItems={testFilterOptions}
@@ -145,7 +145,7 @@ describe('ApiDataSetMappableTable', () => {
     render(
       <ApiDataSetMappableTable
         groupKey="Filter1Key"
-        groupLabel="Filter 1"
+        tableCaptionText="Filter 1"
         itemLabel="filter option"
         itemPluralLabel="filter options"
         mappableItems={testFilterOptions}
@@ -167,7 +167,7 @@ describe('ApiDataSetMappableTable', () => {
     render(
       <ApiDataSetMappableTable
         groupKey="Filter1Key"
-        groupLabel="Filter 1"
+        tableCaptionText="Filter 1"
         itemLabel="filter option"
         itemPluralLabel="filter options"
         mappableItems={testFilterOptions}

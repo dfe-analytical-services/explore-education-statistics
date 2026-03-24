@@ -257,7 +257,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 key="indicator-mappings"
                 itemLabel="indicator"
                 itemPluralLabel="indicators"
-                groupLabel="Indicators that require mapping"
+                tableCaptionText="Indicators that require mapping"
                 mappableItems={mappableIndicators}
                 newItems={newIndicators}
                 pendingUpdates={pendingUpdates}
@@ -295,7 +295,6 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               <Tag colour="grey">No action required</Tag>
             </h3>
 
-            {/* TODO EES-6764 - is it OK to have an Accordion that always only has 1 section? */}
             {autoMappedIndicators.length > 0 ? (
               <Accordion
                 id={`${sectionIds.autoMappedIndicators}-accordion`}
