@@ -22,8 +22,9 @@ const MethodologySectionBlocks = ({ blocks, methodologyId }: Props) => {
         <ContentBlockRenderer
           key={block.id}
           block={block}
-          transformImageAttributes={transformImageAttributes}
+          generateH3Ids={false}
           getGlossaryEntry={glossaryService.getEntry}
+          transformImageAttributes={transformImageAttributes}
           trackGlossaryLinks={glossaryEntrySlug =>
             logEvent({
               category: `Methodology Page Content Glossary Link`,

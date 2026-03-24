@@ -13,6 +13,7 @@ interface Props {
   transformImageAttributes?: (
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
+  generateH3Ids?: boolean;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
@@ -21,6 +22,7 @@ interface Props {
 const ContentBlockRenderer = ({
   block,
   transformImageAttributes,
+  generateH3Ids,
   getGlossaryEntry,
   transformFeaturedTableLinks,
   trackGlossaryLinks,
@@ -48,9 +50,10 @@ const ContentBlockRenderer = ({
       return (
         <ContentHtml
           blockId={block.id}
+          generateH3Ids={generateH3Ids}
+          getGlossaryEntry={getGlossaryEntry}
           html={body}
           sanitizeOptions={sanitizeOptions}
-          getGlossaryEntry={getGlossaryEntry}
           trackGlossaryLinks={trackGlossaryLinks}
           transformFeaturedTableLinks={transformFeaturedTableLinks}
         />
