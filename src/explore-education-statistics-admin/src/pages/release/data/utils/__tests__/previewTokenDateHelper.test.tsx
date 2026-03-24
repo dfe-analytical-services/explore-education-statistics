@@ -158,8 +158,13 @@ describe('PreviewTokenDateHelper', () => {
       'should create date range for valid preset span = %i',
       datePresetSpan => {
         const activatesDate = new Date();
-        const expiresDate = new Date(activatesDate);
-        expiresDate.setDate(activatesDate.getDate() + datePresetSpan);
+        // Use UK timezone to avoid timezone failures in the pipeline
+        const activatesDateUk = UkTimeHelper.toUkStartOfDay(activatesDate);
+        const expiresDateUk = UkTimeHelper.addDaysInTimeZoneEndOfDay(
+          UkTimeHelper.europeLondonTimeZoneId,
+          activatesDateUk,
+          datePresetSpan,
+        );
         const timeThreshold = 100; // 100ms
 
         const result = helper.setDateRangeBasedOnPresets(datePresetSpan);
@@ -170,9 +175,7 @@ describe('PreviewTokenDateHelper', () => {
         );
         expect(difference).toBeLessThanOrEqual(timeThreshold);
 
-        // End date should be "datePresetSpan" days later, set to 23:59:59
-        expiresDate.setHours(23, 59, 59, 0);
-        expect(result.endDate.toISOString()).toBe(expiresDate.toISOString());
+        expect(result.endDate.toISOString()).toBe(expiresDateUk.toISOString());
       },
     );
 

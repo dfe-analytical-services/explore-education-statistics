@@ -1,4 +1,3 @@
-import { isSameDay, isBefore } from 'date-fns';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -11,6 +10,8 @@ import {
 import FormProvider from '@common/components/form/FormProvider';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
+import { isBefore } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import React, { useMemo } from 'react';
 import { ObjectSchema, Schema } from 'yup';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
@@ -49,7 +50,19 @@ export default function ApiDataSetPreviewTokenCreateForm({
     startDate: Date,
     endDate: Date,
   ) => {
-    return isBefore(startDate, endDate) || isSameDay(startDate, endDate);
+    // Format both to the same timezone-agnostic string format for comparison
+    const startStr = formatInTimeZone(
+      startDate,
+      UkTimeHelper.europeLondonTimeZoneId,
+      'yyyy-MM-dd',
+    );
+    const endStr = formatInTimeZone(
+      endDate,
+      UkTimeHelper.europeLondonTimeZoneId,
+      'yyyy-MM-dd',
+    );
+
+    return startStr <= endStr;
   };
   const { user } = useAuthContext();
 
@@ -96,14 +109,18 @@ export default function ApiDataSetPreviewTokenCreateForm({
               test(value) {
                 if (value == null) return false;
                 // Start of activates day in UK (UTC instant)
-                const todayMidnightUk = new Date(
-                  UkTimeHelper.toUkStartOfDay(new Date()),
-                );
+                const todayMidnightUk = UkTimeHelper.toUkStartOfDay(new Date());
                 const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
 
+                const sevenDaysFromTodayEndOfDayUk =
+                  UkTimeHelper.addDaysInTimeZoneEndOfDay(
+                    UkTimeHelper.europeLondonTimeZoneId,
+                    todayMidnightUk,
+                    7,
+                  );
                 return endDateIsLaterThanOrEqualToStartDate(
                   activatesMidnightUk,
-                  UkTimeHelper.getDateRangeFromDate(7, todayMidnightUk).endDate,
+                  sevenDaysFromTodayEndOfDayUk,
                 );
               },
             }),
