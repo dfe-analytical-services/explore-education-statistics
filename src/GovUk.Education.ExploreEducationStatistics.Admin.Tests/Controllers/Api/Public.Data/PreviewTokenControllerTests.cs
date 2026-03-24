@@ -120,18 +120,20 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [InlineData(true, true)]
         [InlineData(true, false)]
         [InlineData(false, true)]
+        [InlineData(false, false)]
         public async Task CustomActivatesOrExpiresProvided_Success(bool activatesProvided, bool expiresProvided)
         {
             var dataSetVersion = await SetUpDataSetVersionTestData();
 
             DateTimeOffset? suppliedActivates = activatesProvided
-                ? DateTimeOffset.UtcNow.AddDays(2).GetUkStartOfDayOn() // 2 days from now start of day UK time
+                ? DateTimeOffset.UtcNow.AddDays(2).GetUkStartOfDayUtc() // 2 days from now start of day UK time
                 : null;
 
-            DateTimeOffset? suppliedExpires =
-                !expiresProvided ? null
-                : activatesProvided ? suppliedActivates?.AddDays(5).GetUkEndOfDayOn() // 5 days after activates end of day UK time
-                : DateTimeOffset.UtcNow.AddDays(5).GetUkEndOfDayOn(); // 5 days from now end of day UK time
+            DateTimeOffset? suppliedExpires = expiresProvided
+                ? suppliedActivates.HasValue
+                    ? GetUkEndOfDayUtcAfterDays(suppliedActivates.Value, daysToAdd: 5) // 5 days after activates end of day UK time
+                    : GetUkEndOfDayUtcAfterDays(DateTimeOffset.UtcNow, daysToAdd: 5) // 5 days from now end of day UK time
+                : null;
 
             var label = new string('A', count: 100);
 
@@ -149,10 +151,11 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             Assert.True(Guid.TryParse(createdEntityId, out var previewTokenId));
 
             var expectedActivates = suppliedActivates ?? viewModel.Created;
-            var expectedExpiry =
-                suppliedExpires
-                ?? suppliedActivates?.AddDays(7).GetUkStartOfDayOn() // 7 days after activates end of day UK time
-                ?? DateTimeOffset.UtcNow.AddDays(7).GetUkStartOfDayOn(); // 7 days from now end of day UK time
+
+            var expectedExpires =
+                suppliedExpires // The supplied expires value
+                ?? suppliedActivates?.AddDays(7) // otherwise 7 days after activates if that has a supplied value
+                ?? DateTimeOffset.UtcNow.AddDays(7); // otherwise 7 days from now
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, viewModel.Id),
@@ -165,7 +168,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertEqual(expectedActivates),
-                () => viewModel.Expires.AssertEqual(expectedExpiry),
+                () => viewModel.Expires.AssertEqual(expectedExpires),
                 () => Assert.Null(viewModel.Updated)
             );
 
@@ -183,7 +186,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(fixture.BauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => actualPreviewToken.Created.AssertUtcNow(),
                 () => actualPreviewToken.Activates.AssertEqual(expectedActivates),
-                () => actualPreviewToken.Expires.AssertEqual(expectedExpiry),
+                () => actualPreviewToken.Expires.AssertEqual(expectedExpires),
                 () => Assert.Null(actualPreviewToken.Updated)
             );
         }
@@ -337,6 +340,11 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
             response.AssertForbidden();
         }
+
+        private static DateTimeOffset GetUkEndOfDayUtcAfterDays(DateTimeOffset date, int daysToAdd) =>
+            // The request validation expects the expiry value to be at the end of the day,
+            // without fractional seconds.
+            date.ToUkDateOnly().AddDays(daysToAdd).GetUkEndOfDayUtc(includeFractionalSeconds: false);
 
         private async Task<HttpResponseMessage> CreatePreviewToken(
             Guid dataSetVersionId,

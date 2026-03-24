@@ -80,15 +80,27 @@ export default class UkTimeHelper {
     // 2) Today at 00:00 London → UTC instant
     const todayMidnightUtc = fromZonedTime(`${todayYmdLondon}T00:00:00`, TZ);
 
-    // 3) Add N *calendar* days from that midnight
-    const plusNMidnightUtc = addDays(todayMidnightUtc, daysToAdd);
-
-    // 4) What calendar day is that in London?
-    const plusNYmdLondon = formatInTimeZone(plusNMidnightUtc, TZ, 'yyyy-MM-dd');
-
-    // 5) End of that day in London → UTC instant
-    const endDate = fromZonedTime(`${plusNYmdLondon}T23:59:59`, TZ);
+    const endDate = UkTimeHelper.addDaysInTimeZoneEndOfDay(
+      TZ,
+      todayMidnightUtc,
+      daysToAdd,
+    );
 
     return { startDate, endDate };
+  }
+
+  public static addDaysInTimeZoneEndOfDay(
+    TZ: string,
+    date: Date,
+    days: number,
+  ): Date {
+    // 1) Add N *calendar* days from that midnight
+    const plusNMidnightUtc = addDays(date, days);
+
+    // 2) What calendar day is that in London/TZ?
+    const plusNYmdLondon = formatInTimeZone(plusNMidnightUtc, TZ, 'yyyy-MM-dd');
+
+    // 3) End of that day in London/TZ → UTC instant
+    return fromZonedTime(`${plusNYmdLondon}T23:59:59`, TZ);
   }
 }

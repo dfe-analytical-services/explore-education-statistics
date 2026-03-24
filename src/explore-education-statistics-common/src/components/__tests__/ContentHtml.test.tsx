@@ -397,5 +397,22 @@ describe('ContentHtml', () => {
         }),
       ).toHaveAttribute('id', 'test-heading-content');
     });
+
+    test('does not process h3s if generateH3Ids is false', () => {
+      render(
+        <ContentHtml
+          blockId="test-block-id"
+          html="<h3>Heading Content</h3>"
+          generateH3Ids={false}
+        />,
+      );
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Heading Content',
+          level: 3,
+        }),
+      ).not.toHaveAttribute('id', 'test-heading-content');
+    });
   });
 });
