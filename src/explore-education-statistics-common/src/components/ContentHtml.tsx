@@ -24,6 +24,7 @@ export interface ContentHtmlProps {
   blockId?: string;
   className?: string;
   formatLinks?: boolean;
+  generateH3Ids?: boolean;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   html: string;
   parseOptions?: HTMLReactParserOptions;
@@ -38,6 +39,7 @@ export default function ContentHtml({
   blockId,
   className,
   formatLinks = true,
+  generateH3Ids = true,
   getGlossaryEntry,
   html,
   parseOptions,
@@ -124,7 +126,7 @@ export default function ContentHtml({
         return renderTable(node);
       }
 
-      if (node.name === 'h3') {
+      if (node.name === 'h3' && generateH3Ids) {
         const text = extractTextFromDOMNode(node);
         if (text && text.trim().length > 0) {
           return (
