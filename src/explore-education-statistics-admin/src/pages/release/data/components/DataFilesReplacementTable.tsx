@@ -35,7 +35,7 @@ export default function DataFilesReplacementTable({
   onReplacementStatusChange,
 }: Props) {
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table className={styles.table} data-testid={testId}>
         <caption className="govuk-table__caption--m">{caption}</caption>
 

@@ -72,7 +72,7 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
 
         {dataSetVersions?.length ? (
           <>
-            <div className="container-with-horizontal-scroll">
+            <div className="table-container">
               <table>
                 <caption className="govuk-visually-hidden">
                   Table showing versions of the API data set

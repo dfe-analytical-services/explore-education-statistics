@@ -39,7 +39,7 @@ const BauUsersPage = () => {
       ]}
     >
       <LoadingSpinner loading={isLoading} text="Loading users">
-        <div className="container-with-horizontal-scroll">
+        <div className="table-container">
           <table>
             <caption>Active user accounts</caption>
             <thead>

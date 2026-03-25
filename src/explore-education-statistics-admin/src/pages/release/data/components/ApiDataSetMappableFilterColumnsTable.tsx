@@ -13,7 +13,7 @@ export default function ApiDataSetMappableFilterColumnsTable({
   mappableFilters,
 }: Props) {
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table
         className="dfe-table--row-highlights"
         id="mappable-filter-columns-table"

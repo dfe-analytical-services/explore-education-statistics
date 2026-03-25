@@ -72,7 +72,7 @@ export default function ReleaseSeriesTable({
   }
 
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table data-testid="release-series">
         <caption className="govuk-visually-hidden">
           Table showing the ordered releases for this publication.

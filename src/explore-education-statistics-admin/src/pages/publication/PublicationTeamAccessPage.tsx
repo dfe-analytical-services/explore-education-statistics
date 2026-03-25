@@ -96,7 +96,7 @@ const PublicationTeamAccessPage = ({
 
       {model.publicationRoles.length ? (
         <>
-          <div className="container-with-horizontal-scroll">
+          <div className="table-container">
             <table data-testid="publicationRoles">
               <thead>
                 <tr>

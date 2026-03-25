@@ -14,7 +14,7 @@ export default function ApiDataSetDeletedLocationGroupsTable({
   locationGroups,
 }: Props) {
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table
         className="govuk-!-margin-bottom-7"
         id="deleted-location-groups-table"

@@ -27,7 +27,7 @@ const ReleaseUserTable = ({
   caption,
 }: Props) => {
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table data-testid={testId}>
         {caption && (
           <caption className="govuk-visually-hidden">{caption}</caption>

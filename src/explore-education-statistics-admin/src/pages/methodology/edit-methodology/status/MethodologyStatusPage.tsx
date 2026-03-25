@@ -156,7 +156,7 @@ const MethodologyStatusPage = () => {
                     loading={!methodologyStatuses}
                     text="Loading methodology status history"
                   >
-                    <div className="container-with-horizontal-scroll">
+                    <div className="table-container">
                       <table data-testid="methodology-status-history">
                         <thead>
                           <tr>

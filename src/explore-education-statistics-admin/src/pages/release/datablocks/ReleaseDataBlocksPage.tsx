@@ -162,7 +162,7 @@ const ReleaseDataBlocksPage = ({
         <>
           <h3>Data blocks</h3>
 
-          <div className="container-with-horizontal-scroll">
+          <div className="table-container">
             <table data-testid="dataBlocks">
               <thead>
                 <tr>

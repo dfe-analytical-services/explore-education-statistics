@@ -103,7 +103,7 @@ const BoundaryDataPage = () => {
           Upload boundary data file
         </Link>
 
-        <div className="container-with-horizontal-scroll">
+        <div className="table-container">
           <table>
             <thead>
               <tr>

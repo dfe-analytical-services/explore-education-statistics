@@ -100,7 +100,7 @@ export default function FeaturedTablesTable({
         )}
       </div>
 
-      <div className="container-with-horizontal-scroll">
+      <div className="table-container">
         <table data-testid="featuredTables">
           <thead>
             <tr>

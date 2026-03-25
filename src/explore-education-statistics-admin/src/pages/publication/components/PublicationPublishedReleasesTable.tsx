@@ -49,7 +49,7 @@ export default function PublicationPublishedReleasesTable({
 
   return (
     <>
-      <div className="container-with-horizontal-scroll">
+      <div className="table-container">
         <table
           className="dfe-hide-empty-cells"
           data-testid="publication-published-releases"

@@ -47,7 +47,7 @@ export default function LiveApiDataSetsTable({
   const orderedDataSets = orderBy(dataSets, dataSet => dataSet.title);
 
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table className={styles.table} data-testid="live-api-data-sets">
         <thead>
           <tr>

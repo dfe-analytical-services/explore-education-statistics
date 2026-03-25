@@ -29,7 +29,7 @@ const PublicationDraftReleases = ({
 
   return (
     <>
-      <div className="container-with-horizontal-scroll">
+      <div className="table-container">
         <table
           className="dfe-hide-empty-cells"
           data-testid="publication-draft-releases"

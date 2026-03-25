@@ -88,7 +88,7 @@ const ReleaseDataReorderSection = ({
               {subjects?.length !== 0 &&
                 !reorderingFilters &&
                 !reorderingIndicators && (
-                  <div className="container-with-horizontal-scroll">
+                  <div className="table-container">
                     <table className={styles.table}>
                       <caption className="govuk-visually-hidden">
                         Table showing data files in this release and buttons for

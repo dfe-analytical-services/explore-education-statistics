@@ -48,7 +48,7 @@ export default function DraftApiDataSetsTable({
   const orderedDataSets = orderBy(dataSets, dataSet => dataSet.title);
 
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table
         className={`${styles.table} dfe-table--row-highlights`}
         data-testid="draft-api-data-sets"

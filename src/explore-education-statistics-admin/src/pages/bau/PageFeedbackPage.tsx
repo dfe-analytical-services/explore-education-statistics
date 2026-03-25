@@ -76,7 +76,7 @@ const PageFeedbackPage = () => {
         {feedbackItems.length === 0 ? (
           <InsetText>No feedback found</InsetText>
         ) : (
-          <div className="container-with-horizontal-scroll">
+          <div className="table-container">
             <table>
               <thead>
                 <tr>

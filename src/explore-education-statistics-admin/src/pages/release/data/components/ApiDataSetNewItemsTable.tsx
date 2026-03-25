@@ -19,7 +19,7 @@ export default function ApiDataSetNewItemsTable({
   renderItem,
 }: Props) {
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table data-testid={`new-items-table-${groupKey}`}>
       <caption className="govuk-visually-hidden">
         {`Table showing new ${itemPluralLabel}${

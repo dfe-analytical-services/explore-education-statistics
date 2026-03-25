@@ -84,7 +84,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
         </div>
 
         {previewTokens?.length ? (
-          <div className="container-with-horizontal-scroll">
+          <div className="table-container">
             <table>
               <caption>
                 <VisuallyHidden>

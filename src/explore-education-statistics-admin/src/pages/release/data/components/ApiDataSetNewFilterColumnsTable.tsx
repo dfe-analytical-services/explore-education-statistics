@@ -11,7 +11,7 @@ interface Props {
 
 export default function ApiDataSetNewFilterColumnsTable({ newFilters }: Props) {
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table
         id="new-filter-columns-table"
         data-testid="new-filter-columns-table"

@@ -131,7 +131,7 @@ export default function ChartBoundaryLevelsForm({
             {dataSetRows.length > 1 && (
               <>
                 <h4>Set boundary levels per data set</h4>
-                <div className="container-with-horizontal-scroll">
+                <div className="table-container">
                   <table data-testid="data-set-boundary-levels">
                     <thead>
                       <tr>

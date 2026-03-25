@@ -14,7 +14,7 @@ export default function ApiDataSetNewLocationGroupsTable({
   locationGroups,
 }: Props) {
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table
         id="new-location-groups-table"
         data-testid="new-location-groups-table"

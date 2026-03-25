@@ -171,7 +171,7 @@ export default function ReleaseStatusPage() {
             loading={!releaseStatuses}
             text="Loading release status history"
           >
-            <div className="container-with-horizontal-scroll">
+            <div className="table-container">
               <table data-testid="release-status-history">
                 <thead>
                   <tr>

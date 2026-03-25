@@ -57,7 +57,7 @@ const InvitedUsersPage = () => {
         'There are currently no pending user invites'
       ) : (
         <LoadingSpinner loading={isLoading} text="Loading invited users">
-          <div className="container-with-horizontal-scroll">
+          <div className="table-container">
             <table>
               <caption className="govuk-table__caption">Invited users</caption>
               <thead>

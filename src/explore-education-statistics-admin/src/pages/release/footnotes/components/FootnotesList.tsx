@@ -126,7 +126,7 @@ const FootnotesList = ({
               summary="See matching criteria"
               className="govuk-!-margin-0"
             >
-              <div className="container-with-horizontal-scroll">
+              <div className="table-container">
                 <table className={styles.footnoteSelectionTable}>
                   <caption className="govuk-visually-hidden">
                     Table showing the subjects, indicators and filters that this

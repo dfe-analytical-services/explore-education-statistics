@@ -106,7 +106,7 @@ export default function RelatedPagesEditModal({
                   Reorder pages
                 </Button>
               )}
-              <div className="container-with-horizontal-scroll">
+              <div className="table-container">
                 <table>
                   <thead>
                     <tr>

@@ -21,7 +21,7 @@ const BauImportsPage = () => {
       ]}
     >
       <LoadingSpinner loading={isLoading} text="Loading imports">
-        <div className="container-with-horizontal-scroll">
+        <div className="table-container">
           <table>
             <thead>
               <tr>

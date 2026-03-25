@@ -61,7 +61,7 @@ const EducationInNumbersPagesTable = ({
     );
   }
   return (
-    <div className="container-with-horizontal-scroll">
+    <div className="table-container">
       <table className={styles.table} data-testid="education-in-numbers-table">
         <thead>
           <tr>

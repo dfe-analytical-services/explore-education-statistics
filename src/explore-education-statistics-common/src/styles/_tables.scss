@@ -6,7 +6,7 @@ table {
   @extend .govuk-table;
 }
 
-.container-with-horizontal-scroll {
+.table-container {
   width: 100%;
   overflow-x: auto;
 }
