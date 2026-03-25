@@ -7,5 +7,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleasePublishingStatusService
 {
-    Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(Guid releaseVersionId);
+    Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatus(Guid releaseVersionId);
 }

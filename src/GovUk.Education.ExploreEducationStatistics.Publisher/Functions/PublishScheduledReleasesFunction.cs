@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,17 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 public class PublishScheduledReleasesFunction(
     ILogger<PublishScheduledReleasesFunction> logger,
     IReleasePublishingStatusService releasePublishingStatusService,
-    IPublishingService publishingService,
     IPublishingCompletionService publishingCompletionService
 )
 {
     /// <summary>
-    /// Azure function which publishes the content for a release version at a scheduled time by moving it from a staging
-    /// directory.
+    /// Azure function which calls the <see cref="IPublishingCompletionService"/> in order to complete the publishing
+    /// process for release versions that are scheduled to be published.
     /// </summary>
-    /// <remarks>
-    /// It will then call PublishingCompletionService in order to complete the publishing process for that release version.
-    /// </remarks>
     /// <param name="timer"></param>
     /// <param name="context"></param>
     /// <returns></returns>
@@ -36,7 +31,8 @@ public class PublishScheduledReleasesFunction(
 
         var releasesReadyForPublishing = await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
-        await PublishScheduledReleases(releasesReadyForPublishing);
+        // Complete publishing of these release versions
+        await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(releasesReadyForPublishing);
 
         logger.LogInformation(
             "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
@@ -46,12 +42,11 @@ public class PublishScheduledReleasesFunction(
     }
 
     /// <summary>
-    /// Azure function which publishes the content for a release version immediately by moving it from a staging
-    /// directory. This function is manually triggered by an HTTP POST, and is disabled by default in production
-    /// environments.
+    /// Azure function which calls the <see cref="IPublishingCompletionService"/> in order to complete the publishing
+    /// process for release versions that are scheduled to be published.
     /// </summary>
     /// <remarks>
-    /// It will then call PublishingCompletionService in order to complete the publishing process for that release version.
+    /// This function is manually triggered by an HTTP POST, and is disabled by default in production environments.
     /// </remarks>
     /// <param name="request">
     /// An optional JSON request body with a "ReleaseVersionIds" array can be included in the POST request to limit
@@ -76,7 +71,8 @@ public class PublishScheduledReleasesFunction(
                 ? releasesReadyForPublishing.Where(key => releaseVersionIds.Contains(key.ReleaseVersionId)).ToList()
                 : releasesReadyForPublishing;
 
-        await PublishScheduledReleases(selectedReleasesToPublish);
+        // Complete publishing of these release versions
+        await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(selectedReleasesToPublish);
 
         logger.LogInformation(
             "{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
@@ -85,29 +81,6 @@ public class PublishScheduledReleasesFunction(
         );
 
         return new ManualTriggerResponse(selectedReleasesToPublish.ToReleaseVersionIds());
-    }
-
-    private async Task PublishScheduledReleases(IReadOnlyList<ReleasePublishingKey> scheduled)
-    {
-        if (!scheduled.Any())
-        {
-            return;
-        }
-
-        await publishingService.PublishStagedReleaseContent();
-
-        await scheduled
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async key =>
-            {
-                await releasePublishingStatusService.UpdateContentStage(
-                    key,
-                    ReleasePublishingStatusContentStage.Complete
-                );
-            });
-
-        // Finalise publishing of these releases
-        await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(scheduled);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local

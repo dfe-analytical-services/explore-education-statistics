@@ -113,7 +113,7 @@ public abstract class ReleasePublishingStatusServiceTests
         {
             // Arrange
             const string expectedFilter =
-                "OverallStage eq 'Started' and ContentStage eq 'Scheduled' and FilesStage eq 'Complete' and PublishingStage eq 'Scheduled'";
+                "OverallStage eq 'Started' and FilesStage eq 'Complete' and PublishingStage eq 'Scheduled'";
 
             var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
 

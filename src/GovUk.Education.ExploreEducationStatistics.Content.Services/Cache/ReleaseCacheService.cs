@@ -44,30 +44,8 @@ public class ReleaseCacheService(
         );
     }
 
-    public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
-        Guid releaseVersionId,
-        DateTimeOffset expectedPublishDate,
-        string publicationSlug,
-        string? releaseSlug = null
-    )
-    {
-        return publicBlobCacheService.Update(
-            cacheKey: new ReleaseStagedCacheKey(publicationSlug: publicationSlug, releaseSlug: releaseSlug),
-            createFn: () => releaseService.GetRelease(releaseVersionId, expectedPublishDate),
-            logger: logger
-        );
-    }
-
     public async Task<Either<ActionResult, Unit>> RemoveRelease(string publicationSlug, string releaseSlug)
     {
-        await publicBlobStorageService.DeleteBlob(
-            containerName: BlobContainers.PublicContent,
-            path: FileStoragePathUtils.PublicContentReleasePath(
-                publicationSlug: publicationSlug,
-                releaseSlug: releaseSlug
-            )
-        );
-
         await publicBlobStorageService.DeleteBlobs(
             containerName: BlobContainers.PublicContent,
             directoryPath: FileStoragePathUtils.PublicContentReleaseParentPath(
