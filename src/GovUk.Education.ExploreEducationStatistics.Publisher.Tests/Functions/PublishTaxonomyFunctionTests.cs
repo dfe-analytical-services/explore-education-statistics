@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -64,6 +65,8 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
                 },
             ];
 
+            PublicationsTreeThemeDto[] expectedPublicationsTree = [];
+
             var publicBlobCacheService = Mock.Get(GetRequiredService<IPublicBlobCacheService>());
 
             publicBlobCacheService
@@ -73,9 +76,7 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
                 .Returns(Task.CompletedTask);
 
             publicBlobCacheService
-                .Setup(s =>
-                    s.SetItemAsync<object>(new PublicationTreeCacheKey(), new List<PublicationTreeThemeViewModel>())
-                )
+                .Setup(s => s.SetItemAsync<object>(new PublicationsTreeCacheKey(), expectedPublicationsTree))
                 .Returns(Task.CompletedTask);
 
             var function = GetRequiredService<PublishTaxonomyFunction>();

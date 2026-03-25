@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -140,7 +141,7 @@ public static class PublisherHostBuilderExtensions
                         releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                        publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
+                        publicationsTreeService: provider.GetRequiredService<IPublicationsTreeService>()
                     ))
                     .AddScoped<IReleaseService, ReleaseService>()
                     .AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(
@@ -225,6 +226,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
                     .AddScoped<IPublicationService, PublicationService>()
                     .AddScoped<IPublicationCacheService, PublicationCacheService>()
+                    .AddScoped<IPublicationsTreeService, PublicationsTreeService>()
                     .AddScoped<Content.Services.Interfaces.IReleaseService, Content.Services.ReleaseService>()
                     .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                     .AddScoped<IReleaseCacheService, ReleaseCacheService>();
