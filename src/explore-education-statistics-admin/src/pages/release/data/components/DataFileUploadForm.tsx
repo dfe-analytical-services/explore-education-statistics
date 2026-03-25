@@ -141,6 +141,7 @@ export default function DataFileUploadForm({
 }: Props) {
   const [selectedFileType, setSelectedFileType] = useState<FileType>('csv');
   const [showReplacementWarning, toggleReplacementWarning] = useToggle(false);
+  const [showCompletionStatus, setShowCompletionStatus] = useState(false);
 
   const getErrorMappings = () => {
     return isDataReplacement
@@ -150,6 +151,7 @@ export default function DataFileUploadForm({
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
+      setShowCompletionStatus(false);
       switch (values.uploadType) {
         case 'csv': {
           if (!values.title) {
@@ -188,6 +190,7 @@ export default function DataFileUploadForm({
       }
 
       onSubmit();
+      setShowCompletionStatus(true);
       toggleReplacementWarning.off();
     },
     [onSubmit, releaseVersionId, toggleReplacementWarning],
@@ -290,6 +293,7 @@ export default function DataFileUploadForm({
                         dataSetFileTitles.includes(title),
                       );
                     }}
+                    onChange={() => setShowCompletionStatus(false)}
                   />
                   {showReplacementWarning && (
                     <WarningMessage>
@@ -315,12 +319,14 @@ export default function DataFileUploadForm({
                           name="dataFile"
                           label="Upload data file"
                           accept=".csv"
+                          onChange={() => setShowCompletionStatus(false)}
                         />
 
                         <FormFieldFileInput<DataFileUploadFormValues>
                           name="metadataFile"
                           label="Upload metadata file"
                           accept=".csv"
+                          onChange={() => setShowCompletionStatus(false)}
                         />
                       </>
                     ),
@@ -335,6 +341,7 @@ export default function DataFileUploadForm({
                         name="zipFile"
                         label="Upload ZIP file"
                         accept=".zip"
+                        onChange={() => setShowCompletionStatus(false)}
                       />
                     ),
                   },
@@ -350,6 +357,7 @@ export default function DataFileUploadForm({
                               name="bulkZipFile"
                               label="Upload bulk ZIP file"
                               accept=".zip"
+                              onChange={() => setShowCompletionStatus(false)}
                             />
                           ),
                         },
@@ -358,6 +366,7 @@ export default function DataFileUploadForm({
                 ]}
                 onChange={event => {
                   setSelectedFileType(event.target.value as FileType);
+                  setShowCompletionStatus(false);
                 }}
               />
 
@@ -385,8 +394,12 @@ export default function DataFileUploadForm({
                 </ButtonText>
               </ButtonGroup>
 
-              <div className="govuk-visually-hidden" role="status">
-                {formState.isSubmitSuccessful && !formState.isSubmitting && (
+              <div
+                id="upload-completion-status"
+                className="govuk-visually-hidden"
+                role="status"
+              >
+                {showCompletionStatus && (
                   <>
                     Upload complete. Click 'View details' on the item pending
                     review in order to continue import.
