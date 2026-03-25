@@ -7,8 +7,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 public interface IPublicationCacheService
 {
     Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(string publicationSlug);
-
-    Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(string publicationSlug);
-
-    Task<Either<ActionResult, Unit>> RemovePublication(string publicationSlug);
 }
