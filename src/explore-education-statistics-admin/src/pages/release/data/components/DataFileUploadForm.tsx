@@ -386,7 +386,7 @@ export default function DataFileUploadForm({
               </ButtonGroup>
 
               <div className="govuk-visually-hidden" role="status">
-                {formState.isSubmitSuccessful && (
+                {formState.isSubmitSuccessful && !formState.isSubmitting && (
                   <>
                     Upload complete. Click 'View details' on the item pending
                     review in order to continue import.
