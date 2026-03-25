@@ -15,12 +15,5 @@ public interface IReleaseCacheService
         DateTimeOffset? expectedPublishDate = null
     );
 
-    Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
-        Guid releaseVersionId,
-        DateTimeOffset expectedPublishDate,
-        string publicationSlug,
-        string? releaseSlug = null
-    );
-
     Task<Either<ActionResult, Unit>> RemoveRelease(string publicationSlug, string releaseSlug);
 }

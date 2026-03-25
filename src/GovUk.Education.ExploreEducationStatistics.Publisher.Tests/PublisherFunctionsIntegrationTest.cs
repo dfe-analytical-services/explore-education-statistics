@@ -152,13 +152,10 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         return
         [
             typeof(NotifyChangeFunction),
-            typeof(PublishImmediateReleaseContentFunction),
             typeof(PublishMethodologyFilesFunction),
             typeof(PublishReleaseFilesFunction),
             typeof(PublishScheduledReleasesFunction),
             typeof(PublishTaxonomyFunction),
-            typeof(RetryReleasePublishingFunction),
-            typeof(StageReleaseContentFunction),
             typeof(StageScheduledReleasesFunction),
         ];
     }

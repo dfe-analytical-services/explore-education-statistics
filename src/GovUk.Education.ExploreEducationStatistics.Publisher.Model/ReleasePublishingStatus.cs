@@ -23,7 +23,6 @@ public class ReleasePublishingStatus : ITableEntity
     public string PublicationSlug { get; set; }
     public DateTimeOffset? Publish { get; set; }
     public string ReleaseSlug { get; set; }
-    public string ContentStage { get; set; }
     public string FilesStage { get; set; }
     public string PublishingStage { get; set; }
     public string OverallStage { get; set; }
@@ -66,7 +65,7 @@ public class ReleasePublishingStatus : ITableEntity
         {
             if (_state == null)
             {
-                _state = new ReleasePublishingStatusState(ContentStage, FilesStage, PublishingStage, OverallStage);
+                _state = new ReleasePublishingStatusState(FilesStage, PublishingStage, OverallStage);
                 _state.PropertyChanged += StateChangedCallback;
             }
 
@@ -74,12 +73,11 @@ public class ReleasePublishingStatus : ITableEntity
         }
         set
         {
-            ContentStage = value.Content.ToString();
             FilesStage = value.Files.ToString();
             PublishingStage = value.Publishing.ToString();
             OverallStage = value.Overall.ToString();
 
-            _state = new ReleasePublishingStatusState(value.Content, value.Files, value.Publishing, value.Overall);
+            _state = new ReleasePublishingStatusState(value.Files, value.Publishing, value.Overall);
             _state.PropertyChanged += StateChangedCallback;
         }
     }
@@ -102,9 +100,6 @@ public class ReleasePublishingStatus : ITableEntity
     {
         switch (e.PropertyName)
         {
-            case nameof(ReleasePublishingStatusState.Content):
-                ContentStage = _state.Content.ToString();
-                break;
             case nameof(ReleasePublishingStatusState.Files):
                 FilesStage = _state.Files.ToString();
                 break;
@@ -116,11 +111,7 @@ public class ReleasePublishingStatus : ITableEntity
         OverallStage = _state.Overall.ToString();
     }
 
-    public bool AllStagesPriorToPublishingComplete()
-    {
-        return State.Content == ReleasePublishingStatusContentStage.Complete
-            && State.Files == ReleasePublishingStatusFilesStage.Complete;
-    }
+    public bool AllStagesPriorToPublishingComplete() => State.Files == ReleasePublishingStatusFilesStage.Complete;
 
     public ReleasePublishingKey AsTableRowKey()
     {

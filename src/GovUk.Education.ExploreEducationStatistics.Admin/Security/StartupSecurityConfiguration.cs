@@ -160,11 +160,6 @@ public static class StartupSecurityConfiguration
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanPublishSpecificRelease.ToString(),
-                policy => policy.Requirements.Add(new PublishSpecificReleaseRequirement())
-            );
-
-            options.AddPolicy(
                 SecurityPolicies.CanDeleteSpecificReleaseVersion.ToString(),
                 policy => policy.Requirements.Add(new DeleteSpecificReleaseRequirement())
             );
@@ -327,7 +322,6 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationHandler, MarkReleaseAsApprovedAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ResolveSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
