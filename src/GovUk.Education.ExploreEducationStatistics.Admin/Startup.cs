@@ -408,7 +408,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IContentReleaseService, ContentReleaseService>();
         services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
         services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IPublicationsTreeService, PublicationsTreeService>();
         services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 

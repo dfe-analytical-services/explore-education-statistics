@@ -13,7 +13,6 @@ public class PublishingCompletionService(
     IMethodologyService methodologyService,
     INotificationsService notificationsService,
     IReleasePublishingStatusService releasePublishingStatusService,
-    IPublicationCacheService publicationCacheService,
     IReleaseService releaseService,
     IRedirectsCacheService redirectsCacheService,
     IDataSetPublishingService dataSetPublishingService,
@@ -155,9 +154,6 @@ public class PublishingCompletionService(
         publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id;
         await contentDbContext.SaveChangesAsync();
 
-        // Invalidate the cache for the publication
-        await publicationCacheService.UpdatePublication(publication.Slug);
-
         return new PublishedPublicationInfo
         {
             PublicationId = publication.Id,
@@ -189,9 +185,6 @@ public class PublishingCompletionService(
 
         foreach (var archivedPublication in archivedPublications)
         {
-            // Invalidate the cache of the publication to reflect its new archived status
-            await publicationCacheService.UpdatePublication(archivedPublication.Slug);
-
             // Raise an event to indicate the publication has been archived
             await publisherEventRaiser.OnPublicationArchived(
                 archivedPublication.Id,
