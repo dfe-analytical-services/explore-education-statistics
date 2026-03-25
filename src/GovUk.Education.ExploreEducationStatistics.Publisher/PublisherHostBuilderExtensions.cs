@@ -3,8 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -138,7 +136,6 @@ public static class PublisherHostBuilderExtensions
                             provider.GetRequiredService<IPublicBlobStorageService>(),
                             provider.GetRequiredService<ILogger<BlobCacheService>>()
                         ),
-                        releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                         publicationsTreeService: provider.GetRequiredService<IPublicationsTreeService>()
@@ -219,17 +216,9 @@ public static class PublisherHostBuilderExtensions
                 // being done from Publisher directly, and so these DI dependencies should eventually be removed.
                 services
                     .AddAutoMapper(typeof(MappingProfiles))
-                    // UserService is added to satisfy the IUserService dependency in Content.Services.ReleaseService
-                    // even though it is not used
-                    .AddScoped<IUserService, UserService>(_ => new UserService(null!, null!))
                     .AddScoped<Content.Services.Interfaces.IMethodologyService, Content.Services.MethodologyService>()
                     .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
-                    .AddScoped<IPublicationService, PublicationService>()
-                    .AddScoped<IPublicationCacheService, PublicationCacheService>()
-                    .AddScoped<IPublicationsTreeService, PublicationsTreeService>()
-                    .AddScoped<Content.Services.Interfaces.IReleaseService, Content.Services.ReleaseService>()
-                    .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
-                    .AddScoped<IReleaseCacheService, ReleaseCacheService>();
+                    .AddScoped<IPublicationsTreeService, PublicationsTreeService>();
 
                 // Only set up the `PublicDataDbContext` in non-integration test
                 // environments. Otherwise, the connection string will be null and

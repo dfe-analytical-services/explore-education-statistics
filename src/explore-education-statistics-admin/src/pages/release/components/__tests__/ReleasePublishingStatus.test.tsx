@@ -12,7 +12,6 @@ describe('ReleasePublishingStatus', () => {
     releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Started',
       filesStage: 'Queued',
-      contentStage: 'Complete',
       publishingStage: 'NotStarted',
     });
 
@@ -21,7 +20,6 @@ describe('ReleasePublishingStatus', () => {
     expect(await screen.findByText('Started')).toBeInTheDocument();
 
     expect(screen.getByText('Files - queued')).toBeInTheDocument();
-    expect(screen.getByText('Content - complete')).toBeInTheDocument();
     expect(screen.getByText('Publishing - not started')).toBeInTheDocument();
   });
 
@@ -38,7 +36,6 @@ describe('ReleasePublishingStatus', () => {
 
     releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Complete',
-      contentStage: 'Complete',
       publishingStage: 'Complete',
       filesStage: 'Complete',
     });
@@ -49,7 +46,6 @@ describe('ReleasePublishingStatus', () => {
 
     expect(await screen.findByText('Complete')).toBeInTheDocument();
 
-    expect(screen.getByText('Content - complete')).toBeInTheDocument();
     expect(screen.getByText('Files - complete')).toBeInTheDocument();
     expect(screen.getByText('Publishing - complete')).toBeInTheDocument();
 
@@ -87,7 +83,6 @@ describe('ReleasePublishingStatus', () => {
 
     releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Complete',
-      contentStage: 'Complete',
       publishingStage: 'Complete',
       filesStage: 'Complete',
     });

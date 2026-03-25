@@ -49,8 +49,7 @@ public class NotifyChangeFunction(
                                 message,
                                 ReleasePublishingStatusStates.ImmediateReleaseStartedState
                             );
-                            await queueService.QueuePublishReleaseFilesMessages(new[] { releasePublishingKey });
-                            await queueService.QueuePublishReleaseContentMessage(releasePublishingKey);
+                            await queueService.QueuePublishReleaseFilesMessages([releasePublishingKey]);
                         }
                         else
                         {

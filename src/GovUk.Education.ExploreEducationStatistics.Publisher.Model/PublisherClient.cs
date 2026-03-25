@@ -16,18 +16,6 @@ public class PublisherClient(string connectionString) : IPublisherClient
         );
     }
 
-    public async Task PublishReleaseContent(
-        ReleasePublishingKey releasePublishingKey,
-        CancellationToken cancellationToken = default
-    )
-    {
-        await _queueServiceClient.SendMessageAsJson(
-            PublisherQueues.PublishReleaseContentQueue,
-            new PublishReleaseContentMessage(releasePublishingKey),
-            cancellationToken
-        );
-    }
-
     public async Task PublishReleaseFiles(
         IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
         CancellationToken cancellationToken = default
@@ -58,27 +46,6 @@ public class PublisherClient(string connectionString) : IPublisherClient
         await _queueServiceClient.SendMessageAsJson(
             PublisherQueues.NotifyChangeQueue,
             new NotifyChangeMessage(immediate, releasePublishingKey),
-            cancellationToken
-        );
-    }
-
-    public async Task RetryReleasePublishing(Guid releaseVersionId, CancellationToken cancellationToken = default)
-    {
-        await _queueServiceClient.SendMessageAsJson(
-            PublisherQueues.RetryReleasePublishingQueue,
-            new RetryReleasePublishingMessage(releaseVersionId),
-            cancellationToken
-        );
-    }
-
-    public async Task StageReleaseContent(
-        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
-        CancellationToken cancellationToken = default
-    )
-    {
-        await _queueServiceClient.SendMessageAsJson(
-            PublisherQueues.StageReleaseContentQueue,
-            new StageReleaseContentMessage(releasePublishingKeys),
             cancellationToken
         );
     }

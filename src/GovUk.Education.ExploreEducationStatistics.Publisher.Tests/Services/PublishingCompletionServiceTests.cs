@@ -68,12 +68,12 @@ public class PublishingCompletionServiceTests
                 // ARRANGE
                 ReleasePublishingKey releasePublishingKey1 = new(Guid.NewGuid(), Guid.NewGuid());
                 var releasePublishingStatus1 = new ReleasePublishingStatusBuilder(releasePublishingKey1)
-                    .WhereContentStatusIs(ReleasePublishingStatusContentStage.Queued)
+                    .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                     .Build();
 
                 ReleasePublishingKey releasePublishingKey2 = new(Guid.NewGuid(), Guid.NewGuid());
                 var releasePublishingStatus2 = new ReleasePublishingStatusBuilder(releasePublishingKey2)
-                    .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
+                    .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.Started)
                     .Build();
 
                 var notReadyKeys = new List<ReleasePublishingKey>() { releasePublishingKey1, releasePublishingKey2 };
@@ -150,7 +150,7 @@ public class PublishingCompletionServiceTests
                     _releasePublishingStatusService.WhereGetReturns(
                         readyKey,
                         new ReleasePublishingStatusBuilder(readyKey)
-                            .WhereContentStatusIs(ReleasePublishingStatusContentStage.Complete)
+                            .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.Complete)
                             .Build()
                     );
                 }
@@ -190,7 +190,7 @@ public class PublishingCompletionServiceTests
                         _releasePublishingStatusService.WhereGetReturns(
                             notReadyKey,
                             new ReleasePublishingStatusBuilder(notReadyKey)
-                                .WhereContentStatusIs(ReleasePublishingStatusContentStage.Scheduled)
+                                .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                                 .Build()
                         );
                     }
@@ -236,7 +236,7 @@ public class PublishingCompletionServiceTests
                         _releasePublishingStatusService.WhereGetReturns(
                             notReadyKey,
                             new ReleasePublishingStatusBuilder(notReadyKey)
-                                .WhereContentStatusIs(ReleasePublishingStatusContentStage.Scheduled)
+                                .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                                 .Build()
                         );
                     }

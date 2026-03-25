@@ -488,7 +488,7 @@ export class AdminService {
 
   getReleaseApprovalStatus({ releaseVersionId }: { releaseVersionId: string }) {
     const { response, json } = this.client.get<{ overallStage: OverallStage }>(
-      `/api/releases/${releaseVersionId}/stage-status`,
+      `/api/releaseVersions/${releaseVersionId}/stage-status`,
       applicationJsonHeaders,
     );
     return {

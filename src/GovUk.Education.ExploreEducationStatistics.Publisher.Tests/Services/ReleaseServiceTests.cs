@@ -104,10 +104,7 @@ public class ReleaseServiceTests
         {
             var service = BuildReleaseService(contentDbContext);
 
-            var result = await service.GetLatestPublishedReleaseVersion(
-                publication.Id,
-                includeUnpublishedVersionIds: []
-            );
+            var result = await service.GetLatestPublishedReleaseVersion(publication.Id);
 
             Assert.Equal(release2021.Versions[1].Id, result.Id);
         }
@@ -149,152 +146,10 @@ public class ReleaseServiceTests
         {
             var service = BuildReleaseService(contentDbContext);
 
-            var result = await service.GetLatestPublishedReleaseVersion(
-                publication.Id,
-                includeUnpublishedVersionIds: []
-            );
+            var result = await service.GetLatestPublishedReleaseVersion(publication.Id);
 
             // Check the 2020 release version is considered to be the latest published release version,
             // since 2020 is the first release in the release series with a published version
-            Assert.Equal(release2020.Versions[0].Id, result.Id);
-        }
-    }
-
-    [Fact]
-    public async Task GetLatestPublishedReleaseVersion_IncludeUnpublishedReleaseVersion()
-    {
-        Publication publication = _fixture
-            .DefaultPublication()
-            .WithReleases(_ =>
-                [
-                    _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _fixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
-                    _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                ]
-            );
-
-        var release2021 = publication.Releases.Single(r => r.Year == 2021);
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            contentDbContext.Publications.Add(publication);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            var service = BuildReleaseService(contentDbContext);
-
-            // Include the unpublished 2021 release version id in the call
-            // to test the scenario where this version is about to be published
-            var result = await service.GetLatestPublishedReleaseVersion(
-                publication.Id,
-                includeUnpublishedVersionIds: [release2021.Versions.Single(rv => rv.Published == null).Id]
-            );
-
-            // Check the unpublished 2021 release version is considered to be the latest published release version,
-            // despite the fact that it is not published yet
-            Assert.Equal(release2021.Versions.Single(rv => rv.Published == null).Id, result.Id);
-        }
-    }
-
-    [Fact]
-    public async Task GetLatestPublishedReleaseVersion_IncludeUnpublishedReleaseVersions()
-    {
-        Publication publication = _fixture
-            .DefaultPublication()
-            .WithReleases(_ =>
-                [
-                    _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _fixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
-                    _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                ]
-            );
-
-        var release2021 = publication.Releases.Single(r => r.Year == 2021);
-        var release2022 = publication.Releases.Single(r => r.Year == 2022);
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            contentDbContext.Publications.Add(publication);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            var service = BuildReleaseService(contentDbContext);
-
-            // Include the unpublished 2021 and 2022 release version id's in the call
-            // to test the scenario where both versions are about to be published together
-            var result = await service.GetLatestPublishedReleaseVersion(
-                publication.Id,
-                includeUnpublishedVersionIds:
-                [
-                    release2021.Versions.Single(rv => rv.Published == null).Id,
-                    release2022.Versions.Single(rv => rv.Published == null).Id,
-                ]
-            );
-
-            // Check the unpublished 2022 release version is considered to be the latest published release version,
-            // despite the fact that it is not published yet
-            Assert.Equal(release2022.Versions.Single(rv => rv.Published == null).Id, result.Id);
-        }
-    }
-
-    [Fact]
-    public async Task GetLatestPublishedReleaseVersion_IgnoresIncludedUnpublishedReleaseVersions()
-    {
-        Publication publication = _fixture
-            .DefaultPublication()
-            .WithReleases(_ =>
-                [
-                    _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _fixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
-                    _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                ]
-            )
-            .FinishWith(p =>
-            {
-                // Adjust the generated LatestPublishedReleaseVersion to make 2020 the latest published release
-                var release2020Version0 = p.Releases.Single(r => r.Year == 2020).Versions[0];
-                p.LatestPublishedReleaseVersion = release2020Version0;
-                p.LatestPublishedReleaseVersionId = release2020Version0.Id;
-
-                // Apply a different release series order rather than using the default
-                p.ReleaseSeries = [.. GenerateReleaseSeries(p.Releases, 2020, 2021, 2022)];
-            });
-
-        var release2020 = publication.Releases.Single(r => r.Year == 2020);
-        var release2021 = publication.Releases.Single(r => r.Year == 2021);
-        var release2022 = publication.Releases.Single(r => r.Year == 2022);
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            contentDbContext.Publications.Add(publication);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            var service = BuildReleaseService(contentDbContext);
-
-            // Include the unpublished 2021 and 2022 release version id's in the call
-            // to test the scenario where both versions are about to be published together
-            var result = await service.GetLatestPublishedReleaseVersion(
-                publication.Id,
-                includeUnpublishedVersionIds:
-                [
-                    release2021.Versions.Single(rv => rv.Published == null).Id,
-                    release2022.Versions.Single(rv => rv.Published == null).Id,
-                ]
-            );
-
-            // Check the 2020 release version is considered to be the latest published release version,
-            // despite the fact that versions for 2021 and 2022 are about to be published,
-            // since 2020 is the first release in the release series and has a published version
             Assert.Equal(release2020.Versions[0].Id, result.Id);
         }
     }

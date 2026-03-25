@@ -1,23 +1,36 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class ReleasePublishingStatusViewModel
+public record ReleasePublishingStatusViewModel
 {
-    public Guid ReleaseId { get; set; }
+    public required Guid ReleaseId { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public ReleasePublishingStatusContentStage ContentStage { get; set; }
+    public required ReleasePublishingStatusFilesStage FilesStage { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public ReleasePublishingStatusFilesStage FilesStage { get; set; }
+    public required ReleasePublishingStatusPublishingStage PublishingStage { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public ReleasePublishingStatusPublishingStage PublishingStage { get; set; }
+    public required ReleasePublishingStatusOverallStage OverallStage { get; init; }
 
-    [JsonConverter(typeof(StringEnumConverter))]
-    public ReleasePublishingStatusOverallStage OverallStage { get; set; }
-    public DateTimeOffset LastUpdated { get; set; }
+    public required DateTimeOffset LastUpdated { get; init; }
+
+    public static ReleasePublishingStatusViewModel FromReleasePublishingStatus(
+        ReleasePublishingStatus releasePublishingStatus
+    ) =>
+        new()
+        {
+            ReleaseId = Guid.Parse(releasePublishingStatus.PartitionKey),
+            FilesStage = Enum.Parse<ReleasePublishingStatusFilesStage>(releasePublishingStatus.FilesStage),
+            PublishingStage = Enum.Parse<ReleasePublishingStatusPublishingStage>(
+                releasePublishingStatus.PublishingStage
+            ),
+            OverallStage = Enum.Parse<ReleasePublishingStatusOverallStage>(releasePublishingStatus.OverallStage),
+            LastUpdated = releasePublishingStatus.Timestamp ?? DateTimeOffset.MinValue,
+        };
 }

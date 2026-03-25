@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
 using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
 using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
@@ -32,10 +31,6 @@ public class MappingProfiles : CommonMappingProfile
     public MappingProfiles()
     {
         CreateMap<User, UserDetailsViewModel>();
-
-        CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
-            .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp))
-            .ForMember(model => model.ReleaseId, m => m.MapFrom(status => status.PartitionKey));
 
         CreateMap<MethodologyNote, MethodologyNoteViewModel>();
 
