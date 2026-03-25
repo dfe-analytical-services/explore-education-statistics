@@ -1,10 +1,13 @@
 import classNames from 'classnames';
+import { FileUpload } from 'govuk-frontend';
 import React, {
   ChangeEventHandler,
   FocusEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
+  useEffect,
+  useRef,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
 
@@ -35,6 +38,12 @@ const FormFileInput = ({
   onClick,
   onKeyPress,
 }: FormFileInputProps) => {
+  const dropZoneRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // eslint-disable-next-line no-new
+    new FileUpload(dropZoneRef.current);
+  }, []);
+
   return (
     <>
       <label className="govuk-label govuk-label--s" htmlFor={id}>
@@ -46,7 +55,11 @@ const FormFileInput = ({
         </div>
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-      <div className="govuk-drop-zone" data-module="govuk-file-upload">
+      <div
+        className="govuk-drop-zone"
+        data-module="govuk-file-upload"
+        ref={dropZoneRef}
+      >
         <input
           aria-describedby={
             classNames({

@@ -15,7 +15,6 @@ import {
 import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
 import composeProviders from '@common/hocs/composeProviders';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { initAll } from 'govuk-frontend';
 import {
   QueryClientProvider as BaseQueryClientProvider,
   QueryClient,
@@ -59,14 +58,6 @@ function ApplicationInsightsTracking() {
     }
 
     document.body.classList.add('js-enabled', 'govuk-frontend-supported');
-    /* 
-      Running `initAll` seems to get the error: `SupportError: GOV.UK Frontend initialised
-       without `<body class="govuk-frontend-supported">` from template `<script>` snippet`.
-      Using setTimeout works around this error message.
-    */
-    setTimeout(() => {
-      initAll(); // Required to enable the 'enhanced file upload' in `FormFileInput` under the div with the class `govuk-drop-zone`.
-    }, 500);
   }, [appInsights, history]);
 
   return null;
