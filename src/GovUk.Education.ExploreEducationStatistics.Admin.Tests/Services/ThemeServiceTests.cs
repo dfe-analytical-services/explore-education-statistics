@@ -20,15 +20,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Abstractions;
-using MockQueryable;
 using Moq;
 using Moq.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -136,13 +133,11 @@ public class ThemeServiceTests
             publishingService.Setup(s => s.TaxonomyChanged(It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Instance);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
-            var publicationCacheService = new PublicationCacheServiceMockBuilder();
 
             var service = SetupThemeService(
                 contentDbContext: context,
                 publishingService: publishingService.Object,
-                adminEventRaiser: adminEventRaiser.Build(),
-                publicationCacheService: publicationCacheService.Build()
+                adminEventRaiser: adminEventRaiser.Build()
             );
 
             // Act
@@ -168,8 +163,6 @@ public class ThemeServiceTests
             Assert.Equal("Updated summary", savedTheme.Summary);
 
             adminEventRaiser.Assert.OnThemeUpdatedWasRaised(actual => actual == savedTheme);
-
-            Assert.All(expectedPublicationSlugs, publicationCacheService.Assert.CacheInvalidatedForPublicationEntry);
         }
     }
 
@@ -995,143 +988,6 @@ public class ThemeServiceTests
         }
     }
 
-    public class CacheInvalidationTests
-    {
-        [Fact]
-        public async Task GivenPublicationsForTheme_WhenInvalidatePublicationsCacheByThemeIsCalled_ThenPublicationsForThemeAreInvalidated()
-        {
-            // ARRANGE
-            var themeId = Guid.NewGuid();
-            Publication[] publications =
-            [
-                new() { Slug = "publication-slug-1", ThemeId = themeId },
-                new()
-                {
-                    Slug = "publication-slug-2",
-                    ThemeId = themeId,
-                    SupersededById = Guid.NewGuid(),
-                }, // Archived Publication
-                new() { Slug = "publication-slug-3", ThemeId = themeId },
-                new() { Slug = "different-theme-publication-slug-A", ThemeId = Guid.NewGuid() },
-                new() { Slug = "different-theme-publication-slug-B", ThemeId = Guid.NewGuid() },
-            ];
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Publications.AddRange(publications);
-                await context.SaveChangesAsync();
-            }
-
-            var publicationCacheService = new PublicationCacheServiceMockBuilder();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var sut = SetupThemeService(
-                    contentDbContext: context,
-                    publicationCacheService: publicationCacheService.Build()
-                );
-
-                // ACT
-                await sut.InvalidatePublicationsCacheByTheme(themeId);
-            }
-
-            // ASSERT
-            var expectedInvalidatedPublications = publications.Where(p => p.ThemeId == themeId).ToArray();
-            foreach (var expected in expectedInvalidatedPublications)
-            {
-                publicationCacheService.Assert.CacheInvalidatedForPublicationEntry(expected.Slug);
-            }
-            var expectedNotInvalidatedPublications = publications.Except(expectedInvalidatedPublications);
-            foreach (var notExpected in expectedNotInvalidatedPublications)
-            {
-                publicationCacheService.Assert.CacheNotInvalidatedForPublicationEntry(notExpected.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task GivenPublicationsForTheme_WhenInvalidatingPublicationThrows_ThenOtherPublicationsAreStillInvalidated()
-        {
-            // ARRANGE
-            var themeId = Guid.NewGuid();
-            Publication[] publications =
-            [
-                new() { Slug = "publication-slug-1", ThemeId = themeId },
-                new() { Slug = "publication-slug-2", ThemeId = themeId },
-                new() { Slug = "publication-slug-3", ThemeId = themeId },
-            ];
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Publications.AddRange(publications);
-                await context.SaveChangesAsync();
-            }
-
-            // Setup publication-slug-2 to throw
-            var publicationCacheService = new PublicationCacheServiceMockBuilder().WhereInvalidatingPublicationThrows(
-                publications[1].Slug
-            );
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var sut = SetupThemeService(
-                    contentDbContext: context,
-                    publicationCacheService: publicationCacheService.Build()
-                );
-
-                // ACT
-                await sut.InvalidatePublicationsCacheByTheme(themeId);
-            }
-
-            // ASSERT
-            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-1");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-2");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-3");
-        }
-
-        [Fact]
-        public async Task GivenPublicationsForTheme_WhenInvalidatingPublicationFails_ThenOtherPublicationsAreStillInvalidated()
-        {
-            // ARRANGE
-            var themeId = Guid.NewGuid();
-            Publication[] publications =
-            [
-                new() { Slug = "publication-slug-1", ThemeId = themeId },
-                new() { Slug = "publication-slug-2", ThemeId = themeId },
-                new() { Slug = "publication-slug-3", ThemeId = themeId },
-            ];
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Publications.AddRange(publications);
-                await context.SaveChangesAsync();
-            }
-
-            // Setup publication-slug-2 to throw
-            var publicationCacheService = new PublicationCacheServiceMockBuilder().WhereInvalidatingPublicationFails(
-                publications[1].Slug
-            );
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var sut = SetupThemeService(
-                    contentDbContext: context,
-                    publicationCacheService: publicationCacheService.Build()
-                );
-
-                // ACT
-                await sut.InvalidatePublicationsCacheByTheme(themeId);
-            }
-
-            // ASSERT
-            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-1");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-2");
-            publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-3");
-        }
-    }
-
     private static ThemeService SetupThemeService(
         ContentDbContext? contentDbContext = null,
         PublicDataDbContext? publicDataDbContext = null,
@@ -1141,7 +997,6 @@ public class ThemeServiceTests
         IPublishingService? publishingService = null,
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
-        IPublicationCacheService? publicationCacheService = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         bool enableThemeDeletion = true
@@ -1170,10 +1025,8 @@ public class ThemeServiceTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            publicationCacheService ?? new PublicationCacheServiceMockBuilder().Build(),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-            NullLogger<ThemeService>.Instance
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );
     }
 

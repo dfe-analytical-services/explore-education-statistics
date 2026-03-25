@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -34,10 +33,8 @@ public class ThemeService(
     IPublishingService publishingService,
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
-    IPublicationCacheService publicationCacheService,
     IUserReleaseRoleRepository userReleaseRoleRepository,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    ILogger<ThemeService> logger
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : IThemeService
 {
     private readonly bool _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
@@ -90,42 +87,10 @@ public class ThemeService(
 
                 await publishingService.TaxonomyChanged();
 
-                await InvalidatePublicationsCacheByTheme(theme.Id);
-
                 await eventRaiser.OnThemeUpdated(theme);
 
                 return await GetTheme(theme.Id);
             });
-    }
-
-    public async Task InvalidatePublicationsCacheByTheme(Guid themeId)
-    {
-        var themePublicationsSlugs = await contentDbContext
-            .Publications.Where(p => p.ThemeId == themeId)
-            .Select(p => p.Slug)
-            .ToListAsync();
-
-        await themePublicationsSlugs.ToAsyncEnumerable().ForEachAwaitAsync(InvalidatePublicationCacheSafe);
-    }
-
-    private async Task InvalidatePublicationCacheSafe(string publicationSlug)
-    {
-        try
-        {
-            await publicationCacheService
-                .UpdatePublication(publicationSlug)
-                .OnFailureDo(result =>
-                    logger.LogWarning(
-                        "Failed to invalidate cache for Publication {PublicationSlug}. Reason: {Result}",
-                        publicationSlug,
-                        result
-                    )
-                );
-        }
-        catch (Exception e)
-        {
-            logger.LogWarning(e, "Failed to invalidate cache for Publication {PublicationSlug}.", publicationSlug);
-        }
     }
 
     public async Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id)

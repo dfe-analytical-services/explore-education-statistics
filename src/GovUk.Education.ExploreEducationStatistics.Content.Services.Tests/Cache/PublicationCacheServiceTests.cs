@@ -138,35 +138,6 @@ public class PublicationCacheServiceTests
     }
 
     [Fact]
-    public async Task UpdatePublication()
-    {
-        var cacheKey = new PublicationCacheKey(PublicationSlug);
-
-        var publicationService = new Mock<IPublicationService>(Strict);
-
-        publicationService.Setup(s => s.Get(PublicationSlug)).ReturnsAsync(_publicationViewModel);
-
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, _publicationViewModel))
-            .Returns(Task.CompletedTask);
-
-        var service = BuildService(
-            publicationService: publicationService.Object,
-            publicBlobCacheService: publicBlobCacheService.Object
-        );
-
-        var result = await service.UpdatePublication(PublicationSlug);
-
-        // There should be no attempt on the cache service to get the cached resource
-
-        VerifyAllMocks(publicationService, publicBlobCacheService);
-
-        result.AssertRight(_publicationViewModel);
-    }
-
-    [Fact]
     public void PublicationCacheViewModel_SerializeAndDeserialize()
     {
         var converted = DeserializeObject<PublicationCacheViewModel>(SerializeObject(_publicationViewModel));
@@ -175,13 +146,11 @@ public class PublicationCacheServiceTests
 
     private static PublicationCacheService BuildService(
         IPublicationService? publicationService = null,
-        IPublicBlobStorageService? publicBlobStorageService = null,
         IPublicBlobCacheService? publicBlobCacheService = null
     )
     {
         return new PublicationCacheService(
             publicationService: publicationService ?? Mock.Of<IPublicationService>(Strict),
-            publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
             publicBlobCacheService: publicBlobCacheService ?? Mock.Of<IPublicBlobCacheService>(Strict),
             Mock.Of<ILogger<PublicationCacheService>>()
         );
