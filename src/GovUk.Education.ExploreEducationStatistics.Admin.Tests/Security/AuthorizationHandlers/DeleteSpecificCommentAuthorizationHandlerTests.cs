@@ -1,58 +1,170 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
-using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class DeleteSpecificCommentAuthorizationHandlerTests
+public abstract class DeleteSpecificCommentAuthorizationHandlerTests
 {
     private static readonly DataFixture _dataFixture = new();
 
-    [Fact]
-    public async Task CanDeleteCommentAuthorizationHandler()
-    {
-        var comment = new Comment { Id = Guid.NewGuid() };
-        ReleaseVersion releaseVersion = _dataFixture
-            .DefaultReleaseVersion()
-            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-            .WithGenericContent([
-                _dataFixture.DefaultContentSection().WithContentBlocks([new DataBlock { Comments = [comment] }]),
-            ])
-            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    private static readonly Guid _userId = Guid.NewGuid();
 
-        await AssertHandlerOnlySucceedsWithReleaseRoles<DeleteSpecificCommentRequirement, Comment>(
-            releaseVersion,
-            comment,
-            contentDbContext => contentDbContext.Add(releaseVersion),
-            CreateHandler,
-            ReleaseRole.Approver,
-            ReleaseRole.Contributor
-        );
+    private static readonly Comment _commentForDraftReleaseVersion = new() { Id = Guid.NewGuid() };
+
+    private static readonly Comment _commentForApprovedReleaseVersion = new() { Id = Guid.NewGuid() };
+
+    private static readonly ReleaseVersion _draftReleaseVersion = _dataFixture
+        .DefaultReleaseVersion()
+        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+        .WithGenericContent([
+            _dataFixture
+                .DefaultContentSection()
+                .WithContentBlocks([new DataBlock { Comments = [_commentForDraftReleaseVersion] }]),
+        ])
+        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+    private static readonly ReleaseVersion _approvedReleaseVersion = _dataFixture
+        .DefaultReleaseVersion()
+        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+        .WithGenericContent([
+            _dataFixture
+                .DefaultContentSection()
+                .WithContentBlocks([new DataBlock { Comments = [_commentForApprovedReleaseVersion] }]),
+        ])
+        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+    public class ClaimsTests : DeleteSpecificCommentAuthorizationHandlerTests
+    {
+        [Fact]
+        public async Task SucceedsOnlyForValidClaims()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.ReleaseVersions.Add(_draftReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // If the claims check fails, it will check the user's roles on the publication, but since we're testing claims here,
+                // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
+                // to failing any role check, within the SetupHandler method.
+                await AssertHandlerSucceedsWithCorrectClaims<DeleteSpecificCommentRequirement, Comment>(
+                    handler: SetupHandler(context),
+                    entity: _commentForDraftReleaseVersion,
+                    userId: _userId,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases]
+                );
+            }
+        }
+
+        [Fact]
+        public async Task ArchivedPublication_FailsForAllClaims()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.ReleaseVersions.Add(_approvedReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await AssertHandlerFailsForAllClaims<DeleteSpecificCommentRequirement, Comment>(
+                    handler: SetupHandler(context),
+                    entity: _commentForApprovedReleaseVersion,
+                    userId: _userId
+                );
+            }
+        }
     }
 
-    private static DeleteSpecificCommentAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    public class PublicationRolesTests : DeleteSpecificCommentAuthorizationHandlerTests
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            contentDbContext
-        );
+        [Fact]
+        public async Task SucceedsOnlyForValidPublicationRoles()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-        return new DeleteSpecificCommentAuthorizationHandler(
-            contentDbContext,
-            new AuthorizationHandlerService(
-                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: userReleaseRoleRepository,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.ReleaseVersions.Add(_draftReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(context, authorizationHandlerService);
+
+                await AssertHandlerSucceedsForAnyValidPublicationRole<DeleteSpecificCommentRequirement, Comment>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _commentForDraftReleaseVersion,
+                    publicationId: _draftReleaseVersion.Release.PublicationId,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+                );
+            }
+        }
+
+        [Fact]
+        public async Task ArchivedPublication_FailsWithoutCheckingRoles()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.ReleaseVersions.Add(_approvedReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(context, authorizationHandlerService);
+
+                await AssertHandlerFailsWithoutCheckingRoles<DeleteSpecificCommentRequirement, Comment>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _commentForApprovedReleaseVersion
+                );
+            }
+        }
+    }
+
+    private static DeleteSpecificCommentAuthorizationHandler SetupHandler(
+        ContentDbContext? contentDbContext = null,
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
+    {
+        contentDbContext ??= InMemoryApplicationDbContext();
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+        return new(contentDbContext, authorizationHandlerService);
+    }
+
+    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    It.IsAny<Guid>(),
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

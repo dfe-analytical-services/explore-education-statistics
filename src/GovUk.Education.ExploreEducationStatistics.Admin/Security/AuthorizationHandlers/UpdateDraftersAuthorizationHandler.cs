@@ -5,19 +5,18 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ManagePublicationReleaseSeriesRequirement : IAuthorizationRequirement { }
+public class UpdateDraftersRequirement : IAuthorizationRequirement { }
 
-public class ManagePublicationReleaseSeriesAuthorizationHandler(
-    IAuthorizationHandlerService authorizationHandlerService
-) : AuthorizationHandler<ManagePublicationReleaseSeriesRequirement, Publication>
+public class UpdateDraftersAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
+    : AuthorizationHandler<UpdateDraftersRequirement, Publication>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        ManagePublicationReleaseSeriesRequirement requirement,
+        UpdateDraftersRequirement requirement,
         Publication publication
     )
     {
-        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.UpdateAllPublications))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.ManageAnyUser))
         {
             context.Succeed(requirement);
             return;
