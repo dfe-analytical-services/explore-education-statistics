@@ -149,7 +149,8 @@ public record HtmlBlockDto : ContentBlockBaseDto
 {
     public required string Body { get; set; }
 
-    public static HtmlBlockDto FromHtmlBlock(HtmlBlock htmlBlock) => new() { Id = htmlBlock.Id, Body = htmlBlock.Body };
+    public static HtmlBlockDto FromHtmlBlock(HtmlBlock htmlBlock) =>
+        new() { Id = htmlBlock.Id, Body = htmlBlock.Body ?? throw new ArgumentException("HtmlBlock must have Body") };
 }
 
 [JsonConverter(typeof(JsonKnownTypesConverter<KeyStatisticBaseDto>))]
