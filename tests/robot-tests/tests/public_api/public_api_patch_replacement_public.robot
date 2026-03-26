@@ -363,6 +363,9 @@ Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
 Navigate to api data set on public frontend website
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
     user clicks link    Data catalogue
     user waits until h1 is visible    Data catalogue
     user clicks link    ${PUBLICATION_NAME} - Subject 1

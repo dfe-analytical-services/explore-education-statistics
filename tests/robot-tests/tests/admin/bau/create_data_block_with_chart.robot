@@ -494,6 +494,7 @@ Add reference line
 
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview
+    user scrolls to element    id:chartBuilderPreview
 
     user checks chart title contains    id:chartBuilderPreview    Test chart title
     user checks chart subtitle contains    id:chartBuilderPreview    Test chart subtitle
