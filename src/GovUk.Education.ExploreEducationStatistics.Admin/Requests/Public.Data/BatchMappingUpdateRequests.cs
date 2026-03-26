@@ -32,6 +32,11 @@ public record FilterOptionMappingUpdateRequest : MappingUpdateRequest
     }
 }
 
+public record IndicatorMappingUpdateRequest : MappingUpdateRequest
+{
+    public class Validator : MappingUpdateRequestValidator<IndicatorMappingUpdateRequest>;
+}
+
 public record BatchLocationMappingUpdatesRequest : BatchMappingUpdatesRequest<LocationMappingUpdateRequest>
 {
     public class Validator : AbstractValidator<BatchLocationMappingUpdatesRequest>
@@ -50,6 +55,17 @@ public record BatchFilterOptionMappingUpdatesRequest : BatchMappingUpdatesReques
         public Validator()
         {
             RuleForEach(request => request.Updates).SetValidator(new FilterOptionMappingUpdateRequest.Validator());
+        }
+    }
+}
+
+public record BatchIndicatorMappingUpdatesRequest : BatchMappingUpdatesRequest<IndicatorMappingUpdateRequest>
+{
+    public class Validator : AbstractValidator<BatchIndicatorMappingUpdatesRequest>
+    {
+        public Validator()
+        {
+            RuleForEach(request => request.Updates).SetValidator(new IndicatorMappingUpdateRequest.Validator());
         }
     }
 }

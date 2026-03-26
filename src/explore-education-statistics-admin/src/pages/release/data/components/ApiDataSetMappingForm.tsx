@@ -1,13 +1,5 @@
-import {
-  FilterOptionCandidateWithKey,
-  FilterOptionMappingWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import styles from '@admin/pages/release/data/components/ApiDataSetMappingModal.module.scss';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
-import {
-  LocationCandidateWithKey,
-  LocationMappingWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -18,6 +10,11 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
+import prefixNoun from '@common/utils/string/prefixNoun';
+import {
+  CandidateWithKey,
+  MappingWithKey,
+} from '@admin/pages/release/data/utils/mappingTypes';
 
 const noMappingValue = 'noMapping';
 
@@ -26,14 +23,12 @@ interface FormValues {
 }
 
 interface Props {
-  candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
-  candidateHint?: (
-    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => ReactNode;
-  groupKey: string;
+  candidate?: CandidateWithKey;
+  candidateHint?: (candidate: CandidateWithKey) => ReactNode;
+  groupKey?: string;
   itemLabel: string;
-  mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
-  newItems: FilterOptionCandidateWithKey[] | LocationCandidateWithKey[];
+  mapping: MappingWithKey;
+  newItems: CandidateWithKey[];
   onCancel?: () => void;
   onSubmit: (update: PendingMappingUpdate) => Promise<void>;
 }
@@ -48,6 +43,8 @@ export default function ApiDataSetMappingForm({
   onCancel,
   onSubmit,
 }: Props) {
+  const itemLabelPrefix = prefixNoun(itemLabel);
+
   const handleSubmit = async ({ nextItem }: FormValues) => {
     await onSubmit({
       candidateKey: nextItem !== noMappingValue ? nextItem : undefined,
@@ -59,11 +56,11 @@ export default function ApiDataSetMappingForm({
     });
   };
 
-  const options: RadioOption<string>[] = [
+  const options: RadioOption[] = [
     {
       label: 'No mapping available',
       value: noMappingValue,
-      divider: `Select a ${itemLabel}:`,
+      divider: `Select ${itemLabelPrefix} ${itemLabel}:`,
     },
     ...(candidate
       ? [
@@ -94,10 +91,13 @@ export default function ApiDataSetMappingForm({
     >
       {({ formState }) => {
         return (
-          <Form id={`mapping-${groupKey}-form`} onSubmit={handleSubmit}>
+          <Form
+            id={`mapping-${groupKey ?? 'default'}-form`}
+            onSubmit={handleSubmit}
+          >
             <FormFieldRadioSearchGroup<FormValues>
               alwaysShowOptions={[noMappingValue]}
-              hint={`Choose a ${itemLabel} that will be mapped to the current data set ${itemLabel} (see above).`}
+              hint={`Choose ${itemLabelPrefix} ${itemLabel} that will be mapped to the current data set ${itemLabel} (see above).`}
               legend={`Next data set ${itemLabel}`}
               name="nextItem"
               options={options}
@@ -133,8 +133,8 @@ function getInitialValues({
   candidate,
   mapping,
 }: {
-  candidate?: FilterOptionCandidateWithKey | LocationCandidateWithKey;
-  mapping: FilterOptionMappingWithKey | LocationMappingWithKey;
+  candidate?: CandidateWithKey;
+  mapping: MappingWithKey;
 }) {
   if (candidate) {
     return { nextItem: candidate.key };

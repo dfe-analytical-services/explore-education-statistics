@@ -11,7 +11,10 @@ import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiD
 import getUnmappedFilterErrors from '@admin/pages/release/data/utils/getUnmappedFilterErrors';
 import ApiDataSetMappableFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnsTable';
 import ApiDataSetNewFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetNewFilterColumnsTable';
-import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
+import {
+  PendingGroupableMappingUpdate,
+  PendingMappingUpdate,
+} from '@admin/pages/release/data/types/apiDataSetMappings';
 import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import {
   releaseApiDataSetDetailsRoute,
@@ -68,9 +71,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
   const [newFilters, updateNewFilters] = useImmer<Dictionary<FilterCandidate>>(
     {},
   );
-  const [pendingUpdates, setPendingUpdates] = useState<PendingMappingUpdate[]>(
-    [],
-  );
+  const [pendingUpdates, setPendingUpdates] = useState<
+    PendingGroupableMappingUpdate[]
+  >([]);
 
   const { dataSetId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetRouteParams>();
@@ -149,7 +152,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
         : []),
       {
         id: sectionIds.newFilterOptions,
-        text: 'Filter options not found in old dataset',
+        text: 'Filter options not found in old data set',
         subNavItems: Object.keys(newFilterOptions).map(filterKey => {
           return {
             id: sectionIds.newFilterOptionsGroup(filterKey),
@@ -179,7 +182,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
   ]);
 
   const updateMappingState = useCallback(
-    (updates: PendingMappingUpdate[]) => {
+    (updates: PendingGroupableMappingUpdate[]) => {
       // MappableFilterOption - Add or update mapping
       updateMappableFilterOptions(draft => {
         updates.forEach(
@@ -288,7 +291,13 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
   const handleUpdateMapping = useCallback(
     async (update: PendingMappingUpdate) => {
-      setPendingUpdates(current => [...current, update]);
+      setPendingUpdates(current => [
+        ...current,
+        {
+          ...update,
+          groupKey: update.groupKey!,
+        },
+      ]);
       handleUpdate();
     },
     [handleUpdate],
@@ -373,7 +382,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                     groupKey={filterKey}
                     itemLabel="filter option"
                     itemPluralLabel="filter options"
-                    groupLabel={filtersMapping.mappings[filterKey].source.label}
+                    tableCaptionText={
+                      filtersMapping.mappings[filterKey].source.label
+                    }
                     mappableItems={mappableFilterOptions[filterKey]}
                     newItems={newFilterOptions[filterKey]}
                     pendingUpdates={pendingUpdates}
@@ -395,7 +406,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                 ))}
               </>
             ) : (
-              <p>No filter options.</p>
+              <p>No mappable filter options.</p>
             )}
 
             {Object.keys(newFilters).length > 0 && (
@@ -414,7 +425,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newFilterOptions}
             >
-              Filter options not found in old dataset ({totalNewFilterOptions}){' '}
+              Filter options not found in old data set ({totalNewFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
@@ -504,6 +515,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                             groupKey={filterKey}
                             groupLabel={filterLabel}
                             itemLabel="filter option"
+                            itemPluralLabel="filter options"
                             autoMappedItems={autoMappedFilterOptions[filterKey]}
                             newItems={newFilterOptions[filterKey]}
                             pendingUpdates={pendingUpdates}
