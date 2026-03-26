@@ -150,6 +150,7 @@ export const ReleaseVersionChecklistErrorCode = [
   'RelatedDashboardsSectionContainsEmptyHtmlBlock',
   'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock',
   'SummarySectionContainsEmptyHtmlBlock',
+  'WarningSectionContainsEmptyHtmlBlock',
   'PublicApiDataSetImportsMustBeCompleted',
   'PublicApiDataSetCancellationsMustBeResolved',
   'PublicApiDataSetFailuresMustBeResolved',
