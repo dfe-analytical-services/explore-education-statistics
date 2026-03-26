@@ -4,28 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class CreateMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement { }
 
-public class CreateMethodologyForSpecificPublicationAuthorizationHandler
-    : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
+public class CreateMethodologyForSpecificPublicationAuthorizationHandler(
+    ContentDbContext contentDbContext,
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
 {
-    private readonly ContentDbContext _context;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public CreateMethodologyForSpecificPublicationAuthorizationHandler(
-        ContentDbContext context,
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _context = context;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         CreateMethodologyForSpecificPublicationRequirement requirement,
@@ -39,22 +27,26 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandler
         }
 
         // If a publication owns a methodology already, they cannot own another
-        if (await _context.PublicationMethodologies.AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
+        if (
+            await contentDbContext.PublicationMethodologies.AnyAsync(pm =>
+                pm.PublicationId == publication.Id && pm.Owner
+            )
+        )
         {
             return;
         }
 
-        if (SecurityUtils.HasClaim(context.User, CreateAnyMethodology))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.CreateAnyMethodology))
         {
             context.Succeed(requirement);
             return;
         }
 
         if (
-            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
-                context.User.GetUserId(),
-                publication.Id,
-                Owner
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: publication.Id,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

@@ -10,8 +10,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
-public abstract class ManageExternalMethodologyForSpecificPublicationAuthorizationHandlerTests
+public abstract class UpdateDraftersAuthorizationHandlerTests
 {
     private static readonly DataFixture _dataFixture = new();
 
@@ -19,32 +18,26 @@ public abstract class ManageExternalMethodologyForSpecificPublicationAuthorizati
 
     private static readonly Publication _publication = _dataFixture.DefaultPublication();
 
-    public class ClaimsTests : ManageExternalMethodologyForSpecificPublicationAuthorizationHandlerTests
+    public class ClaimsTests : UpdateDraftersAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidClaims()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<
-                ManageExternalMethodologyForSpecificPublicationRequirement,
-                Publication
-            >(
+            await AssertHandlerSucceedsWithCorrectClaims<UpdateDraftersRequirement, Publication>(
                 handler: SetupHandler(),
                 entity: _publication,
                 userId: _userId,
-                claimsExpectedToSucceed: [SecurityClaimTypes.CreateAnyMethodology]
+                claimsExpectedToSucceed: [SecurityClaimTypes.ManageAnyUser]
             );
         }
     }
 
-    public class PublicationRolesTests : ManageExternalMethodologyForSpecificPublicationAuthorizationHandlerTests
+    public class PublicationRolesTests : UpdateDraftersAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidPublicationRoles()
         {
-            await AssertHandlerSucceedsForAnyValidPublicationRole<
-                ManageExternalMethodologyForSpecificPublicationRequirement,
-                Publication
-            >(
+            await AssertHandlerSucceedsForAnyValidPublicationRole<UpdateDraftersRequirement, Publication>(
                 handlerSupplier: SetupHandler,
                 entity: _publication,
                 publicationId: _publication.Id,
@@ -53,7 +46,7 @@ public abstract class ManageExternalMethodologyForSpecificPublicationAuthorizati
         }
     }
 
-    private static ManageExternalMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
+    private static UpdateDraftersAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -68,7 +61,7 @@ public abstract class ManageExternalMethodologyForSpecificPublicationAuthorizati
         mock.Setup(s =>
                 s.UserHasAnyPublicationRoleOnPublication(
                     _userId,
-                    It.IsAny<Guid>(),
+                    _publication.Id,
                     CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
                 )
             )

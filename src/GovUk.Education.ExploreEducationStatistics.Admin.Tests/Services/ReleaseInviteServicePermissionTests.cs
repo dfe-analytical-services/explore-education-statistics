@@ -36,7 +36,7 @@ public class ReleaseInviteServicePermissionTest
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
                 tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
-                CanUpdateSpecificReleaseRole
+                CanUpdateDrafters
             )
             .AssertForbidden(async userService =>
             {
@@ -74,7 +74,7 @@ public class ReleaseInviteServicePermissionTest
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
                 tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
-                CanUpdateSpecificReleaseRole
+                CanUpdateDrafters
             )
             .AssertForbidden(async userService =>
             {

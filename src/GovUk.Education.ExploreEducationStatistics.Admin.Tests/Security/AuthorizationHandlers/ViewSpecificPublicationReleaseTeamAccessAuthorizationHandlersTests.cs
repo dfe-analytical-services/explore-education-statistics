@@ -1,120 +1,78 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 {
-    private static readonly Guid UserId = Guid.NewGuid();
+    private static readonly DataFixture _dataFixture = new();
 
-    private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
+    private static readonly Guid _userId = Guid.NewGuid();
 
-    private readonly DataFixture _fixture = new();
+    private static readonly Publication _publication = _dataFixture.DefaultPublication();
 
-    [Fact]
-    public async Task ViewSpecificPublicationReleaseTeamAccess_SucceedsWithAccessAllPublicationsClaim()
+    public class ClaimsTests
     {
-        // Assert that any users with the "AccessAllPublications" claim can view Team Access of Releases on this
-        // Publication
-        await ForEachSecurityClaimAsync(async claim =>
+        [Fact]
+        public async Task SucceedsOnlyForValidClaims()
         {
-            var expectedToPassByClaimAlone = claim == AccessAllPublications;
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-            if (!expectedToPassByClaimAlone)
-            {
-                userPublicationRoleRepository
-                    .Setup(mock =>
-                        mock.UserHasAnyRoleOnPublication(
-                            UserId,
-                            Publication.Id,
-                            ResourceRoleFilter.ActiveOnly,
-                            It.IsAny<CancellationToken>(),
-                            new[] { PublicationRole.Owner, PublicationRole.Allower }
-                        )
-                    )
-                    .ReturnsAsync(false);
-            }
-
-            var handler = CreateHandler(userPublicationRoleRepository.Object);
-
-            var user = _fixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
-
-            var authContext = CreateAuthorizationHandlerContext<
+            await AssertHandlerSucceedsWithCorrectClaims<
                 ViewSpecificPublicationReleaseTeamAccessRequirement,
                 Publication
-            >(user, Publication);
-
-            await handler.HandleAsync(authContext);
-
-            VerifyAllMocks(userPublicationRoleRepository);
-
-            Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
-        });
+            >(
+                handler: SetupHandler(),
+                entity: _publication,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllPublications]
+            );
+        }
     }
 
-    [Fact]
-    public async Task ViewSpecificPublicationReleaseTeamAccess_SucceedsWithPublicationRoles()
+    public class PublicationRolesTests
     {
-        await ForEachPublicationRoleAsync(async role =>
+        [Fact]
+        public async Task SucceedsOnlyForValidPublicationRoles()
         {
-            var isApproverOrOwner = ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(role);
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        UserId,
-                        Publication.Id,
-                        ResourceRoleFilter.ActiveOnly,
-                        It.IsAny<CancellationToken>(),
-                        new[] { PublicationRole.Owner, PublicationRole.Allower }
-                    )
-                )
-                .ReturnsAsync(isApproverOrOwner);
-
-            var handler = CreateHandler(userPublicationRoleRepository.Object);
-
-            var user = _fixture.AuthenticatedUser(userId: UserId);
-
-            var authContext = CreateAuthorizationHandlerContext<
+            await AssertHandlerSucceedsForAnyValidPublicationRole<
                 ViewSpecificPublicationReleaseTeamAccessRequirement,
                 Publication
-            >(user, Publication);
-
-            await handler.HandleAsync(authContext);
-
-            VerifyAllMocks(userPublicationRoleRepository);
-
-            Assert.Equal(isApproverOrOwner, authContext.HasSucceeded);
-        });
+            >(
+                handlerSupplier: SetupHandler,
+                entity: _publication,
+                publicationId: _publication.Id,
+                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+            );
+        }
     }
 
-    private static ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler CreateHandler(
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+    private static ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler SetupHandler(
+        IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
-        return new ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler(
-            new AuthorizationHandlerService(
-                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-                Mock.Of<IPreReleaseService>(Strict)
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+        return new(authorizationHandlerService);
+    }
+
+    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    _publication.Id,
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

@@ -217,13 +217,12 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(publication, SecurityPolicies.CanViewReleaseTeamAccess);
     }
 
-    public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(
+    public static Task<Either<ActionResult, Publication>> CheckCanUpdateDrafters(
         this IUserService userService,
-        Publication publication,
-        ReleaseRole role
+        Publication publication
     )
     {
-        return userService.CheckPolicy(TupleOf(publication, role), SecurityPolicies.CanUpdateSpecificReleaseRole);
+        return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateDrafters);
     }
 
     public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(

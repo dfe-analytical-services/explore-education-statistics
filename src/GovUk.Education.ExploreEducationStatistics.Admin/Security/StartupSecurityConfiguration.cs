@@ -97,8 +97,8 @@ public static class StartupSecurityConfiguration
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(),
-                policy => policy.Requirements.Add(new UpdateReleaseRoleRequirement())
+                SecurityPolicies.CanUpdateDrafters.ToString(),
+                policy => policy.Requirements.Add(new UpdateDraftersRequirement())
             );
 
             options.AddPolicy(
@@ -328,7 +328,7 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationHandler, DeleteSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, CancelSpecificFileImportAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewReleaseStatusHistoryAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, UpdateReleaseRoleAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, UpdateDraftersAuthorizationHandler>();
 
         /*
          * Pre Release management

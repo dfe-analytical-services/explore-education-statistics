@@ -3,8 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
@@ -13,24 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 // ReSharper disable once ClassNeverInstantiated.Global
 public class MarkMethodologyAsDraftRequirement : IAuthorizationRequirement { }
 
-public class MarkMethodologyAsDraftAuthorizationHandler
-    : AuthorizationHandler<MarkMethodologyAsDraftRequirement, MethodologyVersion>
+public class MarkMethodologyAsDraftAuthorizationHandler(
+    IMethodologyVersionRepository methodologyVersionRepository,
+    IMethodologyRepository methodologyRepository,
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<MarkMethodologyAsDraftRequirement, MethodologyVersion>
 {
-    private readonly IMethodologyVersionRepository _methodologyVersionRepository;
-    private readonly IMethodologyRepository _methodologyRepository;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public MarkMethodologyAsDraftAuthorizationHandler(
-        IMethodologyVersionRepository methodologyVersionRepository,
-        IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _methodologyVersionRepository = methodologyVersionRepository;
-        _methodologyRepository = methodologyRepository;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         MarkMethodologyAsDraftRequirement requirement,
@@ -38,12 +24,12 @@ public class MarkMethodologyAsDraftAuthorizationHandler
     )
     {
         // If the Methodology is already public, it cannot be marked as draft
-        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
+        if (await methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }
 
-        if (SecurityUtils.HasClaim(context.User, MarkAllMethodologiesDraft))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.MarkAllMethodologiesDraft))
         {
             context.Succeed(requirement);
             return;
@@ -51,20 +37,16 @@ public class MarkMethodologyAsDraftAuthorizationHandler
 
         var allowedPublicationRoles =
             methodologyVersion.Status == Approved
-                ? SetOf(PublicationRole.Allower)
-                : SetOf(PublicationRole.Owner, PublicationRole.Allower);
+                ? SetOf(PublicationRole.Approver)
+                : SetOf(PublicationRole.Drafter, PublicationRole.Approver);
 
-        var allowedReleaseRoles =
-            methodologyVersion.Status == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
-
-        var owningPublication = await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+        var owningPublication = await methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
-                context.User.GetUserId(),
-                owningPublication.Id,
-                allowedPublicationRoles,
-                allowedReleaseRoles
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: owningPublication.Id,
+                rolesToInclude: allowedPublicationRoles
             )
         )
         {
