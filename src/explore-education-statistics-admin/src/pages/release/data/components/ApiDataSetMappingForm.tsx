@@ -97,7 +97,10 @@ export default function ApiDataSetMappingForm({
     >
       {({ formState }) => {
         return (
-          <Form id={`mapping-${groupKey}-form`} onSubmit={handleSubmit}>
+          <Form
+            id={`mapping-${groupKey ?? 'default'}-form`}
+            onSubmit={handleSubmit}
+          >
             <FormFieldRadioSearchGroup<FormValues>
               alwaysShowOptions={[noMappingValue]}
               hint={`Choose ${itemLabelPrefix} ${itemLabel} that will be mapped to the current data set ${itemLabel} (see above).`}

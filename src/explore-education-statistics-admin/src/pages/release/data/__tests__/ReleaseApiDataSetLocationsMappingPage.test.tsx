@@ -447,7 +447,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('No locations.')).toBeInTheDocument();
+    expect(screen.getByText('No mappable locations.')).toBeInTheDocument();
 
     expect(
       screen.queryByTestId('mappable-locations-localAuthority'),
@@ -729,7 +729,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(unmappedLocation).getByRole('button', {
-          name: 'Map option for Location 2',
+          name: 'Map location for Location 2',
         }),
       );
 
@@ -829,7 +829,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(unmappedLocation).getByRole('button', {
-          name: 'Map option for Location 2',
+          name: 'Map location for Location 2',
         }),
       );
 
@@ -1013,7 +1013,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(autoMappedLocation).getByRole('button', {
-          name: 'Map option for Location 1',
+          name: 'Map location for Location 1',
         }),
       );
 
@@ -1143,7 +1143,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
 
       await user.click(
         within(autoMappedLocation).getByRole('button', {
-          name: 'Map option for Location 1',
+          name: 'Map location for Location 1',
         }),
       );
 

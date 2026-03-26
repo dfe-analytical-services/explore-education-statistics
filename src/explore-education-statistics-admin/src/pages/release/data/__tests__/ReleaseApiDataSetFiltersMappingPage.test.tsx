@@ -353,7 +353,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('No filter options.')).toBeInTheDocument();
+    expect(screen.getByText('No mappable filter options.')).toBeInTheDocument();
 
     expect(screen.queryByTestId('mappable-Filter1Key')).not.toBeInTheDocument();
 
@@ -414,7 +414,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders a message if there are no filter options found in both', async () => {
+  test('renders a message if there are no filter options automatically found in both', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getFiltersMapping.mockResolvedValue({
       candidates: {
@@ -533,7 +533,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(unmappedFilterOption).getByRole('button', {
-          name: 'Map option for Filter 1 Option 2',
+          name: 'Map filter option for Filter 1 Option 2',
         }),
       );
 
@@ -634,7 +634,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(unmappedFilterOption).getByRole('button', {
-          name: 'Map option for Filter 1 Option 2',
+          name: 'Map filter option for Filter 1 Option 2',
         }),
       );
 
@@ -825,7 +825,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(autoMappedFilter).getByRole('button', {
-          name: 'Map option for Filter 1 Option 1',
+          name: 'Map filter option for Filter 1 Option 1',
         }),
       );
 
@@ -957,7 +957,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(autoMappedFilter).getByRole('button', {
-          name: 'Map option for Filter 1 Option 1',
+          name: 'Map filter option for Filter 1 Option 1',
         }),
       );
 

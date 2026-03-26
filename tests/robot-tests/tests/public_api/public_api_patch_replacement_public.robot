@@ -126,7 +126,7 @@ Validate the 'unmapped location' notification banner
     user waits until page contains link    There is 1 unmapped region
 
 User edits location mapping
-    user clicks button in table cell    1    4    Map option
+    user clicks button in table cell    1    4    Map location
 
     ${modal}=    user waits until modal is visible    Map existing location
     user clicks radio    Yorkshire
@@ -151,7 +151,7 @@ Validate the 'unmapped filter option' notification banner
     user waits until page contains link    There is 1 unmapped School type filter option
 
 User edits filter mapping
-    user clicks button in table cell    1    4    Map option
+    user clicks button in table cell    1    4    Map filter option
 
     ${modal}=    user waits until modal is visible    Map existing filter option
     user clicks radio    State-funded primary and secondary
@@ -180,7 +180,7 @@ Validate the 'new indicators' section
     user waits until h3 is visible    Indicators not found in new data set (1)
 
 User maps original indicator to an indicator in the new data set version
-    user clicks button in table cell    1    4    Map option    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user clicks button in table cell    1    4    Map indicator    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
 
     ${modal}=    user waits until modal is visible    Map existing indicator
     user clicks radio    Number of enrolments
@@ -278,7 +278,7 @@ User clicks on Map locations link for second patch replacement
     ...    1 unmapped location    %{WAIT_LONG}
 
 User edits location mapping for second patch replacement
-    user clicks button in table cell    1    4    Map option
+    user clicks button in table cell    1    4    Map location
 
     ${modal}=    user waits until modal is visible    Map existing location
     user clicks radio    Hull
@@ -299,7 +299,7 @@ User clicks on Map indicators link for second patch replacement
     ...    1 unmapped indicator    %{WAIT_LONG}
 
 User edits indicator mapping for second patch replacement
-    user clicks button in table cell    1    4    Map option    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user clicks button in table cell    1    4    Map indicator    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
 
     ${modal}=    user waits until modal is visible    Map existing indicator
     user clicks radio    Enrolments

@@ -13,7 +13,7 @@ export default function getUnmappedIndicatorErrors(
 
   if (total) {
     errors.push({
-      id: mappableTableId('mappable-indicators'),
+      id: mappableTableId('default'),
       message: `There ${total > 1 ? 'are' : 'is'} ${total} unmapped indicator${
         total > 1 ? 's' : ''
       }`,
