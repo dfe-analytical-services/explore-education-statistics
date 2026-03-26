@@ -42,13 +42,16 @@ param acrLoginServer string
 @description('Specifies the container image to deploy from the registry.')
 param functionAppImageName string
 
-@description('The Docker image tag for the data screener. This value should represent a pipeline build number')
+@description('The Docker image tag for the data screener. This value should represent a pipeline build number.')
 param screenerDockerImageTag string
 
-@description('Whether to create or update Azure Monitor alerts during this deploy')
+@description('Whether or not to include Data Dictionary checks in the Screener.')
+param includeDataDictionaryChecks bool = false
+
+@description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
 
-@description('A set of tags with which to tag the resource in Azure')
+@description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
@@ -108,6 +111,10 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
       {
         name: 'LOG_DIR'
         value: '/tmp'
+      }
+      {
+        name: 'DD_CHECKS'
+        value: includeDataDictionaryChecks ? 'TRUE' : 'FALSE'
       }
       {
         name: 'AzureWebJobs_StartScreening__queueServiceUri'

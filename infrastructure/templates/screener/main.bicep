@@ -31,6 +31,9 @@ param screenerAppRegistrationClientId string = ''
 @secure()
 param devopsServicePrincipalId string = ''
 
+@description('Whether or not to include Data Dictionary checks in the Screener.')
+param includeDataDictionaryChecks bool
+
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
@@ -90,6 +93,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
+    includeDataDictionaryChecks: includeDataDictionaryChecks
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists
