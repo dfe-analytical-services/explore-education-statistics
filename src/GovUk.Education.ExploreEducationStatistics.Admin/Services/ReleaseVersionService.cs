@@ -98,7 +98,8 @@ public class ReleaseVersionService(
     )
     {
         return await context
-            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanDeleteReleaseVersion)
             .OnSuccess(_ =>
             {
@@ -116,10 +117,8 @@ public class ReleaseVersionService(
     )
     {
         return context
-            .ReleaseVersions.SingleOrNotFoundAsync(
-                releaseVersion => releaseVersion.Id == releaseVersionId,
-                cancellationToken
-            )
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanDeleteReleaseVersion)
             .OnSuccess(releaseVersion =>
                 DoDeleteReleaseVersion(
@@ -138,6 +137,7 @@ public class ReleaseVersionService(
     {
         return context
             .ReleaseVersions.IgnoreQueryFilters()
+            .Include(rv => rv.Release)
             .SingleOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
             .OnSuccessDo(userService.CheckCanDeleteTestReleaseVersion)
             .OnSuccessDo(async releaseVersion =>

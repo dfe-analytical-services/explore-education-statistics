@@ -82,6 +82,11 @@ public static class PublicationGeneratorExtensions
         return generator.ForInstance(s => s.SetUpdated(updated));
     }
 
+    public static Generator<Publication> WithMethodologies(
+        this Generator<Publication> generator,
+        IReadOnlyList<PublicationMethodology> methodologies
+    ) => generator.ForInstance(s => s.SetMethodologies(methodologies));
+
     public static InstanceSetters<Publication> SetId(this InstanceSetters<Publication> setters, Guid id) =>
         setters.Set(p => p.Id, id);
 
@@ -299,6 +304,23 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         DateTime? updated
     ) => setters.Set(p => p.Updated, updated);
+
+    private static InstanceSetters<Publication> SetMethodologies(
+        this InstanceSetters<Publication> setters,
+        IReadOnlyList<PublicationMethodology> methodologies
+    ) =>
+        setters
+            .Set(p => p.Methodologies, methodologies)
+            .Set(
+                (_, publication, _) =>
+                {
+                    methodologies.ForEach(methodology =>
+                    {
+                        methodology.Publication = publication;
+                        methodology.PublicationId = publication.Id;
+                    });
+                }
+            );
 
     public static ConditionalGeneratorDeclaration If(this Generator<Publication> generator, bool condition) =>
         new(condition, generator);

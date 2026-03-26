@@ -5,8 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -15,10 +13,9 @@ public class ViewSpecificMethodologyRequirement : IAuthorizationRequirement { }
 
 public class ViewSpecificMethodologyAuthorizationHandler(
     IMethodologyRepository methodologyRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
     IPreReleaseService preReleaseService,
     IReleaseVersionRepository releaseVersionRepository,
-    AuthorizationHandlerService authorizationHandlerService
+    IAuthorizationHandlerService authorizationHandlerService
 ) : AuthorizationHandler<ViewSpecificMethodologyRequirement, MethodologyVersion>
 {
     protected override async Task HandleRequirementAsync(
@@ -36,15 +33,13 @@ public class ViewSpecificMethodologyAuthorizationHandler(
 
         var owningPublication = await methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
-        // If the user is a Publication Owner or Approver of the Publication that owns this Methodology, they can
-        // view it.  Additionally, if the user is a Contributor or an Approver of any
-        // (Live or non-Live) release version of the owning publication of this methodology, they can view it.
+        // If the user is a Publication Drafter or Approver of the Publication that owns this Methodology, they can
+        // view it.
         if (
-            await authorizationHandlerService.UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
-                context.User.GetUserId(),
-                owningPublication.Id,
-                SetOf(PublicationRole.Owner, PublicationRole.Allower),
-                ReleaseEditorAndApproverRoles
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: owningPublication.Id,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {
@@ -56,49 +51,46 @@ public class ViewSpecificMethodologyAuthorizationHandler(
         // PrereleaseViewer role on the release version.
         // The release version must be the latest version of the most recent release by time series for the
         // publication, approved but unpublished, and within the prerelease window.
-        if (methodologyVersion.Approved)
+        if (!methodologyVersion.Approved)
         {
-            var publicationIds = await methodologyRepository.GetAllPublicationIds(methodologyVersion.MethodologyId);
+            return;
+        }
 
-            foreach (var publicationId in publicationIds)
+        var publicationIds = await methodologyRepository.GetAllPublicationIds(methodologyVersion.MethodologyId);
+
+        foreach (var publicationId in publicationIds)
+        {
+            var latestReleaseVersion = await releaseVersionRepository.GetLatestReleaseVersion(publicationId);
+
+            // The publication may have no releases
+            if (latestReleaseVersion == null)
             {
-                var latestReleaseVersion = await releaseVersionRepository.GetLatestReleaseVersion(publicationId);
+                continue;
+            }
 
-                // The publication may have no releases
-                if (latestReleaseVersion == null)
-                {
-                    continue;
-                }
+            // A published release is not in prerelease
+            if (latestReleaseVersion.Live)
+            {
+                continue;
+            }
 
-                // A published release is not in prerelease
-                if (latestReleaseVersion.Live)
-                {
-                    continue;
-                }
+            // An unapproved release is not in prerelease
+            if (latestReleaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
+            {
+                continue;
+            }
 
-                // An unapproved release is not in prerelease
-                if (latestReleaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
-                {
-                    continue;
-                }
-
-                if (
-                    await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(
-                        context.User.GetUserId(),
-                        latestReleaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer
-                    )
+            if (
+                await authorizationHandlerService.UserHasPrereleaseRoleOnReleaseVersion(
+                    userId: context.User.GetUserId(),
+                    releaseVersionId: latestReleaseVersion.Id
                 )
-                {
-                    if (
-                        preReleaseService.GetPreReleaseWindowStatus(latestReleaseVersion, DateTimeOffset.UtcNow).Access
-                        == PreReleaseAccess.Within
-                    )
-                    {
-                        context.Succeed(requirement);
-                        return;
-                    }
-                }
+                && preReleaseService.GetPreReleaseWindowStatus(latestReleaseVersion, DateTimeOffset.UtcNow).Access
+                    == PreReleaseAccess.Within
+            )
+            {
+                context.Succeed(requirement);
+                return;
             }
         }
     }

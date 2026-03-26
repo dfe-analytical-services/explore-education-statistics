@@ -1,19 +1,13 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class ViewSpecificPublicationRequirement : IAuthorizationRequirement { }
 
-public class ViewSpecificPublicationAuthorizationHandler(
-    IUserReleaseRoleRepository userReleaseRoleRepository,
-    AuthorizationHandlerService authorizationHandlerService
-) : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
+public class ViewSpecificPublicationAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
+    : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
@@ -28,33 +22,12 @@ public class ViewSpecificPublicationAuthorizationHandler(
             return;
         }
 
-        // This will be changed when we start introducing the use of the NEW publication roles in the
-        // authorisation handlers, in STEP 8 (EES-6194) of the Permissions Rework. For now, we want to
-        // filter out any usage of the NEW roles.
-        var validPublicationRoles = EnumUtil
-            .GetEnums<PublicationRole>()
-            .Except([PublicationRole.Approver, PublicationRole.Drafter]);
-
-        // If the user has any PublicationRole on the Publication, they can see it.
+        // If the user has any role (including both publication roles and prerelease roles) on the publication, they can see it.
         if (
-            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
-                context.User.GetUserId(),
-                publication.Id,
-                [.. validPublicationRoles]
+            await authorizationHandlerService.UserHasAnyRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: publication.Id
             )
-        )
-        {
-            context.Succeed(requirement);
-            return;
-        }
-
-        // If the user has any ReleaseRoles on any of the Publication's Releases, they can see it.
-        if (
-            await userReleaseRoleRepository
-                .Query()
-                .WhereForUser(context.User.GetUserId())
-                .WhereForPublication(publication.Id)
-                .AnyAsync()
         )
         {
             context.Succeed(requirement);

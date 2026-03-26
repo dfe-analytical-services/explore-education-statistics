@@ -45,7 +45,8 @@ public class ReleaseApprovalService(
     public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
     {
         return await context
-            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewReleaseVersionStatusHistory)
             .OnSuccess(async releaseVersion =>
             {

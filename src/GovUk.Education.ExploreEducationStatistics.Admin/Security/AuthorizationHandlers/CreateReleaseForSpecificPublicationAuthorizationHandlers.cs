@@ -2,25 +2,15 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class CreateReleaseForSpecificPublicationRequirement : IAuthorizationRequirement { }
 
-public class CreateReleaseForSpecificPublicationAuthorizationHandler
-    : AuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Publication>
+public class CreateReleaseForSpecificPublicationAuthorizationHandler(
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Publication>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public CreateReleaseForSpecificPublicationAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         CreateReleaseForSpecificPublicationRequirement requirement,
@@ -33,17 +23,17 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandler
             return;
         }
 
-        if (SecurityUtils.HasClaim(context.User, CreateAnyRelease))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.CreateAnyRelease))
         {
             context.Succeed(requirement);
             return;
         }
 
         if (
-            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
-                context.User.GetUserId(),
-                publication.Id,
-                Owner
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: publication.Id,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {
