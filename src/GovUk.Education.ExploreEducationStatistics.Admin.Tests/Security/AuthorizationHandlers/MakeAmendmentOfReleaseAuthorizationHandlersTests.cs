@@ -1,323 +1,154 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
+public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 {
     private static readonly DataFixture _dataFixture = new();
 
-    public class ClaimTests : MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
+    private static readonly Guid _userId = Guid.NewGuid();
+
+    private static readonly ReleaseVersion _draftReleaseVersion = _dataFixture
+        .DefaultReleaseVersion()
+        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+    private static readonly ReleaseVersion _publishedReleaseVersion = _dataFixture
+        .DefaultReleaseVersion()
+        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+        .WithPublished(DateTimeOffset.UtcNow)
+        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+    public class ClaimsTests : MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
     {
         [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionUnpublished()
+        public async Task UnpublishedVersion_FailsForAllClaims()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions[0];
-
-            // Assert that no users can amend an unpublished Release that is the only version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Publications.Add(publication);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
-                releaseVersion
+            await AssertHandlerFailsForAllClaims<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
+                handler: SetupHandler(),
+                entity: _draftReleaseVersion,
+                userId: _userId
             );
         }
 
         [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionPublished()
+        public async Task PublishedAndNotLatestVersion_FailsForAllClaims()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+            releaseVersionRepository
+                .Setup(s => s.IsLatestReleaseVersion(_publishedReleaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
 
-            var releaseVersion = publication.Releases[0].Versions[0];
-
-            // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the only version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Publications.Add(publication);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
-                releaseVersion,
-                MakeAmendmentsOfAllReleases
+            await AssertHandlerFailsForAllClaims<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
+                handler: SetupHandler(releaseVersionRepository.Object),
+                entity: _publishedReleaseVersion,
+                userId: _userId
             );
         }
 
         [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_UnpublishedVersion()
+        public async Task PublishedAndLatestVersion_SucceedsOnlyForValidClaims()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv is { Published: null, Version: 1 });
-
-            // Assert that no users can amend a version that is not published
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Publications.Add(publication);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_NotLatestVersion()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv.Version == 0);
-
-            // Assert that no users can amend an amendment Release if it is not the latest version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Publications.Add(publication);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_LatestVersion()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv.Version == 1);
-
-            // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the latest version
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Publications.Add(publication);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
-                releaseVersion,
-                MakeAmendmentsOfAllReleases
+            await AssertHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
+                // IReleaseVersionRespository.IsLatestReleaseVersion has a default setup of returning 'true'
+                handler: SetupHandler(),
+                entity: _publishedReleaseVersion,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.MakeAmendmentsOfAllReleases]
             );
         }
     }
 
-    public class PublicationRoleTests : MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
+    public class PublicationRolesTests : MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
     {
         [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionUnpublished()
+        public async Task UnpublishedVersion_FailsWithoutCheckingRoles()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+            var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                SetupHandler(authorizationHandlerService: authorizationHandlerService);
 
-            var releaseVersion = publication.Releases[0].Versions[0];
-
-            // Assert that no User Publication roles will allow an unpublished Release that is the only version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
+            await AssertHandlerFailsWithoutCheckingRoles<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
+                handlerSupplier: handlerSuppler,
+                entity: _draftReleaseVersion
             );
         }
 
         [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionPublished()
+        public async Task PublishedAndNotLatestVersion_FailsWithoutCheckingRoles()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+            releaseVersionRepository
+                .Setup(s => s.IsLatestReleaseVersion(_publishedReleaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
 
-            var releaseVersion = publication.Releases[0].Versions[0];
+            var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                SetupHandler(releaseVersionRepository.Object, authorizationHandlerService);
 
-            // Assert that a User who has the Publication Owner role on a Release can amend it if it is the only version published
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion,
-                Owner
+            await AssertHandlerFailsWithoutCheckingRoles<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
+                handlerSupplier: handlerSuppler,
+                entity: _publishedReleaseVersion
             );
         }
 
         [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_UnpublishedVersion()
+        public async Task PublishedAndLatestVersion_SucceedsOnlyForValidPublicationRoles()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
+            var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                SetupHandler(authorizationHandlerService: authorizationHandlerService);
 
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv is { Published: null, Version: 1 });
-
-            // Assert that no User Publication roles will allow an amendment Release that is not yet approved to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_NotLatestVersion()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv.Version == 0);
-
-            // Assert that no User Publication roles will allow an amendment Release that is not the latest version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_LatestVersion()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv.Version == 1);
-
-            // Assert that a User who has the Publication Owner role on a Release can amend it if it is the latest published version
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion,
-                Owner
+            await AssertHandlerSucceedsForAnyValidPublicationRole<
+                MakeAmendmentOfSpecificReleaseRequirement,
+                ReleaseVersion
+            >(
+                handlerSupplier: handlerSuppler,
+                entity: _publishedReleaseVersion,
+                publicationId: _publishedReleaseVersion.Release.PublicationId,
+                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
             );
         }
     }
 
-    public class ReleaseRoleTests : MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
+    private static MakeAmendmentOfSpecificReleaseAuthorizationHandler SetupHandler(
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
     {
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionUnpublished()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+        releaseVersionRepository ??= CreateDefaultReleaseVersionRepository();
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
 
-            var releaseVersion = publication.Releases[0].Versions[0];
-
-            // Assert that no User Release roles will allow an unpublished Release that is the only version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_OnlyVersionPublished()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions[0];
-
-            // Assert that no User Release roles will allow a published Release that is the only version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_UnpublishedVersion()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv is { Published: null, Version: 1 });
-
-            // Assert that no User Release roles will allow an amendment Release that is not yet approved to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_NotLatestVersion()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv.Version == 0);
-
-            // Assert that no User Release roles will allow an amendment Release that is not the latest version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
-            );
-        }
-
-        [Fact]
-        public async Task MakeAmendmentOfSpecificReleaseAuthorizationHandler_LatestVersion()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 2).Generate(1));
-
-            var releaseVersion = publication.Releases[0].Versions.Single(rv => rv.Version == 1);
-
-            // Assert that no User Release roles will allow an amendment Release that is the latest version to be amended
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
-                CreateHandler,
-                releaseVersion
-            );
-        }
+        return new(releaseVersionRepository, authorizationHandlerService);
     }
 
-    private static MakeAmendmentOfSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static IReleaseVersionRepository CreateDefaultReleaseVersionRepository()
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            contentDbContext
-        );
+        var mock = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+        mock.Setup(s => s.IsLatestReleaseVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
-        return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(
-            new AuthorizationHandlerService(
-                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: userReleaseRoleRepository,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
-            ),
-            new ReleaseVersionRepository(contentDbContext)
-        );
+        return mock.Object;
+    }
+
+    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    It.IsAny<Guid>(),
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
+            )
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

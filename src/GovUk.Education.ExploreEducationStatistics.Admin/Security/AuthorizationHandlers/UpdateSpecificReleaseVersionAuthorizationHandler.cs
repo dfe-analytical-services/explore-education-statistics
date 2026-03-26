@@ -1,24 +1,15 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class UpdateSpecificReleaseVersionRequirement : IAuthorizationRequirement;
 
-public class UpdateSpecificReleaseVersionAuthorizationHandler
+public class UpdateSpecificReleaseVersionAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
     : AuthorizationHandler<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public UpdateSpecificReleaseVersionAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         UpdateSpecificReleaseVersionRequirement requirement,
@@ -36,16 +27,11 @@ public class UpdateSpecificReleaseVersionAuthorizationHandler
             return;
         }
 
-        var allowedPublicationRoles = SetOf(PublicationRole.Owner, PublicationRole.Allower);
-        var allowedReleaseRoles = ReleaseEditorAndApproverRoles;
-
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
-                context.User.GetUserId(),
-                releaseVersion.PublicationId,
-                releaseVersion.Id,
-                allowedPublicationRoles,
-                allowedReleaseRoles
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

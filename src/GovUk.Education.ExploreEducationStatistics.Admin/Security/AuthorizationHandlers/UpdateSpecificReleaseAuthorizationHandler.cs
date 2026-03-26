@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class UpdateSpecificReleaseRequirement : IAuthorizationRequirement;
 
-public class UpdateSpecificReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
+public class UpdateSpecificReleaseAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
     : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
 {
     protected override async Task HandleRequirementAsync(
@@ -21,13 +21,11 @@ public class UpdateSpecificReleaseAuthorizationHandler(AuthorizationHandlerServi
             return;
         }
 
-        const PublicationRole allowedPublicationRole = PublicationRole.Owner;
-
         if (
             await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 userId: context.User.GetUserId(),
                 publicationId: release.PublicationId,
-                rolesToInclude: allowedPublicationRole
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

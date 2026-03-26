@@ -1,23 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class ViewReleaseStatusHistoryRequirement : IAuthorizationRequirement { }
 
-public class ViewReleaseStatusHistoryAuthorizationHandler
+public class ViewReleaseStatusHistoryAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
     : AuthorizationHandler<ViewReleaseStatusHistoryRequirement, ReleaseVersion>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public ViewReleaseStatusHistoryAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewReleaseStatusHistoryRequirement requirement,
@@ -31,12 +22,10 @@ public class ViewReleaseStatusHistoryAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
-                context.User.GetUserId(),
-                releaseVersion.PublicationId,
-                releaseVersion.Id,
-                SetOf(PublicationRole.Owner, PublicationRole.Allower),
-                UnrestrictedReleaseViewerRoles
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

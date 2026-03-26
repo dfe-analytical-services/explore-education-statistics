@@ -29,7 +29,7 @@ public class DeleteTestReleaseAuthorizationHandler(IOptions<AppOptions> appOptio
             return Task.CompletedTask;
         }
 
-        var theme = releaseVersion.Publication.Theme;
+        var theme = releaseVersion.Release.Publication.Theme;
 
         if (theme.IsTestOrSeedTheme())
         {

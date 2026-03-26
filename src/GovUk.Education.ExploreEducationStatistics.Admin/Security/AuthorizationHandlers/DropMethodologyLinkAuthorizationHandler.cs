@@ -2,23 +2,14 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class DropMethodologyLinkRequirement : IAuthorizationRequirement { }
 
-public class DropMethodologyLinkAuthorizationHandler
+public class DropMethodologyLinkAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
     : AuthorizationHandler<DropMethodologyLinkRequirement, PublicationMethodology>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public DropMethodologyLinkAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         DropMethodologyLinkRequirement requirement,
@@ -32,17 +23,17 @@ public class DropMethodologyLinkAuthorizationHandler
         }
 
         // Allow users who can adopt methodologies to also drop them
-        if (SecurityUtils.HasClaim(context.User, AdoptAnyMethodology))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AdoptAnyMethodology))
         {
             context.Succeed(requirement);
             return;
         }
 
         if (
-            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
-                context.User.GetUserId(),
-                link.PublicationId,
-                Owner
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: link.PublicationId,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

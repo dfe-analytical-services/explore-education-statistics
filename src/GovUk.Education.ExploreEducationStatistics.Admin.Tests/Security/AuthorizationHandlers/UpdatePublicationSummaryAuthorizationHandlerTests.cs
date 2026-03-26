@@ -1,53 +1,72 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class UpdatePublicationSummaryAuthorizationHandlerTests
+public abstract class UpdatePublicationSummaryAuthorizationHandlerTests
 {
-    [Fact]
-    public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithClaim()
+    private static readonly DataFixture _dataFixture = new();
+
+    private static readonly Guid _userId = Guid.NewGuid();
+
+    private static readonly Publication _publication = _dataFixture.DefaultPublication();
+
+    public class ClaimsTests : UpdatePublicationSummaryAuthorizationHandlerTests
     {
-        await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationSummaryRequirement>(
-            CreateHandler,
-            new Publication(),
-            UpdateAllPublications
-        );
+        [Fact]
+        public async Task SucceedsOnlyForValidClaims()
+        {
+            await AssertHandlerSucceedsWithCorrectClaims<UpdatePublicationSummaryRequirement, Publication>(
+                handler: SetupHandler(),
+                entity: _publication,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllPublications]
+            );
+        }
     }
 
-    [Fact]
-    public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithPublicationOwner()
+    public class PublicationRolesTests : UpdatePublicationSummaryAuthorizationHandlerTests
     {
-        await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
-            CreateHandler,
-            Owner
-        );
+        [Fact]
+        public async Task SucceedsOnlyForValidPublicationRoles()
+        {
+            await AssertHandlerSucceedsForAnyValidPublicationRole<UpdatePublicationSummaryRequirement, Publication>(
+                handlerSupplier: SetupHandler,
+                entity: _publication,
+                publicationId: _publication.Id,
+                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+            );
+        }
     }
 
-    private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static UpdatePublicationSummaryAuthorizationHandler SetupHandler(
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            contentDbContext
-        );
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
 
-        return new UpdatePublicationSummaryAuthorizationHandler(
-            new AuthorizationHandlerService(
-                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: userReleaseRoleRepository,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+        return new(authorizationHandlerService);
+    }
+
+    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    _publication.Id,
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

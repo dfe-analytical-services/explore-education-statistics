@@ -8,33 +8,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class DeleteSpecificCommentRequirement : IAuthorizationRequirement { }
 
-public class DeleteSpecificCommentAuthorizationHandler : AuthorizationHandler<DeleteSpecificCommentRequirement, Comment>
+public class DeleteSpecificCommentAuthorizationHandler(
+    ContentDbContext contentDbContext,
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<DeleteSpecificCommentRequirement, Comment>
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public DeleteSpecificCommentAuthorizationHandler(
-        ContentDbContext contentDbContext,
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _contentDbContext = contentDbContext;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         DeleteSpecificCommentRequirement requirement,
         Comment resource
     )
     {
-        var releaseVersion = GetReleaseVersion(_contentDbContext, resource);
+        var releaseVersion = GetReleaseVersion(contentDbContext, resource);
+
         var updateSpecificReleaseVersionContext = new AuthorizationHandlerContext(
             requirements: [new UpdateSpecificReleaseVersionRequirement()],
             user: context.User,
             resource: releaseVersion
         );
-        await new UpdateSpecificReleaseVersionAuthorizationHandler(_authorizationHandlerService).HandleAsync(
+
+        await new UpdateSpecificReleaseVersionAuthorizationHandler(authorizationHandlerService).HandleAsync(
             updateSpecificReleaseVersionContext
         );
 
@@ -47,9 +40,10 @@ public class DeleteSpecificCommentAuthorizationHandler : AuthorizationHandler<De
     private static ReleaseVersion? GetReleaseVersion(ContentDbContext context, Comment comment)
     {
         var contentBlock = context
-            .ContentBlocks.Include(block => block.ContentSection)
-                .ThenInclude(contentSection => contentSection!.ReleaseVersion)
-            .First(block => block.Id == comment.ContentBlockId);
+            .ContentBlocks.Include(cb => cb.ContentSection)
+                .ThenInclude(cs => cs!.ReleaseVersion)
+                    .ThenInclude(rv => rv.Release)
+            .First(cb => cb.Id == comment.ContentBlockId);
 
         return contentBlock.ContentSection?.ReleaseVersion;
     }

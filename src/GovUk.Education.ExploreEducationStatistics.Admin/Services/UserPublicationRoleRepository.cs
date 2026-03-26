@@ -326,7 +326,7 @@ public class UserPublicationRoleRepository(
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(resourceRoleFilter, includeNewPermissionsSystemRoles: true)
+        return await Query(resourceRoleFilter)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
             .WhereRolesIn(role)
