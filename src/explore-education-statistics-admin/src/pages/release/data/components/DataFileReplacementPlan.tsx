@@ -191,8 +191,9 @@ const DataFileReplacementPlan = ({
           process.
         </p>
       )}
-      {isNotReadyToPublish &&
-        user?.permissions.isBauUser && { mappingLinkNotAvailableToNonBauText }}
+      {isNotReadyToPublish && user?.permissions.isBauUser && (
+        <>{mappingLinkNotAvailableToNonBauText}</>
+      )}
       {!isNotReadyToPublish && (
         <p>No actions required for API data set version mapping.</p>
       )}
@@ -588,11 +589,12 @@ function getApiDataSetMappingProgressTag(
         </p>
       )}
 
-      {mappingRequired &&
-        !user.permissions.isBauUser && { mappingLinkNotAvailableToNonBauText }}
+      {mappingRequired && !user.permissions.isBauUser && (
+        <>{mappingLinkNotAvailableToNonBauText}</>
+      )}
 
       {!mappingRequired && (
-        <p>No manual mapping required for API data set ${mappableType}.</p>
+        <p>No manual mapping required for API data set {mappableType}.</p>
       )}
     </>
   );

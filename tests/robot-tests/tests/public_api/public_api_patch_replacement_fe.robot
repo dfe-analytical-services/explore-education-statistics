@@ -15,9 +15,12 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    Public API - patch manual changes public site %{RUN_IDENTIFIER}
-${RELEASE_1_NAME}=      Financial year 3000-01
-${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1
+${PUBLICATION_NAME}=                        Public API - patch manual changes public site %{RUN_IDENTIFIER}
+${RELEASE_1_NAME}=                          Financial year 3000-01
+${SUBJECT_1_NAME}=                          ${PUBLICATION_NAME} - Subject 1
+${MAPPABLE_INDICATORS_TABLE_SELECTOR}=      testid:mappable-table-default
+${NEW_INDICATORS_TABLE_SELECTOR}=           testid:new-items-table-default
+${AUTOMAPPED_INDICATORS_TABLE_SELECTOR}=    testid:auto-mapped-table-default
 
 
 *** Test Cases ***
@@ -101,8 +104,9 @@ Upload patch replacement data
     ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Verify the pending data replacement summary
-    user waits until h3 is visible    API data set Locations: ERROR
-    user waits until h3 is visible    API data set Filters: ERROR
+    user waits until h3 is visible    API data set locations: ERROR
+    user waits until h3 is visible    API data set filters: ERROR
+    user waits until h3 is visible    API data set indicators: ERROR
     user waits until h3 is visible    API data set has to be finalized: ERROR
     user waits until parent contains element    id:main-content    text:Cancel data replacement
 
@@ -162,6 +166,40 @@ Validate the row headings and its contents in the 'filters options' section afte
     user waits until h3 is visible    Filter options not found in new data set
     user clicks link    Back
 
+User clicks on Map indicators link
+    user clicks link    Map indicators
+    user waits until h3 is visible    Indicators not found in new data set (1)
+    user waits until element contains    css:[data-testid="mappable-table-default"] caption
+    ...    1 unmapped indicator    %{WAIT_LONG}
+
+Validate the 'unmapped indicators' notification banner
+    user waits until h2 is visible    Action required
+    user waits until page contains link    There is 1 unmapped indicator
+
+Validate the 'new indicators' section
+    user waits until h3 is visible    Indicators not found in new data set (1)
+
+User maps original indicator to an indicator in the new data set version
+    user clicks button in table cell    1    4    Map option    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+    ${modal}=    user waits until modal is visible    Map existing indicator
+    user clicks radio    Number of enrolments
+    user clicks button    Update indicator mapping
+    user waits until modal is not visible    Map existing indicator
+    user waits until h3 is visible    Indicators not found in old data set (0)
+    user checks page contains    No new indicators.
+    User checks page does not contain element    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user clicks link    Back
+
+Validate the version status of indicators task is now complete
+    user waits until h3 is visible    Draft version tasks
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Complete
+
 Confirm finalization of this API data set version
     user clicks button    Finalise this data set version
     user waits for caches to expire
@@ -172,8 +210,9 @@ Verify that API summary tags have status OK and then press 'confirm data replace
     user clicks link    Back to API data sets
     user clicks link    Data uploads
     user clicks link containing text    View details    testId:Actions
-    user waits until h3 is visible    API data set Locations: OK
-    user waits until h3 is visible    API data set Filters: OK
+    user waits until h3 is visible    API data set locations: OK
+    user waits until h3 is visible    API data set filters: OK
+    user waits until h3 is visible    API data set indicators: OK
     user waits until h3 is visible    API data set has to be finalized: OK
     user waits until parent contains element    id:main-content    text:Cancel data replacement
     user waits until parent contains element    id:main-content    text:Confirm data replacement
@@ -216,8 +255,9 @@ Upload second patch replacement data
     ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Verify the pending data replacement summary for second patch replacement
-    user waits until h3 is visible    API data set Locations: ERROR
-    user waits until h3 is visible    API data set Filters: OK
+    user waits until h3 is visible    API data set locations: ERROR
+    user waits until h3 is visible    API data set filters: OK
+    user waits until h3 is visible    API data set indicators: ERROR
     user waits until h3 is visible    API data set has to be finalized: ERROR
     user waits until parent contains element    id:main-content    text:Cancel data replacement
 
@@ -252,6 +292,35 @@ Verify location mapping changes for second patch replacement
     user clicks link    Back
     user waits until h3 is visible    Draft version tasks
 
+User clicks on Map indicators link for second patch replacement
+    user clicks link    Map indicators
+    user waits until h3 is visible    Indicators not found in new data set
+    user waits until element contains    css:[data-testid="mappable-table-default"] caption
+    ...    1 unmapped indicator    %{WAIT_LONG}
+
+User edits indicator mapping for second patch replacement
+    user clicks button in table cell    1    4    Map option    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+    ${modal}=    user waits until modal is visible    Map existing indicator
+    user clicks radio    Enrolments
+    user clicks button    Update indicator mapping
+    user waits until modal is not visible    Map existing indicator
+
+Verify indicator mapping changes for second patch replacement
+    user waits until element contains    css:[data-testid="mappable-table-default"] caption
+    ...    1 mapped indicator    %{WAIT_LONG}
+    user waits until h3 is visible    Indicators not found in new data set (1)
+    user clicks link    Back
+
+Validate the version status of indicators task is now complete after mapping the second patch replacement
+    user waits until h3 is visible    Draft version tasks
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Complete
+
 Confirm finalization of this API data set version for second patch replacement
     user clicks button    Finalise this data set version
     user waits for caches to expire
@@ -262,8 +331,9 @@ Verify that API summary tags have status OK and then press 'confirm data replace
     user clicks link    Back to API data sets
     user clicks link    Data uploads
     user clicks link containing text    View details    testId:Actions
-    user waits until h3 is visible    API data set Locations: OK
-    user waits until h3 is visible    API data set Filters: OK
+    user waits until h3 is visible    API data set locations: OK
+    user waits until h3 is visible    API data set filters: OK
+    user waits until h3 is visible    API data set indicators: OK
     user waits until h3 is visible    API data set has to be finalized: OK
     user waits until parent contains element    id:main-content    text:Cancel data replacement
     user waits until parent contains element    id:main-content    text:Confirm data replacement
@@ -306,13 +376,19 @@ Verify the highest patch version is displayed in the data set public frontend pa
 
 Verify that the two patch versions are collated on a single page
     user clicks link    API data set changelog
-    user waits until h3 is visible    Patch changes for version 1.0.2
-    user waits until h3 is visible    Patch changes for version 1.0.1
+
     # This change log is from 1.0.2
+    user waits until h3 is visible    Patch changes for version 1.0.2
     user waits until li is visible    label changed to: Hull
+    user waits until li is visible    label changed to: Enrolments
+    user waits until li is visible    column changed to: enrolments
+
     # This change log is from 1.0.1
+    user waits until h3 is visible    Patch changes for version 1.0.1
     user waits until li is visible    label changed to: State-funded primary and secondary
     user waits until li is visible    label changed to: Yorkshire
+    user waits until li is visible    label changed to: Number of enrolments
+    user waits until li is visible    column changed to: number_of_enrolments
 
 
 *** Keywords ***

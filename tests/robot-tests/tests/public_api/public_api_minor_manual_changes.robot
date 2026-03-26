@@ -222,6 +222,8 @@ Validate the version status of location task is now complete
     user waits until parent contains element    id:map-locations-task-status    text:Complete
     user waits until parent contains element    testid:map-filters-task    link:Map filters
     user waits until parent contains element    id:map-filters-task-status    text:Incomplete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Incomplete
 
 User clicks on Map filters link
     user clicks link    Map filters
@@ -269,6 +271,15 @@ Validate the row headings and its contents in the 'filters options' section afte
     user checks table cell contains    1    3    Minor
 
     user clicks link    Back
+
+Validate the version status of filter task is now complete
+    user waits until h3 is visible    Draft version tasks
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Incomplete
 
 User clicks on Map indicators link
     user clicks link    Map indicators
@@ -357,6 +368,15 @@ Validate the row headings and its contents in the 'new indicators' section after
     user checks page contains    No new indicators.
     User checks page does not contain element    ${NEW_INDICATORS_TABLE_SELECTOR}
     user clicks link    Back
+
+Validate the version status of indicators task is now complete
+    user waits until h3 is visible    Draft version tasks
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Complete
 
 Confirm finalization of this API data set version
     user clicks button    Finalise this data set version

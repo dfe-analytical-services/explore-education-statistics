@@ -558,6 +558,7 @@ user clicks element
     # Look up the element again prior to clicking, as scrolling can often lead to DOM elements being refreshed.
     # This lets us reduce the number of StaleElementReferenceExceptions.
     ${element}=    lookup or return webelement    ${selector}    ${parent}
+    user sets focus to element    ${element}
     click element    ${element}
 
 user clicks link

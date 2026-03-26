@@ -426,10 +426,10 @@ describe('DataReplacementPlan', () => {
       true,
     );
     await waitFor(() => {
-      const filtersHeading = screen.getByText('API data set Filters: ERROR');
+      const filtersHeading = screen.getByText('API data set filters: ERROR');
       const filtersParagraph = filtersHeading.closest('h3')?.nextElementSibling;
       const locationsHeading = screen.getByText(
-        'API data set Locations: ERROR',
+        'API data set locations: ERROR',
       );
       const locationsParagraph =
         locationsHeading.closest('h3')?.nextElementSibling;
@@ -519,10 +519,10 @@ describe('DataReplacementPlan', () => {
         bauUser,
       );
       await waitFor(() => {
-        const filtersHeading = screen.getByText('API data set Filters: ERROR');
+        const filtersHeading = screen.getByText('API data set filters: ERROR');
         const filtersParagraph =
           filtersHeading.closest('h3')?.nextElementSibling;
-        const locationsHeading = screen.getByText('API data set Locations: OK');
+        const locationsHeading = screen.getByText('API data set locations: OK');
         const locationsParagraph =
           locationsHeading.closest('h3')?.nextElementSibling;
         const finalizationHeading = screen.getByText(
@@ -590,11 +590,11 @@ describe('DataReplacementPlan', () => {
         bauUser,
       );
       await waitFor(() => {
-        const filtersHeading = screen.getByText('API data set Filters: OK');
+        const filtersHeading = screen.getByText('API data set filters: OK');
         const filtersParagraph =
           filtersHeading.closest('h3')?.nextElementSibling;
         const locationsHeading = screen.getByText(
-          'API data set Locations: ERROR',
+          'API data set locations: ERROR',
         );
         const locationsParagraph =
           locationsHeading.closest('h3')?.nextElementSibling;
