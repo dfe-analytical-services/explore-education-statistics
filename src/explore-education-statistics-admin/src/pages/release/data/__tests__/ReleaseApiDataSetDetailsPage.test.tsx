@@ -319,8 +319,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         mappingStatus: {
           filtersComplete: false,
           locationsComplete: false,
+          indicatorsComplete: false,
           filtersHaveMajorChange: false,
           locationsHaveMajorChange: false,
+          indicatorsHaveMajorChange: false,
           isMajorVersionUpdate: false,
         },
       },
@@ -454,8 +456,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         mappingStatus: {
           filtersComplete: false,
           locationsComplete: false,
+          indicatorsComplete: false,
           filtersHaveMajorChange: false,
           locationsHaveMajorChange: false,
+          indicatorsHaveMajorChange: false,
           isMajorVersionUpdate: false,
         },
       },
@@ -702,9 +706,11 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            indicatorsComplete: true,
             isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -740,9 +746,11 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            indicatorsComplete: true,
             isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -755,9 +763,11 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            indicatorsComplete: true,
             isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -843,9 +853,11 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            indicatorsComplete: true,
             isMajorVersionUpdate: null,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
           },
         },
         latestLiveVersion: testLiveVersion,
@@ -858,8 +870,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           mappingStatus: {
             filtersComplete: true,
             locationsComplete: true,
+            indicatorsComplete: true,
             filtersHaveMajorChange: false,
             locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
             isMajorVersionUpdate: null,
           },
         },
@@ -932,8 +946,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: true,
+          indicatorsComplete: true,
           filtersHaveMajorChange: true,
           locationsHaveMajorChange: true,
+          indicatorsHaveMajorChange: true,
         },
       },
     });
@@ -956,7 +972,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       expect(() =>
         screen.getByText(
-          'This API data set can not be published because location or filter mappings are not yet complete.',
+          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
         ),
       ).toThrow('Unable to find an element');
     });
@@ -972,8 +988,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           isMajorVersionUpdate: true,
           locationsComplete: false,
           filtersComplete: false,
+          indicatorsComplete: false,
           filtersHaveMajorChange: false,
           locationsHaveMajorChange: false,
+          indicatorsHaveMajorChange: false,
         },
       },
     });
@@ -983,7 +1001,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because location or filter mappings are not yet complete.',
+          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
           {
             selector: 'h2',
           },
@@ -1012,8 +1030,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           isMajorVersionUpdate: true,
           locationsComplete: false,
           filtersComplete: true,
+          indicatorsComplete: false,
           filtersHaveMajorChange: true,
           locationsHaveMajorChange: false,
+          indicatorsHaveMajorChange: false,
         },
       },
     });
@@ -1023,7 +1043,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because location or filter mappings are not yet complete.',
+          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
           {
             selector: 'h2',
           },
@@ -1036,6 +1056,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       const mapLocationsTask = within(screen.getByTestId('map-locations-task'));
       const mapFiltersTask = within(screen.getByTestId('map-filters-task'));
+      const mapIndicatorsTask = within(
+        screen.getByTestId('map-indicators-task'),
+      );
 
       expect(
         mapFiltersTask.queryByText('Major Change', {
@@ -1044,6 +1067,11 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       ).toBeInTheDocument();
       expect(
         mapLocationsTask.queryByText('Incomplete', {
+          selector: 'strong',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        mapIndicatorsTask.queryByText('Incomplete', {
           selector: 'strong',
         }),
       ).toBeInTheDocument();
@@ -1060,8 +1088,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: false,
+          indicatorsComplete: false,
           filtersHaveMajorChange: false,
           locationsHaveMajorChange: true,
+          indicatorsHaveMajorChange: false,
         },
       },
     });
@@ -1071,7 +1101,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because location or filter mappings are not yet complete.',
+          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
           {
             selector: 'h2',
           },
@@ -1084,14 +1114,80 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       const mapLocationsTask = within(screen.getByTestId('map-locations-task'));
       const mapFiltersTask = within(screen.getByTestId('map-filters-task'));
+      const mapIndicatorsTask = within(
+        screen.getByTestId('map-indicators-task'),
+      );
 
+      expect(
+        mapFiltersTask.queryByText('Incomplete', {
+          selector: 'strong',
+        }),
+      ).toBeInTheDocument();
       expect(
         mapLocationsTask.queryByText('Major Change', {
           selector: 'strong',
         }),
       ).toBeInTheDocument();
       expect(
+        mapIndicatorsTask.queryByText('Incomplete', {
+          selector: 'strong',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('renders "Major Change" when user has selected a major change for the indicators', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDraftVersion,
+        version: '2.0.1',
+        mappingStatus: {
+          isMajorVersionUpdate: true,
+          locationsComplete: false,
+          filtersComplete: false,
+          indicatorsComplete: true,
+          filtersHaveMajorChange: false,
+          locationsHaveMajorChange: false,
+          indicatorsHaveMajorChange: true,
+        },
+      },
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText(
+          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
+          {
+            selector: 'h2',
+          },
+        ),
+      ).toBeInTheDocument();
+
+      expect(() =>
+        screen.getByText('Draft API data set version is ready to be published'),
+      ).toThrow('Unable to find an element');
+
+      const mapLocationsTask = within(screen.getByTestId('map-locations-task'));
+      const mapFiltersTask = within(screen.getByTestId('map-filters-task'));
+      const mapIndicatorsTask = within(
+        screen.getByTestId('map-indicators-task'),
+      );
+
+      expect(
         mapFiltersTask.queryByText('Incomplete', {
+          selector: 'strong',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        mapLocationsTask.queryByText('Incomplete', {
+          selector: 'strong',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        mapIndicatorsTask.queryByText('Major Change', {
           selector: 'strong',
         }),
       ).toBeInTheDocument();
@@ -1106,10 +1202,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         version: '1.0.1',
         mappingStatus: {
           isMajorVersionUpdate: false,
-          locationsComplete: false,
-          filtersComplete: false,
+          locationsComplete: true,
+          filtersComplete: true,
+          indicatorsComplete: true,
           filtersHaveMajorChange: false,
           locationsHaveMajorChange: false,
+          indicatorsHaveMajorChange: false,
         },
       },
     });
@@ -1138,8 +1236,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: true,
-          filtersHaveMajorChange: false,
-          locationsHaveMajorChange: false,
+          indicatorsComplete: true,
+          filtersHaveMajorChange: true,
+          locationsHaveMajorChange: true,
+          indicatorsHaveMajorChange: true,
         },
       },
     });
@@ -1165,8 +1265,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         isMajorVersionUpdate: true,
         locationsComplete: true,
         filtersComplete: true,
+        indicatorsComplete: true,
         filtersHaveMajorChange: true,
         locationsHaveMajorChange: true,
+        indicatorsHaveMajorChange: true,
       },
     };
 
@@ -1203,8 +1305,10 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           isMajorVersionUpdate: true,
           locationsComplete: true,
           filtersComplete: true,
+          indicatorsComplete: true,
           filtersHaveMajorChange: true,
           locationsHaveMajorChange: true,
+          indicatorsHaveMajorChange: true,
         },
         // no originalFileId
       },

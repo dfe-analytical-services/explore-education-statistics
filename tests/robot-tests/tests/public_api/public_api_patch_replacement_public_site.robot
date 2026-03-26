@@ -15,7 +15,7 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    Public API - patch manual changes %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Public API - patch manual changes public site %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=      Financial year 3000-01
 ${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1
 
@@ -109,7 +109,7 @@ Verify the pending data replacement summary
 Validate error summary is displayed on Api Data Set Details page
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
-    ...    This API data set can not be published because location or filter mappings are not yet complete.
+    ...    This API data set can not be published because location, filter or indicator mappings are not yet complete.
 
 User clicks on Map locations link
     user clicks link    Map locations
@@ -224,7 +224,7 @@ Verify the pending data replacement summary for second patch replacement
 Validate error summary is displayed on Api Data Set Details page for second patch replacement
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
-    ...    This API data set can not be published because location or filter mappings are not yet complete.
+    ...    This API data set can not be published because location, filter or indicator mappings are not yet complete.
     user checks element is visible    testid:cancel-replacement-link
 
 Validate the summary contents inside the 'draft version details' table contains version 1.0.2
