@@ -32,7 +32,7 @@ param screenerAppRegistrationClientId string = ''
 param devopsServicePrincipalId string = ''
 
 @description('Whether or not to include Data Dictionary checks in the Screener.')
-param includeDataDictionaryChecks bool
+param includeDataDictionaryChecks bool = false
 
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
