@@ -10,7 +10,7 @@ public static class HtmlBlockGeneratorExtensions
     public static Generator<HtmlBlock> WithDefaults(this Generator<HtmlBlock> generator) =>
         generator.ForInstance(d => d.SetDefaults());
 
-    public static Generator<HtmlBlock> WithBody(this Generator<HtmlBlock> generator, string body) =>
+    public static Generator<HtmlBlock> WithBody(this Generator<HtmlBlock> generator, string? body) =>
         generator.ForInstance(d => d.SetBody(body));
 
     public static Generator<HtmlBlock> WithOrder(this Generator<HtmlBlock> generator, int order) =>
@@ -37,7 +37,7 @@ public static class HtmlBlockGeneratorExtensions
                         .ToList()
             );
 
-    public static InstanceSetters<HtmlBlock> SetBody(this InstanceSetters<HtmlBlock> setters, string body) =>
+    public static InstanceSetters<HtmlBlock> SetBody(this InstanceSetters<HtmlBlock> setters, string? body) =>
         setters.Set(d => d.Body, body);
 
     public static InstanceSetters<HtmlBlock> SetOrder(this InstanceSetters<HtmlBlock> setters, int order) =>

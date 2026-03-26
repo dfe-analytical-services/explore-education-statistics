@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.24")
+                .HasAnnotation("ProductVersion", "8.0.25")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1692,7 +1692,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
 
                     b.Property<string>("Body")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Body");
 
