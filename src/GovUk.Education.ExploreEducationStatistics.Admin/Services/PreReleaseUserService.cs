@@ -31,8 +31,9 @@ public class PreReleaseUserService(
 {
     public async Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
     {
-        return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await context
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
                 (

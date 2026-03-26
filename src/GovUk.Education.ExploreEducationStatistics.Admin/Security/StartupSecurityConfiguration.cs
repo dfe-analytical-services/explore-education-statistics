@@ -97,8 +97,8 @@ public static class StartupSecurityConfiguration
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(),
-                policy => policy.Requirements.Add(new UpdateReleaseRoleRequirement())
+                SecurityPolicies.CanUpdateDrafters.ToString(),
+                policy => policy.Requirements.Add(new UpdateDraftersRequirement())
             );
 
             options.AddPolicy(
@@ -157,11 +157,6 @@ public static class StartupSecurityConfiguration
             options.AddPolicy(
                 SecurityPolicies.CanMakeAmendmentOfSpecificReleaseVersion.ToString(),
                 policy => policy.Requirements.Add(new MakeAmendmentOfSpecificReleaseRequirement())
-            );
-
-            options.AddPolicy(
-                SecurityPolicies.CanPublishSpecificRelease.ToString(),
-                policy => policy.Requirements.Add(new PublishSpecificReleaseRequirement())
             );
 
             options.AddPolicy(
@@ -327,14 +322,13 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationHandler, MarkReleaseAsApprovedAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ResolveSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, DeleteSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, CancelSpecificFileImportAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewReleaseStatusHistoryAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, UpdateReleaseRoleAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, UpdateDraftersAuthorizationHandler>();
 
         /*
          * Pre Release management

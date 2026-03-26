@@ -1,76 +1,194 @@
 #nullable enable
+using System.Security.Claims;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
-using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
 {
-    private static readonly DataFixture _fixture = new();
-    private static readonly ReleaseVersion _releaseVersion = _fixture
+    private static readonly DataFixture _dataFixture = new();
+
+    private static readonly Guid _userId = Guid.NewGuid();
+
+    private static readonly ReleaseVersion _releaseVersion = _dataFixture
         .DefaultReleaseVersion()
-        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    [Fact]
-    public async Task ViewSpecificPreReleaseSummary_SucceedsWithAccessAllReleasesClaim()
+    public class ClaimsTests
     {
-        // Assert that any users with the "AccessAllReleases" claim can view an arbitrary PreRelease Summary
-        // (and no other claim allows this)
-        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewSpecificPreReleaseSummaryRequirement>(
-            CreateHandler,
-            _releaseVersion,
-            AccessAllReleases
-        );
+        [Fact]
+        public async Task SucceedsOnlyForValidClaims()
+        {
+            await AssertHandlerSucceedsWithCorrectClaims<ViewSpecificPreReleaseSummaryRequirement, ReleaseVersion>(
+                handler: SetupHandler(),
+                entity: _releaseVersion,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllReleases]
+            );
+        }
     }
 
-    [Fact]
-    public async Task ViewSpecificPreReleaseSummary_SucceedsWithReleaseRoles()
+    public class PublicationRolesTests
     {
-        // Assert that a User who has any unrestricted viewer role on a Release can view the PreRelease Summary
-        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
-            CreateHandler,
-            _releaseVersion,
-            ReleaseRole.Contributor,
-            ReleaseRole.Approver,
-            ReleaseRole.PrereleaseViewer
-        );
+        [Fact]
+        public async Task SucceedsForValidPublicationRoles()
+        {
+            ClaimsPrincipal user = _dataFixture.AuthenticatedUser(_userId);
+
+            var authContext = AuthorizationHandlerContextFactory.CreateAuthContext<
+                ViewSpecificPreReleaseSummaryRequirement,
+                ReleaseVersion
+            >(user, _releaseVersion);
+
+            var authorizationHandlerService = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+            authorizationHandlerService
+                .Setup(s =>
+                    s.UserHasAnyPublicationRoleOnPublication(
+                        _userId,
+                        _releaseVersion.Release.PublicationId,
+                        CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                    )
+                )
+                .ReturnsAsync(true);
+            authorizationHandlerService
+                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .ReturnsAsync(false);
+
+            var handler = SetupHandler(authorizationHandlerService.Object);
+
+            await handler.HandleAsync(authContext);
+
+            Assert.True(authContext.HasSucceeded);
+        }
+
+        [Fact]
+        public async Task FailsForInvalidPublicationRoles()
+        {
+            ClaimsPrincipal user = _dataFixture.AuthenticatedUser(_userId);
+
+            var authContext = AuthorizationHandlerContextFactory.CreateAuthContext<
+                ViewSpecificPreReleaseSummaryRequirement,
+                ReleaseVersion
+            >(user, _releaseVersion);
+
+            var authorizationHandlerService = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+            authorizationHandlerService
+                .Setup(s =>
+                    s.UserHasAnyPublicationRoleOnPublication(
+                        _userId,
+                        _releaseVersion.Release.PublicationId,
+                        CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                    )
+                )
+                .ReturnsAsync(false);
+            authorizationHandlerService
+                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .ReturnsAsync(false);
+
+            var handler = SetupHandler(authorizationHandlerService.Object);
+
+            await handler.HandleAsync(authContext);
+
+            Assert.False(authContext.HasSucceeded);
+        }
     }
 
-    [Fact]
-    public async Task ViewSpecificPreReleaseSummary_SucceedsWithPublicationRoles()
+    public class PrereleaseRolesTests
     {
-        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewSpecificPreReleaseSummaryRequirement>(
-            CreateHandler,
-            _releaseVersion,
-            PublicationRole.Owner,
-            PublicationRole.Allower
-        );
+        [Fact]
+        public async Task HasPreReleaseRole_Succeeds()
+        {
+            ClaimsPrincipal user = _dataFixture.AuthenticatedUser(_userId);
+
+            var authContext = AuthorizationHandlerContextFactory.CreateAuthContext<
+                ViewSpecificPreReleaseSummaryRequirement,
+                ReleaseVersion
+            >(user, _releaseVersion);
+
+            var authorizationHandlerService = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+            authorizationHandlerService
+                .Setup(s =>
+                    s.UserHasAnyPublicationRoleOnPublication(
+                        _userId,
+                        _releaseVersion.Release.PublicationId,
+                        CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                    )
+                )
+                .ReturnsAsync(false);
+            authorizationHandlerService
+                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .ReturnsAsync(true);
+
+            var handler = SetupHandler(authorizationHandlerService.Object);
+
+            await handler.HandleAsync(authContext);
+
+            Assert.True(authContext.HasSucceeded);
+        }
+
+        [Fact]
+        public async Task DoesNotHavePreReleaseRole_Fails()
+        {
+            ClaimsPrincipal user = _dataFixture.AuthenticatedUser(_userId);
+
+            var authContext = AuthorizationHandlerContextFactory.CreateAuthContext<
+                ViewSpecificPreReleaseSummaryRequirement,
+                ReleaseVersion
+            >(user, _releaseVersion);
+
+            var authorizationHandlerService = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+            authorizationHandlerService
+                .Setup(s =>
+                    s.UserHasAnyPublicationRoleOnPublication(
+                        _userId,
+                        _releaseVersion.Release.PublicationId,
+                        CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                    )
+                )
+                .ReturnsAsync(false);
+            authorizationHandlerService
+                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .ReturnsAsync(false);
+
+            var handler = SetupHandler(authorizationHandlerService.Object);
+
+            await handler.HandleAsync(authContext);
+
+            Assert.False(authContext.HasSucceeded);
+        }
     }
 
-    private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    private static ViewSpecificPreReleaseSummaryAuthorizationHandler SetupHandler(
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            contentDbContext
-        );
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
 
-        return new ViewSpecificPreReleaseSummaryAuthorizationHandler(
-            new AuthorizationHandlerService(
-                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: userReleaseRoleRepository,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+        return new(authorizationHandlerService);
+    }
+
+    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    _releaseVersion.Release.PublicationId,
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+        mock.Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id)).ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

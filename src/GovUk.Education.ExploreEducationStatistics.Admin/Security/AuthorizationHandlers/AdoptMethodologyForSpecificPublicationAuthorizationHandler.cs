@@ -2,24 +2,15 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class AdoptMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement { }
 
-public class AdoptMethodologyForSpecificPublicationAuthorizationHandler
-    : AuthorizationHandler<AdoptMethodologyForSpecificPublicationRequirement, Publication>
+public class AdoptMethodologyForSpecificPublicationAuthorizationHandler(
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<AdoptMethodologyForSpecificPublicationRequirement, Publication>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public AdoptMethodologyForSpecificPublicationAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         AdoptMethodologyForSpecificPublicationRequirement requirement,
@@ -33,10 +24,10 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
-                context.User.GetUserId(),
-                publication.Id,
-                Owner
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: publication.Id,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

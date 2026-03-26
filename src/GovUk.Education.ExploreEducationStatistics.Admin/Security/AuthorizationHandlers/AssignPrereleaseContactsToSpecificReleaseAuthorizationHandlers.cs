@@ -1,45 +1,32 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement { }
 
-public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
-    : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, ReleaseVersion>
+public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, ReleaseVersion>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         AssignPrereleaseContactsToSpecificReleaseRequirement requirement,
         ReleaseVersion releaseVersion
     )
     {
-        if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.UpdateAllReleases))
         {
             context.Succeed(requirement);
             return;
         }
 
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
-                context.User.GetUserId(),
-                releaseVersion.PublicationId,
-                releaseVersion.Id,
-                SetOf(PublicationRole.Owner, PublicationRole.Allower),
-                ReleaseEditorAndApproverRoles
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

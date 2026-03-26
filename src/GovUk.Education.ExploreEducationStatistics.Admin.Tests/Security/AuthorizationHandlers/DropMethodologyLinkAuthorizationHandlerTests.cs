@@ -1,219 +1,105 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class DropMethodologyLinkAuthorizationHandlerTests
+public abstract class DropMethodologyLinkAuthorizationHandlerTests
 {
-    private static readonly Guid UserId = Guid.NewGuid();
+    private static readonly Guid _userId = Guid.NewGuid();
 
-    private static readonly PublicationMethodology OwningLink = new()
+    private static readonly PublicationMethodology _owningLink = new()
     {
         Owner = true,
         PublicationId = Guid.NewGuid(),
         MethodologyId = Guid.NewGuid(),
     };
 
-    private static readonly PublicationMethodology NonOwningLink = new()
+    private static readonly PublicationMethodology _nonOwningLink = new()
     {
         Owner = false,
         PublicationId = Guid.NewGuid(),
         MethodologyId = Guid.NewGuid(),
     };
 
-    private static readonly DataFixture DataFixture = new();
-
-    public class ClaimsTests
+    public class ClaimsTests : DropMethodologyLinkAuthorizationHandlerTests
     {
         [Fact]
-        public async Task NoClaimsAllowDroppingOwningLinks()
+        public async Task NonOwningLink_SucceedsOnlyForValidClaims()
         {
-            await ForEachSecurityClaimAsync(async claim =>
-            {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-                var handler = SetupHandler(userPublicationRoleRepository.Object);
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    DropMethodologyLinkRequirement,
-                    PublicationMethodology
-                >(user, OwningLink);
-
-                await handler.HandleAsync(authContext);
-
-                VerifyAllMocks(userPublicationRoleRepository);
-
-                // No claims should allow dropping the link from a methodology to the owning publication
-                Assert.False(authContext.HasSucceeded);
-            });
+            await AssertHandlerSucceedsWithCorrectClaims<DropMethodologyLinkRequirement, PublicationMethodology>(
+                handler: SetupHandler(),
+                entity: _nonOwningLink,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.AdoptAnyMethodology]
+            );
         }
 
         [Fact]
-        public async Task UserWithCorrectClaimCanDropLinks()
+        public async Task OwningLink_FailsForAllClaims()
         {
-            await ForEachSecurityClaimAsync(async claim =>
-            {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-                var handler = SetupHandler(userPublicationRoleRepository.Object);
-
-                // Only the AdoptAnyMethodology claim should allow dropping methodology links to publications
-                var expectedToPassByClaimAlone = claim == AdoptAnyMethodology;
-
-                if (!expectedToPassByClaimAlone)
-                {
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                UserId,
-                                NonOwningLink.PublicationId,
-                                ResourceRoleFilter.ActiveOnly,
-                                It.IsAny<CancellationToken>(),
-                                PublicationRole.Owner
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    DropMethodologyLinkRequirement,
-                    PublicationMethodology
-                >(user, NonOwningLink);
-
-                await handler.HandleAsync(authContext);
-
-                VerifyAllMocks(userPublicationRoleRepository);
-
-                Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
-            });
+            // No claims should allow dropping the link from a methodology to the owning publication
+            await AssertHandlerFailsForAllClaims<DropMethodologyLinkRequirement, PublicationMethodology>(
+                handler: SetupHandler(),
+                entity: _owningLink,
+                userId: _userId
+            );
         }
     }
 
-    public class PublicationRoleTests
+    public class PublicationRolesTests : DropMethodologyLinkAuthorizationHandlerTests
     {
         [Fact]
-        public async Task NoPublicationRolesAllowDroppingOwningLinks()
+        public async Task NonOwningLink_SucceedsOnlyForValidPublicationRoles()
         {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-            var handler = SetupHandler(userPublicationRoleRepository.Object);
-
-            // Deliberately set no expectations for checking user has any publication owner roles
-
-            var user = DataFixture.AuthenticatedUser(userId: UserId);
-            var authContext = CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
-                user,
-                OwningLink
+            await AssertHandlerSucceedsForAnyValidPublicationRole<
+                DropMethodologyLinkRequirement,
+                PublicationMethodology
+            >(
+                handlerSupplier: SetupHandler,
+                entity: _nonOwningLink,
+                publicationId: _nonOwningLink.PublicationId,
+                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
             );
+        }
 
-            await handler.HandleAsync(authContext);
-
-            VerifyAllMocks(userPublicationRoleRepository);
-
+        [Fact]
+        public async Task OwningLink_FailsWithoutCheckingRoles()
+        {
             // No publication roles should allow dropping the link from a methodology to the owning publication
-            Assert.False(authContext.HasSucceeded);
-        }
-
-        [Fact]
-        public async Task PublicationOwnerCanDropLinks()
-        {
-            await ForEachPublicationRoleAsync(async publicationRole =>
-            {
-                // If the user has Publication Owner role on the publication they are allowed to drop methodology links
-                var isOwnerRole = publicationRole == PublicationRole.Owner;
-
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-                var handler = SetupHandler(userPublicationRoleRepository.Object);
-
-                userPublicationRoleRepository
-                    .Setup(mock =>
-                        mock.UserHasAnyRoleOnPublication(
-                            UserId,
-                            NonOwningLink.PublicationId,
-                            ResourceRoleFilter.ActiveOnly,
-                            It.IsAny<CancellationToken>(),
-                            PublicationRole.Owner
-                        )
-                    )
-                    .ReturnsAsync(isOwnerRole);
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
-                var authContext = CreateAuthorizationHandlerContext<
-                    DropMethodologyLinkRequirement,
-                    PublicationMethodology
-                >(user, NonOwningLink);
-
-                await handler.HandleAsync(authContext);
-
-                VerifyAllMocks(userPublicationRoleRepository);
-
-                Assert.Equal(isOwnerRole, authContext.HasSucceeded);
-            });
-        }
-
-        [Fact]
-        public async Task UsersWithoutPublicationOwnerRoleCannotDropLinks()
-        {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-            var handler = SetupHandler(userPublicationRoleRepository.Object);
-
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        UserId,
-                        NonOwningLink.PublicationId,
-                        ResourceRoleFilter.ActiveOnly,
-                        It.IsAny<CancellationToken>(),
-                        PublicationRole.Owner
-                    )
-                )
-                .ReturnsAsync(false);
-
-            var user = DataFixture.AuthenticatedUser(userId: UserId);
-            var authContext = CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
-                user,
-                NonOwningLink
+            await AssertHandlerFailsWithoutCheckingRoles<DropMethodologyLinkRequirement, PublicationMethodology>(
+                handlerSupplier: SetupHandler,
+                entity: _owningLink
             );
-
-            await handler.HandleAsync(authContext);
-
-            VerifyAllMocks(userPublicationRoleRepository);
-
-            // A user with no role on the owning publication is not allowed to drop methodology links
-            Assert.False(authContext.HasSucceeded);
         }
     }
 
     private static DropMethodologyLinkAuthorizationHandler SetupHandler(
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+        IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
-        return new(
-            new AuthorizationHandlerService(
-                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-                Mock.Of<IPreReleaseService>(Strict)
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+        return new(authorizationHandlerService);
+    }
+
+    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    It.IsAny<Guid>(),
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

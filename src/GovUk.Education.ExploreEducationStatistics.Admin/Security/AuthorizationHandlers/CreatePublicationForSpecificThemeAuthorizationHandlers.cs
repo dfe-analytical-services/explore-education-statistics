@@ -11,7 +11,7 @@ public class CreatePublicationForSpecificThemeAuthorizationHandler
     protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         CreatePublicationForSpecificThemeRequirement requirement,
-        Theme resource
+        Theme _
     )
     {
         if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.CreateAnyPublication))

@@ -83,7 +83,8 @@ public class ReleasePermissionService(
     {
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+            .OnSuccessDo(userService.CheckCanUpdateDrafters)
             .OnSuccess(async () =>
             {
                 var users = (
@@ -116,7 +117,8 @@ public class ReleasePermissionService(
                 query => query.Include(rv => rv.Release).ThenInclude(r => r.Publication)
             )
             .OnSuccessDo(releaseVersion =>
-                userService.CheckCanUpdateReleaseRole(releaseVersion.Release.Publication, ReleaseRole.Contributor)
+                // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+                userService.CheckCanUpdateDrafters(releaseVersion.Release.Publication)
             )
             .OnSuccessVoid(async releaseVersion =>
             {
@@ -159,7 +161,8 @@ public class ReleasePermissionService(
     {
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+            .OnSuccessDo(userService.CheckCanUpdateDrafters)
             .OnSuccessVoid(async publication =>
             {
                 var releaseRoleIdsToRemove = (
