@@ -13,11 +13,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ViewSpecificReleaseAuthorizationHandlersTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly ReleaseVersion _releaseVersion;
 
-    private static readonly ReleaseVersion _releaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    public ViewSpecificReleaseAuthorizationHandlersTests()
+    {
+        _releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     [Fact]
     public async Task SucceedsIfReleaseVersionIsViewableByUser()
@@ -29,7 +33,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         );
     }
 
-    private static ViewSpecificReleaseAuthorizationHandler SetupHandler(
+    private ViewSpecificReleaseAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -38,7 +42,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s => s.IsReleaseVersionViewableByUser(_releaseVersion, It.IsAny<ClaimsPrincipal>()))
