@@ -12,9 +12,9 @@ public interface IAuthorizationHandlerService
         HashSet<PublicationRole> rolesToInclude
     );
 
-    Task<bool> UserHasPrereleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId);
-
     Task<bool> UserHasAnyRoleOnPublication(Guid userId, Guid publicationId);
+
+    Task<bool> UserHasPrereleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId);
 
     Task<bool> IsReleaseVersionViewableByUser(ReleaseVersion releaseVersion, ClaimsPrincipal user);
 }
