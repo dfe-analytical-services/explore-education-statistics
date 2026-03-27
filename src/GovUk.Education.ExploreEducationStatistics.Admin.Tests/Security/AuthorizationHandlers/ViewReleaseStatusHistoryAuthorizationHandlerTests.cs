@@ -13,13 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class ViewReleaseStatusHistoryAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _releaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
-
-    private static readonly ReleaseVersion _releaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    public ViewReleaseStatusHistoryAuthorizationHandlerTests()
+    {
+        _releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     public class ClaimsTests : ViewReleaseStatusHistoryAuthorizationHandlerTests
     {
@@ -49,7 +52,7 @@ public abstract class ViewReleaseStatusHistoryAuthorizationHandlerTests
         }
     }
 
-    private static ViewReleaseStatusHistoryAuthorizationHandler SetupHandler(
+    private ViewReleaseStatusHistoryAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -58,7 +61,7 @@ public abstract class ViewReleaseStatusHistoryAuthorizationHandlerTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

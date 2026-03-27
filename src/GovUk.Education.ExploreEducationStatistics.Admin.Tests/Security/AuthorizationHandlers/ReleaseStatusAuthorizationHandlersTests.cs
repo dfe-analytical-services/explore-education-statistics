@@ -14,25 +14,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class ReleaseStatusAuthorizationHandlersTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _approvedReleaseVersion;
+    private readonly ReleaseVersion _publishedReleaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected ReleaseStatusAuthorizationHandlersTests()
+    {
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _draftReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _approvedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _approvedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-    private static readonly ReleaseVersion _publishedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithPublished(DateTimeOffset.UtcNow)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _publishedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithPublished(DateTimeOffset.UtcNow)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     public class MarkReleaseAsDraftAuthorizationHandlerTests : ReleaseStatusAuthorizationHandlersTests
     {
@@ -160,7 +165,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             }
         }
 
-        private static MarkReleaseAsDraftAuthorizationHandler SetupHandler(
+        private MarkReleaseAsDraftAuthorizationHandler SetupHandler(
             IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
             IAuthorizationHandlerService? authorizationHandlerService = null
         )
@@ -304,7 +309,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             }
         }
 
-        private static MarkReleaseAsHigherLevelReviewAuthorizationHandler SetupHandler(
+        private MarkReleaseAsHigherLevelReviewAuthorizationHandler SetupHandler(
             IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
             IAuthorizationHandlerService? authorizationHandlerService = null
         )
@@ -442,7 +447,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             }
         }
 
-        private static MarkReleaseAsApprovedAuthorizationHandler SetupHandler(
+        private MarkReleaseAsApprovedAuthorizationHandler SetupHandler(
             IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
             IAuthorizationHandlerService? authorizationHandlerService = null
         )
@@ -454,7 +459,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
         }
     }
 
-    private static IReleasePublishingStatusRepository CreateDefaultReleasePublishingStatusRepository()
+    private IReleasePublishingStatusRepository CreateDefaultReleasePublishingStatusRepository()
     {
         var mock = new Mock<IReleasePublishingStatusRepository>(MockBehavior.Strict);
         mock.Setup(s =>
@@ -472,7 +477,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
         return mock.Object;
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>
