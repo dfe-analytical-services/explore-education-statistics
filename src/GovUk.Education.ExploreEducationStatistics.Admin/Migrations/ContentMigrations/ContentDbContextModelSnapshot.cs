@@ -1707,7 +1707,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
 
                     b.Property<string>("Body")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Body");
 

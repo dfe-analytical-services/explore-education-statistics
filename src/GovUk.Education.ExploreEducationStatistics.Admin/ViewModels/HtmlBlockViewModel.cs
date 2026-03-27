@@ -13,7 +13,7 @@ public record HtmlBlockViewModel : IContentBlockViewModel
 
     public int Order { get; init; }
 
-    public string Body { get; set; } = string.Empty;
+    public string? Body { get; set; }
 
     public DateTimeOffset? Locked { get; init; }
 

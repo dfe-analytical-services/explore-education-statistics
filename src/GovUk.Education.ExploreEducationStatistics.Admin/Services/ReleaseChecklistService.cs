@@ -141,6 +141,11 @@ public class ReleaseChecklistService : IReleaseChecklistService
             );
         }
 
+        if (await ReleaseSectionHasEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.Warning))
+        {
+            errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.WarningSectionContainsEmptyHtmlBlock));
+        }
+
         var dataSetVersionStatuses = await _dataSetVersionService.GetStatusesForReleaseVersion(
             releaseVersion.Id,
             cancellationToken

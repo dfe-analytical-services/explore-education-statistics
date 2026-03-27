@@ -81,6 +81,10 @@ Add empty Related dashboards section text block to the page
     user clicks button    Add dashboards section
     user waits until page contains accordion section    View related dashboard(s)
 
+Add empty Warning section text block to the page
+    user clicks button    Add a warning text block
+    user waits until element contains    id:releaseWarning    This section is empty    %{WAIT_SMALL}
+
 Validate checklist errors and warnings after adding empty content sections
     user clicks link    Publishing checklist
 
@@ -92,7 +96,7 @@ Validate checklist errors and warnings after adding empty content sections
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
     user checks checklist errors contains
-    ...    4 issues that must be resolved before this release can be published.
+    ...    5 issues that must be resolved before this release can be published.
     user checks checklist errors contains link
     ...    Release content should not contain an empty summary section
     user checks checklist errors contains link
@@ -101,6 +105,8 @@ Validate checklist errors and warnings after adding empty content sections
     ...    Release content should not contain empty text blocks
     user checks checklist errors contains link
     ...    Release content should not contain an empty related dashboards section
+    user checks checklist errors contains link
+    ...    Release content should not contain an empty warning section. Please either add the required warning text or remove the warning block entirely
 
 Add content to text block in Summary section
     user navigates to content page    ${PUBLICATION_NAME}
@@ -134,6 +140,10 @@ Add content to text block in Related dashboards section
     user waits until page contains accordion section    View related dashboard(s)
     user opens accordion section    View related dashboard(s)    id:data-accordion
     user adds content to related dashboards text block    Related dashboards test text
+
+Add content to text block in Warning section
+    user adds content to warning text block
+    ...    Warning test text
 
 Validate checklist errors and warnings after adding content to text blocks
     user clicks link    Publishing checklist

@@ -27,6 +27,7 @@ describe('ReleaseStatusChecklist', () => {
       { code: 'GenericSectionsContainEmptyHtmlBlock' },
       { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
       { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
+      { code: 'WarningSectionContainsEmptyHtmlBlock' },
       { code: 'PublicApiDataSetImportsMustBeCompleted' },
       { code: 'PublicApiDataSetCancellationsMustBeResolved' },
       { code: 'PublicApiDataSetFailuresMustBeResolved' },
@@ -65,7 +66,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('13 issues')).toBeInTheDocument();
+    expect(screen.getByText('14 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -142,6 +143,15 @@ describe('ReleaseStatusChecklist', () => {
     expect(
       screen.getByRole('link', {
         name: 'Release must contain a key statistic or a non-empty headline text block',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Release content should not contain an empty warning section. Please either add the required warning text or remove the warning block entirely',
       }),
     ).toHaveAttribute(
       'href',
