@@ -261,6 +261,81 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         }
 
         [Fact]
+        public async Task WhenContentContainsHtmlBlockWithEmptyBody_OmitsEmptySectionHeadingInHtmlContent()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Initialise the release version with sections containing HtmlBlocks with a null or empty body.
+            // This scenario is not expected in practice, as all published release versions should have non-empty content.
+            releaseVersion.GenericContent =
+            [
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 1")
+                    .WithContentBlocks(
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .ForIndex(0, s => s.SetBody(null))
+                            .ForIndex(1, s => s.SetBody(string.Empty))
+                            .GenerateArray()
+                    ),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 2")
+                    .WithContentBlocks(
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .ForIndex(0, s => s.SetBody("<p>Section 2 block 1 content</p>"))
+                            .ForIndex(1, s => s.SetBody(null))
+                            .ForIndex(2, s => s.SetBody(string.Empty))
+                            .GenerateArray()
+                    ),
+            ];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var actual = outcome.AssertRight();
+
+                // The expected HTML content omits "Section 1" because it only has empty content.
+                // "Section 2" is included because it contains content.
+                var expectedHtmlContent = $"""
+                    <html>
+                        <head>
+                            <title>{publication.Title}</title>
+                        </head>
+                        <body>
+                            <h1>{publication.Title}</h1>
+                            <h2>{release.Title}</h2>
+                            <h3>Section 2</h3>
+                            <p>Section 2 block 1 content</p>
+                        </body>
+                    </html>
+                    """;
+
+                Assert.Multiple(GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent));
+            }
+        }
+
+        [Fact]
         public async Task WhenContentContainsComments_RemovesCommentsFromHtmlContent()
         {
             // Arrange

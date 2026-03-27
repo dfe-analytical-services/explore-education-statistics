@@ -141,6 +141,15 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
               releaseRouteParams,
             ),
           };
+        case 'WarningSectionContainsEmptyHtmlBlock':
+          return {
+            message:
+              'Release content should not contain an empty warning section. Please either add the required warning text or remove the warning block entirely',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         case 'PublicApiDataSetImportsMustBeCompleted':
           return {
             message: 'All public API data set processing must be completed',

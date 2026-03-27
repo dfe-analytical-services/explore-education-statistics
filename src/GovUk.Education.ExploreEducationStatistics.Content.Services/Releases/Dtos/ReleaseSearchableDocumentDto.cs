@@ -80,7 +80,11 @@ public record ReleaseSearchableDocumentDto
 
     private static void AddH3Section(StringBuilder sb, string sectionTitle, ContentSection contentSection)
     {
-        var htmlBlocks = contentSection.Content.OfType<HtmlBlock>().OrderBy(hb => hb.Order).ToList();
+        var htmlBlocks = contentSection
+            .Content.OfType<HtmlBlock>()
+            .Where(hb => !string.IsNullOrEmpty(hb.Body))
+            .OrderBy(hb => hb.Order)
+            .ToList();
 
         if (htmlBlocks.Count == 0)
         {
@@ -118,6 +122,6 @@ public record ReleaseSearchableDocumentDto
             """
         );
 
-    private static string RemoveComments(string input) =>
-        ContentFilterUtils.CommentsRegex().Replace(input, string.Empty);
+    private static string? RemoveComments(string? input) =>
+        string.IsNullOrEmpty(input) ? input : ContentFilterUtils.CommentsRegex().Replace(input, string.Empty);
 }

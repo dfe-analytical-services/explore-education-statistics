@@ -59,7 +59,7 @@ public class HtmlBlock : ContentBlock
 {
     public HtmlBlock() { }
 
-    public string Body { get; set; }
+    public string? Body { get; set; }
 }
 
 public class EmbedBlockLink : ContentBlock

@@ -9,5 +9,5 @@ public record HtmlBlockViewModel : IContentBlockViewModel
 
     public int Order { get; set; }
 
-    public string Body { get; set; } = string.Empty;
+    public string? Body { get; set; }
 }

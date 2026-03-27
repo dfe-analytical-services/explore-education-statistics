@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 

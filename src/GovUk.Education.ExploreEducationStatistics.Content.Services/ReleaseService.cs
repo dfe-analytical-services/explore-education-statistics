@@ -180,7 +180,9 @@ public class ReleaseService : IReleaseService
         switch (block)
         {
             case HtmlBlockViewModel htmlBlock:
-                htmlBlock.Body = CommentsRegex().Replace(htmlBlock.Body, string.Empty);
+                htmlBlock.Body = string.IsNullOrEmpty(htmlBlock.Body)
+                    ? htmlBlock.Body
+                    : CommentsRegex().Replace(htmlBlock.Body, string.Empty);
                 break;
         }
     }

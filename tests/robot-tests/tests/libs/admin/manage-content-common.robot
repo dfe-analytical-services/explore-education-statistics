@@ -363,6 +363,10 @@ user adds content to related dashboards text block
     [Arguments]    ${content}
     user adds content to autosaving text block    id:related-dashboards-content    ${content}
 
+user adds content to warning text block
+    [Arguments]    ${content}
+    user adds content to autosaving text block    id:releaseWarning    ${content}
+
 user adds content to accordion section text block
     [Arguments]
     ...    ${section_name}

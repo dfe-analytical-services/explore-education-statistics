@@ -90,6 +90,7 @@ public enum ValidationErrorMessages
     RelatedDashboardsSectionContainsEmptyHtmlBlock,
     ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
     SummarySectionContainsEmptyHtmlBlock,
+    WarningSectionContainsEmptyHtmlBlock,
     PublicApiDataSetImportsMustBeCompleted,
     PublicApiDataSetCancellationsMustBeResolved,
     PublicApiDataSetFailuresMustBeResolved,

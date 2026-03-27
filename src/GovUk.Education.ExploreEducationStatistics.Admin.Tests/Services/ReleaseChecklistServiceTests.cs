@@ -44,7 +44,10 @@ public class ReleaseChecklistServiceTests
             Release = release,
             Version = 0,
             Created = DateTime.UtcNow.AddMonths(-2),
-            Updates = [new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) }],
+            Updates =
+            [
+                new Update { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) },
+            ],
         };
 
         var releaseVersion = new ReleaseVersion
@@ -55,8 +58,8 @@ public class ReleaseChecklistServiceTests
             Created = DateTime.UtcNow.AddMonths(-1),
             GenericContent =
             [
-                new() { Type = ContentSectionType.Generic, Content = [] },
-                new()
+                new ContentSection { Type = ContentSectionType.Generic, Content = [] },
+                new ContentSection
                 {
                     Type = ContentSectionType.Generic,
                     Content = [new HtmlBlock { Body = "<p>Test</p>" }, new DataBlock(), new HtmlBlock { Body = "" }],
@@ -72,7 +75,15 @@ public class ReleaseChecklistServiceTests
                 Type = ContentSectionType.ReleaseSummary,
                 Content = [new HtmlBlock { Body = "" }],
             },
-            Updates = [new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) }],
+            WarningSection = new ContentSection
+            {
+                Type = ContentSectionType.Warning,
+                Content = [new HtmlBlock { Body = "" }],
+            },
+            Updates =
+            [
+                new Update { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) },
+            ],
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -126,7 +137,7 @@ public class ReleaseChecklistServiceTests
                 dataSetVersionService: dataSetVersionService.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id, default);
+            var result = await service.GetChecklist(releaseVersion.Id);
 
             MockUtils.VerifyAllMocks(
                 dataImportService,
@@ -142,7 +153,7 @@ public class ReleaseChecklistServiceTests
 
             var errors = checklist.Errors.Select(error => error.Code).ToList();
 
-            Assert.Equal(13, errors.Count);
+            Assert.Equal(14, errors.Count);
             Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
             Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
             Assert.Equal(PublicDataGuidanceRequired, errors[2]);
@@ -152,10 +163,11 @@ public class ReleaseChecklistServiceTests
             Assert.Equal(GenericSectionsContainEmptyHtmlBlock, errors[6]);
             Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, errors[7]);
             Assert.Equal(RelatedDashboardsSectionContainsEmptyHtmlBlock, errors[8]);
-            Assert.Equal(PublicApiDataSetImportsMustBeCompleted, errors[9]);
-            Assert.Equal(PublicApiDataSetCancellationsMustBeResolved, errors[10]);
-            Assert.Equal(PublicApiDataSetFailuresMustBeResolved, errors[11]);
-            Assert.Equal(PublicApiDataSetMappingsMustBeCompleted, errors[12]);
+            Assert.Equal(WarningSectionContainsEmptyHtmlBlock, errors[9]);
+            Assert.Equal(PublicApiDataSetImportsMustBeCompleted, errors[10]);
+            Assert.Equal(PublicApiDataSetCancellationsMustBeResolved, errors[11]);
+            Assert.Equal(PublicApiDataSetFailuresMustBeResolved, errors[12]);
+            Assert.Equal(PublicApiDataSetMappingsMustBeCompleted, errors[13]);
         }
     }
 
@@ -232,7 +244,7 @@ public class ReleaseChecklistServiceTests
                 releasePublishingValidator: releasePublishingValidator.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id, default);
+            var result = await service.GetChecklist(releaseVersion.Id);
 
             MockUtils.VerifyAllMocks(
                 dataGuidanceService,
@@ -345,7 +357,7 @@ public class ReleaseChecklistServiceTests
                 releasePublishingValidator: releasePublishingValidator.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id, default);
+            var result = await service.GetChecklist(releaseVersion.Id);
 
             MockUtils.VerifyAllMocks(
                 dataBlockService,
@@ -443,7 +455,7 @@ public class ReleaseChecklistServiceTests
                 releasePublishingValidator: releasePublishingValidator.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id, default);
+            var result = await service.GetChecklist(releaseVersion.Id);
 
             MockUtils.VerifyAllMocks(
                 dataGuidanceService,
@@ -497,8 +509,16 @@ public class ReleaseChecklistServiceTests
             PreReleaseAccessList = "Test access list",
             GenericContent =
             [
-                new() { Type = ContentSectionType.Generic, Content = [new HtmlBlock { Body = "<p>test</p>" }] },
-                new() { Type = ContentSectionType.Generic, Content = [new DataBlock { Id = dataBlockId }] },
+                new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = [new HtmlBlock { Body = "<p>test</p>" }],
+                },
+                new ContentSection
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = [new DataBlock { Id = dataBlockId }],
+                },
             ],
             HeadlinesSection = new ContentSection
             {
@@ -508,6 +528,12 @@ public class ReleaseChecklistServiceTests
             RelatedDashboardsSection = new ContentSection
             {
                 Type = ContentSectionType.RelatedDashboards,
+                Content = [new HtmlBlock { Body = "Not empty" }],
+            },
+            SummarySection = new ContentSection { Type = ContentSectionType.ReleaseSummary, Content = [] },
+            WarningSection = new ContentSection
+            {
+                Type = ContentSectionType.Warning,
                 Content = [new HtmlBlock { Body = "Not empty" }],
             },
             NextReleaseDate = new PartialDate { Month = "12", Year = "2021" },
@@ -592,7 +618,7 @@ public class ReleaseChecklistServiceTests
                 dataBlockService: dataBlockService.Object,
                 dataSetVersionService: dataSetVersionService.Object
             );
-            var result = await service.GetChecklist(releaseVersion.Id, default);
+            var result = await service.GetChecklist(releaseVersion.Id);
 
             var checklist = result.AssertRight();
 
@@ -617,7 +643,7 @@ public class ReleaseChecklistServiceTests
         await using var context = InMemoryContentDbContext();
         var service = BuildReleaseChecklistService(context);
 
-        var result = await service.GetChecklist(releaseVersionId: Guid.NewGuid(), default);
+        var result = await service.GetChecklist(releaseVersionId: Guid.NewGuid());
 
         result.AssertNotFound();
     }
