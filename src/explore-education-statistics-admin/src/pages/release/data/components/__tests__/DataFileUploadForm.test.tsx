@@ -12,6 +12,10 @@ const releaseDataFileService = _releaseDataFileService as jest.Mocked<
 >;
 
 describe('DataFileUploadForm', () => {
+  beforeEach(() => {
+    document.body.className = 'govuk-frontend-supported';
+  });
+
   test('shows validation message when no data file selected', async () => {
     const { user } = render(
       <DataFileUploadForm
@@ -47,7 +51,10 @@ describe('DataFileUploadForm', () => {
       type: 'text/csv',
     });
 
-    await user.upload(screen.getByLabelText('Upload data file'), file);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-dataFile'),
+      file,
+    );
     await user.click(
       screen.getByRole('button', {
         name: 'Upload data files',
@@ -98,7 +105,10 @@ describe('DataFileUploadForm', () => {
       type: 'text/csv',
     });
 
-    await user.upload(screen.getByLabelText('Upload metadata file'), file);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-metadataFile'),
+      file,
+    );
     await user.click(
       screen.getByRole('button', {
         name: 'Upload data files',
@@ -151,7 +161,10 @@ describe('DataFileUploadForm', () => {
     });
 
     await user.click(screen.getByLabelText('ZIP file'));
-    await user.upload(screen.getByLabelText('Upload ZIP file'), file);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-zipFile'),
+      file,
+    );
     await user.click(
       screen.getByRole('button', {
         name: 'Upload data files',
@@ -209,8 +222,14 @@ describe('DataFileUploadForm', () => {
 
     await user.type(screen.getByLabelText('Data file title'), 'Test title');
     await user.click(screen.getByLabelText('CSV files'));
-    await user.upload(screen.getByLabelText('Upload data file'), file);
-    await user.upload(screen.getByLabelText('Upload metadata file'), metaFile);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-dataFile'),
+      file,
+    );
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-metadataFile'),
+      metaFile,
+    );
 
     expect(releaseDataFileService.uploadDataSetFilePair).not.toHaveBeenCalled();
 
@@ -251,7 +270,10 @@ describe('DataFileUploadForm', () => {
 
     await user.type(screen.getByLabelText('Data file title'), 'Test title');
     await user.click(screen.getByLabelText('ZIP file'));
-    await user.upload(screen.getByLabelText('Upload ZIP file'), file);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-zipFile'),
+      file,
+    );
 
     expect(
       releaseDataFileService.uploadZippedDataSetFilePair,
@@ -291,7 +313,10 @@ describe('DataFileUploadForm', () => {
     });
 
     await user.click(screen.getByLabelText('Bulk ZIP upload'));
-    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-bulkZipFile'),
+      file,
+    );
 
     expect(
       releaseDataFileService.uploadBulkZipDataSetFile,
@@ -327,7 +352,10 @@ describe('DataFileUploadForm', () => {
     });
 
     await user.click(screen.getByLabelText('Bulk ZIP upload'));
-    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileUploadForm-bulkZipFile'),
+      file,
+    );
     await user.click(
       screen.getByRole('button', {
         name: 'Upload data files',
@@ -457,7 +485,10 @@ describe('DataFileUploadForm', () => {
     });
 
     await user.click(screen.getByLabelText('ZIP file'));
-    await user.upload(screen.getByLabelText('Upload ZIP file'), file);
+    await user.upload(
+      screen.getByTestId('file-input-dataFileReplacementUploadForm-zipFile'),
+      file,
+    );
 
     expect(
       releaseDataFileService.uploadZippedDataSetFilePair,

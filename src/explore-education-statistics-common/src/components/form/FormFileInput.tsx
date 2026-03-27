@@ -77,6 +77,7 @@ const FormFileInput = ({
           onChange={onChange}
           onClick={onClick}
           onKeyPress={onKeyPress}
+          data-testid={`file-input-${id}`}
         />
       </div>
     </>
