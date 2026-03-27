@@ -20,11 +20,9 @@ const ReleasePageTitle = ({
 
   return (
     <>
-      {publishingOrganisations && (
-        <PublishingOrganisations
-          publishingOrganisations={publishingOrganisations}
-        />
-      )}
+      <PublishingOrganisations
+        publishingOrganisations={publishingOrganisations}
+      />
 
       <div className={styles.releasePageTitleWrap}>
         <div className={styles.releasePageTitle}>
