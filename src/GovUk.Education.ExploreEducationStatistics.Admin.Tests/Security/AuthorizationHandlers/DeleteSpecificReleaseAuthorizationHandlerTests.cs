@@ -14,27 +14,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _nonAmendmentReleaseVersion;
+    private readonly ReleaseVersion _approvedAmendmentReleaseVersion;
+    private readonly ReleaseVersion _draftAmendmentReleaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected DeleteSpecificReleaseAuthorizationHandlerTests()
+    {
+        _nonAmendmentReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithVersion(0)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _nonAmendmentReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithVersion(0)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _approvedAmendmentReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithVersion(1)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _approvedAmendmentReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithVersion(1)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-    private static readonly ReleaseVersion _draftAmendmentReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithVersion(1)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _draftAmendmentReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithVersion(1)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     public class GlobalRolesTests : DeleteSpecificReleaseAuthorizationHandlerTests
     {
@@ -145,7 +150,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         }
     }
 
-    private static DeleteSpecificReleaseAuthorizationHandler SetupHandler(
+    private DeleteSpecificReleaseAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -154,7 +159,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

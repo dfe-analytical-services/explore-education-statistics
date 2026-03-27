@@ -15,19 +15,20 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Con
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class AuthorizationHandlerServiceTests
+public abstract class AuthorizationHandlerServiceTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Guid _publicationId = Guid.NewGuid();
+    private readonly ClaimsPrincipal _user;
+    private readonly ReleaseVersion _releaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected AuthorizationHandlerServiceTests()
+    {
+        _user = _dataFixture.AuthenticatedUser(_userId);
 
-    private static readonly Guid _publicationId = Guid.NewGuid();
-
-    private readonly ClaimsPrincipal _user = _dataFixture.AuthenticatedUser(_userId);
-
-    private readonly ReleaseVersion _releaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithRelease(_dataFixture.DefaultRelease());
+        _releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+    }
 
     public class UserHasAnyPublicationRoleOnPublicationTests : AuthorizationHandlerServiceTests
     {

@@ -13,15 +13,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Publication _publication;
+    private readonly Publication _archivedPublication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected CreateReleaseForSpecificPublicationAuthorizationHandlerTests()
+    {
+        _publication = _dataFixture.DefaultPublication();
 
-    private static readonly Publication _publication = _dataFixture.DefaultPublication();
-
-    private static readonly Publication _archivedPublication = _dataFixture
-        .DefaultPublication()
-        .WithSupersededBy(_dataFixture.DefaultPublication());
+        _archivedPublication = _dataFixture.DefaultPublication().WithSupersededBy(_dataFixture.DefaultPublication());
+    }
 
     public class ClaimsTests : CreateReleaseForSpecificPublicationAuthorizationHandlerTests
     {
@@ -76,7 +78,7 @@ public abstract class CreateReleaseForSpecificPublicationAuthorizationHandlerTes
         }
     }
 
-    private static CreateReleaseForSpecificPublicationAuthorizationHandler SetupHandler(
+    private CreateReleaseForSpecificPublicationAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -85,7 +87,7 @@ public abstract class CreateReleaseForSpecificPublicationAuthorizationHandlerTes
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

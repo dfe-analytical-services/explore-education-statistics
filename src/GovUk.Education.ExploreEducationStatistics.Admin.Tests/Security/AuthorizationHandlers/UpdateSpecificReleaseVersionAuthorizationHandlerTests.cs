@@ -12,19 +12,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _approvedReleaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected UpdateSpecificReleaseVersionAuthorizationHandlerTests()
+    {
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _draftReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-    private static readonly ReleaseVersion _approvedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _approvedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     public class ClaimsTests : UpdateSpecificReleaseVersionAuthorizationHandlerTests
     {
@@ -82,7 +86,7 @@ public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         }
     }
 
-    private static UpdateSpecificReleaseVersionAuthorizationHandler SetupHandler(
+    private UpdateSpecificReleaseVersionAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -91,7 +95,7 @@ public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

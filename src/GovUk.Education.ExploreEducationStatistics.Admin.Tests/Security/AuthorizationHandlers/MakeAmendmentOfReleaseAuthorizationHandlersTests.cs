@@ -14,20 +14,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _publishedReleaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests()
+    {
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _draftReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-    private static readonly ReleaseVersion _publishedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithPublished(DateTimeOffset.UtcNow)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _publishedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithPublished(DateTimeOffset.UtcNow)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     public class ClaimsTests : MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
     {
@@ -118,7 +122,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         }
     }
 
-    private static MakeAmendmentOfSpecificReleaseAuthorizationHandler SetupHandler(
+    private MakeAmendmentOfSpecificReleaseAuthorizationHandler SetupHandler(
         IReleaseVersionRepository? releaseVersionRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
@@ -129,7 +133,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         return new(releaseVersionRepository, authorizationHandlerService);
     }
 
-    private static IReleaseVersionRepository CreateDefaultReleaseVersionRepository()
+    private IReleaseVersionRepository CreateDefaultReleaseVersionRepository()
     {
         var mock = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
         mock.Setup(s => s.IsLatestReleaseVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
@@ -137,7 +141,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>
