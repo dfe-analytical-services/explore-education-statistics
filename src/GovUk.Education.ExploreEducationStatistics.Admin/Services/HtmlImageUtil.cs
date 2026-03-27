@@ -1,32 +1,27 @@
-﻿using System.Text.RegularExpressions;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿#nullable enable
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public static class HtmlImageUtil
+public static partial class HtmlImageUtil
 {
-    public static List<Guid> GetMethodologyImages(string htmlContent)
-    {
-        var idCapturingRegex = new Regex(@"^/api/methodologies/{methodologyId}/images/(.+)$");
-        return GetImages(htmlContent, idCapturingRegex);
-    }
+    [GeneratedRegex("^/api/methodologies/{methodologyId}/images/(.+)$")]
+    private static partial Regex MethodologyImagesPattern();
+
+    [GeneratedRegex("^/api/releases/{(releaseId|releaseVersionId)}/images/(.+)$")]
+    private static partial Regex ReleaseImagesPattern();
+
+    public static List<Guid> GetMethodologyImages(string? htmlContent) =>
+        string.IsNullOrEmpty(htmlContent) ? [] : GetImages(htmlContent, MethodologyImagesPattern());
 
     // TODO EES-5901 - migrate all content placeholders to be "releaseVersionId" and then remove the legacy
     // "releaseId" checks below.
-    public static List<Guid> GetReleaseImages(string htmlContent)
-    {
-        var idCapturingRegex = new Regex(@"^/api/releases/{(releaseId|releaseVersionId)}/images/(.+)$");
-        return GetImages(htmlContent, idCapturingRegex);
-    }
+    public static List<Guid> GetReleaseImages(string? htmlContent) =>
+        string.IsNullOrEmpty(htmlContent) ? [] : GetImages(htmlContent, ReleaseImagesPattern());
 
     private static List<Guid> GetImages(string htmlContent, Regex idCapturingRegex)
     {
-        if (htmlContent.IsNullOrEmpty())
-        {
-            return new List<Guid>();
-        }
-
         var htmlDocument = ParseContentAsHtml(htmlContent);
         var imageIds = htmlDocument
             .DocumentNode.SelectNodes("//img")
@@ -37,7 +32,7 @@ public static class HtmlImageUtil
             .ToList();
 
         // Convert to Guids, removing any that are malformed
-        return ParseIdsAsGuids(imageIds);
+        return ParseGuids(imageIds);
     }
 
     private static HtmlDocument ParseContentAsHtml(string htmlContent)
@@ -48,11 +43,10 @@ public static class HtmlImageUtil
         return htmlDoc;
     }
 
-    private static List<Guid> ParseIdsAsGuids(IEnumerable<string> ids)
-    {
-        return ids.Select(id => Guid.TryParse(id, out var idAsGuid) ? idAsGuid : (Guid?)null)
-            .Where(id => id.HasValue)
-            .Select(id => id.Value)
+    private static List<Guid> ParseGuids(IEnumerable<string> input) =>
+        input
+            .Select(s => Guid.TryParse(s, out var g) ? g : (Guid?)null)
+            .Where(g => g.HasValue)
+            .Select(g => g!.Value)
             .ToList();
-    }
 }
