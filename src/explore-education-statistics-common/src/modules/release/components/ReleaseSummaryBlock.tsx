@@ -75,33 +75,38 @@ export default function ReleaseSummaryBlock({
     >
       <div className={styles.innerWrap}>
         <dl className={styles.list}>
-          <ListItem term="Release type">
-            <Modal
-              showClose
-              title={releaseTypes[releaseType]}
-              triggerButton={
-                <ButtonText
-                  onClick={() => {
-                    onShowReleaseTypeModal?.();
-                  }}
-                  underline={false}
-                >
-                  {releaseTypes[releaseType]}{' '}
-                  <InfoIcon
-                    description={`Information on ${releaseTypes[releaseType]}`}
-                  />
-                </ButtonText>
-              }
-            >
-              <ReleaseTypeSection
-                publishingOrganisations={publishingOrganisations}
-                showHeading={false}
-                type={releaseType}
-              />
-            </Modal>
-          </ListItem>
+          <div className="dfe-flex dfe-flex-direction--column">
+            <div className="dfe-flex">
+              <span data-testid="Release type-value">
+                {releaseTypes[releaseType]}
+              </span>
+              <Modal
+                showClose
+                title={releaseTypes[releaseType]}
+                triggerButton={
+                  <ButtonText
+                    className="govuk-!-margin-left-1"
+                    onClick={() => {
+                      onShowReleaseTypeModal?.();
+                    }}
+                    underline={false}
+                  >
+                    <InfoIcon
+                      description={`Information on ${releaseTypes[releaseType]}`}
+                    />
+                  </ButtonText>
+                }
+              >
+                <ReleaseTypeSection
+                  publishingOrganisations={publishingOrganisations}
+                  showHeading={false}
+                  type={releaseType}
+                />
+              </Modal>
+            </div>
+            {renderProducerLink}
+          </div>
 
-          <ListItem term="Produced by">{renderProducerLink}</ListItem>
           <ListItem term="Published">
             {releaseDate ? (
               <FormattedDate>{parseISO(releaseDate)}</FormattedDate>

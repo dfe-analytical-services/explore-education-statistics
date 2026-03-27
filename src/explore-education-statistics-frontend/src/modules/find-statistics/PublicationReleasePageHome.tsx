@@ -14,6 +14,7 @@ import {
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import Link from '@frontend/components/Link';
 import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistics/components/PublicationReleaseHeadlinesSectionRedesign';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
@@ -76,7 +77,10 @@ const PublicationReleasePage = ({
                   {releaseVersionSummary.publishingOrganisations.map(
                     (org, index) => (
                       <Fragment key={org.id}>
-                        {index > 0 && ' and '}
+                        {getListStringSeparator(
+                          releaseVersionSummary.publishingOrganisations ?? [],
+                          index,
+                        )}
                         <Link
                           unvisited
                           to={org.url}

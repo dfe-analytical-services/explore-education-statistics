@@ -36,6 +36,7 @@ import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataA
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
+import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import React, {
   Fragment,
   useCallback,
@@ -245,7 +246,10 @@ const ReleaseContent = ({
                 <span>
                   {release.publishingOrganisations.map((org, index) => (
                     <Fragment key={org.id}>
-                      {index > 0 && ' and '}
+                      {getListStringSeparator(
+                        release.publishingOrganisations ?? [],
+                        index,
+                      )}
                       <Link unvisited to={org.url}>
                         {org.title}
                       </Link>

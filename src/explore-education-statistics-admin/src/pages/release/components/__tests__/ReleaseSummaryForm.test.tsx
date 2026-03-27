@@ -39,11 +39,15 @@ describe('ReleaseSummaryForm', () => {
       id: '466a14bf-4c77-4fb4-beb0-a09065d9ced8',
       title: 'Department for Education',
       url: 'https://www.gov.uk/government/organisations/department-for-education',
+      useGISLogo: true,
+      logoFileName: 'logo.png',
     },
     {
       id: '8d26bfaa-44b8-461e-9260-2b0eed9631e0',
-      title: 'Other Organisation name',
+      title: 'Ofsted',
       url: 'https://example.com',
+      useGISLogo: false,
+      logoFileName: 'logo.png',
     },
   ];
 

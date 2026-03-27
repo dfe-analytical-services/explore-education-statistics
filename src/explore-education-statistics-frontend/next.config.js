@@ -95,6 +95,15 @@ const nextConfig = {
         ],
       },
       {
+        source: '/api/assets/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400', // 1 day
+          },
+        ],
+      },
+      {
         source: '/:file(favicon.svg|manifest.json)',
         headers: metaHeaders,
       },
