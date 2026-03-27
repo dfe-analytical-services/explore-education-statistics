@@ -9,15 +9,18 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class ViewSpecificPublicationAuthorizationHandlersTests
+public abstract class ViewSpecificPublicationAuthorizationHandlersTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Publication _publication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    public ViewSpecificPublicationAuthorizationHandlersTests()
+    {
+        _publication = _dataFixture.DefaultPublication();
+    }
 
-    private static readonly Publication _publication = _dataFixture.DefaultPublication();
-
-    public class ClaimsTests
+    public class ClaimsTests : ViewSpecificPublicationAuthorizationHandlersTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidClaims()
@@ -31,7 +34,7 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         }
     }
 
-    public class RolesTests
+    public class RolesTests : ViewSpecificPublicationAuthorizationHandlersTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidPublicationRoles()
@@ -44,7 +47,7 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         }
     }
 
-    private static ViewSpecificPublicationAuthorizationHandler SetupHandler(
+    private ViewSpecificPublicationAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -53,7 +56,7 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s => s.UserHasAnyRoleOnPublication(_userId, _publication.Id)).ReturnsAsync(false);

@@ -13,17 +13,20 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
+public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _releaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected ViewSpecificPreReleaseSummaryAuthorizationHandlersTests()
+    {
+        _releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
-    private static readonly ReleaseVersion _releaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-    public class ClaimsTests
+    public class ClaimsTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidClaims()
@@ -37,7 +40,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         }
     }
 
-    public class PublicationRolesTests
+    public class PublicationRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         [Fact]
         public async Task SucceedsForValidPublicationRoles()
@@ -102,7 +105,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         }
     }
 
-    public class PrereleaseRolesTests
+    public class PrereleaseRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         [Fact]
         public async Task HasPreReleaseRole_Succeeds()
@@ -167,7 +170,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         }
     }
 
-    private static ViewSpecificPreReleaseSummaryAuthorizationHandler SetupHandler(
+    private ViewSpecificPreReleaseSummaryAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -176,7 +179,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

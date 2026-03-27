@@ -13,11 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Publication _publication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
-
-    private static readonly Publication _publication = _dataFixture.DefaultPublication();
+    protected PublicationReleaseSeriesAuthorizationHandlersTests()
+    {
+        _publication = _dataFixture.DefaultPublication();
+    }
 
     public class ClaimsTests : PublicationReleaseSeriesAuthorizationHandlersTests
     {
@@ -50,7 +53,7 @@ public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
         }
     }
 
-    private static ManagePublicationReleaseSeriesAuthorizationHandler SetupHandler(
+    private ManagePublicationReleaseSeriesAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -59,7 +62,7 @@ public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

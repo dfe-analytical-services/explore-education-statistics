@@ -12,13 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public abstract class UpdateSpecificReleaseAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Release _release;
 
-    private static readonly Guid _userId = Guid.NewGuid();
-
-    private static readonly Release _release = _dataFixture
-        .DefaultRelease()
-        .WithPublication(_dataFixture.DefaultPublication());
+    protected UpdateSpecificReleaseAuthorizationHandlerTests()
+    {
+        _release = _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication());
+    }
 
     public class ClaimsTests : UpdateSpecificReleaseAuthorizationHandlerTests
     {
@@ -48,7 +49,7 @@ public abstract class UpdateSpecificReleaseAuthorizationHandlerTests
         }
     }
 
-    private static UpdateSpecificReleaseAuthorizationHandler SetupHandler(
+    private UpdateSpecificReleaseAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -57,7 +58,7 @@ public abstract class UpdateSpecificReleaseAuthorizationHandlerTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

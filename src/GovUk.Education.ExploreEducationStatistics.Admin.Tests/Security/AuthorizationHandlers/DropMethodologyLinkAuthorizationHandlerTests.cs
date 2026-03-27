@@ -11,21 +11,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class DropMethodologyLinkAuthorizationHandlerTests
 {
-    private static readonly Guid _userId = Guid.NewGuid();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly PublicationMethodology _owningLink;
+    private readonly PublicationMethodology _nonOwningLink;
 
-    private static readonly PublicationMethodology _owningLink = new()
+    protected DropMethodologyLinkAuthorizationHandlerTests()
     {
-        Owner = true,
-        PublicationId = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid(),
-    };
+        _owningLink = new()
+        {
+            Owner = true,
+            PublicationId = Guid.NewGuid(),
+            MethodologyId = Guid.NewGuid(),
+        };
 
-    private static readonly PublicationMethodology _nonOwningLink = new()
-    {
-        Owner = false,
-        PublicationId = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid(),
-    };
+        _nonOwningLink = new()
+        {
+            Owner = false,
+            PublicationId = Guid.NewGuid(),
+            MethodologyId = Guid.NewGuid(),
+        };
+    }
 
     public class ClaimsTests : DropMethodologyLinkAuthorizationHandlerTests
     {
@@ -79,7 +84,7 @@ public abstract class DropMethodologyLinkAuthorizationHandlerTests
         }
     }
 
-    private static DropMethodologyLinkAuthorizationHandler SetupHandler(
+    private DropMethodologyLinkAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -88,7 +93,7 @@ public abstract class DropMethodologyLinkAuthorizationHandlerTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

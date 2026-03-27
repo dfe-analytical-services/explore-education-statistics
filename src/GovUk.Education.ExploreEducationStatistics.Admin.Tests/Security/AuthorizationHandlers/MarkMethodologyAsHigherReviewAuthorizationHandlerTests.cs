@@ -13,19 +13,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly MethodologyVersion _draftReviewMethodologyVersion;
+    private readonly MethodologyVersion _approvedMethodologyVersion;
+    private readonly Publication _owningPublication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected MarkMethodologyAsHigherReviewAuthorizationHandlerTests()
+    {
+        _draftReviewMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Draft);
 
-    private static readonly MethodologyVersion _draftReviewMethodologyVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Draft);
+        _approvedMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved);
 
-    private static readonly MethodologyVersion _approvedMethodologyVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Approved);
-
-    private static readonly Publication _owningPublication = _dataFixture.DefaultPublication();
+        _owningPublication = _dataFixture.DefaultPublication();
+    }
 
     public class ClaimsTests : MarkMethodologyAsHigherReviewAuthorizationHandlerTests
     {
@@ -96,7 +101,7 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         }
     }
 
-    private static MarkMethodologyAsHigherLevelReviewAuthorizationHandler SetupHandler(
+    private MarkMethodologyAsHigherLevelReviewAuthorizationHandler SetupHandler(
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
@@ -109,7 +114,7 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         return new(methodologyVersionRepository, methodologyRepository, authorizationHandlerService);
     }
 
-    private static IMethodologyVersionRepository CreateDefaultMethodologyVersionRepository()
+    private IMethodologyVersionRepository CreateDefaultMethodologyVersionRepository()
     {
         var mock = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
         mock.Setup(s => s.IsLatestPublishedVersion(It.IsAny<MethodologyVersion>())).ReturnsAsync(false);
@@ -117,7 +122,7 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IMethodologyRepository CreateDefaultMethodologyRepository()
+    private IMethodologyRepository CreateDefaultMethodologyRepository()
     {
         var mock = new Mock<IMethodologyRepository>(MockBehavior.Strict);
         mock.Setup(s => s.GetOwningPublication(It.IsAny<Guid>())).ReturnsAsync(_owningPublication);
@@ -125,7 +130,7 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

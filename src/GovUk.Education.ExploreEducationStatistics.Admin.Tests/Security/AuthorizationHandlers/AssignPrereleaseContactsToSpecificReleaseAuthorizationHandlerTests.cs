@@ -13,19 +13,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _approvedReleaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests()
+    {
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft);
 
-    private static readonly ReleaseVersion draftReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft);
-
-    private static readonly ReleaseVersion approvedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved);
+        _approvedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved);
+    }
 
     public class ClaimsTests : AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
     {
@@ -40,7 +44,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 ReleaseVersion
             >(
                 handler: SetupHandler(),
-                entity: draftReleaseVersion,
+                entity: _draftReleaseVersion,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases],
                 userId: _userId
             );
@@ -57,7 +61,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 ReleaseVersion
             >(
                 handler: SetupHandler(),
-                entity: approvedReleaseVersion,
+                entity: _approvedReleaseVersion,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases],
                 userId: _userId
             );
@@ -74,8 +78,8 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 ReleaseVersion
             >(
                 handlerSupplier: SetupHandler,
-                entity: draftReleaseVersion,
-                publicationId: draftReleaseVersion.Release.PublicationId,
+                entity: _draftReleaseVersion,
+                publicationId: _draftReleaseVersion.Release.PublicationId,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
             );
         }
@@ -88,14 +92,14 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 ReleaseVersion
             >(
                 handlerSupplier: SetupHandler,
-                entity: approvedReleaseVersion,
-                publicationId: approvedReleaseVersion.Release.PublicationId,
+                entity: _approvedReleaseVersion,
+                publicationId: _approvedReleaseVersion.Release.PublicationId,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
             );
         }
     }
 
-    private static AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler SetupHandler(
+    private AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -104,7 +108,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

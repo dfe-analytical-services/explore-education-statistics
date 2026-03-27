@@ -14,33 +14,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public abstract class DeleteSpecificCommentAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Comment _commentForDraftReleaseVersion;
+    private readonly Comment _commentForApprovedReleaseVersion;
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _approvedReleaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected DeleteSpecificCommentAuthorizationHandlerTests()
+    {
+        _commentForDraftReleaseVersion = new() { Id = Guid.NewGuid() };
 
-    private static readonly Comment _commentForDraftReleaseVersion = new() { Id = Guid.NewGuid() };
+        _commentForApprovedReleaseVersion = new() { Id = Guid.NewGuid() };
 
-    private static readonly Comment _commentForApprovedReleaseVersion = new() { Id = Guid.NewGuid() };
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithGenericContent([
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithContentBlocks([new DataBlock { Comments = [_commentForDraftReleaseVersion] }]),
+            ])
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _draftReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithGenericContent([
-            _dataFixture
-                .DefaultContentSection()
-                .WithContentBlocks([new DataBlock { Comments = [_commentForDraftReleaseVersion] }]),
-        ])
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-    private static readonly ReleaseVersion _approvedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithGenericContent([
-            _dataFixture
-                .DefaultContentSection()
-                .WithContentBlocks([new DataBlock { Comments = [_commentForApprovedReleaseVersion] }]),
-        ])
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _approvedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithGenericContent([
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithContentBlocks([new DataBlock { Comments = [_commentForApprovedReleaseVersion] }]),
+            ])
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     public class ClaimsTests : DeleteSpecificCommentAuthorizationHandlerTests
     {
@@ -142,7 +148,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
         }
     }
 
-    private static DeleteSpecificCommentAuthorizationHandler SetupHandler(
+    private DeleteSpecificCommentAuthorizationHandler SetupHandler(
         ContentDbContext? contentDbContext = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
@@ -153,7 +159,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
         return new(contentDbContext, authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

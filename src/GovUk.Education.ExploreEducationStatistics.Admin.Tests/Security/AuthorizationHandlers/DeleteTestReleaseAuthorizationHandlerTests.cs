@@ -12,43 +12,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public abstract class DeleteTestReleaseAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly ReleaseVersion _testReleaseVersion;
+    private readonly ReleaseVersion _seedReleaseVersion;
+    private readonly ReleaseVersion _realReleaseVersion;
 
-    private static readonly ReleaseVersion _testReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithVersion(1)
-        .WithRelease(
-            _dataFixture
-                .DefaultRelease()
-                .WithPublication(
-                    _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme().WithTitle("UI test theme"))
-                )
-        );
+    protected DeleteTestReleaseAuthorizationHandlerTests()
+    {
+        _testReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithVersion(1)
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(
+                        _dataFixture
+                            .DefaultPublication()
+                            .WithTheme(_dataFixture.DefaultTheme().WithTitle("UI test theme"))
+                    )
+            );
 
-    private static readonly ReleaseVersion _seedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithVersion(1)
-        .WithRelease(
-            _dataFixture
-                .DefaultRelease()
-                .WithPublication(
-                    _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme().WithTitle("Seed theme"))
-                )
-        );
+        _seedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithVersion(1)
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(
+                        _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme().WithTitle("Seed theme"))
+                    )
+            );
 
-    private static readonly ReleaseVersion _realReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithVersion(1)
-        .WithRelease(
-            _dataFixture
-                .DefaultRelease()
-                .WithPublication(
-                    _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme().WithTitle("Normal theme\""))
-                )
-        );
+        _realReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithVersion(1)
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(
+                        _dataFixture
+                            .DefaultPublication()
+                            .WithTheme(_dataFixture.DefaultTheme().WithTitle("Normal theme\""))
+                    )
+            );
+    }
 
     public class GlobalRolesTests : DeleteTestReleaseAuthorizationHandlerTests
     {
@@ -91,7 +101,7 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         }
     }
 
-    private static DeleteTestReleaseAuthorizationHandler CreateHandler(bool enableThemeDeletion = false)
+    private DeleteTestReleaseAuthorizationHandler CreateHandler(bool enableThemeDeletion = false)
     {
         return new DeleteTestReleaseAuthorizationHandler(
             appOptions: new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper()

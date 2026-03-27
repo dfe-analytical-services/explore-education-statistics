@@ -14,13 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly MethodologyVersion _methodologyVersion;
+    private readonly Publication _owningPublication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected MarkMethodologyAsApprovedAuthorizationHandlerTests()
+    {
+        _methodologyVersion = _dataFixture.DefaultMethodologyVersion();
 
-    private static readonly MethodologyVersion _methodologyVersion = _dataFixture.DefaultMethodologyVersion();
-
-    private static readonly Publication _owningPublication = _dataFixture.DefaultPublication();
+        _owningPublication = _dataFixture.DefaultPublication();
+    }
 
     public class ClaimsTests : MarkMethodologyAsApprovedAuthorizationHandlerTests
     {
@@ -87,7 +91,7 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
         }
     }
 
-    private static MarkMethodologyAsApprovedAuthorizationHandler SetupHandler(
+    private MarkMethodologyAsApprovedAuthorizationHandler SetupHandler(
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
@@ -100,7 +104,7 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
         return new(methodologyVersionRepository, methodologyRepository, authorizationHandlerService);
     }
 
-    private static IMethodologyVersionRepository CreateDefaultMethodologyVersionRepository()
+    private IMethodologyVersionRepository CreateDefaultMethodologyVersionRepository()
     {
         var mock = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
         mock.Setup(s => s.IsLatestPublishedVersion(_methodologyVersion)).ReturnsAsync(false);
@@ -108,7 +112,7 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IMethodologyRepository CreateDefaultMethodologyRepository()
+    private IMethodologyRepository CreateDefaultMethodologyRepository()
     {
         var mock = new Mock<IMethodologyRepository>(MockBehavior.Strict);
         mock.Setup(s => s.GetOwningPublication(_methodologyVersion.MethodologyId)).ReturnsAsync(_owningPublication);
@@ -116,7 +120,7 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

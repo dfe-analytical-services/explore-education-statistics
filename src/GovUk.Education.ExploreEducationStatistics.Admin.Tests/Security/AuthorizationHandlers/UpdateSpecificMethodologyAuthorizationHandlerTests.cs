@@ -14,19 +14,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly MethodologyVersion _draftMethodologyVersion;
+    private readonly MethodologyVersion _approvedMethodologyVersion;
+    private readonly Publication _owningPublication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected UpdateSpecificMethodologyAuthorizationHandlerTests()
+    {
+        _draftMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Draft);
 
-    private static readonly MethodologyVersion _draftMethodologyVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Draft);
+        _approvedMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved);
 
-    private static readonly MethodologyVersion _approvedMethodologyVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Approved);
-
-    private static readonly Publication _owningPublication = _dataFixture.DefaultPublication();
+        _owningPublication = _dataFixture.DefaultPublication();
+    }
 
     public class ClaimsTests : UpdateSpecificMethodologyAuthorizationHandlerTests
     {
@@ -84,7 +89,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private static UpdateSpecificMethodologyAuthorizationHandler SetupHandler(
+    private UpdateSpecificMethodologyAuthorizationHandler SetupHandler(
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
@@ -95,7 +100,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         return new(methodologyRepository, authorizationHandlerService);
     }
 
-    private static IMethodologyRepository CreateDefaultMethodologyRepository()
+    private IMethodologyRepository CreateDefaultMethodologyRepository()
     {
         var mock = new Mock<IMethodologyRepository>(MockBehavior.Strict);
         mock.Setup(s => s.GetOwningPublication(It.IsAny<Guid>())).ReturnsAsync(_owningPublication);
@@ -103,7 +108,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

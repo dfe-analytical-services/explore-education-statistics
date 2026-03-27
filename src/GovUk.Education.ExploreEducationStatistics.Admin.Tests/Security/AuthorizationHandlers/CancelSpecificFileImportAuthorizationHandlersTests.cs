@@ -14,9 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public class CancelSpecificFileImportAuthorizationHandlersTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly File file;
 
-    private static readonly File file = _dataFixture.DefaultFile();
+    public CancelSpecificFileImportAuthorizationHandlersTests()
+    {
+        file = _dataFixture.DefaultFile();
+    }
 
     [Fact]
     public async Task FinishedOrAbortingImport_Fails()
@@ -62,7 +66,7 @@ public class CancelSpecificFileImportAuthorizationHandlersTests
         }
     }
 
-    private static CancelSpecificFileImportAuthorizationHandler SetupHandler(
+    private CancelSpecificFileImportAuthorizationHandler SetupHandler(
         IDataImportRepository? dataImportRepository = null
     ) => new(dataImportRepository ?? Mock.Of<IDataImportRepository>(MockBehavior.Strict));
 }

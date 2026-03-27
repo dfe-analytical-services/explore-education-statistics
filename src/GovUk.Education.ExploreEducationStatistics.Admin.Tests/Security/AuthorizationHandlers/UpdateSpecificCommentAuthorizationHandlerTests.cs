@@ -17,57 +17,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public abstract class UpdateSpecificCommentAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Comment _commentCreatedBySameUser;
+    private readonly Comment _commentCreatedByDifferentUser;
+    private readonly ReleaseVersion _draftReleaseVersionWithCommentCreatedBySameUser;
+    private readonly ReleaseVersion _draftReleaseVersionWithCommentCreatedByDifferedUser;
+    private readonly ReleaseVersion _approvedReleaseVersionWithCommentCreatedBySameUser;
+    private readonly ReleaseVersion _approvedReleaseVersionWithCommentCreatedByDifferedUser;
 
-    private static readonly Guid _userId = Guid.NewGuid();
-
-    private static readonly Comment _commentCreatedBySameUser = new() { Id = Guid.NewGuid(), CreatedById = _userId };
-
-    private static readonly Comment _commentCreatedByDifferentUser = new()
+    protected UpdateSpecificCommentAuthorizationHandlerTests()
     {
-        Id = Guid.NewGuid(),
-        CreatedById = Guid.NewGuid(),
-    };
+        _commentCreatedBySameUser = new() { Id = Guid.NewGuid(), CreatedById = _userId };
 
-    private static readonly ReleaseVersion _draftReleaseVersionWithCommentCreatedBySameUser = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithContent([
-            _dataFixture
-                .DefaultContentSection()
-                .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
-        ])
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _commentCreatedByDifferentUser = new() { Id = Guid.NewGuid(), CreatedById = Guid.NewGuid() };
 
-    private static readonly ReleaseVersion _draftReleaseVersionWithCommentCreatedByDifferedUser = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithContent([
-            _dataFixture
-                .DefaultContentSection()
-                .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
-        ])
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _draftReleaseVersionWithCommentCreatedBySameUser = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithContent([
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
+            ])
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _approvedReleaseVersionWithCommentCreatedBySameUser = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithContent([
-            _dataFixture
-                .DefaultContentSection()
-                .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
-        ])
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _draftReleaseVersionWithCommentCreatedByDifferedUser = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithContent([
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
+            ])
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-    private static readonly ReleaseVersion _approvedReleaseVersionWithCommentCreatedByDifferedUser = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithContent([
-            _dataFixture
-                .DefaultContentSection()
-                .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
-        ])
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+        _approvedReleaseVersionWithCommentCreatedBySameUser = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithContent([
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
+            ])
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+        _approvedReleaseVersionWithCommentCreatedByDifferedUser = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithContent([
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
+            ])
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
 
     public class ClaimsTests : UpdateSpecificCommentAuthorizationHandlerTests
     {
@@ -273,7 +277,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
         }
     }
 
-    private static UpdateSpecificCommentAuthorizationHandler SetupHandler(
+    private UpdateSpecificCommentAuthorizationHandler SetupHandler(
         ContentDbContext? contentDbContext = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
@@ -284,7 +288,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
         return new(contentDbContext, authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

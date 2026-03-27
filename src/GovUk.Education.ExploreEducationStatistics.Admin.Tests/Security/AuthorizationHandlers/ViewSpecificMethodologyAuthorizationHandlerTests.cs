@@ -20,35 +20,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly MethodologyVersion _draftMethodologyVersion;
+    private readonly MethodologyVersion _approvedMethodologyVersion;
+    private readonly Publication _owningPublication;
+    private readonly ReleaseVersion _liveReleaseVersion;
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _approvedReleaseVersion;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected ViewSpecificMethodologyAuthorizationHandlerTests()
+    {
+        _draftMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Draft);
 
-    private static readonly MethodologyVersion _draftMethodologyVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Draft);
+        _approvedMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved);
 
-    private static readonly MethodologyVersion _approvedMethodologyVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Approved);
+        _owningPublication = _dataFixture.DefaultPublication();
 
-    private static readonly Publication _owningPublication = _dataFixture.DefaultPublication();
+        _liveReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithPublished(DateTimeOffset.UtcNow)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_owningPublication));
 
-    private static readonly ReleaseVersion _liveReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithPublished(DateTimeOffset.UtcNow)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_owningPublication));
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_owningPublication));
 
-    private static readonly ReleaseVersion _draftReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_owningPublication));
-
-    private static readonly ReleaseVersion _approvedReleaseVersion = _dataFixture
-        .DefaultReleaseVersion()
-        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_owningPublication));
+        _approvedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_owningPublication));
+    }
 
     public class ClaimsTests : ViewSpecificMethodologyAuthorizationHandlerTests
     {
@@ -84,7 +92,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    public class InvalidClaimsAndRolesTests
+    public class InvalidClaimsAndRolesTests : ViewSpecificMethodologyAuthorizationHandlerTests
     {
         [Fact]
         public async Task UnapprovedMethodologyVersion_Fails()
@@ -305,7 +313,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private static ViewSpecificMethodologyAuthorizationHandler SetupHandler(
+    private ViewSpecificMethodologyAuthorizationHandler SetupHandler(
         IMethodologyRepository? methodologyRepository = null,
         IPreReleaseService? preReleaseService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
@@ -320,7 +328,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         return new(methodologyRepository, preReleaseService, releaseVersionRepository, authorizationHandlerService);
     }
 
-    private static IMethodologyRepository CreateDefaultMethodologyRepository()
+    private IMethodologyRepository CreateDefaultMethodologyRepository()
     {
         var mock = new Mock<IMethodologyRepository>(MockBehavior.Strict);
         mock.Setup(s => s.GetOwningPublication(It.IsAny<Guid>())).ReturnsAsync(_owningPublication);
@@ -329,7 +337,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IPreReleaseService CreateDefaultPreReleaseService()
+    private IPreReleaseService CreateDefaultPreReleaseService()
     {
         var mock = new Mock<IPreReleaseService>(MockBehavior.Strict);
         mock.Setup(s => s.GetPreReleaseWindowStatus(It.IsAny<ReleaseVersion>(), It.IsAny<DateTimeOffset>()))
@@ -338,7 +346,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IReleaseVersionRepository CreateDefaultReleaseVersionRepository()
+    private IReleaseVersionRepository CreateDefaultReleaseVersionRepository()
     {
         var mock = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
         mock.Setup(s => s.GetLatestReleaseVersion(_owningPublication.Id, It.IsAny<CancellationToken>()))
@@ -347,7 +355,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

@@ -14,31 +14,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly MethodologyVersion _draftFirstVersion;
+    private readonly MethodologyVersion _approvedFirstVersion;
+    private readonly MethodologyVersion _draftAmendmentVersion;
+    private readonly MethodologyVersion _approvedAmendmentVersion;
+    private readonly Publication _owningPublication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected DeleteSpecificMethodologyAuthorizationHandlerTests()
+    {
+        _draftFirstVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Draft);
 
-    private static readonly MethodologyVersion _draftFirstVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Draft);
+        _approvedFirstVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved);
 
-    private static readonly MethodologyVersion _approvedFirstVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Approved);
+        _draftAmendmentVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Draft)
+            .WithVersion(1)
+            .WithPreviousVersionId(Guid.NewGuid());
 
-    private static readonly MethodologyVersion _draftAmendmentVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Draft)
-        .WithVersion(1)
-        .WithPreviousVersionId(Guid.NewGuid());
+        _approvedAmendmentVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved)
+            .WithVersion(1)
+            .WithPreviousVersionId(Guid.NewGuid());
 
-    private static readonly MethodologyVersion _approvedAmendmentVersion = _dataFixture
-        .DefaultMethodologyVersion()
-        .WithApprovalStatus(MethodologyApprovalStatus.Approved)
-        .WithVersion(1)
-        .WithPreviousVersionId(Guid.NewGuid());
-
-    private static readonly Publication _owningPublication = new() { Id = Guid.NewGuid() };
+        _owningPublication = new() { Id = Guid.NewGuid() };
+    }
 
     public class ClaimsTests : DeleteSpecificMethodologyAuthorizationHandlerTests
     {
@@ -152,7 +159,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private static DeleteSpecificMethodologyAuthorizationHandler SetupHandler(
+    private DeleteSpecificMethodologyAuthorizationHandler SetupHandler(
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
@@ -163,7 +170,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         return new(methodologyRepository, authorizationHandlerService);
     }
 
-    private static IMethodologyRepository CreateDefaultMethodologyRepository()
+    private IMethodologyRepository CreateDefaultMethodologyRepository()
     {
         var mock = new Mock<IMethodologyRepository>(MockBehavior.Strict);
         mock.Setup(s => s.GetOwningPublication(It.IsAny<Guid>())).ReturnsAsync(_owningPublication);
@@ -171,7 +178,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         return mock.Object;
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>
