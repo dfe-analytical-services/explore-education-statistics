@@ -844,7 +844,6 @@ public abstract class ReleaseVersionServiceTests
                         Type = updatedType,
                         Year = release.Year,
                         TimePeriodCoverage = release.TimePeriodCoverage,
-                        PreReleaseAccessList = "New access list",
                         Label = newLabel,
                         PublishingOrganisations = null,
                     }
@@ -865,7 +864,6 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(release.Year, viewModel.Year);
                 Assert.Equal(release.YearTitle, viewModel.YearTitle);
                 Assert.Equal(release.TimePeriodCoverage, viewModel.TimePeriodCoverage);
-                Assert.Equal("New access list", viewModel.PreReleaseAccessList);
                 Assert.Equal(newReleaseSlug, viewModel.Slug);
                 Assert.Equal(newReleaseTitle, viewModel.Title);
                 Assert.Equal(newLabel, viewModel.Label);
@@ -889,7 +887,6 @@ public abstract class ReleaseVersionServiceTests
 
                 Assert.Equal(releaseVersion.NextReleaseDate, actualReleaseVersion.NextReleaseDate);
                 Assert.Equal(updatedType, actualReleaseVersion.Type);
-                Assert.Equal("New access list", actualReleaseVersion.PreReleaseAccessList);
 
                 Assert.Empty(actualReleaseVersion.ReleaseStatuses);
                 Assert.Empty(actualReleaseVersion.PublishingOrganisations);
@@ -1269,7 +1266,6 @@ public abstract class ReleaseVersionServiceTests
                         Year = otherRelease.Year,
                         TimePeriodCoverage = otherRelease.TimePeriodCoverage,
                         Type = releaseVersion.Type,
-                        PreReleaseAccessList = releaseVersion.PreReleaseAccessList,
                     }
                 );
 

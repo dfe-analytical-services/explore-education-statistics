@@ -87,7 +87,6 @@ export interface UpdatePreReleaseAccessListRequest {
 }
 
 export interface UpdateReleaseVersionRequest {
-  preReleaseAccessList?: string;
   year: number;
   timePeriodCoverage: {
     value: string;

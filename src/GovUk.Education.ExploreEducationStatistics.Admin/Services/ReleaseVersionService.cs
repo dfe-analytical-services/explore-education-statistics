@@ -813,7 +813,6 @@ public class ReleaseVersionService(
 
         releaseVersion.PublishingOrganisations = [.. publishingOrganisations];
         releaseVersion.Type = request.Type!.Value;
-        releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
 
         await context.SaveChangesAsync();
 
