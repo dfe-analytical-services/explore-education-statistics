@@ -337,6 +337,17 @@ public class ReleaseVersionsController : ControllerBase
         return await _releaseChecklistService.GetChecklist(releaseVersionId).HandleFailuresOrOk();
     }
 
+    [HttpPatch("releaseVersions/{releaseVersionId:guid}/prerelease-access-list")]
+    public async Task<ActionResult<ReleaseVersionViewModel>> UpdatePreReleaseAccessList(
+        Guid releaseVersionId,
+        ReleaseVersionPreReleaseAccessListUpdateRequest request,
+        CancellationToken cancellationToken = default
+    ) =>
+        await _releaseVersionService
+            .UpdatePreReleaseAccessList(releaseVersionId, request, cancellationToken)
+            .OnSuccess(_ => _releaseVersionService.GetRelease(releaseVersionId))
+            .HandleFailuresOrOk();
+
     [HttpPatch("releaseVersions/{releaseVersionId:guid}/published-display-date")]
     public async Task<ActionResult> UpdatePublishedDisplayDate(
         Guid releaseVersionId,

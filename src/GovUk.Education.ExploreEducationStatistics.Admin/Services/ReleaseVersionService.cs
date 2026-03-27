@@ -404,6 +404,23 @@ public class ReleaseVersionService(
             .OnSuccess(async () => await GetRelease(releaseVersionId));
     }
 
+    public async Task<Either<ActionResult, Unit>> UpdatePreReleaseAccessList(
+        Guid releaseVersionId,
+        ReleaseVersionPreReleaseAccessListUpdateRequest request,
+        CancellationToken cancellationToken = default
+    ) =>
+        await context
+            .ReleaseVersions.SingleOrNotFoundAsync(
+                rv => rv.Id == releaseVersionId,
+                cancellationToken: cancellationToken
+            )
+            .OnSuccessDo(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccessVoid(async rv =>
+            {
+                rv.PreReleaseAccessList = request.PreReleaseAccessList;
+                await context.SaveChangesAsync(cancellationToken);
+            });
+
     public async Task<Either<ActionResult, Unit>> UpdatePublishedDisplayDate(
         Guid releaseVersionId,
         ReleaseVersionPublishedDisplayDateUpdateRequest request
@@ -796,7 +813,6 @@ public class ReleaseVersionService(
 
         releaseVersion.PublishingOrganisations = [.. publishingOrganisations];
         releaseVersion.Type = request.Type!.Value;
-        releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
 
         await context.SaveChangesAsync();
 

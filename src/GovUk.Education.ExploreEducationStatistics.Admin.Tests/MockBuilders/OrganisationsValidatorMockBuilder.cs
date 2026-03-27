@@ -20,7 +20,7 @@ public class OrganisationsValidatorMockBuilder
     private static readonly Expression<
         Func<IOrganisationsValidator, Task<Either<ActionResult, Organisation[]>>>
     > ValidateOrganisations = m =>
-        m.ValidateOrganisations(It.IsAny<Guid[]?>(), It.IsAny<string>(), It.IsAny<CancellationToken>());
+        m.ValidateOrganisations(It.IsAny<Guid[]>(), It.IsAny<string>(), It.IsAny<CancellationToken>());
 
     public IOrganisationsValidator Build()
     {
@@ -58,7 +58,7 @@ public class OrganisationsValidatorMockBuilder
             mock.Verify(
                 m =>
                     m.ValidateOrganisations(
-                        It.Is<Guid[]?>(organisationIds =>
+                        It.Is<Guid[]>(organisationIds =>
                             expectedOrganisationIds == null || organisationIds == expectedOrganisationIds
                         ),
                         It.Is<string?>(path => expectedPath == null || path == expectedPath),
