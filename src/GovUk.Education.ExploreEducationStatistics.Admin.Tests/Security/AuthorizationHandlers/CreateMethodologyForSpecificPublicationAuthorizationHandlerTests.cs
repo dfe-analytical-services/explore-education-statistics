@@ -15,27 +15,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Publication _publication;
+    private readonly Publication _publicationArchived;
+    private readonly Publication _publicationWithOwnedMethodology;
+    private readonly Publication _publicationWithAdoptedMethodology;
 
-    private static readonly Guid _userId = Guid.NewGuid();
+    protected CreateMethodologyForSpecificPublicationAuthorizationHandlerTests()
+    {
+        _publication = _dataFixture.DefaultPublication();
 
-    private static readonly Publication _publication = _dataFixture.DefaultPublication();
+        _publicationArchived = _dataFixture.DefaultPublication().WithSupersededBy(_dataFixture.DefaultPublication());
 
-    private static readonly Publication _publicationArchived = _dataFixture
-        .DefaultPublication()
-        .WithSupersededBy(_dataFixture.DefaultPublication());
+        _publicationWithOwnedMethodology = _dataFixture
+            .DefaultPublication()
+            .WithMethodologies(
+                CollectionUtils.ListOf(new PublicationMethodology { Owner = true, MethodologyId = Guid.NewGuid() })
+            );
 
-    private static readonly Publication _publicationWithOwnedMethodology = _dataFixture
-        .DefaultPublication()
-        .WithMethodologies(
-            CollectionUtils.ListOf(new PublicationMethodology { Owner = true, MethodologyId = Guid.NewGuid() })
-        );
-
-    private static readonly Publication _publicationWithAdoptedMethodology = _dataFixture
-        .DefaultPublication()
-        .WithMethodologies(
-            CollectionUtils.ListOf(new PublicationMethodology { Owner = false, MethodologyId = Guid.NewGuid() })
-        );
+        _publicationWithAdoptedMethodology = _dataFixture
+            .DefaultPublication()
+            .WithMethodologies(
+                CollectionUtils.ListOf(new PublicationMethodology { Owner = false, MethodologyId = Guid.NewGuid() })
+            );
+    }
 
     public class ClaimsTests : CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
     {
@@ -63,7 +67,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
             await AssertFailsForAllClaims(_publicationWithOwnedMethodology);
         }
 
-        private static async Task AssertSucceedsOnlyForValidClaims(Publication publication)
+        private async Task AssertSucceedsOnlyForValidClaims(Publication publication)
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -87,7 +91,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
             }
         }
 
-        private static async Task AssertFailsForAllClaims(Publication publication)
+        private async Task AssertFailsForAllClaims(Publication publication)
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -134,7 +138,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
             await AssertFailsWithoutCheckingRoles(_publicationWithOwnedMethodology);
         }
 
-        private static async Task AssertSucceedsOnlyForValidPublicationRoles(Publication publication)
+        private async Task AssertSucceedsOnlyForValidPublicationRoles(Publication publication)
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -161,7 +165,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
             }
         }
 
-        private static async Task AssertFailsWithoutCheckingRoles(Publication publication)
+        private async Task AssertFailsWithoutCheckingRoles(Publication publication)
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -184,7 +188,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
         }
     }
 
-    private static CreateMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
+    private CreateMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
         ContentDbContext? contentDbContext = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
@@ -195,7 +199,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
         return new(contentDbContext, authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>

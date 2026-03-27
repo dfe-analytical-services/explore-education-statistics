@@ -12,11 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public abstract class UpdateContactAuthorizationHandlerTests
 {
-    private static readonly DataFixture _dataFixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Publication _publication;
 
-    private static readonly Guid _userId = Guid.NewGuid();
-
-    private static readonly Publication _publication = _dataFixture.DefaultPublication();
+    protected UpdateContactAuthorizationHandlerTests()
+    {
+        _publication = _dataFixture.DefaultPublication();
+    }
 
     public class ClaimsTests : UpdateContactAuthorizationHandlerTests
     {
@@ -46,7 +49,7 @@ public abstract class UpdateContactAuthorizationHandlerTests
         }
     }
 
-    private static UpdateContactAuthorizationHandler SetupHandler(
+    private UpdateContactAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -55,7 +58,7 @@ public abstract class UpdateContactAuthorizationHandlerTests
         return new(authorizationHandlerService);
     }
 
-    private static IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
         mock.Setup(s =>
