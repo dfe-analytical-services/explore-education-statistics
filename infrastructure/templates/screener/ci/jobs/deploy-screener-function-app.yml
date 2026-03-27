@@ -27,6 +27,6 @@ jobs:
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
               displayName: Check the Screener API Function App is healthy after deployment
-              endpoint: '$(screenerFunctionAppUrl)/api/screen'
+              endpoint: '$(screenerFunctionAppUrl)/api/healthcheck'
               accessTokenScope: $(screenerAppRegistrationClientId)
               maxAttempts: 50

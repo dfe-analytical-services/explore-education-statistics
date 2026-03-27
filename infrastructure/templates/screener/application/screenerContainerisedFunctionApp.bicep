@@ -147,6 +147,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
       storageAccounts: privateEndpointSubnet.id
     }
     subnetId: outboundVnetSubnet.id
+    includeQueueServices: true
     alerts: deployAlerts
       ? {
           cpuPercentage: true
@@ -164,5 +165,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     tagValues: tagValues
   }
 }
+
+
 
 output functionAppUrl string = containerisedFunctionAppModule.outputs.url
