@@ -68,6 +68,7 @@ public enum ValidationErrorMessages
 
     // Release
     ReleaseTypeInvalid,
+    PublishingOrganisationsLimitExceeded,
 
     // Release approval
     ReleaseNotApproved,

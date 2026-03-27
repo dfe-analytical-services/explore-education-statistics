@@ -117,7 +117,8 @@ export default function ReleaseSummaryForm({
           }
           return value;
         })
-        .optional(),
+        .optional()
+        .max(3, 'No more than three Publishing Organisations can be selected'),
     });
   }, [permittedReleaseTypes]);
 
@@ -235,7 +236,7 @@ export default function ReleaseSummaryForm({
 
             {organisations && (
               <FormFieldCheckboxGroup<ReleaseSummaryFormValues>
-                hint="Optional - select which organisations are responsible for publishing this release"
+                hint="Optional - select a maximum of three organisations which are responsible for publishing this release"
                 legend="Publishing Organisations"
                 legendSize="m"
                 name="publishingOrganisations"
