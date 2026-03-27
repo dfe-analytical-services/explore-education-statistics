@@ -1,6 +1,7 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration.module.scss';
 import { ChartLegendFormValues } from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
 import ChartReorderCategories from '@admin/pages/release/datablocks/components/chart/ChartReorderCategories';
+import classNames from 'classnames';
 import {
   legendInlinePositions,
   colours,
@@ -131,7 +132,7 @@ export default function ChartLegendItems({
                     fieldErrorDetails[0] ? fieldErrorDetails[0].message : ''
                   }
                 >
-                  <div className="dfe-flex">
+                  <div className={classNames(styles.legendItems, 'dfe-flex')}>
                     <div className={styles.labelInput}>
                       <FormFieldTextInput
                         name={`items.${index}.label`}
