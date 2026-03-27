@@ -2,14 +2,16 @@
 Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=record test failure
 Library     OperatingSystem
 Library     Collections
+Library     String
 Library     dates_and_times.py
 Library     fail_fast.py
 Library     file_operations.py
 Library     utilities.py
 Library     visual.py
+Library     admin_api.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
-Library     admin_api.py
+Resource    ./debug.robot
 
 
 *** Variables ***
@@ -22,6 +24,7 @@ ${DOWNLOADS_DIR}                    ${EXECDIR}${/}test-results${/}downloads${/}
 ${timeout}                          %{TIMEOUT}
 ${implicit_wait}                    %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}    0
+${log_network_traffic}              0
 
 
 *** Keywords ***
@@ -53,11 +56,36 @@ user opens the browser
     # Therefore, all browsers used in our tests firstly obtain basic auth access, and
     # then can continue using the site as per usual without any more need to interact
     # with authentication.
+
     ${authenticated_url}=    get url with basic auth    %{PUBLIC_URL}
-    log to console    Loading page in browser: ${authenticated_url}
+
+    # Because responses are cached by Azure Front Door by URL, if we simply allow all tests
+    # to visit the exact same page with the exact same request in order to validate their
+    # basic auth credentials, the first test that calls this method would bypass the cache,
+    # hit the origin App Service, and receive a 200 back in response. The first test's browser
+    # would then know that its basic auth credentials were reliable and would continue to use
+    # them for subsequent requests to the public site.
+    #
+    # When a subsequent test came to requesting this same page in order to validate its basic
+    # auth credentials however, it would not hit the origin and receive a 200, but would instead
+    # receive the cached response from the first test hitting this page and most importantly,
+    # would receive a "304 Not Modified" response status instead of the 200.    This would NOT
+    # give the browser confidence to reuse these basic auth credentials for subsequent requests
+    # to the public site, and therefore the next piece of navigation undertook would hit a 401.
+    #
+    # To overcome this, we need to ensure that each test hits a UNIQUE URL and so always receives
+    # a 200 from the origin.    We therefore use a random string query parameter to ensure each
+    # request is unique and uncached each time a test calls this suite setup method.    We hit the
+    # "/contact-us" page rather than the "/" landing page, as hitting the landing page with request
+    # parameters causes an infinite redirection loop.
+
+    ${random_string}=    Generate Random String    10
+    ${authenticated_url_with_random_string}=    Set Variable
+    ...    ${authenticated_url}/contact-us?cacheBust=${random_string}
+
+    log to console    Loading page in browser: ${authenticated_url_with_random_string}
     # if the tests fail for you here, update chrome/chromedriver and ensure the public site is running
-    go to    ${authenticated_url}
-    user waits until page finishes loading
+    go to    ${authenticated_url_with_random_string}
 
 user opens chrome
     [Arguments]    ${alias}=chrome
@@ -99,8 +127,14 @@ user opens chrome headlessly
 
     ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
     Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
-    Create Webdriver    Chrome    ${alias}    options=${c_opts}
 
+    IF    "${log_network_traffic}" == "1"
+        ${log_prefs}=    Create Dictionary    performance=ALL
+        Call Method    ${c_opts}    set_capability    goog:loggingPrefs    ${log_prefs}
+        Call Method    ${c_opts}    add_argument    auto-open-devtools-for-tabs
+    END
+
+    Create Webdriver    Chrome    ${alias}    options=${c_opts}
     ${all_opts}=    Call Method    ${c_opts}    to_capabilities
 
 user opens chrome visually
@@ -116,6 +150,12 @@ user opens chrome visually
     Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
     Create Webdriver    Chrome    ${alias}    options=${c_opts}
     ${all_opts}=    Call Method    ${c_opts}    to_capabilities
+
+    IF    "${log_network_traffic}" == "1"
+        ${log_prefs}=    Create Dictionary    performance=ALL
+        Call Method    ${c_opts}    set_capability    goog:loggingPrefs    ${log_prefs}
+        Call Method    ${c_opts}    add_argument    auto-open-devtools-for-tabs
+    END
 
     maximize browser window
 
@@ -135,6 +175,10 @@ user switches browser
     switch browser    ${alias}
 
 user closes the browser
+    IF    "${log_network_traffic}" == "1"
+        Log network traffic from performance log
+    END
+
     close browser
 
 user closes all browsers
@@ -1086,7 +1130,7 @@ user checks page does not contain other release
     ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
 
 user navigates to admin homepage
-    go to    %{ADMIN_URL}
+    user navigates to    %{ADMIN_URL}
 
 user navigates to public site homepage
     user navigates to    %{PUBLIC_URL}
