@@ -130,20 +130,16 @@ const ReleasePreReleaseAccessPage = () => {
                 isReleaseLive={release.live}
                 preReleaseAccessList={release.preReleaseAccessList}
                 onSubmit={async ({ preReleaseAccessList }) => {
-                  const updatedRelease =
-                    await releaseVersionService.updateReleaseVersion(
+                  const updatedReleaseVersion =
+                    await releaseVersionService.updatePreReleaseAccessList(
                       release.id,
                       {
-                        year: release.year,
-                        timePeriodCoverage: release.timePeriodCoverage,
-                        type: release.type,
                         preReleaseAccessList,
-                        label: release.label,
                       },
                     );
 
                   setRelease({
-                    value: updatedRelease,
+                    value: updatedReleaseVersion,
                   });
                 }}
               />

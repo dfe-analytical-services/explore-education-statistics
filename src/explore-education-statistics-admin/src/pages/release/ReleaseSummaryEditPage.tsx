@@ -44,9 +44,8 @@ export default function ReleaseSummaryEditPage({
         value: values.timePeriodCoverageCode,
       },
       type: values.releaseType ?? 'AdHocStatistics',
-      preReleaseAccessList: releaseVersion.preReleaseAccessList,
       label: values.releaseLabel,
-      publishingOrganisations: values.publishingOrganisations,
+      publishingOrganisations: values.publishingOrganisations ?? [],
     });
 
     onReleaseChange();

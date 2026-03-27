@@ -1215,6 +1215,15 @@ public class ThemeServiceTests
             ReleaseVersionUpdateRequest request
         ) => throw new NotImplementedException();
 
+        public Task<Either<ActionResult, Unit>> UpdatePreReleaseAccessList(
+            Guid releaseVersionId,
+            ReleaseVersionPreReleaseAccessListUpdateRequest request,
+            CancellationToken cancellationToken = default
+        )
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Either<ActionResult, Unit>> UpdatePublishedDisplayDate(
             Guid releaseVersionId,
             ReleaseVersionPublishedDisplayDateUpdateRequest request

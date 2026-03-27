@@ -84,7 +84,7 @@ public abstract class ReleaseServiceTests
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         Type = ReleaseType.OfficialStatistics,
                         Label = "initial",
-                        PublishingOrganisations = null,
+                        PublishingOrganisations = [],
                     }
                 );
 

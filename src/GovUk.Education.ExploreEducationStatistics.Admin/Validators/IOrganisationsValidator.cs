@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 public interface IOrganisationsValidator
 {
     Task<Either<ActionResult, Organisation[]>> ValidateOrganisations(
-        Guid[]? organisationIds,
+        Guid[] organisationIds,
         string? path = null,
         CancellationToken cancellationToken = default
     );

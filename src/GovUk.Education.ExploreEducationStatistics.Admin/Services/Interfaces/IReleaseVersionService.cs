@@ -34,6 +34,12 @@ public interface IReleaseVersionService
         ReleaseVersionUpdateRequest request
     );
 
+    Task<Either<ActionResult, Unit>> UpdatePreReleaseAccessList(
+        Guid releaseVersionId,
+        ReleaseVersionPreReleaseAccessListUpdateRequest request,
+        CancellationToken cancellationToken = default
+    );
+
     Task<Either<ActionResult, Unit>> UpdatePublishedDisplayDate(
         Guid releaseVersionId,
         ReleaseVersionPublishedDisplayDateUpdateRequest request

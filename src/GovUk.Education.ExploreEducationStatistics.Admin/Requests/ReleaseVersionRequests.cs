@@ -17,8 +17,6 @@ public record ReleaseVersionUpdateRequest
     [Required]
     public TimeIdentifier TimePeriodCoverage { get; init; }
 
-    public string PreReleaseAccessList { get; init; } = string.Empty;
-
     public string Slug => CreateReleaseSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
 
     [Range(1000, 9999)]
@@ -27,5 +25,5 @@ public record ReleaseVersionUpdateRequest
     [MaxLength(50)]
     public string? Label { get; init; }
 
-    public Guid[]? PublishingOrganisations { get; init; }
+    public Guid[] PublishingOrganisations { get; init; } = [];
 }

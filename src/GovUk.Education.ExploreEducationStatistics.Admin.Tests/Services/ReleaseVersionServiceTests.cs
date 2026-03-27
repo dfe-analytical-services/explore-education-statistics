@@ -844,9 +844,8 @@ public abstract class ReleaseVersionServiceTests
                         Type = updatedType,
                         Year = release.Year,
                         TimePeriodCoverage = release.TimePeriodCoverage,
-                        PreReleaseAccessList = "New access list",
                         Label = newLabel,
-                        PublishingOrganisations = null,
+                        PublishingOrganisations = [],
                     }
                 );
 
@@ -865,7 +864,6 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(release.Year, viewModel.Year);
                 Assert.Equal(release.YearTitle, viewModel.YearTitle);
                 Assert.Equal(release.TimePeriodCoverage, viewModel.TimePeriodCoverage);
-                Assert.Equal("New access list", viewModel.PreReleaseAccessList);
                 Assert.Equal(newReleaseSlug, viewModel.Slug);
                 Assert.Equal(newReleaseTitle, viewModel.Title);
                 Assert.Equal(newLabel, viewModel.Label);
@@ -889,7 +887,6 @@ public abstract class ReleaseVersionServiceTests
 
                 Assert.Equal(releaseVersion.NextReleaseDate, actualReleaseVersion.NextReleaseDate);
                 Assert.Equal(updatedType, actualReleaseVersion.Type);
-                Assert.Equal("New access list", actualReleaseVersion.PreReleaseAccessList);
 
                 Assert.Empty(actualReleaseVersion.ReleaseStatuses);
                 Assert.Empty(actualReleaseVersion.PublishingOrganisations);
@@ -1196,7 +1193,7 @@ public abstract class ReleaseVersionServiceTests
                         Type = releaseVersion.Type,
                         Year = releaseVersion.Release.Year,
                         TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
-                        PublishingOrganisations = null,
+                        PublishingOrganisations = [],
                     }
                 );
 
@@ -1269,7 +1266,6 @@ public abstract class ReleaseVersionServiceTests
                         Year = otherRelease.Year,
                         TimePeriodCoverage = otherRelease.TimePeriodCoverage,
                         Type = releaseVersion.Type,
-                        PreReleaseAccessList = releaseVersion.PreReleaseAccessList,
                     }
                 );
 
@@ -2388,6 +2384,118 @@ public abstract class ReleaseVersionServiceTests
         }
     }
 
+    public class UpdatePreReleaseAccessListTests : ReleaseVersionServiceTests
+    {
+        [Fact]
+        public async Task WhenReleaseVersionHasNoPreReleaseAccessList_UpdatesPreReleaseAccessList()
+        {
+            // Arrange
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithPreReleaseAccessList(null);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease().WithVersions(_ => [releaseVersion])]);
+
+            var request = new ReleaseVersionPreReleaseAccessListUpdateRequest
+            {
+                PreReleaseAccessList = "Updated access list",
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(contentDbContext: context);
+
+                // Act
+                var result = await sut.UpdatePreReleaseAccessList(releaseVersion.Id, request);
+
+                // Assert - View model
+                result.AssertRight();
+            }
+
+            // Assert - Database
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actualReleaseVersion = await context.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersion.Id);
+
+                Assert.Equal(request.PreReleaseAccessList, actualReleaseVersion.PreReleaseAccessList);
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionHasPreReleaseAccessList_UpdatesPreReleaseAccessList()
+        {
+            // Arrange
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithPreReleaseAccessList("Original access list");
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease().WithVersions(_ => [releaseVersion])]);
+
+            var request = new ReleaseVersionPreReleaseAccessListUpdateRequest
+            {
+                PreReleaseAccessList = "Updated access list",
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(contentDbContext: context);
+
+                // Act
+                var result = await sut.UpdatePreReleaseAccessList(releaseVersion.Id, request);
+
+                // Assert - View model
+                result.AssertRight();
+            }
+
+            // Assert - Database
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actualReleaseVersion = await context.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersion.Id);
+
+                Assert.Equal(request.PreReleaseAccessList, actualReleaseVersion.PreReleaseAccessList);
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionDoesNotExist_ReturnsNotFound()
+        {
+            // Arrange
+            var releaseVersionId = Guid.NewGuid();
+
+            var request = new ReleaseVersionPreReleaseAccessListUpdateRequest
+            {
+                PreReleaseAccessList = "Updated access list",
+            };
+
+            await using var context = InMemoryApplicationDbContext();
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.UpdatePreReleaseAccessList(releaseVersionId, request);
+
+            // Assert
+            outcome.AssertNotFound();
+        }
+    }
+
     public class UpdatePublishedDisplayDateTests : ReleaseVersionServiceTests
     {
         [Fact]
@@ -2939,8 +3047,10 @@ public abstract class ReleaseVersionServiceTests
 
         userService.Setup(s => s.GetUserId()).Returns(User.Id);
 
+        contentDbContext ??= InMemoryApplicationDbContext();
+
         return new ReleaseVersionService(
-            contentDbContext ?? InMemoryApplicationDbContext(),
+            contentDbContext,
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
             AdminMapper(),
             new PersistenceHelper<ContentDbContext>(contentDbContext),

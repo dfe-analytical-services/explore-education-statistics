@@ -22,7 +22,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.Extensions.Logging;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -310,6 +309,32 @@ public class ReleaseVersionServicePermissionTests
                 var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
                 return await service.RemoveDataFiles(releaseVersion.Id, Guid.NewGuid());
+            });
+    }
+
+    [Fact]
+    public async Task UpdatePreReleaseAccessList()
+    {
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+        var request = new ReleaseVersionPreReleaseAccessListUpdateRequest { PreReleaseAccessList = "" };
+
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
+
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
+
+                return await service.UpdatePreReleaseAccessList(releaseVersion.Id, request);
             });
     }
 
