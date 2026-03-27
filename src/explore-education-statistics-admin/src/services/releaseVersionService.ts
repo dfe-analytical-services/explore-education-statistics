@@ -82,6 +82,10 @@ export interface ReleaseVersionSummaryWithPermissions
   permissions: ReleaseVersionPermissions;
 }
 
+export interface UpdatePreReleaseAccessListRequest {
+  preReleaseAccessList: string;
+}
+
 export interface UpdateReleaseVersionRequest {
   preReleaseAccessList?: string;
   year: number;
@@ -216,6 +220,16 @@ const releaseVersionService = {
 
   getReleaseVersionStatuses(id: string): Promise<ReleaseStatus[]> {
     return client.get(`/releases/${id}/status`);
+  },
+
+  updatePreReleaseAccessList(
+    releaseVersionId: string,
+    updateRequest: UpdatePreReleaseAccessListRequest,
+  ): Promise<ReleaseVersion> {
+    return client.patch(
+      `/releaseVersions/${releaseVersionId}/prerelease-access-list`,
+      updateRequest,
+    );
   },
 
   updateReleaseVersion(
