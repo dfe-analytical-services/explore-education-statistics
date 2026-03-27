@@ -138,6 +138,8 @@ public class PublishingOrganisationDtoBuilder
             Id = _id,
             Title = _title,
             Url = _url,
+            UseGISLogo = false,
+            LogoFileName = "logo.png",
         };
 
     public PublishingOrganisationDtoBuilder WithId(Guid id)
