@@ -845,7 +845,7 @@ public abstract class ReleaseVersionServiceTests
                         Year = release.Year,
                         TimePeriodCoverage = release.TimePeriodCoverage,
                         Label = newLabel,
-                        PublishingOrganisations = null,
+                        PublishingOrganisations = [],
                     }
                 );
 
@@ -1193,7 +1193,7 @@ public abstract class ReleaseVersionServiceTests
                         Type = releaseVersion.Type,
                         Year = releaseVersion.Release.Year,
                         TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
-                        PublishingOrganisations = null,
+                        PublishingOrganisations = [],
                     }
                 );
 

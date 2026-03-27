@@ -45,7 +45,7 @@ export default function ReleaseSummaryEditPage({
       },
       type: values.releaseType ?? 'AdHocStatistics',
       label: values.releaseLabel,
-      publishingOrganisations: values.publishingOrganisations,
+      publishingOrganisations: values.publishingOrganisations ?? [],
     });
 
     onReleaseChange();

@@ -25,5 +25,5 @@ public record ReleaseVersionUpdateRequest
     [MaxLength(50)]
     public string? Label { get; init; }
 
-    public Guid[]? PublishingOrganisations { get; init; }
+    public Guid[] PublishingOrganisations { get; init; } = [];
 }

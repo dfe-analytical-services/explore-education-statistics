@@ -25,12 +25,12 @@ public class OrganisationsValidator(ContentDbContext context) : IOrganisationsVa
     /// - A Bad Request <see cref="ActionResult"/> if any id's are invalid.
     /// </returns>
     public async Task<Either<ActionResult, Organisation[]>> ValidateOrganisations(
-        Guid[]? organisationIds,
+        Guid[] organisationIds,
         string? path = null,
         CancellationToken cancellationToken = default
     )
     {
-        if (organisationIds.IsNullOrEmpty())
+        if (organisationIds.Length == 0)
         {
             return Array.Empty<Organisation>();
         }

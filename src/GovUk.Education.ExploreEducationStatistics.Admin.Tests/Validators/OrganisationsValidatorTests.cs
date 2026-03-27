@@ -18,21 +18,6 @@ public abstract class OrganisationsValidatorTests
     public class ValidateOrganisationsTests : OrganisationsValidatorTests
     {
         [Fact]
-        public async Task WhenOrganisationIdsIsNull_ReturnsEmpty()
-        {
-            // Arrange
-            await using var context = InMemoryApplicationDbContext();
-            var sut = BuildService(context);
-
-            // Act
-            var result = await sut.ValidateOrganisations(organisationIds: null);
-
-            // Assert
-            var actualOrganisations = result.AssertRight();
-            Assert.Empty(actualOrganisations);
-        }
-
-        [Fact]
         public async Task WhenOrganisationIdsIsEmpty_ReturnsEmpty()
         {
             // Arrange
