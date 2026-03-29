@@ -33,8 +33,8 @@ Validate Email alerts link
 
 Validate next release and summary list items
     user checks element should contain    testid:Next release    March 2019
-    user checks summary list contains    Release type    Official statistics
-    user checks summary list contains    Produced by    Department for Education
+    user checks element should contain    testid:Release type-value    Official statistics
+    user checks element should contain    testid:Produced by-value    Department for Education
     user checks summary list contains    Published    26 March 2020
     user checks summary list contains    Last updated    9 March 2022
     user checks element contains    testid:release-summary-block    3 updates

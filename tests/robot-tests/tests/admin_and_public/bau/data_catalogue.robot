@@ -280,6 +280,7 @@ Validate data catalogue page redirect from slug based urls
     user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
+    user waits until page contains element    css:[data-testid="data-set-file-list"]
     user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    2
     ${dataSet_1}=    user gets testid element    data-set-file-summary-Absence by characteristic
     user checks element contains    ${dataSet_1}    Absence by characteristic
