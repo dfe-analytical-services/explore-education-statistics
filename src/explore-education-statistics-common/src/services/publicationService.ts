@@ -367,11 +367,6 @@ export interface PublicationReleaseSummary extends ReleaseSummary {
   publication: PublicationSummaryMinimal;
 }
 
-export interface PreReleaseAccessListSummary extends ReleaseSummary {
-  publication: PublicationSummaryMinimal;
-  preReleaseAccessList: string;
-}
-
 export interface PublicationTreeSummary {
   id: string;
   title: string;
@@ -496,21 +491,6 @@ const publicationService = {
     publicationSlug: string,
   ): Promise<PublicationMethodologiesList> {
     return contentApi.get(`/publications/${publicationSlug}/methodologies`);
-  },
-  getLatestPreReleaseAccessList(
-    publicationSlug: string,
-  ): Promise<PreReleaseAccessListSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/latest/prerelease-access-list`,
-    );
-  },
-  getPreReleaseAccessList(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<PreReleaseAccessListSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}/prerelease-access-list`,
-    );
   },
   getPublicationTree({
     publicationFilter,

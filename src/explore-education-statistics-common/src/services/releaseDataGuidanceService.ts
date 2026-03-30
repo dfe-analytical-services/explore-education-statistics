@@ -1,9 +1,3 @@
-import { contentApi } from '@common/services/api';
-import {
-  PublicationSummaryMinimal,
-  ReleaseSummary,
-} from '@common/services/publicationService';
-
 export interface DataSetDataGuidance {
   fileId: string;
   filename: string;
@@ -23,29 +17,3 @@ export interface DataSetDataGuidance {
     label: string;
   }[];
 }
-
-export interface ReleaseDataGuidanceSummary extends ReleaseSummary {
-  publication: PublicationSummaryMinimal;
-  dataGuidance: string;
-  dataSets: DataSetDataGuidance[];
-}
-
-const releaseDataGuidanceService = {
-  getLatestReleaseDataGuidance(
-    publicationSlug: string,
-  ): Promise<ReleaseDataGuidanceSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/latest/data-guidance`,
-    );
-  },
-  getReleaseDataGuidance(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<ReleaseDataGuidanceSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}/data-guidance`,
-    );
-  },
-};
-
-export default releaseDataGuidanceService;
