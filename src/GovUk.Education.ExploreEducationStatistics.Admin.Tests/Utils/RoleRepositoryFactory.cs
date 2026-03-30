@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 
 public static class RoleRepositoryFactory
 {
-    public static (UserPublicationRoleRepository, UserReleaseRoleRepository) BuildRoleRepositories(
+    public static (UserPublicationRoleRepository, UserPrereleaseRoleRepository) BuildRoleRepositories(
         ContentDbContext contentDbContext
     )
     {
@@ -22,7 +22,7 @@ public static class RoleRepositoryFactory
             userRepository: userRepository
         );
 
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(
+        var userPrereleaseRoleRepository = new UserPrereleaseRoleRepository(
             contentDbContext: contentDbContext,
             userPublicationRoleRepository: userPublicationRoleRepository,
             newPermissionsSystemHelper: newPermissionsSystemHelper,
@@ -30,6 +30,6 @@ public static class RoleRepositoryFactory
             userRepository: userRepository
         );
 
-        return (userPublicationRoleRepository, userReleaseRoleRepository);
+        return (userPublicationRoleRepository, userPrereleaseRoleRepository);
     }
 }

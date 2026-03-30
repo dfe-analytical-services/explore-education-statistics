@@ -328,8 +328,8 @@ public class ReleaseAmendmentServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -338,7 +338,7 @@ public class ReleaseAmendmentServiceTests
             var releaseAmendmentService = BuildService(
                 contentDbContext,
                 statisticsDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             // Method under test
@@ -350,7 +350,7 @@ public class ReleaseAmendmentServiceTests
             amendmentId = viewModel.Id;
         }
 
-        VerifyAllMocks(userReleaseRoleRepository);
+        VerifyAllMocks(userPrereleaseRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -721,8 +721,8 @@ public class ReleaseAmendmentServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -730,7 +730,7 @@ public class ReleaseAmendmentServiceTests
             var releaseAmendmentService = BuildService(
                 contentDbContext,
                 statisticsDbContext: InMemoryStatisticsDbContext(),
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
@@ -739,7 +739,7 @@ public class ReleaseAmendmentServiceTests
             Assert.NotEqual(originalReleaseVersion.Id, amendmentId);
         }
 
-        VerifyAllMocks(userReleaseRoleRepository);
+        VerifyAllMocks(userPrereleaseRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -784,8 +784,8 @@ public class ReleaseAmendmentServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -793,7 +793,7 @@ public class ReleaseAmendmentServiceTests
             var releaseAmendmentService = BuildService(
                 contentDbContext,
                 statisticsDbContext: InMemoryStatisticsDbContext(),
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             // Method under test
@@ -805,7 +805,7 @@ public class ReleaseAmendmentServiceTests
             amendmentId = amendment.Id;
         }
 
-        VerifyAllMocks(userReleaseRoleRepository);
+        VerifyAllMocks(userPrereleaseRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -884,8 +884,8 @@ public class ReleaseAmendmentServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -894,7 +894,7 @@ public class ReleaseAmendmentServiceTests
             var releaseAmendmentService = BuildService(
                 contentDbContext,
                 statisticsDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             // Method under test
@@ -906,7 +906,7 @@ public class ReleaseAmendmentServiceTests
             amendmentId = viewModel.Id;
         }
 
-        VerifyAllMocks(userReleaseRoleRepository);
+        VerifyAllMocks(userPrereleaseRoleRepository);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
@@ -1115,7 +1115,7 @@ public class ReleaseAmendmentServiceTests
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
         IUserService? userService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null
     )
     {
         return new ReleaseAmendmentService(
@@ -1123,7 +1123,7 @@ public class ReleaseAmendmentServiceTests
             userService ?? UserServiceMock().Object,
             new FootnoteRepository(statisticsDbContext),
             statisticsDbContext,
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict)
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict)
         );
     }
 }

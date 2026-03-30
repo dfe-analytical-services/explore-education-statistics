@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class AuthorizationHandlerService(
     IReleaseVersionRepository releaseVersionRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IPreReleaseService preReleaseService
 ) : IAuthorizationHandlerService
@@ -35,10 +35,10 @@ public class AuthorizationHandlerService(
 
     public async Task<bool> UserHasAnyRoleOnPublication(Guid userId, Guid publicationId) =>
         await userPublicationRoleRepository.UserHasAnyRoleOnPublication(userId: userId, publicationId: publicationId)
-        || await userReleaseRoleRepository.UserHasAnyRoleOnPublication(userId: userId, publicationId: publicationId);
+        || await userPrereleaseRoleRepository.UserHasAnyRoleOnPublication(userId: userId, publicationId: publicationId);
 
     public async Task<bool> UserHasPrereleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
-        await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(
+        await userPrereleaseRoleRepository.UserHasRoleOnReleaseVersion(
             userId: userId,
             releaseVersionId: releaseVersionId,
             ReleaseRole.PrereleaseViewer

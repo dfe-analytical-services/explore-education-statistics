@@ -26,7 +26,7 @@ public class PermissionsController(
     IUserService userService,
     IPreReleaseService preReleaseService,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
 ) : ControllerBase
 {
     [HttpGet("permissions/access")]
@@ -183,7 +183,7 @@ public class PermissionsController(
 
     private async Task<bool> IsReleaseApprover()
     {
-        return await userReleaseRoleRepository
+        return await userPrereleaseRoleRepository
             .Query()
             .WhereForUser(userService.GetUserId())
             .WhereRolesIn(ReleaseRole.Approver)

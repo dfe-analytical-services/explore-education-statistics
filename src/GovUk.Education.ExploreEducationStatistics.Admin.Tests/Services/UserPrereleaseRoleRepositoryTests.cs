@@ -16,7 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class UserReleaseRoleRepositoryTests
+public abstract class UserPrereleaseRoleRepositoryTests
 {
     private readonly DataFixture _fixture = new();
 
@@ -33,7 +33,7 @@ public abstract class UserReleaseRoleRepositoryTests
         fixture => fixture.DefaultSoftDeletedUser(),
     ];
 
-    public class CreateTests : UserReleaseRoleRepositoryTests
+    public class CreateTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task NoNewPermissionsSystemPublicationRoleChanges()
@@ -346,7 +346,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class CreateManyIfNotExistsTests : UserReleaseRoleRepositoryTests
+    public class CreateManyIfNotExistsTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ManyRoles_CreatesExpectedOldAndNewPermissionsSystemRoles_WhenNewPermissionsSystemRoleUpgradeNotRequired()
@@ -1302,7 +1302,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class GetByIdTests : UserReleaseRoleRepositoryTests
+    public class GetByIdTests : UserPrereleaseRoleRepositoryTests
     {
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
@@ -1360,7 +1360,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class GetByCompositeKeyTests : UserReleaseRoleRepositoryTests
+    public class GetByCompositeKeyTests : UserPrereleaseRoleRepositoryTests
     {
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
@@ -1426,7 +1426,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class QueryTests : UserReleaseRoleRepositoryTests
+    public class QueryTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ActiveOnlyFilter_ReturnsAllRolesForActiveUsers()
@@ -1660,7 +1660,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class RemoveTests : UserReleaseRoleRepositoryTests
+    public class RemoveTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task NoNewPermissionsSystemPublicationRoleChanges()
@@ -1960,7 +1960,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class RemoveManyTests : UserReleaseRoleRepositoryTests
+    public class RemoveManyTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ManyRoles_RemovesExpectedOldAndNewPermissionsSystemRoles_WhenSingleNewPermissionsSystemRoleDowngradeRequired()
@@ -2638,7 +2638,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class RemoveForUserTests : UserReleaseRoleRepositoryTests
+    public class RemoveForUserTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task TargetUserHasRoles_RemovesTargetRoles()
@@ -2761,7 +2761,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class UserHasRoleOnReleaseVersionTests : UserReleaseRoleRepositoryTests
+    public class UserHasRoleOnReleaseVersionTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ExistingRoleNotForTargetUser_False()
@@ -3631,7 +3631,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class UserHasAnyRoleOnReleaseVersionTests : UserReleaseRoleRepositoryTests
+    public class UserHasAnyRoleOnReleaseVersionTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ExistingRoleNotForTargetUser_False()
@@ -4598,7 +4598,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class UserHasAnyRoleOnPublicationTests : UserReleaseRoleRepositoryTests
+    public class UserHasAnyRoleOnPublicationTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ExistingRoleNotForTargetUser_False()
@@ -5565,7 +5565,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class MarkEmailAsSentTests : UserReleaseRoleRepositoryTests
+    public class MarkEmailAsSentTests : UserPrereleaseRoleRepositoryTests
     {
         [Fact]
         public async Task Success_NoSuppliedDateSent()
@@ -5654,7 +5654,7 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    private static UserReleaseRoleRepository CreateRepository(
+    private static UserPrereleaseRoleRepository CreateRepository(
         ContentDbContext? contentDbContext = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserRepository? userRepository = null
