@@ -35,7 +35,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
         _draftReleaseVersionWithCommentCreatedBySameUser = _dataFixture
             .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-            .WithContent([
+            .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
                     .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
@@ -45,7 +45,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
         _draftReleaseVersionWithCommentCreatedByDifferedUser = _dataFixture
             .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Draft)
-            .WithContent([
+            .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
                     .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
@@ -55,7 +55,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
         _approvedReleaseVersionWithCommentCreatedBySameUser = _dataFixture
             .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-            .WithContent([
+            .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
                     .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
@@ -65,7 +65,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
         _approvedReleaseVersionWithCommentCreatedByDifferedUser = _dataFixture
             .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-            .WithContent([
+            .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
                     .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
