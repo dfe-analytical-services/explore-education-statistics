@@ -1,5 +1,5 @@
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+import ContactUsSection from '@common/modules/release/components/ReleaseContactUsSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import {
   PublicationMethodologiesList,
   PublicationSummary,

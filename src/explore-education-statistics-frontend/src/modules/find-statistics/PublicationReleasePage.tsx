@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 import { NavItem } from '@common/components/PageNavExpandable';
 import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
-import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import { contactUsNavItem } from '@common/modules/release/components/ReleaseContactUsSection';
 import exploreDataPageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import {
   PublicationMethodologiesList,

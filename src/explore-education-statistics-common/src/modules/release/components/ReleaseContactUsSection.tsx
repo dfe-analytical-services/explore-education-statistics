@@ -1,15 +1,18 @@
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+import {
+  DfeOpeningHours,
+  DfeTelephoneLine,
+} from '@common/modules/find-statistics/components/ContactUsSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import { Contact } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
 import React from 'react';
-import { DfeOpeningHours, DfeTelephoneLine } from './ContactUsSection';
 
 export const contactUsNavItem = {
   id: 'contact-us-section',
   text: 'Contact us',
 };
 
-const ContactUsSection = ({
+const ReleaseContactUsSection = ({
   includeSectionBreak = false,
   publicationContact,
   publicationTitle,
@@ -111,4 +114,4 @@ const ContactUsSection = ({
   );
 };
 
-export default ContactUsSection;
+export default ReleaseContactUsSection;

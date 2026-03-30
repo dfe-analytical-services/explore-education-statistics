@@ -6,8 +6,8 @@ import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContactUsSection, {
   contactUsNavItem,
-} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+} from '@common/modules/release/components/ReleaseContactUsSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
 import { releaseTypes } from '@common/services/types/releaseType';

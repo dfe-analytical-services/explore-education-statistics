@@ -9,14 +9,14 @@ import { useMobileMedia } from '@common/hooks/useMedia';
 import useToggle from '@common/hooks/useToggle';
 import ContactUsSection, {
   contactUsNavItem,
-} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+} from '@common/modules/release/components/ReleaseContactUsSection';
 import ReleaseDataList from '@common/modules/find-statistics/components/ReleaseDataList';
 import ReleaseDataListItem from '@common/modules/find-statistics/components/ReleaseDataListItem';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseDataPageCardLink, {
   ReleaseDataPageCardLinkGrid,
 } from '@common/modules/release/components/ReleaseDataPageCardLink';
 import ReleaseDataSetFileSummary from '@common/modules/release/components/ReleaseDataSetFileSummary';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import pageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import {
   PublicationSummary,

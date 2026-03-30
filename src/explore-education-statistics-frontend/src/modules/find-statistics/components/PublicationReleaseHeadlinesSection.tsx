@@ -4,7 +4,7 @@ import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import { ReleaseVersionHomeContent } from '@common/services/publicationService';
 import DataBlockTabs from '@frontend/modules/find-statistics/components/DataBlockTabs';
