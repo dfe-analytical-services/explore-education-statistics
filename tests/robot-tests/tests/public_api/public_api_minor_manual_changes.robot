@@ -14,11 +14,14 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    Public API - minor manual changes %{RUN_IDENTIFIER}
-${RELEASE_1_NAME}=      Financial year 3000-01
-${RELEASE_2_NAME}=      Academic year 3010/11
-${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1
-${SUBJECT_2_NAME}=      ${PUBLICATION_NAME} - Subject 2
+${PUBLICATION_NAME}=                        Public API - minor manual changes %{RUN_IDENTIFIER}
+${RELEASE_1_NAME}=                          Financial year 3000-01
+${RELEASE_2_NAME}=                          Academic year 3010/11
+${SUBJECT_1_NAME}=                          ${PUBLICATION_NAME} - Subject 1
+${SUBJECT_2_NAME}=                          ${PUBLICATION_NAME} - Subject 2
+${MAPPABLE_INDICATORS_TABLE_SELECTOR}=      testid:mappable-table-default
+${NEW_INDICATORS_TABLE_SELECTOR}=           testid:new-items-table-default
+${AUTOMAPPED_INDICATORS_TABLE_SELECTOR}=    testid:auto-mapped-table-default
 
 
 *** Test Cases ***
@@ -152,7 +155,7 @@ Validate the summary contents inside the 'draft version details' table
     user checks summary list contains    Geographic levels    Local authority, National, Regional, School
     ...    id:draft-version-summary
     user checks summary list contains    Time periods    2020/21 to 2022/23    id:draft-version-summary
-    user checks summary list contains    Indicators    Enrolments    id:draft-version-summary
+    user checks summary list contains    Indicators    Number of enrolments    id:draft-version-summary
     user checks summary list contains    Indicators    more indicators    id:draft-version-summary
     user checks summary list contains    Filters    Academy type    id:draft-version-summary
     user checks summary list contains    Actions    Remove draft version    id:draft-version-summary
@@ -163,6 +166,8 @@ Validate the version task statuses inside the 'Draft version task' section
     user waits until parent contains element    id:map-locations-task-status    text:Incomplete
     user waits until parent contains element    testid:map-filters-task    link:Map filters
     user waits until parent contains element    id:map-filters-task-status    text:Incomplete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Incomplete
 
 User clicks on Map locations link
     user clicks link    Map locations
@@ -186,7 +191,7 @@ Validate the row headings and its contents in the 'Regions' section
     user checks table cell contains    1    3    N/A
 
 User edits location mapping
-    user clicks button in table cell    1    4    Map option
+    user clicks button in table cell    1    4    Map location
 
     ${modal}=    user waits until modal is visible    Map existing location
     user clicks radio    Yorkshire
@@ -217,6 +222,8 @@ Validate the version status of location task is now complete
     user waits until parent contains element    id:map-locations-task-status    text:Complete
     user waits until parent contains element    testid:map-filters-task    link:Map filters
     user waits until parent contains element    id:map-filters-task-status    text:Incomplete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Incomplete
 
 User clicks on Map filters link
     user clicks link    Map filters
@@ -240,12 +247,12 @@ Validate the row headings and its contents in the 'filter options' section
     user checks table cell contains    1    3    N/A
 
 User edits filter mapping
-    user clicks button in table cell    1    4    Map option
+    user clicks button in table cell    1    4    Map filter option
 
     ${modal}=    user waits until modal is visible    Map existing filter option
     user clicks radio    State-funded primary and secondary
     user clicks button    Update filter option mapping
-    user waits until modal is not visible    Map existing location
+    user waits until modal is not visible    Map existing filter option
 
 Verify filter mapping changes
     user waits until element contains    css:[data-testid="mappable-table-schoolType"] caption
@@ -264,6 +271,112 @@ Validate the row headings and its contents in the 'filters options' section afte
     user checks table cell contains    1    3    Minor
 
     user clicks link    Back
+
+Validate the version status of filter task is now complete
+    user waits until h3 is visible    Draft version tasks
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Incomplete
+
+User clicks on Map indicators link
+    user clicks link    Map indicators
+    user waits until h3 is visible    Indicators not found in new data set (1)
+    user waits until element contains    css:[data-testid="mappable-table-default"] caption
+    ...    1 unmapped indicator    %{WAIT_LONG}
+
+Validate the 'unmapped indicators' notification banner
+    user waits until h2 is visible    Action required
+    user waits until page contains link    There is 1 unmapped indicator
+
+Validate the row headings and its contents in the 'mappable indicators' section
+    user checks table column heading contains    1    1    Current data set    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    2    New data set    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    3    Type    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    4    Actions    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+    user checks table cell contains    1    1    Enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    Unmapped    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    3    N/A    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+Validate the row headings and its contents in the 'mappable indicators' section before mapping
+    user waits until h3 is visible    Indicators not found in new data set (1)
+    user checks table column heading contains    1    1    Current data set    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    2    New data set    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    3    Type    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    4    Actions    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+    user checks table cell contains    1    1    Enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    Unmapped    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    3    N/A    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+Validate the row headings and its contents in the 'new indicators' section before mapping
+    user waits until h3 is visible    Indicators not found in old data set (1)
+    user checks page does not contain    No new indicators.
+    user checks table column heading contains    1    1    Current data set    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    2    New data set    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    3    Type    ${NEW_INDICATORS_TABLE_SELECTOR}
+
+    user checks table cell contains    1    1    Not applicable    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    Number of enrolments    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    3    Minor    ${NEW_INDICATORS_TABLE_SELECTOR}
+
+User selects "No mapping" for indicator
+    user clicks button in table cell    1    4    No mapping    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user waits until page contains    No mapping available
+    user checks table cell contains    1    1    Enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    No mapping available    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    3    Major    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+Verify indicator changes are reflected in the caption tag after mapping the indicator to another indicator
+    user waits until element contains    css:[data-testid="mappable-table-default"] caption
+    ...    1 mapped indicator    %{WAIT_LONG}
+
+Validate the row headings and its contents in the 'new indicators' section after selecting "No mapping"
+    user waits until h3 is visible    Indicators not found in old data set (1)
+    user checks page does not contain    No new indicators.
+    user checks table column heading contains    1    1    Current data set    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    2    New data set    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table column heading contains    1    3    Type    ${NEW_INDICATORS_TABLE_SELECTOR}
+
+    user checks table cell contains    1    1    Not applicable    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    Number of enrolments    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    3    Minor    ${NEW_INDICATORS_TABLE_SELECTOR}
+
+User maps original indicator to an indicator in the new data set version
+    user clicks button in table cell    1    4    Map indicator    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+    ${modal}=    user waits until modal is visible    Map existing indicator
+    user clicks radio    Number of enrolments
+    user clicks button    Update indicator mapping
+    user waits until modal is not visible    Map existing indicator
+
+Verify mapping the original indicator to a target indicator are reflected in the caption tag
+    user waits until element contains    css:[data-testid="mappable-table-default"] caption
+    ...    1 mapped indicator    %{WAIT_LONG}
+
+Validate the row headings and its contents in the 'mappable indicators' section after mapping
+    user waits until h3 is visible    Indicators not found in new data set (1)
+    user checks table cell contains    1    1    Enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    Number of enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    3    Minor    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+
+Validate the row headings and its contents in the 'new indicators' section after mapping
+    user waits until h3 is visible    Indicators not found in old data set (0)
+    user checks page contains    No new indicators.
+    User checks page does not contain element    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user clicks link    Back
+
+Validate the version status of indicators task is now complete
+    user waits until h3 is visible    Draft version tasks
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until parent contains element    id:map-indicators-task-status    text:Complete
 
 Confirm finalization of this API data set version
     user clicks button    Finalise this data set version

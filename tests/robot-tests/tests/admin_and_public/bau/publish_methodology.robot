@@ -417,7 +417,7 @@ Verify that the amended methodology is visible on the public methodologies page
     ...    ${PUBLIC_METHODOLOGY_URL_ENDING}-amended-methodology    # Slug has changed
 
 Validate methodology redirect works
-    go to    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
+    user navigates to    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
     user waits until h1 is visible    ${PUBLICATION_NAME} - Amended methodology
     user checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-amended-methodology
 

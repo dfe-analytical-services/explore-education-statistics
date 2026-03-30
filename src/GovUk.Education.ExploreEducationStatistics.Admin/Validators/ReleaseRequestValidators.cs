@@ -17,6 +17,11 @@ public static class ReleaseCreateRequestValidator
             return ValidationActionResult(ReleaseTypeInvalid);
         }
 
+        if (releaseCreateRequest.PublishingOrganisations?.Length > 3)
+        {
+            return ValidationActionResult(PublishingOrganisationsLimitExceeded);
+        }
+
         return Unit.Instance;
     }
 }

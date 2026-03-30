@@ -119,6 +119,7 @@ public class OptimisedPublicDataProcessorCollectionFixture(
         serviceModifications.AddSingleton<HealthCheckFunctions>();
         serviceModifications.AddSingleton<BulkDeleteDataSetVersionsFunction>();
         serviceModifications.AddSingleton<StatusCheckFunction>();
+        serviceModifications.AddSingleton<Ees6764AddIndicatorMappingPlansMigrationFunction>();
     }
 
     protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)

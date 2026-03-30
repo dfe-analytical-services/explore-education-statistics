@@ -114,6 +114,9 @@ param functionAppExists bool
 @description('Specifies an optional URL for Azure to use to monitor the health of this resource')
 param healthCheckPath string?
 
+@description('Specifies whether or not to include queue services, private endpoints and role assignments')
+param includeQueueServices bool = false
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   functionAppHealth: bool
@@ -204,6 +207,7 @@ module deploymentStorageAccountModule '../../public-api/components/storageAccoun
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
       file: privateEndpoints.storageAccounts
+      queue: includeQueueServices ? privateEndpoints.storageAccounts : null
     }
     publicNetworkAccessEnabled: false
     alerts: storageAlerts
@@ -232,6 +236,17 @@ module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bice
       : [functionApp.identity.principalId]
     storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
     role: 'Storage Blob Data Owner'
+  }
+}
+
+module storageAccountQueueDataContributorRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = if (includeQueueServices) {
+  name: '${deploymentStorageAccountName}QueueDataContributorRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: userAssignedManagedIdentityParams != null
+      ? [userAssignedManagedIdentityParams!.principalId]
+      : [functionApp.identity.principalId]
+    storageAccountName: deploymentStorageAccountModule.outputs.storageAccountName
+    role: 'Storage Queue Data Contributor'
   }
 }
 

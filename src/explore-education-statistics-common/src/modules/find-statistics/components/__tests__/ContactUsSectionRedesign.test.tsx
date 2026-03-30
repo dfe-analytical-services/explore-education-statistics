@@ -93,7 +93,13 @@ describe('ContactUsSectionRedesign', () => {
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
         publishingOrganisations={[
-          { id: 'test-id', title: 'Skills England', url: 'test-url' },
+          {
+            id: 'test-id',
+            title: 'Skills England',
+            url: 'test-url',
+            useGISLogo: true,
+            logoFileName: 'logo.png',
+          },
         ]}
       />,
     );

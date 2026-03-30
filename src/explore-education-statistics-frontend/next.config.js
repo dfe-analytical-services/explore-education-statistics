@@ -2,6 +2,13 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer');
 const path = require('path');
 
+const defaultPublicSiteCacheMaxAgeSeconds = process.env
+  .DEFAULT_CACHE_MAX_AGE_SECONDS
+  ? Number(process.env.DEFAULT_CACHE_MAX_AGE_SECONDS)
+  : 30;
+
+const defaultCacheControlHeaders = `public, max-age=0, s-maxage=${defaultPublicSiteCacheMaxAgeSeconds}, stale-while-revalidate=30`;
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -31,8 +38,7 @@ let generalCacheControlValue;
 switch (process.env.NODE_ENV) {
   case 'production':
     // for all environments, not just production! - see where NODE_ENV is set in ARM template
-    generalCacheControlValue =
-      'public, max-age=0, s-maxage=30, stale-while-revalidate=30';
+    generalCacheControlValue = defaultCacheControlHeaders;
     break;
   default:
     // for hotreload when running locally
@@ -85,6 +91,15 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'no-store, no-cache, must-revalidate',
+          },
+        ],
+      },
+      {
+        source: '/api/assets/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400', // 1 day
           },
         ],
       },

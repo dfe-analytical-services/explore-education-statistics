@@ -18,6 +18,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
+import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import React, { Fragment, useState } from 'react';
 
 export const releasePageTabSections = {
@@ -122,7 +123,10 @@ const ReleaseContent = ({
               <span>
                 {publishingOrganisations.map((org, index) => (
                   <Fragment key={org.id}>
-                    {index > 0 && ' and '}
+                    {getListStringSeparator(
+                      release.publishingOrganisations ?? [],
+                      index,
+                    )}
                     <Link unvisited to={org.url}>
                       {org.title}
                     </Link>

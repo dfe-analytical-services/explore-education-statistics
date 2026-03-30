@@ -49,6 +49,9 @@ const ReleasePageShell: NextPage<Props> = ({
         <ReleasePageTitle
           publicationSummary={publicationSummary}
           releaseTitle={releaseVersionSummary.title}
+          publishingOrganisations={
+            releaseVersionSummary.publishingOrganisations
+          }
         />
       }
       customBannerContent={

@@ -963,6 +963,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("GISLogoHexCode")
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("LogoFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -976,12 +985,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
+                    b.Property<bool>("UseGISLogo")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Organisations");
+                    b.ToTable("Organisations", t =>
+                        {
+                            t.HasCheckConstraint("CK_Organisations_GISLogoHexCode", "[UseGISLogo] = CASE WHEN [GISLogoHexCode] IS NULL THEN 0 ELSE 1 END");
+                        });
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.PageFeedback", b =>

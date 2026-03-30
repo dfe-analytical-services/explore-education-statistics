@@ -111,7 +111,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // new filter options
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in old dataset (1) No action required',
+        name: 'Filter options not found in old data set (1) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -205,7 +205,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       within(navItems[3]).getByRole('link', {
-        name: 'Filter options not found in old dataset',
+        name: 'Filter options not found in old data set',
       }),
     ).toHaveAttribute('href', '#new-filter-options');
     const newSubItems = within(navItems[3]).getAllByRole('listitem');
@@ -353,7 +353,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('No filter options.')).toBeInTheDocument();
+    expect(screen.getByText('No mappable filter options.')).toBeInTheDocument();
 
     expect(screen.queryByTestId('mappable-Filter1Key')).not.toBeInTheDocument();
 
@@ -399,7 +399,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Filter options not found in old dataset (0) No action required',
+        name: 'Filter options not found in old data set (0) No action required',
       }),
     ).toBeInTheDocument();
 
@@ -414,7 +414,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders a message if there are no filter options found in both', async () => {
+  test('renders a message if there are no filter options automatically found in both', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getFiltersMapping.mockResolvedValue({
       candidates: {
@@ -505,7 +505,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // new filter1 table
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (1) No action required',
+          name: 'Filter options not found in old data set (1) No action required',
         }),
       ).toBeInTheDocument();
       const newFilterOptionsAccordion = within(
@@ -533,7 +533,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(unmappedFilterOption).getByRole('button', {
-          name: 'Map option for Filter 1 Option 2',
+          name: 'Map filter option for Filter 1 Option 2',
         }),
       );
 
@@ -594,7 +594,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Remove from new filter options
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (0) No action required',
+          name: 'Filter options not found in old data set (0) No action required',
         }),
       ).toBeInTheDocument();
       expect(
@@ -634,7 +634,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(unmappedFilterOption).getByRole('button', {
-          name: 'Map option for Filter 1 Option 2',
+          name: 'Map filter option for Filter 1 Option 2',
         }),
       );
 
@@ -807,7 +807,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // new filter options table
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (1) No action required',
+          name: 'Filter options not found in old data set (1) No action required',
         }),
       ).toBeInTheDocument();
       const newFilterOptionsAccordion = within(
@@ -825,7 +825,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(autoMappedFilter).getByRole('button', {
-          name: 'Map option for Filter 1 Option 1',
+          name: 'Map filter option for Filter 1 Option 1',
         }),
       );
 
@@ -896,7 +896,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Add to new filter options table
       expect(
         screen.getByRole('heading', {
-          name: 'Filter options not found in old dataset (2) No action required',
+          name: 'Filter options not found in old data set (2) No action required',
         }),
       ).toBeInTheDocument();
       expect(
@@ -957,7 +957,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       await user.click(
         within(autoMappedFilter).getByRole('button', {
-          name: 'Map option for Filter 1 Option 1',
+          name: 'Map filter option for Filter 1 Option 1',
         }),
       );
 
@@ -1169,7 +1169,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
 
       expect(
         within(navItems[3]).getByRole('link', {
-          name: 'Filter options not found in old dataset',
+          name: 'Filter options not found in old data set',
         }),
       ).toHaveAttribute('href', '#new-filter-options');
 

@@ -53,7 +53,7 @@ public class DataSetVersionChangeService(
                 var (change, history) = tuple;
                 return new DataSetVersionChangesViewModel
                 {
-                    VersionNumber = change!.VersionNumber,
+                    VersionNumber = change.VersionNumber,
                     Notes = change.Notes,
                     MajorChanges = change.MajorChanges,
                     MinorChanges = change.MinorChanges,

@@ -15,6 +15,7 @@ public interface IBlobContainer
 ///
 public static class BlobContainers
 {
+    public static readonly IBlobContainer Images = new BlobContainer(Constants.ContainerNames.Images);
     public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer(
         Constants.ContainerNames.PrivateReleaseFiles
     );

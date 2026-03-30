@@ -18,6 +18,7 @@ import ReleasePageContentSection from '@common/modules/find-statistics/component
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
+import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import React, { Fragment, useEffect, useMemo } from 'react';
 
 interface Props {
@@ -119,7 +120,10 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
                   <span>
                     {publishingOrganisations.map((org, index) => (
                       <Fragment key={org.id}>
-                        {index > 0 && ' and '}
+                        {getListStringSeparator(
+                          release.publishingOrganisations ?? [],
+                          index,
+                        )}
                         <Link unvisited to={org.url}>
                           {org.title}
                         </Link>

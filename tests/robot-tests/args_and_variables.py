@@ -121,7 +121,12 @@ def create_argument_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="get debug-level logging in report.html, including Python tracebacks",
     )
-
+    parser.add_argument(
+        "--log-network-traffic",
+        dest="log_network_traffic",
+        action="store_true",
+        help="choose to print out HTTP request and response data upon browser close",
+    )
     """
     NOTE(mark): The admin and analyst passwords to access the Admin app are
     stored in the CI pipeline as secret variables, which means they cannot be accessed as normal

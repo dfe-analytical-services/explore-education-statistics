@@ -33,7 +33,13 @@ describe('OfficialStatisticsInDevelopmentSection', () => {
     render(
       <OfficialStatisticsInDevelopmentSection
         publishingOrganisations={[
-          { id: 'test-id', title: 'Skills England', url: 'test-url' },
+          {
+            id: 'test-id',
+            title: 'Skills England',
+            url: 'test-url',
+            useGISLogo: true,
+            logoFileName: 'logo.png',
+          },
         ]}
       />,
     );

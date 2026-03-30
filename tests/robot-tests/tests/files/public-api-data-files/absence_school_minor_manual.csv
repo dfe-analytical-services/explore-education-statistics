@@ -1,4 +1,4 @@
-time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_urn,school_laestab,school_name,school_type,academy_type,ncyear,enrolments,sess_possible,sess_authorised,sess_unauthorised,sess_unauthorised_percent
+time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_urn,school_laestab,school_name,school_type,academy_type,ncyear,number_of_enrolments,sess_possible,sess_authorised,sess_unauthorised,sess_unauthorised_percent
 202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 4,930365,8380405,4410042,36349,10.0359
 202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 6,390233,2895910,2734525,418548,12.8344
 202021,Academic year,National,E92000001,England,,,,,,,,,State-funded primary and secondary,,Year 8,966035,3669102,4767788,12507,9.4158

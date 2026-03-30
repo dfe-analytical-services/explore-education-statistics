@@ -19,6 +19,9 @@ public record FilterOptionMappingUpdateResponseViewModel
     public string FilterKey { get; init; } = string.Empty;
 }
 
+public record IndicatorMappingUpdateResponseViewModel
+    : MappingUpdateResponseViewModel<IndicatorMapping, MappableIndicator>;
+
 public record BatchLocationMappingUpdatesResponseViewModel
     : BatchMappingUpdatesResponseViewModel<
         LocationMappingUpdateResponseViewModel,
@@ -31,6 +34,13 @@ public record BatchFilterOptionMappingUpdatesResponseViewModel
         FilterOptionMappingUpdateResponseViewModel,
         FilterOptionMapping,
         MappableFilterOption
+    >;
+
+public record BatchIndicatorMappingUpdatesResponseViewModel
+    : BatchMappingUpdatesResponseViewModel<
+        IndicatorMappingUpdateResponseViewModel,
+        IndicatorMapping,
+        MappableIndicator
     >;
 
 public abstract record MappingUpdateResponseViewModel<TMapping, TMappableElement>

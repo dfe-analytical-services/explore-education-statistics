@@ -235,6 +235,7 @@ Validate reordered publication releases
     user checks table cell contains    3    3    Latest release
 
 Navigate to first published release on public frontend after reordering
+    user waits for caches to expire
     user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release is the latest release after reordering
@@ -328,6 +329,7 @@ Validate second release has latest release status in publication release order
     user checks table cell does not contain    4    3    Latest release
 
 Navigate to second published release on public frontend
+    user waits for caches to expire
     user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate second published release is the latest release
