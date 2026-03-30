@@ -154,7 +154,7 @@ public class ThemeServicePermissionTests
         IPublishingService? publishingService = null,
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
@@ -175,7 +175,7 @@ public class ThemeServicePermissionTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );
     }

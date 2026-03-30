@@ -136,8 +136,8 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(false);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasAnyRoleOnPublication(
                         _userId,
@@ -150,7 +150,7 @@ public abstract class AuthorizationHandlerServiceTests
 
             var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await authorizationHandlerService.UserHasAnyRoleOnPublication(
@@ -176,8 +176,8 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(false);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasAnyRoleOnPublication(
                         _userId,
@@ -190,7 +190,7 @@ public abstract class AuthorizationHandlerServiceTests
 
             var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await authorizationHandlerService.UserHasAnyRoleOnPublication(
@@ -216,8 +216,8 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasAnyRoleOnPublication(
                         _userId,
@@ -230,7 +230,7 @@ public abstract class AuthorizationHandlerServiceTests
 
             var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await authorizationHandlerService.UserHasAnyRoleOnPublication(
@@ -256,8 +256,8 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasAnyRoleOnPublication(
                         _userId,
@@ -270,7 +270,7 @@ public abstract class AuthorizationHandlerServiceTests
 
             var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await authorizationHandlerService.UserHasAnyRoleOnPublication(
@@ -287,8 +287,8 @@ public abstract class AuthorizationHandlerServiceTests
         [Fact]
         public async Task UserDoesNotHaveAnySuppliedRoleOnPublication_ReturnsFalse()
         {
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasRoleOnReleaseVersion(
                         _userId,
@@ -300,14 +300,16 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(false);
 
-            var authorizationHandlerService = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+            var authorizationHandlerService = BuildService(
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+            );
 
             var result = await authorizationHandlerService.UserHasPrereleaseRoleOnReleaseVersion(
                 userId: _userId,
                 releaseVersionId: _releaseVersion.Id
             );
 
-            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
 
             Assert.False(result);
         }
@@ -315,8 +317,8 @@ public abstract class AuthorizationHandlerServiceTests
         [Fact]
         public async Task UserHasAnySuppliedRoleOnPublication_ReturnsTrue()
         {
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasRoleOnReleaseVersion(
                         _userId,
@@ -328,14 +330,16 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+            var authorizationHandlerService = BuildService(
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+            );
 
             var result = await authorizationHandlerService.UserHasPrereleaseRoleOnReleaseVersion(
                 userId: _userId,
                 releaseVersionId: _releaseVersion.Id
             );
 
-            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
 
             Assert.True(result);
         }
@@ -395,8 +399,8 @@ public abstract class AuthorizationHandlerServiceTests
         [Fact]
         public async Task UserHasPrereleaseRoleOnReleaseVersion_ButWeAreNotInThePrereleaseWindow_ReturnsFalse()
         {
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasRoleOnReleaseVersion(
                         _userId,
@@ -408,7 +412,9 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+            var authorizationHandlerService = BuildService(
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+            );
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(_releaseVersion, _user);
 
@@ -433,8 +439,8 @@ public abstract class AuthorizationHandlerServiceTests
         [Fact]
         public async Task UserHasPrereleaseRoleOnReleaseVersion_AndWeAreInThePrereleaseWindow_ReturnsTrue()
         {
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.UserHasRoleOnReleaseVersion(
                         _userId,
@@ -452,7 +458,7 @@ public abstract class AuthorizationHandlerServiceTests
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
             var authorizationHandlerService = BuildService(
-                userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                 preReleaseService: preReleaseService.Object
             );
 
@@ -479,19 +485,19 @@ public abstract class AuthorizationHandlerServiceTests
 
     private static AuthorizationHandlerService BuildService(
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IPreReleaseService? preReleaseService = null
     )
     {
         releaseVersionRepository ??= CreateDefaultReleaseVersionRepository();
-        userReleaseRoleRepository ??= CreateDefaultUserReleaseRoleRepository();
+        userPrereleaseRoleRepository ??= CreateDefaultuserPrereleaseRoleRepository();
         userPublicationRoleRepository ??= CreateDefaultUserPublicationRoleRepository();
         preReleaseService ??= CreateDefaultPreReleaseService();
 
         return new(
             releaseVersionRepository,
-            userReleaseRoleRepository,
+            userPrereleaseRoleRepository,
             userPublicationRoleRepository,
             preReleaseService
         );
@@ -507,10 +513,10 @@ public abstract class AuthorizationHandlerServiceTests
         return releaseVersionRepository.Object;
     }
 
-    private static IUserReleaseRoleRepository CreateDefaultUserReleaseRoleRepository()
+    private static IUserPrereleaseRoleRepository CreateDefaultuserPrereleaseRoleRepository()
     {
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository
             .Setup(mock =>
                 mock.UserHasAnyRoleOnPublication(
                     It.IsAny<Guid>(),
@@ -520,7 +526,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
             )
             .ReturnsAsync(false);
-        userReleaseRoleRepository
+        userPrereleaseRoleRepository
             .Setup(mock =>
                 mock.UserHasRoleOnReleaseVersion(
                     It.IsAny<Guid>(),
@@ -532,7 +538,7 @@ public abstract class AuthorizationHandlerServiceTests
             )
             .ReturnsAsync(false);
 
-        return userReleaseRoleRepository.Object;
+        return userPrereleaseRoleRepository.Object;
     }
 
     private static IUserPublicationRoleRepository CreateDefaultUserPublicationRoleRepository()

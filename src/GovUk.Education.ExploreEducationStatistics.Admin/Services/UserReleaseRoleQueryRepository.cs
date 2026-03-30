@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-// The method in this class will remain but be moved back to the 'UserReleaseRoleRepository' class in EES-6196, when we no longer
+// The method in this class will remain but be moved back to the 'userPrereleaseRoleRepository' class in EES-6196, when we no longer
 // have to cater for the old roles. For now, it has been moved here temporarily for convenience to allow
 // us to avoid duplication, and avoid using circular dependencies where the two resource role repositories would depend on each other.
 // An interface has purposefully NOT been created, as I do not want to mock this dependency. It should be tested as part of the
