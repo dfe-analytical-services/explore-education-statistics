@@ -59,14 +59,14 @@ public class UserReleaseRoleServiceTests
             .Setup(m => m.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
             .ReturnsAsync([publication.Releases[0].Versions[0].Id, publication.Releases[1].Versions[0].Id]);
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepository.SetupQuery(
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+        userPrereleaseRoleRepository.SetupQuery(
             ResourceRoleFilter.ActiveOnly,
             [userReleaseRole1, userReleaseRole2, userReleaseRole3, userReleaseRoleIgnored1, userReleaseRoleIgnored2]
         );
 
         var service = BuildService(
-            userReleaseRoleRepository: userReleaseRoleRepository.Object,
+            userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
             releaseVersionRepository: releaseVersionRepository.Object
         );
         var latestActiveUserReleaseRoles = await service.ListLatestActiveUserReleaseRolesByPublication(
@@ -91,7 +91,7 @@ public class UserReleaseRoleServiceTests
         Assert.Equal(userReleaseRole3.ReleaseVersionId, latestActiveUserReleaseRoles[2].ReleaseVersionId);
         Assert.Equal(userReleaseRole3.Role, latestActiveUserReleaseRoles[2].Role);
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository, releaseVersionRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository, releaseVersionRepository);
     }
 
     [Fact]
@@ -115,28 +115,28 @@ public class UserReleaseRoleServiceTests
             .Setup(m => m.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
             .ReturnsAsync([publication.Releases[0].Versions[0].Id]);
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         var service = BuildService(
-            userReleaseRoleRepository: userReleaseRoleRepository.Object,
+            userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
             releaseVersionRepository: releaseVersionRepository.Object
         );
         var latestActiveUserReleaseRoles = await service.ListLatestActiveUserReleaseRolesByPublication(publication.Id);
 
         Assert.Equal(3, userReleaseRoles.Count);
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository, releaseVersionRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository, releaseVersionRepository);
     }
 
     private static UserReleaseRoleService BuildService(
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null
     )
     {
         return new(
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict)
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict)
         );
     }
 }

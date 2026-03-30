@@ -14,7 +14,7 @@ public class ReleaseVersionRepository(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
 ) : IReleaseVersionRepository
 {
     public async Task<List<ReleaseVersion>> ListReleases(params ReleaseApprovalStatus[] releaseApprovalStatuses)
@@ -32,7 +32,7 @@ public class ReleaseVersionRepository(
         params ReleaseApprovalStatus[] releaseApprovalStatuses
     )
     {
-        var releaseRoleReleaseVersionIds = await userReleaseRoleRepository
+        var releaseRoleReleaseVersionIds = await userPrereleaseRoleRepository
             .Query()
             .WhereForUser(userId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)

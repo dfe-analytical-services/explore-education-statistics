@@ -16,7 +16,7 @@ public class UserResourceRoleNotificationService(
     IPreReleaseService preReleaseService,
     IUserRepository userRepository,
     IEmailTemplateService emailTemplateService,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     TimeProvider timeProvider
 ) : IUserResourceRoleNotificationService
@@ -30,7 +30,7 @@ public class UserResourceRoleNotificationService(
             throw new ArgumentException($"User with ID {userId} is already active and does not need notifying.");
         }
 
-        var userReleaseRoles = await userReleaseRoleRepository
+        var userReleaseRoles = await userPrereleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .WhereForUser(user.Id)
@@ -75,7 +75,7 @@ public class UserResourceRoleNotificationService(
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async userReleaseRole =>
-                        await userReleaseRoleRepository.MarkEmailAsSent(
+                        await userPrereleaseRoleRepository.MarkEmailAsSent(
                             userReleaseRoleId: userReleaseRole.Id,
                             dateSent: utcNow,
                             cancellationToken: cancellationToken
@@ -149,7 +149,7 @@ public class UserResourceRoleNotificationService(
             // would have sent an email for a role which has an unmarked `SentDate`.
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
-            await userReleaseRoleRepository.MarkEmailAsSent(
+            await userPrereleaseRoleRepository.MarkEmailAsSent(
                 userReleaseRoleId: userReleaseRoleId,
                 cancellationToken: cancellationToken
             );
@@ -229,7 +229,7 @@ public class UserResourceRoleNotificationService(
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async userReleaseRoleId =>
-                        await userReleaseRoleRepository.MarkEmailAsSent(
+                        await userPrereleaseRoleRepository.MarkEmailAsSent(
                             userReleaseRoleId: userReleaseRoleId,
                             cancellationToken: cancellationToken
                         ),
@@ -271,7 +271,7 @@ public class UserResourceRoleNotificationService(
             // would have sent an email for a role which has an unmarked `SentDate`.
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
-            await userReleaseRoleRepository.MarkEmailAsSent(
+            await userPrereleaseRoleRepository.MarkEmailAsSent(
                 userReleaseRoleId: userReleaseRoleId,
                 cancellationToken: cancellationToken
             );
@@ -321,7 +321,7 @@ public class UserResourceRoleNotificationService(
         // Using AsNoTracking causes PublishScheduled to be null.
         // Reordering to notify after SaveChanges would avoid this, but breaks
         // unit tests because the in-memory provider does not support transactions.
-        return await userReleaseRoleRepository
+        return await userPrereleaseRoleRepository
                 .Query(ResourceRoleFilter.AllButExpired)
                 .Include(urr => urr.User)
                 .Include(urr => urr.ReleaseVersion)
@@ -339,7 +339,7 @@ public class UserResourceRoleNotificationService(
         CancellationToken cancellationToken
     )
     {
-        var userReleaseRoles = await userReleaseRoleRepository
+        var userReleaseRoles = await userPrereleaseRoleRepository
             .Query(ResourceRoleFilter.AllButExpired)
             .AsNoTracking()
             .Where(urr => userReleaseRoleIds.Contains(urr.Id))

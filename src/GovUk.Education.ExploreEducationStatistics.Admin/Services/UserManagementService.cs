@@ -32,7 +32,7 @@ public class UserManagementService(
     IUserRoleService userRoleService,
     IUserRepository userRepository,
     IUserService userService,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserResourceRoleNotificationService userResourceRoleNotificationService,
     UserManager<ApplicationUser> userManager
@@ -198,7 +198,7 @@ public class UserManagementService(
                     .ToAsyncEnumerable()
                     .SelectAwait(async pendingUserInvite =>
                     {
-                        var userReleaseRoles = await userReleaseRoleRepository
+                        var userReleaseRoles = await userPrereleaseRoleRepository
                             .Query(ResourceRoleFilter.PendingOnly)
                             .WhereForUser(pendingUserInvite.UserId)
                             .Select(urr => new UserReleaseRoleViewModel
@@ -259,7 +259,7 @@ public class UserManagementService(
 
                 // Clear out any pre-existing Release Roles or Publication Roles prior to adding
                 // new ones.
-                await userReleaseRoleRepository.RemoveForUser(user.Id);
+                await userPrereleaseRoleRepository.RemoveForUser(user.Id);
                 await userPublicationRoleRepository.RemoveForUser(user.Id);
 
                 foreach (var userReleaseRole in request.UserReleaseRoles)
@@ -268,7 +268,7 @@ public class UserManagementService(
                         .ReleaseVersions.LatestReleaseVersion(releaseId: userReleaseRole.ReleaseId)
                         .SingleAsync();
 
-                    await userReleaseRoleRepository.Create(
+                    await userPrereleaseRoleRepository.Create(
                         userId: user.Id,
                         releaseVersionId: latestReleaseVersion!.Id,
                         role: userReleaseRole.ReleaseRole,
@@ -304,7 +304,7 @@ public class UserManagementService(
             {
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    await userReleaseRoleRepository.RemoveForUser(invitedUser.Id);
+                    await userPrereleaseRoleRepository.RemoveForUser(invitedUser.Id);
                     await userPublicationRoleRepository.RemoveForUser(invitedUser.Id);
 
                     await userRepository.SoftDeleteUser(invitedUser.Id, userService.GetUserId());
@@ -333,7 +333,7 @@ public class UserManagementService(
                 {
                     await userManager.DeleteAsync(identityUser);
 
-                    await userReleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
+                    await userPrereleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
                     await userPublicationRoleRepository.RemoveForUser(activeInternalUser.Id);
 
                     await userRepository.SoftDeleteUser(activeInternalUser.Id, userService.GetUserId());

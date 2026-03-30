@@ -168,7 +168,7 @@ public class ReleasePermissionServicePermissionTests
     {
         return new(
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
-            userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
+            userPrereleaseRoleRepository: Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict),
             userReleaseRoleService: Mock.Of<IUserReleaseRoleService>(MockBehavior.Strict),
             userService: userService
         );

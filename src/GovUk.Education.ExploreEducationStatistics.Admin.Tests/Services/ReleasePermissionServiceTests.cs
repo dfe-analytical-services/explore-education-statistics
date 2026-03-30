@@ -61,14 +61,14 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.ListReleaseRoles(releaseVersion.Id);
@@ -92,7 +92,7 @@ public class ReleasePermissionServiceTests
             Assert.Equal(userReleaseRoles[2].Role, viewModel[2].Role);
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     [Theory]
@@ -128,14 +128,14 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.ListReleaseRoles(releaseVersion.Id, rolesToInclude);
@@ -145,7 +145,7 @@ public class ReleasePermissionServiceTests
             Assert.All(expectedRoles, r => Assert.Contains(viewModel, urr => urr.Role == r.Role));
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     [Fact]
@@ -173,14 +173,14 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.ListReleaseRoles(releaseVersion.Id);
@@ -190,7 +190,7 @@ public class ReleasePermissionServiceTests
             Assert.Empty(viewModel);
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     [Fact]
@@ -230,14 +230,14 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.ListReleaseInvites(releaseVersion.Id);
@@ -254,7 +254,7 @@ public class ReleasePermissionServiceTests
             Assert.Equal(userReleaseRolesOrderedByEmail[1].Role, viewModel[1].Role);
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     [Fact]
@@ -285,14 +285,14 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.ListReleaseInvites(releaseVersion.Id, rolesToInclude: [Contributor]);
@@ -304,7 +304,7 @@ public class ReleasePermissionServiceTests
             Assert.Equal(userReleaseRoles[0].Role, viewModel[0].Role);
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     [Fact]
@@ -331,14 +331,14 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, []);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, []);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleasePermissionService(
                 contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.ListReleaseInvites(releaseVersion.Id);
@@ -347,7 +347,7 @@ public class ReleasePermissionServiceTests
             Assert.Empty(viewModel);
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     [Fact]
@@ -494,14 +494,14 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
         // The first role should be removed
-        userReleaseRoleRepository
+        userPrereleaseRoleRepository
             .Setup(m => m.RemoveMany(SetOf(userReleaseRoles[0].Id), default))
             .Returns(Task.CompletedTask);
         // The third role should be created
-        userReleaseRoleRepository
+        userPrereleaseRoleRepository
             .Setup(m =>
                 m.CreateManyIfNotExists(
                     It.Is<List<UserReleaseRole>>(l =>
@@ -531,7 +531,7 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.UpdateReleaseContributors(
@@ -541,7 +541,7 @@ public class ReleasePermissionServiceTests
             result.AssertRight();
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     [Fact]
@@ -633,9 +633,9 @@ public class ReleasePermissionServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
-        userReleaseRoleRepository
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+        userPrereleaseRoleRepository
             .Setup(m =>
                 m.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), It.IsAny<CancellationToken>())
             )
@@ -645,7 +645,7 @@ public class ReleasePermissionServiceTests
         {
             var service = SetupReleasePermissionService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var result = await service.RemoveAllUserContributorPermissionsForPublication(
@@ -656,13 +656,13 @@ public class ReleasePermissionServiceTests
             result.AssertRight();
         }
 
-        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
     }
 
     private static ReleasePermissionService SetupReleasePermissionService(
         ContentDbContext? contentDbContext = null,
         IUserService? userService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserReleaseRoleService? userReleaseRoleService = null
     )
     {
@@ -670,8 +670,8 @@ public class ReleasePermissionServiceTests
 
         return new(
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
-            userReleaseRoleRepository: userReleaseRoleRepository
-                ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
+            userPrereleaseRoleRepository: userPrereleaseRoleRepository
+                ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict),
             userReleaseRoleService: userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(MockBehavior.Strict),
             userService: userService ?? MockUtils.AlwaysTrueUserService(UserId).Object
         );

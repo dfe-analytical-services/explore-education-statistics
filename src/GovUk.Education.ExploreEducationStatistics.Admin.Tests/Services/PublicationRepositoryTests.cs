@@ -126,15 +126,15 @@ public abstract class PublicationRepositoryTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme1.Id);
@@ -164,7 +164,7 @@ public abstract class PublicationRepositoryTests
                 Assert.Empty(result[3].Methodologies);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -255,15 +255,15 @@ public abstract class PublicationRepositoryTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await service.ListPublicationsForUser(userId: user.Id);
@@ -282,7 +282,7 @@ public abstract class PublicationRepositoryTests
                 Assert.Equal(userReleaseRoles[1].ReleaseVersion.Release.Publication.ThemeId, result[3].Theme.Id);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -329,15 +329,15 @@ public abstract class PublicationRepositoryTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, userPublicationRole);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
@@ -345,7 +345,7 @@ public abstract class PublicationRepositoryTests
                 Assert.Empty(result);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -390,15 +390,15 @@ public abstract class PublicationRepositoryTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, userPublicationRole);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
@@ -406,7 +406,7 @@ public abstract class PublicationRepositoryTests
                 Assert.Empty(result);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -447,15 +447,15 @@ public abstract class PublicationRepositoryTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, userPublicationRole);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var publications = await service.ListPublicationsForUser(userId: user.Id, themeId: publication.ThemeId);
@@ -464,7 +464,7 @@ public abstract class PublicationRepositoryTests
                 Assert.Equal(publication.Id, resultPublication.Id);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -496,15 +496,15 @@ public abstract class PublicationRepositoryTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var publications = await service.ListPublicationsForUser(userId: user.Id, themeId: publication.ThemeId);
@@ -513,7 +513,7 @@ public abstract class PublicationRepositoryTests
                 Assert.Equal(publication.Id, resultPublication.Id);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -549,15 +549,15 @@ public abstract class PublicationRepositoryTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var publications = await service.ListPublicationsForUser(userId: user.Id, themeId: publication.ThemeId);
@@ -566,7 +566,7 @@ public abstract class PublicationRepositoryTests
                 Assert.Equal(publication.Id, resultPublication.Id);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
         }
     }
 
@@ -611,13 +611,13 @@ public abstract class PublicationRepositoryTests
     private static PublicationRepository BuildService(
         ContentDbContext? contentDbContext = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null
     )
     {
         return new(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict)
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict)
         );
     }
 }

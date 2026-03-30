@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserReleaseRoleService(
     IReleaseVersionRepository releaseVersionRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
 ) : IUserReleaseRoleService
 {
     public async Task<List<UserReleaseRole>> ListLatestActiveUserReleaseRolesByPublication(
@@ -23,7 +23,7 @@ public class UserReleaseRoleService(
 
         var releaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
 
-        return await userReleaseRoleRepository
+        return await userPrereleaseRoleRepository
             .Query()
             .Where(urr => releaseVersionIds.Contains(urr.ReleaseVersionId))
             .WhereRolesIn(rolesToCheck)
