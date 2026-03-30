@@ -49,7 +49,7 @@ public class ReleaseAmendmentServicePermissionTests
             userService,
             Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
             Mock.Of<StatisticsDbContext>(MockBehavior.Strict),
-            Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict)
+            Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict)
         );
     }
 }

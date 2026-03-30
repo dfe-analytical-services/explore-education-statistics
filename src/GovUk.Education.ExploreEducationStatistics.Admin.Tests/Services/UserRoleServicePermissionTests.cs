@@ -193,8 +193,8 @@ public class UserRoleServicePermissionTests
             .WithUser(_dataFixture.DefaultUser())
             .WithRole(Contributor);
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
@@ -205,12 +205,12 @@ public class UserRoleServicePermissionTests
             {
                 var service = SetupUserRoleService(
                     userService: userService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
-                MockUtils.VerifyAllMocks(userService, userReleaseRoleRepository);
+                MockUtils.VerifyAllMocks(userService, userPrereleaseRoleRepository);
 
                 return result;
             });
@@ -236,7 +236,7 @@ public class UserRoleServicePermissionTests
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserRepository? userRepository = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null
@@ -254,7 +254,7 @@ public class UserRoleServicePermissionTests
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict),
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             userManager ?? MockUserManager().Object
         );
