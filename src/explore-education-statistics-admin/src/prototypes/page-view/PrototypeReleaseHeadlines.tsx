@@ -1,5 +1,4 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
@@ -19,7 +18,6 @@ interface Props {
 }
 
 const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
-  const { editingMode } = useEditingContext();
   const actions = useReleaseContentActions();
 
   const getChartFile = useGetChartFile(release.id);
@@ -40,7 +38,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
   const headlinesTab = (
     <TabsSection title="Summary">
       <section id="releaseHeadlines-keyStatistics">
-        <KeyStatistics release={release} isEditing={editingMode === 'edit'} />
+        <KeyStatistics release={release} isEditing />
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
@@ -62,14 +60,13 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
           )}
         />
 
-        {editingMode === 'edit' &&
-          release.headlinesSection.content?.length === 0 && (
-            <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-              <Button variant="secondary" onClick={addBlock}>
-                Add a headlines text block
-              </Button>
-            </div>
-          )}
+        {release.headlinesSection.content?.length === 0 && (
+          <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+            <Button variant="secondary" onClick={addBlock}>
+              Add a headlines text block
+            </Button>
+          </div>
+        )}
       </section>
     </TabsSection>
   );
