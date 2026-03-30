@@ -25,7 +25,7 @@ public class ReleaseInviteService(
     IUserRepository userRepository,
     IUserService userService,
     IUserRoleService userRoleService,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserResourceRoleNotificationService userResourceRoleNotificationService
 ) : IReleaseInviteService
 {
@@ -64,7 +64,7 @@ public class ReleaseInviteService(
             .OnSuccess(async tuple =>
             {
                 var releaseRoleIdsToRemove = (
-                    await userReleaseRoleRepository
+                    await userPrereleaseRoleRepository
                         .Query(ResourceRoleFilter.PendingOnly)
                         .WhereForUser(tuple.User.Id)
                         .WhereForPublication(publicationId)
@@ -73,7 +73,7 @@ public class ReleaseInviteService(
                         .ToListAsync()
                 ).ToHashSet();
 
-                await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove);
+                await userPrereleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove);
 
                 return Unit.Instance;
             });
@@ -104,7 +104,7 @@ public class ReleaseInviteService(
                 })
                 .ToList();
 
-            var createdUserReleaseRoles = await userReleaseRoleRepository.CreateManyIfNotExists(userReleaseRoles);
+            var createdUserReleaseRoles = await userPrereleaseRoleRepository.CreateManyIfNotExists(userReleaseRoles);
 
             if (!createdUserReleaseRoles.Any())
             {

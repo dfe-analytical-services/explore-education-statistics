@@ -37,7 +37,7 @@ public class ReleaseApprovalService(
     IReleaseFileService releaseFileService,
     IOptions<ReleaseApprovalOptions> options,
     IUserReleaseRoleService userReleaseRoleService,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IEmailTemplateService emailTemplateService
 ) : IReleaseApprovalService
@@ -195,7 +195,7 @@ public class ReleaseApprovalService(
 
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
-        var unsentUserReleaseRoleInvites = await userReleaseRoleRepository
+        var unsentUserReleaseRoleInvites = await userPrereleaseRoleRepository
             .Query(ResourceRoleFilter.AllButExpired)
             .AsNoTracking()
             .WhereForReleaseVersion(releaseVersion.Id)

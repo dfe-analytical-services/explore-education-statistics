@@ -3543,13 +3543,13 @@ public class PublicationServiceTests
 
     private static PublicationRepository CreatePublicationRepository(ContentDbContext context)
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
+        var (userPublicationRoleRepository, userPrereleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
             context
         );
 
         return new PublicationRepository(
             context: context,
-            userReleaseRoleRepository: userReleaseRoleRepository,
+            userPrereleaseRoleRepository: userPrereleaseRoleRepository,
             userPublicationRoleRepository: userPublicationRoleRepository
         );
     }

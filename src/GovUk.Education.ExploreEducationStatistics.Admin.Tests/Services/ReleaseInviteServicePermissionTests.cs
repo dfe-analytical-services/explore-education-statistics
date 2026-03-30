@@ -126,9 +126,9 @@ public class ReleaseInviteServicePermissionTest
             .Setup(m => m.FindPendingUserInviteByEmail(user.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
-        userReleaseRoleRepository
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
+        userPrereleaseRoleRepository
             .Setup(m => m.RemoveMany(userReleaseRoleIds, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
@@ -136,7 +136,7 @@ public class ReleaseInviteServicePermissionTest
         {
             var service = SetupReleaseInviteService(
                 contentDbContext: contentDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                 userRepository: userRepository.Object
             );
 
@@ -149,7 +149,7 @@ public class ReleaseInviteServicePermissionTest
             result.AssertRight();
         }
 
-        VerifyAllMocks(userReleaseRoleRepository, userRepository);
+        VerifyAllMocks(userPrereleaseRoleRepository, userRepository);
     }
 
     private static ReleaseInviteService SetupReleaseInviteService(
@@ -159,7 +159,7 @@ public class ReleaseInviteServicePermissionTest
         IUserRepository? userRepository = null,
         IUserService? userService = null,
         IUserRoleService? userRoleService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null
     )
     {
@@ -172,7 +172,7 @@ public class ReleaseInviteServicePermissionTest
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService().Object,
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict)
         );
     }

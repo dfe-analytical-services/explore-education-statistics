@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserReleaseRoleRepository(
+public class UserPrereleaseRoleRepository(
     ContentDbContext contentDbContext,
     INewPermissionsSystemHelper newPermissionsSystemHelper,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     UserReleaseRoleQueryRepository userReleaseRoleQueryRepository,
     IUserRepository userRepository
-) : IUserReleaseRoleRepository
+) : IUserPrereleaseRoleRepository
 {
     // This method will remain but be amended slightly in EES-6196, when we no longer have to cater for
     // the old roles.

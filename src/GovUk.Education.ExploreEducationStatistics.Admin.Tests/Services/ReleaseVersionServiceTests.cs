@@ -841,8 +841,8 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             var updatedType = EnumUtil
                 .GetEnums<ReleaseType>()
@@ -854,7 +854,7 @@ public abstract class ReleaseVersionServiceTests
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
                     dataSetVersionService: dataSetVersionService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.UpdateReleaseVersion(
@@ -869,7 +869,7 @@ public abstract class ReleaseVersionServiceTests
                     }
                 );
 
-                VerifyAllMocks(dataSetVersionService, userReleaseRoleRepository);
+                VerifyAllMocks(dataSetVersionService, userPrereleaseRoleRepository);
 
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
                     expectedOrganisationIds: null,
@@ -1007,15 +1007,15 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
                     dataSetVersionService: dataSetVersionService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.UpdateReleaseVersion(
@@ -1044,7 +1044,7 @@ public abstract class ReleaseVersionServiceTests
                 );
             }
 
-            VerifyAllMocks(userReleaseRoleRepository, dataSetVersionService);
+            VerifyAllMocks(userPrereleaseRoleRepository, dataSetVersionService);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1098,15 +1098,15 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
                     dataSetVersionService: dataSetVersionService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.UpdateReleaseVersion(
@@ -1135,7 +1135,7 @@ public abstract class ReleaseVersionServiceTests
                 );
             }
 
-            VerifyAllMocks(dataSetVersionService, userReleaseRoleRepository);
+            VerifyAllMocks(dataSetVersionService, userPrereleaseRoleRepository);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1195,15 +1195,15 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
                     dataSetVersionService: dataSetVersionService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.UpdateReleaseVersion(
@@ -1227,7 +1227,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Empty(viewModel.PublishingOrganisations);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository, dataSetVersionService);
+            VerifyAllMocks(userPrereleaseRoleRepository, dataSetVersionService);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1318,14 +1318,14 @@ public abstract class ReleaseVersionServiceTests
 
             var dataSetVersionService = new DataSetVersionServiceMockBuilder();
             var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             var sut = BuildService(
                 context,
                 dataSetVersionService: dataSetVersionService.Build(),
                 releaseSlugValidator: releaseSlugValidator.Build(),
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
             );
 
             var newLabel = "initial";
@@ -1354,7 +1354,7 @@ public abstract class ReleaseVersionServiceTests
                 expectedReleaseId: release.Id
             );
 
-            VerifyAllMocks(userReleaseRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository);
         }
     }
 
@@ -1400,14 +1400,14 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, nonPreReleaseUserRole);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, nonPreReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.GetRelease(releaseVersion.Id);
@@ -1454,7 +1454,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.False(viewModel.PreReleaseUsersOrInvitesAdded);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -1477,14 +1477,14 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.GetRelease(preReleaseUserRole.ReleaseVersionId);
@@ -1493,7 +1493,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -1516,14 +1516,14 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.GetRelease(preReleaseUserRole.ReleaseVersionId);
@@ -1532,7 +1532,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -1552,14 +1552,14 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
                 var result = await releaseVersionService.GetRelease(notLatestReleaseVersion.Id);
 
@@ -1569,7 +1569,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.False(viewModel.LatestRelease);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository);
         }
 
         [Fact]
@@ -1586,14 +1586,14 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseVersionService = BuildService(
                     context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 var result = await releaseVersionService.GetRelease(publication.Releases[0].Versions[0].Id);
@@ -1602,7 +1602,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Null(releaseViewModel.LatestInternalReleaseNote);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository);
         }
     }
 
@@ -1808,7 +1808,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
 
             var forceDeleteRelatedData = false;
 
@@ -1846,8 +1846,8 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(Unit.Instance);
 
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
-            userReleaseRoleRepository
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
+            userPrereleaseRoleRepository
                 .Setup(mock => mock.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), default))
                 .Returns(Task.CompletedTask);
 
@@ -1863,7 +1863,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 // Act
@@ -1893,7 +1893,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService,
                     dataSetUploadRepository,
                     processorClient,
-                    userReleaseRoleRepository
+                    userPrereleaseRoleRepository
                 );
 
                 result.AssertRight();
@@ -2162,7 +2162,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
 
             var forceDeleteRelatedData = true;
 
@@ -2204,8 +2204,8 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(Unit.Instance);
 
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
-            userReleaseRoleRepository
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
+            userPrereleaseRoleRepository
                 .Setup(mock => mock.RemoveMany(SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id), default))
                 .Returns(Task.CompletedTask);
 
@@ -2222,7 +2222,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 // Act
@@ -2250,7 +2250,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService,
                     processorClient,
                     releasePublishingStatusRepository,
-                    userReleaseRoleRepository
+                    userPrereleaseRoleRepository
                 );
 
                 result.AssertRight();
@@ -2806,8 +2806,8 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(
                 ResourceRoleFilter.ActiveOnly,
                 [
                     .. contributorReleaseRolesForUser,
@@ -2824,7 +2824,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var service = BuildService(
                     context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
@@ -2845,7 +2845,7 @@ public abstract class ReleaseVersionServiceTests
                 );
             }
 
-            VerifyAllMocks(userReleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository, userPublicationRoleRepository);
         }
 
         [Fact]
@@ -2944,14 +2944,14 @@ public abstract class ReleaseVersionServiceTests
                 ]
             );
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
@@ -2966,7 +2966,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion2WithApproverRoleForUser.Id, viewModels[1].Id);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository, userPublicationRoleRepository);
         }
 
         [Fact]
@@ -3008,8 +3008,8 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. approverReleaseRolesForUser]);
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. approverReleaseRolesForUser]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(
@@ -3022,7 +3022,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var service = BuildService(
                     context,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
@@ -3036,7 +3036,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(publication.ReleaseVersions[0].Id, viewModels[0].Id);
             }
 
-            VerifyAllMocks(userReleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository, userPublicationRoleRepository);
         }
     }
 
@@ -3057,7 +3057,7 @@ public abstract class ReleaseVersionServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
         ILogger<ReleaseVersionService>? logger = null
@@ -3090,7 +3090,7 @@ public abstract class ReleaseVersionServiceTests
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
             _organisationsValidator.Build(),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             releaseSlugValidator ?? new ReleaseSlugValidatorMockBuilder().Build(),
             logger ?? Mock.Of<ILogger<ReleaseVersionService>>(Strict)

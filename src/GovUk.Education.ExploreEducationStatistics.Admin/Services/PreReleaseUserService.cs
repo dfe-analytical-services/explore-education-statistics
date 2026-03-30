@@ -26,7 +26,7 @@ public class PreReleaseUserService(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserService userService,
     IUserRepository userRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
 ) : IPreReleaseUserService
 {
     public async Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
@@ -37,7 +37,7 @@ public class PreReleaseUserService(
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
                 (
-                    await userReleaseRoleRepository
+                    await userPrereleaseRoleRepository
                         .Query(ResourceRoleFilter.All)
                         .WhereForReleaseVersion(releaseVersionId)
                         .WhereRolesIn(ReleaseRole.PrereleaseViewer)
@@ -75,7 +75,7 @@ public class PreReleaseUserService(
                             return;
                         }
 
-                        var userHasPreReleaseRole = await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(
+                        var userHasPreReleaseRole = await userPrereleaseRoleRepository.UserHasRoleOnReleaseVersion(
                             userId: existingUser.Id,
                             releaseVersionId: releaseVersionId,
                             role: ReleaseRole.PrereleaseViewer,
@@ -138,7 +138,7 @@ public class PreReleaseUserService(
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async () => await FindUserByEmail(email))
             .OnSuccess(async user =>
-                await userReleaseRoleRepository.RemoveByCompositeKey(
+                await userPrereleaseRoleRepository.RemoveByCompositeKey(
                     userId: user.Id,
                     releaseVersionId: releaseVersionId,
                     role: ReleaseRole.PrereleaseViewer
@@ -161,7 +161,7 @@ public class PreReleaseUserService(
                     createdById: userService.GetUserId()
                 );
 
-            var createdUserReleaseRole = await userReleaseRoleRepository.Create(
+            var createdUserReleaseRole = await userPrereleaseRoleRepository.Create(
                 userId: user.Id,
                 releaseVersionId: releaseVersion.Id,
                 role: ReleaseRole.PrereleaseViewer,

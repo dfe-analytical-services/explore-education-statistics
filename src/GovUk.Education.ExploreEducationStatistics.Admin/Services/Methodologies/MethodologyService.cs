@@ -41,7 +41,7 @@ public class MethodologyService(
     IRedirectsCacheService redirectsCacheService,
     IUserService userService,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
 ) : IMethodologyService
 {
     public async Task<Either<ActionResult, Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
@@ -529,7 +529,7 @@ public class MethodologyService(
             .Select(role => role.PublicationId)
             .ToListAsync();
 
-        var indirectPublicationsWithApprovalRole = await userReleaseRoleRepository
+        var indirectPublicationsWithApprovalRole = await userPrereleaseRoleRepository
             .Query()
             .WhereForUser(userId)
             .WhereRolesIn(ReleaseRole.Approver)

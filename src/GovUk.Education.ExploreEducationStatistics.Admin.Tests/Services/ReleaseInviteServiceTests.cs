@@ -68,8 +68,8 @@ public abstract class ReleaseInviteServiceTests
                 .GenerateList(2);
             var createdUserReleaseRoleIds = createdUserReleaseRoles.Select(urr => urr.Id).ToHashSet();
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
                         // Assert that all 3 UserReleaseRoles are attempted to be created
@@ -119,7 +119,7 @@ public abstract class ReleaseInviteServiceTests
                 var service = SetupReleaseInviteService(
                     contentDbContext: contentDbContext,
                     userRepository: userRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     releaseVersionRepository: releaseVersionRepository.Object,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object
                 );
@@ -134,7 +134,7 @@ public abstract class ReleaseInviteServiceTests
             }
 
             VerifyAllMocks(
-                userReleaseRoleRepository,
+                userPrereleaseRoleRepository,
                 userRepository,
                 releaseVersionRepository,
                 userResourceRoleNotificationService
@@ -177,8 +177,8 @@ public abstract class ReleaseInviteServiceTests
                 .GenerateList(2);
             var createdUserReleaseRoleIds = createdUserReleaseRoles.Select(urr => urr.Id).ToHashSet();
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
                         // Assert that all 3 UserReleaseRoles are attempted to be created
@@ -232,7 +232,7 @@ public abstract class ReleaseInviteServiceTests
                     contentDbContext: contentDbContext,
                     userRoleService: userRoleService.Object,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     releaseVersionRepository: releaseVersionRepository.Object,
                     userRepository: userRepository.Object
                 );
@@ -249,7 +249,7 @@ public abstract class ReleaseInviteServiceTests
             VerifyAllMocks(
                 userRoleService,
                 userResourceRoleNotificationService,
-                userReleaseRoleRepository,
+                userPrereleaseRoleRepository,
                 releaseVersionRepository,
                 userRepository
             );
@@ -275,8 +275,8 @@ public abstract class ReleaseInviteServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
                         It.Is<List<UserReleaseRole>>(l =>
@@ -311,7 +311,7 @@ public abstract class ReleaseInviteServiceTests
             {
                 var service = SetupReleaseInviteService(
                     contentDbContext: contentDbContext,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     releaseVersionRepository: releaseVersionRepository.Object,
                     userRepository: userRepository.Object
                 );
@@ -325,7 +325,7 @@ public abstract class ReleaseInviteServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userReleaseRoleRepository, releaseVersionRepository, userRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository, releaseVersionRepository, userRepository);
         }
 
         [Fact]
@@ -375,8 +375,8 @@ public abstract class ReleaseInviteServiceTests
                 .WithUser(userToCreate)
                 .WithReleaseVersion(releaseVersion);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
                         It.Is<List<UserReleaseRole>>(l =>
@@ -410,7 +410,7 @@ public abstract class ReleaseInviteServiceTests
                     releaseVersionRepository: releaseVersionRepository.Object,
                     userRepository: userRepository.Object,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
@@ -426,7 +426,7 @@ public abstract class ReleaseInviteServiceTests
                 userResourceRoleNotificationService,
                 releaseVersionRepository,
                 userRepository,
-                userReleaseRoleRepository
+                userPrereleaseRoleRepository
             );
         }
 
@@ -455,8 +455,8 @@ public abstract class ReleaseInviteServiceTests
                 .WithUser(user)
                 .WithReleaseVersion(releaseVersion);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
                         It.Is<List<UserReleaseRole>>(l =>
@@ -500,7 +500,7 @@ public abstract class ReleaseInviteServiceTests
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
                     releaseVersionRepository: releaseVersionRepository.Object,
                     userRepository: userRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
                 await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
@@ -515,7 +515,7 @@ public abstract class ReleaseInviteServiceTests
                     userResourceRoleNotificationService,
                     releaseVersionRepository,
                     userRepository,
-                    userReleaseRoleRepository
+                    userPrereleaseRoleRepository
                 );
             }
         }
@@ -633,9 +633,9 @@ public abstract class ReleaseInviteServiceTests
                 )
                 .ReturnsAsync(userWithPendingInvite);
 
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
-            userReleaseRoleRepository
+            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
+            userPrereleaseRoleRepository
                 .Setup(mock =>
                     mock.RemoveMany(
                         SetOf(userReleaseRoles[0].Id, userReleaseRoles[1].Id, userReleaseRoles[2].Id),
@@ -648,7 +648,7 @@ public abstract class ReleaseInviteServiceTests
             {
                 var service = SetupReleaseInviteService(
                     contentDbContext: contentDbContext,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -661,7 +661,7 @@ public abstract class ReleaseInviteServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userReleaseRoleRepository, userRepository);
+            VerifyAllMocks(userPrereleaseRoleRepository, userRepository);
         }
 
         [Fact]
@@ -686,7 +686,7 @@ public abstract class ReleaseInviteServiceTests
         IUserRepository? userRepository = null,
         IUserService? userService = null,
         IUserRoleService? userRoleService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null
     )
     {
@@ -699,7 +699,7 @@ public abstract class ReleaseInviteServiceTests
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict)
         );
     }

@@ -356,15 +356,15 @@ public class ThemeServiceTests
         userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanManageAllTaxonomy)).ReturnsAsync(false);
         userService.Setup(s => s.GetUserId()).Returns(user.Id);
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
         userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
         var service = SetupThemeService(
             userService: userService.Object,
-            userReleaseRoleRepository: userReleaseRoleRepository.Object,
+            userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
             userPublicationRoleRepository: userPublicationRoleRepository.Object
         );
 
@@ -386,7 +386,7 @@ public class ThemeServiceTests
         Assert.Equal(publication3.Theme.Title, themes[2].Title);
         Assert.Equal(publication3.Theme.Summary, themes[2].Summary);
 
-        VerifyAllMocks(userService, userReleaseRoleRepository, userPublicationRoleRepository);
+        VerifyAllMocks(userService, userPrereleaseRoleRepository, userPublicationRoleRepository);
     }
 
     [Fact]
@@ -1142,7 +1142,7 @@ public class ThemeServiceTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IPublicationCacheService? publicationCacheService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         bool enableThemeDeletion = true
     )
@@ -1171,7 +1171,7 @@ public class ThemeServiceTests
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             publicationCacheService ?? new PublicationCacheServiceMockBuilder().Build(),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             NullLogger<ThemeService>.Instance
         );

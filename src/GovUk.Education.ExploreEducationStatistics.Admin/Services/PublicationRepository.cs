@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class PublicationRepository(
     ContentDbContext context,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
 ) : Content.Model.Repository.PublicationRepository(context), IPublicationRepository
 {
     public IQueryable<Publication> QueryPublicationsForTheme(Guid? themeId = null)
@@ -41,7 +41,7 @@ public class PublicationRepository(
             .WhereForUser(userId)
             .WhereRolesIn([PublicationRole.Owner, PublicationRole.Allower]);
 
-        var publicationIdsFromReleaseRolesQueryable = userReleaseRoleRepository
+        var publicationIdsFromReleaseRolesQueryable = userPrereleaseRoleRepository
             .Query()
             .WhereForUser(userId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer);

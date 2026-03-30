@@ -58,7 +58,7 @@ public class ReleaseVersionService(
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     ILogger<ReleaseVersionService> logger
@@ -75,7 +75,7 @@ public class ReleaseVersionService(
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
-                var prereleaseRolesAdded = await userReleaseRoleRepository
+                var prereleaseRolesAdded = await userPrereleaseRoleRepository
                     .Query(ResourceRoleFilter.AllButExpired)
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
@@ -281,14 +281,14 @@ public class ReleaseVersionService(
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
         var releaseRoleIdsToRemove = (
-            await userReleaseRoleRepository
+            await userPrereleaseRoleRepository
                 .Query(ResourceRoleFilter.All)
                 .WhereForReleaseVersion(releaseVersion.Id)
                 .Select(urr => urr.Id)
                 .ToListAsync(cancellationToken)
         ).ToHashSet();
 
-        await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove, cancellationToken);
+        await userPrereleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove, cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -530,7 +530,7 @@ public class ReleaseVersionService(
     {
         var userId = userService.GetUserId();
 
-        var directReleaseVersionsWithApprovalRole = await userReleaseRoleRepository
+        var directReleaseVersionsWithApprovalRole = await userPrereleaseRoleRepository
             .Query()
             .WhereForUser(userId)
             .WhereRolesIn(ReleaseRole.Approver)

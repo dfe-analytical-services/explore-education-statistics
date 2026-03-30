@@ -24,7 +24,7 @@ public class ReleaseAmendmentService(
     IUserService userService,
     IFootnoteRepository footnoteRepository,
     StatisticsDbContext statisticsDbContext,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
 ) : IReleaseAmendmentService
 {
     public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
@@ -512,7 +512,7 @@ public class ReleaseAmendmentService(
     )
     {
         // Copy all current roles apart from Prerelease Users to the Release amendment.
-        var newRoles = await userReleaseRoleRepository
+        var newRoles = await userPrereleaseRoleRepository
             .Query()
             .WhereForReleaseVersion(originalReleaseId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)

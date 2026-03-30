@@ -256,7 +256,7 @@ public class MethodologyServicePermissionTests
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null,
         IUserService? userService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
@@ -272,7 +272,7 @@ public class MethodologyServicePermissionTests
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             userService ?? Mock.Of<IUserService>(),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict)
+            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict)
         );
     }
 

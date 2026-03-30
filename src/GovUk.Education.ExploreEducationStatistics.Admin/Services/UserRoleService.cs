@@ -32,7 +32,7 @@ public class UserRoleService(
     IUserService userService,
     IReleaseVersionRepository releaseVersionRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserRepository userRepository,
     UserManager<ApplicationUser> identityUserManager
 ) : IUserRoleService
@@ -115,7 +115,7 @@ public class UserRoleService(
 
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    var createdUserReleaseRole = await userReleaseRoleRepository.Create(
+                    var createdUserReleaseRole = await userPrereleaseRoleRepository.Create(
                         userId: userId,
                         releaseVersionId: releaseVersion!.Id,
                         role,
@@ -203,7 +203,7 @@ public class UserRoleService(
 
     private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
     {
-        var releaseRoles = await userReleaseRoleRepository
+        var releaseRoles = await userPrereleaseRoleRepository
             .Query()
             .WhereForUser(Guid.Parse(user.Id))
             .Select(urr => urr.Role)
@@ -391,7 +391,7 @@ public class UserRoleService(
             .OnSuccess(_ => FindActiveUser(userId))
             .OnSuccess(async () =>
             {
-                var allReleaseRoles = await userReleaseRoleRepository
+                var allReleaseRoles = await userPrereleaseRoleRepository
                     .Query()
                     .AsNoTracking()
                     .WhereForUser(userId)
@@ -457,7 +457,7 @@ public class UserRoleService(
             )
             .OnSuccessDo(async userReleaseRole =>
             {
-                var removed = await userReleaseRoleRepository.RemoveById(userReleaseRole.Id);
+                var removed = await userPrereleaseRoleRepository.RemoveById(userReleaseRole.Id);
 
                 if (!removed)
                 {
@@ -485,7 +485,7 @@ public class UserRoleService(
                 return await FindActiveUser(userId)
                     .OnSuccess(async _ =>
                     {
-                        await userReleaseRoleRepository.RemoveForUser(userId);
+                        await userPrereleaseRoleRepository.RemoveForUser(userId);
                         await userPublicationRoleRepository.RemoveForUser(userId);
 
                         await usersAndRolesPersistenceHelper
@@ -523,7 +523,7 @@ public class UserRoleService(
         ReleaseRole role
     )
     {
-        if (await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(userId, releaseVersionId, role))
+        if (await userPrereleaseRoleRepository.UserHasRoleOnReleaseVersion(userId, releaseVersionId, role))
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
         }
@@ -539,7 +539,7 @@ public class UserRoleService(
         ?? new Either<ActionResult, UserPublicationRole>(new NotFoundResult());
 
     private async Task<Either<ActionResult, UserReleaseRole>> FindUserReleaseRole(Guid userReleaseRoleId) =>
-        await userReleaseRoleRepository
+        await userPrereleaseRoleRepository
             .Query(ResourceRoleFilter.All)
             .Where(urr => urr.Id == userReleaseRoleId)
             .Include(userReleaseRole => userReleaseRole.ReleaseVersion)

@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReleasePermissionService(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserReleaseRoleService userReleaseRoleService,
     IUserService userService
 ) : IReleasePermissionService
@@ -34,7 +34,7 @@ public class ReleasePermissionService(
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
                 (
-                    await userReleaseRoleRepository
+                    await userPrereleaseRoleRepository
                         .Query()
                         .AsNoTracking()
                         .WhereForReleaseVersion(releaseVersionId)
@@ -64,7 +64,7 @@ public class ReleasePermissionService(
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
                 (
-                    await userReleaseRoleRepository
+                    await userPrereleaseRoleRepository
                         .Query(ResourceRoleFilter.PendingOnly)
                         .WhereForReleaseVersion(releaseVersionId)
                         .WhereRolesIn(rolesToCheck)
@@ -122,7 +122,7 @@ public class ReleasePermissionService(
             )
             .OnSuccessVoid(async releaseVersion =>
             {
-                var releaseContributorReleaseRoleIdsByUserId = await userReleaseRoleRepository
+                var releaseContributorReleaseRoleIdsByUserId = await userPrereleaseRoleRepository
                     .Query()
                     .WhereForReleaseVersion(releaseVersion.Id)
                     .WhereRolesIn(ReleaseRole.Contributor)
@@ -137,7 +137,7 @@ public class ReleasePermissionService(
                     .Where(userId => !releaseContributorReleaseRoleIdsByUserId.ContainsKey(userId))
                     .ToList();
 
-                await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToBeRemoved);
+                await userPrereleaseRoleRepository.RemoveMany(releaseRoleIdsToBeRemoved);
 
                 var newUserReleaseRoles = usersToBeAdded
                     .Select(userId => new UserReleaseRole
@@ -150,7 +150,7 @@ public class ReleasePermissionService(
                     })
                     .ToList();
 
-                await userReleaseRoleRepository.CreateManyIfNotExists(newUserReleaseRoles);
+                await userPrereleaseRoleRepository.CreateManyIfNotExists(newUserReleaseRoles);
             });
     }
 
@@ -166,7 +166,7 @@ public class ReleasePermissionService(
             .OnSuccessVoid(async publication =>
             {
                 var releaseRoleIdsToRemove = (
-                    await userReleaseRoleRepository
+                    await userPrereleaseRoleRepository
                         .Query()
                         .WhereForUser(userId)
                         .WhereForPublication(publicationId)
@@ -175,7 +175,7 @@ public class ReleasePermissionService(
                         .ToListAsync()
                 ).ToHashSet();
 
-                await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove);
+                await userPrereleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove);
             });
     }
 }

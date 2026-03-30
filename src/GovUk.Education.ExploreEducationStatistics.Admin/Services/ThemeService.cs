@@ -35,7 +35,7 @@ public class ThemeService(
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
     IPublicationCacheService publicationCacheService,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     ILogger<ThemeService> logger
 ) : IThemeService
@@ -310,7 +310,7 @@ public class ThemeService(
     {
         var userId = userService.GetUserId();
 
-        return await userReleaseRoleRepository
+        return await userPrereleaseRoleRepository
             .Query()
             .AsNoTracking()
             .WhereForUser(userId)

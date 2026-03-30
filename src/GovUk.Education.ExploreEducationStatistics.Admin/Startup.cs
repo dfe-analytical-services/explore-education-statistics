@@ -487,7 +487,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<UserReleaseRoleQueryRepository>();
         services.AddTransient<INewPermissionsSystemHelper, NewPermissionsSystemHelper>();
         services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
-        services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
+        services.AddTransient<IUserPrereleaseRoleRepository, UserPrereleaseRoleRepository>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
