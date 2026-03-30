@@ -15,7 +15,7 @@ import {
 } from '@common/services/publicationService';
 import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import Link from '@frontend/components/Link';
-import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistics/components/PublicationReleaseHeadlinesSectionRedesign';
+import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistics/components/PublicationReleaseHeadlinesSection';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';

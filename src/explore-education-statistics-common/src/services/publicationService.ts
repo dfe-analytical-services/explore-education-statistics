@@ -171,6 +171,8 @@ export interface PublicationListRequest {
   themeId?: string;
 }
 
+// This interface is no longer used for the FE release pages but is
+// still used elsewhere, e.g. table tool, and in admin.
 export interface ReleaseVersion<
   ContentBlockType extends ContentBlock = ContentBlock,
   DataBlockType extends DataBlock = DataBlock,
@@ -203,7 +205,7 @@ export interface ReleaseVersion<
   yearTitle: string;
 }
 
-// Used for the redesigned release pages
+// Used for the release pages
 export interface ReleaseVersionSummary {
   coverageTitle: string;
   id: string;
@@ -419,24 +421,36 @@ const publicationService = {
   listReleases(publicationSlug: string): Promise<ReleaseSummary[]> {
     return contentApi.get(`/publications/${publicationSlug}/releases`);
   },
-  getLatestPublicationRelease(
-    publicationSlug: string,
-  ): Promise<ReleaseVersion> {
-    return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
-  },
-  getLatestPublicationReleaseSummary(
-    publicationSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/latest/summary`,
-    );
-  },
+  // Currently used within table tool
   getPublicationRelease(
     publicationSlug: string,
     releaseSlug: string,
   ): Promise<ReleaseVersion> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}`,
+    );
+  },
+  // Currently used within table tool
+  getLatestPublicationRelease(
+    publicationSlug: string,
+  ): Promise<ReleaseVersion> {
+    return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
+  },
+  // Currently used within table tool
+  getPublicationReleaseSummary(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<PublicationReleaseSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
+    );
+  },
+  // Currently used within table tool
+  getLatestPublicationReleaseSummary(
+    publicationSlug: string,
+  ): Promise<PublicationReleaseSummary> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/latest/summary`,
     );
   },
   getReleaseVersionSummary(
@@ -478,14 +492,6 @@ const publicationService = {
     return contentApi.get(`/publications/${publicationSlug}/release-entries`, {
       params,
     });
-  },
-  getPublicationReleaseSummary(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
-    );
   },
   getPublicationMethodologies(
     publicationSlug: string,

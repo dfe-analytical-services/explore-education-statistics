@@ -1,34 +1,34 @@
-import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import DataBlockTabs from '@frontend/modules/find-statistics/components/DataBlockTabs';
 import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
+import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
-import { ReleaseVersion } from '@common/services/publicationService';
+import { ReleaseVersionHomeContent } from '@common/services/publicationService';
+import DataBlockTabs from '@frontend/modules/find-statistics/components/DataBlockTabs';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import orderBy from 'lodash/orderBy';
 import React from 'react';
 
-interface Props {
-  releaseVersion: ReleaseVersion;
-}
-
 const PublicationReleaseHeadlinesSection = ({
-  releaseVersion: {
-    id: releaseVersionId,
-    keyStatisticsSecondarySection,
-    keyStatistics,
-    headlinesSection,
-  },
-}: Props) => {
+  headlinesSection,
+  keyStatisticsSecondarySection,
+  keyStatistics,
+  releaseVersionId,
+}: Pick<
+  ReleaseVersionHomeContent,
+  'headlinesSection' | 'keyStatistics' | 'keyStatisticsSecondarySection'
+> & {
+  releaseVersionId: string;
+}) => {
   const getReleaseFile = useGetReleaseFile(releaseVersionId);
 
+  const secondaryKeyStatsDataBlock = keyStatisticsSecondarySection.content[0];
+
   const summaryTab = (
-    <TabsSection title="Summary" id="releaseHeadlines-summary">
+    <>
       <KeyStatContainer>
         {keyStatistics?.map(keyStat => {
           if (keyStat.type === 'KeyStatisticDataBlock') {
@@ -40,6 +40,7 @@ const PublicationReleaseHeadlinesSection = ({
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
                 guidanceText={keyStat.guidanceText}
+                isRedesignStyle
               />
             );
           }
@@ -52,12 +53,13 @@ const PublicationReleaseHeadlinesSection = ({
               trend={keyStat.trend}
               guidanceTitle={keyStat.guidanceTitle}
               guidanceText={keyStat.guidanceText}
+              isRedesignStyle
             />
           );
         })}
       </KeyStatContainer>
 
-      {orderBy(headlinesSection.content, 'order').map(block => (
+      {headlinesSection.content.map(block => (
         <ContentBlockRenderer
           key={block.id}
           block={block}
@@ -71,22 +73,37 @@ const PublicationReleaseHeadlinesSection = ({
           }
         />
       ))}
-    </TabsSection>
+    </>
   );
 
-  if (!keyStatisticsSecondarySection.content.length) {
-    return <Tabs id="releaseHeadlines">{summaryTab}</Tabs>;
-  }
-
   return (
-    <DataBlockTabs
-      id="releaseHeadlines"
-      releaseVersionId={releaseVersionId}
-      getInfographic={getReleaseFile}
-      dataBlock={keyStatisticsSecondarySection.content[0]}
-      dataBlockStaleTime={Infinity}
-      firstTabs={summaryTab}
-    />
+    <ReleasePageContentSection
+      className="dfe-print-break-before"
+      heading="Headline facts and figures"
+      id="headlines-section"
+      testId="headlines-section"
+    >
+      {!keyStatisticsSecondarySection.content.length ? (
+        summaryTab
+      ) : (
+        <DataBlockTabs
+          id="releaseHeadlines"
+          releaseVersionId={releaseVersionId}
+          getInfographic={getReleaseFile}
+          dataBlock={{
+            id: secondaryKeyStatsDataBlock.id,
+            type: secondaryKeyStatsDataBlock.type,
+            ...secondaryKeyStatsDataBlock.dataBlockVersion,
+          }}
+          dataBlockStaleTime={Infinity}
+          firstTabs={
+            <TabsSection title="Summary" id="releaseHeadlines-summary">
+              {summaryTab}
+            </TabsSection>
+          }
+        />
+      )}
+    </ReleasePageContentSection>
   );
 };
 
