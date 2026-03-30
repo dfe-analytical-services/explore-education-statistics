@@ -19,7 +19,7 @@ import ReleaseDataPageCardLink, {
 import ReleaseDataSetFileSummary from '@common/modules/release/components/ReleaseDataSetFileSummary';
 import pageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionDataContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
@@ -30,7 +30,7 @@ import React from 'react';
 
 interface Props {
   dataContent: ReleaseVersionDataContent;
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 

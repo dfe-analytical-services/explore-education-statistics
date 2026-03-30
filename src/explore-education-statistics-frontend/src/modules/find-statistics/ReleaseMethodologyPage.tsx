@@ -2,7 +2,7 @@ import ContactUsSection from '@common/modules/find-statistics/components/Contact
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import {
   PublicationMethodologiesList,
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
@@ -11,7 +11,7 @@ import React from 'react';
 
 interface Props {
   methodologiesSummary: PublicationMethodologiesList;
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 

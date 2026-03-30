@@ -1,9 +1,9 @@
 import React from 'react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import { PublicationSummary } from '@common/services/publicationService';
+import { PublicationSummaryMinimal } from '@common/services/publicationService';
 
 interface Props {
-  owningPublication: PublicationSummary;
+  owningPublication: PublicationSummaryMinimal;
   trackScroll?: boolean;
 }
 

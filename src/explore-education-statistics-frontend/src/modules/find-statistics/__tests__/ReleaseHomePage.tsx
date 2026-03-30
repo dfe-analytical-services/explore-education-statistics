@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import PublicationReleasePageHome from '@frontend/modules/find-statistics/PublicationReleasePageHome';
+import ReleaseHomePage from '@frontend/modules/find-statistics/ReleaseHomePage';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
 import {
@@ -17,10 +17,10 @@ jest.mock('@common/hooks/useMedia', () => ({
   },
 }));
 
-describe('PublicationReleasePageHome', () => {
+describe('ReleaseHomePage', () => {
   test('Does not render summary block and publication summary on desktop', async () => {
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={testReleaseHomeContent}
@@ -40,7 +40,7 @@ describe('PublicationReleasePageHome', () => {
   test('renders summary block and publication summary on mobile with updates info', async () => {
     mockIsMedia = true;
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={testReleaseHomeContent}
@@ -77,7 +77,7 @@ describe('PublicationReleasePageHome', () => {
   test('renders publication summary with no update info if less than 2 updates', () => {
     mockIsMedia = true;
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={{ ...testReleaseVersionSummary, updateCount: 1 }}
         homeContent={testReleaseHomeContent}
@@ -107,7 +107,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('renders warning section if warning content exists', () => {
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={testReleaseHomeContent}
@@ -119,7 +119,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('does not render warning section if no warning content', () => {
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={{
@@ -139,7 +139,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('renders summary section if summary content exists', async () => {
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={testReleaseHomeContent}
@@ -156,7 +156,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('does not render summary section if no summary content', async () => {
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={{
@@ -179,7 +179,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('renders headlines section', async () => {
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={testReleaseHomeContent}
@@ -198,7 +198,7 @@ describe('PublicationReleasePageHome', () => {
 
   test('renders content sections as normal sections on desktop', async () => {
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={testReleaseHomeContent}
@@ -223,7 +223,7 @@ describe('PublicationReleasePageHome', () => {
   test('renders content sections as accordions on mobile', async () => {
     mockIsMedia = true;
     render(
-      <PublicationReleasePageHome
+      <ReleaseHomePage
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
         homeContent={testReleaseHomeContent}

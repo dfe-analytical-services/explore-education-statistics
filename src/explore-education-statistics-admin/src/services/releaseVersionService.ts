@@ -5,7 +5,7 @@ import {
 } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import {
-  PublicationSummary,
+  PublicationSummaryMinimal,
   ReleaseApprovalStatus,
 } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
@@ -69,12 +69,12 @@ export interface ReleaseVersionSummary {
   amendment: boolean;
   previousVersionId?: string;
   permissions?: ReleaseVersionPermissions;
-  publication?: PublicationSummary;
+  publication?: PublicationSummaryMinimal;
 }
 
 export interface DashboardReleaseVersionSummary
   extends ReleaseVersionSummaryWithPermissions {
-  publication: PublicationSummary;
+  publication: PublicationSummaryMinimal;
 }
 
 export interface ReleaseVersionSummaryWithPermissions

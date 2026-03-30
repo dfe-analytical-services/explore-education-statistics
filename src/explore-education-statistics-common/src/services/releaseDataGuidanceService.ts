@@ -1,6 +1,6 @@
 import { contentApi } from '@common/services/api';
 import {
-  PublicationSummary,
+  PublicationSummaryMinimal,
   ReleaseSummary,
 } from '@common/services/publicationService';
 
@@ -25,7 +25,7 @@ export interface DataSetDataGuidance {
 }
 
 export interface ReleaseDataGuidanceSummary extends ReleaseSummary {
-  publication: PublicationSummary;
+  publication: PublicationSummaryMinimal;
   dataGuidance: string;
   dataSets: DataSetDataGuidance[];
 }

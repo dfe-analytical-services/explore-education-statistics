@@ -7,7 +7,7 @@ import {
 import { screen, within } from '@testing-library/react';
 import React from 'react';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 
@@ -37,7 +37,7 @@ describe('ReleasePageIntro', () => {
   });
 
   test('does not render latest/not latest release tag when publication is superseded', () => {
-    const testPublicationSummarySuperseded: PublicationSummaryRedesign = {
+    const testPublicationSummarySuperseded: PublicationSummary = {
       ...testPublicationSummary,
       supersededByPublication: {
         id: '223e4567-e89b-12d3-a456-426614174000',
@@ -106,7 +106,7 @@ describe('ReleasePageIntro', () => {
   });
 
   test('renders superseded warning text when publication is superseded', () => {
-    const testPublicationSummarySuperseded: PublicationSummaryRedesign = {
+    const testPublicationSummarySuperseded: PublicationSummary = {
       ...testPublicationSummary,
       supersededByPublication: {
         id: '223e4567-e89b-12d3-a456-426614174000',

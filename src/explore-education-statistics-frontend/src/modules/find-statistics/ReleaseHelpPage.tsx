@@ -3,7 +3,7 @@ import ContactUsSection from '@common/modules/find-statistics/components/Contact
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   RelatedInformationItem,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
@@ -11,7 +11,7 @@ import { releaseTypes } from '@common/services/types/releaseType';
 import React from 'react';
 
 interface Props {
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   relatedInformationItems: RelatedInformationItem[];
   releaseVersionSummary: ReleaseVersionSummary;
 }

@@ -6,7 +6,7 @@ import _publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
-import { PublicationSummary } from '@common/services/publicationService';
+import { PublicationSummaryMinimal } from '@common/services/publicationService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -38,7 +38,7 @@ describe('PublicationDetailsPage', () => {
     },
   ];
 
-  const testPublicationSummaries: PublicationSummary[] = [
+  const testPublicationSummaries: PublicationSummaryMinimal[] = [
     {
       id: 'publication-1',
       slug: 'publication-1-slug',

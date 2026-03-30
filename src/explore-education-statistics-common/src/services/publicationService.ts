@@ -47,7 +47,7 @@ export interface ReleaseSeriesItem {
   legacyLinkUrl?: string;
 }
 
-export interface PublicationSummary {
+export interface PublicationSummaryMinimal {
   id: string;
   slug: string;
   latestReleaseSlug?: string;
@@ -56,8 +56,7 @@ export interface PublicationSummary {
   contact: Contact;
 }
 
-// TODO EES-6449 - rename to remove 'redesign'
-export interface PublicationSummaryRedesign {
+export interface PublicationSummary {
   contact: Contact;
   id: string;
   latestRelease: {
@@ -365,11 +364,11 @@ export interface ReleaseSummary {
 }
 
 export interface PublicationReleaseSummary extends ReleaseSummary {
-  publication: PublicationSummary;
+  publication: PublicationSummaryMinimal;
 }
 
 export interface PreReleaseAccessListSummary extends ReleaseSummary {
-  publication: PublicationSummary;
+  publication: PublicationSummaryMinimal;
   preReleaseAccessList: string;
 }
 
@@ -416,9 +415,7 @@ export interface ReleaseSitemapItem {
 }
 
 const publicationService = {
-  getPublicationSummaryRedesign(
-    publicationSlug: string,
-  ): Promise<PublicationSummaryRedesign> {
+  getPublicationSummary(publicationSlug: string): Promise<PublicationSummary> {
     return contentApi.get(`/publications/${publicationSlug}`);
   },
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {

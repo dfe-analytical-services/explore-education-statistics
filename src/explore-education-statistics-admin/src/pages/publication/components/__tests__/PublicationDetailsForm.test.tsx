@@ -2,7 +2,7 @@ import PublicationDetailsForm from '@admin/pages/publication/components/Publicat
 import _publicationService from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import render from '@common-test/render';
-import { PublicationSummary } from '@common/services/publicationService';
+import { PublicationSummaryMinimal } from '@common/services/publicationService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
@@ -37,7 +37,7 @@ describe('PublicationDetailsForm', () => {
     },
   ];
 
-  const testPublicationSummaries: PublicationSummary[] = [
+  const testPublicationSummaries: PublicationSummaryMinimal[] = [
     {
       id: 'publication-1',
       slug: 'publication-1-slug',

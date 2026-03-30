@@ -2,7 +2,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
 import {
   PublicationReleaseSeriesItem,
-  PublicationSummaryRedesign,
+  PublicationSummary,
 } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { formatPartialDate } from '@common/utils/date/partialDate';
@@ -17,7 +17,7 @@ import { GetServerSideProps } from 'next';
 import React from 'react';
 
 interface Props {
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releases: PaginatedList<PublicationReleaseSeriesItem>;
 }
 
@@ -150,7 +150,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   try {
     const [publicationSummary, releases] = await Promise.all([
       queryClient.fetchQuery(
-        publicationQueries.getPublicationSummaryRedesign(publicationSlug),
+        publicationQueries.getPublicationSummary(publicationSlug),
       ),
       queryClient.fetchQuery(
         publicationQueries.getPublicationReleaseList(publicationSlug, {

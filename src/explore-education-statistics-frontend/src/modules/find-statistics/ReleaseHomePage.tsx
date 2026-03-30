@@ -8,9 +8,8 @@ import ContentBlockRenderer from '@common/modules/find-statistics/components/Con
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
-
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
@@ -24,11 +23,11 @@ import React, { Fragment } from 'react';
 
 interface Props {
   homeContent: ReleaseVersionHomeContent;
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
-const PublicationReleasePage = ({
+const ReleaseHomePage = ({
   homeContent,
   publicationSummary,
   releaseVersionSummary,
@@ -228,4 +227,4 @@ const PublicationReleasePage = ({
   );
 };
 
-export default PublicationReleasePage;
+export default ReleaseHomePage;
