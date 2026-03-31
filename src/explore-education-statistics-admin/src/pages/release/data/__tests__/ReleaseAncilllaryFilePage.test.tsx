@@ -20,10 +20,6 @@ const releaseAncillaryFileService = _releaseAncillaryFileService as jest.Mocked<
 >;
 
 describe('ReleaseAncillaryFilePage', () => {
-  beforeEach(() => {
-    document.body.className = 'govuk-frontend-supported';
-  });
-
   const testFile: AncillaryFile = {
     id: 'file-1',
     title: 'Test title 1',

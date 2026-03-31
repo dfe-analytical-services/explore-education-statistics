@@ -136,7 +136,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
     // Arrange
     const activates = new Date();
     activates.setDate(activates.getDate() + 1);
-    let expiresStartOfDay = new Date(activates);
+    const expiresStartOfDay = new Date(activates);
     expiresStartOfDay.setDate(expiresStartOfDay.getDate() + 4);
     const handleSubmit = jest.fn();
 
@@ -159,23 +159,12 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
         0,
       ),
     );
-    expiresStartOfDay = new Date(
-      Date.UTC(
-        expiresStartOfDay.getFullYear(),
-        expiresStartOfDay.getMonth(),
-        expiresStartOfDay.getDate(),
-        0,
-        0,
-        0,
-        0,
-      ),
-    );
+    expiresStartOfDay.setHours(0, 0, 0, 0);
 
     const handleSubmitParam: PreviewTokenCreateValues = {
       activates: activatesStartOfDay,
       expires: expiresStartOfDay,
       label: 'Test label',
-      datePresetSpan: undefined,
     };
 
     await waitFor(() =>

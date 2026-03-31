@@ -61,8 +61,6 @@ export default function FormProvider<TFormValues extends FieldValues>({
 
   const { handleError } = useErrorControl();
 
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const previousInitialValues = useRef(initialValues);
 
   /**
@@ -160,7 +158,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
 
   return (
     <RHFFormProvider {...providerProps}>
-      <div ref={containerRef}>
+      <div>
         {typeof children === 'function' ? children(providerProps) : children}
       </div>
     </RHFFormProvider>
