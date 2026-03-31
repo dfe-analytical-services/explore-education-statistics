@@ -40,7 +40,6 @@ public class PreReleaseUserService(
                     await userPrereleaseRoleRepository
                         .Query(ResourceRoleFilter.All)
                         .WhereForReleaseVersion(releaseVersionId)
-                        .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                         .Select(urr => urr.User.Email)
                         .Distinct()
                         .OrderBy(email => email)
@@ -75,12 +74,12 @@ public class PreReleaseUserService(
                             return;
                         }
 
-                        var userHasPreReleaseRole = await userPrereleaseRoleRepository.UserHasRoleOnReleaseVersion(
-                            userId: existingUser.Id,
-                            releaseVersionId: releaseVersionId,
-                            role: ReleaseRole.PrereleaseViewer,
-                            resourceRoleFilter: ResourceRoleFilter.AllButExpired
-                        );
+                        var userHasPreReleaseRole =
+                            await userPrereleaseRoleRepository.UserHasPrereleaseRoleOnReleaseVersion(
+                                userId: existingUser.Id,
+                                releaseVersionId: releaseVersionId,
+                                resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                            );
 
                         if (!userHasPreReleaseRole)
                         {
@@ -140,8 +139,7 @@ public class PreReleaseUserService(
             .OnSuccess(async user =>
                 await userPrereleaseRoleRepository.RemoveByCompositeKey(
                     userId: user.Id,
-                    releaseVersionId: releaseVersionId,
-                    role: ReleaseRole.PrereleaseViewer
+                    releaseVersionId: releaseVersionId
                 )
             )
             .OnSuccess(removed => (Either<ActionResult, Unit>)(removed ? Unit.Instance : new NotFoundResult()));
@@ -164,7 +162,6 @@ public class PreReleaseUserService(
             var createdUserReleaseRole = await userPrereleaseRoleRepository.Create(
                 userId: user.Id,
                 releaseVersionId: releaseVersion.Id,
-                role: ReleaseRole.PrereleaseViewer,
                 createdById: userService.GetUserId()
             );
 
