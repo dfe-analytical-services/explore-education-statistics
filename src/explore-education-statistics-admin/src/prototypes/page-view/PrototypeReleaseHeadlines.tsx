@@ -1,6 +1,6 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
-import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
+import KeyStatistics from '@admin/pages/release/content/components/EditableKeyStatistics';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
@@ -38,7 +38,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
   const headlinesTab = (
     <TabsSection title="Summary">
       <section id="releaseHeadlines-keyStatistics">
-        <KeyStatistics release={release} isEditing />
+        <KeyStatistics release={release} />
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks

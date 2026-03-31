@@ -4,9 +4,7 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContentEdit from '@admin/pages/release/content/components/ReleaseContentEdit';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseContent as ReleaseContentType } from '@admin/services/releaseContentService';
-import generateReleaseContent, {
-  generateEditableRelease,
-} from '@admin-test/generators/releaseContentGenerators';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
 import {
   render as baseRender,
   RenderResult,

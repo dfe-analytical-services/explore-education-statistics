@@ -16,7 +16,6 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
 
 export interface EditableKeyStatDataBlockProps {
-  isEditing?: boolean;
   isReordering?: boolean;
   keyStat: KeyStatisticDataBlock;
   keyStats: KeyStatistic[];
@@ -27,7 +26,6 @@ export interface EditableKeyStatDataBlockProps {
 }
 
 export default function EditableKeyStatDataBlock({
-  isEditing = false,
   isReordering = false,
   keyStat,
   keyStats,
@@ -98,7 +96,6 @@ export default function EditableKeyStatDataBlock({
       guidanceText={keyStat.guidanceText}
       testId={testId}
       isReordering={isReordering}
-      isEditing={isEditing}
       onRemove={onRemove}
       onEdit={toggleShowForm.on}
     />

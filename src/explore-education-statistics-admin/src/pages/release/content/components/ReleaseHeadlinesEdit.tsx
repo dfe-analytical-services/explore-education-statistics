@@ -1,6 +1,6 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
-import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
+import EditableKeyStatistics from '@admin/pages/release/content/components/EditableKeyStatistics';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
@@ -53,7 +53,7 @@ const ReleaseHeadlinesEdit = ({
   const headlinesTab = (
     <TabsSection title="Summary">
       <section data-scroll id="releaseHeadlines-keyStatistics">
-        <KeyStatistics release={release} isEditing />
+        <EditableKeyStatistics release={release} />
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
