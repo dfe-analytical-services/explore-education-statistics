@@ -84,7 +84,7 @@ public class UserPublicationRoleRepository(
     }
 
     public async Task<List<UserPublicationRole>> CreateManyIfNotExists(
-        HashSet<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
+        IEnumerable<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
         CancellationToken cancellationToken = default
     )
     {
@@ -201,7 +201,7 @@ public class UserPublicationRoleRepository(
     }
 
     public async Task RemoveMany(
-        HashSet<UserPublicationRole> userPublicationRoles,
+        IEnumerable<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default
     )
     {

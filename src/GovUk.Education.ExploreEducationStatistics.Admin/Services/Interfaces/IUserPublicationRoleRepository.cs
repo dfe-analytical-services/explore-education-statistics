@@ -17,7 +17,7 @@ public interface IUserPublicationRoleRepository
     );
 
     Task<List<UserPublicationRole>> CreateManyIfNotExists(
-        HashSet<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
+        IEnumerable<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
         CancellationToken cancellationToken = default
     );
 
@@ -48,7 +48,7 @@ public interface IUserPublicationRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    Task RemoveMany(HashSet<UserPublicationRole> userPublicationRoles, CancellationToken cancellationToken = default);
+    Task RemoveMany(IEnumerable<UserPublicationRole> userPublicationRoles, CancellationToken cancellationToken = default);
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 
