@@ -40,8 +40,7 @@ public class MethodologyService(
     IMethodologyCacheService methodologyCacheService,
     IRedirectsCacheService redirectsCacheService,
     IUserService userService,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : IMethodologyService
 {
     public async Task<Either<ActionResult, Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
@@ -522,30 +521,19 @@ public class MethodologyService(
     {
         var userId = userService.GetUserId();
 
-        var directPublicationsWithApprovalRole = await userPublicationRoleRepository
+        var publicationIdsWithApprovalRole = await userPublicationRoleRepository
             .Query()
             .WhereForUser(userId)
-            .WhereRolesIn(PublicationRole.Allower)
+            .WhereRolesIn(PublicationRole.Approver)
             .Select(role => role.PublicationId)
             .ToListAsync();
-
-        var indirectPublicationsWithApprovalRole = await userPrereleaseRoleRepository
-            .Query()
-            .WhereForUser(userId)
-            .WhereRolesIn(ReleaseRole.Approver)
-            .Select(role => role.ReleaseVersion.Release.PublicationId)
-            .ToListAsync();
-
-        var publicationIdsForApproval = directPublicationsWithApprovalRole
-            .Concat(indirectPublicationsWithApprovalRole)
-            .Distinct();
 
         var methodologiesToApprove = await context
             .MethodologyVersions.Where(methodologyVersion =>
                 methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
                 && methodologyVersion.Methodology.Publications.Any(publicationMethodology =>
                     publicationMethodology.Owner
-                    && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)
+                    && publicationIdsWithApprovalRole.Contains(publicationMethodology.PublicationId)
                 )
             )
             .ToListAsync();
