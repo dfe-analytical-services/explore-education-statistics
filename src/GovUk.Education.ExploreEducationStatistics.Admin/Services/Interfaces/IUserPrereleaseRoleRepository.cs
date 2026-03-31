@@ -44,7 +44,7 @@ public interface IUserPrereleaseRoleRepository
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 
-    Task<bool> UserHasPrereleaseRole(
+    Task<bool> UserHasPrereleaseRoleOnReleaseVersion(
         Guid userId,
         Guid releaseVersionId,
         ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,

@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -199,10 +198,9 @@ public abstract class PreReleaseUserServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         activeUser.Id,
                         releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.AllButExpired,
                         It.IsAny<CancellationToken>()
                     )
@@ -210,10 +208,9 @@ public abstract class PreReleaseUserServiceTests
                 .ReturnsAsync(true);
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         userWithPendingInvite.Id,
                         releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.AllButExpired,
                         It.IsAny<CancellationToken>()
                     )
@@ -308,10 +305,9 @@ public abstract class PreReleaseUserServiceTests
                 {
                     userPrereleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasRoleOnReleaseVersion(
+                            mock.UserHasPrereleaseRoleOnReleaseVersion(
                                 user.Id,
                                 releaseVersion.Id,
-                                ReleaseRole.PrereleaseViewer,
                                 ResourceRoleFilter.AllButExpired,
                                 It.IsAny<CancellationToken>()
                             )
@@ -330,10 +326,9 @@ public abstract class PreReleaseUserServiceTests
 
                 userPrereleaseRoleRepository
                     .Setup(mock =>
-                        mock.UserHasRoleOnReleaseVersion(
+                        mock.UserHasPrereleaseRoleOnReleaseVersion(
                             userWithoutRole.Id,
                             releaseVersion.Id,
-                            ReleaseRole.PrereleaseViewer,
                             ResourceRoleFilter.AllButExpired,
                             It.IsAny<CancellationToken>()
                         )
@@ -441,10 +436,9 @@ public abstract class PreReleaseUserServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         activeUser.Id,
                         releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.AllButExpired,
                         It.IsAny<CancellationToken>()
                     )
@@ -452,10 +446,9 @@ public abstract class PreReleaseUserServiceTests
                 .ReturnsAsync(true);
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         userWithPendingInvite.Id,
                         releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.AllButExpired,
                         It.IsAny<CancellationToken>()
                     )
@@ -626,10 +619,9 @@ public abstract class PreReleaseUserServiceTests
                 {
                     userPrereleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasRoleOnReleaseVersion(
+                            mock.UserHasPrereleaseRoleOnReleaseVersion(
                                 user.Id,
                                 releaseVersion.Id,
-                                ReleaseRole.PrereleaseViewer,
                                 ResourceRoleFilter.AllButExpired,
                                 It.IsAny<CancellationToken>()
                             )
@@ -643,10 +635,9 @@ public abstract class PreReleaseUserServiceTests
                 {
                     userPrereleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasRoleOnReleaseVersion(
+                            mock.UserHasPrereleaseRoleOnReleaseVersion(
                                 existingUser.Id,
                                 releaseVersion.Id,
-                                ReleaseRole.PrereleaseViewer,
                                 ResourceRoleFilter.AllButExpired,
                                 It.IsAny<CancellationToken>()
                             )
@@ -659,16 +650,7 @@ public abstract class PreReleaseUserServiceTests
 
                 var userId = existingUser?.Id ?? newUserIdsByEmail[email];
                 userPrereleaseRoleRepository
-                    .Setup(mock =>
-                        mock.Create(
-                            userId,
-                            releaseVersion.Id,
-                            ReleaseRole.PrereleaseViewer,
-                            _userId,
-                            null,
-                            It.IsAny<CancellationToken>()
-                        )
-                    )
+                    .Setup(mock => mock.Create(userId, releaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(createdUserReleaseRole);
             }
 
@@ -864,10 +846,9 @@ public abstract class PreReleaseUserServiceTests
                 {
                     userPrereleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasRoleOnReleaseVersion(
+                            mock.UserHasPrereleaseRoleOnReleaseVersion(
                                 user.Id,
                                 releaseVersion.Id,
-                                ReleaseRole.PrereleaseViewer,
                                 ResourceRoleFilter.AllButExpired,
                                 It.IsAny<CancellationToken>()
                             )
@@ -881,10 +862,9 @@ public abstract class PreReleaseUserServiceTests
                 {
                     userPrereleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasRoleOnReleaseVersion(
+                            mock.UserHasPrereleaseRoleOnReleaseVersion(
                                 existingUser.Id,
                                 releaseVersion.Id,
-                                ReleaseRole.PrereleaseViewer,
                                 ResourceRoleFilter.AllButExpired,
                                 It.IsAny<CancellationToken>()
                             )
@@ -894,16 +874,7 @@ public abstract class PreReleaseUserServiceTests
 
                 var userId = existingUser?.Id ?? newUserIdsByEmail[email];
                 userPrereleaseRoleRepository
-                    .Setup(mock =>
-                        mock.Create(
-                            userId,
-                            releaseVersion.Id,
-                            ReleaseRole.PrereleaseViewer,
-                            _userId,
-                            null,
-                            It.IsAny<CancellationToken>()
-                        )
-                    )
+                    .Setup(mock => mock.Create(userId, releaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(
                         _dataFixture
                             .DefaultUserReleaseRole()
@@ -1050,7 +1021,6 @@ public abstract class PreReleaseUserServiceTests
                     m.RemoveByCompositeKey(
                         userReleaseRole.UserId,
                         userReleaseRole.ReleaseVersionId,
-                        userReleaseRole.Role,
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -1102,7 +1072,6 @@ public abstract class PreReleaseUserServiceTests
                     m.RemoveByCompositeKey(
                         userReleaseRole.UserId,
                         userReleaseRole.ReleaseVersionId,
-                        userReleaseRole.Role,
                         It.IsAny<CancellationToken>()
                     )
                 )
