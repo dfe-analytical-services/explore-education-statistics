@@ -44,7 +44,7 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
             .ToAsyncEnumerable()
             .Where(
                 async (urr, ct) =>
-                    !await UserHasPrereleaseRole(
+                    !await UserHasPrereleaseRoleOnReleaseVersion(
                         userId: urr.UserId,
                         releaseVersionId: urr.ReleaseVersionId,
                         resourceRoleFilter: ResourceRoleFilter.All,
@@ -159,7 +159,7 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> UserHasPrereleaseRole(
+    public async Task<bool> UserHasPrereleaseRoleOnReleaseVersion(
         Guid userId,
         Guid releaseVersionId,
         ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
