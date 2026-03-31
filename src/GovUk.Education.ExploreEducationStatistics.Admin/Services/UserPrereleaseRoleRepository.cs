@@ -36,7 +36,7 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
     }
 
     public async Task<List<UserReleaseRole>> CreateManyIfNotExists(
-        IReadOnlyList<UserPrereleaseRoleCreateDto> userPrereleaseRolesToCreate,
+        IEnumerable<UserPrereleaseRoleCreateDto> userPrereleaseRolesToCreate,
         CancellationToken cancellationToken = default
     )
     {
@@ -136,7 +136,7 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
     }
 
     public async Task RemoveMany(
-        HashSet<UserReleaseRole> userPrereleaseRoles,
+        IEnumerable<UserReleaseRole> userPrereleaseRoles,
         CancellationToken cancellationToken = default
     )
     {

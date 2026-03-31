@@ -16,7 +16,7 @@ public interface IUserPrereleaseRoleRepository
     );
 
     Task<List<UserReleaseRole>> CreateManyIfNotExists(
-        IReadOnlyList<UserPrereleaseRoleCreateDto> userPrereleaseRolesToCreate,
+        IEnumerable<UserPrereleaseRoleCreateDto> userPrereleaseRolesToCreate,
         CancellationToken cancellationToken = default
     );
 
@@ -40,7 +40,7 @@ public interface IUserPrereleaseRoleRepository
 
     Task<bool> RemoveByCompositeKey(Guid userId, Guid releaseVersionId, CancellationToken cancellationToken = default);
 
-    Task RemoveMany(HashSet<UserReleaseRole> userPrereleaseRoleIds, CancellationToken cancellationToken = default);
+    Task RemoveMany(IEnumerable<UserReleaseRole> userPrereleaseRoleIds, CancellationToken cancellationToken = default);
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 
