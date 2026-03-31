@@ -1,5 +1,5 @@
-﻿import { fromZonedTime, formatInTimeZone } from 'date-fns-tz';
-import { addDays } from 'date-fns';
+﻿import { fromZonedTime, formatInTimeZone, toZonedTime } from 'date-fns-tz';
+import { addDays, format } from 'date-fns';
 
 export type DateRange = { startDate: Date; endDate: Date };
 
@@ -74,15 +74,16 @@ export default class UkTimeHelper {
 
     const TZ = UkTimeHelper.europeLondonTimeZoneId;
 
-    // 1) "Today" in London as a calendar date (no time)
-    const todayYmdLondon = formatInTimeZone(startDate, TZ, 'yyyy-MM-dd');
+    const startDateYmdLondon = formatInTimeZone(startDate, TZ, 'yyyy-MM-dd');
 
-    // 2) Today at 00:00 London → UTC instant
-    const todayMidnightUtc = fromZonedTime(`${todayYmdLondon}T00:00:00`, TZ);
+    const startDateMidnightUtc = fromZonedTime(
+      `${startDateYmdLondon}T00:00:00`,
+      TZ,
+    );
 
     const endDate = UkTimeHelper.addDaysInTimeZoneEndOfDay(
       TZ,
-      todayMidnightUtc,
+      startDateMidnightUtc,
       daysToAdd,
     );
 
@@ -94,13 +95,16 @@ export default class UkTimeHelper {
     date: Date,
     days: number,
   ): Date {
-    // 1) Add N *calendar* days from that midnight
-    const plusNMidnightUtc = addDays(date, days);
+    // 1) Convert the UTC instant to the local time of the target TZ first
+    const localDate = toZonedTime(date, TZ);
 
-    // 2) What calendar day is that in London/TZ?
-    const plusNYmdLondon = formatInTimeZone(plusNMidnightUtc, TZ, 'yyyy-MM-dd');
+    // 2) Add the calendar days to the LOCAL date
+    const localDatePlusN = addDays(localDate, days);
 
-    // 3) End of that day in London/TZ → UTC instant
-    return fromZonedTime(`${plusNYmdLondon}T23:59:59`, TZ);
+    // 3) Get the 'yyyy-MM-dd' string of that local shifted date
+    const plusNYmd = format(localDatePlusN, 'yyyy-MM-dd');
+
+    // 4) Convert that local end-of-day back to a UTC instant
+    return fromZonedTime(`${plusNYmd}T23:59:59`, TZ);
   }
 }
