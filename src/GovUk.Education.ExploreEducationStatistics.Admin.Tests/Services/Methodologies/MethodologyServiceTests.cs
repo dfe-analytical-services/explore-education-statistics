@@ -2796,7 +2796,7 @@ public class MethodologyServiceTests
                 .DefaultUserPublicationRole()
                 .WithUser(User)
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Allower);
+                .WithRole(PublicationRole.Approver);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -2809,15 +2809,11 @@ public class MethodologyServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, publicationRoleForUser);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await service.ListUsersMethodologyVersionsForApproval();
@@ -2830,7 +2826,7 @@ public class MethodologyServiceTests
                 Assert.Equal(publication.Title, methodologyForApproval.OwningPublication.Title);
             }
 
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userPublicationRoleRepository);
         }
 
         [Fact]
@@ -2862,7 +2858,7 @@ public class MethodologyServiceTests
                 .DefaultUserPublicationRole()
                 .WithUser(User)
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Allower);
+                .WithRole(PublicationRole.Approver);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -2875,22 +2871,18 @@ public class MethodologyServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, publicationRoleForUser);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await service.ListUsersMethodologyVersionsForApproval();
                 Assert.Empty(result.AssertRight());
             }
 
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userPublicationRoleRepository);
         }
 
         [Fact]
@@ -2911,7 +2903,7 @@ public class MethodologyServiceTests
                 .DefaultUserPublicationRole()
                 .WithUser(User)
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Allower);
+                .WithRole(PublicationRole.Approver);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -2923,26 +2915,22 @@ public class MethodologyServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, publicationRoleForUser);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await service.ListUsersMethodologyVersionsForApproval();
                 Assert.Empty(result.AssertRight());
             }
 
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userPublicationRoleRepository);
         }
 
         [Fact]
-        public async Task UserIsOnlyOwnerOnOwningPublication_NotIncluded()
+        public async Task UserIsOnlyDrafterOnOwningPublication_NotIncluded()
         {
             var publication = _fixture.DefaultPublication().WithContact(MockContact).Generate();
 
@@ -2954,12 +2942,12 @@ public class MethodologyServiceTests
                 )
                 .Generate();
 
-            // Set up the User as an Owner on the Methodology's Publication rather than an Approver.
+            // Set up the User as an Drafter on the Methodology's Publication rather than an Approver.
             UserPublicationRole publicationRoleForUser = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(User)
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Owner);
+                .WithRole(PublicationRole.Drafter);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -2971,22 +2959,18 @@ public class MethodologyServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, publicationRoleForUser);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await service.ListUsersMethodologyVersionsForApproval();
                 Assert.Empty(result.AssertRight());
             }
 
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userPublicationRoleRepository);
         }
 
         [Fact]
@@ -3009,7 +2993,7 @@ public class MethodologyServiceTests
                 .DefaultUserPublicationRole()
                 .WithUser(otherUser)
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Allower);
+                .WithRole(PublicationRole.Approver);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3021,427 +3005,18 @@ public class MethodologyServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, publicationRoleForOtherUser);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await service.ListUsersMethodologyVersionsForApproval();
                 Assert.Empty(result.AssertRight());
             }
 
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
-        }
-    }
-
-    public class ListUsersMethodologyVersionsForApprovalForReleaseRoles
-    {
-        private readonly DataFixture _fixture = new();
-
-        [Fact]
-        public async Task UserIsApproverOnOwningPublicationRelease_Included()
-        {
-            Publication publication = _fixture
-                .DefaultPublication()
-                .WithContact(MockContact)
-                .WithReleases(_fixture.DefaultRelease(publishedVersions: 1).Generate(1));
-
-            var releaseVersion = publication.Releases.Single().Versions.Single();
-
-            var methodology = _fixture
-                .DefaultMethodology()
-                .WithOwningPublication(publication)
-                .WithMethodologyVersions(_ =>
-                    _fixture.DefaultMethodologyVersion().WithApprovalStatus(HigherLevelReview).Generate(1)
-                )
-                .Generate();
-
-            UserReleaseRole releaseRoleForUser = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(User)
-                .WithReleaseVersion(releaseVersion)
-                .WithRole(ReleaseRole.Approver);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddRangeAsync(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
-
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, releaseRoleForUser);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
-                );
-
-                var result = await service.ListUsersMethodologyVersionsForApproval();
-                var methodologyVersionsForApproval = result.AssertRight();
-
-                var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);
-                Assert.Equal(methodology.Versions[0].Id, methodologyForApproval.Id);
-
-                // Assert that we have a populated view model, including the owning Publication details.
-                Assert.Equal(publication.Title, methodologyForApproval.OwningPublication.Title);
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
-        }
-
-        [Fact]
-        public async Task UserIsApproverOnOwningPublicationOldRelease_Included()
-        {
-            Publication publication = _fixture
-                .DefaultPublication()
-                .WithContact(MockContact)
-                .WithReleases(_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
-
-            var publishedReleaseVersion = publication
-                .Releases.Single()
-                .Versions.Single(rv => rv is { Published: not null, Version: 0 });
-
-            var methodology = _fixture
-                .DefaultMethodology()
-                .WithOwningPublication(publication)
-                .WithMethodologyVersions(_ =>
-                    _fixture.DefaultMethodologyVersion().WithApprovalStatus(HigherLevelReview).Generate(1)
-                )
-                .Generate();
-
-            UserReleaseRole releaseRoleForUserOnOldRelease = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(User)
-                .WithReleaseVersion(publishedReleaseVersion)
-                .WithRole(ReleaseRole.Approver);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddRangeAsync(methodology);
-                await context.Publications.AddAsync(publication);
-                await context.Contacts.AddAsync(MockContact);
-                await context.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
-
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, releaseRoleForUserOnOldRelease);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
-                );
-
-                var result = await service.ListUsersMethodologyVersionsForApproval();
-                var methodologyVersionsForApproval = result.AssertRight();
-
-                // The user should have access to approve the Methodology if they have Approver permissions
-                // on ANY of the Publication's Releases, not just the latest one.
-                var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);
-                Assert.Equal(methodology.Versions[0].Id, methodologyForApproval.Id);
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
-        }
-
-        [Fact]
-        public async Task UserIsApproverOnOwningPublicationRelease_MethodologyVersionNotInHigherReview_NotIncluded()
-        {
-            var publication = _fixture.DefaultPublication().WithContact(MockContact).Generate();
-
-            // Generate 2 Methodologies that are not in Higher Review.
-            var methodologies = _fixture
-                .DefaultMethodology()
-                .WithOwningPublication(publication)
-                .ForIndex(
-                    0,
-                    s =>
-                        s.SetMethodologyVersions(
-                            _fixture.DefaultMethodologyVersion().WithApprovalStatus(Draft).Generate(1)
-                        )
-                )
-                .ForIndex(
-                    1,
-                    s =>
-                        s.SetMethodologyVersions(
-                            _fixture.DefaultMethodologyVersion().WithApprovalStatus(Approved).Generate(1)
-                        )
-                )
-                .GenerateList();
-
-            UserReleaseRole releaseRoleForUser = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(User)
-                .WithReleaseVersion(
-                    _fixture
-                        .DefaultReleaseVersion()
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-                )
-                .WithRole(ReleaseRole.Approver);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddRangeAsync(methodologies);
-                await context.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
-
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, releaseRoleForUser);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
-                );
-
-                var result = await service.ListUsersMethodologyVersionsForApproval();
-                Assert.Empty(result.AssertRight());
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
-        }
-
-        [Fact]
-        public async Task UserIsReleaseApproverOnAdoptingPublication_NotIncluded()
-        {
-            var publication = _fixture.DefaultPublication().WithContact(MockContact).Generate();
-
-            // Create a Methodology that has only been adopted by the User's Publication.
-            var methodology = _fixture
-                .DefaultMethodology()
-                .WithAdoptingPublications([publication])
-                .WithMethodologyVersions(_ =>
-                    _fixture.DefaultMethodologyVersion().WithApprovalStatus(HigherLevelReview).Generate(1)
-                )
-                .Generate();
-
-            UserReleaseRole releaseRoleForUser = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(User)
-                .WithReleaseVersion(
-                    _fixture
-                        .DefaultReleaseVersion()
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-                )
-                .WithRole(ReleaseRole.Approver);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddRangeAsync(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
-
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, releaseRoleForUser);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
-                );
-
-                var result = await service.ListUsersMethodologyVersionsForApproval();
-                Assert.Empty(result.AssertRight());
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
-        }
-
-        [Fact]
-        public async Task UserIsOnlyContributorOnOwningPublicationRelease_NotIncluded()
-        {
-            var publication = _fixture.DefaultPublication().Generate();
-
-            var methodology = _fixture
-                .DefaultMethodology()
-                .WithOwningPublication(publication)
-                .WithMethodologyVersions(_ =>
-                    _fixture.DefaultMethodologyVersion().WithApprovalStatus(HigherLevelReview).Generate(1)
-                )
-                .Generate();
-
-            // Set up the User as a Contributor on the Methodology's Publication's Release rather than an Approver.
-            UserReleaseRole releaseRoleForUser = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(User)
-                .WithReleaseVersion(
-                    _fixture
-                        .DefaultReleaseVersion()
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-                )
-                .WithRole(ReleaseRole.Contributor);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddRangeAsync(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
-
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, releaseRoleForUser);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
-                );
-
-                var result = await service.ListUsersMethodologyVersionsForApproval();
-                Assert.Empty(result.AssertRight());
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
-        }
-
-        [Fact]
-        public async Task DifferentUserIsApproverOnOwningPublicationRelease_NotIncluded()
-        {
-            // Set up a different User as the Approver for the owning Publication.
-            User otherUser = _fixture.DefaultUser();
-
-            var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
-
-            var publication = _fixture.DefaultPublication().WithContact(MockContact).Generate();
-
-            var methodology = _fixture
-                .DefaultMethodology()
-                .WithOwningPublication(publication)
-                .WithMethodologyVersions(_ =>
-                    _fixture.DefaultMethodologyVersion().WithApprovalStatus(HigherLevelReview).Generate(1)
-                )
-                .Generate();
-
-            UserReleaseRole releaseRoleForOtherUser = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(otherUser)
-                .WithReleaseVersion(releaseVersion)
-                .WithRole(ReleaseRole.Approver);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddRangeAsync(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
-
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, releaseRoleForOtherUser);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
-                );
-
-                var result = await service.ListUsersMethodologyVersionsForApproval();
-                Assert.Empty(result.AssertRight());
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
-        }
-
-        [Fact]
-        public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
-        {
-            Publication publication = _fixture
-                .DefaultPublication()
-                .WithContact(MockContact)
-                .WithReleases(_fixture.DefaultRelease(publishedVersions: 1).Generate(1));
-
-            var publishedReleaseVersion = publication.Releases.Single().Versions.Single();
-
-            var methodology = _fixture
-                .DefaultMethodology()
-                .WithOwningPublication(publication)
-                .WithMethodologyVersions(_ =>
-                    _fixture.DefaultMethodologyVersion().WithApprovalStatus(HigherLevelReview).GenerateList(1)
-                )
-                .Generate();
-
-            UserPublicationRole publicationRoleForUser = _fixture
-                .DefaultUserPublicationRole()
-                .WithUser(User)
-                .WithPublication(publication)
-                .WithRole(PublicationRole.Allower);
-
-            UserReleaseRole releaseRoleForUser = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(User)
-                .WithReleaseVersion(publishedReleaseVersion)
-                .WithRole(ReleaseRole.Approver);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Methodologies.AddRangeAsync(methodology);
-                await context.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, publicationRoleForUser);
-
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, releaseRoleForUser);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(
-                    context,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
-                );
-
-                var result = await service.ListUsersMethodologyVersionsForApproval();
-                var methodologyVersionsForApproval = result.AssertRight();
-
-                // Assert that we just get back a single MethodologyVersion with no duplication, despite the user
-                // having links to this MethodologyVersion via Publication Roles and Release Roles.
-                Assert.Single(methodologyVersionsForApproval);
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userPublicationRoleRepository);
         }
     }
 
@@ -3464,8 +3039,8 @@ public class MethodologyServiceTests
                     LatestPublishedVersionId = latestPublishedVersionId,
                     OwningPublicationTitle = "Original Title",
                     OwningPublicationSlug = "original-slug",
-                    Versions = new List<MethodologyVersion>
-                    {
+                    Versions =
+                    [
                         new() { Id = originalVersionId, Version = 0 },
                         new()
                         {
@@ -3473,7 +3048,7 @@ public class MethodologyServiceTests
                             Version = 1,
                             PreviousVersionId = originalVersionId,
                         },
-                    },
+                    ],
                 },
             };
 
@@ -4050,8 +3625,7 @@ public class MethodologyServiceTests
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null,
         IUserService? userService = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
         return new(
@@ -4065,8 +3639,7 @@ public class MethodologyServiceTests
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             userService ?? AlwaysTrueUserService(User.Id).Object,
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict)
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );
     }
 }
