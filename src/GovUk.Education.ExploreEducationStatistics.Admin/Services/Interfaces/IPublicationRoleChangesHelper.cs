@@ -10,10 +10,7 @@ public interface IPublicationRoleChangesHelper
     /// </summary>
     /// <param name="existingPublicationRoleForPublication">The existing publication role for the user/publication combination, if one exists.</param>
     /// <param name="publicationRoleToCreate">The publication role to be created for the user/publication combination.</param>
-    (
-        PublicationRole? publicationRoleToRemove,
-        PublicationRole? publicationRoleToCreate
-    ) DetermineChanges(
+    (PublicationRole? publicationRoleToRemove, PublicationRole? publicationRoleToCreate) DetermineChanges(
         PublicationRole? existingPublicationRoleForPublication,
         PublicationRole publicationRoleToCreate
     );

@@ -7,16 +7,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class PublicationRoleChangesHelper : IPublicationRoleChangesHelper
 {
-    public (
-        PublicationRole? publicationRoleToRemove,
-        PublicationRole? publicationRoleToCreate
-    ) DetermineChanges(
+    public (PublicationRole? publicationRoleToRemove, PublicationRole? publicationRoleToCreate) DetermineChanges(
         PublicationRole? existingPublicationRoleForPublication,
         PublicationRole publicationRoleToCreate
     )
     {
-        if (existingPublicationRoleForPublication is PublicationRole role &&
-            !role.IsNewPermissionsSystemPublicationRole())
+        if (
+            existingPublicationRoleForPublication is PublicationRole role
+            && !role.IsNewPermissionsSystemPublicationRole()
+        )
         {
             throw new ArgumentException(
                 $"Unexpected publication role: '{existingPublicationRoleForPublication}'. Expected a NEW permissions system role."
@@ -32,9 +31,7 @@ public class PublicationRoleChangesHelper : IPublicationRoleChangesHelper
 
         if (existingPublicationRoleForPublication == publicationRoleToCreate)
         {
-            throw new ArgumentException(
-                $"The publication role '{publicationRoleToCreate}' already exists."
-            );
+            throw new ArgumentException($"The publication role '{publicationRoleToCreate}' already exists.");
         }
 
         if (!existingPublicationRoleForPublication.HasValue)

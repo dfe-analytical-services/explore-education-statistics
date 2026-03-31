@@ -85,15 +85,19 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly) =>
-        resourceRoleFilter switch
+    public IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly)
+    {
+        var userPrereleaseRoles = contentDbContext.UserReleaseRoles.AsQueryable();
+
+        return resourceRoleFilter switch
         {
-            ResourceRoleFilter.ActiveOnly => contentDbContext.UserReleaseRoles.WhereUserIsActive(),
-            ResourceRoleFilter.PendingOnly => contentDbContext.UserReleaseRoles.WhereUserHasPendingInvite(),
-            ResourceRoleFilter.AllButExpired => contentDbContext.UserReleaseRoles.WhereUserIsActiveOrHasPendingInvite(),
-            ResourceRoleFilter.All => contentDbContext.UserReleaseRoles,
+            ResourceRoleFilter.ActiveOnly => userPrereleaseRoles.WhereUserIsActive(),
+            ResourceRoleFilter.PendingOnly => userPrereleaseRoles.WhereUserHasPendingInvite(),
+            ResourceRoleFilter.AllButExpired => userPrereleaseRoles.WhereUserIsActiveOrHasPendingInvite(),
+            ResourceRoleFilter.All => userPrereleaseRoles,
             _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
         };
+    }
 
     public async Task<bool> RemoveById(Guid userPrereleaseRoleId, CancellationToken cancellationToken = default)
     {
@@ -148,7 +152,7 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
         var userPrereleaseRoles = await Query(ResourceRoleFilter.All)
-            .Where(urr => urr.UserId == userId)
+            .WhereForUser(userId)
             .ToListAsync(cancellationToken);
 
         contentDbContext.UserReleaseRoles.RemoveRange(userPrereleaseRoles);
