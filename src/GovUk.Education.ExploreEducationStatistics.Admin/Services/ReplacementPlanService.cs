@@ -151,6 +151,25 @@ public class ReplacementPlanService(
                     ? null
                     : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
 
+                var mappingPlan = new ReplacementPlanMappingViewModel
+                {
+                    Indicators = new ReplacementPlanIndicatorsMappingViewModel
+                    {
+                        Mappings = mapping.IndicatorMappings.Values.ToDictionary(
+                            map => map.OriginalColumnName,
+                            map => new ReplacementPlanIndicatorMappingViewModel
+                            {
+                                Source = new ReplacementPlanIndicatorViewModel { Label = map.OriginalLabel },
+                                Type = map.Status,
+                                CandidateKey = map.ReplacementColumnName,
+                            }
+                        ),
+                        Candidates = statisticsDbContext
+                            .Indicator.Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
+                            .ToDictionary(i => i.Name, i => new ReplacementPlanIndicatorViewModel { Label = i.Label }),
+                    },
+                };
+
                 return new DataReplacementPlanViewModel
                 {
                     DataBlocks = dataBlocks,
@@ -158,6 +177,7 @@ public class ReplacementPlanService(
                     ApiDataSetVersionPlan = apiDataSetVersionPlan,
                     OriginalSubjectId = originalSubjectId,
                     ReplacementSubjectId = replacementSubjectId,
+                    Mapping = mappingPlan,
                 };
             });
     }

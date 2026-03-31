@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -12,6 +13,7 @@ public class DataReplacementPlanViewModel
     public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; init; } = [];
     public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
     public ReplaceApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
+    public ReplacementPlanMappingViewModel? Mapping { get; init; }
     public Guid OriginalSubjectId { get; init; }
     public Guid ReplacementSubjectId { get; init; }
 
@@ -33,6 +35,7 @@ public class DataReplacementPlanViewModel
             ApiDataSetVersionPlan = ApiDataSetVersionPlan,
             OriginalSubjectId = OriginalSubjectId,
             ReplacementSubjectId = ReplacementSubjectId,
+            Mapping = Mapping, // @MarkFix we want this? If so Mapping shouldn't be nullable
         };
     }
 }
@@ -331,4 +334,30 @@ public abstract class ReplacementViewModel
     {
         Valid = valid;
     }
+}
+
+public record ReplacementPlanMappingViewModel
+{
+    public ReplacementPlanIndicatorsMappingViewModel Indicators { get; init; } = new();
+}
+
+public record ReplacementPlanIndicatorsMappingViewModel
+{
+    // Key is original indicator csv column name
+    public Dictionary<string, ReplacementPlanIndicatorMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement indicator csv column name
+    public Dictionary<string, ReplacementPlanIndicatorViewModel> Candidates { get; init; } = new();
+}
+
+public record ReplacementPlanIndicatorMappingViewModel
+{
+    public ReplacementPlanIndicatorViewModel Source { get; init; } = new();
+    public MapStatus Type { get; init; }
+    public string? CandidateKey { get; init; } // replacement indicator csv column name
+}
+
+public record ReplacementPlanIndicatorViewModel
+{
+    public string Label { get; init; } = "";
 }
