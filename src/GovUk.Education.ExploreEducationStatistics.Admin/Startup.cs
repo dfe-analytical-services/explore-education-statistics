@@ -484,7 +484,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataSetMappingService, DataSetMappingService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
-        services.AddTransient<UserReleaseRoleQueryRepository>();
         services.AddTransient<INewPermissionsSystemHelper, NewPermissionsSystemHelper>();
         services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
         services.AddTransient<IUserPrereleaseRoleRepository, UserPrereleaseRoleRepository>();
@@ -665,7 +664,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
         services.AddSingleton<DataServiceMemoryCache<BoundaryData>, DataServiceMemoryCache<BoundaryData>>();
         services.AddTransient<IUserManagementService, UserManagementService>();
-        services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
