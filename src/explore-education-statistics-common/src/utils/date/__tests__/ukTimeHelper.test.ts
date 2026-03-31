@@ -48,7 +48,7 @@ describe('UkTimeHelper', () => {
     });
 
     // Test case for Summer (BST - Offset +1)
-    test('should return 22:59:59 UTC of previous day during Summer (BST)', () => {
+    test('should return 22:59:59 during Summer (BST)', () => {
       const summerDate = new Date('2026-06-15T12:00:00Z');
       const result = UkTimeHelper.toUkEndOfDay(summerDate);
 

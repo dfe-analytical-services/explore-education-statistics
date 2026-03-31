@@ -77,7 +77,6 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
       timeZone: 'Europe/London',
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true,
     })}`;
 
     expect(screen.getByText('The token expires:')).toBeInTheDocument();
