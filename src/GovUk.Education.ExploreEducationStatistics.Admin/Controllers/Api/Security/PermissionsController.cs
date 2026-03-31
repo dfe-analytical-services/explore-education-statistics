@@ -25,8 +25,7 @@ public class PermissionsController(
     IReleaseFileService releaseFileService,
     IUserService userService,
     IPreReleaseService preReleaseService,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : ControllerBase
 {
     [HttpGet("permissions/access")]
@@ -39,7 +38,7 @@ public class PermissionsController(
         // roles.  If they were to be given Approver permissions, we would therefore assume that they
         // should have Approver access to ALL Methodologies and Releases that are awaiting approval,
         // which would potentially be overwhelming.
-        var isApprover = !isBauUser && (await IsReleaseApprover() || await IsPublicationApprover());
+        var isApprover = !isBauUser && await IsPublicationApprover();
 
         return new GlobalPermissionsViewModel(
             CanAccessSystem: await userService.CheckCanAccessSystem().IsRight(),
@@ -181,21 +180,12 @@ public class PermissionsController(
             .OrElse(() => new OkObjectResult(false));
     }
 
-    private async Task<bool> IsReleaseApprover()
-    {
-        return await userPrereleaseRoleRepository
-            .Query()
-            .WhereForUser(userService.GetUserId())
-            .WhereRolesIn(ReleaseRole.Approver)
-            .AnyAsync();
-    }
-
     private async Task<bool> IsPublicationApprover()
     {
         return await userPublicationRoleRepository
             .Query()
             .WhereForUser(userService.GetUserId())
-            .WhereRolesIn(PublicationRole.Allower)
+            .WhereRolesIn(PublicationRole.Approver)
             .AnyAsync();
     }
 }
