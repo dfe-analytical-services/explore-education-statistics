@@ -1,8 +1,8 @@
-﻿import { isToday } from 'date-fns';
-import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
+﻿import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
-import { formatInTimeZone } from 'date-fns-tz';
 import mockDate from '@common-test/mockDate';
+import { formatInTimeZone } from 'date-fns-tz';
+import { isToday } from 'date-fns';
 
 jest.mock('date-fns', () => {
   const actual = jest.requireActual('date-fns');
@@ -41,7 +41,7 @@ describe('PreviewTokenDateHelper', () => {
 
     test('should use current time as start date when activates is today', () => {
       const activatesDate = new Date();
-      const expiresDate = new Date(activatesDate);
+      let expiresDate = new Date(activatesDate);
       expiresDate.setDate(activatesDate.getDate() + 1);
       const timeThreshold = 100; // 100ms
 
@@ -58,7 +58,7 @@ describe('PreviewTokenDateHelper', () => {
       );
       expect(difference).toBeLessThanOrEqual(timeThreshold);
 
-      expiresDate.setHours(23, 59, 59, 0);
+      expiresDate = UkTimeHelper.toUkEndOfDay(expiresDate);
       expect(result.endDate).toStrictEqual(expiresDate);
     });
 
@@ -105,9 +105,9 @@ describe('PreviewTokenDateHelper', () => {
       // ——— Around BST end (last Sunday in Oct 2023: 2023-10-29) ———
       ['2023-10-27T23:59:00.000Z', '2023-10-29T23:59:59.000Z'],
       ['2023-10-15T23:59:00.000Z', '2023-10-17T22:59:59.000Z'],
-      // ['2023-10-28T23:59:00.000Z', '2023-10-30T23:59:59.000Z'], // This test is failing on the pipeline but not locally - TODO: EES-6748 investigate & fix
-      // ['2023-10-29T00:30:00.000Z', '2023-10-30T23:59:59.000Z'], // This test is failing on the pipeline but not locally - TODO: EES-6748 investigate & fix
-      // ['2023-10-30T10:00:00.000Z', '2023-10-31T23:59:59.000Z'],  // This test is failing on the pipeline but not locally - TODO: EES-6748 investigate & fix
+      ['2023-10-28T23:59:00.000Z', '2023-10-30T23:59:59.000Z'],
+      ['2023-10-29T00:30:00.000Z', '2023-10-30T23:59:59.000Z'],
+      ['2023-10-30T10:00:00.000Z', '2023-10-31T23:59:59.000Z'],
 
       // ——— Representative mid-year / winter cases ———
       ['2023-06-15T12:00:00.000Z', '2023-06-16T22:59:59.000Z'], // summer (BST)

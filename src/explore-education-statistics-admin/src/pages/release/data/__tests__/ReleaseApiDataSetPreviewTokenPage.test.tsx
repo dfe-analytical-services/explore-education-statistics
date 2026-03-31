@@ -74,6 +74,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
     ).toBeInTheDocument();
 
     const expiry = `tomorrow at ${now.toLocaleTimeString('en-US', {
+      timeZone: 'Europe/London',
       hour: 'numeric',
       minute: '2-digit',
     })}`;
