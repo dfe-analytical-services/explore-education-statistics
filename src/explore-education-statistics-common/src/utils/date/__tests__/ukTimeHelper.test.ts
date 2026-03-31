@@ -17,20 +17,44 @@ describe('UkTimeHelper', () => {
     expect(result.toISOString()).toBe('2025-01-15T23:59:59.000Z'); // UK 23:59:59 in UTC during DST
   });
 
-  test('should return today midnight in UK', () => {
-    const result = UkTimeHelper.toUkStartOfDay(new Date());
+  describe('UkTimeHelper.toUkStartOfDay', () => {
+    // Test case for Winter (GMT - Offset 0)
+    test('should return midnight UTC during Winter (GMT)', () => {
+      const winterDate = new Date('2026-01-15T12:00:00Z');
+      const result = UkTimeHelper.toUkStartOfDay(winterDate);
 
-    expect(result.toISOString()).toMatch(
-      /^\d{4}-\d{2}-\d{2}T00:00:00.000(Z|[+-]\d{2}:\d{2})$/,
-    );
+      // In Winter, 00:00 UK is 00:00 UTC
+      expect(result.toISOString()).toMatch(/^2026-01-15T00:00:00.000Z$/);
+    });
+
+    // Test case for Summer (BST - Offset +1)
+    test('should return 23:00 UTC of previous day during Summer (BST)', () => {
+      const summerDate = new Date('2026-06-15T12:00:00Z');
+      const result = UkTimeHelper.toUkStartOfDay(summerDate);
+
+      // In Summer, 00:00 UK is 23:00 UTC of the previous day
+      expect(result.toISOString()).toMatch(/^2026-06-14T23:00:00.000Z$/);
+    });
   });
 
-  test('should return today midnight in UK', () => {
-    const result = UkTimeHelper.toUkEndOfDay(new Date());
+  describe('UkTimeHelper.toUkEndOfDay', () => {
+    // Test case for Winter (GMT - Offset 0)
+    test('should return 23:59:59 during Winter (GMT)', () => {
+      const winterDate = new Date('2026-01-15T12:00:00Z');
+      const result = UkTimeHelper.toUkEndOfDay(winterDate);
 
-    expect(result.toISOString()).toMatch(
-      /^\d{4}-\d{2}-\d{2}T23:59:59.000(Z|[+-]\d{2}:\d{2})$/,
-    );
+      // In Winter, 23:59 UK is 23:59 UTC
+      expect(result.toISOString()).toMatch(/^2026-01-15T23:59:59.000Z$/);
+    });
+
+    // Test case for Summer (BST - Offset +1)
+    test('should return 22:59:59 UTC of previous day during Summer (BST)', () => {
+      const summerDate = new Date('2026-06-15T12:00:00Z');
+      const result = UkTimeHelper.toUkEndOfDay(summerDate);
+
+      // In Summer, 23:59 UK is 22:59 UTC
+      expect(result.toISOString()).toMatch(/^2026-06-15T22:59:59.000Z$/);
+    });
   });
 
   describe('UkTimeHelper.getDateRangeFromDate', () => {
@@ -65,13 +89,13 @@ describe('UkTimeHelper', () => {
       expect(result.endDate.toISOString()).toBe('2025-03-31T22:59:59.000Z'); // End of day in BST after transition
     });
 
-    // test('should handle transition from BST to GMT', () => {
-    //   const startDate = new Date('2025-10-25T12:00:00Z'); // Day before GMT starts
-    //   const result = UkTimeHelper.getDateRangeFromDate(2, startDate);
-    //
-    //   expect(result.startDate).toBe(startDate);
-    //   expect(result.endDate.toISOString()).toBe('2025-10-27T23:59:59.000Z'); // End of day in GMT after transition
-    // }); // This test is failing on the pipeline but not locally - TODO: EES-6748 investigate & fix
+    test('should handle transition from BST to GMT', () => {
+      const startDate = new Date('2025-10-25T12:00:00Z'); // Day before GMT starts
+      const result = UkTimeHelper.getDateRangeFromDate(2, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2025-10-27T23:59:59.000Z'); // End of day in GMT after transition
+    });
 
     test('should throw error when supplied with negative days (past dates)', () => {
       const startDate = new Date('2025-06-15T14:30:00Z');
