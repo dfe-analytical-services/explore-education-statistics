@@ -48,7 +48,10 @@ public interface IUserPublicationRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    Task RemoveMany(IEnumerable<UserPublicationRole> userPublicationRoles, CancellationToken cancellationToken = default);
+    Task RemoveMany(
+        IEnumerable<UserPublicationRole> userPublicationRoles,
+        CancellationToken cancellationToken = default
+    );
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 
