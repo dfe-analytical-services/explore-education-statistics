@@ -36,7 +36,6 @@ public class ReleaseApprovalService(
     IReleaseFileRepository releaseFileRepository,
     IReleaseFileService releaseFileService,
     IOptions<ReleaseApprovalOptions> options,
-    IUserReleaseRoleService userReleaseRoleService,
     IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IEmailTemplateService emailTemplateService
@@ -170,36 +169,25 @@ public class ReleaseApprovalService(
         ReleaseVersion releaseVersion
     )
     {
-        var userReleaseRoleEmails = (
-            await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
-                publicationId: releaseVersion.Release.PublicationId,
-                rolesToInclude: ReleaseRole.Approver
-            )
-        )
-            .Select(urr => urr.User.Email)
-            .ToList();
-
-        var userPublicationRoleEmails = await userPublicationRoleRepository
+        var approverEmails = await userPublicationRoleRepository
             .Query()
             .WhereForPublication(releaseVersion.Release.PublicationId)
-            .WhereRolesIn(PublicationRole.Allower)
+            .WhereRolesIn(PublicationRole.Approver)
             .Select(upr => upr.User.Email)
+            .Distinct()
             .ToListAsync();
 
-        return userReleaseRoleEmails
-            .Concat(userPublicationRoleEmails)
-            .Distinct()
+        return approverEmails
             .Select(email => emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
             .OnSuccessAllReturnVoid();
     }
 
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
-        var unsentUserReleaseRoleInvites = await userPrereleaseRoleRepository
+        var unsentUserPrereleaseRoleInvites = await userPrereleaseRoleRepository
             .Query(ResourceRoleFilter.AllButExpired)
             .AsNoTracking()
             .WhereForReleaseVersion(releaseVersion.Id)
-            .WhereRolesIn(ReleaseRole.PrereleaseViewer)
             .WhereEmailNotSent()
             .ToListAsync();
 
@@ -209,7 +197,7 @@ public class ReleaseApprovalService(
         // now have pre-release access to a Release which isn't approved yet.
         // On the other hand, if we skip over failed emails and continue sending the rest, some people will not get notified
         // of their access even when the Release is now approved. This makes them hard to detect.
-        await unsentUserReleaseRoleInvites
+        await unsentUserPrereleaseRoleInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async invite =>
                 await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(invite.Id)
