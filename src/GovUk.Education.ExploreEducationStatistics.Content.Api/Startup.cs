@@ -155,7 +155,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         });
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IIndicatorRepository, IndicatorRepository>();
-        services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
