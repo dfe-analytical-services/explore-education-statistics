@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import MethodologyHelpAndSupportSection from '@common/modules/methodology/components/MethodologyHelpAndSupportSection';
-import { PublicationSummaryMinimal } from '@common/services/publicationService';
+import { PublicationSummaryPreview } from '@common/services/publicationService';
 import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
 
-const testPublicationSummary: PublicationSummaryMinimal = {
+const testPublicationSummary: PublicationSummaryPreview = {
   id: 'Mock Publication Id',
   slug: 'Mock Publication Slug',
   latestReleaseSlug: 'Mock Latest Release Slug',

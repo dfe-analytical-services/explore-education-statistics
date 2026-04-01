@@ -47,7 +47,7 @@ export interface ReleaseSeriesItem {
   legacyLinkUrl?: string;
 }
 
-export interface PublicationSummaryMinimal {
+export interface PublicationSummaryPreview {
   id: string;
   slug: string;
   latestReleaseSlug?: string;
@@ -366,7 +366,7 @@ export interface ReleaseSummary {
 }
 
 export interface PublicationReleaseSummary extends ReleaseSummary {
-  publication: PublicationSummaryMinimal;
+  publication: PublicationSummaryPreview;
 }
 
 export interface PublicationTreeSummary {

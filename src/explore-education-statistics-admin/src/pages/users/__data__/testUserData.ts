@@ -1,4 +1,4 @@
-import { PublicationSummaryMinimal } from '@common/services/publicationService';
+import { PublicationSummaryPreview } from '@common/services/publicationService';
 import { IdTitlePair } from '@admin/services/types/common';
 import { Role, ResourceRoles, User } from '@admin/services/userService';
 
@@ -39,7 +39,7 @@ export const testUser: User = {
   ],
 };
 
-export const testPublicationSummaries: PublicationSummaryMinimal[] = [
+export const testPublicationSummaries: PublicationSummaryPreview[] = [
   {
     id: 'publication-1-id',
     slug: 'publication-1-slug',

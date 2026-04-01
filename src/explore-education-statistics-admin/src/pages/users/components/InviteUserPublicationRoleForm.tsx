@@ -8,14 +8,14 @@ import {
 import ButtonText from '@common/components/ButtonText';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
-import { PublicationSummaryMinimal } from '@common/services/publicationService';
+import { PublicationSummaryPreview } from '@common/services/publicationService';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { useFormContext } from 'react-hook-form';
 import { PublicationRole } from '@admin/services/types/PublicationRole';
 import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
 
 interface Props {
-  publications?: PublicationSummaryMinimal[];
+  publications?: PublicationSummaryPreview[];
   publicationRoles?: PublicationRole[];
 }
 

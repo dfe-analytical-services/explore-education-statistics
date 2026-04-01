@@ -3,7 +3,7 @@ import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import {
-  PublicationSummaryMinimal,
+  PublicationSummaryPreview,
   ReleaseSeriesItem,
 } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
@@ -113,7 +113,7 @@ const publicationService = {
       params: { themeId },
     });
   },
-  getPublicationSummaries(): Promise<PublicationSummaryMinimal[]> {
+  getPublicationSummaries(): Promise<PublicationSummaryPreview[]> {
     return client.get('/publication-summaries');
   },
   createPublication(
