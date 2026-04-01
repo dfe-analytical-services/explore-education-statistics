@@ -1,55 +1,57 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormFieldDateInput renders correctly 1`] = `
-<div class="govuk-form-group">
-  <fieldset class="govuk-fieldset"
-            id="startDate"
-  >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-      Start date
-    </legend>
-    <div class="govuk-form-group govuk-date-input__item">
-      <label class="govuk-label"
-             for="startDate-day"
-      >
-        Day
-      </label>
-      <input class="govuk-input govuk-input--width-2"
-             id="startDate-day"
-             inputmode="numeric"
-             type="text"
-             value
-             name="startDate.day"
-      >
-    </div>
-    <div class="govuk-form-group govuk-date-input__item">
-      <label class="govuk-label"
-             for="startDate-month"
-      >
-        Month
-      </label>
-      <input class="govuk-input govuk-input--width-2"
-             id="startDate-month"
-             inputmode="numeric"
-             type="text"
-             value
-             name="startDate.month"
-      >
-    </div>
-    <div class="govuk-form-group govuk-date-input__item">
-      <label class="govuk-label"
-             for="startDate-year"
-      >
-        Year
-      </label>
-      <input class="govuk-input govuk-input--width-4"
-             id="startDate-year"
-             inputmode="numeric"
-             type="text"
-             value
-             name="startDate.year"
-      >
-    </div>
-  </fieldset>
+<div>
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset"
+              id="startDate"
+    >
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        Start date
+      </legend>
+      <div class="govuk-form-group govuk-date-input__item">
+        <label class="govuk-label"
+               for="startDate-day"
+        >
+          Day
+        </label>
+        <input class="govuk-input govuk-input--width-2"
+               id="startDate-day"
+               inputmode="numeric"
+               type="text"
+               value
+               name="startDate.day"
+        >
+      </div>
+      <div class="govuk-form-group govuk-date-input__item">
+        <label class="govuk-label"
+               for="startDate-month"
+        >
+          Month
+        </label>
+        <input class="govuk-input govuk-input--width-2"
+               id="startDate-month"
+               inputmode="numeric"
+               type="text"
+               value
+               name="startDate.month"
+        >
+      </div>
+      <div class="govuk-form-group govuk-date-input__item">
+        <label class="govuk-label"
+               for="startDate-year"
+        >
+          Year
+        </label>
+        <input class="govuk-input govuk-input--width-4"
+               id="startDate-year"
+               inputmode="numeric"
+               type="text"
+               value
+               name="startDate.year"
+        >
+      </div>
+    </fieldset>
+  </div>
 </div>
 `;
