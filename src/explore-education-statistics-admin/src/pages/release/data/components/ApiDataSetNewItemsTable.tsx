@@ -20,11 +20,11 @@ export default function ApiDataSetNewItemsTable({
 }: Props) {
   return (
     <div className="table-container">
-      <table data-testid={`new-items-table-${groupKey}`}>
-      <caption className="govuk-visually-hidden">
-        {`Table showing new ${itemPluralLabel}${
-          groupLabel ? ` for ${groupLabel}` : ''
-        }`}
+      <table data-testid={`new-items-table-${groupKey ?? 'default'}`}>
+        <caption className="govuk-visually-hidden">
+          {`Table showing new ${itemPluralLabel}${
+            groupLabel ? ` for ${groupLabel}` : ''
+          }`}
         </caption>
         <thead>
           <tr>

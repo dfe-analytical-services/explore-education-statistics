@@ -99,89 +99,89 @@ export default function ApiDataSetMappableTable({
             const isPendingUpdate = pendingUpdates.some(
               update => update.sourceKey === mapping.sourceKey,
             );
-              const isMajorMapping =
-                candidate && candidateIsMajorMapping
-                  ? candidateIsMajorMapping(candidate, mapping)
-                  : false;
-  
-              return (
-                <tr
-                  key={`mapping-${mapping.sourceKey}`}
-                  className={classNames({
-                    'rowHighlight--alert': mapping.type === 'AutoNone',
-                  })}
-                >
-                  <td>{renderSource(mapping.source)}</td>
-                  <td>
-                    {!candidate ? (
-                      <>
-                        {mapping.type === 'AutoNone' ? (
-                          <Tag colour="red">Unmapped</Tag>
-                        ) : (
-                          'No mapping available'
-                        )}
-                      </>
-                    ) : (
-                      <>{renderCandidate(candidate)}</>
-                    )}
-                  </td>
-                  <td>
-                    <Tag
-                      colour={getUpdateTagColour(mapping.type, isMajorMapping)}
-                    >
-                      {getUpdateTagText(mapping.type, isMajorMapping)}
-                    </Tag>
-                  </td>
-                  <td className="govuk-!-text-align-right">
-                    {isPendingUpdate ? (
-                      <LoadingSpinner
-                        alert
-                        hideText
-                        inline
-                        size="sm"
-                        text={`Updating mapping for ${mapping.source.label}`}
+            const isMajorMapping =
+              candidate && candidateIsMajorMapping
+                ? candidateIsMajorMapping(candidate, mapping)
+                : false;
+
+            return (
+              <tr
+                key={`mapping-${mapping.sourceKey}`}
+                className={classNames({
+                  'rowHighlight--alert': mapping.type === 'AutoNone',
+                })}
+              >
+                <td>{renderSource(mapping.source)}</td>
+                <td>
+                  {!candidate ? (
+                    <>
+                      {mapping.type === 'AutoNone' ? (
+                        <Tag colour="red">Unmapped</Tag>
+                      ) : (
+                        'No mapping available'
+                      )}
+                    </>
+                  ) : (
+                    <>{renderCandidate(candidate)}</>
+                  )}
+                </td>
+                <td>
+                  <Tag
+                    colour={getUpdateTagColour(mapping.type, isMajorMapping)}
+                  >
+                    {getUpdateTagText(mapping.type, isMajorMapping)}
+                  </Tag>
+                </td>
+                <td className="govuk-!-text-align-right">
+                  {isPendingUpdate ? (
+                    <LoadingSpinner
+                      alert
+                      hideText
+                      inline
+                      size="sm"
+                      text={`Updating mapping for ${mapping.source.label}`}
+                    />
+                  ) : (
+                    <>
+                      {mapping.type !== 'ManualNone' && (
+                        <ButtonText
+                          onClick={async () => {
+                            await onUpdate({
+                              groupKey,
+                              previousCandidate: candidate,
+                              previousMapping: mapping,
+                              sourceKey: mapping.sourceKey,
+                              type: 'ManualNone',
+                            });
+                          }}
+                        >
+                          No mapping
+                          <VisuallyHidden>
+                            {' '}
+                            for {mapping.source.label}
+                          </VisuallyHidden>
+                        </ButtonText>
+                      )}
+
+                      <ApiDataSetMappingModal
+                        candidate={candidate}
+                        candidateHint={candidateHint}
+                        groupKey={groupKey}
+                        itemLabel={itemLabel}
+                        mapping={mapping}
+                        newItems={newItems}
+                        renderSourceDetails={renderSourceDetails}
+                        onSubmit={onUpdate}
                       />
-                    ) : (
-                      <>
-                        {mapping.type !== 'ManualNone' && (
-                          <ButtonText
-                            onClick={async () => {
-                              await onUpdate({
-                                groupKey,
-                                previousCandidate: candidate,
-                                previousMapping: mapping,
-                                sourceKey: mapping.sourceKey,
-                                type: 'ManualNone',
-                              });
-                            }}
-                          >
-                            No mapping
-                            <VisuallyHidden>
-                              {' '}
-                              for {mapping.source.label}
-                            </VisuallyHidden>
-                          </ButtonText>
-                        )}
-  
-                        <ApiDataSetMappingModal
-                          candidate={candidate}
-                          candidateHint={candidateHint}
-                          groupKey={groupKey}
-                          itemLabel={itemLabel}
-                          mapping={mapping}
-                          newItems={newItems}
-                          renderSourceDetails={renderSourceDetails}
-                          onSubmit={onUpdate}
-                        />
-                      </>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
