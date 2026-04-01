@@ -19,7 +19,8 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ApiDataSetQuickStart from '@common/modules/data-catalogue/components/ApiDataSetQuickStart';
-import { isToday } from 'date-fns';
+import UkTimeHelper from '@common/utils/date/ukTimeHelper';
+import { formatInTimeZone } from 'date-fns-tz';
 import { useQuery } from '@tanstack/react-query';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
@@ -67,7 +68,16 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
   const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.id}`;
 
   const displayActivatedDate = previewToken
-    ? isToday(new Date(previewToken.activates))
+    ? formatInTimeZone(
+        previewToken.activates,
+        UkTimeHelper.europeLondonTimeZoneId,
+        'yyyy-MM-dd',
+      ) ===
+      formatInTimeZone(
+        new Date(),
+        UkTimeHelper.europeLondonTimeZoneId,
+        'yyyy-MM-dd',
+      )
     : false;
 
   return (
