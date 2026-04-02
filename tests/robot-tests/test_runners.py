@@ -40,6 +40,8 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
         robot_args += ["-v", "prompt_to_continue_on_failure:1"]
     if arguments.debug:
         robot_args += ["--loglevel", "DEBUG"]
+    if arguments.log_network_traffic:
+        robot_args += ["-v", "log_network_traffic:1"]
     robot_args += ["-v", "browser:" + arguments.browser]
     # We want to add arguments on the first rerun attempt, but on subsequent attempts, we just want
     # to change rerunfailedsuites xml file we use

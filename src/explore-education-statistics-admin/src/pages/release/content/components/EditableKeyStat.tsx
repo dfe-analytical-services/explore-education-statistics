@@ -9,7 +9,6 @@ import { KeyStatistic } from '@common/services/publicationService';
 import React from 'react';
 
 interface EditableKeyStatProps {
-  isEditing?: boolean;
   keyStat: KeyStatistic;
   keyStats: KeyStatistic[];
   releaseVersionId: string;
@@ -17,7 +16,6 @@ interface EditableKeyStatProps {
 }
 
 const EditableKeyStat = ({
-  isEditing = false,
   keyStat,
   keyStats,
   releaseVersionId,
@@ -38,7 +36,6 @@ const EditableKeyStat = ({
           keyStats={keyStats}
           releaseVersionId={releaseVersionId}
           testId={testId}
-          isEditing={isEditing}
           onRemove={async () => {
             await deleteKeyStatistic({
               releaseVersionId,
@@ -67,7 +64,6 @@ const EditableKeyStat = ({
           keyStat={keyStat}
           keyStats={keyStats}
           testId={testId}
-          isEditing={isEditing}
           onRemove={async () => {
             await deleteKeyStatistic({
               releaseVersionId,

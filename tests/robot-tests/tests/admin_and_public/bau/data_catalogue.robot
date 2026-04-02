@@ -174,7 +174,7 @@ Validate release filter exists
 Filter by theme
     user wait for option to be available and select it    css:select[id="filters-form-theme"]
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user waits until page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Filter by publication
     user wait for option to be available and select it    css:select[id="filters-form-publication"]
@@ -186,12 +186,12 @@ Filter by publication
 
 Filter by all releases
     user wait for option to be available and select it    css:select[id="filters-form-release"]    All releases
-    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Remove theme filter
     user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user waits until page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks selected option label    css:select[id="filters-form-theme"]    All themes
 
@@ -201,7 +201,7 @@ Remove publication filter
     user wait for option to be available and select it    css:select[id="filters-form-publication"]
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user waits until page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks selected option label    css:select[id="filters-form-publication"]    All publications
@@ -215,7 +215,7 @@ Remove release filter
     user wait for option to be available and select it    css:select[id="filters-form-release"]
     ...    ${PUPIL_ABSENCE_RELEASE_NAME}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user waits until page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks selected option label    id:filters-form-release    All releases
@@ -233,7 +233,7 @@ Filter by geographic level
 Remove geographic level filter
     user clicks button    Local Authority District
 
-    user checks page does not contain button    Local Authority District
+    user waits until page does not contain button    Local Authority District
     user checks selected option label    id:filters-form-geographic-level    All
 
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
@@ -246,12 +246,12 @@ Reset all filters
     user wait for option to be available and select it    css:select[id="filters-form-theme"]
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
-    user checks page contains button    pupil
+    user waits until page contains button    pupil
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
     user clicks button    Reset filters
 
-    user checks page does not contain button    pupil
+    user waits until page does not contain button    pupil
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    Reset filters
 
@@ -263,12 +263,12 @@ Searching
     user clicks element    id:searchForm-search
     user presses keys    Exclusions by geographic level
     user clicks button    Search
-    user checks page contains button    Exclusions by geographic level
+    user waits until page contains button    Exclusions by geographic level
     user checks list item contains    testid:data-set-file-list    1    Exclusions by geographic level
 
 Removing search
     user clicks button    Exclusions by geographic level
-    user checks page does not contain button    Exclusions by geographic level
+    user waits until page does not contain button    Exclusions by geographic level
 
 Validate data catalogue page redirect from slug based urls
     environment variable should be set    PUBLIC_URL
@@ -280,6 +280,7 @@ Validate data catalogue page redirect from slug based urls
     user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
+    user waits until page contains element    css:[data-testid="data-set-file-list"]
     user checks element count is x    css:[data-testid="data-set-file-list"] li:first-child    2
     ${dataSet_1}=    user gets testid element    data-set-file-summary-Absence by characteristic
     user checks element contains    ${dataSet_1}    Absence by characteristic

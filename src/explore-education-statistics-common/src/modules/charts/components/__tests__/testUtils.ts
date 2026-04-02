@@ -6,7 +6,7 @@ export function expectTick(
 ) {
   expect(
     container.querySelector(
-      `.${axis}Axis .recharts-cartesian-axis-tick:nth-child(${child}) .recharts-cartesian-axis-tick-value tspan`,
+      `.recharts-${axis}Axis-tick-labels .recharts-cartesian-axis-tick-label:nth-child(${child}) .recharts-cartesian-axis-tick-value tspan`,
     ),
   ).toHaveTextContent(value);
 }

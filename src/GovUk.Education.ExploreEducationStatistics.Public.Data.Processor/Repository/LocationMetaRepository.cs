@@ -59,7 +59,7 @@ public class LocationMetaRepository(
         publicDataDbContext.LocationMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+        var publicIdMappings = await GetPublicIdMappings(dataSetVersion, cancellationToken);
 
         foreach (var meta in metas)
         {
@@ -137,7 +137,7 @@ public class LocationMetaRepository(
                         (option, index) =>
                             new LocationOptionMetaLink
                             {
-                                PublicId = CreatePublicIdForLocationOptionMetaLink(publicIdMappings, meta, option),
+                                PublicId = GetOrCreatePublicIdForLocationOptionMetaLink(publicIdMappings, meta, option),
                                 MetaId = meta.Id,
                                 OptionId = option.Id,
                             }
@@ -165,7 +165,7 @@ public class LocationMetaRepository(
         }
     }
 
-    private static string CreatePublicIdForLocationOptionMetaLink(
+    private static string GetOrCreatePublicIdForLocationOptionMetaLink(
         PublicIdMappings publicIdMappings,
         GeographicLevel level,
         LocationOptionMetaRow option
@@ -257,7 +257,7 @@ public class LocationMetaRepository(
         };
     }
 
-    private async Task<PublicIdMappings> CreatePublicIdMappings(
+    private async Task<PublicIdMappings> GetPublicIdMappings(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken
     )

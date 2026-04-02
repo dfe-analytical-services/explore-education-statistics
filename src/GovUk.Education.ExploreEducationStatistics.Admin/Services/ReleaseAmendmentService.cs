@@ -609,15 +609,8 @@ public class ReleaseAmendmentService(
         return amendmentReleaseVersion;
     }
 
-    private static string FilterOutComments(string bodyText)
-    {
-        if (bodyText.IsNullOrEmpty())
-        {
-            return bodyText;
-        }
-
-        return CommentsRegex().Replace(bodyText, _ => string.Empty);
-    }
+    private static string? FilterOutComments(string? bodyText) =>
+        string.IsNullOrEmpty(bodyText) ? bodyText : CommentsRegex().Replace(bodyText, _ => string.Empty);
 }
 
 internal static class ReleaseAmendmentQueryableExtensions

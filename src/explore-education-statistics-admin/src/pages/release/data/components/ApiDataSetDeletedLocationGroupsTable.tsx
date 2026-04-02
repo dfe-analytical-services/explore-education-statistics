@@ -14,47 +14,49 @@ export default function ApiDataSetDeletedLocationGroupsTable({
   locationGroups,
 }: Props) {
   return (
-    <table
-      className="govuk-!-margin-bottom-7"
-      id="deleted-location-groups-table"
-      data-testid="deleted-location-groups-table"
-    >
-      <caption className="govuk-visually-hidden">
-        Table showing location groups deleted by new data set
-      </caption>
-      <thead>
-        <tr>
-          <th className="govuk-!-width-one-third">Current data set</th>
-          <th className="govuk-!-width-one-third">New data set</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.entries(locationGroups).map(([key, options]) => {
-          const levelKey = key as LocationLevelKey;
+    <div className="table-container">
+      <table
+        className="govuk-!-margin-bottom-7"
+        id="deleted-location-groups-table"
+        data-testid="deleted-location-groups-table"
+      >
+        <caption className="govuk-visually-hidden">
+          Table showing location groups deleted by new data set
+        </caption>
+        <thead>
+          <tr>
+            <th className="govuk-!-width-one-third">Current data set</th>
+            <th className="govuk-!-width-one-third">New data set</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(locationGroups).map(([key, options]) => {
+            const levelKey = key as LocationLevelKey;
 
-          return (
-            <tr key={levelKey}>
-              <td>
-                {locationLevelsMap[levelKey].plural}
-                {options.length > 0 && (
-                  <>
-                    <br />
-                    <ApiDataSetLocationGroupOptionsModal
-                      level={levelKey}
-                      options={options}
-                    />
-                  </>
-                )}
-              </td>
-              <td>No mapping available</td>
-              <td>
-                <Tag colour="blue">Major</Tag>
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+            return (
+              <tr key={levelKey}>
+                <td>
+                  {locationLevelsMap[levelKey].plural}
+                  {options.length > 0 && (
+                    <>
+                      <br />
+                      <ApiDataSetLocationGroupOptionsModal
+                        level={levelKey}
+                        options={options}
+                      />
+                    </>
+                  )}
+                </td>
+                <td>No mapping available</td>
+                <td>
+                  <Tag colour="blue">Major</Tag>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }

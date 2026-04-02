@@ -363,6 +363,33 @@ public class ReleaseVersionsControllerUnitTests
     }
 
     [Fact]
+    public async Task UpdatePreReleaseAccessList_Returns_Ok()
+    {
+        // Arrange
+        var request = new ReleaseVersionPreReleaseAccessListUpdateRequest { PreReleaseAccessList = "access list" };
+
+        var expectedResult = new ReleaseVersionViewModel { Id = _releaseVersionId };
+
+        var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+
+        releaseVersionService
+            .Setup(s => s.UpdatePreReleaseAccessList(_releaseVersionId, request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Unit.Instance);
+
+        releaseVersionService.Setup(s => s.GetRelease(_releaseVersionId)).ReturnsAsync(expectedResult);
+
+        var controller = BuildController(releaseVersionService: releaseVersionService.Object);
+
+        // Act
+        var result = await controller.UpdatePreReleaseAccessList(_releaseVersionId, request);
+
+        // Assert
+        VerifyAllMocks(releaseVersionService);
+
+        result.AssertOkResult(expectedResult);
+    }
+
+    [Fact]
     public async Task GetTemplateRelease_Returns_Ok()
     {
         // Arrange

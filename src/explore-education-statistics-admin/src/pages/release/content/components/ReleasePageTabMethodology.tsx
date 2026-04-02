@@ -7,8 +7,8 @@ import {
 } from '@admin/routes/preReleaseRoutes';
 import ContactUsSection, {
   contactUsNavItem,
-} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+} from '@common/modules/release/components/ReleaseContactUsSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';

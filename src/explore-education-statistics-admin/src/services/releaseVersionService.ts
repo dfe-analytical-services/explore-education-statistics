@@ -5,7 +5,7 @@ import {
 } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import {
-  PublicationSummary,
+  PublicationSummaryPreview,
   ReleaseApprovalStatus,
 } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
@@ -69,12 +69,12 @@ export interface ReleaseVersionSummary {
   amendment: boolean;
   previousVersionId?: string;
   permissions?: ReleaseVersionPermissions;
-  publication?: PublicationSummary;
+  publication?: PublicationSummaryPreview;
 }
 
 export interface DashboardReleaseVersionSummary
   extends ReleaseVersionSummaryWithPermissions {
-  publication: PublicationSummary;
+  publication: PublicationSummaryPreview;
 }
 
 export interface ReleaseVersionSummaryWithPermissions
@@ -82,15 +82,18 @@ export interface ReleaseVersionSummaryWithPermissions
   permissions: ReleaseVersionPermissions;
 }
 
+export interface UpdatePreReleaseAccessListRequest {
+  preReleaseAccessList: string;
+}
+
 export interface UpdateReleaseVersionRequest {
-  preReleaseAccessList?: string;
   year: number;
   timePeriodCoverage: {
     value: string;
   };
   type: ReleaseType;
   label?: string;
-  publishingOrganisations?: string[];
+  publishingOrganisations: string[];
 }
 
 export interface CreateReleaseVersionStatusRequest {
@@ -150,6 +153,7 @@ export const ReleaseVersionChecklistErrorCode = [
   'RelatedDashboardsSectionContainsEmptyHtmlBlock',
   'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock',
   'SummarySectionContainsEmptyHtmlBlock',
+  'WarningSectionContainsEmptyHtmlBlock',
   'PublicApiDataSetImportsMustBeCompleted',
   'PublicApiDataSetCancellationsMustBeResolved',
   'PublicApiDataSetFailuresMustBeResolved',
@@ -215,6 +219,16 @@ const releaseVersionService = {
 
   getReleaseVersionStatuses(id: string): Promise<ReleaseStatus[]> {
     return client.get(`/releases/${id}/status`);
+  },
+
+  updatePreReleaseAccessList(
+    releaseVersionId: string,
+    updateRequest: UpdatePreReleaseAccessListRequest,
+  ): Promise<ReleaseVersion> {
+    return client.patch(
+      `/releaseVersions/${releaseVersionId}/prerelease-access-list`,
+      updateRequest,
+    );
   },
 
   updateReleaseVersion(

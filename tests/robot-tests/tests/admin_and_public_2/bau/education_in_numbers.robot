@@ -135,7 +135,7 @@ Publish page
     user checks summary list contains    Status    Published    testid:summary-list
 
 Check page appears on public site
-    go to    ${test_page_url}
+    user navigates to    ${test_page_url}
 
     user waits until h1 is visible    UI test page
 
@@ -152,7 +152,7 @@ Check page appears on public site
     user checks page contains link with text and url    A link to somewhere    http://test.link
 
 Validate Manage Education in Numbers entry
-    go to    %{ADMIN_URL}/education-in-numbers
+    user navigates to    %{ADMIN_URL}/education-in-numbers
 
     user waits until h1 is visible    Education in Numbers pages
 
@@ -197,7 +197,8 @@ Publish amendment
     user checks summary list contains    Status    Published    testid:summary-list
 
 Check amendment on public site
-    go to    ${test_page_url}
+    user waits for caches to expire
+    user navigates to    ${test_page_url}
 
     user waits until h1 is visible    UI test page
 

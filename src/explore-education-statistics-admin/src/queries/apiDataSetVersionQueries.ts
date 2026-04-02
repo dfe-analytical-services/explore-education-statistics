@@ -30,6 +30,13 @@ const apiDataSetVersionQueries = createQueryKeys('apiDataSetVersionQueries', {
         apiDataSetVersionService.getLocationsMapping(dataSetVersionId),
     };
   },
+  getIndicatorsMapping(dataSetVersionId: string) {
+    return {
+      queryKey: [dataSetVersionId],
+      queryFn: () =>
+        apiDataSetVersionService.getIndicatorsMapping(dataSetVersionId),
+    };
+  },
   getChanges(dataSetVersionId: string) {
     return {
       queryKey: [dataSetVersionId],

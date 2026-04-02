@@ -37,6 +37,7 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
   const { ref, ...field } = useRegister(name, register);
   const { fieldId } = useFormIdContext();
   const id = fieldId(name);
+  const [resetKey, setResetKey] = useState(0);
 
   const { onChange } = props;
 
@@ -52,6 +53,7 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
             if (previousTouched && !touched) {
               toggleClicked.off();
               setInputValue(undefined);
+              setResetKey(prev => prev + 1);
             }
           }}
         />
@@ -60,6 +62,7 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
           {...props}
           {...field}
           error={fieldState.error?.message}
+          key={resetKey}
           id={id}
           onClick={toggleClicked.on}
           onChange={event => {

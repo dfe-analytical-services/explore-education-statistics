@@ -162,63 +162,65 @@ const ReleaseDataBlocksPage = ({
         <>
           <h3>Data blocks</h3>
 
-          <table data-testid="dataBlocks">
-            <thead>
-              <tr>
-                <th scope="col" className="govuk-!-width-one-quarter">
-                  Name
-                </th>
-                <th scope="col">Has chart</th>
-                <th scope="col">In content</th>
-                <th scope="col">Created date</th>
-                <th scope="col" className="govuk-table__header--actions">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredDataBlocks.map(dataBlock => (
-                <tr key={dataBlock.id}>
-                  <td>{dataBlock.name}</td>
-                  <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
-                  <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
-                  <td>
-                    {dataBlock.created ? (
-                      <FormattedDate format="d MMMM yyyy HH:mm">
-                        {dataBlock.created}
-                      </FormattedDate>
-                    ) : (
-                      'Not available'
-                    )}
-                  </td>
-                  <td className="govuk-table__cell--actions govuk-!-width-one-quarter">
-                    <Link
-                      className="govuk-!-margin-bottom-0"
-                      unvisited
-                      data-testid={`Edit data block ${dataBlock.name}`}
-                      to={generatePath<ReleaseDataBlockRouteParams>(
-                        releaseDataBlockEditRoute.path,
-                        {
-                          publicationId,
-                          releaseVersionId,
-                          dataBlockId: dataBlock.id,
-                        },
-                      )}
-                    >
-                      {canUpdateRelease ? 'Edit block' : 'View block'}
-                    </Link>
-                    {canUpdateRelease && (
-                      <DataBlockDeletePlanModal
-                        releaseVersionId={releaseVersionId}
-                        dataBlockId={dataBlock.id}
-                        onConfirm={() => handleDeleteConfirm(dataBlock.id)}
-                      />
-                    )}
-                  </td>
+          <div className="table-container">
+            <table data-testid="dataBlocks">
+              <thead>
+                <tr>
+                  <th scope="col" className="govuk-!-width-one-quarter">
+                    Name
+                  </th>
+                  <th scope="col">Has chart</th>
+                  <th scope="col">In content</th>
+                  <th scope="col">Created date</th>
+                  <th scope="col" className="govuk-table__header--actions">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredDataBlocks.map(dataBlock => (
+                  <tr key={dataBlock.id}>
+                    <td>{dataBlock.name}</td>
+                    <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
+                    <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
+                    <td>
+                      {dataBlock.created ? (
+                        <FormattedDate format="d MMMM yyyy HH:mm">
+                          {dataBlock.created}
+                        </FormattedDate>
+                      ) : (
+                        'Not available'
+                      )}
+                    </td>
+                    <td className="govuk-table__cell--actions govuk-!-width-one-quarter">
+                      <Link
+                        className="govuk-!-margin-bottom-0"
+                        unvisited
+                        data-testid={`Edit data block ${dataBlock.name}`}
+                        to={generatePath<ReleaseDataBlockRouteParams>(
+                          releaseDataBlockEditRoute.path,
+                          {
+                            publicationId,
+                            releaseVersionId,
+                            dataBlockId: dataBlock.id,
+                          },
+                        )}
+                      >
+                        {canUpdateRelease ? 'Edit block' : 'View block'}
+                      </Link>
+                      {canUpdateRelease && (
+                        <DataBlockDeletePlanModal
+                          releaseVersionId={releaseVersionId}
+                          dataBlockId={dataBlock.id}
+                          onConfirm={() => handleDeleteConfirm(dataBlock.id)}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
 

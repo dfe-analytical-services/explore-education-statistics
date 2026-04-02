@@ -36,21 +36,16 @@ public static class FilterMappingPlanGeneratorExtensions
                 var sourceKey = MappingKeyGenerators.FilterOptionMeta(option);
                 var sourceLink = sourceFilter.OptionLinks.SingleOrDefault(l => l.OptionId == option.Id);
 
-                var autoMappedOption = autoMappedFilter?.Options.SingleOrDefault(o =>
-                    MappingKeyGenerators.FilterOptionMeta(o) == sourceKey
-                );
+                var autoMappedOption =
+                    autoMappedFilter?.Options.Any(o => MappingKeyGenerators.FilterOptionMeta(o) == sourceKey) ?? false;
 
                 filterMappingGenerator.AddOptionMapping(
                     sourceKey: sourceKey,
                     mapping: fixture
                         .DefaultFilterOptionMapping()
                         .WithSource(fixture.DefaultMappableFilterOption().WithLabel(option.Label))
-                        .WithType(autoMappedOption is not null ? MappingType.AutoMapped : MappingType.AutoNone)
-                        .WithCandidateKey(
-                            autoMappedOption is not null
-                                ? MappingKeyGenerators.FilterOptionMeta(autoMappedOption)
-                                : null
-                        )
+                        .WithType(autoMappedOption ? MappingType.AutoMapped : MappingType.AutoNone)
+                        .WithCandidateKey(autoMappedOption ? sourceKey : null)
                         .WithPublicId(sourceLink?.PublicId ?? $"{sourceFilter.PublicId} :: {option.Label}")
                 );
             });

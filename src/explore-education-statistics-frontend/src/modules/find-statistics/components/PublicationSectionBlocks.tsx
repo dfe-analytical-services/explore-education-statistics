@@ -7,7 +7,6 @@ import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
 import ExploreDataButton from '@frontend/modules/find-statistics/components/ExploreDataButton';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { BlockViewModel } from '@common/services/publicationService';
-import { Block } from '@common/services/types/blocks';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
@@ -15,7 +14,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 
 export interface PublicationSectionBlocksProps {
   releaseVersionId: string;
-  blocks: Block[] | BlockViewModel[];
+  blocks: BlockViewModel[];
   visible?: boolean;
 }
 
@@ -34,14 +33,6 @@ const PublicationSectionBlocks = ({
   return blocks.length > 0 ? (
     <>
       {blocks.map(block => {
-        if (block.type === 'EmbedBlockLink') {
-          return (
-            <Gate condition={!!visible} key={block.id}>
-              <EmbedBlock url={block.url} title={block.title} />
-            </Gate>
-          );
-        }
-
         if (block.type === 'EmbedBlock') {
           return (
             <Gate condition={!!visible} key={block.id}>
@@ -54,14 +45,11 @@ const PublicationSectionBlocks = ({
         }
 
         if (block.type === 'DataBlock') {
-          const dataBlock =
-            'dataBlockVersion' in block
-              ? {
-                  id: block.id,
-                  type: block.type,
-                  ...block.dataBlockVersion,
-                }
-              : block;
+          const dataBlock = {
+            id: block.id,
+            type: block.type,
+            ...block.dataBlockVersion,
+          };
           return (
             <Gate condition={!!visible} key={block.id}>
               <DataBlockTabs

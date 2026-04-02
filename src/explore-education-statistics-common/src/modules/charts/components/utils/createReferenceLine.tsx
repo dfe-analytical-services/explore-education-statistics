@@ -10,6 +10,15 @@ import React, { ReactElement } from 'react';
 import { ReferenceLine, ReferenceLineProps } from 'recharts';
 import { AxisDomainItem } from 'recharts/types/util/types';
 
+type InjectedLabelProps = ReferenceLineProps & {
+  viewBox?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+};
+
 interface Props {
   axis: Axis;
   axisDomain?: [AxisDomainItem, AxisDomainItem];
@@ -89,7 +98,7 @@ export default function createReferenceLine({
         position,
         otherAxisStart,
       })}
-      label={(lineProps: ReferenceLineProps) => (
+      label={(lineProps: InjectedLabelProps) => (
         <CustomReferenceLineLabel
           viewBox={lineProps.viewBox}
           axis={axis}
@@ -125,7 +134,12 @@ function getSegment({
   otherAxisEnd?: string;
   position?: string | number;
   otherAxisStart?: string;
-}) {
+}):
+  | readonly [
+      { x?: string | number; y?: string | number },
+      { x?: string | number; y?: string | number },
+    ]
+  | undefined {
   if (!otherAxisStart || !otherAxisEnd || !position) {
     return undefined;
   }

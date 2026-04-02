@@ -15,7 +15,7 @@ import Pagination from '@frontend/components/Pagination';
 import { SortOption } from '@frontend/components/SortControls';
 import Filters from '@frontend/modules/find-statistics/components/Filters';
 import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
-import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
+import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
 import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import {
   PublicationFilter,
@@ -392,7 +392,10 @@ const FindStatisticsPage: NextPage = () => {
                     data-testid="publicationsList"
                   >
                     {publications.map(pub => (
-                      <PublicationSummary key={pub.id} publication={pub} />
+                      <PublicationResultSummary
+                        key={pub.id}
+                        publication={pub}
+                      />
                     ))}
                   </ul>
                 )}

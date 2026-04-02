@@ -1,11 +1,11 @@
 /* eslint-disable react/destructuring-assignment */
 import { NavItem } from '@common/components/PageNavExpandable';
 import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
-import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import { contactUsNavItem } from '@common/modules/release/components/ReleaseContactUsSection';
 import exploreDataPageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import {
   PublicationMethodologiesList,
-  PublicationSummaryRedesign,
+  PublicationSummary,
   RelatedInformationItem,
   ReleaseVersionDataContent,
   ReleaseVersionHomeContent,
@@ -16,9 +16,9 @@ import { Dictionary } from '@common/types';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
 import { TabRouteItem } from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
-import PublicationReleasePageHome from '@frontend/modules/find-statistics/PublicationReleasePageHome';
 import ReleaseExploreDataPage from '@frontend/modules/find-statistics/ReleaseExploreDataPage';
 import ReleaseHelpPage from '@frontend/modules/find-statistics/ReleaseHelpPage';
+import ReleaseHomePage from '@frontend/modules/find-statistics/ReleaseHomePage';
 import ReleaseMethodologyPage from '@frontend/modules/find-statistics/ReleaseMethodologyPage';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
@@ -49,8 +49,8 @@ export type ReleasePageTabRouteKey = keyof ReleasePageTabRouteItems;
 
 interface BaseReleaseProps {
   inPageNavItems: NavItem[];
-  publicationSummary: PublicationSummaryRedesign;
   page: ReleasePageTabRouteKey;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
@@ -88,7 +88,7 @@ const PublicationReleasePage: NextPage<Props> = props => {
       tabNavItems={releasePageTabRouteItems}
     >
       {page === 'home' && (
-        <PublicationReleasePageHome
+        <ReleaseHomePage
           homeContent={props.homeContent}
           publicationSummary={props.publicationSummary}
           releaseVersionSummary={props.releaseVersionSummary}
@@ -131,7 +131,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
 
     try {
       const publicationSummary = await queryClient.fetchQuery(
-        publicationQueries.getPublicationSummaryRedesign(publicationSlug),
+        publicationQueries.getPublicationSummary(publicationSlug),
       );
 
       if (!releaseSlug) {

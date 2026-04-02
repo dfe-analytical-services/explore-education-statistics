@@ -1,5 +1,6 @@
 import ApiDataSetPreviewTokenCreateForm from '@admin/pages/release/data/components/ApiDataSetPreviewTokenCreateForm';
 import render from '@common-test/render';
+import { addDays } from 'date-fns';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
@@ -140,7 +141,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
     const handleSubmit = jest.fn();
 
     // Act
-    await renderWithCustomDatesSelected(
+    await renderWithCustomDatesSubmitted(
       activates,
       expiresStartOfDay,
       handleSubmit,
@@ -177,7 +178,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
     yesterday.setDate(today.getDate() - 1);
     const handleSubmit = jest.fn();
 
-    await renderWithCustomDatesSelected(yesterday, today, handleSubmit);
+    await renderWithCustomDatesSubmitted(yesterday, today, handleSubmit);
 
     expect(
       await screen.findByText('Activates date must not be in the past.', {
@@ -187,14 +188,12 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
   });
 
   test('shows validation error when start date is more than 7 days from current time', async () => {
-    const today = new Date();
-    const afterTodayBy8Days = new Date();
-    const afterTodayBy10Days = new Date();
-    afterTodayBy8Days.setDate(today.getDate() + 8);
-    afterTodayBy10Days.setDate(today.getDate() + 10);
+    const afterTodayBy8Days = addDays(new Date(), 8);
+    const afterTodayBy10Days = addDays(new Date(), 10);
+
     const handleSubmit = jest.fn();
 
-    await renderWithCustomDatesSelected(
+    await renderWithCustomDatesSubmitted(
       afterTodayBy8Days,
       afterTodayBy10Days,
       handleSubmit,
@@ -216,7 +215,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
     beyond7.setDate(today.getDate() + 8);
     const handleSubmit = jest.fn();
 
-    await renderWithCustomDatesSelected(today, beyond7, handleSubmit);
+    await renderWithCustomDatesSubmitted(today, beyond7, handleSubmit);
 
     expect(
       await screen.findByText(
@@ -261,7 +260,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
   });
 });
 
-async function renderWithCustomDatesSelected(
+async function renderWithCustomDatesSubmitted(
   activatesDate: Date,
   expiresDate: Date,
   handleSubmit: Mock<void, [PreviewTokenCreateValues], void>,

@@ -62,7 +62,7 @@ describe('ApiDataSetMappableTable', () => {
     render(
       <ApiDataSetMappableTable
         groupKey="Filter1Key"
-        groupLabel="Filter 1"
+        tableCaptionText="Filter 1"
         itemLabel="filter option"
         itemPluralLabel="filter options"
         mappableItems={testFilterOptions}
@@ -88,7 +88,7 @@ describe('ApiDataSetMappableTable', () => {
     );
     expect(
       within(row1Cells[3]).getByRole('button', {
-        name: 'Map option for Filter Option 1',
+        name: 'Map filter option for Filter Option 1',
       }),
     ).toBeInTheDocument();
 
@@ -104,7 +104,7 @@ describe('ApiDataSetMappableTable', () => {
     ).toBeInTheDocument();
     expect(
       within(row2Cells[3]).getByRole('button', {
-        name: 'Map option for Filter Option 2',
+        name: 'Map filter option for Filter Option 2',
       }),
     ).toBeInTheDocument();
 
@@ -120,7 +120,7 @@ describe('ApiDataSetMappableTable', () => {
     ).toBeInTheDocument();
     expect(
       within(row3Cells[3]).getByRole('button', {
-        name: 'Map option for Filter Option 3',
+        name: 'Map filter option for Filter Option 3',
       }),
     ).toBeInTheDocument();
 
@@ -136,7 +136,7 @@ describe('ApiDataSetMappableTable', () => {
     ).not.toBeInTheDocument();
     expect(
       within(row4Cells[3]).getByRole('button', {
-        name: 'Map option for Filter Option 4',
+        name: 'Map filter option for Filter Option 4',
       }),
     ).toBeInTheDocument();
   });
@@ -145,7 +145,7 @@ describe('ApiDataSetMappableTable', () => {
     render(
       <ApiDataSetMappableTable
         groupKey="Filter1Key"
-        groupLabel="Filter 1"
+        tableCaptionText="Filter 1"
         itemLabel="filter option"
         itemPluralLabel="filter options"
         mappableItems={testFilterOptions}
@@ -167,7 +167,7 @@ describe('ApiDataSetMappableTable', () => {
     render(
       <ApiDataSetMappableTable
         groupKey="Filter1Key"
-        groupLabel="Filter 1"
+        tableCaptionText="Filter 1"
         itemLabel="filter option"
         itemPluralLabel="filter options"
         mappableItems={testFilterOptions}
@@ -197,7 +197,7 @@ describe('ApiDataSetMappableTable', () => {
     ).not.toBeInTheDocument();
     expect(
       within(row2Cells[3]).queryByRole('button', {
-        name: 'Map option for Filter Option 2',
+        name: 'Map filter option for Filter Option 2',
       }),
     ).not.toBeInTheDocument();
   });

@@ -58,7 +58,7 @@ public class FilterMetaRepository(
         CancellationToken cancellationToken = default
     )
     {
-        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+        var publicIdMappings = await GetPublicIdMappings(dataSetVersion, cancellationToken);
 
         var metaRows = await GetFilterMetaRows(duckDbConnection, dataSetVersion, allowedColumns, cancellationToken);
 
@@ -235,7 +235,7 @@ public class FilterMetaRepository(
         ).Select(label => new FilterOptionMeta { Label = label }).ToList();
     }
 
-    private async Task<PublicIdMappings> CreatePublicIdMappings(
+    private async Task<PublicIdMappings> GetPublicIdMappings(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken
     )

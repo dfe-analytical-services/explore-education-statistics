@@ -9,16 +9,17 @@ import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetChangelogRoute,
   releaseApiDataSetFiltersMappingRoute,
-  releaseApiDataSetVersionHistoryRoute,
+  releaseApiDataSetIndicatorsMappingRoute,
   releaseApiDataSetLocationsMappingRoute,
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
   releaseApiDataSetsRoute,
+  releaseApiDataSetVersionHistoryRoute,
+  releaseDataFileReplaceRoute,
+  ReleaseDataFileReplaceRouteParams,
   ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
-  releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
 } from '@admin/routes/releaseRoutes';
 import { ApiDataSet, DataSetStatus } from '@admin/services/apiDataSetService';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
@@ -29,13 +30,13 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag, { TagProps } from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
-import TaskListItem from '@common/components/TaskListItem';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import InsetText from '@common/components/InsetText';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
+import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -74,7 +75,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const isPatch = isPatchVersion(dataSet?.draftVersion?.version);
 
-  const shouldShowRejectedError = (
+  const isMajorVersionRejected = (
     apiDataSet: ApiDataSet | undefined,
     isPatchDataSetVersion: boolean,
   ): boolean => {
@@ -252,12 +253,13 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
-  const showRejectedError = shouldShowRejectedError(dataSet, isPatch);
+  const majorVersionRejected = isMajorVersionRejected(dataSet, isPatch);
 
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
     dataSet.draftVersion.mappingStatus.filtersComplete &&
-    dataSet.draftVersion.mappingStatus.locationsComplete;
+    dataSet.draftVersion.mappingStatus.locationsComplete &&
+    dataSet.draftVersion.mappingStatus.indicatorsComplete;
 
   const showDraftVersionTasks =
     dataSet?.draftVersion?.status !== 'Processing' &&
@@ -290,7 +292,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     <InsetText variant="error">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
         {incompletesFound
-          ? 'This API data set can not be published because location or filter mappings are not yet complete.'
+          ? 'This API data set can not be published because location, filter or indicator mappings are not yet complete.'
           : 'This API data set can not be published because it has major changes that are not allowed.'}
       </h2>
       <div className="govuk-error-summary__body">
@@ -337,7 +339,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
-            {showRejectedError
+            {majorVersionRejected
               ? majorVersionErrorSummary
               : mappingComplete &&
                 dataSet.draftVersion && (
@@ -377,94 +379,74 @@ export default function ReleaseApiDataSetDetailsPage() {
                   </p>
 
                   <TaskList className="govuk-!-margin-bottom-8">
-                    <TaskListItem
+                    <ApiDataSetMappingTaskListItem
                       id="map-locations-task"
-                      status={
-                        <Tag
-                          colour={
-                            (
-                              dataSet.draftVersion.mappingStatus
-                                ?.locationsComplete && isPatch
-                                ? dataSet.draftVersion.mappingStatus
-                                    ?.locationsHaveMajorChange
-                                : !dataSet.draftVersion.mappingStatus
-                                    ?.locationsComplete
-                            )
-                              ? 'red'
-                              : 'blue'
-                          }
-                        >
-                          {dataSet.draftVersion.mappingStatus?.locationsComplete
-                            ? getCompleteText(
-                                showRejectedError,
-                                dataSet.draftVersion.mappingStatus
-                                  ?.locationsHaveMajorChange,
-                              )
-                            : 'Incomplete'}
-                        </Tag>
+                      isPatch={isPatch}
+                      mappingCompleteForFacet={
+                        dataSet.draftVersion.mappingStatus?.locationsComplete ??
+                        false
                       }
-                      hint="Define the changes to locations in this version."
-                    >
-                      {props => (
-                        <Link
-                          {...props}
-                          to={generatePath<ReleaseDataSetRouteParams>(
-                            releaseApiDataSetLocationsMappingRoute.path,
-                            {
-                              publicationId: releaseVersion.publicationId,
-                              releaseVersionId: releaseVersion.id,
-                              dataSetId,
-                            },
-                          )}
-                        >
-                          Map locations
-                        </Link>
+                      majorChangesForFacet={
+                        dataSet.draftVersion.mappingStatus
+                          ?.locationsHaveMajorChange ?? false
+                      }
+                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
+                        releaseApiDataSetLocationsMappingRoute.path,
+                        {
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
+                          dataSetId,
+                        },
                       )}
-                    </TaskListItem>
-                    <TaskListItem
+                      taskText="Map locations"
+                      taskHintText="Define the changes to locations in this version."
+                    />
+
+                    <ApiDataSetMappingTaskListItem
                       id="map-filters-task"
-                      status={
-                        <Tag
-                          colour={
-                            (
-                              dataSet.draftVersion.mappingStatus
-                                ?.filtersComplete && isPatch
-                                ? dataSet.draftVersion.mappingStatus
-                                    ?.filtersHaveMajorChange
-                                : !dataSet.draftVersion.mappingStatus
-                                    ?.filtersComplete
-                            )
-                              ? 'red'
-                              : 'blue'
-                          }
-                        >
-                          {dataSet.draftVersion.mappingStatus?.filtersComplete
-                            ? getCompleteText(
-                                showRejectedError,
-                                dataSet.draftVersion.mappingStatus
-                                  ?.filtersHaveMajorChange,
-                              )
-                            : 'Incomplete'}
-                        </Tag>
+                      isPatch={isPatch}
+                      mappingCompleteForFacet={
+                        dataSet.draftVersion.mappingStatus?.filtersComplete ??
+                        false
                       }
-                      hint="Define the changes to filters in this version."
-                    >
-                      {props => (
-                        <Link
-                          {...props}
-                          to={generatePath<ReleaseDataSetRouteParams>(
-                            releaseApiDataSetFiltersMappingRoute.path,
-                            {
-                              publicationId: releaseVersion.publicationId,
-                              releaseVersionId: releaseVersion.id,
-                              dataSetId,
-                            },
-                          )}
-                        >
-                          Map filters
-                        </Link>
+                      majorChangesForFacet={
+                        dataSet.draftVersion.mappingStatus
+                          ?.filtersHaveMajorChange ?? false
+                      }
+                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
+                        releaseApiDataSetFiltersMappingRoute.path,
+                        {
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
+                          dataSetId,
+                        },
                       )}
-                    </TaskListItem>
+                      taskText="Map filters"
+                      taskHintText="Define the changes to filters in this version."
+                    />
+
+                    <ApiDataSetMappingTaskListItem
+                      id="map-indicators-task"
+                      isPatch={isPatch}
+                      mappingCompleteForFacet={
+                        dataSet.draftVersion.mappingStatus
+                          ?.indicatorsComplete ?? false
+                      }
+                      majorChangesForFacet={
+                        dataSet.draftVersion.mappingStatus
+                          ?.indicatorsHaveMajorChange ?? false
+                      }
+                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
+                        releaseApiDataSetIndicatorsMappingRoute.path,
+                        {
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
+                          dataSetId,
+                        },
+                      )}
+                      taskText="Map indicators"
+                      taskHintText="Define the changes to indicators in this version."
+                    />
                   </TaskList>
                 </div>
               </div>
@@ -531,15 +513,6 @@ export default function ReleaseApiDataSetDetailsPage() {
       </LoadingSpinner>
     </>
   );
-
-  function getCompleteText(
-    rejectedErrorShown: boolean,
-    majorVersionFound: boolean,
-  ): React.ReactNode {
-    return rejectedErrorShown && majorVersionFound
-      ? 'Major Change'
-      : 'Complete';
-  }
 }
 
 function getDataSetStatusColour(status: DataSetStatus): TagProps['colour'] {

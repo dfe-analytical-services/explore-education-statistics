@@ -4,21 +4,23 @@ import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ReleaseSummaryBlock from '@common/modules/release/components/ReleaseSummaryBlock';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
+import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import Link from '@frontend/components/Link';
+import SubscribeLink from '@frontend/components/SubscribeLink';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageIntro.module.scss';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import React, { Fragment } from 'react';
 
 interface Props {
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
@@ -102,9 +104,7 @@ const ReleasePageIntro = ({
           >
             All releases in this series
           </Link>
-        </div>
 
-        <div className={styles.container}>
           <Link
             to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
             onClick={() => {
@@ -127,6 +127,22 @@ const ReleasePageIntro = ({
             Create your own tables
           </Link>
         </div>
+
+        <div className={styles.container}>
+          {!isMobileMedia && (
+            <div className="dfe-flex-shrink--0">
+              <SubscribeLink
+                url={`/subscriptions/new-subscription/${publicationSummary.slug}`}
+                onClick={() => {
+                  logEvent({
+                    category: 'Subscribe',
+                    action: 'Email subscription',
+                  });
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {!isMobileMedia && (
@@ -137,10 +153,10 @@ const ReleasePageIntro = ({
           releaseType={type}
           renderProducerLink={
             publishingOrganisations?.length ? (
-              <span>
+              <span data-testid="Produced by-value">
                 {publishingOrganisations.map((org, index) => (
                   <Fragment key={org.id}>
-                    {index > 0 && ' and '}
+                    {getListStringSeparator(publishingOrganisations, index)}
                     <Link
                       unvisited
                       to={org.url}
@@ -153,6 +169,7 @@ const ReleasePageIntro = ({
               </span>
             ) : (
               <Link
+                testId="Produced by-value"
                 unvisited
                 className="govuk-link--no-underline"
                 to="https://www.gov.uk/government/organisations/department-for-education"

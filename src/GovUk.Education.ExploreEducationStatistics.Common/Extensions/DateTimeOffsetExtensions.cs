@@ -157,44 +157,6 @@ public static class DateTimeOffsetExtensions
         return TruncateNanoseconds(dateTimeOffset.Value);
     }
 
-    public static DateTimeOffset GetUkStartOfDayOn(this DateTimeOffset dateTimeOffset, int daysAfter = 0)
-    {
-        // Convert the source instant to the UK local time
-        var ukLocal = dateTimeOffset.ConvertToUkTimeZone(); // returns DateTimeOffset with UK offset
-
-        // Get the local calendar date in UK, then add days
-        var targetUkLocalDate = ukLocal.Date.AddDays(daysAfter); // Date is midnight of that day (DateTime)
-
-        // Get the correct offset for that local UK date (handles DST transitions)
-        var targetUkOffset = UkTimeZone.GetUtcOffset(targetUkLocalDate);
-
-        // Return DateTimeOffset with the correct offset for UK at that local midnight
-        return new DateTimeOffset(targetUkLocalDate, targetUkOffset);
-    }
-
-    public static DateTimeOffset GetUkEndOfDayOn(this DateTimeOffset dateTimeOffset, int daysAfter = 0)
-    {
-        // Convert the source instant to the UK local time
-        var ukLocal = dateTimeOffset.ConvertToUkTimeZone(); // returns DateTimeOffset with UK offset
-
-        // Get the local calendar date in UK, then add days
-        var targetUkLocalDate = ukLocal.Date.AddDays(daysAfter); // Date is midnight of that day (DateTime)
-
-        // Get the correct offset for that local UK date (handles DST transitions)
-        var targetUkOffset = UkTimeZone.GetUtcOffset(targetUkLocalDate);
-
-        // Return DateTimeOffset with the correct offset for UK at that local end-of-day
-        return new DateTimeOffset(
-            targetUkLocalDate.Year,
-            targetUkLocalDate.Month,
-            targetUkLocalDate.Day,
-            23,
-            59,
-            59,
-            targetUkOffset
-        );
-    }
-
     public static bool IsSameUkDay(this DateTimeOffset dateTimeOffset, DateTimeOffset otherDateTimeOffset) =>
         dateTimeOffset.ConvertToUkTimeZone().Date == otherDateTimeOffset.ConvertToUkTimeZone().Date;
 

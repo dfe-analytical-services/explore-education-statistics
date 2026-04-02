@@ -1412,15 +1412,15 @@ public class ReplacementPlanServiceTests
     /// <param name="majorVersionUpdate">Whether the user has uploaded a file that results in a major version update</param>
     /// <param name="expectedValidValue">The expected value for the scenario set up</param>
     [Theory]
-    //When user has uploaded major version data set
+    // When user has uploaded major version data set
     [InlineData(DataSetVersionStatus.Published, true, false)]
     [InlineData(DataSetVersionStatus.Mapping, true, false)]
     [InlineData(DataSetVersionStatus.Draft, true, false)]
-    //When user has uploaded minor version
+    // When user has uploaded minor version
     [InlineData(DataSetVersionStatus.Published, false, false)]
     [InlineData(DataSetVersionStatus.Mapping, false, false)]
     [InlineData(DataSetVersionStatus.Draft, false, true)]
-    //When API data set version status is not appropriate to be replaced
+    // When API data set version status is not appropriate to be replaced
     [InlineData(DataSetVersionStatus.Processing, false, false)]
     [InlineData(DataSetVersionStatus.Failed, false, false)]
     [InlineData(DataSetVersionStatus.Deprecated, false, false)]
@@ -1510,11 +1510,13 @@ public class ReplacementPlanServiceTests
 
         var mappingStatus = new MappingStatusViewModel
         {
-            FiltersComplete = majorVersionUpdate,
             LocationsComplete = majorVersionUpdate,
+            FiltersComplete = majorVersionUpdate,
+            IndicatorsComplete = majorVersionUpdate,
             HasDeletionChanges = majorVersionUpdate,
             FiltersHaveMajorChange = majorVersionUpdate,
             LocationsHaveMajorChange = majorVersionUpdate,
+            IndicatorsHaveMajorChange = majorVersionUpdate,
         };
         var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
         dataSetVersionMappingService

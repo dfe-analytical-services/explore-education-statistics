@@ -8,6 +8,7 @@ import RelatedPagesSection from '@admin/pages/release/content/components/Related
 import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseNotesSection from '@admin/pages/release/content/components/ReleaseNotesSection';
+import ReleaseSummarySection from '@admin/pages/release/content/components/ReleaseSummarySection';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
@@ -24,7 +25,6 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedContent from '@common/components/RelatedContent';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
-import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
@@ -133,7 +133,6 @@ const PrototypeReleaseContent = ({
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <ReleaseSummarySection
-            isEditing={editingMode === 'edit'}
             lastUpdated={release.lastUpdated}
             latestRelease={release.latestRelease}
             nextReleaseDate={release.nextReleaseDate}

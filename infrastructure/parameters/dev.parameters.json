@@ -51,7 +51,8 @@
       "value": 3
     },
     "domain": {
-      "value": "dev.explore-education-statistics.service.gov.uk"
+      // TODO EES-7024 - revert public URL after testing.
+      "value": "devafd.explore-education-statistics.service.gov.uk"
     },
     "contentApiUrl": {
       "value": "content.dev.explore-education-statistics.service.gov.uk"
@@ -64,6 +65,9 @@
     },
     "publicApiDocsUrl": {
       "value": "pp-api.education.gov.uk/statistics-dev/docs"
+    },
+    "defaultPublicSiteCacheMaxAgeSeconds": {
+      "value": "10"
     },
     "detailedErrors": {
       "value": true

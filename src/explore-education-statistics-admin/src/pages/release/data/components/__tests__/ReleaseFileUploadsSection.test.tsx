@@ -14,6 +14,10 @@ const releaseAncillaryFileService = _releaseAncillaryFileService as jest.Mocked<
 >;
 
 describe('ReleaseFileUploadsSection', () => {
+  beforeEach(() => {
+    document.body.className = 'govuk-frontend-supported';
+  });
+
   const testFiles: AncillaryFile[] = [
     {
       id: 'file-1',
@@ -240,7 +244,7 @@ describe('ReleaseFileUploadsSection', () => {
       const { user } = renderPage();
 
       await user.upload(
-        screen.getByLabelText('Upload file'),
+        screen.getByTestId('file-input-ancillaryFileForm-file'),
         new File([''], 'test.txt'),
       );
       await user.click(screen.getByRole('button', { name: 'Add file' }));
@@ -307,7 +311,10 @@ describe('ReleaseFileUploadsSection', () => {
       await user.type(screen.getByLabelText('Title'), 'Test title');
       await user.type(screen.getByLabelText('Summary'), 'Test summary');
 
-      await user.upload(screen.getByLabelText('Upload file'), file);
+      await user.upload(
+        screen.getByTestId('file-input-ancillaryFileForm-file'),
+        file,
+      );
       await user.click(
         screen.getByRole('button', {
           name: 'Add file',
@@ -351,7 +358,10 @@ describe('ReleaseFileUploadsSection', () => {
 
       await user.type(screen.getByLabelText('Title'), 'Test file 3');
       await user.type(screen.getByLabelText('Summary'), 'Test summary 3');
-      await user.upload(screen.getByLabelText('Upload file'), file);
+      await user.upload(
+        screen.getByTestId('file-input-ancillaryFileForm-file'),
+        file,
+      );
 
       await user.click(
         screen.getByRole('button', {

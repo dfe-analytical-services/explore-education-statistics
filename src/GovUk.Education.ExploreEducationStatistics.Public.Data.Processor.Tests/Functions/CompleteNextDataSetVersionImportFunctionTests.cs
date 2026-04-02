@@ -266,6 +266,30 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             );
         }
 
+        [Fact]
+        public async Task DataSetVersionMappings_IndicatorsNotComplete_ReturnsValidationProblem()
+        {
+            var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
+
+            // Remove the DataSetVersionMapping entry from the database.
+            var mapping = await fixture
+                .GetPublicDataDbContext()
+                .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextVersion.Id);
+
+            mapping.IndicatorMappingsComplete = false;
+
+            await fixture.GetPublicDataDbContext().SaveChangesAsync();
+
+            var result = await CompleteNextDataSetVersionImport(dataSetVersionId: nextVersion.Id);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: nameof(NextDataSetVersionCompleteImportRequest.DataSetVersionId).ToLowerFirst(),
+                expectedCode: ValidationMessages.DataSetVersionMappingsNotComplete.Code
+            );
+        }
+
         [Theory]
         [MemberData(nameof(NonManualMappingStages))]
         public async Task DataSetVersionImportInManualMappingStateNotFound_ReturnsValidationProblem(
@@ -348,15 +372,13 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            var dataSetVersionMapping = new DataSetVersionMapping
-            {
-                SourceDataSetVersionId = dataSet.LatestLiveVersionId!.Value,
-                TargetDataSetVersionId = nextDataSetVersion.Id,
-                FilterMappingPlan = new FilterMappingPlan(),
-                LocationMappingPlan = new LocationMappingPlan(),
-                LocationMappingsComplete = true,
-                FilterMappingsComplete = true,
-            };
+            DataSetVersionMapping dataSetVersionMapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(dataSet.LatestLiveVersionId!.Value)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingsComplete()
+                .WithFilterMappingsComplete()
+                .WithIndicatorMappingsComplete();
 
             await fixture
                 .GetPublicDataDbContext()

@@ -2,7 +2,7 @@ import NotificationBanner from '@common/components/NotificationBanner';
 import { NavItem } from '@common/components/PageNavExpandable';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
@@ -23,7 +23,7 @@ import React, { ReactNode } from 'react';
 interface Props {
   activePage: ReleasePageTabRouteKey;
   inPageNavItems: NavItem[];
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
   tabNavItems: TabRouteItem;
   children: ReactNode;
@@ -49,6 +49,9 @@ const ReleasePageShell: NextPage<Props> = ({
         <ReleasePageTitle
           publicationSummary={publicationSummary}
           releaseTitle={releaseVersionSummary.title}
+          publishingOrganisations={
+            releaseVersionSummary.publishingOrganisations
+          }
         />
       }
       customBannerContent={

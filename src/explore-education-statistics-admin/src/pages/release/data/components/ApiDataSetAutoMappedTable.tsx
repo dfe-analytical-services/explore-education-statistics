@@ -1,18 +1,11 @@
-import {
-  AutoMappedLocation,
-  LocationCandidateWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
-import {
-  AutoMappedFilterOption,
-  FilterOptionCandidateWithKey,
-} from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
 import { autoMappedTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import {
-  FilterOptionSource,
-  LocationCandidate,
-} from '@admin/services/apiDataSetVersionService';
+  AutoMappedItem,
+  CandidateWithKey,
+  MappableSourceItem,
+} from '@admin/pages/release/data/utils/mappingTypes';
 import Tag from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
 import Pagination from '@common/components/Pagination';
@@ -28,25 +21,18 @@ const itemsPerPage = 10;
 const formId = 'auto-mapped-search';
 
 interface Props {
-  autoMappedItems: AutoMappedLocation[] | AutoMappedFilterOption[];
-  candidateHint?: (
-    candidate: FilterOptionCandidateWithKey | LocationCandidateWithKey,
-  ) => ReactNode;
-  groupKey: LocationLevelKey | string;
-  groupLabel: string;
+  autoMappedItems: AutoMappedItem[];
+  candidateHint?: (candidate: CandidateWithKey) => ReactNode;
+  groupKey?: LocationLevelKey | string;
+  groupLabel?: string;
   itemLabel: string;
-  newItems?: LocationCandidateWithKey[] | FilterOptionCandidateWithKey[];
+  itemPluralLabel: string;
+  newItems?: CandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
-  renderCandidate: (
-    candidate: LocationCandidateWithKey | FilterOptionCandidateWithKey,
-  ) => ReactNode;
-  renderSource: (source: LocationCandidate | FilterOptionSource) => ReactNode;
-  renderSourceDetails?: (
-    source: FilterOptionSource | LocationCandidate,
-  ) => ReactNode;
-  searchFilter: (
-    searchTerm: string,
-  ) => AutoMappedLocation[] | AutoMappedFilterOption[];
+  renderCandidate: (candidate: CandidateWithKey) => ReactNode;
+  renderSource: (source: MappableSourceItem) => ReactNode;
+  renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
+  searchFilter: (searchTerm: string) => AutoMappedItem[];
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
@@ -56,6 +42,7 @@ export default function ApiDataSetAutoMappedTable({
   groupKey,
   groupLabel,
   itemLabel,
+  itemPluralLabel,
   newItems = [],
   pendingUpdates = [],
   renderCandidate,
@@ -82,7 +69,7 @@ export default function ApiDataSetAutoMappedTable({
   const totalFilteredItems = filteredItems.length;
   const totalPages = filteredItemsChunks.length;
 
-  const tableId = autoMappedTableId(groupKey);
+  const tableId = autoMappedTableId(groupKey ?? 'default');
 
   const [handleSearch] = useDebouncedCallback((term: string) => {
     setSearchTerm(term);
@@ -105,8 +92,10 @@ export default function ApiDataSetAutoMappedTable({
                 id={`${formId}-search`}
                 label={
                   <>
-                    Search auto mapped options
-                    <VisuallyHidden>{`for ${groupLabel}`}</VisuallyHidden>
+                    Search auto mapped {itemPluralLabel}
+                    {groupLabel && (
+                      <VisuallyHidden>{`for ${groupLabel}`}</VisuallyHidden>
+                    )}
                   </>
                 }
                 labelSize="s"
@@ -127,63 +116,67 @@ export default function ApiDataSetAutoMappedTable({
         </div>
       </div>
       {filteredItemsChunks.length > 0 ? (
-        <table
-          className="dfe-table--vertical-align-middle"
-          data-testid={tableId}
-          id={tableId}
-        >
-          <caption className="govuk-visually-hidden">
-            {`Table showing auto mapped options for ${groupLabel}`}
-          </caption>
-          <thead>
-            <tr>
-              <th className="govuk-!-width-one-third">Current data set</th>
-              <th className="govuk-!-width-one-third">New data set</th>
-              <th>Type</th>
-              <th className="govuk-!-text-align-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredItemsChunks[currentPage - 1].map(
-              ({ candidate, mapping }) => {
-                const isPendingUpdate = !!pendingUpdates.find(
-                  update => update.sourceKey === mapping.sourceKey,
-                );
-                return (
-                  <tr key={`mapping-${mapping.sourceKey}`}>
-                    <td>{renderSource(mapping.source)}</td>
-                    <td>{renderCandidate(candidate)}</td>
-                    <td>
-                      <Tag colour="grey">Minor</Tag>
-                    </td>
-                    <td className="govuk-!-text-align-right">
-                      {isPendingUpdate ? (
-                        <LoadingSpinner
-                          alert
-                          hideText
-                          inline
-                          size="sm"
-                          text={`Updating auto-mapping for ${mapping.source.label}`}
-                        />
-                      ) : (
-                        <ApiDataSetMappingModal
-                          candidate={candidate}
-                          candidateHint={candidateHint}
-                          groupKey={groupKey}
-                          itemLabel={itemLabel}
-                          mapping={mapping}
-                          newItems={newItems}
-                          renderSourceDetails={renderSourceDetails}
-                          onSubmit={onUpdate}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                );
-              },
-            )}
-          </tbody>
-        </table>
+        <div className="table-container">
+          <table
+            className="dfe-table--vertical-align-middle"
+            data-testid={tableId}
+            id={tableId}
+          >
+            <caption className="govuk-visually-hidden">
+              {`Table showing auto mapped ${itemPluralLabel}${
+                groupLabel ? ` for ${groupLabel}` : ''
+              }`}
+            </caption>
+            <thead>
+              <tr>
+                <th className="govuk-!-width-one-third">Current data set</th>
+                <th className="govuk-!-width-one-third">New data set</th>
+                <th>Type</th>
+                <th className="govuk-!-text-align-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItemsChunks[currentPage - 1].map(
+                ({ candidate, mapping }) => {
+                  const isPendingUpdate = !!pendingUpdates.find(
+                    update => update.sourceKey === mapping.sourceKey,
+                  );
+                  return (
+                    <tr key={`mapping-${mapping.sourceKey}`}>
+                      <td>{renderSource(mapping.source)}</td>
+                      <td>{renderCandidate(candidate)}</td>
+                      <td>
+                        <Tag colour="grey">Minor</Tag>
+                      </td>
+                      <td className="govuk-!-text-align-right">
+                        {isPendingUpdate ? (
+                          <LoadingSpinner
+                            alert
+                            hideText
+                            inline
+                            size="sm"
+                            text={`Updating auto-mapping for ${mapping.source.label}`}
+                          />
+                        ) : (
+                          <ApiDataSetMappingModal
+                            candidate={candidate}
+                            candidateHint={candidateHint}
+                            groupKey={groupKey}
+                            itemLabel={itemLabel}
+                            mapping={mapping}
+                            newItems={newItems}
+                            renderSourceDetails={renderSourceDetails}
+                            onSubmit={onUpdate}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  );
+                },
+              )}
+            </tbody>
+          </table>
+        </div>
       ) : (
         'No results found.'
       )}

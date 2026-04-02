@@ -10,5 +10,6 @@ declare namespace NodeJS {
     PUBLIC_API_DOCS_URL: string;
     PUBLIC_API_BASE_URL: string;
     PUBLIC_URL: string;
+    DEFAULT_CACHE_MAX_AGE_SECONDS: string;
   }
 }

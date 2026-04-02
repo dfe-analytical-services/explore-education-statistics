@@ -96,34 +96,36 @@ const PublicationTeamAccessPage = ({
 
       {model.publicationRoles.length ? (
         <>
-          <table data-testid="publicationRoles">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Publication role</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orderBy(model.publicationRoles, role => [
-                role.userName,
-                role.role,
-              ]).map(role => (
-                <tr key={`${role.id}_${role.role}`}>
-                  <td>{role.userName}</td>
-                  <td>{role.email}</td>
-                  <td>
-                    {
-                      // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
-                      // publication role. Once the new 'Approver' role is introduced in STEP 10 of the permissions
-                      // rework, this can be reverted to display the role without transformation.
-                      publicationRoleDisplayName(role.role)
-                    }
-                  </td>
+          <div className="table-container">
+            <table data-testid="publicationRoles">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Publication role</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {orderBy(model.publicationRoles, role => [
+                  role.userName,
+                  role.role,
+                ]).map(role => (
+                  <tr key={`${role.id}_${role.role}`}>
+                    <td>{role.userName}</td>
+                    <td>{role.email}</td>
+                    <td>
+                      {
+                        // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
+                        // publication role. Once the new 'Approver' role is introduced in STEP 10 of the permissions
+                        // rework, this can be reverted to display the role without transformation.
+                        publicationRoleDisplayName(role.role)
+                      }
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <p>
             {model.publicationOwners.length === 0 && (
               <>

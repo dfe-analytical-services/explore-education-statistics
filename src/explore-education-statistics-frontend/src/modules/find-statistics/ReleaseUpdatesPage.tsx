@@ -1,6 +1,6 @@
 import FormattedDate from '@common/components/FormattedDate';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import { ReleaseUpdate } from '@common/services/releaseUpdatesService';
@@ -18,7 +18,7 @@ import { GetServerSideProps } from 'next';
 import React from 'react';
 
 interface Props {
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseUpdates: PaginatedList<ReleaseUpdate>;
   releaseVersionSummary: ReleaseVersionSummary;
 }
@@ -122,7 +122,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     const [publicationSummary, releaseVersionSummary, releaseUpdates] =
       await Promise.all([
         queryClient.fetchQuery(
-          publicationQueries.getPublicationSummaryRedesign(publicationSlug),
+          publicationQueries.getPublicationSummary(publicationSlug),
         ),
         queryClient.fetchQuery(
           publicationQueries.getReleaseVersionSummary(

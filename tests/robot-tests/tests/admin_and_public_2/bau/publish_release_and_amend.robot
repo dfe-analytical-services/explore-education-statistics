@@ -431,7 +431,7 @@ Verify Dates data block Fast Track page
     ${url}=    user gets url
     set suite variable    ${FAST_TRACK_URL}    ${url}
 
-    go to    ${release_url}
+    user navigates to    ${release_url}
 
 Verify Test text section contains correct text
     user checks section with ID contains elements and back to top link    section-test-text
@@ -897,7 +897,7 @@ Verify amendment Dates data block Fast Track page
     user checks list item contains    testid:footnotes    3
     ...    Applies to all data 3
 
-    go to    ${release_url}
+    user navigates to    ${release_url}
 
 Verify amendment Test text accordion section contains correct text
     user waits until h2 is visible    Test text
@@ -928,6 +928,7 @@ Verify published date on publication page is overridden with past date
     user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
 Verify public published date is overridden with past date
+    user waits for caches to expire
     user navigates to    ${PUBLIC_RELEASE_LINK}
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
@@ -989,5 +990,5 @@ Validate next update date
     user checks element should contain    testid:Next release    August 4001
 
 Verify that the Dates data block is no longer available
-    go to    ${FAST_TRACK_URL}
+    user navigates to    ${FAST_TRACK_URL}
     user waits until page contains title    Page not found

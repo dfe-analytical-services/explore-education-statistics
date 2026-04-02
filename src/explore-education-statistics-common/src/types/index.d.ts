@@ -1,4 +1,3 @@
-export * from './govuk-frontend';
 export * from './memoizee';
 // eslint-disable-next-line import/export
 export * from './react';

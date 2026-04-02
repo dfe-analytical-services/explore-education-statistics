@@ -6,6 +6,11 @@ table {
   @extend .govuk-table;
 }
 
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
 table,
 .govuk-table {
   th {

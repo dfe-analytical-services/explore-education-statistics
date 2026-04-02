@@ -374,7 +374,10 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                         candidateHint={candidate => (
                           <ApiDataSetLocationCode location={candidate} />
                         )}
-                        candidateIsMajorMapping={(candidate, mapping) => {
+                        candidateIsMajorMapping={(
+                          candidate: LocationCandidateWithKey,
+                          mapping,
+                        ) => {
                           return Object.entries(
                             omit(mapping.source, omittedDiffingFields),
                           ).some(
@@ -384,7 +387,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                           );
                         }}
                         groupKey={level}
-                        groupLabel={groupLabel}
+                        tableCaptionText={groupLabel}
                         itemLabel="location"
                         itemPluralLabel="locations"
                         mappableItems={levelMappableLocations}
@@ -414,7 +417,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                 })}
               </>
             ) : (
-              <p>No locations.</p>
+              <p>No mappable locations.</p>
             )}
 
             {Object.keys(newLocationGroups).length > 0 && (
@@ -517,6 +520,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                           groupKey={level}
                           groupLabel={groupLabel}
                           itemLabel="location"
+                          itemPluralLabel="locations"
                           autoMappedItems={levelAutoMappedLocations}
                           newItems={newLocations[level]}
                           pendingUpdates={pendingUpdates}

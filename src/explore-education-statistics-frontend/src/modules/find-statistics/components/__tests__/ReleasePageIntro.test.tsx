@@ -7,7 +7,7 @@ import {
 import { screen, within } from '@testing-library/react';
 import React from 'react';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 
@@ -37,7 +37,7 @@ describe('ReleasePageIntro', () => {
   });
 
   test('does not render latest/not latest release tag when publication is superseded', () => {
-    const testPublicationSummarySuperseded: PublicationSummaryRedesign = {
+    const testPublicationSummarySuperseded: PublicationSummary = {
       ...testPublicationSummary,
       supersededByPublication: {
         id: '223e4567-e89b-12d3-a456-426614174000',
@@ -106,7 +106,7 @@ describe('ReleasePageIntro', () => {
   });
 
   test('renders superseded warning text when publication is superseded', () => {
-    const testPublicationSummarySuperseded: PublicationSummaryRedesign = {
+    const testPublicationSummarySuperseded: PublicationSummary = {
       ...testPublicationSummary,
       supersededByPublication: {
         id: '223e4567-e89b-12d3-a456-426614174000',
@@ -228,12 +228,12 @@ describe('ReleasePageIntro', () => {
 
     expect(
       screen.getByRole('button', {
-        name: 'Accredited official statistics Information on Accredited official statistics',
+        name: 'Information on Accredited official statistics',
       }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
-        name: 'Official statistics Information on Official statistics',
+        name: 'Information on Official statistics',
       }),
     ).not.toBeInTheDocument();
   });
@@ -265,15 +265,8 @@ describe('ReleasePageIntro', () => {
     );
     const producedBy = screen.getByTestId('Produced by-value');
 
-    expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
-      'Department for Education',
-    );
-
-    expect(
-      within(producedBy).getByRole('link', {
-        name: 'Department for Education',
-      }),
-    ).toHaveAttribute(
+    expect(producedBy).toHaveTextContent('Department for Education');
+    expect(producedBy).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/organisations/department-for-education',
     );
@@ -290,11 +283,15 @@ describe('ReleasePageIntro', () => {
               id: 'org-id-1',
               title: 'Department for Education',
               url: 'https://www.gov.uk/government/organisations/department-for-education',
+              useGISLogo: true,
+              logoFileName: 'logo.png',
             },
             {
               id: 'org-id-2',
-              title: 'Other Organisation',
+              title: 'Ofsted',
               url: 'https://example.com',
+              useGISLogo: false,
+              logoFileName: 'logo.png',
             },
           ],
         }}
@@ -303,12 +300,12 @@ describe('ReleasePageIntro', () => {
     const producedBy = screen.getByTestId('Produced by-value');
 
     expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
-      'Department for Education and Other Organisation',
+      'Department for Education and Ofsted',
     );
 
     expect(
       within(producedBy).getByRole('link', {
-        name: 'Other Organisation',
+        name: 'Ofsted',
       }),
     ).toHaveAttribute('href', 'https://example.com');
   });

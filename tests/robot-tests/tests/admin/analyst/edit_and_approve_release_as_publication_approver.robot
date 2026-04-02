@@ -108,6 +108,7 @@ Create some release content
 
     ${datablock}=    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user scrolls to element    ${datablock}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text

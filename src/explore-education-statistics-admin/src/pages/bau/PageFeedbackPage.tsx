@@ -76,57 +76,59 @@ const PageFeedbackPage = () => {
         {feedbackItems.length === 0 ? (
           <InsetText>No feedback found</InsetText>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Date</th>
-                <th scope="col">URL</th>
-                <th scope="col">Response</th>
-                <th scope="col">What were you doing?</th>
-                <th scope="col">What went wrong?</th>
-                <th scope="col">What did you hope to achieve?</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="govuk-!-font-size-16">
-              {feedbackItems
-                .filter(feedback => (showRead ? true : !feedback.read))
-                .map(feedback => {
-                  return (
-                    <tr key={feedback.id}>
-                      <td>
-                        <FormattedDate format="d MMM yyyy, HH:mm">
-                          {feedback.created}
-                        </FormattedDate>
-                      </td>
-                      <td>{feedback.url}</td>
-                      <td className="dfe-white-space--nowrap">
-                        {getResponseText(feedback.response)}
-                      </td>
-                      <td className="dfe-white-space--pre-wrap">
-                        {truncateTextOrBlank(feedback.context)}
-                      </td>
-                      <td className="dfe-white-space--pre-wrap">
-                        {truncateTextOrBlank(feedback.issue)}
-                      </td>
-                      <td className="dfe-white-space--pre-wrap">
-                        {truncateTextOrBlank(feedback.intent)}
-                      </td>
-                      <td>
-                        <ButtonText
-                          className="dfe-white-space--nowrap govuk-!-margin-bottom-2"
-                          onClick={() => toggleReadStatus(feedback.id)}
-                        >
-                          Mark as {feedback.read ? 'unread' : 'read'}
-                        </ButtonText>
-                        <br />
-                        <PageFeedbackDetailsModal feedback={feedback} />
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">URL</th>
+                  <th scope="col">Response</th>
+                  <th scope="col">What were you doing?</th>
+                  <th scope="col">What went wrong?</th>
+                  <th scope="col">What did you hope to achieve?</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="govuk-!-font-size-16">
+                {feedbackItems
+                  .filter(feedback => (showRead ? true : !feedback.read))
+                  .map(feedback => {
+                    return (
+                      <tr key={feedback.id}>
+                        <td>
+                          <FormattedDate format="d MMM yyyy, HH:mm">
+                            {feedback.created}
+                          </FormattedDate>
+                        </td>
+                        <td>{feedback.url}</td>
+                        <td className="dfe-white-space--nowrap">
+                          {getResponseText(feedback.response)}
+                        </td>
+                        <td className="dfe-white-space--pre-wrap">
+                          {truncateTextOrBlank(feedback.context)}
+                        </td>
+                        <td className="dfe-white-space--pre-wrap">
+                          {truncateTextOrBlank(feedback.issue)}
+                        </td>
+                        <td className="dfe-white-space--pre-wrap">
+                          {truncateTextOrBlank(feedback.intent)}
+                        </td>
+                        <td>
+                          <ButtonText
+                            className="dfe-white-space--nowrap govuk-!-margin-bottom-2"
+                            onClick={() => toggleReadStatus(feedback.id)}
+                          >
+                            Mark as {feedback.read ? 'unread' : 'read'}
+                          </ButtonText>
+                          <br />
+                          <PageFeedbackDetailsModal feedback={feedback} />
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
         )}
       </LoadingSpinner>
     </Page>

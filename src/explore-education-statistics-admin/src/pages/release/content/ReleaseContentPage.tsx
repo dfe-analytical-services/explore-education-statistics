@@ -2,8 +2,8 @@ import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
-import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
-import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
+import ReleaseContentEdit from '@admin/pages/release/content/components/ReleaseContentEdit';
+import ReleaseContentPreview from '@admin/pages/release/content/components/ReleaseContentPreview';
 import {
   ReleaseContentProvider,
   ReleaseContentContextState,
@@ -127,7 +127,7 @@ const ReleaseContentPageLoaded = () => {
                 {editingMode !== 'table-preview' && (
                   <>
                     {editingMode === 'preview' ? (
-                      <ReleaseContentRedesign
+                      <ReleaseContentPreview
                         handleFeaturedTableItemClick={
                           canPreviewRelease
                             ? handleFeaturedTableItemClick
@@ -150,7 +150,7 @@ const ReleaseContentPageLoaded = () => {
                         <ReleaseContentHubContextProvider
                           releaseVersionId={release.id}
                         >
-                          <ReleaseContent
+                          <ReleaseContentEdit
                             transformFeaturedTableLinks={
                               canPreviewRelease
                                 ? transformFeaturedTableLinks
