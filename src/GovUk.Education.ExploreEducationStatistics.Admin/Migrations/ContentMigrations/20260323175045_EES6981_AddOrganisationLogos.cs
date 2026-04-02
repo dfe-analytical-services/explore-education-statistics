@@ -94,14 +94,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 END"
             );
 
-            // Add Department for Health and Social Care
+            // Add Department of Health and Social Care
             // or update it to use 'govuk-crest.svg' as LogoFileName and `UseGISLogo` = true
             migrationBuilder.Sql(
                 $@"
-                IF NOT EXISTS (SELECT 1 FROM dbo.Organisations WHERE Title = N'Department for Health and Social Care')
+                IF NOT EXISTS (SELECT 1 FROM dbo.Organisations WHERE Title = N'Department of Health and Social Care')
                 BEGIN   
                     INSERT INTO dbo.Organisations (Id, Title, Url, Created, Updated, UseGISLogo, GISLogoHexCode, LogoFileName) 
-                    VALUES (NEWID(), N'Department for Health and Social Care', N'https://www.gov.uk/government/organisations/department-of-health-and-social-care', SYSDATETIMEOFFSET(), null, 'True', '#00ad93', 'govuk-crest.svg');
+                    VALUES (NEWID(), N'Department of Health and Social Care', N'https://www.gov.uk/government/organisations/department-of-health-and-social-care', SYSDATETIMEOFFSET(), null, 'True', '#00ad93', 'govuk-crest.svg');
                 END
                 ELSE
                 BEGIN
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         UseGISLogo = 'True', 
                         GISLogoHexCode = '#00ad93', 
                         LogoFileName = 'govuk-crest.svg' 
-                    WHERE Title = 'Department for Health and Social Care';
+                    WHERE Title = 'Department of Health and Social Care';
                 END"
             );
         }
