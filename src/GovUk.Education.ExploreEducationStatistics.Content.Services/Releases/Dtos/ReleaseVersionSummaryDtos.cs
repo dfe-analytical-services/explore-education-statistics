@@ -70,11 +70,11 @@ public record PublishingOrganisationDto
 
     public required string Url { get; init; }
 
-    public bool UseGISLogo { get; set; }
+    public required bool UseGISLogo { get; init; }
 
-    public string? GISLogoHexCode { get; set; }
+    public required string? GISLogoHexCode { get; init; }
 
-    public required string LogoFileName { get; set; }
+    public required string LogoFileName { get; init; }
 
     public static PublishingOrganisationDto FromOrganisation(Organisation organisation) =>
         new()

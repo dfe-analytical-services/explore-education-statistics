@@ -131,6 +131,9 @@ public class PublishingOrganisationDtoBuilder
     private Guid _id = Guid.NewGuid();
     private string _title = "Title";
     private string _url = "Url";
+    private bool _useGisLogo = true;
+    private string _gisLogoHexCode = "GIS logo hex code";
+    private string _logoFileName = "Logo file name";
 
     public PublishingOrganisationDto Build() =>
         new()
@@ -138,8 +141,9 @@ public class PublishingOrganisationDtoBuilder
             Id = _id,
             Title = _title,
             Url = _url,
-            UseGISLogo = false,
-            LogoFileName = "logo.png",
+            UseGISLogo = _useGisLogo,
+            GISLogoHexCode = _gisLogoHexCode,
+            LogoFileName = _logoFileName,
         };
 
     public PublishingOrganisationDtoBuilder WithId(Guid id)
@@ -157,6 +161,24 @@ public class PublishingOrganisationDtoBuilder
     public PublishingOrganisationDtoBuilder WithUrl(string url)
     {
         _url = url;
+        return this;
+    }
+
+    public PublishingOrganisationDtoBuilder WithUseGisLogo(bool useGisLogo)
+    {
+        _useGisLogo = useGisLogo;
+        return this;
+    }
+
+    public PublishingOrganisationDtoBuilder WithGisLogoHexCode(string gisLogoHexCode)
+    {
+        _gisLogoHexCode = gisLogoHexCode;
+        return this;
+    }
+
+    public PublishingOrganisationDtoBuilder WithLogoFileName(string logoFileName)
+    {
+        _logoFileName = logoFileName;
         return this;
     }
 }
