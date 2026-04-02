@@ -1,6 +1,6 @@
 import {
   Publication,
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersion,
   ReleaseVersionDataContent,
   ReleaseVersionHomeContent,
@@ -216,7 +216,7 @@ export const testRelease: ReleaseVersion = {
   },
 };
 
-export const testPublicationSummary: PublicationSummaryRedesign = {
+export const testPublicationSummary: PublicationSummary = {
   id: 'publication-summary-1',
   title: 'Pupil attendance in schools',
   slug: 'publication-slug',

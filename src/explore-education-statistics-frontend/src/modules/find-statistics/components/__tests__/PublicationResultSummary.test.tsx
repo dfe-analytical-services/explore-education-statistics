@@ -1,11 +1,11 @@
-import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
+import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('PublicationSummary', () => {
   test('renders a publication correctly', () => {
-    render(<PublicationSummary publication={testPublications[0]} />);
+    render(<PublicationResultSummary publication={testPublications[0]} />);
 
     const heading = screen.getByRole('heading', { name: 'Publication 1' });
     expect(
@@ -24,7 +24,7 @@ describe('PublicationSummary', () => {
   });
 
   test('renders summary content with html highlight', () => {
-    render(<PublicationSummary publication={testPublications[1]} />);
+    render(<PublicationResultSummary publication={testPublications[1]} />);
 
     const searchHighlight = screen.getByTestId('search-highlight');
     expect(

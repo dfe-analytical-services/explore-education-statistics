@@ -1,15 +1,10 @@
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import {
-  EditingContextProvider,
-  EditingMode,
-} from '@admin/contexts/EditingContext';
-import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
+import ReleaseContentEdit from '@admin/pages/release/content/components/ReleaseContentEdit';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseContent as ReleaseContentType } from '@admin/services/releaseContentService';
-import generateReleaseContent, {
-  generateEditableRelease,
-} from '@admin-test/generators/releaseContentGenerators';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
 import {
   render as baseRender,
   RenderResult,
@@ -21,11 +16,11 @@ import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 
-describe('ReleaseContent', () => {
+describe('ReleaseContentEdit', () => {
   const testReleaseContent = generateReleaseContent({});
 
   test('renders the content', async () => {
-    render(<ReleaseContent />);
+    render(<ReleaseContentEdit />);
 
     expect(await screen.findByTestId('Published-value')).toHaveTextContent(
       'TBA',
@@ -108,46 +103,9 @@ describe('ReleaseContent', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the "release contents" quick link in edit mode when there is no content', async () => {
-    const testReleaseContentWithoutContent = generateReleaseContent({
-      release: generateEditableRelease({ content: [] }),
-    });
-    render(<ReleaseContent />, testReleaseContentWithoutContent);
-
-    const navigation = await screen.findByRole('navigation', {
-      name: 'Quick links',
-    });
-
-    const quickLinks = within(navigation).getAllByRole('link');
-    expect(quickLinks).toHaveLength(3);
-    expect(quickLinks[0]).toHaveTextContent('Release contents');
-    expect(quickLinks[0]).toHaveAttribute('href', '#releaseMainContent');
-  });
-
-  test('does not render the "release contents" quick link in preview mode when there is no content', async () => {
-    const testReleaseContentWithoutContent = generateReleaseContent({
-      release: generateEditableRelease({ content: [] }),
-    });
-    render(<ReleaseContent />, testReleaseContentWithoutContent, 'preview');
-
-    const navigation = await screen.findByRole('navigation', {
-      name: 'Quick links',
-    });
-
-    const quickLinks = within(navigation).getAllByRole('link');
-    expect(quickLinks).toHaveLength(2);
-    expect(quickLinks[0]).toHaveTextContent('Explore data');
-    expect(quickLinks[0]).toHaveAttribute('href', '#explore-data-and-files');
-    expect(quickLinks[1]).toHaveTextContent('Help and support');
-    expect(quickLinks[1]).toHaveAttribute('href', '#help-and-support');
-
-    expect(screen.queryByText('Release contents')).not.toBeInTheDocument();
-  });
-
   function render(
     child: ReactNode,
     releaseContent: ReleaseContentType = testReleaseContent,
-    editingMode: EditingMode = 'edit',
   ): RenderResult {
     return baseRender(
       <TestConfigContextProvider>
@@ -161,7 +119,7 @@ describe('ReleaseContent', () => {
               canUpdateRelease: true,
             }}
           >
-            <EditingContextProvider editingMode={editingMode}>
+            <EditingContextProvider editingMode="edit">
               <MemoryRouter>{child}</MemoryRouter>
             </EditingContextProvider>
           </ReleaseContentProvider>

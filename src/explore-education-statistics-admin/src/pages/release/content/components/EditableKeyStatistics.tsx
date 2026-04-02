@@ -13,13 +13,9 @@ import React, { useEffect, useState } from 'react';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
-  isEditing?: boolean;
 }
 
-export default function KeyStatistics({
-  release,
-  isEditing,
-}: KeyStatisticsProps) {
+export default function EditableKeyStatistics({ release }: KeyStatisticsProps) {
   const { reorderKeyStatistics } = useReleaseContentActions();
   const [keyStatistics, setKeyStatistics] = useState(release.keyStatistics);
 
@@ -31,19 +27,16 @@ export default function KeyStatistics({
 
   return (
     <>
-      {isEditing && (
-        <>
-          <AddKeyStatistics release={release} />
-          <hr />
-          {keyStatistics.length > 1 && !isReordering && (
-            <Button variant="secondary" onClick={toggleIsReordering.on}>
-              Reorder
-              <span className="govuk-visually-hidden"> key statistics</span>
-            </Button>
-          )}
-        </>
+      <AddKeyStatistics release={release} />
+      <hr />
+      {keyStatistics.length > 1 && !isReordering && (
+        <Button variant="secondary" onClick={toggleIsReordering.on}>
+          Reorder
+          <span className="govuk-visually-hidden"> key statistics</span>
+        </Button>
       )}
-      {isReordering && isEditing ? (
+
+      {isReordering ? (
         <ReorderableList
           heading="Reorder key statistics"
           id="reorder-key-statistics"
@@ -100,7 +93,6 @@ export default function KeyStatistics({
                   keyStat={keyStat}
                   keyStats={release.keyStatistics}
                   releaseVersionId={release.id}
-                  isEditing={isEditing}
                 />
               </div>
             ))}

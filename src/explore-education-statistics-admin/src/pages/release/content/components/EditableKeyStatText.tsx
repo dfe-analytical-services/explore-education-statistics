@@ -10,7 +10,6 @@ import {
 import React, { useCallback } from 'react';
 
 export interface EditableKeyStatTextProps {
-  isEditing?: boolean;
   keyStat: KeyStatisticText;
   keyStats: KeyStatistic[];
   testId?: string;
@@ -19,7 +18,6 @@ export interface EditableKeyStatTextProps {
 }
 
 export default function EditableKeyStatText({
-  isEditing = false,
   keyStat,
   keyStats,
   testId = 'keyStat',
@@ -56,7 +54,6 @@ export default function EditableKeyStatText({
       guidanceTitle={keyStat.guidanceTitle}
       guidanceText={keyStat.guidanceText}
       testId={testId}
-      isEditing={isEditing}
       onRemove={onRemove}
       onEdit={toggleShowForm.on}
     />

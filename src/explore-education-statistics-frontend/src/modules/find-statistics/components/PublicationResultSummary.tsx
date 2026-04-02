@@ -4,7 +4,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { PublicationListSummary } from '@common/services/publicationService';
 import { releaseTypes } from '@common/services/types/releaseType';
-import styles from '@frontend/modules/find-statistics/components/PublicationSummary.module.scss';
+import styles from '@frontend/modules/find-statistics/components/PublicationResultSummary.module.scss';
 import Link from '@frontend/components/Link';
 import React from 'react';
 
@@ -12,7 +12,7 @@ interface Props {
   publication: PublicationListSummary;
 }
 
-const PublicationSummary = ({ publication }: Props) => {
+const PublicationResultSummary = ({ publication }: Props) => {
   const {
     published,
     slug,
@@ -77,4 +77,4 @@ const PublicationSummary = ({ publication }: Props) => {
     </li>
   );
 };
-export default PublicationSummary;
+export default PublicationResultSummary;

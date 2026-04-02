@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
+import ReleaseContentPreview from '@admin/pages/release/content/components/ReleaseContentPreview';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import featuredTableQueries from '@admin/queries/featuredTableQueries';
 import releaseContentQueries from '@admin/queries/releaseContentQueries';
@@ -61,7 +61,7 @@ const PreReleaseContentPage = ({
               featuredTables,
             }}
           >
-            <ReleaseContentRedesign
+            <ReleaseContentPreview
               isPra
               transformFeaturedTableLinks={handleFeaturedTableLinks}
             />

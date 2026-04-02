@@ -106,50 +106,11 @@ describe('EditableKeyStatDataBlock', () => {
       'DataBlock guidance text',
     );
 
-    expect(
-      screen.queryByRole('button', { name: /Edit/ }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Edit/ })).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', { name: /Remove/ }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('renders correctly when `isEditing` is true', async () => {
-    tableBuilderService.getDataBlockTableData.mockResolvedValue(
-      testTableDataResponse,
-    );
-
-    render(
-      <EditableKeyStatDataBlock
-        isEditing
-        releaseVersionId="release-1"
-        keyStat={testKeyStat}
-        keyStats={[testKeyStat]}
-        onRemove={noop}
-        onSubmit={noop}
-      />,
-    );
-
-    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
-
-    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-      '608,180',
-    );
-    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-      'DataBlock trend',
-    );
-    expect(
-      screen.getByRole('button', {
-        name: 'DataBlock guidance title',
-      }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-      'DataBlock guidance text',
-    );
-
-    expect(screen.getByRole('button', { name: /Edit/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Remove/ })).toBeInTheDocument();
   });
 
   test('does not render the trend when `trend` is undefined', async () => {
@@ -239,7 +200,6 @@ describe('EditableKeyStatDataBlock', () => {
         releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
-        isEditing
         onRemove={onRemove}
         onSubmit={noop}
       />,
@@ -269,7 +229,6 @@ describe('EditableKeyStatDataBlock', () => {
         releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
-        isEditing
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -305,7 +264,6 @@ describe('EditableKeyStatDataBlock', () => {
         releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
-        isEditing
         onRemove={noop}
         onSubmit={noop}
       />,

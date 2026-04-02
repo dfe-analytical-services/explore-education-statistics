@@ -1,13 +1,13 @@
 import render from '@common-test/render';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import testContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
+import ReleaseContactUsSection from '@common/modules/release/components/ReleaseContactUsSection';
 import { Matcher, screen } from '@testing-library/react';
 import React from 'react';
 
-describe('ContactUsSectionRedesign', () => {
+describe('ReleaseContactUsSection', () => {
   test('renders', () => {
     render(
-      <ContactUsSection
+      <ReleaseContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
       />,
@@ -32,7 +32,7 @@ describe('ContactUsSectionRedesign', () => {
     'constructs a sensible prompt text',
     (publicationTitle: string, expectedText: Matcher) => {
       render(
-        <ContactUsSection
+        <ReleaseContactUsSection
           publicationContact={testContact}
           publicationTitle={publicationTitle}
         />,
@@ -46,7 +46,7 @@ describe('ContactUsSectionRedesign', () => {
 
   test('contains an appropriate href to the contact email', () => {
     render(
-      <ContactUsSection
+      <ReleaseContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
       />,
@@ -63,7 +63,7 @@ describe('ContactUsSectionRedesign', () => {
 
   test('displays the telephone number if one is supplied', () => {
     render(
-      <ContactUsSection
+      <ReleaseContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
       />,
@@ -76,7 +76,7 @@ describe('ContactUsSectionRedesign', () => {
 
   test('hides the telephone number section if one is not supplied', () => {
     render(
-      <ContactUsSection
+      <ReleaseContactUsSection
         publicationContact={{ ...testContact, contactTelNo: undefined }}
         publicationTitle="Mock Publication Title"
       />,
@@ -89,7 +89,7 @@ describe('ContactUsSectionRedesign', () => {
 
   test('renders correctly when the publishing organisation is Skills England', () => {
     render(
-      <ContactUsSection
+      <ReleaseContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
         publishingOrganisations={[

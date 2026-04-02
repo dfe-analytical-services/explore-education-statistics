@@ -1,7 +1,7 @@
 import {
   ReleasePageTabSectionKey,
   releasePageTabSections,
-} from '@admin/pages/release/content/components/ReleaseContentRedesign';
+} from '@admin/pages/release/content/components/ReleaseContentPreview';
 import styles from '@admin/pages/release/content/components/ReleasePageTabBar.module.scss';
 import React, { useRef } from 'react';
 

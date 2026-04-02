@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
-import ReleaseHeadlinesRedesign from '@admin/pages/release/content/components/ReleaseHeadlinesRedesign';
+import ReleaseHeadlinesPreview from '@admin/pages/release/content/components/ReleaseHeadlinesPreview';
 import ReleasePageTabPanel from '@admin/pages/release/content/components/ReleasePageTabPanel';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import Accordion from '@common/components/Accordion';
@@ -13,8 +13,8 @@ import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection, {
   contactUsNavItem,
-} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+} from '@common/modules/release/components/ReleaseContactUsSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
@@ -178,7 +178,7 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
           </ReleasePageContentSection>
         )}
 
-        <ReleaseHeadlinesRedesign
+        <ReleaseHeadlinesPreview
           release={release}
           transformFeaturedTableLinks={transformFeaturedTableLinks}
         />

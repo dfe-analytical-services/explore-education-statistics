@@ -1,4 +1,4 @@
-import { ReleasePageTabSectionKey } from '@admin/pages/release/content/components/ReleaseContentRedesign';
+import { ReleasePageTabSectionKey } from '@admin/pages/release/content/components/ReleaseContentPreview';
 import styles from '@admin/pages/release/content/components/ReleasePageTabPanel.module.scss';
 import React, { ReactNode } from 'react';
 

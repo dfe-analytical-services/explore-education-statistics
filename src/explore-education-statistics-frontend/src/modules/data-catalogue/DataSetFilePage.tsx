@@ -7,7 +7,7 @@ import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
 import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
-import { PublicationSummaryRedesign } from '@common/services/publicationService';
+import { PublicationSummary } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import SubscribeLink from '@frontend/components/SubscribeLink';
@@ -69,7 +69,7 @@ interface Props {
   apiDataSetVersion?: ApiDataSetVersion;
   apiDataSetVersionChanges?: ApiDataSetVersionChanges | null;
   dataSetFile: DataSetFile;
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
 }
 
 export default function DataSetFilePage({
@@ -322,7 +322,7 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     );
 
     const publicationSummary = await queryClient.fetchQuery(
-      publicationQueries.getPublicationSummaryRedesign(
+      publicationQueries.getPublicationSummary(
         dataSetFile.release.publication.slug,
       ),
     );

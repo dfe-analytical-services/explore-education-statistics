@@ -2,7 +2,7 @@ import Details from '@common/components/Details';
 import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { DataSetDataGuidance } from '@common/services/releaseDataGuidanceService';
+import { DataSetDataGuidance } from '@common/types/releaseDataGuidance';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { ReactNode, useMemo } from 'react';
 import styles from './ReleaseDataGuidanceDataFile.module.scss';

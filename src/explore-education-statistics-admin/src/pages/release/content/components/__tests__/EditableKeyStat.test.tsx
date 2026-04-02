@@ -81,10 +81,10 @@ describe('EditableKeyStat', () => {
 
       expect(
         screen.queryByRole('button', { name: /Edit/ }),
-      ).not.toBeInTheDocument();
+      ).toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: /Remove/ }),
-      ).not.toBeInTheDocument();
+      ).toBeInTheDocument();
     });
   });
 
@@ -204,7 +204,6 @@ describe('EditableKeyStat', () => {
           releaseVersionId="release-1"
           keyStat={testKeyStat}
           keyStats={[testKeyStat]}
-          isEditing
         />,
       );
 
@@ -258,7 +257,6 @@ describe('EditableKeyStat', () => {
           releaseVersionId="release-1"
           keyStat={testKeyStat}
           keyStats={[testKeyStat]}
-          isEditing
         />,
       );
 

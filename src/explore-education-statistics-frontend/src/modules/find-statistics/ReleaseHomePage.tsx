@@ -3,20 +3,19 @@ import AccordionSection from '@common/components/AccordionSection';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ContactUsSection from '@common/modules/release/components/ReleaseContactUsSection';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
-
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import Link from '@frontend/components/Link';
-import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistics/components/PublicationReleaseHeadlinesSectionRedesign';
+import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistics/components/PublicationReleaseHeadlinesSection';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
@@ -24,11 +23,11 @@ import React, { Fragment } from 'react';
 
 interface Props {
   homeContent: ReleaseVersionHomeContent;
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
-const PublicationReleasePage = ({
+const ReleaseHomePage = ({
   homeContent,
   publicationSummary,
   releaseVersionSummary,
@@ -228,4 +227,4 @@ const PublicationReleasePage = ({
   );
 };
 
-export default PublicationReleasePage;
+export default ReleaseHomePage;

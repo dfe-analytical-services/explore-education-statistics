@@ -1,12 +1,12 @@
 import { useMobileMedia } from '@common/hooks/useMedia';
-import { PublicationSummaryRedesign } from '@common/services/publicationService';
+import { PublicationSummary } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageTitle.module.scss';
 import React from 'react';
 import PublishingOrganisations from './PublishingOrganisations';
 
 interface Props {
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseTitle: string;
   publishingOrganisations: Organisation[] | undefined;
 }

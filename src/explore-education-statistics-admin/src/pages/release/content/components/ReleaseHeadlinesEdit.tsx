@@ -1,7 +1,6 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
-import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
+import EditableKeyStatistics from '@admin/pages/release/content/components/EditableKeyStatistics';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
@@ -20,8 +19,10 @@ interface Props {
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
-const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
-  const { editingMode } = useEditingContext();
+const ReleaseHeadlinesEdit = ({
+  release,
+  transformFeaturedTableLinks,
+}: Props) => {
   const actions = useReleaseContentActions();
 
   const addHeadlinesBlockButton = useRef<HTMLButtonElement>(null);
@@ -52,7 +53,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
   const headlinesTab = (
     <TabsSection title="Summary">
       <section data-scroll id="releaseHeadlines-keyStatistics">
-        <KeyStatistics release={release} isEditing={editingMode === 'edit'} />
+        <EditableKeyStatistics release={release} />
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
@@ -88,18 +89,17 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
           )}
         />
 
-        {editingMode === 'edit' &&
-          release.headlinesSection.content?.length === 0 && (
-            <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-              <Button
-                variant="secondary"
-                onClick={addBlock}
-                ref={addHeadlinesBlockButton}
-              >
-                Add a headlines text block
-              </Button>
-            </div>
-          )}
+        {release.headlinesSection.content?.length === 0 && (
+          <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+            <Button
+              variant="secondary"
+              onClick={addBlock}
+              ref={addHeadlinesBlockButton}
+            >
+              Add a headlines text block
+            </Button>
+          </div>
+        )}
       </section>
     </TabsSection>
   );
@@ -135,4 +135,4 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
   );
 };
 
-export default ReleaseHeadlines;
+export default ReleaseHeadlinesEdit;

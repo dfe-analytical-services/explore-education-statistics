@@ -7,7 +7,7 @@ import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import React from 'react';
 
 interface Props {

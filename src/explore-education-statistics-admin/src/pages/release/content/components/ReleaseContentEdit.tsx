@@ -12,8 +12,9 @@ import ReleaseHelpAndSupportSection from '@common/modules/release/components/Rel
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseContentAccordion from '@admin/pages/release/content/components/ReleaseContentAccordion';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
-import ReleaseHeadlines from '@admin/pages/release/content/components/ReleaseHeadlines';
+import ReleaseHeadlinesEdit from '@admin/pages/release/content/components/ReleaseHeadlinesEdit';
 import ReleaseNotesSection from '@admin/pages/release/content/components/ReleaseNotesSection';
+import ReleaseSummarySection from '@admin/pages/release/content/components/ReleaseSummarySection';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
@@ -27,11 +28,9 @@ import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBl
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
-import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedContent from '@common/components/RelatedContent';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
-import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
@@ -61,12 +60,8 @@ const ReleaseContent = ({
 }) => {
   const { publicAppUrl } = useConfig();
   const location = useLocation();
-  const {
-    editingMode,
-    setActiveSection,
-    unsavedBlocks,
-    unsavedCommentDeletions,
-  } = useEditingContext();
+  const { setActiveSection, unsavedBlocks, unsavedCommentDeletions } =
+    useEditingContext();
   const { release } = useReleaseContentState();
   const { addContentSectionBlock } = useReleaseContentActions();
 
@@ -220,7 +215,6 @@ const ReleaseContent = ({
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <ReleaseSummarySection
-            isEditing={editingMode === 'edit'}
             lastUpdated={release.lastUpdated}
             latestRelease={release.latestRelease}
             publishingOrganisations={release.publishingOrganisations}
@@ -267,72 +261,68 @@ const ReleaseContent = ({
             }
             trackScroll
           />
-          {editingMode === 'edit' && (
-            <div id="releaseWarning" data-testid="release-warning">
-              <EditableSectionBlocks
-                blocks={release.warningSection.content}
-                renderBlock={block => <ReleaseWarningBlock block={block} />}
-                renderEditableBlock={block => (
-                  <ReleaseEditableBlock
-                    allowComments
-                    block={block}
-                    characterLimit={250}
-                    editButtonLabel={<>Edit warning block</>}
-                    label="Warning block"
-                    isReleaseWarningBlock
-                    publicationId={release.publication.id}
-                    releaseVersionId={release.id}
-                    removeButtonLabel={
-                      <>
-                        Remove<VisuallyHidden> warning</VisuallyHidden> block
-                      </>
-                    }
-                    sectionId={release.warningSection.id}
-                    sectionKey="warningSection"
-                    toolbarConfig={toolbarConfigLinkOnly}
-                    onAfterDeleteBlock={onAfterDeleteWarningBlock}
-                  />
-                )}
-              />
-              {release.warningSection.content?.length === 0 && (
-                <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-                  <Button
-                    variant="secondary"
-                    onClick={addWarningBlock}
-                    ref={addWarningBlockButton}
-                  >
-                    Add a warning text block
-                  </Button>
-                </div>
+          <div id="releaseWarning" data-testid="release-warning">
+            <EditableSectionBlocks
+              blocks={release.warningSection.content}
+              renderBlock={block => <ReleaseWarningBlock block={block} />}
+              renderEditableBlock={block => (
+                <ReleaseEditableBlock
+                  allowComments
+                  block={block}
+                  characterLimit={250}
+                  editButtonLabel={<>Edit warning block</>}
+                  label="Warning block"
+                  isReleaseWarningBlock
+                  publicationId={release.publication.id}
+                  releaseVersionId={release.id}
+                  removeButtonLabel={
+                    <>
+                      Remove<VisuallyHidden> warning</VisuallyHidden> block
+                    </>
+                  }
+                  sectionId={release.warningSection.id}
+                  sectionKey="warningSection"
+                  toolbarConfig={toolbarConfigLinkOnly}
+                  onAfterDeleteBlock={onAfterDeleteWarningBlock}
+                />
               )}
-            </div>
-          )}
+            />
+            {release.warningSection.content?.length === 0 && (
+              <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+                <Button
+                  variant="secondary"
+                  onClick={addWarningBlock}
+                  ref={addWarningBlockButton}
+                >
+                  Add a warning text block
+                </Button>
+              </div>
+            )}
+          </div>
 
           <div id="releaseSummary" data-testid="release-summary">
-            {editingMode === 'edit' && (
-              <WarningMessage testId="release-summary-deprecated-warning">
-                <p className="govuk-!-font-weight-bold">
-                  Warning: As part of the redesign of the EES release pages, the
-                  summary text block functionality will be removed.
-                </p>
-                <p>
-                  Existing pages released with a summary text block will retain
-                  the information as legacy support, but new releases will cease
-                  to offer this as an option.
-                </p>
-                <p>
-                  We recommend any draft publications avoid using the summary
-                  text block and instead add any summary content in a standard
-                  text block below headlines and key stats.
-                </p>
-                <p>
-                  Note that important warnings and messages will be accommodated
-                  via a dedicated warnings text block in future. As always, we
-                  welcome feedback on this change via the feedback form linked
-                  above.
-                </p>
-              </WarningMessage>
-            )}
+            <WarningMessage testId="release-summary-deprecated-warning">
+              <p className="govuk-!-font-weight-bold">
+                Warning: As part of the redesign of the EES release pages, the
+                summary text block functionality will be removed.
+              </p>
+              <p>
+                Existing pages released with a summary text block will retain
+                the information as legacy support, but new releases will cease
+                to offer this as an option.
+              </p>
+              <p>
+                We recommend any draft publications avoid using the summary text
+                block and instead add any summary content in a standard text
+                block below headlines and key stats.
+              </p>
+              <p>
+                Note that important warnings and messages will be accommodated
+                via a dedicated warnings text block in future. As always, we
+                welcome feedback on this change via the feedback form linked
+                above.
+              </p>
+            </WarningMessage>
             {release.summarySection && (
               <>
                 <EditableSectionBlocks
@@ -367,29 +357,20 @@ const ReleaseContent = ({
                     />
                   )}
                 />
-                {editingMode === 'edit' &&
-                  release.summarySection.content?.length === 0 && (
-                    <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-                      <Button
-                        variant="secondary"
-                        onClick={addSummaryBlock}
-                        ref={addSummaryBlockButton}
-                      >
-                        Add a summary text block
-                      </Button>
-                    </div>
-                  )}
+                {release.summarySection.content?.length === 0 && (
+                  <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+                    <Button
+                      variant="secondary"
+                      onClick={addSummaryBlock}
+                      ref={addSummaryBlockButton}
+                    >
+                      Add a summary text block
+                    </Button>
+                  </div>
+                )}
               </>
             )}
           </div>
-
-          {editingMode !== 'edit' && (
-            <PageSearchForm
-              id="search-form"
-              inputLabel="Search in this release page."
-              className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
-            />
-          )}
         </div>
 
         <div className="govuk-grid-column-one-third">
@@ -421,11 +402,9 @@ const ReleaseContent = ({
                     <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
-                {(editingMode === 'edit' || !!release.content.length) && (
-                  <li>
-                    <a href="#releaseMainContent">Release contents</a>
-                  </li>
-                )}
+                <li>
+                  <a href="#releaseMainContent">Release contents</a>
+                </li>
                 <li>
                   <a href="#explore-data-and-files">Explore data</a>
                 </li>
@@ -540,14 +519,7 @@ const ReleaseContent = ({
                 <ul className="govuk-list" data-testid="methodologies-list">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>
-                      {editingMode === 'edit' ? (
-                        <a>{methodology.title}</a>
-                      ) : (
-                        <Link to={methodology.url}>
-                          {methodology.title}
-                          {methodology.external && ' (opens in new tab)'}
-                        </Link>
-                      )}
+                      <a>{methodology.title}</a>
                     </li>
                   ))}
                 </ul>
@@ -560,7 +532,7 @@ const ReleaseContent = ({
 
       <hr />
 
-      <ReleaseHeadlines
+      <ReleaseHeadlinesEdit
         release={release}
         transformFeaturedTableLinks={transformFeaturedTableLinks}
       />
@@ -644,14 +616,13 @@ const ReleaseContent = ({
           onSectionOpen={({ id }) => setActiveSection(id)}
         />
       )}
-      {editingMode === 'edit' &&
-        !release.relatedDashboardsSection?.content.length && (
-          <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-            <Button onClick={addRelatedDashboardsBlock}>
-              Add dashboards section
-            </Button>
-          </div>
-        )}
+      {!release.relatedDashboardsSection?.content.length && (
+        <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+          <Button onClick={addRelatedDashboardsBlock}>
+            Add dashboards section
+          </Button>
+        </div>
+      )}
 
       <ReleaseContentAccordion
         release={release}
@@ -680,17 +651,7 @@ const ReleaseContent = ({
             </Link>
           );
         }}
-        renderMethodologyLink={methodology => (
-          <>
-            {editingMode === 'edit' ? (
-              <a>{`${methodology.title}`}</a>
-            ) : (
-              <Link to={`/methodology/${methodology.id}/summary`}>
-                {methodology.title}
-              </Link>
-            )}
-          </>
-        )}
+        renderMethodologyLink={methodology => <a>{`${methodology.title}`}</a>}
         trackScroll
       />
       <PrintThisPage />

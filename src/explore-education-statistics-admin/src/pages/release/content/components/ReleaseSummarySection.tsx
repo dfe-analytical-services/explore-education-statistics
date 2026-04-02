@@ -9,12 +9,12 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import Modal from '@common/components/Modal';
 import { parseISO } from 'date-fns';
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
-import { Organisation } from '@common/services/types/organisation';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -29,7 +29,6 @@ const releaseTypesToIcons: Partial<Record<ReleaseType, ReleaseTypeIcon>> = {
 };
 
 interface Props {
-  isEditing?: boolean;
   lastUpdated?: string | Date;
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
@@ -45,7 +44,6 @@ interface Props {
 }
 
 export default function ReleaseSummarySection({
-  isEditing,
   lastUpdated,
   latestRelease,
   nextReleaseDate,
@@ -92,13 +90,9 @@ export default function ReleaseSummarySection({
           </SummaryListItem>
         )}
 
-        {(isEditing || lastUpdated) && (
+        {lastUpdated && (
           <SummaryListItem term="Last updated">
-            {lastUpdated ? (
-              <FormattedDate>{lastUpdated}</FormattedDate>
-            ) : (
-              <p>TBA</p>
-            )}
+            <FormattedDate>{lastUpdated}</FormattedDate>
           </SummaryListItem>
         )}
 
