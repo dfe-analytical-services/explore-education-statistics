@@ -11,12 +11,12 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ViewSpecificReleaseAuthorizationHandlersTests
+public class ViewSpecificReleaseVersionAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly ReleaseVersion _releaseVersion;
 
-    public ViewSpecificReleaseAuthorizationHandlersTests()
+    public ViewSpecificReleaseVersionAuthorizationHandlerTests()
     {
         _releaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -26,14 +26,14 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
     [Fact]
     public async Task SucceedsIfReleaseVersionIsViewableByUser()
     {
-        await AssertHandlerSucceedsIfReleaseVersionIsViewableByUser<ViewReleaseRequirement, ReleaseVersion>(
+        await AssertHandlerSucceedsIfReleaseVersionIsViewableByUser<ViewReleaseVersionRequirement, ReleaseVersion>(
             handlerSupplier: SetupHandler,
             entity: _releaseVersion,
             releaseVersion: _releaseVersion
         );
     }
 
-    private ViewSpecificReleaseAuthorizationHandler SetupHandler(
+    private ViewSpecificReleaseVersionAuthorizationHandler SetupHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

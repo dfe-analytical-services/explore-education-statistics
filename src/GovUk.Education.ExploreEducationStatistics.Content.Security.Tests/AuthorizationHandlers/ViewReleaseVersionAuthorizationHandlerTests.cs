@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.AuthorizationHandlers;
 
-public class ViewReleaseAuthorizationHandlerTests
+public class ViewReleaseVersionAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
 
@@ -35,7 +35,7 @@ public class ViewReleaseAuthorizationHandlerTests
         {
             var handler = BuildHandler(contentDbContext);
 
-            var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
+            var authContext = CreateAnonymousAuthContext<ViewReleaseVersionRequirement, ReleaseVersion>(releaseVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -63,7 +63,7 @@ public class ViewReleaseAuthorizationHandlerTests
         {
             var handler = BuildHandler(contentDbContext);
 
-            var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
+            var authContext = CreateAnonymousAuthContext<ViewReleaseVersionRequirement, ReleaseVersion>(releaseVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -91,7 +91,7 @@ public class ViewReleaseAuthorizationHandlerTests
         {
             var handler = BuildHandler(contentDbContext);
 
-            var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
+            var authContext = CreateAnonymousAuthContext<ViewReleaseVersionRequirement, ReleaseVersion>(releaseVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -119,7 +119,7 @@ public class ViewReleaseAuthorizationHandlerTests
         {
             var handler = BuildHandler(contentDbContext);
 
-            var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
+            var authContext = CreateAnonymousAuthContext<ViewReleaseVersionRequirement, ReleaseVersion>(releaseVersion);
 
             await handler.HandleAsync(authContext);
 
@@ -134,7 +134,7 @@ public class ViewReleaseAuthorizationHandlerTests
 
         var handler = BuildHandler(contentDbContext);
 
-        var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(
+        var authContext = CreateAnonymousAuthContext<ViewReleaseVersionRequirement, ReleaseVersion>(
             new ReleaseVersion { Id = Guid.NewGuid() }
         );
 
@@ -143,8 +143,8 @@ public class ViewReleaseAuthorizationHandlerTests
         Assert.False(authContext.HasSucceeded);
     }
 
-    private static ViewReleaseAuthorizationHandler BuildHandler(ContentDbContext contentDbContext)
+    private static ViewReleaseVersionAuthorizationHandler BuildHandler(ContentDbContext contentDbContext)
     {
-        return new ViewReleaseAuthorizationHandler(new ReleaseVersionRepository(contentDbContext));
+        return new ViewReleaseVersionAuthorizationHandler(new ReleaseVersionRepository(contentDbContext));
     }
 }

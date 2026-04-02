@@ -64,15 +64,6 @@ public class AuthorizationHandlerService(
             return true;
         }
 
-        var a = await UserHasPrereleaseRoleOnReleaseVersion(
-            userId: user.GetUserId(),
-            releaseVersionId: releaseVersion.Id
-        );
-
-        var b =
-            preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTimeOffset.UtcNow).Access
-            == PreReleaseAccess.Within;
-
         // If the user has the Pre-release Viewer role on this Release and the Release is within its open
         // Pre-release window, they can see the release version.
         if (

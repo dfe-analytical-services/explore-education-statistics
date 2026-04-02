@@ -83,7 +83,7 @@ public class ReleasePermissionService(
     {
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
             .OnSuccessDo(userService.CheckCanUpdateDrafters)
             .OnSuccess(async () =>
             {
@@ -117,7 +117,7 @@ public class ReleasePermissionService(
                 query => query.Include(rv => rv.Release).ThenInclude(r => r.Publication)
             )
             .OnSuccessDo(releaseVersion =>
-                // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+                // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
                 userService.CheckCanUpdateDrafters(releaseVersion.Release.Publication)
             )
             .OnSuccessVoid(async releaseVersion =>
@@ -161,7 +161,7 @@ public class ReleasePermissionService(
     {
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
             .OnSuccessDo(userService.CheckCanUpdateDrafters)
             .OnSuccessVoid(async publication =>
             {

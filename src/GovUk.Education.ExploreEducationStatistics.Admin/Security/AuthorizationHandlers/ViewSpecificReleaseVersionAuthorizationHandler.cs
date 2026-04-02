@@ -1,15 +1,16 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ViewSpecificReleaseAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
-    : AuthorizationHandler<ViewReleaseRequirement, ReleaseVersion>
+public class ViewSpecificReleaseVersionAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
+    : AuthorizationHandler<ViewReleaseVersionRequirement, ReleaseVersion>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        ViewReleaseRequirement requirement,
+        ViewReleaseVersionRequirement requirement,
         ReleaseVersion releaseVersion
     )
     {

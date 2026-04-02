@@ -31,6 +31,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler(IAuthorizationHan
         )
         {
             context.Succeed(requirement);
+            return;
         }
 
         if (
