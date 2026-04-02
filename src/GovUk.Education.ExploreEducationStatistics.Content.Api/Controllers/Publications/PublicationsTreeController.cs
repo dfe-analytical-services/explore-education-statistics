@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Pub
 public class PublicationsTreeController(IPublicationsTreeService publicationsTreeService) : ControllerBase
 {
     [HttpGet("publications/tree")]
-    public async Task<ActionResult<PublicationsTreeThemeDto[]>> GetPublicationsTree(
+    public async Task<PublicationsTreeThemeDto[]> GetPublicationsTree(
         [FromQuery] [Required] PublicationsTreeFilter filter,
         CancellationToken cancellationToken = default
     ) => await publicationsTreeService.GetPublicationsTreeFiltered(filter, cancellationToken);

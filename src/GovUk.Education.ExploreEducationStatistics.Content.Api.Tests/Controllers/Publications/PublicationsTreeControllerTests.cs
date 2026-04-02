@@ -1,5 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -53,7 +52,7 @@ public abstract class PublicationsTreeControllerTests
 
             // Assert
             _publicationsTreeService.Assert.GetPublicationsTreeFilteredWasCalled(filter);
-            result.AssertOkResult(publicationsTree);
+            Assert.Equal(publicationsTree, result);
         }
     }
 

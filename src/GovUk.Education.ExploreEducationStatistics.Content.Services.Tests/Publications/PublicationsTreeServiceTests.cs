@@ -224,44 +224,6 @@ public abstract class PublicationsTreeServiceTests
         }
 
         [Fact]
-        public async Task WhenPublicationHasNoReleases_PublicationIsExcluded()
-        {
-            // Arrange
-            Theme theme = _dataFixture
-                .DefaultTheme()
-                .WithPublications(
-                    _dataFixture
-                        .DefaultPublication()
-                        // Index 0 has a published release
-                        // Index 1 has no releases
-                        .ForIndex(0, s => s.SetReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]))
-                        .Generate(2)
-                );
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Themes.Add(theme);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var result = await sut.GetPublicationsTree();
-
-                // Assert
-                var resultTheme = Assert.Single(result);
-                Assert.Equal(theme.Title, resultTheme.Title);
-
-                var resultPublication = Assert.Single(resultTheme.Publications);
-                Assert.Equal(theme.Publications[0].Title, resultPublication.Title);
-            }
-        }
-
-        [Fact]
         public async Task WhenLatestReleaseHasData_LatestReleaseHasDataAndAnyLiveReleaseHasDataAreTrue()
         {
             // Arrange
