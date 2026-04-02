@@ -599,8 +599,10 @@ user uploads subject
     user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-title    %{WAIT_SMALL}
     user enters text into element    id:dataFileUploadForm-title    ${SUBJECT_NAME}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
+    user waits until element is visible    id:dataFileUploadForm-dataFile
+    choose file    id:dataFileUploadForm-dataFile-input    ${FOLDER}${SUBJECT_FILE}
+    user waits until element is visible    id:dataFileUploadForm-metadataFile
+    choose file    id:dataFileUploadForm-metadataFile-input    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
     user waits until page contains element    testid:Data files table
 
