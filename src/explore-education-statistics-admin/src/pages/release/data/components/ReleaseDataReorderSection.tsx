@@ -88,53 +88,59 @@ const ReleaseDataReorderSection = ({
               {subjects?.length !== 0 &&
                 !reorderingFilters &&
                 !reorderingIndicators && (
-                  <table className={styles.table}>
-                    <caption className="govuk-visually-hidden">
-                      Table showing data files in this release and buttons for
-                      reordering data file filters and indicators.
-                    </caption>
-                    <thead>
-                      <tr>
-                        <th>Data file</th>
-                        <th>
-                          <VisuallyHidden>Actions</VisuallyHidden>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {subjects?.map(subject => {
-                        return (
-                          <tr key={subject.id}>
-                            <td className="govuk-!-width-two-thirds">
-                              {subject.name}
-                            </td>
-                            <td>
-                              <ButtonGroup className={styles.tableCellButtons}>
-                                <Button
-                                  onClick={() => setReorderingFilters(subject)}
+                  <div className="table-container">
+                    <table className={styles.table}>
+                      <caption className="govuk-visually-hidden">
+                        Table showing data files in this release and buttons for
+                        reordering data file filters and indicators.
+                      </caption>
+                      <thead>
+                        <tr>
+                          <th>Data file</th>
+                          <th>
+                            <VisuallyHidden>Actions</VisuallyHidden>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {subjects?.map(subject => {
+                          return (
+                            <tr key={subject.id}>
+                              <td className="govuk-!-width-two-thirds">
+                                {subject.name}
+                              </td>
+                              <td>
+                                <ButtonGroup
+                                  className={styles.tableCellButtons}
                                 >
-                                  Reorder filters
-                                  <VisuallyHidden>
-                                    {` for ${subject.name}`}
-                                  </VisuallyHidden>
-                                </Button>
-                                <Button
-                                  onClick={() =>
-                                    setReorderingIndicators(subject)
-                                  }
-                                >
-                                  Reorder indicators
-                                  <VisuallyHidden>
-                                    {` for ${subject.name}`}
-                                  </VisuallyHidden>
-                                </Button>
-                              </ButtonGroup>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                                  <Button
+                                    onClick={() =>
+                                      setReorderingFilters(subject)
+                                    }
+                                  >
+                                    Reorder filters
+                                    <VisuallyHidden>
+                                      {` for ${subject.name}`}
+                                    </VisuallyHidden>
+                                  </Button>
+                                  <Button
+                                    onClick={() =>
+                                      setReorderingIndicators(subject)
+                                    }
+                                  >
+                                    Reorder indicators
+                                    <VisuallyHidden>
+                                      {` for ${subject.name}`}
+                                    </VisuallyHidden>
+                                  </Button>
+                                </ButtonGroup>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
             </>
           </LoadingSpinner>

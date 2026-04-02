@@ -106,40 +106,48 @@ export default function RelatedPagesEditModal({
                   Reorder pages
                 </Button>
               )}
-              <table>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Link URL</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {relatedPages.map(page => (
-                    <tr key={page.id}>
-                      <td>{page.description}</td>
-                      <td>
-                        <Link to={page.url}>{page.url}</Link>
-                      </td>
-                      <td>
-                        <ButtonGroup className="govuk-!-margin-bottom-0">
-                          <Button onClick={() => setEditingPage(page)}>
-                            Edit
-                            <VisuallyHidden> {page.description}</VisuallyHidden>
-                          </Button>
-                          <Button
-                            variant="warning"
-                            onClick={() => handleRemove(page.id)}
-                          >
-                            Remove{' '}
-                            <VisuallyHidden> {page.description}</VisuallyHidden>
-                          </Button>
-                        </ButtonGroup>
-                      </td>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Link URL</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {relatedPages.map(page => (
+                      <tr key={page.id}>
+                        <td>{page.description}</td>
+                        <td>
+                          <Link to={page.url}>{page.url}</Link>
+                        </td>
+                        <td>
+                          <ButtonGroup className="govuk-!-margin-bottom-0">
+                            <Button onClick={() => setEditingPage(page)}>
+                              Edit
+                              <VisuallyHidden>
+                                {' '}
+                                {page.description}
+                              </VisuallyHidden>
+                            </Button>
+                            <Button
+                              variant="warning"
+                              onClick={() => handleRemove(page.id)}
+                            >
+                              Remove{' '}
+                              <VisuallyHidden>
+                                {' '}
+                                {page.description}
+                              </VisuallyHidden>
+                            </Button>
+                          </ButtonGroup>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <Button onClick={toggleOpen.off}>
                 Close <VisuallyHidden> modal</VisuallyHidden>
               </Button>

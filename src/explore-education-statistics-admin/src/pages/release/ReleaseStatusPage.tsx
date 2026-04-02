@@ -171,45 +171,47 @@ export default function ReleaseStatusPage() {
             loading={!releaseStatuses}
             text="Loading release status history"
           >
-            <table data-testid="release-status-history">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Internal note</th>
-                  <th scope="col">Release version</th>
-                  <th scope="col">By user</th>
-                </tr>
-              </thead>
-              <tbody>
-                {releaseStatuses.map(status => (
-                  <tr key={status.releaseStatusId}>
-                    <td>
-                      {status.created ? (
-                        <FormattedDate format="d MMMM yyyy HH:mm">
-                          {status.created}
-                        </FormattedDate>
-                      ) : (
-                        'Not available'
-                      )}
-                    </td>
-                    <td>{status.approvalStatus}</td>
-                    <td>{status.internalReleaseNote}</td>
-                    <td>{`${status.releaseVersion + 1}`}</td>
-                    {/* +1 because version starts from 0 in DB */}
-                    <td>
-                      {status.createdByEmail ? (
-                        <a href={`mailto:${status.createdByEmail}`}>
-                          {status.createdByEmail}
-                        </a>
-                      ) : (
-                        'Not available'
-                      )}
-                    </td>
+            <div className="table-container">
+              <table data-testid="release-status-history">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Internal note</th>
+                    <th scope="col">Release version</th>
+                    <th scope="col">By user</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {releaseStatuses.map(status => (
+                    <tr key={status.releaseStatusId}>
+                      <td>
+                        {status.created ? (
+                          <FormattedDate format="d MMMM yyyy HH:mm">
+                            {status.created}
+                          </FormattedDate>
+                        ) : (
+                          'Not available'
+                        )}
+                      </td>
+                      <td>{status.approvalStatus}</td>
+                      <td>{status.internalReleaseNote}</td>
+                      <td>{`${status.releaseVersion + 1}`}</td>
+                      {/* +1 because version starts from 0 in DB */}
+                      <td>
+                        {status.createdByEmail ? (
+                          <a href={`mailto:${status.createdByEmail}`}>
+                            {status.createdByEmail}
+                          </a>
+                        ) : (
+                          'Not available'
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </LoadingSpinner>
         </>
       )}
