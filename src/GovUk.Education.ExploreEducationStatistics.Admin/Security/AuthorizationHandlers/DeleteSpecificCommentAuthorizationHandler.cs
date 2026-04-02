@@ -19,7 +19,7 @@ public class DeleteSpecificCommentAuthorizationHandler(
         Comment resource
     )
     {
-        var releaseVersion = GetReleaseVersion(contentDbContext, resource);
+        var releaseVersion = await GetReleaseVersion(contentDbContext, resource);
 
         var updateSpecificReleaseVersionContext = new AuthorizationHandlerContext(
             requirements: [new UpdateSpecificReleaseVersionRequirement()],
@@ -37,14 +37,14 @@ public class DeleteSpecificCommentAuthorizationHandler(
         }
     }
 
-    private static ReleaseVersion? GetReleaseVersion(ContentDbContext context, Comment comment)
+    private static async Task<ReleaseVersion> GetReleaseVersion(ContentDbContext context, Comment comment)
     {
-        var contentBlock = context
+        var contentBlock = await context
             .ContentBlocks.Include(cb => cb.ContentSection)
                 .ThenInclude(cs => cs!.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
-            .First(cb => cb.Id == comment.ContentBlockId);
+            .SingleAsync(cb => cb.Id == comment.ContentBlockId);
 
-        return contentBlock.ContentSection?.ReleaseVersion;
+        return contentBlock.ContentSection!.ReleaseVersion;
     }
 }

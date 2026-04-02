@@ -19,7 +19,7 @@ public class ViewSubjectDataAuthorizationHandler(
     )
     {
         // If this data has been published, it is visible to anyone.
-        var releaseVersion = await contentDbContext.ReleaseVersions.FirstAsync(rv =>
+        var releaseVersion = await contentDbContext.ReleaseVersions.SingleAsync(rv =>
             rv.Id == releaseSubject.ReleaseVersionId
         );
 
