@@ -16,15 +16,15 @@ public record DataSetMapping
     public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; set; } = new();
     public List<UnmappedIndicator> UnmappedReplacementIndicators { get; set; } = [];
 
+    public static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter() }, // so we save MapStatus as a string
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        WriteIndented = false,
+    };
+
     internal class Config : IEntityTypeConfiguration<DataSetMapping>
     {
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            Converters = { new JsonStringEnumConverter() }, // so we save MapStatus as a string
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            WriteIndented = false,
-        };
-
         public void Configure(EntityTypeBuilder<DataSetMapping> builder)
         {
             builder.HasKey(x => x.Id);

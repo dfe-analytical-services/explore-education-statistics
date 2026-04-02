@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -266,9 +267,12 @@ public class DataSetMappingServiceTests
 
     private static DataSetMappingService SetupDataSetMappingService(
         ContentDbContext contentDbContext,
-        StatisticsDbContext statisticsDbContext
+        StatisticsDbContext? statisticsDbContext = null
     )
     {
-        return new DataSetMappingService(contentDbContext, statisticsDbContext);
+        return new DataSetMappingService(
+            contentDbContext,
+            statisticsDbContext ?? Mock.Of<StatisticsDbContext>(MockBehavior.Strict)
+        );
     }
 }

@@ -160,7 +160,7 @@ public class ReplacementPlanService(
                             map => new ReplacementPlanIndicatorMappingViewModel
                             {
                                 Source = new ReplacementPlanIndicatorViewModel { Label = map.OriginalLabel },
-                                Type = map.Status,
+                                Type = map.Status.ToString(),
                                 CandidateKey = map.ReplacementColumnName,
                             }
                         ),
