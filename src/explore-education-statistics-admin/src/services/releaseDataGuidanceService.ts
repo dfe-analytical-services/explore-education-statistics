@@ -1,5 +1,5 @@
 import client from '@admin/services/utils/service';
-import { DataSetDataGuidance } from '@common/services/releaseDataGuidanceService';
+import { DataSetDataGuidance } from '@common/types/releaseDataGuidance';
 
 export interface ReleaseDataGuidance {
   id: string;
