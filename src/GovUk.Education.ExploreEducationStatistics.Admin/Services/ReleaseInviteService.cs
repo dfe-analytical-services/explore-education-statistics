@@ -37,7 +37,7 @@ public class ReleaseInviteService(
     {
         return await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
             .OnSuccessDo(userService.CheckCanUpdateDrafters)
             .OnSuccessDo(() => ValidateReleaseVersionIds(publicationId, releaseVersionIds))
             .OnSuccessVoid(async publication =>
@@ -56,10 +56,10 @@ public class ReleaseInviteService(
     )
     {
         return await contentPersistenceHelper
-            .CheckEntityExists<Publication>(publicationId, query => query.Include(p => p.ReleaseVersions))
+            .CheckEntityExists<Publication>(publicationId)
             .OnSuccessCombineWith(_ => GetPendingUserInvite(email))
             .OnSuccess(tuple => (Publication: tuple.Item1, User: tuple.Item2))
-            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-XXXX
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
             .OnSuccessDo(tuple => userService.CheckCanUpdateDrafters(tuple.Publication))
             .OnSuccess(async tuple =>
             {

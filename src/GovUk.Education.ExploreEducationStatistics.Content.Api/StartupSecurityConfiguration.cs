@@ -32,7 +32,7 @@ public static class StartupSecurityConfiguration
             // does this use have permission to view a specific Release?
             options.AddPolicy(
                 ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(),
-                policy => policy.Requirements.Add(new ViewReleaseRequirement())
+                policy => policy.Requirements.Add(new ViewReleaseVersionRequirement())
             );
         });
     }
@@ -47,6 +47,6 @@ public static class StartupSecurityConfiguration
 
         services.AddTransient<IAuthorizationHandler, ViewMethodologyVersionAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewPublicationAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, ViewReleaseVersionAuthorizationHandler>();
     }
 }
