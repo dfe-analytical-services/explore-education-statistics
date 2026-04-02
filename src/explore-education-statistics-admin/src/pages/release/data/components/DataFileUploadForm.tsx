@@ -151,7 +151,6 @@ export default function DataFileUploadForm({
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
-      toggleCompletionStatus.off();
       switch (values.uploadType) {
         case 'csv': {
           if (!values.title) {
@@ -280,6 +279,10 @@ export default function DataFileUploadForm({
                 ? 'dataFileReplacementUploadForm'
                 : 'dataFileUploadForm'
             }
+            onChange={() => {
+              if (Object.keys(formState.dirtyFields).length > 0)
+                toggleCompletionStatus.off();
+            }}
             onSubmit={handleSubmit}
           >
             <div style={{ position: 'relative' }}>
