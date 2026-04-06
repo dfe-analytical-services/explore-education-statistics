@@ -1,5 +1,6 @@
 import styles from '@common/modules/find-statistics/components/ReleaseDataListItem.module.scss';
 import React, { ReactNode } from 'react';
+import Tag from '@common/components/Tag';
 
 interface Props {
   actions?: ReactNode;
@@ -7,6 +8,7 @@ interface Props {
   description?: string;
   metaInfo?: string;
   title: string;
+  isApiEnabled?: boolean;
 }
 
 export default function ReleaseDataListItem({
@@ -15,11 +17,19 @@ export default function ReleaseDataListItem({
   description,
   metaInfo,
   title,
+  isApiEnabled,
 }: Props) {
   return (
     <li className={styles.listItem} data-testid="release-data-list-item">
       <div className={styles.content}>
-        <h4 className={styles.title}>{title}</h4>
+        <h4 className={styles.title}>
+          {title}
+          {isApiEnabled && (
+            <Tag className="govuk-!-margin-left-1" colour="grey">
+              Available by API
+            </Tag>
+          )}
+        </h4>
         {metaInfo && <p className="govuk-!-margin-bottom-1">{metaInfo}</p>}
         {description && (
           <p className="dfe-colour--dark-grey govuk-!-margin-bottom-0">

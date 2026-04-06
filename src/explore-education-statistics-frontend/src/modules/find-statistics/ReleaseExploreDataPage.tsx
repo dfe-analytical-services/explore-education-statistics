@@ -128,6 +128,7 @@ const ReleaseExploreDataPage = ({
           title={dataset.title}
           description={dataset.summary}
           metaInfo={dataset.meta.geographicLevels.join(', ')}
+          isApiEnabled={dataset.isApiEnabled}
           actions={
             <>
               <Link

@@ -81,6 +81,7 @@ public class ReleaseDataContentDataSetDtoBuilder
     private ReleaseDataContentDataSetMetaDto _meta = new ReleaseDataContentDataSetMetaDtoBuilder().Build();
     private string _summary = "Summary";
     private string _title = "Title";
+    private bool _isApiEnabled = true;
 
     public ReleaseDataContentDataSetDto Build() =>
         new()
@@ -91,6 +92,7 @@ public class ReleaseDataContentDataSetDtoBuilder
             Meta = _meta,
             Summary = _summary,
             Title = _title,
+            IsApiEnabled = _isApiEnabled,
         };
 
     public ReleaseDataContentDataSetDtoBuilder WithDataSetFileId(Guid dataSetFileId)
@@ -126,6 +128,12 @@ public class ReleaseDataContentDataSetDtoBuilder
     public ReleaseDataContentDataSetDtoBuilder WithTitle(string title)
     {
         _title = title;
+        return this;
+    }
+
+    public ReleaseDataContentDataSetDtoBuilder WithIsApiEnabled(bool isApiEnabled)
+    {
+        _isApiEnabled = isApiEnabled;
         return this;
     }
 }

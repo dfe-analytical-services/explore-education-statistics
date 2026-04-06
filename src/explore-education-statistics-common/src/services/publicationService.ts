@@ -313,6 +313,7 @@ export interface DataSetItem {
   };
   title: string;
   summary?: string;
+  isApiEnabled: boolean;
 }
 
 export interface FeaturedTableItem {

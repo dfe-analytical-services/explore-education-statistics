@@ -87,7 +87,7 @@ public static class ReleaseFileGeneratorExtensions
 
     public static Generator<ReleaseFile> WithPublicApiDataSetId(
         this Generator<ReleaseFile> generator,
-        Guid publicApiDataSetId
+        Guid? publicApiDataSetId
     ) => generator.ForInstance(s => s.SetPublicApiDataSetId(publicApiDataSetId));
 
     public static Generator<ReleaseFile> WithPublicApiDataSetVersion(
@@ -150,7 +150,7 @@ public static class ReleaseFileGeneratorExtensions
 
     public static InstanceSetters<ReleaseFile> SetPublicApiDataSetId(
         this InstanceSetters<ReleaseFile> setters,
-        Guid publicApiDataSetId
+        Guid? publicApiDataSetId
     ) => setters.Set(rf => rf.PublicApiDataSetId, publicApiDataSetId);
 
     public static InstanceSetters<ReleaseFile> SetPublicApiDataSetVersion(

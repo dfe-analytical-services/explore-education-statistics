@@ -41,4 +41,24 @@ describe('ReleaseDataListItem', () => {
     expect(screen.getByText('Test meta info')).toBeInTheDocument();
     expect(screen.getByText('Test content')).toBeInTheDocument();
   });
+
+  test('renders "Available by API" tag when isApiEnabled is true', () => {
+    render(<ReleaseDataListItem title="Test title" isApiEnabled />);
+
+    expect(
+      screen.getByRole('heading', { name: /Test title/ }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('Available by API')).toBeInTheDocument();
+  });
+
+  test('does not render "Available by API" tag when isApiEnabled is false', () => {
+    render(<ReleaseDataListItem title="Test title" isApiEnabled={false} />);
+
+    expect(
+      screen.getByRole('heading', { name: 'Test title' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByText('Available by API')).not.toBeInTheDocument();
+  });
 });
