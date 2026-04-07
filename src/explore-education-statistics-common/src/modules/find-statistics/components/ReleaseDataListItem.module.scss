@@ -15,6 +15,16 @@
   margin: 0 0 govuk-spacing(1);
 }
 
+.heading {
+  display: flex;
+  gap: govuk-spacing(2);
+  flex-wrap: wrap;
+}
+
+.tag {
+  margin: 0 0 govuk-spacing(1);
+}
+
 .actions {
   margin-block: govuk-spacing(3);
   display: flex;

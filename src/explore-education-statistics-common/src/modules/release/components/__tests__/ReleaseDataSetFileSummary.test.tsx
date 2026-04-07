@@ -5,7 +5,8 @@ import React from 'react';
 import ReleaseDataSetFileSummary from '../ReleaseDataSetFileSummary';
 
 const testDataSetItem: DataSetItem = {
-  isApiEnabled: false,
+  isApiEnabled: true,
+  publicApiDataSetId: 'test-dataset-1-publicapidatasetid',
   dataSetFileId: 'test-dataset-1-datasetfileid',
   fileId: 'test-dataset-1-fileid',
   subjectId: 'test-dataset-1-subjectid',
@@ -49,6 +50,11 @@ describe('ReleaseDataSetFileSummary', () => {
       }),
     );
 
+    expect(
+      within(screen.getByTestId('API data set ID')).getByText(
+        'test-dataset-1-publicapidatasetid',
+      ),
+    ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('Number of rows')).getByText('1,000'),
     ).toBeInTheDocument();

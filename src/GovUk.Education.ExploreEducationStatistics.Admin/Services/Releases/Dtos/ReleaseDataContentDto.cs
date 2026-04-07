@@ -43,6 +43,8 @@ public record ReleaseDataContentDataSetDto
     public required ReleaseDataContentDataSetMetaDto Meta { get; init; }
     public required string Title { get; init; }
     public required string? Summary { get; init; }
+    public Guid? PublicApiDataSetId { get; init; }
+    public bool IsApiEnabled => PublicApiDataSetId != null;
 
     public static ReleaseDataContentDataSetDto FromReleaseFile(ReleaseFile releaseFile) =>
         new()
@@ -57,6 +59,7 @@ public record ReleaseDataContentDataSetDto
             // Summary is only set when data guidance has been added, so a data set can initially have no summary.
             Summary = releaseFile.Summary != null ? HtmlToTextUtils.HtmlToText(releaseFile.Summary) : null,
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
+            PublicApiDataSetId = releaseFile.PublicApiDataSetId,
         };
 }
 
