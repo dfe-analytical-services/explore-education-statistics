@@ -5,6 +5,7 @@ import React from 'react';
 import ReleaseDataSetFileSummary from '../ReleaseDataSetFileSummary';
 
 const testDataSetItem: DataSetItem = {
+  isApiEnabled: false,
   dataSetFileId: 'test-dataset-1-datasetfileid',
   fileId: 'test-dataset-1-fileid',
   subjectId: 'test-dataset-1-subjectid',

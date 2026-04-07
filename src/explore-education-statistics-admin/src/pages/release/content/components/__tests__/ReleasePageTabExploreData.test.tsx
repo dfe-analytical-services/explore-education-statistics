@@ -85,6 +85,7 @@ describe('ReleasePageTabExploreData', () => {
         },
         title: 'Test dataset 1',
         summary: 'Test dataset 1 summary',
+        isApiEnabled: false,
       },
       {
         dataSetFileId: 'test-dataset-2-datasetfileid',
@@ -105,6 +106,7 @@ describe('ReleasePageTabExploreData', () => {
         },
         title: 'Test dataset 2',
         summary: 'Test dataset 2 summary',
+        isApiEnabled: false,
       },
     ],
     featuredTables: [
