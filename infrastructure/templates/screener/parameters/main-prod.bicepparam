@@ -14,4 +14,4 @@ param screenerFunctionAppSku = {
 //
 // In the future, this can be switched back to true to allow Prod to properly enforce this
 // quality check.
-param includeDataDictionaryChecks bool = false
+param includeDataDictionaryChecks = false
