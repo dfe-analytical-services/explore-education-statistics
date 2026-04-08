@@ -76,7 +76,6 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
               event.target.files && event.target.files.length > 0
                 ? event.target.files[0]
                 : null;
-
             if (file) {
               setInputValue(file);
               setValue(
@@ -85,6 +84,17 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
                 {
                   shouldTouch: true,
                 },
+              );
+            }
+          }}
+          onDrop={event => {
+            const file = event.dataTransfer.files?.[0];
+            if (file) {
+              setInputValue(file);
+              setValue(
+                name,
+                file as PathValue<TFormValues, Path<TFormValues>>,
+                { shouldTouch: true },
               );
             }
           }}

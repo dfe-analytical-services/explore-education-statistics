@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { FileUpload } from 'govuk-frontend';
 import React, {
   ChangeEventHandler,
+  DragEventHandler,
   FocusEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
@@ -22,6 +23,7 @@ export interface FormFileInputProps {
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
+  onDrop?: DragEventHandler<HTMLDivElement>;
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
 }
 
@@ -36,6 +38,7 @@ const FormFileInput = ({
   onBlur,
   onChange,
   onClick,
+  onDrop,
   onKeyPress,
 }: FormFileInputProps) => {
   const dropZoneRef = useRef<HTMLDivElement>(null);
@@ -59,6 +62,7 @@ const FormFileInput = ({
         className="govuk-drop-zone"
         data-module="govuk-file-upload"
         ref={dropZoneRef}
+        onDrop={onDrop}
       >
         <input
           aria-describedby={
