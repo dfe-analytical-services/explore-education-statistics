@@ -131,7 +131,7 @@ const ReleaseExploreDataPage = ({
           metaInfo={dataset.meta.geographicLevels.join(', ')}
           tag={
             dataset.isApiEnabled && (
-              <Tag className="desktop-margin-left-2" colour="grey">
+              <Tag className="govuk-!-margin-bottom-2" colour="grey">
                 Available by API
               </Tag>
             )

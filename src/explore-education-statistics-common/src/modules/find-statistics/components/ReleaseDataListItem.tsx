@@ -21,10 +21,8 @@ export default function ReleaseDataListItem({
   return (
     <li className={styles.listItem} data-testid="release-data-list-item">
       <div className={styles.content}>
-        <div className={styles.heading}>
-          <h4 className={styles.title}>{title}</h4>
-          <span className={styles.tag}>{tag}</span>
-        </div>
+        <h4 className={styles.title}>{title}</h4>
+        {tag}
         {metaInfo && <p className="govuk-!-margin-bottom-1">{metaInfo}</p>}
         {description && (
           <p className="dfe-colour--dark-grey govuk-!-margin-bottom-0">

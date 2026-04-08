@@ -164,7 +164,11 @@ const ReleasePageTabExploreData = ({
           description={dataset.summary}
           metaInfo={dataset.meta.geographicLevels.join(', ')}
           tag={
-            dataset.isApiEnabled && <Tag colour="grey">Available by API</Tag>
+            dataset.isApiEnabled && (
+              <Tag className="govuk-!-margin-bottom-2" colour="grey">
+                Available by API
+              </Tag>
+            )
           }
           actions={
             <>

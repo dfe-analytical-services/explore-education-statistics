@@ -35,7 +35,7 @@ public abstract class ReleaseDataContentServiceTests
             releaseVersion.RelatedDashboardsSection = _dataFixture
                 .DefaultContentSection(ContentSectionType.RelatedDashboards)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Data dashboards</p>")]);
-            var publicApiId = Guid.NewGuid();
+            var publicApiDataSetId = Guid.NewGuid();
             var dataSets = _dataFixture
                 .DefaultReleaseFile()
                 .ForIndex(
@@ -68,7 +68,7 @@ public abstract class ReleaseDataContentServiceTests
                 .GenerateArray(2);
 
             // Set one of the dataSets to be
-            dataSets[0].PublicApiDataSetId = publicApiId;
+            dataSets[0].PublicApiDataSetId = publicApiDataSetId;
 
             var supportingFiles = _dataFixture
                 .DefaultReleaseFile()
