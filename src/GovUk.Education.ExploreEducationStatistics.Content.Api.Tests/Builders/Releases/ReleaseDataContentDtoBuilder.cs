@@ -79,6 +79,7 @@ public class ReleaseDataContentDataSetDtoBuilder
     private Guid _fileId = Guid.NewGuid();
     private Guid _subjectId = Guid.NewGuid();
     private ReleaseDataContentDataSetMetaDto _meta = new ReleaseDataContentDataSetMetaDtoBuilder().Build();
+    private Guid _publicApiDataSetId = Guid.NewGuid();
     private string _summary = "Summary";
     private string _title = "Title";
 
@@ -89,6 +90,7 @@ public class ReleaseDataContentDataSetDtoBuilder
             FileId = _fileId,
             SubjectId = _subjectId,
             Meta = _meta,
+            PublicApiDataSetId = _publicApiDataSetId,
             Summary = _summary,
             Title = _title,
         };
@@ -114,6 +116,12 @@ public class ReleaseDataContentDataSetDtoBuilder
     public ReleaseDataContentDataSetDtoBuilder WithMeta(ReleaseDataContentDataSetMetaDto meta)
     {
         _meta = meta;
+        return this;
+    }
+
+    public ReleaseDataContentDataSetDtoBuilder WithPublicApiDataSetId(Guid publicApiDataSetId)
+    {
+        _publicApiDataSetId = publicApiDataSetId;
         return this;
     }
 
