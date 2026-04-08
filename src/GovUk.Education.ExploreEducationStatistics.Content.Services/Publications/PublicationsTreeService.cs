@@ -20,7 +20,7 @@ public class PublicationsTreeService(
     ILogger<PublicationsTreeService> logger
 ) : IPublicationsTreeService
 {
-    public async Task<PublicationsTreeThemeDto[]> GetPublicationsTree(CancellationToken cancellationToken = default)
+    internal async Task<PublicationsTreeThemeDto[]> GetPublicationsTree(CancellationToken cancellationToken = default)
     {
         var themes = await contentDbContext
             .Themes.Include(theme => theme.Publications)
@@ -35,7 +35,7 @@ public class PublicationsTreeService(
             .ToArrayAsync(cancellationToken);
     }
 
-    public async Task<PublicationsTreeThemeDto[]> GetPublicationsTreeCached(
+    internal async Task<PublicationsTreeThemeDto[]> GetPublicationsTreeCached(
         CancellationToken cancellationToken = default
     ) =>
         await publicBlobCacheService.GetOrCreateAsync(

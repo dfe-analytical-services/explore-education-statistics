@@ -5,10 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publicatio
 
 public interface IPublicationsTreeService
 {
-    Task<PublicationsTreeThemeDto[]> GetPublicationsTree(CancellationToken cancellationToken = default);
-
-    Task<PublicationsTreeThemeDto[]> GetPublicationsTreeCached(CancellationToken cancellationToken = default);
-
     Task<PublicationsTreeThemeDto[]> GetPublicationsTreeFiltered(
         PublicationsTreeFilter filter,
         CancellationToken cancellationToken = default
