@@ -253,6 +253,16 @@ describe('DataFileUploadForm', () => {
     );
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      const status = screen.getByRole('status');
+      expect(status).toContainElement(
+        screen.getByText(
+          "Upload complete. Click 'View details' on the item pending review in order to continue import.",
+        ),
+      );
+      expect(status).toHaveClass('govuk-visually-hidden');
+    });
   });
 
   test('form submits and calls the correct endpoint when a zip file is used', async () => {
@@ -295,8 +305,17 @@ describe('DataFileUploadForm', () => {
       title: 'Test title',
       zipFile: file,
     });
-
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      const status = screen.getByRole('status');
+      expect(status).toContainElement(
+        screen.getByText(
+          "Upload complete. Click 'View details' on the item pending review in order to continue import.",
+        ),
+      );
+      expect(status).toHaveClass('govuk-visually-hidden');
+    });
   });
 
   test('form submits and calls the correct endpoint when a bulk zip file is used', async () => {
@@ -337,6 +356,16 @@ describe('DataFileUploadForm', () => {
     ).toHaveBeenCalledWith('release-version-id', file);
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      const status = screen.getByRole('status');
+      expect(status).toContainElement(
+        screen.getByText(
+          "Upload complete. Click 'View details' on the item pending review in order to continue import.",
+        ),
+      );
+      expect(status).toHaveClass('govuk-visually-hidden');
+    });
   });
 
   test('shows validation message when bulk ZIP file is empty', async () => {
