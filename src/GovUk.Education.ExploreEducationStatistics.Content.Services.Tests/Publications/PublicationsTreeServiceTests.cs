@@ -592,12 +592,12 @@ public abstract class PublicationsTreeServiceTests
         }
     }
 
-    public class ApplyFilterTests : PublicationsTreeServiceTests
+    public class GetPublicationsTreeFilteredTests : PublicationsTreeServiceTests
     {
         [Theory]
         [InlineData(PublicationsTreeFilter.DataCatalogue)]
         [InlineData(PublicationsTreeFilter.FastTrack)]
-        public void WhenFilterIsDataCatalogueOrFastTrack_IncludesPublicationWhenAnyLiveReleaseHasData(
+        public async Task WhenFilterIsDataCatalogueOrFastTrack_IncludesPublicationWhenAnyLiveReleaseHasData(
             PublicationsTreeFilter filter
         )
         {
@@ -624,10 +624,19 @@ public abstract class PublicationsTreeServiceTests
                 },
             ];
 
+            var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+            publicBlobCacheService
+                .Setup(s => s.GetItemAsync(new PublicationsTreeCacheKey(), typeof(PublicationsTreeThemeDto[])))
+                .ReturnsAsync(tree);
+
+            var sut = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
+
             // Act
-            var result = PublicationsTreeService.ApplyFilter(tree, filter);
+            var result = await sut.GetPublicationsTreeFiltered(filter);
 
             // Assert
+            VerifyAllMocks(publicBlobCacheService);
+
             var resultTheme = Assert.Single(result);
             Assert.Equal("Theme A", resultTheme.Title);
 
@@ -638,7 +647,7 @@ public abstract class PublicationsTreeServiceTests
         [Theory]
         [InlineData(PublicationsTreeFilter.DataCatalogue)]
         [InlineData(PublicationsTreeFilter.FastTrack)]
-        public void WhenFilterIsDataCatalogueOrFastTrack_ExcludesPublicationWhenReleaseHasNoData(
+        public async Task WhenFilterIsDataCatalogueOrFastTrack_ExcludesPublicationWhenReleaseHasNoData(
             PublicationsTreeFilter filter
         )
         {
@@ -665,15 +674,24 @@ public abstract class PublicationsTreeServiceTests
                 },
             ];
 
+            var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+            publicBlobCacheService
+                .Setup(s => s.GetItemAsync(new PublicationsTreeCacheKey(), typeof(PublicationsTreeThemeDto[])))
+                .ReturnsAsync(tree);
+
+            var sut = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
+
             // Act
-            var result = PublicationsTreeService.ApplyFilter(tree, filter);
+            var result = await sut.GetPublicationsTreeFiltered(filter);
 
             // Assert
+            VerifyAllMocks(publicBlobCacheService);
+
             Assert.Empty(result);
         }
 
         [Fact]
-        public void WhenFilterIsDataTables_IncludesPublicationWhenLatestReleaseHasData()
+        public async Task WhenFilterIsDataTables_IncludesPublicationWhenLatestReleaseHasData()
         {
             // Arrange
             PublicationsTreeThemeDto[] tree =
@@ -698,10 +716,19 @@ public abstract class PublicationsTreeServiceTests
                 },
             ];
 
+            var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+            publicBlobCacheService
+                .Setup(s => s.GetItemAsync(new PublicationsTreeCacheKey(), typeof(PublicationsTreeThemeDto[])))
+                .ReturnsAsync(tree);
+
+            var sut = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
+
             // Act
-            var result = PublicationsTreeService.ApplyFilter(tree, PublicationsTreeFilter.DataTables);
+            var result = await sut.GetPublicationsTreeFiltered(PublicationsTreeFilter.DataTables);
 
             // Assert
+            VerifyAllMocks(publicBlobCacheService);
+
             var resultTheme = Assert.Single(result);
             Assert.Equal("Theme A", resultTheme.Title);
 
@@ -710,7 +737,7 @@ public abstract class PublicationsTreeServiceTests
         }
 
         [Fact]
-        public void WhenFilterIsDataTables_ExcludesPublicationWhenLatestReleaseHasNoData()
+        public async Task WhenFilterIsDataTables_ExcludesPublicationWhenLatestReleaseHasNoData()
         {
             // Arrange
             PublicationsTreeThemeDto[] tree =
@@ -735,10 +762,19 @@ public abstract class PublicationsTreeServiceTests
                 },
             ];
 
+            var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+            publicBlobCacheService
+                .Setup(s => s.GetItemAsync(new PublicationsTreeCacheKey(), typeof(PublicationsTreeThemeDto[])))
+                .ReturnsAsync(tree);
+
+            var sut = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
+
             // Act
-            var result = PublicationsTreeService.ApplyFilter(tree, PublicationsTreeFilter.DataTables);
+            var result = await sut.GetPublicationsTreeFiltered(PublicationsTreeFilter.DataTables);
 
             // Assert
+            VerifyAllMocks(publicBlobCacheService);
+
             Assert.Empty(result);
         }
 
@@ -746,7 +782,7 @@ public abstract class PublicationsTreeServiceTests
         [InlineData(PublicationsTreeFilter.DataCatalogue)]
         [InlineData(PublicationsTreeFilter.FastTrack)]
         [InlineData(PublicationsTreeFilter.DataTables)]
-        public void WhenThemesExistWithNoPublicationsRemainingAfterFiltering_ThemesAreRemoved(
+        public async Task WhenThemesExistWithNoPublicationsRemainingAfterFiltering_ThemesAreRemoved(
             PublicationsTreeFilter filter
         )
         {
@@ -793,10 +829,19 @@ public abstract class PublicationsTreeServiceTests
                 },
             ];
 
+            var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+            publicBlobCacheService
+                .Setup(s => s.GetItemAsync(new PublicationsTreeCacheKey(), typeof(PublicationsTreeThemeDto[])))
+                .ReturnsAsync(tree);
+
+            var sut = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
+
             // Act
-            var result = PublicationsTreeService.ApplyFilter(tree, filter);
+            var result = await sut.GetPublicationsTreeFiltered(filter);
 
             // Assert
+            VerifyAllMocks(publicBlobCacheService);
+
             var resultTheme = Assert.Single(result);
             Assert.Equal("Theme B", resultTheme.Title);
 

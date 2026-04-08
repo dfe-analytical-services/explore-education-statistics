@@ -126,7 +126,7 @@ public class PublicationsTreeService(
                 cancellationToken
             );
 
-    internal static PublicationsTreeThemeDto[] ApplyFilter(
+    private static PublicationsTreeThemeDto[] ApplyFilter(
         PublicationsTreeThemeDto[] tree,
         PublicationsTreeFilter filter
     ) =>
