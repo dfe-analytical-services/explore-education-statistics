@@ -3,9 +3,5 @@
 .container {
   display: flex;
   gap: 2rem;
-  flex-direction: column;
-
-  @media (min-width: 641px) {
-    flex-direction: row;
-  }
+  align-items: center;
 }
