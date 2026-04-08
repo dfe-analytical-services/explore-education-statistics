@@ -270,78 +270,26 @@ public class ThemeServiceTests
     {
         User user = _fixture.DefaultUser();
 
-        Publication publication1 = _fixture
+        var (publication1, publication2, publication3) = _fixture
             .DefaultPublication()
-            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)])
-            .WithTheme(_fixture.DefaultTheme());
-        Publication publication2 = _fixture
-            .DefaultPublication()
-            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)])
-            .WithTheme(_fixture.DefaultTheme());
-        Publication publication3 = _fixture
-            .DefaultPublication()
-            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)])
-            .WithTheme(_fixture.DefaultTheme());
-
-        var userReleaseRoles = _fixture
-            .DefaultUserReleaseRole()
-            // These roles should result in the theme being included.
-            .ForIndex(
-                0,
-                s =>
-                    s.SetUser(user)
-                        .SetReleaseVersion(publication1.Releases[0].Versions[0])
-                        .SetRole(ReleaseRole.Approver)
-            )
-            .ForIndex(
-                1,
-                s =>
-                    s.SetUser(user)
-                        .SetReleaseVersion(publication1.Releases[0].Versions[1])
-                        .SetRole(ReleaseRole.Contributor)
-            )
-            .ForIndex(
-                2,
-                s =>
-                    s.SetUser(user)
-                        .SetReleaseVersion(publication2.Releases[0].Versions[0])
-                        .SetRole(ReleaseRole.Contributor)
-            )
-            .ForIndex(
-                3,
-                s =>
-                    s.SetUser(user)
-                        .SetReleaseVersion(publication2.Releases[0].Versions[1])
-                        .SetRole(ReleaseRole.Approver)
-            )
-            // These roles should not result in the theme being included.
-            // This role is for a different user
-            .ForIndex(
-                4,
-                s =>
-                    s.SetUser(_fixture.DefaultUser())
-                        .SetReleaseVersion(publication1.Releases[0].Versions[0])
-                        .SetRole(ReleaseRole.Approver)
-            )
-            // This role is for a PrereleaseViewer and should be excluded
-            .ForIndex(
-                5,
-                s =>
-                    s.SetUser(user)
-                        .SetReleaseVersion(publication1.Releases[0].Versions[0])
-                        .SetRole(ReleaseRole.PrereleaseViewer)
-            )
-            .GenerateList(6);
+            .WithTheme(_fixture.DefaultTheme())
+            .GenerateTuple3();
 
         var userPublicationRoles = _fixture
             .DefaultUserPublicationRole()
             // These roles should result in the theme being included.
-            .ForIndex(0, s => s.SetUser(user).SetPublication(publication3).SetRole(PublicationRole.Allower))
-            .ForIndex(1, s => s.SetUser(user).SetPublication(publication3).SetRole(PublicationRole.Owner))
-            // The theme for these roles are already included due to the release roles.
-            // They should not result in the theme doubling-up in the results
-            .ForIndex(2, s => s.SetUser(user).SetPublication(publication1).SetRole(PublicationRole.Allower))
-            .ForIndex(3, s => s.SetUser(user).SetPublication(publication1).SetRole(PublicationRole.Owner))
+            .ForIndex(0, s => s.SetUser(user).SetPublication(publication1).SetRole(PublicationRole.Approver))
+            // This one should not result in a duplicate as the role above already exists for the same publication with the same theme
+            // (although, in theory, you should only have 1 publication role at a time per publication, we included it here for completeness to ensure
+            // that duplicates aren't returned).
+            .ForIndex(1, s => s.SetUser(user).SetPublication(publication1).SetRole(PublicationRole.Drafter))
+            .ForIndex(2, s => s.SetUser(user).SetPublication(publication2).SetRole(PublicationRole.Drafter))
+            // This role should not result in the theme being included.
+            // This role is for a different user
+            .ForIndex(
+                3,
+                s => s.SetUser(_fixture.DefaultUser()).SetPublication(publication3).SetRole(PublicationRole.Drafter)
+            )
             .GenerateList(4);
 
         var userService = new Mock<IUserService>(Strict);
@@ -349,15 +297,11 @@ public class ThemeServiceTests
         userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanManageAllTaxonomy)).ReturnsAsync(false);
         userService.Setup(s => s.GetUserId()).Returns(user.Id);
 
-        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
-
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
         userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
         var service = SetupThemeService(
             userService: userService.Object,
-            userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
             userPublicationRoleRepository: userPublicationRoleRepository.Object
         );
 
@@ -365,7 +309,7 @@ public class ThemeServiceTests
 
         var themes = result.AssertRight();
 
-        Assert.Equal(3, themes.Count);
+        Assert.Equal(2, themes.Count);
 
         Assert.Equal(publication1.ThemeId, themes[0].Id);
         Assert.Equal(publication1.Theme.Title, themes[0].Title);
@@ -375,11 +319,7 @@ public class ThemeServiceTests
         Assert.Equal(publication2.Theme.Title, themes[1].Title);
         Assert.Equal(publication2.Theme.Summary, themes[1].Summary);
 
-        Assert.Equal(publication3.ThemeId, themes[2].Id);
-        Assert.Equal(publication3.Theme.Title, themes[2].Title);
-        Assert.Equal(publication3.Theme.Summary, themes[2].Summary);
-
-        VerifyAllMocks(userService, userPrereleaseRoleRepository, userPublicationRoleRepository);
+        VerifyAllMocks(userService, userPublicationRoleRepository);
     }
 
     [Fact]
@@ -997,7 +937,6 @@ public class ThemeServiceTests
         IPublishingService? publishingService = null,
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         bool enableThemeDeletion = true
     )
@@ -1025,7 +964,6 @@ public class ThemeServiceTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );
     }
