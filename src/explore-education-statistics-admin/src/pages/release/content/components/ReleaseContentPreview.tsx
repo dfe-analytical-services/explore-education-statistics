@@ -4,6 +4,7 @@ import ReleasePageTabExploreData from '@admin/pages/release/content/components/R
 import ReleasePageTabHelp from '@admin/pages/release/content/components/ReleasePageTabHelp';
 import ReleasePageTabHome from '@admin/pages/release/content/components/ReleasePageTabHome';
 import ReleasePageTabMethodology from '@admin/pages/release/content/components/ReleasePageTabMethodology';
+import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
 import ReleasePageTitle from '@admin/pages/release/content/components/ReleasePageTitle';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
@@ -73,6 +74,10 @@ const ReleaseContent = ({
           </Link>
         </p>
       </InsetText>
+
+      <PublishingOrganisations
+        publishingOrganisations={publishingOrganisations}
+      />
 
       <ReleasePageTitle
         publicationSummary={publication.summary || ''}

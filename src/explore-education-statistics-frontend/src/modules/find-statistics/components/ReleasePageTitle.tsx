@@ -1,9 +1,9 @@
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { PublicationSummary } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
+import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageTitle.module.scss';
 import React from 'react';
-import PublishingOrganisations from './PublishingOrganisations';
 
 interface Props {
   publicationSummary: PublicationSummary;

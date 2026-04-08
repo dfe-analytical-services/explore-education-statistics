@@ -4,7 +4,8 @@ import {
   defaultOrganisation,
   Organisation,
 } from '@common/services/types/organisation';
-import styles from '@frontend/modules/find-statistics/components/PublishingOrganisations.module.scss';
+import styles from '@common/modules/find-statistics/components/PublishingOrganisations.module.scss';
+import React from 'react';
 
 interface Props {
   publishingOrganisations?: Organisation[];
