@@ -35,21 +35,27 @@ public abstract class ReleaseDataContentServiceTests
             releaseVersion.RelatedDashboardsSection = _dataFixture
                 .DefaultContentSection(ContentSectionType.RelatedDashboards)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Data dashboards</p>")]);
+
             var publicApiDataSetId = Guid.NewGuid();
+
             var dataSets = _dataFixture
                 .DefaultReleaseFile()
                 .ForIndex(
                     0,
                     s =>
                         s.SetFile(
-                            _dataFixture
-                                .DefaultFile(FileType.Data)
-                                .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(1000))
-                                .WithDataSetFileVersionGeographicLevels([
-                                    GeographicLevel.Country,
-                                    GeographicLevel.LocalAuthority,
-                                ])
-                        )
+                                _dataFixture
+                                    .DefaultFile(FileType.Data)
+                                    .WithDataSetFileMeta(
+                                        _dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(1000)
+                                    )
+                                    .WithDataSetFileVersionGeographicLevels([
+                                        GeographicLevel.Country,
+                                        GeographicLevel.LocalAuthority,
+                                    ])
+                            )
+                            // Set this data set to be available by API
+                            .SetPublicApiDataSetId(publicApiDataSetId)
                 )
                 .ForIndex(
                     1,
@@ -66,9 +72,6 @@ public abstract class ReleaseDataContentServiceTests
                 )
                 .WithReleaseVersion(releaseVersion)
                 .GenerateArray(2);
-
-            // Set one of the dataSets to be
-            dataSets[0].PublicApiDataSetId = publicApiDataSetId;
 
             var supportingFiles = _dataFixture
                 .DefaultReleaseFile()
