@@ -108,7 +108,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
 
   const { data: themes = [], isLoading: isLoadingThemes } = useQuery({
     ...publicationQueries.getPublicationTree({
-      publicationFilter: 'DataCatalogue',
+      filter: 'DataCatalogue',
     }),
     staleTime: Infinity,
   });
@@ -652,7 +652,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
 
   const themes = await queryClient.fetchQuery(
     publicationQueries.getPublicationTree({
-      publicationFilter: 'DataCatalogue',
+      filter: 'DataCatalogue',
     }),
   );
 

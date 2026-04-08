@@ -321,7 +321,7 @@ export const getServerSideProps: GetServerSideProps<
   } = query as Dictionary<string>;
 
   const themeMeta = await publicationService.getPublicationTree({
-    publicationFilter: 'DataTables',
+    filter: 'DataTables',
   });
 
   const selectedPublication = themeMeta

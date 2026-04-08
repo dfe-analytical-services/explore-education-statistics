@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 
-public enum PublicationTreeFilter
+public enum PublicationsTreeFilter
 {
     DataTables,
     DataCatalogue,

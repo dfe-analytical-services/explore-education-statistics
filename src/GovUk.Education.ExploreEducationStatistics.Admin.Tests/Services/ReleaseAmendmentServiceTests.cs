@@ -98,12 +98,11 @@ public class ReleaseAmendmentServiceTests
                 )
             )
             .WithUpdates([
-                // 'On' is deliberately set in local time with DateTime.Now to match how ReleaseNoteService creates Updates.
                 // TODO EES-6490 Convert 'On' from DateTime to DateTimeOffset
                 new Update
                 {
                     Id = Guid.NewGuid(),
-                    On = DateTime.Now.AddDays(-4),
+                    On = DateTime.UtcNow.AddDays(-4),
                     Reason = "Reason 1",
                     Created = DateTime.UtcNow.AddDays(-6),
                     CreatedById = Guid.NewGuid(),
@@ -111,7 +110,7 @@ public class ReleaseAmendmentServiceTests
                 new Update
                 {
                     Id = Guid.NewGuid(),
-                    On = DateTime.Now.AddDays(-5),
+                    On = DateTime.UtcNow.AddDays(-5),
                     Reason = "Reason 2",
                     Created = DateTime.UtcNow.AddDays(-2),
                     CreatedById = Guid.NewGuid(),

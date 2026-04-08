@@ -399,7 +399,7 @@ export interface Theme {
 }
 
 export interface PublicationTreeOptions {
-  publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
+  filter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
 }
 
 export interface PublicationSitemapItem {
@@ -500,11 +500,11 @@ const publicationService = {
   ): Promise<PublicationMethodologiesList> {
     return contentApi.get(`/publications/${publicationSlug}/methodologies`);
   },
-  getPublicationTree({
-    publicationFilter,
-  }: PublicationTreeOptions = {}): Promise<Theme[]> {
-    return contentApi.get('/publication-tree', {
-      params: { publicationFilter },
+  getPublicationTree({ filter }: PublicationTreeOptions = {}): Promise<
+    Theme[]
+  > {
+    return contentApi.get('/publications/tree', {
+      params: { filter },
     });
   },
   listSitemapItems(): Promise<PublicationSitemapItem[]> {
