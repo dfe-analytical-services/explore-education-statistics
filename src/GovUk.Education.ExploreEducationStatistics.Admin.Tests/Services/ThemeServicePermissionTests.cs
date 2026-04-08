@@ -157,7 +157,6 @@ public class ThemeServicePermissionTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IPublicationCacheService? publicationCacheService = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
@@ -179,7 +178,6 @@ public class ThemeServicePermissionTests
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             publicationCacheService ?? new PublicationCacheServiceMockBuilder().Build(),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             NullLogger<ThemeService>.Instance
         );
