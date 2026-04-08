@@ -42,7 +42,7 @@ public record ReleaseDataContentDataSetDto
     public required ReleaseDataContentDataSetMetaDto Meta { get; init; }
     public required string Title { get; init; }
     public required string Summary { get; init; }
-    public Guid? PublicApiDataSetId { get; init; }
+    public required Guid? PublicApiDataSetId { get; init; }
     public bool IsApiEnabled => PublicApiDataSetId != null;
 
     public static ReleaseDataContentDataSetDto FromReleaseFile(ReleaseFile releaseFile) =>
