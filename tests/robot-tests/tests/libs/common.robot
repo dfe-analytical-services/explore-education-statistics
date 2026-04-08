@@ -829,7 +829,7 @@ user chooses select option at index
 user chooses file
     [Arguments]    ${locator}    ${file_path}
     user waits until element is visible    ${locator}
-    choose file    ${locator}    ${file_path}
+    choose file    ${locator}-input    ${file_path}
 
 user clears element text
     [Arguments]    ${selector}

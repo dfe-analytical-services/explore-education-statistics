@@ -189,7 +189,7 @@ Change ancillary file
     user waits until h2 is visible    Edit ancillary file
     user enters text into element    label:Title    Test 2 updated
     user enters text into element    label:Summary    Test 2 summary updated
-    user chooses file    label:Upload new file    ${FILES_DIR}test-file-3.txt
+    user chooses file    ancillaryFileForm-file    ${FILES_DIR}test-file-3.txt
 
     user clicks button    Save file
 
