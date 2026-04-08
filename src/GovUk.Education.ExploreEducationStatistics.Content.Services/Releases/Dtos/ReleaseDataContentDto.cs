@@ -42,6 +42,8 @@ public record ReleaseDataContentDataSetDto
     public required ReleaseDataContentDataSetMetaDto Meta { get; init; }
     public required string Title { get; init; }
     public required string Summary { get; init; }
+    public Guid? PublicApiDataSetId { get; init; }
+    public bool IsApiEnabled => PublicApiDataSetId != null;
 
     public static ReleaseDataContentDataSetDto FromReleaseFile(ReleaseFile releaseFile) =>
         new()
@@ -56,6 +58,7 @@ public record ReleaseDataContentDataSetDto
             // Default to an empty summary for older data sets that predate the summary requirement.
             Summary = releaseFile.Summary != null ? HtmlToTextUtils.HtmlToText(releaseFile.Summary) : "",
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
+            PublicApiDataSetId = releaseFile.PublicApiDataSetId,
         };
 }
 

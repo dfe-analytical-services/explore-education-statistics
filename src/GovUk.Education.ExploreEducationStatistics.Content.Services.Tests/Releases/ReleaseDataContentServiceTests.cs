@@ -35,7 +35,7 @@ public abstract class ReleaseDataContentServiceTests
             releaseVersion.RelatedDashboardsSection = _dataFixture
                 .DefaultContentSection(ContentSectionType.RelatedDashboards)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Data dashboards</p>")]);
-
+            var publicApiDataSetId = Guid.NewGuid();
             var dataSets = _dataFixture
                 .DefaultReleaseFile()
                 .ForIndex(
@@ -66,6 +66,9 @@ public abstract class ReleaseDataContentServiceTests
                 )
                 .WithReleaseVersion(releaseVersion)
                 .GenerateArray(2);
+
+            // Set one of the dataSets to be
+            dataSets[0].PublicApiDataSetId = publicApiDataSetId;
 
             var supportingFiles = _dataFixture
                 .DefaultReleaseFile()
@@ -755,6 +758,8 @@ public abstract class ReleaseDataContentServiceTests
             AssertDataSetFileMetaEqual(expected, actual.Meta);
             Assert.Equal(expected.Summary, actual.Summary);
             Assert.Equal(expected.Name, actual.Title);
+            Assert.Equal(expected.PublicApiDataSetId != null, actual.IsApiEnabled);
+            Assert.Equal(expected.PublicApiDataSetId, actual.PublicApiDataSetId);
         }
 
         private static void AssertDataSetFileMetaEqual(ReleaseFile expected, ReleaseDataContentDataSetMetaDto actual)

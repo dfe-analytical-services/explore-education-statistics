@@ -70,6 +70,14 @@ export default function ReleaseDataSetFileSummary({
         compact
         noBorder
       >
+        {dataSetFile.isApiEnabled && (
+          <SummaryListItem
+            className={classNames({ 'dfe-js-hidden': !showDetails })}
+            term="API data set ID"
+          >
+            {dataSetFile.publicApiDataSetId}
+          </SummaryListItem>
+        )}
         {numDataFileRows && (
           <SummaryListItem
             className={classNames({ 'dfe-js-hidden': !showDetails })}
