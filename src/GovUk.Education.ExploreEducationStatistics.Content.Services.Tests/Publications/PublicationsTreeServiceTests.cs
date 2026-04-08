@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.D
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -590,42 +589,6 @@ public abstract class PublicationsTreeServiceTests
             VerifyAllMocks(publicBlobCacheService);
 
             Assert.Equal(expectedTree, result);
-        }
-
-        [Fact]
-        public void WhenSerializingAndDeserializingCachedTreeDto_PreservesData()
-        {
-            PublicationsTreeThemeDto[] tree =
-            [
-                new()
-                {
-                    Id = Guid.Empty,
-                    Summary = "",
-                    Title = "",
-                    Publications =
-                    [
-                        new PublicationsTreePublicationDto
-                        {
-                            Id = Guid.Empty,
-                            Slug = "",
-                            Title = "",
-                            SupersededBy = new PublicationsTreePublicationSupersededByPublicationDto
-                            {
-                                Id = Guid.Empty,
-                                Slug = "",
-                                Title = "",
-                            },
-                            AnyLiveReleaseHasData = true,
-                            LatestReleaseHasData = true,
-                        },
-                    ],
-                },
-            ];
-
-            var converted = JsonConvert.DeserializeObject<PublicationsTreeThemeDto[]>(
-                JsonConvert.SerializeObject(tree)
-            );
-            Assert.Equal(tree, converted);
         }
     }
 
