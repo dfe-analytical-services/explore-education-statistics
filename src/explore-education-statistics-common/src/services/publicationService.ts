@@ -500,7 +500,9 @@ const publicationService = {
   ): Promise<PublicationMethodologiesList> {
     return contentApi.get(`/publications/${publicationSlug}/methodologies`);
   },
-        getPublicationTree({ filter }: PublicationTreeOptions = {}): Promise<
+  getPublicationTree({ filter }: PublicationTreeOptions = {}): Promise<
+    Theme[]
+  > {
     return contentApi.get('/publications/tree', {
       params: { filter },
     });
