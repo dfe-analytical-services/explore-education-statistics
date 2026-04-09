@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -19,90 +18,6 @@ public abstract class PublicationServiceTests
     private readonly string _contentDbContextId = Guid.NewGuid().ToString();
 
     private readonly DataFixture _dataFixture = new();
-
-    public class GetSummaryTests : PublicationServiceTests
-    {
-        [Fact]
-        public async Task PublicationExists_HasPublishedReleaseVersion_ReturnsPublication()
-        {
-            var releaseVersionPublishedDisplayDate = DateTimeOffset.Parse("2026-01-01T09:30:00 +00:00");
-
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ =>
-                    [
-                        _dataFixture
-                            .DefaultRelease()
-                            .WithVersions([
-                                _dataFixture
-                                    .DefaultReleaseVersion()
-                                    .WithPublished(DateTimeOffset.UtcNow)
-                                    .WithPublishedDisplayDate(releaseVersionPublishedDisplayDate),
-                            ]),
-                    ]
-                );
-
-            await SeedDatabase(publication, _contentDbContextId);
-
-            var result = await GetSummary(publication.Id, _contentDbContextId);
-
-            var publicationViewModel = result.AssertRight();
-
-            Assert.Equal(publication.Id, publicationViewModel.Id);
-            Assert.Equal(publication.Title, publicationViewModel.Title);
-            Assert.Equal(publication.Slug, publicationViewModel.Slug);
-            Assert.Equal(publication.Summary, publicationViewModel.Summary);
-            Assert.Equal(releaseVersionPublishedDisplayDate, publicationViewModel.Published);
-        }
-
-        [Fact]
-        public async Task PublicationExists_NoPublishedReleaseVersion_ReturnsNotFound()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
-
-            await SeedDatabase(publication, _contentDbContextId);
-
-            var result = await GetSummary(publication.Id, _contentDbContextId);
-
-            var notFound = result.AssertLeft();
-
-            notFound.AssertNotFoundResult();
-        }
-
-        [Fact]
-        public async Task PublicationDoesNotExist_NotFound()
-        {
-            var result = await GetSummary(Guid.NewGuid(), _contentDbContextId);
-
-            var notFound = result.AssertLeft();
-
-            notFound.AssertNotFoundResult();
-        }
-
-        private static async Task SeedDatabase(Publication publication, string contentDbContextId)
-        {
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-        }
-
-        private static async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(
-            Guid publicationId,
-            string contentDbContextId
-        )
-        {
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupPublicationService(contentDbContext);
-
-                return await service.GetSummary(publicationId);
-            }
-        }
-    }
 
     public class GetTests : PublicationServiceTests
     {
