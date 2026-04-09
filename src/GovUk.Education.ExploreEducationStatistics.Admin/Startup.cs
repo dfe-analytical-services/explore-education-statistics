@@ -21,9 +21,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -170,7 +172,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services
             .AddMvc(options =>
             {
-                options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
+                options.Filters.Add(new AuthorizeFilter(nameof(SecurityPolicies.RegisteredUser)));
                 options.Filters.Add(new OperationCancelledExceptionFilter());
                 options.Filters.Add(new ProblemDetailsResultFilter());
                 options.EnableEndpointRouting = false;
