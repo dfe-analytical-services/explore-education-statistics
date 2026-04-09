@@ -40,7 +40,6 @@ const PublicationReleaseHeadlinesSection = ({
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
                 guidanceText={keyStat.guidanceText}
-                isRedesignStyle
               />
             );
           }
@@ -53,7 +52,6 @@ const PublicationReleaseHeadlinesSection = ({
               trend={keyStat.trend}
               guidanceTitle={keyStat.guidanceTitle}
               guidanceText={keyStat.guidanceText}
-              isRedesignStyle
             />
           );
         })}
