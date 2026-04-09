@@ -15,21 +15,6 @@ public interface IEmailTemplateService
 
     Either<ActionResult, Unit> SendPublicationRoleEmail(string email, string publicationTitle, PublicationRole role);
 
-    Either<ActionResult, Unit> SendReleaseRoleEmail(
-        string email,
-        string publicationTitle,
-        string releaseTitle,
-        Guid publicationId,
-        Guid releaseVersionId,
-        ReleaseRole role
-    );
-
-    Either<ActionResult, Unit> SendContributorInviteEmail(
-        string email,
-        string publicationTitle,
-        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo
-    );
-
     Either<ActionResult, Unit> SendPreReleaseInviteEmail(
         string email,
         string publicationTitle,

@@ -84,55 +84,6 @@ public class EmailTemplateService(
         return emailService.SendEmail(email, template, emailValues);
     }
 
-    public Either<ActionResult, Unit> SendReleaseRoleEmail(
-        string email,
-        string publicationTitle,
-        string releaseTitle,
-        Guid publicationId,
-        Guid releaseVersionId,
-        ReleaseRole role
-    )
-    {
-        var url = appOptions.Value.Url;
-        var template = notifyOptions.Value.ReleaseRoleTemplateId;
-
-        var link = role == ReleaseRole.PrereleaseViewer ? "prerelease " : "summary";
-        var emailValues = new Dictionary<string, dynamic>
-        {
-            { "url", $"{url}/publication/{publicationId}/release/{releaseVersionId}/{link}" },
-            { "role", role.ToString() },
-            { "publication", publicationTitle },
-            { "release", releaseTitle },
-        };
-
-        return emailService.SendEmail(email, template, emailValues);
-    }
-
-    public Either<ActionResult, Unit> SendContributorInviteEmail(
-        string email,
-        string publicationTitle,
-        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo
-    )
-    {
-        var url = appOptions.Value.Url;
-        var template = notifyOptions.Value.ContributorTemplateId;
-
-        var releaseTitles = releasesInfo
-            .OrderBy(r => r.Year)
-            .ThenBy(r => r.TimePeriodCoverage)
-            .Select(r => $"* {r.Title}")
-            .JoinToString('\n');
-
-        var emailValues = new Dictionary<string, dynamic>
-        {
-            { "url", url },
-            { "publication name", publicationTitle },
-            { "release list", releaseTitles },
-        };
-
-        return emailService.SendEmail(email, template, emailValues);
-    }
-
     public Either<ActionResult, Unit> SendPreReleaseInviteEmail(
         string email,
         string publicationTitle,
