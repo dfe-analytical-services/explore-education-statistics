@@ -30,7 +30,7 @@ public class UserResourceRoleNotificationService(
             throw new ArgumentException($"User with ID {userId} is already active and does not need notifying.");
         }
 
-        var userReleaseRoles = await userPrereleaseRoleRepository
+        var pendingUserPrereleaseRoles = await userPrereleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .WhereForUser(user.Id)
@@ -43,7 +43,7 @@ public class UserResourceRoleNotificationService(
             })
             .ToListAsync(cancellationToken);
 
-        var userPublicationRoles = await userPublicationRoleRepository
+        var pendingUserPublicationRoles = await userPublicationRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .WhereForUser(user.Id)
@@ -55,11 +55,13 @@ public class UserResourceRoleNotificationService(
             })
             .ToListAsync(cancellationToken);
 
-        var releaseRolesInfo = userReleaseRoles
+        var prereleaseRolesInfo = pendingUserPrereleaseRoles
             .Select(urr => (urr.PublicationTitle, urr.ReleaseTitle, urr.Role))
             .ToHashSet();
 
-        var publicationRolesInfo = userPublicationRoles.Select(upr => (upr.PublicationTitle, upr.Role)).ToHashSet();
+        var publicationRolesInfo = pendingUserPublicationRoles
+            .Select(upr => (upr.PublicationTitle, upr.Role))
+            .ToHashSet();
 
         var utcNow = timeProvider.GetUtcNow();
 
@@ -71,19 +73,19 @@ public class UserResourceRoleNotificationService(
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
 
-            await userReleaseRoles
+            await pendingUserPrereleaseRoles
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
-                    async userReleaseRole =>
+                    async userPrereleaseRole =>
                         await userPrereleaseRoleRepository.MarkEmailAsSent(
-                            userReleaseRoleId: userReleaseRole.Id,
+                            userPrereleaseRoleId: userPrereleaseRole.Id,
                             dateSent: utcNow,
                             cancellationToken: cancellationToken
                         ),
                     cancellationToken
                 );
 
-            await userPublicationRoles
+            await pendingUserPublicationRoles
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async userPublicationRole =>
@@ -98,7 +100,7 @@ public class UserResourceRoleNotificationService(
             emailTemplateService
                 .SendInviteEmail(
                     email: user.Email,
-                    releaseRolesInfo: releaseRolesInfo,
+                    releaseRolesInfo: prereleaseRolesInfo,
                     publicationRolesInfo: publicationRolesInfo
                 )
                 .OrThrow(_ => throw new EmailSendFailedException($"Failed to send user invite email to {user.Email}."));
@@ -138,131 +140,16 @@ public class UserResourceRoleNotificationService(
         });
     }
 
-    public async Task NotifyUserOfNewReleaseRole(Guid userReleaseRoleId, CancellationToken cancellationToken = default)
-    {
-        var userReleaseRole = await CheckUserReleaseRoleExists(userReleaseRoleId, cancellationToken);
-
-        await contentDbContext.RequireTransaction(async () =>
-        {
-            // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
-            // But if we did it the other way, and the database transaction failed after sending the email, then we
-            // would have sent an email for a role which has an unmarked `SentDate`.
-            // At least this way, if the email fails to send, the database transaction will be rolled back.
-            // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
-            await userPrereleaseRoleRepository.MarkEmailAsSent(
-                userReleaseRoleId: userReleaseRoleId,
-                cancellationToken: cancellationToken
-            );
-
-            emailTemplateService
-                .SendReleaseRoleEmail(
-                    email: userReleaseRole.User.Email,
-                    publicationTitle: userReleaseRole.ReleaseVersion.Release.Publication.Title,
-                    releaseTitle: userReleaseRole.ReleaseVersion.Release.Title,
-                    publicationId: userReleaseRole.ReleaseVersion.Release.PublicationId,
-                    releaseVersionId: userReleaseRole.ReleaseVersionId,
-                    role: userReleaseRole.Role
-                )
-                .OrThrow(_ =>
-                    throw new EmailSendFailedException(
-                        $"Failed to send release role email for role with ID {userReleaseRoleId}."
-                    )
-                );
-        });
-    }
-
-    public async Task NotifyUserOfNewContributorRoles(
-        HashSet<Guid> userReleaseRoleIds,
-        CancellationToken cancellationToken = default
-    )
-    {
-        if (userReleaseRoleIds.IsNullOrEmpty())
-        {
-            throw new ArgumentException(
-                $"User release role IDs list cannot be null or empty",
-                nameof(userReleaseRoleIds)
-            );
-        }
-
-        var userReleaseRoles = await CheckAllUserReleaseRolesExist(userReleaseRoleIds, cancellationToken);
-
-        var allRolesAreForTheSameUser = userReleaseRoles.Select(urr => urr.UserId).Distinct().Count() == 1;
-
-        if (!allRolesAreForTheSameUser)
-        {
-            throw new ArgumentException("Expected all provided release role IDs to correspond to the same user.");
-        }
-
-        var allRolesAreForTheSamePublication =
-            userReleaseRoles.Select(urr => urr.ReleaseVersion.Release.PublicationId).Distinct().Count() == 1;
-
-        if (!allRolesAreForTheSamePublication)
-        {
-            throw new ArgumentException(
-                "Expected all provided release role IDs to correspond to the same publication."
-            );
-        }
-
-        var allRolesAreContributorRoles = userReleaseRoles.All(urr => urr.Role == ReleaseRole.Contributor);
-
-        if (!allRolesAreContributorRoles)
-        {
-            throw new ArgumentException("Expected all provided release role IDs to correspond to contributor roles.");
-        }
-
-        string email = userReleaseRoles.First().User.Email;
-        string publicationTitle = userReleaseRoles.First().ReleaseVersion.Release.Publication.Title;
-        var releasesInfo = userReleaseRoles
-            .Select(urr => urr.ReleaseVersion.Release)
-            .Distinct()
-            .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
-            .ToHashSet();
-
-        await contentDbContext.RequireTransaction(async () =>
-        {
-            // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
-            // But if we did it the other way, and the database transaction failed after sending the email, then we
-            // would have sent an email for a role which has an unmarked `SentDate`.
-            // At least this way, if the email fails to send, the database transaction will be rolled back.
-            // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
-            await userReleaseRoleIds
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(
-                    async userReleaseRoleId =>
-                        await userPrereleaseRoleRepository.MarkEmailAsSent(
-                            userReleaseRoleId: userReleaseRoleId,
-                            cancellationToken: cancellationToken
-                        ),
-                    cancellationToken
-                );
-
-            emailTemplateService
-                .SendContributorInviteEmail(
-                    email: email,
-                    publicationTitle: publicationTitle,
-                    releasesInfo: releasesInfo
-                )
-                .OrThrow(_ => throw new EmailSendFailedException($"Failed to send contributor invite email."));
-        });
-    }
-
     public async Task NotifyUserOfNewPreReleaseRole(
-        Guid userReleaseRoleId,
+        Guid userPrereleaseRoleId,
         CancellationToken cancellationToken = default
     )
     {
-        var userReleaseRole = await CheckUserReleaseRoleExists(userReleaseRoleId, cancellationToken);
+        var userPrereleaseRole = await CheckUserPrereleaseRoleExists(userPrereleaseRoleId, cancellationToken);
 
-        if (userReleaseRole.Role != ReleaseRole.PrereleaseViewer)
-        {
-            throw new ArgumentException(
-                $"Expected role corresponding to ID {userReleaseRoleId} to be a pre-release role."
-            );
-        }
+        var isNewUser = !userPrereleaseRole.User.Active;
 
-        var isNewUser = !userReleaseRole.User.Active;
-
-        var preReleaseWindow = preReleaseService.GetPreReleaseWindow(userReleaseRole.ReleaseVersion);
+        var preReleaseWindow = preReleaseService.GetPreReleaseWindow(userPrereleaseRole.ReleaseVersion);
 
         await contentDbContext.RequireTransaction(async () =>
         {
@@ -272,23 +159,23 @@ public class UserResourceRoleNotificationService(
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
             await userPrereleaseRoleRepository.MarkEmailAsSent(
-                userReleaseRoleId: userReleaseRoleId,
+                userPrereleaseRoleId: userPrereleaseRoleId,
                 cancellationToken: cancellationToken
             );
 
             emailTemplateService
                 .SendPreReleaseInviteEmail(
-                    email: userReleaseRole.User.Email,
-                    publicationTitle: userReleaseRole.ReleaseVersion.Release.Publication.Title,
-                    releaseTitle: userReleaseRole.ReleaseVersion.Release.Title,
+                    email: userPrereleaseRole.User.Email,
+                    publicationTitle: userPrereleaseRole.ReleaseVersion.Release.Publication.Title,
+                    releaseTitle: userPrereleaseRole.ReleaseVersion.Release.Title,
                     isNewUser: isNewUser,
-                    publicationId: userReleaseRole.ReleaseVersion.Release.PublicationId,
-                    releaseVersionId: userReleaseRole.ReleaseVersionId,
+                    publicationId: userPrereleaseRole.ReleaseVersion.Release.PublicationId,
+                    releaseVersionId: userPrereleaseRole.ReleaseVersionId,
                     preReleaseWindowStart: preReleaseWindow.Start,
-                    publishScheduled: userReleaseRole.ReleaseVersion.PublishScheduled!.Value
+                    publishScheduled: userPrereleaseRole.ReleaseVersion.PublishScheduled!.Value
                 )
                 .OrThrow(_ => new EmailSendFailedException(
-                    $"Failed to send pre-release role email for role with ID {userReleaseRoleId}."
+                    $"Failed to send pre-release role email for role with ID {userPrereleaseRoleId}."
                 ));
         });
     }
@@ -310,8 +197,8 @@ public class UserResourceRoleNotificationService(
         ;
     }
 
-    private async Task<UserReleaseRole> CheckUserReleaseRoleExists(
-        Guid userReleaseRoleId,
+    private async Task<UserReleaseRole> CheckUserPrereleaseRoleExists(
+        Guid userPrereleaseRoleId,
         CancellationToken cancellationToken
     )
     {
@@ -327,36 +214,11 @@ public class UserResourceRoleNotificationService(
                 .Include(urr => urr.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
                         .ThenInclude(r => r.Publication)
-                .SingleOrDefaultAsync(urr => urr.Id == userReleaseRoleId, cancellationToken)
+                .SingleOrDefaultAsync(urr => urr.Id == userPrereleaseRoleId, cancellationToken)
             ?? throw new KeyNotFoundException(
-                $"A non-expired release role with ID {userReleaseRoleId} does not exist."
+                $"A non-expired pre-release role with ID {userPrereleaseRoleId} does not exist."
             );
         ;
-    }
-
-    private async Task<IReadOnlyList<UserReleaseRole>> CheckAllUserReleaseRolesExist(
-        HashSet<Guid> userReleaseRoleIds,
-        CancellationToken cancellationToken
-    )
-    {
-        var userReleaseRoles = await userPrereleaseRoleRepository
-            .Query(ResourceRoleFilter.AllButExpired)
-            .AsNoTracking()
-            .Where(urr => userReleaseRoleIds.Contains(urr.Id))
-            .Include(urr => urr.User)
-            .Include(urr => urr.ReleaseVersion)
-                .ThenInclude(rv => rv.Release)
-                    .ThenInclude(r => r.Publication)
-            .ToListAsync(cancellationToken);
-
-        var userReleaseRoleIdsFound = userReleaseRoles.Select(urr => urr.Id).ToHashSet();
-
-        if (userReleaseRoleIds.Any(id => !userReleaseRoleIdsFound.Contains(id)))
-        {
-            throw new KeyNotFoundException("One or more non-expired release roles do not exist for the provided IDs.");
-        }
-
-        return userReleaseRoles;
     }
 
     private async Task<User> FindUser(Guid userId, CancellationToken cancellationToken)
