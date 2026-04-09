@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
@@ -323,8 +323,8 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
             [Fact]
             public async Task PublicationExists_Returns200()
             {
-                PublishedPublicationSummaryViewModel publication = DataFixture
-                    .Generator<PublishedPublicationSummaryViewModel>()
+                PublicationSummaryDto publicationSummary = DataFixture
+                    .Generator<PublicationSummaryDto>()
                     .ForInstance(s =>
                         s.SetDefault(f => f.Id)
                             .SetDefault(f => f.Title)
@@ -336,24 +336,24 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                 var contentApiClientMock = fixture.GetContentApiClientMock();
 
                 contentApiClientMock
-                    .Setup(c => c.GetPublication(publication.Id, It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(publication);
+                    .Setup(c => c.GetPublicationSummary(publicationSummary.Id, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(publicationSummary);
 
-                var publishedDataSet = GeneratePublishedDataSet(publication.Id);
+                var publishedDataSet = GeneratePublishedDataSet(publicationSummary.Id);
                 await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(publishedDataSet));
 
-                var response = await GetPublication(publication.Id);
+                var response = await GetPublication(publicationSummary.Id);
 
                 MockUtils.VerifyAllMocks(contentApiClientMock);
 
                 var content = response.AssertOk<PublicationSummaryViewModel>(useSystemJson: true);
 
                 Assert.NotNull(content);
-                Assert.Equal(publication.Id, content.Id);
-                Assert.Equal(publication.Title, content.Title);
-                Assert.Equal(publication.Slug, content.Slug);
-                Assert.Equal(publication.Summary, content.Summary);
-                Assert.Equal(publication.Published, content.LastPublished);
+                Assert.Equal(publicationSummary.Id, content.Id);
+                Assert.Equal(publicationSummary.Title, content.Title);
+                Assert.Equal(publicationSummary.Slug, content.Slug);
+                Assert.Equal(publicationSummary.Summary, content.Summary);
+                Assert.Equal(publicationSummary.Published, content.LastPublished);
             }
 
             [Fact]
@@ -367,7 +367,7 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                 var contentApiClientMock = fixture.GetContentApiClientMock();
 
                 contentApiClientMock
-                    .Setup(c => c.GetPublication(publicationId, It.IsAny<CancellationToken>()))
+                    .Setup(c => c.GetPublicationSummary(publicationId, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(new NotFoundResult());
 
                 var response = await GetPublication(publicationId);
@@ -416,7 +416,7 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                 var contentApiClientMock = fixture.GetContentApiClientMock();
 
                 contentApiClientMock
-                    .Setup(c => c.GetPublication(publicationId, It.IsAny<CancellationToken>()))
+                    .Setup(c => c.GetPublicationSummary(publicationId, It.IsAny<CancellationToken>()))
                     .ThrowsAsync(new HttpRequestException("something went wrong"));
 
                 var response = await Assert.ThrowsAsync<HttpRequestException>(() => GetPublication(publicationId));
@@ -432,18 +432,23 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
             [Fact]
             public async Task AnalyticsRequestCaptured()
             {
-                PublishedPublicationSummaryViewModel publication = DataFixture
-                    .Generator<PublishedPublicationSummaryViewModel>()
-                    .ForInstance(s => s.Set(f => f.Id, Guid.NewGuid))
-                    .ForInstance(s => s.Set(f => f.Published, f => f.Date.PastOffset()));
+                PublicationSummaryDto publicationSummary = DataFixture
+                    .Generator<PublicationSummaryDto>()
+                    .ForInstance(s =>
+                        s.SetDefault(p => p.Id)
+                            .Set(p => p.Published, f => f.Date.PastOffset())
+                            .SetDefault(p => p.Slug)
+                            .SetDefault(p => p.Summary)
+                            .SetDefault(p => p.Title)
+                    );
 
                 var contentApiClientMock = fixture.GetContentApiClientMock();
 
                 contentApiClientMock
-                    .Setup(c => c.GetPublication(publication.Id, It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(publication);
+                    .Setup(c => c.GetPublicationSummary(publicationSummary.Id, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(publicationSummary);
 
-                var publishedDataSet = GeneratePublishedDataSet(publication.Id);
+                var publishedDataSet = GeneratePublishedDataSet(publicationSummary.Id);
                 await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(publishedDataSet));
 
                 var analyticsServiceMock = fixture.GetAnalyticsServiceMock();
@@ -451,8 +456,8 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                 analyticsServiceMock
                     .Setup(s =>
                         s.CapturePublicationCall(
-                            publication.Id,
-                            publication.Title,
+                            publicationSummary.Id,
+                            publicationSummary.Title,
                             PublicationCallType.GetSummary,
                             null,
                             It.IsAny<CancellationToken>()
@@ -460,7 +465,7 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                     )
                     .Returns(Task.CompletedTask);
 
-                var response = await GetPublication(publication.Id);
+                var response = await GetPublication(publicationSummary.Id);
 
                 MockUtils.VerifyAllMocks(contentApiClientMock, analyticsServiceMock);
 
@@ -810,10 +815,13 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
             [Fact]
             public async Task AnalyticsRequestCaptured()
             {
-                var publication = new PublishedPublicationSummaryViewModel
+                var publicationSummary = new PublicationSummaryDto
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication 1",
+                    Slug = string.Empty,
+                    Summary = string.Empty,
+                    Published = default,
                 };
 
                 var analyticsServiceMock = fixture.GetAnalyticsServiceMock();
@@ -821,7 +829,7 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                 analyticsServiceMock
                     .Setup(s =>
                         s.CapturePublicationCall(
-                            publication.Id,
+                            publicationSummary.Id,
                             PublicationCallType.GetDataSets,
                             new PaginationParameters(1, 10),
                             It.IsAny<CancellationToken>()
@@ -829,7 +837,10 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                     )
                     .Returns(Task.CompletedTask);
 
-                DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished()
+                    .WithPublicationId(publicationSummary.Id);
 
                 await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -847,7 +858,11 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                         context.DataSets.Update(dataSet);
                     });
 
-                var response = await ListPublicationDataSets(publicationId: publication.Id, page: 1, pageSize: 10);
+                var response = await ListPublicationDataSets(
+                    publicationId: publicationSummary.Id,
+                    page: 1,
+                    pageSize: 10
+                );
 
                 MockUtils.VerifyAllMocks(analyticsServiceMock);
 

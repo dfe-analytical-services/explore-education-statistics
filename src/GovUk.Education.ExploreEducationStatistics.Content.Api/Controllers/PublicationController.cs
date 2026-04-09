@@ -1,6 +1,5 @@
 #nullable enable
 using System.Net.Mime;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -13,10 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class PublicationController(IPublicationService publicationService) : ControllerBase
 {
-    [HttpGet("publications/{publicationId:guid}/summary")]
-    public async Task<ActionResult<PublishedPublicationSummaryViewModel>> GetPublicationSummary(Guid publicationId) =>
-        await publicationService.GetSummary(publicationId).HandleFailuresOrOk();
-
     [HttpGet("publicationInfos")]
     public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(
         [FromQuery] GetPublicationInfosRequest request,

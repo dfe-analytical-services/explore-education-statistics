@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -26,7 +26,7 @@ public abstract class ContentApiClientTests
         _contentApiClient = new ContentApiClient(Mock.Of<ILogger<ContentApiClient>>(), client);
     }
 
-    public class GetPublicationTests : ContentApiClientTests
+    public class GetPublicationSummaryTests : ContentApiClientTests
     {
         [Fact]
         public async Task ValidationProblem()
@@ -40,12 +40,12 @@ public abstract class ContentApiClientTests
                     JsonContent.Create(
                         new ValidationProblemViewModel
                         {
-                            Errors = new ErrorViewModel[] { new() { Code = Errors.Error1.ToString() } },
+                            Errors = [new ErrorViewModel { Code = nameof(Errors.Error1) }],
                         }
                     )
                 );
 
-            var response = await _contentApiClient.GetPublication(publicationId);
+            var response = await _contentApiClient.GetPublicationSummary(publicationId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -62,7 +62,7 @@ public abstract class ContentApiClientTests
                 .Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
                 .Respond(HttpStatusCode.NotFound);
 
-            var response = await _contentApiClient.GetPublication(publicationId);
+            var response = await _contentApiClient.GetPublicationSummary(publicationId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
@@ -88,16 +88,16 @@ public abstract class ContentApiClientTests
                 .Respond(responseStatusCode);
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                await _contentApiClient.GetPublication(publicationId)
+                await _contentApiClient.GetPublicationSummary(publicationId)
             );
 
             _mockHttp.VerifyNoOutstandingExpectation();
         }
 
         [Fact]
-        public async Task Success_ReturnsPublication()
+        public async Task Success_ReturnsPublicationSummary()
         {
-            var result = new PublishedPublicationSummaryViewModel
+            var result = new PublicationSummaryDto
             {
                 Id = Guid.NewGuid(),
                 Title = "Test title",
@@ -110,7 +110,7 @@ public abstract class ContentApiClientTests
                 .Expect(HttpMethod.Get, $"http://localhost/api/publications/{result.Id}/summary")
                 .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(result));
 
-            var response = await _contentApiClient.GetPublication(result.Id);
+            var response = await _contentApiClient.GetPublicationSummary(result.Id);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 

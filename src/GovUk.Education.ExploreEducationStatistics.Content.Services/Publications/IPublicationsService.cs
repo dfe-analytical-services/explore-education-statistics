@@ -11,6 +11,8 @@ public interface IPublicationsService
         CancellationToken cancellationToken = default
     );
 
+    Task<Either<ActionResult, PublicationSummaryDto>> GetPublicationSummary(Guid publicationId);
+
     Task<Either<ActionResult, PublicationTitleDto>> GetPublicationTitle(
         string publicationSlug,
         CancellationToken cancellationToken = default
