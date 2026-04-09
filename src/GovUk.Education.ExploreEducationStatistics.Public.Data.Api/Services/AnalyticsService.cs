@@ -52,7 +52,7 @@ public class AnalyticsService(
             requestSupplier: async () =>
             {
                 return await contentApiClient
-                    .GetPublication(publicationId, cancellationToken)
+                    .GetPublicationSummary(publicationId, cancellationToken)
                     .OnSuccess(publication => new CapturePublicationCallRequest(
                         PublicationId: publicationId,
                         PublicationTitle: publication.Title,
