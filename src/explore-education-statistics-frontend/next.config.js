@@ -51,6 +51,7 @@ const nextConfig = {
     AZURE_SEARCH_QUERY_KEY: process.env.AZURE_SEARCH_QUERY_KEY,
     AZURE_SEARCH_ENDPOINT: process.env.AZURE_SEARCH_ENDPOINT,
     AZURE_SEARCH_INDEX: process.env.AZURE_SEARCH_INDEX,
+    DEFAULT_CACHE_MAX_AGE_SECONDS: process.env.DEFAULT_CACHE_MAX_AGE_SECONDS,
   },
   async headers() {
     return [
