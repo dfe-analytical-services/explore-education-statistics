@@ -25,17 +25,13 @@ public class EmailTemplateServiceTests
 
         string userEmail = "test@test.com";
 
-        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo =
+        HashSet<(string PublicationTitle, string ReleaseTitle)> prereleaseRolesInfo =
         [
-            ("Title 3", "Academic year Q1 2022/23", ReleaseRole.Contributor),
-            ("Title 3", "Academic year Q1 2021/22", ReleaseRole.Contributor),
-            ("Title 3", "Academic year Q1 2022/23", ReleaseRole.Approver),
-            ("Title 1", "Academic year Q1 2022/23", ReleaseRole.Approver),
-            ("Title 1", "Academic year Q1 2021/22", ReleaseRole.Approver),
-            ("Title 1", "Academic year Q1 2022/23", ReleaseRole.Contributor),
-            ("Title 2", "Academic year Q1 2022/23", ReleaseRole.Contributor),
-            ("Title 2", "Academic year Q1 2021/22", ReleaseRole.Contributor),
-            ("Title 2", "Academic year Q1 2022/23", ReleaseRole.Approver),
+            ("Title 3", "Academic year Q1 2022/23"),
+            ("Title 3", "Academic year Q1 2021/22"),
+            ("Title 1", "Academic year Q1 2022/23"),
+            ("Title 2", "Academic year Q1 2022/23"),
+            ("Title 2", "Academic year Q1 2021/22"),
         ];
 
         HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo =
@@ -58,23 +54,19 @@ public class EmailTemplateServiceTests
             * Title 3 - Approver
             """;
 
-        // These should be ordered by publication title, and then by release title, and then by role
-        var expectedReleaseRoleList = """
-            * Title 1, Academic year Q1 2021/22 - Approver
-            * Title 1, Academic year Q1 2022/23 - Approver
-            * Title 1, Academic year Q1 2022/23 - Contributor
-            * Title 2, Academic year Q1 2021/22 - Contributor
-            * Title 2, Academic year Q1 2022/23 - Approver
-            * Title 2, Academic year Q1 2022/23 - Contributor
-            * Title 3, Academic year Q1 2021/22 - Contributor
-            * Title 3, Academic year Q1 2022/23 - Approver
-            * Title 3, Academic year Q1 2022/23 - Contributor
+        // These should be ordered by publication title, and then by release title
+        var expectedPrereleaseRoleList = """
+            * Title 1, Academic year Q1 2022/23
+            * Title 2, Academic year Q1 2021/22
+            * Title 2, Academic year Q1 2022/23
+            * Title 3, Academic year Q1 2021/22
+            * Title 3, Academic year Q1 2022/23
             """;
 
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
-            { "release role list", expectedReleaseRoleList },
+            { "pre-release role list", expectedPrereleaseRoleList },
             { "publication role list", expectedPublicationRoleList },
         };
 
@@ -87,7 +79,7 @@ public class EmailTemplateServiceTests
 
         var result = service.SendInviteEmail(
             email: userEmail,
-            releaseRolesInfo: releaseRolesInfo,
+            prereleaseRolesInfo: prereleaseRolesInfo,
             publicationRolesInfo: publicationRolesInfo
         );
 
@@ -107,7 +99,7 @@ public class EmailTemplateServiceTests
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
-            { "release role list", "* No release permissions granted" },
+            { "pre-release role list", "* No pre-release permissions granted" },
             { "publication role list", "* No publication permissions granted" },
         };
 

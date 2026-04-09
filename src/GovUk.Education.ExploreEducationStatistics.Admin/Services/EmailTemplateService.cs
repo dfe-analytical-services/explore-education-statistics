@@ -17,18 +17,17 @@ public class EmailTemplateService(
 {
     public Either<ActionResult, Unit> SendInviteEmail(
         string email,
-        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo,
+        HashSet<(string PublicationTitle, string ReleaseTitle)> prereleaseRolesInfo,
         HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo
     )
     {
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
-        var releaseRoleList = releaseRolesInfo
+        var prereleaseRoleList = prereleaseRolesInfo
             .OrderBy(rri => rri.PublicationTitle)
             .ThenBy(rri => rri.ReleaseTitle)
-            .ThenBy(rri => rri.Role.ToString())
-            .Select(rri => $"* {rri.PublicationTitle}, {rri.ReleaseTitle} - {rri.Role}")
+            .Select(rri => $"* {rri.PublicationTitle}, {rri.ReleaseTitle}")
             .ToList();
 
         // The transformation step here is necessary to ensure that the email still uses the name 'Approver' for the
@@ -44,10 +43,10 @@ public class EmailTemplateService(
         {
             { "url", url },
             {
-                "release role list",
-                releaseRoleList.IsNullOrEmpty()
-                    ? "* No release permissions granted"
-                    : releaseRoleList.JoinToString("\n")
+                "pre-release role list",
+                prereleaseRoleList.IsNullOrEmpty()
+                    ? "* No pre-release permissions granted"
+                    : prereleaseRoleList.JoinToString("\n")
             },
             {
                 "publication role list",
