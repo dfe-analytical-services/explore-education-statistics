@@ -9,7 +9,7 @@ public interface IEmailTemplateService
 {
     Either<ActionResult, Unit> SendInviteEmail(
         string email,
-        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo,
+        HashSet<(string PublicationTitle, string ReleaseTitle)> prereleaseRolesInfo,
         HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo
     );
 
