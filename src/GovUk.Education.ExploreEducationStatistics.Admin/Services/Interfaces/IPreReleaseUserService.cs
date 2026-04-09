@@ -14,6 +14,8 @@ public interface IPreReleaseUserService
         List<string> emails
     );
 
+    Task<Either<ActionResult, List<UserPrereleaseRoleViewModel>>> GetPrereleaseRolesForUser(Guid userId);
+
     Task<Either<ActionResult, List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
         Guid releaseVersionId,
         List<string> emails

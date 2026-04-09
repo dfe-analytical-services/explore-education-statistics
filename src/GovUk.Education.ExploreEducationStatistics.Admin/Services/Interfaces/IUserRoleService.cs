@@ -8,21 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserRoleService
 {
-    Task<Either<ActionResult, Unit>> SetGlobalRole(string userId, string roleId);
-
-    Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
-
-    Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role);
-
-    Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId);
-
-    string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role);
-
     Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles();
 
-    Task<Either<ActionResult, Dictionary<string, List<string>>>> GetAllResourceRoles();
+    Task<Either<ActionResult, List<RoleViewModel>>> GetGlobalRolesForUser(string userId);
 
-    Task<Either<ActionResult, List<RoleViewModel>>> GetGlobalRoles(string userId);
+    Task<Either<ActionResult, Unit>> SetGlobalRoleForUser(string userId, string roleId);
+
+    Task<Either<ActionResult, Dictionary<string, List<string>>>> GetAllResourceRoles();
 
     Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId);
 
@@ -30,11 +22,9 @@ public interface IUserRoleService
         Guid publicationId
     );
 
-    Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId);
+    Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
     Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
-
-    Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId);
 
     Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId);
 }
