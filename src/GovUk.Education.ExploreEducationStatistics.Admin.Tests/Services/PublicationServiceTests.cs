@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -3543,13 +3542,15 @@ public class PublicationServiceTests
 
     private static PublicationRepository CreatePublicationRepository(ContentDbContext context)
     {
-        var (userPublicationRoleRepository, userPrereleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            context
+        var publicationRoleChangesHelper = new PublicationRoleChangesHelper();
+
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(
+            contentDbContext: context,
+            publicationRoleChangesHelper: publicationRoleChangesHelper
         );
 
         return new PublicationRepository(
             context: context,
-            userPrereleaseRoleRepository: userPrereleaseRoleRepository,
             userPublicationRoleRepository: userPublicationRoleRepository
         );
     }
