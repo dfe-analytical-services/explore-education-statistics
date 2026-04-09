@@ -6,14 +6,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 public class UserInviteCreateRequest
 {
     [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
 
     [Required(AllowEmptyStrings = false)]
-    public string RoleId { get; set; } = string.Empty;
+    public string RoleId { get; init; } = string.Empty;
 
-    public DateTimeOffset? CreatedDate { get; set; }
+    public DateTimeOffset? CreatedDate { get; init; }
 
-    public List<UserReleaseRoleCreateRequest> UserReleaseRoles { get; set; } = new();
+    public List<UserPrereleaseRoleCreateRequest> UserPrereleaseRoles { get; init; } = [];
 
-    public List<UserPublicationRoleCreateRequest> UserPublicationRoles { get; set; } = new();
+    public List<UserPublicationRoleCreateRequest> UserPublicationRoles { get; init; } = [];
 }
