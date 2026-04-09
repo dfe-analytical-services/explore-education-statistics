@@ -9,7 +9,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 
 *** Variables ***
-${FEEDBACK_LINK}    sign-up for a research session using our online form.
+${FEEDBACK_LINK}    sign up for a research session using our online form.
 
 
 *** Test Cases ***

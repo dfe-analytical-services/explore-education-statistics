@@ -51,7 +51,7 @@ const GlossaryPage: NextPage<Props> = ({ categories = [] }) => {
               rel="noreferrer"
               target="_blank"
             >
-              sign-up for a research session using our online form.
+              sign up for a research session using our online form.
             </a>
           </p>
 
