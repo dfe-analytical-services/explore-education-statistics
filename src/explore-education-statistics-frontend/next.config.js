@@ -2,13 +2,6 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer');
 const path = require('path');
 
-const defaultPublicSiteCacheMaxAgeSeconds = process.env
-  .DEFAULT_CACHE_MAX_AGE_SECONDS
-  ? Number(process.env.DEFAULT_CACHE_MAX_AGE_SECONDS)
-  : 30;
-
-const defaultCacheControlHeaders = `public, max-age=0, s-maxage=${defaultPublicSiteCacheMaxAgeSeconds}, stale-while-revalidate=30`;
-
 /**
  * @type {import('next').NextConfig}
  */
@@ -33,23 +26,6 @@ const generalHeaders = [
     value: 'nosniff',
   },
 ];
-
-let generalCacheControlValue;
-switch (process.env.NODE_ENV) {
-  case 'production':
-    // for all environments, not just production! - see where NODE_ENV is set in ARM template
-    generalCacheControlValue = defaultCacheControlHeaders;
-    break;
-  default:
-    // for hotreload when running locally
-    generalCacheControlValue = 'no-store, no-cache, must-revalidate';
-    break;
-}
-
-generalHeaders.push({
-  key: 'Cache-Control',
-  value: generalCacheControlValue,
-});
 
 const nextConfig = {
   compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
@@ -82,7 +58,13 @@ const nextConfig = {
       {
         // use next.js defaults for /_next/*
         source: '/((?!_next/).*)',
-        headers: generalHeaders,
+        headers: [
+          ...generalHeaders,
+          {
+            key: 'Cache-Control',
+            value: getGeneralCacheControlHeaderValue(),
+          },
+        ],
       },
       // specific cases (that override the general case headers)
       {
@@ -194,6 +176,16 @@ const nextConfig = {
       ? ['explore-education-statistics-common']
       : [],
 };
+
+function getGeneralCacheControlHeaderValue() {
+  if (process.env.NODE_ENV !== 'production') {
+    return 'no-store, no-cache, must-revalidate';
+  }
+  const defaultPublicSiteCacheMaxAgeSeconds = Number(
+    process.env.DEFAULT_CACHE_MAX_AGE_SECONDS ?? 30,
+  );
+  return `public, max-age=0, s-maxage=${defaultPublicSiteCacheMaxAgeSeconds}, stale-while-revalidate=30`;
+}
 
 module.exports = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
