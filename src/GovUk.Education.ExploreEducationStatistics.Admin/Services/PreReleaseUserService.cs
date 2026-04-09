@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -26,7 +27,8 @@ public class PreReleaseUserService(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserService userService,
     IUserRepository userRepository,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository
+    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IReleaseVersionRepository releaseVersionRepository
 ) : IPreReleaseUserService
 {
     public async Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
@@ -62,39 +64,38 @@ public class PreReleaseUserService(
             .OnSuccess<ActionResult, List<string>, PreReleaseUserInvitePlan>(async validEmails =>
             {
                 var plan = new PreReleaseUserInvitePlan();
-                await validEmails
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(async email =>
+
+                foreach (var email in validEmails)
+                {
+                    var existingUser = await userRepository.FindUserByEmail(email);
+
+                    if (existingUser is null)
                     {
-                        var existingUser = await userRepository.FindUserByEmail(email);
+                        plan.Invitable.Add(email);
+                        continue;
+                    }
 
-                        if (existingUser is null)
-                        {
-                            plan.Invitable.Add(email);
-                            return;
-                        }
+                    var userHasPreReleaseRole =
+                        await userPrereleaseRoleRepository.UserHasPrereleaseRoleOnReleaseVersion(
+                            userId: existingUser.Id,
+                            releaseVersionId: releaseVersionId,
+                            resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                        );
 
-                        var userHasPreReleaseRole =
-                            await userPrereleaseRoleRepository.UserHasPrereleaseRoleOnReleaseVersion(
-                                userId: existingUser.Id,
-                                releaseVersionId: releaseVersionId,
-                                resourceRoleFilter: ResourceRoleFilter.AllButExpired
-                            );
+                    if (!userHasPreReleaseRole)
+                    {
+                        plan.Invitable.Add(email);
+                        continue;
+                    }
 
-                        if (!userHasPreReleaseRole)
-                        {
-                            plan.Invitable.Add(email);
-                            return;
-                        }
+                    if (existingUser.Active)
+                    {
+                        plan.AlreadyAccepted.Add(email);
+                        continue;
+                    }
 
-                        if (existingUser.Active)
-                        {
-                            plan.AlreadyAccepted.Add(email);
-                            return;
-                        }
-
-                        plan.AlreadyInvited.Add(email);
-                    });
+                    plan.AlreadyInvited.Add(email);
+                }
 
                 if (plan.Invitable.Count == 0)
                 {
@@ -102,6 +103,47 @@ public class PreReleaseUserService(
                 }
 
                 return plan;
+            });
+    }
+
+    public async Task<Either<ActionResult, List<UserPrereleaseRoleViewModel>>> GetPrereleaseRolesForUser(Guid userId)
+    {
+        return await userService
+            .CheckCanManageAllUsers()
+            .OnSuccess(_ => FindActiveUser(userId))
+            .OnSuccess(async () =>
+            {
+                var allPrereleaseRoles = await userPrereleaseRoleRepository
+                    .Query()
+                    .AsNoTracking()
+                    .WhereForUser(userId)
+                    .Include(urr => urr.ReleaseVersion)
+                        .ThenInclude(rv => rv.Release)
+                            .ThenInclude(r => r.Publication)
+                    .ToListAsync();
+
+                var latestPrereleaseRoles = await allPrereleaseRoles
+                    .ToAsyncEnumerable()
+                    .Where(
+                        async (uprr, cancellationToken) =>
+                            await releaseVersionRepository.IsLatestReleaseVersion(
+                                uprr.ReleaseVersionId,
+                                cancellationToken
+                            )
+                    )
+                    .OrderBy(uprr => uprr.ReleaseVersion.Release.Publication.Title)
+                    .ThenBy(uprr => uprr.ReleaseVersion.Release.Year)
+                    .ThenBy(uprr => uprr.ReleaseVersion.Release.TimePeriodCoverage)
+                    .ToListAsync();
+
+                return latestPrereleaseRoles
+                    .Select(uprr => new UserPrereleaseRoleViewModel
+                    {
+                        Id = uprr.Id,
+                        Publication = uprr.ReleaseVersion.Release.Publication.Title,
+                        Release = uprr.ReleaseVersion.Release.Title,
+                    })
+                    .ToList();
             });
     }
 
@@ -120,7 +162,7 @@ public class PreReleaseUserService(
 
                 return await plan
                     .Invitable.ToAsyncEnumerable()
-                    .SelectAwait(async email => await InvitePreReleaseUser(releaseVersion, email))
+                    .Select(async (email, _, _) => await InvitePreReleaseUser(releaseVersion, email))
                     .ToListAsync();
             });
     }
@@ -182,4 +224,7 @@ public class PreReleaseUserService(
 
         return user is null ? new NotFoundResult() : user;
     }
+
+    private async Task<Either<ActionResult, User>> FindActiveUser(Guid userId) =>
+        await userRepository.FindActiveUserById(userId) ?? new Either<ActionResult, User>(new NotFoundResult());
 }
