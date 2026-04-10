@@ -3,8 +3,9 @@
 .group {
   --horizontalSpacing: #{govuk-spacing(2)};
   --verticalSpacing: #{govuk-spacing(2)};
+  --alignment: center;
 
-  align-items: center;
+  align-items: var(--alignment);
   display: flex;
   flex-direction: column;
   margin-bottom: govuk-spacing(6);
@@ -23,7 +24,11 @@
 td > .group {
   // Avoid centering within a table cell as this
   // is likely to be an 'Actions' column.
-  align-items: flex-start;
+  --alignment: flex-start;
+}
+
+.alignStart {
+  --alignment: flex-start;
 }
 
 .horizontalSpacing--m {

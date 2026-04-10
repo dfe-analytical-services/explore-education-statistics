@@ -28,7 +28,10 @@ export default function EditableKeyStatPreview({
 
   return (
     <KeyStat {...keyStatProps} includeWrapper={false}>
-      <ButtonGroup className="govuk-!-margin-top-2">
+      <ButtonGroup
+        className="govuk-!-margin-top-1 govuk-!-margin-bottom-1"
+        alignment="start"
+      >
         <Button onClick={onEdit}>
           Edit <VisuallyHidden> key statistic: {title}</VisuallyHidden>
         </Button>

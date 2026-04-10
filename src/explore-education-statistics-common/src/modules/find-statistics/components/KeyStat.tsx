@@ -2,7 +2,6 @@ import Details from '@common/components/Details';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import React, { ReactNode } from 'react';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
-import classNames from 'classnames';
 
 interface KeyStatContainerProps {
   children: ReactNode;
@@ -14,22 +13,12 @@ export const KeyStatContainer = ({ children }: KeyStatContainerProps) => {
 
 interface KeyStatWrapperProps {
   children: ReactNode;
-  isRedesignStyle?: boolean;
   testId?: string;
 }
 
-export const KeyStatWrapper = ({
-  children,
-  isRedesignStyle = false,
-  testId,
-}: KeyStatWrapperProps) => {
+export const KeyStatWrapper = ({ children, testId }: KeyStatWrapperProps) => {
   return (
-    <div
-      className={classNames(styles.wrapper, {
-        [styles.wrapperRedesign]: isRedesignStyle,
-      })}
-      data-testid={testId}
-    >
+    <div className={styles.wrapper} data-testid={testId}>
       {children}
     </div>
   );
@@ -40,7 +29,6 @@ export interface KeyStatProps {
   guidanceTitle?: string;
   guidanceText?: string;
   includeWrapper?: boolean;
-  isRedesignStyle?: boolean;
   statistic: string;
   testId?: string;
   title: string;
@@ -52,7 +40,6 @@ const KeyStat = ({
   guidanceTitle = 'Help',
   guidanceText,
   includeWrapper = true,
-  isRedesignStyle = false,
   statistic,
   testId = 'keyStat',
   title,
@@ -71,12 +58,8 @@ const KeyStat = ({
       {guidanceText && (
         <Details
           summary={guidanceTitle}
-          className={
-            isRedesignStyle
-              ? styles.guidanceTitleRedesign
-              : styles.guidanceTitle
-          }
-          showCloseButton={isRedesignStyle}
+          className={styles.guidanceTitle}
+          showCloseButton
           hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
         >
           <div data-testid={`${testId}-guidanceText`}>
@@ -90,9 +73,7 @@ const KeyStat = ({
   );
 
   return includeWrapper ? (
-    <KeyStatWrapper testId={testId} isRedesignStyle={isRedesignStyle}>
-      {body}
-    </KeyStatWrapper>
+    <KeyStatWrapper testId={testId}>{body}</KeyStatWrapper>
   ) : (
     body
   );
