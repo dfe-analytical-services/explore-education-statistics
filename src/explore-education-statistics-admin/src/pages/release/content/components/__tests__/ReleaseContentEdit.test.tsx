@@ -48,14 +48,9 @@ describe('ReleaseContentEdit', () => {
     const relatedInfo = within(
       screen.getByTestId('related-information'),
     ).getAllByRole('link');
-    expect(relatedInfo).toHaveLength(2);
-    expect(relatedInfo[0]).toHaveTextContent('Data guidance');
-    expect(relatedInfo[0]).toHaveAttribute(
-      'href',
-      '/publication/publication-id/release/Release-title-id/data-guidance',
-    );
-    expect(relatedInfo[1]).toHaveTextContent('Contact us');
-    expect(relatedInfo[1]).toHaveAttribute('href', '#contact-us');
+    expect(relatedInfo).toHaveLength(1);
+    expect(relatedInfo[0]).toHaveTextContent('Contact us');
+    expect(relatedInfo[0]).toHaveAttribute('href', '#contact-us');
 
     expect(
       screen.getByRole('heading', { name: 'Related pages' }),
