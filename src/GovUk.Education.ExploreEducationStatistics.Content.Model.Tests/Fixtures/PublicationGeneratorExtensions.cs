@@ -84,7 +84,7 @@ public static class PublicationGeneratorExtensions
 
     public static Generator<Publication> WithMethodologies(
         this Generator<Publication> generator,
-        IReadOnlyList<PublicationMethodology> methodologies
+        IEnumerable<PublicationMethodology> methodologies
     ) => generator.ForInstance(s => s.SetMethodologies(methodologies));
 
     public static InstanceSetters<Publication> SetId(this InstanceSetters<Publication> setters, Guid id) =>
@@ -307,20 +307,24 @@ public static class PublicationGeneratorExtensions
 
     private static InstanceSetters<Publication> SetMethodologies(
         this InstanceSetters<Publication> setters,
-        IReadOnlyList<PublicationMethodology> methodologies
-    ) =>
-        setters
-            .Set(p => p.Methodologies, methodologies)
+        IEnumerable<PublicationMethodology> methodologies
+    )
+    {
+        var methodologyList = methodologies.ToList();
+
+        return setters
+            .Set(p => p.Methodologies, methodologyList)
             .Set(
                 (_, publication, _) =>
                 {
-                    methodologies.ForEach(methodology =>
+                    methodologyList.ForEach(methodology =>
                     {
                         methodology.Publication = publication;
                         methodology.PublicationId = publication.Id;
                     });
                 }
             );
+    }
 
     public static ConditionalGeneratorDeclaration If(this Generator<Publication> generator, bool condition) =>
         new(condition, generator);

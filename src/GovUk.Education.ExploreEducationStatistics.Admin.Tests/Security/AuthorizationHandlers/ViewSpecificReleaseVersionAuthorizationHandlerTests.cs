@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ViewSpecificReleaseVersionAuthorizationHandlerTests
+public abstract class ViewSpecificReleaseVersionAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly ReleaseVersion _releaseVersion;
@@ -23,14 +23,17 @@ public class ViewSpecificReleaseVersionAuthorizationHandlerTests
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
     }
 
-    [Fact]
-    public async Task SucceedsIfReleaseVersionIsViewableByUser()
+    public class MiscellaneousTests : ViewSpecificReleaseVersionAuthorizationHandlerTests
     {
-        await AssertHandlerSucceedsIfReleaseVersionIsViewableByUser<ViewReleaseVersionRequirement, ReleaseVersion>(
-            handlerSupplier: BuildHandler,
-            entity: _releaseVersion,
-            releaseVersion: _releaseVersion
-        );
+        [Fact]
+        public async Task SucceedsIfReleaseVersionIsViewableByUser()
+        {
+            await AssertHandlerSucceedsIfReleaseVersionIsViewableByUser<ViewReleaseVersionRequirement, ReleaseVersion>(
+                handlerSupplier: BuildHandler,
+                entity: _releaseVersion,
+                releaseVersion: _releaseVersion
+            );
+        }
     }
 
     private ViewSpecificReleaseVersionAuthorizationHandler BuildHandler(
