@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -10,26 +9,23 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public abstract class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
+public abstract class ViewSpecificPublicationAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Publication _publication;
 
-    protected ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests()
+    protected ViewSpecificPublicationAuthorizationHandlerTests()
     {
         _publication = _dataFixture.DefaultPublication();
     }
 
-    public class ClaimsTests : ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
+    public class ClaimsTests : ViewSpecificPublicationAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidClaims()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<
-                ViewSpecificPublicationReleaseTeamAccessRequirement,
-                Publication
-            >(
+            await AssertHandlerSucceedsWithCorrectClaims<ViewSpecificPublicationRequirement, Publication>(
                 handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
@@ -38,24 +34,20 @@ public abstract class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandl
         }
     }
 
-    public class PublicationRolesTests : ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
+    public class RolesTests : ViewSpecificPublicationAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidPublicationRoles()
         {
-            await AssertHandlerSucceedsForAnyValidPublicationRole<
-                ViewSpecificPublicationReleaseTeamAccessRequirement,
-                Publication
-            >(
+            await AssertHandlerSucceedsIfUserHasAnyRoleOnPublication<ViewSpecificPublicationRequirement, Publication>(
                 handlerSupplier: BuildHandler,
                 entity: _publication,
-                publicationId: _publication.Id,
-                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+                publicationId: _publication.Id
             );
         }
     }
 
-    private ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler BuildHandler(
+    private ViewSpecificPublicationAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -67,14 +59,7 @@ public abstract class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandl
     private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
         var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
-        mock.Setup(s =>
-                s.UserHasAnyPublicationRoleOnPublication(
-                    _userId,
-                    _publication.Id,
-                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
-                )
-            )
-            .ReturnsAsync(false);
+        mock.Setup(s => s.UserHasAnyRoleOnPublication(_userId, _publication.Id)).ReturnsAsync(false);
 
         return mock.Object;
     }

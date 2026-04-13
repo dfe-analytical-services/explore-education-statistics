@@ -13,20 +13,20 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
+public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
     private readonly ReleaseVersion _releaseVersion;
 
-    protected ViewSpecificPreReleaseSummaryAuthorizationHandlersTests()
+    protected ViewSpecificPreReleaseSummaryAuthorizationHandlerTests()
     {
         _releaseVersion = _dataFixture
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
     }
 
-    public class ClaimsTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
+    public class ClaimsTests : ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidClaims()
@@ -40,7 +40,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         }
     }
 
-    public class PublicationRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
+    public class PublicationRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsForValidPublicationRoles()
@@ -105,7 +105,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         }
     }
 
-    public class PrereleaseRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
+    public class PrereleaseRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
     {
         [Fact]
         public async Task HasPreReleaseRole_Succeeds()
