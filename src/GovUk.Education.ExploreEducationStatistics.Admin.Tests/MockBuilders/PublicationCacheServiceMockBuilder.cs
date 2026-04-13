@@ -15,12 +15,7 @@ public class PublicationCacheServiceMockBuilder
     {
         _mock
             .Setup(m => m.UpdatePublication(It.IsAny<string>()))
-            .ReturnsAsync(
-                (string slug) =>
-                    (Either<ActionResult, PublicationCacheViewModel>)new PublicationCacheViewModel { Slug = slug }
-            );
-
-        _mock.Setup(m => m.UpdatePublicationTree()).ReturnsAsync([]);
+            .ReturnsAsync((string slug) => new PublicationCacheViewModel { Slug = slug });
 
         _mock.Setup(m => m.RemovePublication(It.IsAny<string>())).ReturnsAsync(Unit.Instance);
     }
@@ -43,7 +38,7 @@ public class PublicationCacheServiceMockBuilder
             .Setup(m =>
                 m.UpdatePublication(It.Is<string>(actual => publicationSlug == null || actual == publicationSlug))
             )
-            .ReturnsAsync(() => (Either<ActionResult, PublicationCacheViewModel>)new NotFoundResult());
+            .ReturnsAsync(() => new NotFoundResult());
         return this;
     }
 
@@ -62,9 +57,5 @@ public class PublicationCacheServiceMockBuilder
 
         public void CacheNotInvalidatedForPublicationEntry(string publicationSlug) =>
             mock.Verify(m => m.UpdatePublication(It.Is<string>(actual => actual == publicationSlug)), Times.Never);
-
-        public void CacheInvalidatedForPublicationTree() => mock.Verify(m => m.UpdatePublicationTree(), Times.Once);
-
-        public void CacheNotInvalidatedForPublicationTree() => mock.Verify(m => m.UpdatePublicationTree(), Times.Never);
     }
 }

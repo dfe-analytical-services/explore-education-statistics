@@ -3,7 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import ContentHtml from '@common/components/ContentHtml';
 import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
-import { DataSetDataGuidance } from '@common/services/releaseDataGuidanceService';
+import { DataSetDataGuidance } from '@common/types/releaseDataGuidance';
 import React, { ReactNode } from 'react';
 
 interface Props {

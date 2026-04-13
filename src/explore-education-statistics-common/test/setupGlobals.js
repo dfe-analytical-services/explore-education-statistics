@@ -23,6 +23,8 @@ beforeAll(() => {
   };
 
   URL.createObjectURL = jest.fn();
+
+  document.body.classList.add('govuk-frontend-supported');
 });
 
 beforeEach(() => {

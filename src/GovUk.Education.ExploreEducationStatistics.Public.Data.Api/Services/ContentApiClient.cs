@@ -1,7 +1,7 @@
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient httpClient) : IContentApiClient
 {
-    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(
+    public async Task<Either<ActionResult, PublicationSummaryDto>> GetPublicationSummary(
         Guid publicationId,
         CancellationToken cancellationToken = default
     )
@@ -46,9 +46,7 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             }
         }
 
-        var publication = await response.Content.ReadFromJsonAsync<PublishedPublicationSummaryViewModel>(
-            cancellationToken
-        );
+        var publication = await response.Content.ReadFromJsonAsync<PublicationSummaryDto>(cancellationToken);
 
         return publication ?? throw new NullReferenceException("Could not deserialize from content API response.");
     }

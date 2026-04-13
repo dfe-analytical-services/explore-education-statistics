@@ -3,7 +3,7 @@ import generateReleaseContent, {
 } from '@admin-test/generators/releaseContentGenerators';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
-import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
+import ReleaseContentPreview from '@admin/pages/release/content/components/ReleaseContentPreview';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseContent as ReleaseContentType } from '@admin/services/releaseContentService';
 import render from '@common-test/render';
@@ -45,9 +45,9 @@ const renderWithContext = (
     </TestConfigContextProvider>,
   );
 
-describe('ReleaseContentRedesign', () => {
+describe('ReleaseContentPreview', () => {
   test('renders the publication summary on desktop with correct info', () => {
-    renderWithContext(<ReleaseContentRedesign />);
+    renderWithContext(<ReleaseContentPreview />);
     const releaseSummaryBlock = screen.getByTestId('release-summary-block');
 
     expect(releaseSummaryBlock).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('ReleaseContentRedesign', () => {
 
   test('renders the publication summary correctly when published with no updates', () => {
     renderWithContext(
-      <ReleaseContentRedesign />,
+      <ReleaseContentPreview />,
       generateReleaseContent({
         release: generateEditableRelease({
           publishScheduled: '2025-08-12T09:30:00+01:00',
@@ -84,7 +84,7 @@ describe('ReleaseContentRedesign', () => {
 
   test('renders the publication summary correctly when release scheduled', () => {
     renderWithContext(
-      <ReleaseContentRedesign />,
+      <ReleaseContentPreview />,
       generateReleaseContent({
         release: generateEditableRelease({
           lastUpdated: '2025-08-10T09:30:00+01:00',
@@ -108,7 +108,7 @@ describe('ReleaseContentRedesign', () => {
 
   test('renders the published date correctly when both published and release scheduled', () => {
     renderWithContext(
-      <ReleaseContentRedesign />,
+      <ReleaseContentPreview />,
       generateReleaseContent({
         release: generateEditableRelease({
           lastUpdated: '2025-08-12T09:30:00+01:00',
@@ -133,7 +133,7 @@ describe('ReleaseContentRedesign', () => {
 
   test('does not render the publication summary on mobile', () => {
     mockIsMedia = true;
-    renderWithContext(<ReleaseContentRedesign />);
+    renderWithContext(<ReleaseContentPreview />);
 
     expect(
       screen.queryByTestId('release-summary-block'),
@@ -142,7 +142,7 @@ describe('ReleaseContentRedesign', () => {
   });
 
   test('tabs render when expected', async () => {
-    const { user } = renderWithContext(<ReleaseContentRedesign />);
+    const { user } = renderWithContext(<ReleaseContentPreview />);
 
     const tabsContainer = screen.getByTestId('release-page-tabs');
     const tabs = within(tabsContainer).getAllByRole('tab');

@@ -44,45 +44,10 @@ describe('EditableKeyStatText', () => {
       'Text guidance text',
     );
 
-    expect(
-      screen.queryByRole('button', { name: /Edit/ }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Edit/ })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Remove/ }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('renders correctly when `isEditing` is true', async () => {
-    render(
-      <EditableKeyStatText
-        isEditing
-        keyStat={testKeyStat}
-        keyStats={[testKeyStat]}
-        onRemove={noop}
-        onSubmit={noop}
-      />,
-    );
-
-    expect(screen.getByTestId('keyStat-title')).toHaveTextContent('Text title');
-
-    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-      'Over 9000',
-    );
-
-    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent('Text trend');
-
-    expect(
-      screen.getByRole('button', {
-        name: 'Text guidance title',
-      }),
     ).toBeInTheDocument();
-
-    expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-      'Text guidance text',
-    );
-
-    expect(screen.getByRole('button', { name: /Edit/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Remove/ })).toBeInTheDocument();
   });
 
   test('does not render the trend when `trend` is undefined', async () => {
@@ -147,7 +112,6 @@ describe('EditableKeyStatText', () => {
       <EditableKeyStatText
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
-        isEditing
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -192,7 +156,6 @@ describe('EditableKeyStatText', () => {
       <EditableKeyStatText
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
-        isEditing
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -231,7 +194,6 @@ describe('EditableKeyStatText', () => {
       <EditableKeyStatText
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
-        isEditing
         onRemove={handleRemove}
         onSubmit={noop}
       />,

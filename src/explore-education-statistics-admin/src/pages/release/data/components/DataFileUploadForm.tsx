@@ -141,6 +141,7 @@ export default function DataFileUploadForm({
 }: Props) {
   const [selectedFileType, setSelectedFileType] = useState<FileType>('csv');
   const [showReplacementWarning, toggleReplacementWarning] = useToggle(false);
+  const [showCompletionStatus, toggleCompletionStatus] = useToggle(false);
 
   const getErrorMappings = () => {
     return isDataReplacement
@@ -188,9 +189,15 @@ export default function DataFileUploadForm({
       }
 
       onSubmit();
+      toggleCompletionStatus.on();
       toggleReplacementWarning.off();
     },
-    [onSubmit, releaseVersionId, toggleReplacementWarning],
+    [
+      onSubmit,
+      releaseVersionId,
+      toggleReplacementWarning,
+      toggleCompletionStatus,
+    ],
   );
 
   const validationSchema = useMemo<
@@ -272,6 +279,10 @@ export default function DataFileUploadForm({
                 ? 'dataFileReplacementUploadForm'
                 : 'dataFileUploadForm'
             }
+            onChange={() => {
+              if (Object.keys(formState.dirtyFields).length > 0)
+                toggleCompletionStatus.off();
+            }}
             onSubmit={handleSubmit}
           >
             <div style={{ position: 'relative' }}>
@@ -384,6 +395,19 @@ export default function DataFileUploadForm({
                   Cancel
                 </ButtonText>
               </ButtonGroup>
+
+              <div
+                id="upload-completion-status"
+                className="govuk-visually-hidden"
+                role="status"
+              >
+                {showCompletionStatus && (
+                  <>
+                    Upload complete. Click 'View details' on the item pending
+                    review in order to continue import.
+                  </>
+                )}
+              </div>
             </div>
           </Form>
         );

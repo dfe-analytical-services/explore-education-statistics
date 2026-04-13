@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -600,6 +601,7 @@ public class PublicationServicePermissionTests
         IReleaseVersionRepository? releaseVersionRepository = null,
         IMethodologyService? methodologyService = null,
         IPublicationCacheService? publicationCacheService = null,
+        IPublicationsTreeService? publicationsTreeService = null,
         IReleaseCacheService? releaseCacheService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null,
@@ -617,6 +619,7 @@ public class PublicationServicePermissionTests
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+            publicationsTreeService ?? Mock.Of<IPublicationsTreeService>(Strict),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),

@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -25,7 +26,7 @@ public class BauCacheController : ControllerBase
     private readonly IPublicBlobStorageService _publicBlobStorageService;
     private readonly IGlossaryCacheService _glossaryCacheService;
     private readonly IMethodologyCacheService _methodologyCacheService;
-    private readonly IPublicationCacheService _publicationCacheService;
+    private readonly IPublicationsTreeService _publicationsTreeService;
 
     private const string ReleasePeriodPattern = "[0-9]{4}(-[^/]+)?\\";
     private const string BoundaryLevelIdPattern = "\\d{1,3}";
@@ -35,14 +36,14 @@ public class BauCacheController : ControllerBase
         IPublicBlobStorageService publicBlobStorageService,
         IGlossaryCacheService glossaryCacheService,
         IMethodologyCacheService methodologyCacheService,
-        IPublicationCacheService publicationCacheService
+        IPublicationsTreeService publicationsTreeService
     )
     {
         _privateBlobStorageService = privateBlobStorageService;
         _publicBlobStorageService = publicBlobStorageService;
         _glossaryCacheService = glossaryCacheService;
         _methodologyCacheService = methodologyCacheService;
-        _publicationCacheService = publicationCacheService;
+        _publicationsTreeService = publicationsTreeService;
     }
 
     [HttpDelete("private-cache")]
@@ -88,7 +89,7 @@ public class BauCacheController : ControllerBase
                             await _methodologyCacheService.UpdateSummariesTree();
                             break;
                         case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
-                            await _publicationCacheService.UpdatePublicationTree();
+                            await _publicationsTreeService.UpdateCachedPublicationsTree();
                             break;
                         default:
                             throw new ArgumentException($"Unsupported cache entry {entry}");

@@ -131,38 +131,40 @@ export default function ChartBoundaryLevelsForm({
             {dataSetRows.length > 1 && (
               <>
                 <h4>Set boundary levels per data set</h4>
-                <table data-testid="data-set-boundary-levels">
-                  <thead>
-                    <tr>
-                      <th>Data set</th>
-                      <th>Boundary level</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dataSetRows.map(({ key, label }, index) => {
-                      return (
-                        <tr key={key}>
-                          <td>{label}</td>
-                          <td>
-                            <FormFieldSelect
-                              label={`Boundary level for data set: ${label}`}
-                              hideLabel
-                              name={`dataSetConfigs[${index}].boundaryLevel`}
-                              order={[]}
-                              options={[
-                                {
-                                  label: 'Use default',
-                                  value: '',
-                                },
-                                ...boundaryLevelOptions,
-                              ]}
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="table-container">
+                  <table data-testid="data-set-boundary-levels">
+                    <thead>
+                      <tr>
+                        <th>Data set</th>
+                        <th>Boundary level</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dataSetRows.map(({ key, label }, index) => {
+                        return (
+                          <tr key={key}>
+                            <td>{label}</td>
+                            <td>
+                              <FormFieldSelect
+                                label={`Boundary level for data set: ${label}`}
+                                hideLabel
+                                name={`dataSetConfigs[${index}].boundaryLevel`}
+                                order={[]}
+                                options={[
+                                  {
+                                    label: 'Use default',
+                                    value: '',
+                                  },
+                                  ...boundaryLevelOptions,
+                                ]}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </>
             )}
 

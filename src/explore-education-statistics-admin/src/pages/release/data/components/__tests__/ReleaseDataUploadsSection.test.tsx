@@ -29,6 +29,10 @@ const permissionService = jest.mocked(_permissionService);
 const dataReplacementService = jest.mocked(_dataReplacementService);
 
 describe('ReleaseDataUploadsSection', () => {
+  beforeEach(() => {
+    document.body.className = 'govuk-frontend-supported';
+  });
+
   const testDataFiles: DataFile[] = [
     {
       id: 'data-1',
@@ -895,12 +899,13 @@ describe('ReleaseDataUploadsSection', () => {
       const metadataFile = new File(['test'], 'test-data.meta.csv', {
         type: 'text/csv',
       });
-
       await user.type(screen.getByLabelText('Data file title'), 'Test title');
-
-      await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
-        screen.getByLabelText('Upload metadata file'),
+        screen.getByTestId('file-input-dataFileUploadForm-dataFile'),
+        dataFile,
+      );
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-metadataFile'),
         metadataFile,
       );
       await user.click(
@@ -948,7 +953,10 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.click(screen.getByLabelText('ZIP file'));
 
-      await user.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-zipFile'),
+        zipFile,
+      );
       await user.click(
         screen.getByRole('button', { name: 'Upload data files' }),
       );
@@ -988,7 +996,10 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.click(screen.getByLabelText('Bulk ZIP upload'));
 
-      await user.upload(screen.getByLabelText('Upload bulk ZIP file'), zipFile);
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-bulkZipFile'),
+        zipFile,
+      );
       await user.click(
         screen.getByRole('button', { name: 'Upload data files' }),
       );
@@ -1038,10 +1049,12 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       await user.type(screen.getByLabelText('Data file title'), 'Test title');
-
-      await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
-        screen.getByLabelText('Upload metadata file'),
+        screen.getByTestId('file-input-dataFileUploadForm-dataFile'),
+        dataFile,
+      );
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-metadataFile'),
         metadataFile,
       );
       await user.click(
@@ -1114,7 +1127,10 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.click(screen.getByLabelText('ZIP file'));
 
-      await user.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-zipFile'),
+        zipFile,
+      );
       await user.click(
         screen.getByRole('button', { name: 'Upload data files' }),
       );

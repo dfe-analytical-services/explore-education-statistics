@@ -4,8 +4,16 @@ import os.path
 
 def get_local_storage_json_from_browser(driver) -> dict:
     local_storage_string = driver.execute_script(
-        "return JSON.stringify(Object.entries(window.localStorage)"
-        ".reduce((acc, [key, value]) => { acc[key] = JSON.parse(value); return acc; }, {}))"
+        """
+        return JSON.stringify(Object.entries(window.localStorage).reduce((acc, [key, value]) => {
+          try {
+            acc[key] = JSON.parse(value);
+          } catch (e) {
+            acc[key] = value;
+          }
+          return acc;
+        }, {}));
+        """
     )
 
     return json.loads(local_storage_string)
@@ -54,10 +62,31 @@ def clear_local_storage_file(user: str):
 
 
 def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
-    for entry in local_storage_json.values():
-        if isinstance(entry, dict) and "credentialType" in entry and entry["credentialType"] == "AccessToken":
-            return entry["secret"]
+    for key, value in local_storage_json.items():
+        # If value is already a dict, check it directly
+        if isinstance(value, dict):
+            if value.get("credentialType") == "AccessToken":
+                return value["secret"]
+            continue
 
+        # Skip if value isn't a string (though in local storage they usually are)
+        if not isinstance(value, str):
+            continue
+
+        try:
+            # Try to turn the string value into a dictionary
+            entry_data = json.loads(value)
+
+            if isinstance(entry_data, dict):
+                # Check if this dictionary is the AccessToken we want
+                if entry_data.get("credentialType") == "AccessToken":
+                    return entry_data["secret"]
+
+        except (json.JSONDecodeError, TypeError):
+            # If the string isn't JSON (like "msal.version": "3.30.0"), just skip it
+            continue
+
+    # If we get here, we've exhausted the loop
     raise RuntimeError("Unable to find access token from local storage JSON")
 
 

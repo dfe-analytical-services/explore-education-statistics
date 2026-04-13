@@ -173,7 +173,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                     new IndicatorMappingUpdateResponseViewModel
                     {
                         SourceKey = "indicator-1-key",
-                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key")! with
+                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key") with
                         {
                             Type = MappingType.ManualMapped,
                             CandidateKey = "indicator-3-key",
@@ -182,7 +182,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                     new IndicatorMappingUpdateResponseViewModel
                     {
                         SourceKey = "indicator-2-key",
-                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key")! with
+                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key") with
                         {
                             Type = MappingType.ManualNone,
                             CandidateKey = null,
@@ -204,7 +204,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
             {
                 {
                     "indicator-1-key",
-                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key")! with
+                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key") with
                     {
                         Type = MappingType.ManualMapped,
                         CandidateKey = "indicator-3-key",
@@ -212,7 +212,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                 },
                 {
                     "indicator-2-key",
-                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key")! with
+                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key") with
                     {
                         Type = MappingType.ManualNone,
                         CandidateKey = null,
@@ -222,7 +222,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
 
             // Test that the updated mappings retrieved from the database reflect the updates
             // that were requested.
-            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+            updatedMapping.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFullMappings,
                 ignoreCollectionOrders: true
             );
@@ -439,8 +439,8 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                 .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
-            retrievedMappings.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
-                mapping.IndicatorMappingPlan!.Mappings,
+            retrievedMappings.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
+                mapping.IndicatorMappingPlan.Mappings,
                 ignoreCollectionOrders: true
             );
         }
@@ -532,8 +532,8 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                 .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
-            retrievedMappings.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
-                mapping.IndicatorMappingPlan!.Mappings,
+            retrievedMappings.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
+                mapping.IndicatorMappingPlan.Mappings,
                 ignoreCollectionOrders: true
             );
         }

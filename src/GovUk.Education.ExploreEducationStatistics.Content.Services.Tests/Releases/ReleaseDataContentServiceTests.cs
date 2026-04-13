@@ -36,20 +36,26 @@ public abstract class ReleaseDataContentServiceTests
                 .DefaultContentSection(ContentSectionType.RelatedDashboards)
                 .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Data dashboards</p>")]);
 
+            var publicApiDataSetId = Guid.NewGuid();
+
             var dataSets = _dataFixture
                 .DefaultReleaseFile()
                 .ForIndex(
                     0,
                     s =>
                         s.SetFile(
-                            _dataFixture
-                                .DefaultFile(FileType.Data)
-                                .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(1000))
-                                .WithDataSetFileVersionGeographicLevels([
-                                    GeographicLevel.Country,
-                                    GeographicLevel.LocalAuthority,
-                                ])
-                        )
+                                _dataFixture
+                                    .DefaultFile(FileType.Data)
+                                    .WithDataSetFileMeta(
+                                        _dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(1000)
+                                    )
+                                    .WithDataSetFileVersionGeographicLevels([
+                                        GeographicLevel.Country,
+                                        GeographicLevel.LocalAuthority,
+                                    ])
+                            )
+                            // Set this data set to be available by API
+                            .SetPublicApiDataSetId(publicApiDataSetId)
                 )
                 .ForIndex(
                     1,
@@ -542,6 +548,91 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasPublicApiDataSetId_IsApiEnabledIsTrueAndPublicApiDataSetIdIsSet()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            var publicApiDataSetId = Guid.NewGuid();
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .WithPublicApiDataSetId(publicApiDataSetId);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.True(result.DataSets[0].IsApiEnabled);
+                Assert.Equal(publicApiDataSetId, result.DataSets[0].PublicApiDataSetId);
+            }
+        }
+
+        [Fact]
+        public async Task WhenDataSetHasNoPublicApiDataSetId_IsApiEnabledIsFalse()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.False(result.DataSets[0].IsApiEnabled);
+                Assert.Null(result.DataSets[0].PublicApiDataSetId);
+            }
+        }
+
+        [Fact]
         public async Task WhenSupportingFileHasNoSummary_ReturnsEmptySummary()
         {
             // Arrange
@@ -755,6 +846,8 @@ public abstract class ReleaseDataContentServiceTests
             AssertDataSetFileMetaEqual(expected, actual.Meta);
             Assert.Equal(expected.Summary, actual.Summary);
             Assert.Equal(expected.Name, actual.Title);
+            Assert.Equal(expected.PublicApiDataSetId != null, actual.IsApiEnabled);
+            Assert.Equal(expected.PublicApiDataSetId, actual.PublicApiDataSetId);
         }
 
         private static void AssertDataSetFileMetaEqual(ReleaseFile expected, ReleaseDataContentDataSetMetaDto actual)

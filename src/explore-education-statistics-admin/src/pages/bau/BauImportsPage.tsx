@@ -21,40 +21,42 @@ const BauImportsPage = () => {
       ]}
     >
       <LoadingSpinner loading={isLoading} text="Loading imports">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Status</th>
-              <th scope="col">Subject Id</th>
-              <th scope="col">Data filename</th>
-              <th scope="col">Rows</th>
-              <th scope="col">Stage complete</th>
-              <th scope="col">Overall complete</th>
-              <th scope="col">Go to release data files</th>
-            </tr>
-          </thead>
-          {value && (
-            <tbody>
-              {value.map(subject => (
-                <tr key={subject.subjectId}>
-                  <td>{subject.status}</td>
-                  <td>{subject.subjectId}</td>
-                  <td>{subject.dataFileName}</td>
-                  <td>{subject.totalRows ?? 'Unknown'}</td>
-                  <td>{subject.stagePercentageComplete}%</td>
-                  <td>{subject.percentageComplete}%</td>
-                  <td>
-                    <Link
-                      to={`/publication/${subject.publicationId}/release/${subject.releaseId}/data`}
-                    >
-                      {subject.publicationTitle} {subject.releaseTitle}
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Subject Id</th>
+                <th scope="col">Data filename</th>
+                <th scope="col">Rows</th>
+                <th scope="col">Stage complete</th>
+                <th scope="col">Overall complete</th>
+                <th scope="col">Go to release data files</th>
+              </tr>
+            </thead>
+            {value && (
+              <tbody>
+                {value.map(subject => (
+                  <tr key={subject.subjectId}>
+                    <td>{subject.status}</td>
+                    <td>{subject.subjectId}</td>
+                    <td>{subject.dataFileName}</td>
+                    <td>{subject.totalRows ?? 'Unknown'}</td>
+                    <td>{subject.stagePercentageComplete}%</td>
+                    <td>{subject.percentageComplete}%</td>
+                    <td>
+                      <Link
+                        to={`/publication/${subject.publicationId}/release/${subject.releaseId}/data`}
+                      >
+                        {subject.publicationTitle} {subject.releaseTitle}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
+          </table>
+        </div>
       </LoadingSpinner>
     </Page>
   );

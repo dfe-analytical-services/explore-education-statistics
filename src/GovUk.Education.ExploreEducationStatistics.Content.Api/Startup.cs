@@ -155,7 +155,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         });
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IIndicatorRepository, IndicatorRepository>();
-        services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
@@ -184,6 +183,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPublicationMethodologiesService, PublicationMethodologiesService>();
         services.AddTransient<IPublicationReleasesService, PublicationReleasesService>();
         services.AddTransient<IPublicationsSitemapService, PublicationsSitemapService>();
+        services.AddTransient<IPublicationsTreeService, PublicationsTreeService>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IRelatedInformationService, RelatedInformationService>();

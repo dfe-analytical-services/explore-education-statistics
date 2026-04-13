@@ -1,4 +1,4 @@
-import { PublicationSummary } from '@common/services/publicationService';
+import { PublicationSummaryPreview } from '@common/services/publicationService';
 import { ContentBlock } from '@common/services/types/blocks';
 import { contentApi } from './api';
 
@@ -7,7 +7,7 @@ export interface Methodology {
   title: string;
   published: string;
   slug: string;
-  publications: PublicationSummary[];
+  publications: PublicationSummaryPreview[];
   content: {
     order: number;
     heading: string;

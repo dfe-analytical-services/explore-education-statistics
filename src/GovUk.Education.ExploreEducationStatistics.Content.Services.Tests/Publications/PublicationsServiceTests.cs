@@ -352,6 +352,99 @@ public abstract class PublicationsServiceTests
         }
     }
 
+    public class GetPublicationSummaryTests : PublicationsServiceTests
+    {
+        [Fact]
+        public async Task WhenPublicationExistsWithPublishedReleaseVersion_ReturnsExpectedSummary()
+        {
+            // Arrange
+            var releaseVersionPublishedDisplayDate = DateTimeOffset.Parse("2026-01-01T09:30:00 +00:00");
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions([
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithPublished(DateTimeOffset.UtcNow)
+                                    .WithPublishedDisplayDate(releaseVersionPublishedDisplayDate),
+                            ]),
+                    ]
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationSummary(publication.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+                Assert.Multiple(() =>
+                {
+                    Assert.Equal(publication.Id, result.Id);
+                    Assert.Equal(releaseVersionPublishedDisplayDate, result.Published);
+                    Assert.Equal(publication.Slug, result.Slug);
+                    Assert.Equal(publication.Summary, result.Summary);
+                    Assert.Equal(publication.Title, result.Title);
+                });
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublicationExistsWithNoPublishedReleaseVersion_ReturnsNotFound()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationSummary(publication.Id);
+
+                // Assert
+                outcome.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublicationDoesNotExist_ReturnsNotFound()
+        {
+            // Arrange
+            var publicationId = Guid.NewGuid();
+            await using var context = InMemoryContentDbContext();
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.GetPublicationSummary(publicationId);
+
+            // Assert
+            outcome.AssertNotFound();
+        }
+    }
+
     public class GetPublicationTitleTests : PublicationsServiceTests
     {
         [Fact]

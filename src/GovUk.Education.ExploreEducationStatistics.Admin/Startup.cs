@@ -47,6 +47,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -402,7 +403,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
         services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+        services.AddTransient<IPublicationsTreeService, PublicationsTreeService>();
         services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 
         // Content.Model repositories

@@ -39,6 +39,21 @@ const GlossaryPage: NextPage<Props> = ({ categories = [] }) => {
             The glossary is intended to grow over time as the service is
             populated.
           </p>
+          <p>Did you find what you were looking for in the glossary?</p>
+          <p>
+            We’d be interested in hearing your thoughts on how well it’s helping
+            you understand the terms used across the site.
+          </p>
+          <p>
+            Send us feedback or{' '}
+            <a
+              href="https://forms.office.com/e/brCmzrQfXU"
+              rel="noreferrer"
+              target="_blank"
+            >
+              sign up for a research session using our online form.
+            </a>
+          </p>
 
           <PageSearchFormWithAnalytics
             inputLabel="Search our A to Z list of definitions for terms used across

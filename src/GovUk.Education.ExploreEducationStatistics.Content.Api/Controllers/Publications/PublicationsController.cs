@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Publications;
 
-[Route("api/publications/{publicationSlug}")]
+[Route("api")]
 [ApiController]
 public class PublicationsController(
     IPublicationMethodologiesService publicationMethodologiesService,
@@ -16,13 +16,13 @@ public class PublicationsController(
     IPublicationsService publicationsService
 ) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("publications/{publicationSlug}")]
     public async Task<ActionResult<PublicationDto>> GetPublication(
         string publicationSlug,
         CancellationToken cancellationToken = default
     ) => await publicationsService.GetPublication(publicationSlug, cancellationToken).HandleFailuresOrOk();
 
-    [HttpGet("methodologies")]
+    [HttpGet("publications/{publicationSlug}/methodologies")]
     public async Task<ActionResult<PublicationMethodologiesDto>> GetPublicationMethodologies(
         string publicationSlug,
         CancellationToken cancellationToken = default
@@ -31,7 +31,7 @@ public class PublicationsController(
             .GetPublicationMethodologies(publicationSlug, cancellationToken)
             .HandleFailuresOrOk();
 
-    [HttpGet("release-entries")]
+    [HttpGet("publications/{publicationSlug}/release-entries")]
     public async Task<ActionResult<PaginatedListViewModel<IPublicationReleaseEntryDto>>> GetPublicationReleases(
         [FromQuery] GetPublicationReleasesRequest request,
         CancellationToken cancellationToken = default
@@ -45,7 +45,11 @@ public class PublicationsController(
             )
             .HandleFailuresOrOk();
 
-    [HttpGet("title")]
+    [HttpGet("publications/{publicationId:guid}/summary")]
+    public async Task<ActionResult<PublicationSummaryDto>> GetPublicationSummary(Guid publicationId) =>
+        await publicationsService.GetPublicationSummary(publicationId).HandleFailuresOrOk();
+
+    [HttpGet("publications/{publicationSlug}/title")]
     public async Task<ActionResult<PublicationTitleDto>> GetPublicationTitle(
         string publicationSlug,
         CancellationToken cancellationToken = default

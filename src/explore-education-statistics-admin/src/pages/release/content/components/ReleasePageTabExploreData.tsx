@@ -16,20 +16,21 @@ import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import useToggle from '@common/hooks/useToggle';
 import ContactUsSection, {
   contactUsNavItem,
-} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+} from '@common/modules/release/components/ReleaseContactUsSection';
 import ReleaseDataList from '@common/modules/find-statistics/components/ReleaseDataList';
 import ReleaseDataListItem from '@common/modules/find-statistics/components/ReleaseDataListItem';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseDataPageCardLink, {
   ReleaseDataPageCardLinkGrid,
 } from '@common/modules/release/components/ReleaseDataPageCardLink';
 import ReleaseDataSetFileSummary from '@common/modules/release/components/ReleaseDataSetFileSummary';
+import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import pageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import { useQuery } from '@tanstack/react-query';
@@ -162,6 +163,13 @@ const ReleasePageTabExploreData = ({
           title={dataset.title}
           description={dataset.summary}
           metaInfo={dataset.meta.geographicLevels.join(', ')}
+          tag={
+            dataset.isApiEnabled && (
+              <Tag className="govuk-!-margin-bottom-2" colour="grey">
+                Available by API
+              </Tag>
+            )
+          }
           actions={
             <>
               <span>

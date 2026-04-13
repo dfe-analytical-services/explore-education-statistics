@@ -4,7 +4,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ReleaseSummaryBlock from '@common/modules/release/components/ReleaseSummaryBlock';
 import {
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import {
@@ -20,7 +20,7 @@ import classNames from 'classnames';
 import React, { Fragment } from 'react';
 
 interface Props {
-  publicationSummary: PublicationSummaryRedesign;
+  publicationSummary: PublicationSummary;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 

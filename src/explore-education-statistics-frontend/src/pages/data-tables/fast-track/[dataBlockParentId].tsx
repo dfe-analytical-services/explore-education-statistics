@@ -16,7 +16,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
     const [fastTrack, themeMeta] = await Promise.all([
       tableBuilderService.getFastTrackTableAndReleaseMeta(dataBlockParentId),
       publicationService.getPublicationTree({
-        publicationFilter: 'FastTrack',
+        filter: 'FastTrack',
       }),
     ]);
     if (!fastTrack) {

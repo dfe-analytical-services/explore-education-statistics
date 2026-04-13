@@ -158,7 +158,9 @@ export default function FormProvider<TFormValues extends FieldValues>({
 
   return (
     <RHFFormProvider {...providerProps}>
-      {typeof children === 'function' ? children(providerProps) : children}
+      <div>
+        {typeof children === 'function' ? children(providerProps) : children}
+      </div>
     </RHFFormProvider>
   );
 }

@@ -17,22 +17,20 @@ public class DataSetVersionMappingServiceTests
     private readonly Mock<PublicDataDbContext> _publicDataDbContextMock = new();
 
     [Theory]
-    [InlineData(false, false, false, false)]
-    [InlineData(true, false, false, true)]
-    [InlineData(false, true, false, true)]
-    [InlineData(false, false, true, true)]
-    [InlineData(true, true, true, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, true)]
     public async Task IsMajorVersionUpdateDeletions(
         bool deletedLocations,
         bool deletedFilters,
-        bool deletedIndicators,
         bool expectedMajorVersion
     )
     {
         // Arrange
         var targetDataSetVersionId = Guid.NewGuid();
 
-        SetupDbContext(targetDataSetVersionId, deletedLocations, deletedFilters, deletedIndicators);
+        SetupDbContext(targetDataSetVersionId, deletedLocations, deletedFilters);
 
         var mockMappingTypesRepository = SetupMockMappingTypes(targetDataSetVersionId: targetDataSetVersionId);
 
@@ -76,12 +74,7 @@ public class DataSetVersionMappingServiceTests
             },
         };
 
-        SetupDbContext(
-            targetDataSetVersionId,
-            hasDeletedIndicators: false,
-            hasDeletedGeographicLevels: false,
-            hasDeletedTimePeriods: false
-        );
+        SetupDbContext(targetDataSetVersionId, hasDeletedGeographicLevels: false, hasDeletedTimePeriods: false);
 
         var mockMappingTypesRepository = SetupMockMappingTypes(
             targetDataSetVersionId: targetDataSetVersionId,
@@ -126,12 +119,7 @@ public class DataSetVersionMappingServiceTests
             new() { IndicatorMappingTypeString = indicatorMappingType },
         };
 
-        SetupDbContext(
-            targetDataSetVersionId,
-            hasDeletedIndicators: false,
-            hasDeletedGeographicLevels: false,
-            hasDeletedTimePeriods: false
-        );
+        SetupDbContext(targetDataSetVersionId, hasDeletedGeographicLevels: false, hasDeletedTimePeriods: false);
 
         var mockMappingTypesRepository = SetupMockMappingTypes(
             targetDataSetVersionId: targetDataSetVersionId,
@@ -281,21 +269,15 @@ public class DataSetVersionMappingServiceTests
     }
 
     [Theory]
-    [InlineData(false, false, false, false)]
-    [InlineData(true, false, false, true)]
-    [InlineData(false, true, false, true)]
-    [InlineData(false, false, true, true)]
-    [InlineData(true, true, true, true)]
-    public async Task HasDeletionChanges(
-        bool deletedIndicators,
-        bool deletedGeographicLevels,
-        bool deletedTimePeriods,
-        bool expected
-    )
+    [InlineData(false, false, false)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, true)]
+    public async Task HasDeletionChanges(bool deletedGeographicLevels, bool deletedTimePeriods, bool expected)
     {
         // Arrange
         var targetDataSetVersionId = Guid.NewGuid();
-        SetupDbContext(targetDataSetVersionId, deletedIndicators, deletedGeographicLevels, deletedTimePeriods);
+        SetupDbContext(targetDataSetVersionId, deletedGeographicLevels, deletedTimePeriods);
 
         var contextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contextId);
@@ -314,7 +296,6 @@ public class DataSetVersionMappingServiceTests
 
     private void SetupDbContext(
         Guid targetDataSetVersionId,
-        bool hasDeletedIndicators = false,
         bool hasDeletedGeographicLevels = false,
         bool hasDeletedTimePeriods = false
     )
@@ -324,7 +305,6 @@ public class DataSetVersionMappingServiceTests
             new()
             {
                 TargetDataSetVersionId = targetDataSetVersionId,
-                HasDeletedIndicators = hasDeletedIndicators,
                 HasDeletedGeographicLevels = hasDeletedGeographicLevels,
                 HasDeletedTimePeriods = hasDeletedTimePeriods,
                 SourceDataSetVersionId = Guid.NewGuid(),

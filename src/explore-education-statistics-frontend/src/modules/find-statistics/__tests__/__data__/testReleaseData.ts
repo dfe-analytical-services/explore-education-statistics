@@ -1,6 +1,6 @@
 import {
   Publication,
-  PublicationSummaryRedesign,
+  PublicationSummary,
   ReleaseVersion,
   ReleaseVersionDataContent,
   ReleaseVersionHomeContent,
@@ -216,7 +216,7 @@ export const testRelease: ReleaseVersion = {
   },
 };
 
-export const testPublicationSummary: PublicationSummaryRedesign = {
+export const testPublicationSummary: PublicationSummary = {
   id: 'publication-summary-1',
   title: 'Pupil attendance in schools',
   slug: 'publication-slug',
@@ -536,6 +536,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
       },
       title: 'Test dataset 1',
       summary: '<p>Test dataset 1 summary</p>',
+      isApiEnabled: false,
     },
     {
       dataSetFileId: 'test-dataset-2-datasetfileid',
@@ -556,6 +557,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
       },
       title: 'Test dataset 2',
       summary: '<p>Test dataset 2 summary</p>',
+      isApiEnabled: false,
     },
   ],
   featuredTables: [

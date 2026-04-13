@@ -7,6 +7,10 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 describe('AncillaryFileForm', () => {
+  beforeEach(() => {
+    document.body.className = 'govuk-frontend-supported';
+  });
+
   test('shows validation message if `title` field is empty', async () => {
     const { user } = render(<AncillaryFileForm onSubmit={noop} />);
 
@@ -76,7 +80,10 @@ describe('AncillaryFileForm', () => {
 
     const { user } = render(<AncillaryFileForm onSubmit={noop} />);
 
-    await user.upload(screen.getByLabelText('Upload file'), testFile);
+    await user.upload(
+      screen.getByTestId('file-input-ancillaryFileForm-file'),
+      testFile,
+    );
     await user.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
@@ -117,8 +124,10 @@ describe('AncillaryFileForm', () => {
     await user.type(screen.getByLabelText('Summary'), 'Test summary');
 
     const testFile = new File(['test'], 'test.txt');
-
-    await user.upload(screen.getByLabelText('Upload file'), testFile);
+    await user.upload(
+      screen.getByTestId('file-input-ancillaryFileForm-file'),
+      testFile,
+    );
 
     expect(handleSubmit).not.toHaveBeenCalled();
 

@@ -2,6 +2,7 @@ import render from '@common-test/render';
 import ReleaseDataListItem from '@common/modules/find-statistics/components/ReleaseDataListItem';
 import { screen } from '@testing-library/react';
 import React from 'react';
+import Tag from '@common/components/Tag';
 
 describe('ReleaseDataListItem', () => {
   test('renders', () => {
@@ -40,5 +41,30 @@ describe('ReleaseDataListItem', () => {
     expect(screen.getByText('Test description')).toBeInTheDocument();
     expect(screen.getByText('Test meta info')).toBeInTheDocument();
     expect(screen.getByText('Test content')).toBeInTheDocument();
+  });
+
+  test('renders "Available by API" tag when isApiEnabled is true', () => {
+    render(
+      <ReleaseDataListItem
+        title="Test title"
+        tag={<Tag>Available by API</Tag>}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: /Test title/ }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('Available by API')).toBeInTheDocument();
+  });
+
+  test('does not render "Available by API" tag when isApiEnabled is false', () => {
+    render(<ReleaseDataListItem title="Test title" />);
+
+    expect(
+      screen.getByRole('heading', { name: 'Test title' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByText('Available by API')).not.toBeInTheDocument();
   });
 });

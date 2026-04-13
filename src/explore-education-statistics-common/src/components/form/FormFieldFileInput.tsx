@@ -37,6 +37,7 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
   const { ref, ...field } = useRegister(name, register);
   const { fieldId } = useFormIdContext();
   const id = fieldId(name);
+  const [resetKey, setResetKey] = useState(0);
 
   const { onChange } = props;
 
@@ -52,6 +53,7 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
             if (previousTouched && !touched) {
               toggleClicked.off();
               setInputValue(undefined);
+              setResetKey(prev => prev + 1);
             }
           }}
         />
@@ -60,6 +62,7 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
           {...props}
           {...field}
           error={fieldState.error?.message}
+          key={resetKey}
           id={id}
           onClick={toggleClicked.on}
           onChange={event => {
@@ -73,7 +76,6 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
               event.target.files && event.target.files.length > 0
                 ? event.target.files[0]
                 : null;
-
             if (file) {
               setInputValue(file);
               setValue(
@@ -82,6 +84,17 @@ export default function FormFieldFileInput<TFormValues extends FieldValues>(
                 {
                   shouldTouch: true,
                 },
+              );
+            }
+          }}
+          onDrop={event => {
+            const file = event.dataTransfer.files?.[0];
+            if (file) {
+              setInputValue(file);
+              setValue(
+                name,
+                file as PathValue<TFormValues, Path<TFormValues>>,
+                { shouldTouch: true },
               );
             }
           }}

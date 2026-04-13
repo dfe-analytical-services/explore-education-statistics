@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -418,19 +419,21 @@ public class BauCacheControllerTests
     [Fact]
     public async Task UpdatePublicCacheTrees_SingleValidCacheEntry()
     {
-        var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+        var publicationTreeService = new Mock<IPublicationsTreeService>(Strict);
 
-        publicationCacheService.Setup(s => s.UpdatePublicationTree()).ReturnsAsync([]);
+        publicationTreeService
+            .Setup(s => s.UpdateCachedPublicationsTree(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
-        var controller = BuildController(publicationCacheService: publicationCacheService.Object);
+        var controller = BuildController(publicationsTreeService: publicationTreeService.Object);
 
-        var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
+        const string publicationTreeOption = nameof(UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree);
 
         var result = await controller.UpdatePublicCacheTrees(
             new UpdatePublicCacheTreePathsViewModel { CacheEntries = SetOf(publicationTreeOption) }
         );
 
-        VerifyAllMocks(publicationCacheService);
+        VerifyAllMocks(publicationTreeService);
 
         result.AssertNoContent();
     }
@@ -439,9 +442,11 @@ public class BauCacheControllerTests
     public async Task UpdatePublicCacheTrees_AllValidCacheEntries()
     {
         var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-        var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+        var publicationsTreeService = new Mock<IPublicationsTreeService>(Strict);
 
-        publicationCacheService.Setup(s => s.UpdatePublicationTree()).ReturnsAsync([]);
+        publicationsTreeService
+            .Setup(s => s.UpdateCachedPublicationsTree(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         methodologyCacheService
             .Setup(s => s.UpdateSummariesTree())
@@ -449,17 +454,17 @@ public class BauCacheControllerTests
 
         var controller = BuildController(
             methodologyCacheService: methodologyCacheService.Object,
-            publicationCacheService: publicationCacheService.Object
+            publicationsTreeService: publicationsTreeService.Object
         );
 
-        var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
-        var methodologyTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree.ToString();
+        const string publicationTreeOption = nameof(UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree);
+        const string methodologyTreeOption = nameof(UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree);
 
         var result = await controller.UpdatePublicCacheTrees(
             new UpdatePublicCacheTreePathsViewModel { CacheEntries = [publicationTreeOption, methodologyTreeOption] }
         );
 
-        VerifyAllMocks(publicationCacheService, methodologyCacheService);
+        VerifyAllMocks(publicationsTreeService, methodologyCacheService);
 
         result.AssertNoContent();
     }
@@ -483,7 +488,7 @@ public class BauCacheControllerTests
         IPublicBlobStorageService? publicBlobStorageService = null,
         IGlossaryCacheService? glossaryCacheService = null,
         IMethodologyCacheService? methodologyCacheService = null,
-        IPublicationCacheService? publicationCacheService = null
+        IPublicationsTreeService? publicationsTreeService = null
     )
     {
         return new BauCacheController(
@@ -491,7 +496,7 @@ public class BauCacheControllerTests
             publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
             glossaryCacheService ?? Mock.Of<IGlossaryCacheService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
+            publicationsTreeService ?? Mock.Of<IPublicationsTreeService>(Strict)
         );
     }
 }

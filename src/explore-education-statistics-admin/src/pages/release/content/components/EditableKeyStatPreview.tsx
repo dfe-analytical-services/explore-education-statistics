@@ -10,14 +10,12 @@ import React from 'react';
 export interface EditableKeyStatDisplayProps
   extends OmitStrict<KeyStatProps, 'children' | 'includeWrapper'> {
   isReordering?: boolean;
-  isEditing: boolean;
   onRemove?: () => void;
   onEdit: () => void;
 }
 
 export default function EditableKeyStatPreview({
   isReordering = false,
-  isEditing,
   onRemove,
   onEdit,
   ...keyStatProps
@@ -30,17 +28,18 @@ export default function EditableKeyStatPreview({
 
   return (
     <KeyStat {...keyStatProps} includeWrapper={false}>
-      {isEditing && (
-        <ButtonGroup className="govuk-!-margin-top-2">
-          <Button onClick={onEdit}>
-            Edit <VisuallyHidden> key statistic: {title}</VisuallyHidden>
-          </Button>
+      <ButtonGroup
+        className="govuk-!-margin-top-1 govuk-!-margin-bottom-1"
+        alignment="start"
+      >
+        <Button onClick={onEdit}>
+          Edit <VisuallyHidden> key statistic: {title}</VisuallyHidden>
+        </Button>
 
-          <Button variant="secondary" onClick={onRemove}>
-            Remove <VisuallyHidden> key statistic: {title}</VisuallyHidden>
-          </Button>
-        </ButtonGroup>
-      )}
+        <Button variant="secondary" onClick={onRemove}>
+          Remove <VisuallyHidden> key statistic: {title}</VisuallyHidden>
+        </Button>
+      </ButtonGroup>
     </KeyStat>
   );
 }

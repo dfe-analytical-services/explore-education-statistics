@@ -73,8 +73,10 @@ describe('ReleaseAncillaryFilePage', () => {
     await userEvent.type(summary, 'Updated test summary');
 
     const file = new File(['test'], 'test.txt');
-
-    await userEvent.upload(screen.getByLabelText('Upload new file'), file);
+    await userEvent.upload(
+      screen.getByTestId('file-input-ancillaryFileForm-file'),
+      file,
+    );
 
     await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 

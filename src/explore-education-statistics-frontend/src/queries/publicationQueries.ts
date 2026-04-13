@@ -1,7 +1,7 @@
 import publicationService, {
   PublicationMethodologiesList,
   PublicationReleaseSeriesItem,
-  PublicationSummaryRedesign,
+  PublicationSummary,
   PublicationTreeOptions,
   RelatedInformationItem,
   ReleaseSummary,
@@ -27,13 +27,12 @@ const publicationQueries = {
         publicationService.getLatestPublicationRelease(publicationSlug),
     };
   },
-  getPublicationSummaryRedesign(
+  getPublicationSummary(
     publicationSlug: string,
-  ): UseQueryOptions<PublicationSummaryRedesign> {
+  ): UseQueryOptions<PublicationSummary> {
     return {
       queryKey: ['publicationSummaryRedesign', publicationSlug],
-      queryFn: () =>
-        publicationService.getPublicationSummaryRedesign(publicationSlug),
+      queryFn: () => publicationService.getPublicationSummary(publicationSlug),
     };
   },
   getReleaseVersionSummary(

@@ -66,7 +66,7 @@ internal class PublicationService(
     )
     {
         return await CheckPublicationIsPublished(publicationId, cancellationToken)
-            .OnSuccess(async _ => await contentApiClient.GetPublication(publicationId, cancellationToken))
+            .OnSuccess(async _ => await contentApiClient.GetPublicationSummary(publicationId, cancellationToken))
             .OnSuccess(publication => new PublicationSummaryViewModel
             {
                 Id = publication.Id,

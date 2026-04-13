@@ -57,84 +57,86 @@ const InvitedUsersPage = () => {
         'There are currently no pending user invites'
       ) : (
         <LoadingSpinner loading={isLoading} text="Loading invited users">
-          <table>
-            <caption className="govuk-table__caption">Invited users</caption>
-            <thead>
-              <tr>
-                <th scope="col">Email</th>
-                <th scope="col">Role</th>
-                <th scope="col">Release Roles</th>
-                <th scope="col">Publication Roles</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            {model && (
-              <tbody>
-                {model.pendingInvites.map(pendingInvite => (
-                  <tr key={pendingInvite.email}>
-                    <td>{pendingInvite.email}</td>
-                    <td>{pendingInvite.role}</td>
-                    <td>
-                      {pendingInvite.userReleaseRoles.length === 0 ? (
-                        'No user release roles'
-                      ) : (
-                        <ul className="govuk-!-margin-0">
-                          {pendingInvite.userReleaseRoles.map(releaseRole => {
-                            return (
-                              <li key={releaseRole.id}>
-                                {releaseRole.publication}
-                                <ul>
-                                  <li>{releaseRole.release}</li>
-                                  <li>{releaseRole.role}</li>
-                                </ul>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-                    </td>
-                    <td>
-                      {pendingInvite.userPublicationRoles.length === 0 ? (
-                        'No user publication roles'
-                      ) : (
-                        <ul className="govuk-!-margin-0">
-                          {pendingInvite.userPublicationRoles.map(
-                            publicationRole => {
+          <div className="table-container">
+            <table>
+              <caption className="govuk-table__caption">Invited users</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Email</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Release Roles</th>
+                  <th scope="col">Publication Roles</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              {model && (
+                <tbody>
+                  {model.pendingInvites.map(pendingInvite => (
+                    <tr key={pendingInvite.email}>
+                      <td>{pendingInvite.email}</td>
+                      <td>{pendingInvite.role}</td>
+                      <td>
+                        {pendingInvite.userReleaseRoles.length === 0 ? (
+                          'No user release roles'
+                        ) : (
+                          <ul className="govuk-!-margin-0">
+                            {pendingInvite.userReleaseRoles.map(releaseRole => {
                               return (
-                                <li key={publicationRole.id}>
-                                  {
-                                    // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
-                                    // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
-                                    // rework, this can be reverted to display the role without transformation.
-                                    `${
-                                      publicationRole.publication
-                                    } - ${publicationRoleDisplayName(
-                                      publicationRole.role,
-                                    )}`
-                                  }
+                                <li key={releaseRole.id}>
+                                  {releaseRole.publication}
+                                  <ul>
+                                    <li>{releaseRole.release}</li>
+                                    <li>{releaseRole.role}</li>
+                                  </ul>
                                 </li>
                               );
-                            },
-                          )}
-                        </ul>
-                      )}
-                    </td>
-                    <td>
-                      <ButtonText
-                        onClick={() => {
-                          userService
-                            .cancelInvite(pendingInvite.email)
-                            .then(() => getPendingInvites());
-                        }}
-                      >
-                        Cancel invite
-                      </ButtonText>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            )}
-          </table>
+                            })}
+                          </ul>
+                        )}
+                      </td>
+                      <td>
+                        {pendingInvite.userPublicationRoles.length === 0 ? (
+                          'No user publication roles'
+                        ) : (
+                          <ul className="govuk-!-margin-0">
+                            {pendingInvite.userPublicationRoles.map(
+                              publicationRole => {
+                                return (
+                                  <li key={publicationRole.id}>
+                                    {
+                                      // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
+                                      // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
+                                      // rework, this can be reverted to display the role without transformation.
+                                      `${
+                                        publicationRole.publication
+                                      } - ${publicationRoleDisplayName(
+                                        publicationRole.role,
+                                      )}`
+                                    }
+                                  </li>
+                                );
+                              },
+                            )}
+                          </ul>
+                        )}
+                      </td>
+                      <td>
+                        <ButtonText
+                          onClick={() => {
+                            userService
+                              .cancelInvite(pendingInvite.email)
+                              .then(() => getPendingInvites());
+                          }}
+                        >
+                          Cancel invite
+                        </ButtonText>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          </div>
         </LoadingSpinner>
       )}
     </Page>

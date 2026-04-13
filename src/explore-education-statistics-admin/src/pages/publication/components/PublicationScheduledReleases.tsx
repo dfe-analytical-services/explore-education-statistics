@@ -26,7 +26,7 @@ const PublicationScheduledReleases = ({
   }
 
   return (
-    <>
+    <div className="table-container">
       <table data-testid="publication-scheduled-releases">
         <caption className="govuk-visually-hidden">
           Table showing the scheduled releases for this publication.
@@ -61,7 +61,7 @@ const PublicationScheduledReleases = ({
         <ScheduledStagesGuidanceModal />
       </ButtonGroup>
       {showBackToTopLink && <BackToTopLink />}
-    </>
+    </div>
   );
 };
 
