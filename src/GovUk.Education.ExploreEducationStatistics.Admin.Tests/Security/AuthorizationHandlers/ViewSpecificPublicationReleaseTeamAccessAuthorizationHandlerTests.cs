@@ -10,39 +10,41 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
-public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
+public abstract class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Publication _publication;
 
-    protected PublicationReleaseSeriesAuthorizationHandlersTests()
+    protected ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlerTests()
     {
         _publication = _dataFixture.DefaultPublication();
     }
 
-    public class ClaimsTests : PublicationReleaseSeriesAuthorizationHandlersTests
+    public class ClaimsTests : ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidClaims()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<ManagePublicationReleaseSeriesRequirement, Publication>(
+            await AssertHandlerSucceedsWithCorrectClaims<
+                ViewSpecificPublicationReleaseTeamAccessRequirement,
+                Publication
+            >(
                 handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
-                claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllPublications]
+                claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllPublications]
             );
         }
     }
 
-    public class PublicationRolesTests : PublicationReleaseSeriesAuthorizationHandlersTests
+    public class PublicationRolesTests : ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlerTests
     {
         [Fact]
         public async Task SucceedsOnlyForValidPublicationRoles()
         {
             await AssertHandlerSucceedsForAnyValidPublicationRole<
-                ManagePublicationReleaseSeriesRequirement,
+                ViewSpecificPublicationReleaseTeamAccessRequirement,
                 Publication
             >(
                 handlerSupplier: BuildHandler,
@@ -53,7 +55,7 @@ public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
         }
     }
 
-    private ManagePublicationReleaseSeriesAuthorizationHandler BuildHandler(
+    private ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
@@ -68,7 +70,7 @@ public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
         mock.Setup(s =>
                 s.UserHasAnyPublicationRoleOnPublication(
                     _userId,
-                    It.IsAny<Guid>(),
+                    _publication.Id,
                     CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
                 )
             )

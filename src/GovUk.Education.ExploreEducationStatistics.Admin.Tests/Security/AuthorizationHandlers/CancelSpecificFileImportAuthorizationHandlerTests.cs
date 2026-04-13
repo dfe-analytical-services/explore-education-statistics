@@ -12,17 +12,17 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class CancelSpecificFileImportAuthorizationHandlersTests
+public class CancelSpecificFileImportAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly File _file;
 
-    protected CancelSpecificFileImportAuthorizationHandlersTests()
+    protected CancelSpecificFileImportAuthorizationHandlerTests()
     {
         _file = _dataFixture.DefaultFile();
     }
 
-    public class ClaimsTests : CancelSpecificFileImportAuthorizationHandlersTests
+    public class ClaimsTests : CancelSpecificFileImportAuthorizationHandlerTests
     {
         [Fact]
         public async Task FinishedOrAbortingImport_FailsForAllClaims()
