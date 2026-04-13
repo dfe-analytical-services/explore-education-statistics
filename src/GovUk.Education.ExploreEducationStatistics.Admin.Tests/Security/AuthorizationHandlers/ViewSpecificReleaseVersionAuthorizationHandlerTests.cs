@@ -16,7 +16,7 @@ public class ViewSpecificReleaseVersionAuthorizationHandlerTests
     private readonly DataFixture _dataFixture = new();
     private readonly ReleaseVersion _releaseVersion;
 
-    public ViewSpecificReleaseVersionAuthorizationHandlerTests()
+    protected ViewSpecificReleaseVersionAuthorizationHandlerTests()
     {
         _releaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -27,13 +27,13 @@ public class ViewSpecificReleaseVersionAuthorizationHandlerTests
     public async Task SucceedsIfReleaseVersionIsViewableByUser()
     {
         await AssertHandlerSucceedsIfReleaseVersionIsViewableByUser<ViewReleaseVersionRequirement, ReleaseVersion>(
-            handlerSupplier: SetupHandler,
+            handlerSupplier: BuildHandler,
             entity: _releaseVersion,
             releaseVersion: _releaseVersion
         );
     }
 
-    private ViewSpecificReleaseVersionAuthorizationHandler SetupHandler(
+    private ViewSpecificReleaseVersionAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
