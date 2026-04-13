@@ -1,6 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -433,6 +434,152 @@ public abstract class PublicationReleasesServiceTests
 
                 // Act
                 var outcome = await sut.GetPublicationReleases(publication.Slug);
+
+                // Assert
+                outcome.AssertNotFound();
+            }
+        }
+    }
+
+    public class GetPublicationReleaseIdsTests : PublicationReleasesServiceTests
+    {
+        [Fact]
+        public async Task WhenPublicationExistsWithPublishedReleases_ReturnsPublishedReleaseIds()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2023),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
+                    ]
+                );
+            var publishedReleaseIds = publication
+                .Releases.Where(r => r.Versions.Any(v => v.Published.HasValue))
+                .Select(r => r.Id)
+                .ToArray();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleaseIds(publicationSlug: publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(publishedReleaseIds.Length, result.Length);
+                Assert.True(ComparerUtils.SequencesAreEqualIgnoringOrder(publishedReleaseIds, result));
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseHasNoPublishedVersions_ReleaseIsExcludedFromResults()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases([
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2025),
+                ]);
+            var publishedRelease = publication.Releases.Single(r => r.Year == 2024);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleaseIds(publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                // Only the id of the release with a published version should be in the result
+                Assert.Equal([publishedRelease.Id], result);
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublicationDoesNotExist_ReturnsNotFound()
+        {
+            // Arrange
+            const string publicationSlug = "publication-that-does-not-exist";
+
+            await using var context = InMemoryContentDbContext();
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.GetPublicationReleaseIds(publicationSlug);
+
+            // Assert
+            outcome.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task WhenPublicationHasNoReleases_ReturnsNotFound()
+        {
+            // Arrange
+            Publication publication = _dataFixture.DefaultPublication();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleaseIds(publication.Slug);
+
+                // Assert
+                outcome.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublicationHasNoPublishedReleases_ReturnsNotFound()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleaseIds(publication.Slug);
 
                 // Assert
                 outcome.AssertNotFound();
