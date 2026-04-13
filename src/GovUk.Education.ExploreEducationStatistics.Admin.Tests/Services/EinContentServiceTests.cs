@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class EducationInNumbersContentServiceTests
 {
-    private readonly Guid _pageId = Guid.NewGuid();
+    private readonly Guid _pageVersionId = Guid.NewGuid();
     private readonly Guid _sectionAId = Guid.NewGuid();
     private readonly Guid _sectionBId = Guid.NewGuid();
     private readonly Guid _blockAId = Guid.NewGuid();
@@ -39,12 +39,11 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(
-                new EducationInNumbersPage
+            await context.EinPageVersions.AddAsync(
+                new EinPageVersion
                 {
-                    Id = _pageId,
-                    Title = "Test Page",
-                    Slug = "test-page",
+                    Id = _pageVersionId,
+                    EinPage = new EinPage { Title = "Test Page", Slug = "test-page" },
                     Content =
                     [
                         new EinContentSection
@@ -124,10 +123,10 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.GetPageContent(_pageId, CancellationToken.None);
+            var result = await service.GetPageContent(_pageVersionId, CancellationToken.None);
 
             var viewModel = result.AssertRight();
-            Assert.Equal(_pageId, viewModel.Id);
+            Assert.Equal(_pageVersionId, viewModel.Id);
             Assert.Equal("Test Page", viewModel.Title);
             Assert.Equal("test-page", viewModel.Slug);
 
@@ -191,14 +190,14 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(new EducationInNumbersPage { Id = _pageId });
+            await context.EinPageVersions.AddAsync(new EinPageVersion { Id = _pageVersionId });
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddSection(_pageId, 0, CancellationToken.None);
+            var result = await service.AddSection(_pageVersionId, 0, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(0, viewModel.Order);
@@ -207,7 +206,7 @@ public class EducationInNumbersContentServiceTests
 
             var dbSection = await context.EinContentSections.SingleAsync();
             Assert.Equal(viewModel.Id, dbSection.Id);
-            Assert.Equal(_pageId, dbSection.EducationInNumbersPageId);
+            Assert.Equal(_pageVersionId, dbSection.EinPageVersionId);
         }
     }
 
@@ -218,10 +217,10 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(
-                new EducationInNumbersPage
+            await context.EinPageVersions.AddAsync(
+                new EinPageVersion
                 {
-                    Id = _pageId,
+                    Id = _pageVersionId,
                     Content =
                     [
                         new EinContentSection
@@ -229,7 +228,7 @@ public class EducationInNumbersContentServiceTests
                             Id = preExistingSectionId,
                             Order = 0,
                             Heading = "PreExisting section",
-                            EducationInNumbersPageId = _pageId,
+                            EinPageVersionId = _pageVersionId,
                         },
                     ],
                 }
@@ -240,7 +239,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddSection(_pageId, 0, CancellationToken.None);
+            var result = await service.AddSection(_pageVersionId, 0, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(0, viewModel.Order);
@@ -267,10 +266,10 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(
-                new EducationInNumbersPage
+            await context.EinPageVersions.AddAsync(
+                new EinPageVersion
                 {
-                    Id = _pageId,
+                    Id = _pageVersionId,
                     Content =
                     [
                         new EinContentSection
@@ -292,7 +291,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var result = await service.UpdateSectionHeading(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 "New Heading",
                 CancellationToken.None
@@ -319,7 +318,12 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.UpdateSectionHeading(_pageId, Guid.NewGuid(), "New Heading", CancellationToken.None);
+        var result = await service.UpdateSectionHeading(
+            _pageVersionId,
+            Guid.NewGuid(),
+            "New Heading",
+            CancellationToken.None
+        );
         result.AssertNotFound();
     }
 
@@ -330,10 +334,10 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(
-                new EducationInNumbersPage
+            await context.EinPageVersions.AddAsync(
+                new EinPageVersion
                 {
-                    Id = _pageId,
+                    Id = _pageVersionId,
                     Content =
                     [
                         new EinContentSection { Id = _sectionAId, Order = 0 },
@@ -349,7 +353,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var newOrder = new List<Guid> { _sectionBId, sectionCId, _sectionAId };
-            var result = await service.ReorderSections(_pageId, newOrder, CancellationToken.None);
+            var result = await service.ReorderSections(_pageVersionId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -384,10 +388,10 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(
-                new EducationInNumbersPage
+            await context.EinPageVersions.AddAsync(
+                new EinPageVersion
                 {
-                    Id = _pageId,
+                    Id = _pageVersionId,
                     Content = [new EinContentSection { Id = _sectionAId, Order = 0 }],
                 }
             );
@@ -399,7 +403,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             // Providing a different set of IDs
             var newOrder = new List<Guid> { _sectionAId, _sectionBId };
-            var result = await service.ReorderSections(_pageId, newOrder, CancellationToken.None);
+            var result = await service.ReorderSections(_pageVersionId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(
@@ -415,10 +419,10 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(
-                new EducationInNumbersPage
+            await context.EinPageVersions.AddAsync(
+                new EinPageVersion
                 {
-                    Id = _pageId,
+                    Id = _pageVersionId,
                     Content =
                     [
                         new EinContentSection { Id = _sectionAId, Order = 0 },
@@ -433,7 +437,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteSection(_pageId, _sectionBId, CancellationToken.None);
+            var result = await service.DeleteSection(_pageVersionId, _sectionBId, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(2, viewModels.Count);
@@ -460,14 +464,14 @@ public class EducationInNumbersContentServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.EducationInNumbersPages.AddAsync(new EducationInNumbersPage { Id = _pageId });
+            await context.EinPageVersions.AddAsync(new EinPageVersion { Id = _pageVersionId });
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteSection(_pageId, Guid.NewGuid(), CancellationToken.None);
+            var result = await service.DeleteSection(_pageVersionId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }
@@ -479,7 +483,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             await context.EinContentSections.AddAsync(
-                new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId }
+                new EinContentSection { Id = _sectionAId, EinPageVersionId = _pageVersionId }
             );
             await context.SaveChangesAsync();
         }
@@ -488,7 +492,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var result = await service.AddBlock(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 EinBlockType.HtmlBlock,
                 2,
@@ -516,7 +520,7 @@ public class EducationInNumbersContentServiceTests
                 new EinContentSection
                 {
                     Id = _sectionAId,
-                    EducationInNumbersPageId = _pageId,
+                    EinPageVersionId = _pageVersionId,
                     Content = [new EinHtmlBlock { Id = _blockAId, Order = 0 }],
                 }
             );
@@ -528,7 +532,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             // order is null, so should be added to the end
             var result = await service.AddBlock(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 EinBlockType.HtmlBlock,
                 null,
@@ -557,7 +561,7 @@ public class EducationInNumbersContentServiceTests
                 new EinContentSection
                 {
                     Id = _sectionAId,
-                    EducationInNumbersPageId = _pageId,
+                    EinPageVersionId = _pageVersionId,
                     Content = [new EinHtmlBlock { Id = _blockAId, Order = 0 }],
                 }
             );
@@ -569,7 +573,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             // order is null, so should be added to the end
             var result = await service.AddBlock(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 EinBlockType.TileGroupBlock,
                 null,
@@ -599,7 +603,7 @@ public class EducationInNumbersContentServiceTests
                 new EinContentSection
                 {
                     Id = _sectionAId,
-                    EducationInNumbersPageId = _pageId,
+                    EinPageVersionId = _pageVersionId,
                     Content =
                     [
                         new EinHtmlBlock
@@ -618,7 +622,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var result = await service.AddBlock(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 EinBlockType.HtmlBlock,
                 0,
@@ -654,7 +658,7 @@ public class EducationInNumbersContentServiceTests
                 new EinContentSection
                 {
                     Id = _sectionAId,
-                    EducationInNumbersPageId = _pageId,
+                    EinPageVersionId = _pageVersionId,
                     Content = [new EinHtmlBlock { Id = _blockAId, Body = "Old body" }],
                 }
             );
@@ -666,7 +670,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
             var result = await service.UpdateHtmlBlock(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 _blockAId,
                 request,
@@ -693,7 +697,7 @@ public class EducationInNumbersContentServiceTests
         var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
 
         var result = await service.UpdateHtmlBlock(
-            _pageId,
+            _pageVersionId,
             _sectionAId,
             Guid.NewGuid(),
             request,
@@ -713,7 +717,7 @@ public class EducationInNumbersContentServiceTests
                 {
                     Id = _blockAId,
                     Title = "Old title",
-                    EinContentSection = new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { Id = _sectionAId, EinPageVersionId = _pageVersionId },
                     Tiles = [],
                 }
             );
@@ -725,7 +729,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
             var result = await service.UpdateTileGroupBlock(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 _blockAId,
                 request,
@@ -759,7 +763,7 @@ public class EducationInNumbersContentServiceTests
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
 
             var result = await service.UpdateTileGroupBlock(
-                _pageId,
+                _pageVersionId,
                 _sectionAId,
                 Guid.NewGuid(),
                 request,
@@ -780,7 +784,7 @@ public class EducationInNumbersContentServiceTests
                 new EinContentSection
                 {
                     Id = _sectionAId,
-                    EducationInNumbersPageId = _pageId,
+                    EinPageVersionId = _pageVersionId,
                     Content =
                     [
                         new EinHtmlBlock { Id = _blockAId, Order = 0 },
@@ -796,7 +800,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var newOrder = new List<Guid> { _blockBId, blockCId, _blockAId };
-            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder, CancellationToken.None);
+            var result = await service.ReorderBlocks(_pageVersionId, _sectionAId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -819,7 +823,7 @@ public class EducationInNumbersContentServiceTests
                 new EinContentSection
                 {
                     Id = _sectionAId,
-                    EducationInNumbersPageId = _pageId,
+                    EinPageVersionId = _pageVersionId,
                     Content = [new EinHtmlBlock { Id = _blockAId, Order = 0 }],
                 }
             );
@@ -831,7 +835,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
 
             var newOrder = new List<Guid> { _blockAId, _blockBId }; // _blockBId does not exist in the section
-            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder, CancellationToken.None);
+            var result = await service.ReorderBlocks(_pageVersionId, _sectionAId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedBlockIdsDifferFromActualBlockIds);
@@ -849,7 +853,7 @@ public class EducationInNumbersContentServiceTests
                 new EinContentSection
                 {
                     Id = _sectionAId,
-                    EducationInNumbersPageId = _pageId,
+                    EinPageVersionId = _pageVersionId,
                     Content =
                     [
                         new EinHtmlBlock { Id = _blockAId, Order = 0 },
@@ -864,7 +868,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteBlock(_pageId, _sectionAId, _blockBId, CancellationToken.None);
+            var result = await service.DeleteBlock(_pageVersionId, _sectionAId, _blockBId, CancellationToken.None);
 
             result.AssertRight();
 
@@ -886,7 +890,7 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.DeleteBlock(_pageId, Guid.NewGuid(), _blockAId, CancellationToken.None);
+        var result = await service.DeleteBlock(_pageVersionId, Guid.NewGuid(), _blockAId, CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -897,7 +901,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             await context.EinContentSections.AddAsync(
-                new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId }
+                new EinContentSection { Id = _sectionAId, EinPageVersionId = _pageVersionId }
             );
             await context.SaveChangesAsync();
         }
@@ -905,7 +909,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteBlock(_pageId, _sectionAId, Guid.NewGuid(), CancellationToken.None);
+            var result = await service.DeleteBlock(_pageVersionId, _sectionAId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }
@@ -920,7 +924,7 @@ public class EducationInNumbersContentServiceTests
                 new EinTileGroupBlock
                 {
                     Id = _blockAId,
-                    EinContentSection = new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { Id = _sectionAId, EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -930,7 +934,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var result = await service.AddTile(
-                _pageId,
+                _pageVersionId,
                 _blockAId,
                 EinTileType.FreeTextStatTile,
                 1,
@@ -961,7 +965,7 @@ public class EducationInNumbersContentServiceTests
                 {
                     Id = _blockAId,
                     Tiles = [new EinFreeTextStatTile { Id = _tileAId, Order = 0 }],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -972,7 +976,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             // order is null, so should be added to the end of the list
             var result = await service.AddTile(
-                _pageId,
+                _pageVersionId,
                 _blockAId,
                 EinTileType.FreeTextStatTile,
                 null,
@@ -998,7 +1002,7 @@ public class EducationInNumbersContentServiceTests
                 new EinTileGroupBlock
                 {
                     Id = _blockAId,
-                    EinContentSection = new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { Id = _sectionAId, EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -1008,7 +1012,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var result = await service.AddTile(
-                _pageId,
+                _pageVersionId,
                 _blockAId,
                 EinTileType.ApiQueryStatTile,
                 1,
@@ -1058,7 +1062,7 @@ public class EducationInNumbersContentServiceTests
                             LinkText = "Old link text",
                         },
                     ],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -1075,7 +1079,12 @@ public class EducationInNumbersContentServiceTests
                 LinkUrl = "http://new.url",
                 LinkText = "New link text",
             };
-            var result = await service.UpdateFreeTextStatTile(_pageId, _tileAId, request, CancellationToken.None);
+            var result = await service.UpdateFreeTextStatTile(
+                _pageVersionId,
+                _tileAId,
+                request,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             var freeTextTile = Assert.IsType<EinFreeTextStatTileViewModel>(viewModel);
@@ -1101,7 +1110,12 @@ public class EducationInNumbersContentServiceTests
         var service = BuildService(context);
         var request = new EinFreeTextStatTileUpdateRequest();
 
-        var result = await service.UpdateFreeTextStatTile(_pageId, Guid.NewGuid(), request, CancellationToken.None);
+        var result = await service.UpdateFreeTextStatTile(
+            _pageVersionId,
+            Guid.NewGuid(),
+            request,
+            CancellationToken.None
+        );
         result.AssertNotFound();
     }
 
@@ -1157,7 +1171,7 @@ public class EducationInNumbersContentServiceTests
                             DecimalPlaces = null,
                         },
                     ],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await contentDbContext.SaveChangesAsync();
@@ -1294,7 +1308,12 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+            var result = await service.UpdateApiQueryStatTile(
+                _pageVersionId,
+                _tileAId,
+                request,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
@@ -1383,7 +1402,7 @@ public class EducationInNumbersContentServiceTests
                             DecimalPlaces = null,
                         },
                     ],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await contentDbContext.SaveChangesAsync();
@@ -1449,7 +1468,12 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+            var result = await service.UpdateApiQueryStatTile(
+                _pageVersionId,
+                _tileAId,
+                request,
+                CancellationToken.None
+            );
 
             var actionResult = result.AssertLeft();
             Assert.Equal(
@@ -1511,7 +1535,7 @@ public class EducationInNumbersContentServiceTests
                             DecimalPlaces = null,
                         },
                     ],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await contentDbContext.SaveChangesAsync();
@@ -1608,7 +1632,12 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+            var result = await service.UpdateApiQueryStatTile(
+                _pageVersionId,
+                _tileAId,
+                request,
+                CancellationToken.None
+            );
 
             var actionResult = result.AssertLeft();
             Assert.Equal(
@@ -1670,7 +1699,7 @@ public class EducationInNumbersContentServiceTests
                             DecimalPlaces = null,
                         },
                     ],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await contentDbContext.SaveChangesAsync();
@@ -1793,7 +1822,12 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
+            var result = await service.UpdateApiQueryStatTile(
+                _pageVersionId,
+                _tileAId,
+                request,
+                CancellationToken.None
+            );
 
             var actionResult = result.AssertLeft();
             Assert.Equal(
@@ -1820,7 +1854,7 @@ public class EducationInNumbersContentServiceTests
                         new EinFreeTextStatTile { Id = _tileBId, Order = 1 },
                         new EinFreeTextStatTile { Id = tileCId, Order = 2 },
                     ],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -1830,7 +1864,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var newOrder = new List<Guid> { _tileBId, tileCId, _tileAId };
-            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder, CancellationToken.None);
+            var result = await service.ReorderTiles(_pageVersionId, _blockAId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -1859,7 +1893,7 @@ public class EducationInNumbersContentServiceTests
                 {
                     Id = _blockAId,
                     Tiles = [new EinFreeTextStatTile { Id = _tileAId, Order = 0 }],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -1870,7 +1904,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
 
             var newOrder = new List<Guid> { _tileAId, _tileBId }; // _tileBId does not exist
-            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder, CancellationToken.None);
+            var result = await service.ReorderTiles(_pageVersionId, _blockAId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedTileIdsDifferFromActualTileIds);
@@ -1894,7 +1928,7 @@ public class EducationInNumbersContentServiceTests
                         new EinFreeTextStatTile { Id = _tileBId, Order = 1 },
                         new EinFreeTextStatTile { Id = tileCId, Order = 2 },
                     ],
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -1903,7 +1937,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteTile(_pageId, _blockAId, _tileBId, CancellationToken.None);
+            var result = await service.DeleteTile(_pageVersionId, _blockAId, _tileBId, CancellationToken.None);
 
             result.AssertRight();
 
@@ -1925,7 +1959,7 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.DeleteTile(_pageId, Guid.NewGuid(), _tileAId, CancellationToken.None);
+        var result = await service.DeleteTile(_pageVersionId, Guid.NewGuid(), _tileAId, CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -1939,7 +1973,7 @@ public class EducationInNumbersContentServiceTests
                 new EinTileGroupBlock
                 {
                     Id = _blockAId,
-                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                    EinContentSection = new EinContentSection { EinPageVersionId = _pageVersionId },
                 }
             );
             await context.SaveChangesAsync();
@@ -1948,7 +1982,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteTile(_pageId, _blockAId, Guid.NewGuid(), CancellationToken.None);
+            var result = await service.DeleteTile(_pageVersionId, _blockAId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }

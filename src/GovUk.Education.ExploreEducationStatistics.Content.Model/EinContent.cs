@@ -14,8 +14,8 @@ public class EinContentSection
 
     [MaxLength(255)]
     public string Heading { get; set; } = string.Empty;
-    public Guid EducationInNumbersPageId { get; set; }
-    public EducationInNumbersPage EducationInNumbersPage { get; set; } = null!;
+    public Guid EinPageVersionId { get; set; }
+    public EinPageVersion EinPageVersion { get; set; } = null!;
     public List<EinContentBlock> Content { get; set; } = [];
 }
 
