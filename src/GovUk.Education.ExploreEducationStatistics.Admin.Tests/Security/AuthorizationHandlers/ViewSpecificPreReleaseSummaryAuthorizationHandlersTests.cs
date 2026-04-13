@@ -32,7 +32,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         public async Task SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<ViewSpecificPreReleaseSummaryRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _releaseVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllReleases]
@@ -66,7 +66,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(false);
 
-            var handler = SetupHandler(authorizationHandlerService.Object);
+            var handler = BuildHandler(authorizationHandlerService.Object);
 
             await handler.HandleAsync(authContext);
 
@@ -97,7 +97,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(false);
 
-            var handler = SetupHandler(authorizationHandlerService.Object);
+            var handler = BuildHandler(authorizationHandlerService.Object);
 
             await handler.HandleAsync(authContext);
 
@@ -131,7 +131,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(true);
 
-            var handler = SetupHandler(authorizationHandlerService.Object);
+            var handler = BuildHandler(authorizationHandlerService.Object);
 
             await handler.HandleAsync(authContext);
 
@@ -162,7 +162,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(false);
 
-            var handler = SetupHandler(authorizationHandlerService.Object);
+            var handler = BuildHandler(authorizationHandlerService.Object);
 
             await handler.HandleAsync(authContext);
 
@@ -170,7 +170,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         }
     }
 
-    private ViewSpecificPreReleaseSummaryAuthorizationHandler SetupHandler(
+    private ViewSpecificPreReleaseSummaryAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

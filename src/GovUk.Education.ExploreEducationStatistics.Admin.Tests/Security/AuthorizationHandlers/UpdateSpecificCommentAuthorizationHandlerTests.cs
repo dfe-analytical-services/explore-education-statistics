@@ -89,7 +89,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 await AssertHandlerSucceedsWithCorrectClaims<UpdateSpecificCommentRequirement, Comment>(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: _commentCreatedBySameUser,
                     userId: _userId,
                     claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases]
@@ -111,7 +111,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 await AssertHandlerFailsForAllClaims<UpdateSpecificCommentRequirement, Comment>(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: _commentCreatedByDifferentUser,
                     userId: _userId
                 );
@@ -132,7 +132,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 await AssertHandlerFailsForAllClaims<UpdateSpecificCommentRequirement, Comment>(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: _commentCreatedBySameUser,
                     userId: _userId
                 );
@@ -153,7 +153,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 await AssertHandlerFailsForAllClaims<UpdateSpecificCommentRequirement, Comment>(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: _commentCreatedByDifferentUser,
                     userId: _userId
                 );
@@ -177,7 +177,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(context, authorizationHandlerService);
+                    BuildHandler(context, authorizationHandlerService);
 
                 await AssertHandlerSucceedsForAnyValidPublicationRole<UpdateSpecificCommentRequirement, Comment>(
                     handlerSupplier: handlerSuppler,
@@ -220,7 +220,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
                     Comment
                 >(user, _commentCreatedByDifferentUser);
 
-                var handler = SetupHandler(context, authorizationHandlerService.Object);
+                var handler = BuildHandler(context, authorizationHandlerService.Object);
 
                 await handler.HandleAsync(authContext);
 
@@ -242,7 +242,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(context, authorizationHandlerService);
+                    BuildHandler(context, authorizationHandlerService);
 
                 await AssertHandlerFailsWithoutCheckingRoles<UpdateSpecificCommentRequirement, Comment>(
                     handlerSupplier: handlerSuppler,
@@ -266,7 +266,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             await using (var context = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(context, authorizationHandlerService);
+                    BuildHandler(context, authorizationHandlerService);
 
                 await AssertHandlerFailsWithoutCheckingRoles<UpdateSpecificCommentRequirement, Comment>(
                     handlerSupplier: handlerSuppler,
@@ -277,7 +277,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
         }
     }
 
-    private UpdateSpecificCommentAuthorizationHandler SetupHandler(
+    private UpdateSpecificCommentAuthorizationHandler BuildHandler(
         ContentDbContext? contentDbContext = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )

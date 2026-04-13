@@ -34,7 +34,7 @@ public abstract class AdoptMethodologyForSpecificPublicationAuthorizationHandler
                 AdoptMethodologyForSpecificPublicationRequirement,
                 Publication
             >(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.AdoptAnyMethodology]
@@ -51,7 +51,7 @@ public abstract class AdoptMethodologyForSpecificPublicationAuthorizationHandler
                 AdoptMethodologyForSpecificPublicationRequirement,
                 Publication
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _publication,
                 publicationId: _publication.Id,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -59,7 +59,7 @@ public abstract class AdoptMethodologyForSpecificPublicationAuthorizationHandler
         }
     }
 
-    private AdoptMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
+    private AdoptMethodologyForSpecificPublicationAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

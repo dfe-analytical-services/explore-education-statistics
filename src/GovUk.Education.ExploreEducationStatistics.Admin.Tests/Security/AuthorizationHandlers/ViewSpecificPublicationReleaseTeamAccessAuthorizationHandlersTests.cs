@@ -30,7 +30,7 @@ public abstract class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandl
                 ViewSpecificPublicationReleaseTeamAccessRequirement,
                 Publication
             >(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllPublications]
@@ -47,7 +47,7 @@ public abstract class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandl
                 ViewSpecificPublicationReleaseTeamAccessRequirement,
                 Publication
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _publication,
                 publicationId: _publication.Id,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -55,7 +55,7 @@ public abstract class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandl
         }
     }
 
-    private ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler SetupHandler(
+    private ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
