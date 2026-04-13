@@ -15,58 +15,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 public class CancelSpecificFileImportAuthorizationHandlersTests
 {
     private readonly DataFixture _dataFixture = new();
-    private readonly File file;
+    private readonly File _file;
 
-    public CancelSpecificFileImportAuthorizationHandlersTests()
+    protected CancelSpecificFileImportAuthorizationHandlersTests()
     {
-        file = _dataFixture.DefaultFile();
+        _file = _dataFixture.DefaultFile();
     }
 
-    [Fact]
-    public async Task FinishedOrAbortingImport_Fails()
+    public class ClaimsTests : CancelSpecificFileImportAuthorizationHandlersTests
     {
-        var finishedOrAbortingStatuses = EnumUtil
-            .GetEnums<DataImportStatus>()
-            .Where(status => status.IsFinishedOrAborting())
-            .ToList();
-
-        foreach (var status in finishedOrAbortingStatuses)
+        [Fact]
+        public async Task FinishedOrAbortingImport_FailsForAllClaims()
         {
-            var importRepository = new Mock<IDataImportRepository>();
-            importRepository.Setup(s => s.GetStatusByFileId(file.Id)).ReturnsAsync(status);
+            var finishedOrAbortingStatuses = EnumUtil
+                .GetEnums<DataImportStatus>()
+                .Where(status => status.IsFinishedOrAborting())
+                .ToList();
 
-            // Assert that no users can cancel a finished or aborting Import
-            await AssertHandlerSucceedsWithCorrectClaims<CancelSpecificFileImportRequirement, File>(
-                handler: SetupHandler(importRepository.Object),
-                entity: file,
-                claimsExpectedToSucceed: []
-            );
+            foreach (var status in finishedOrAbortingStatuses)
+            {
+                var importRepository = new Mock<IDataImportRepository>();
+                importRepository.Setup(s => s.GetStatusByFileId(_file.Id)).ReturnsAsync(status);
+
+                // Assert that no users can cancel a finished or aborting Import
+                await AssertHandlerFailsForAllClaims<CancelSpecificFileImportRequirement, File>(
+                    handler: BuildHandler(importRepository.Object),
+                    entity: _file
+                );
+            }
+        }
+
+        [Fact]
+        public async Task HealthyOngoingImport_SucceedsOnlyForValidClaims()
+        {
+            var nonFinishedOrAbortingStatuses = EnumUtil
+                .GetEnums<DataImportStatus>()
+                .Where(status => !status.IsFinishedOrAborting())
+                .ToList();
+
+            foreach (var status in nonFinishedOrAbortingStatuses)
+            {
+                var importRepository = new Mock<IDataImportRepository>();
+                importRepository.Setup(s => s.GetStatusByFileId(_file.Id)).ReturnsAsync(status);
+
+                // Assert that users with the CancelAllFileImports claim can cancel a non-finished-or-aborting Import
+                await AssertHandlerSucceedsWithCorrectClaims<CancelSpecificFileImportRequirement, File>(
+                    handler: BuildHandler(importRepository.Object),
+                    entity: _file,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.CancelAllFileImports]
+                );
+            }
         }
     }
 
-    [Fact]
-    public async Task HealthyOngoingImport_SucceedsOnlyForValidClaims()
-    {
-        var nonFinishedOrAbortingStatuses = EnumUtil
-            .GetEnums<DataImportStatus>()
-            .Where(status => !status.IsFinishedOrAborting())
-            .ToList();
-
-        foreach (var status in nonFinishedOrAbortingStatuses)
-        {
-            var importRepository = new Mock<IDataImportRepository>();
-            importRepository.Setup(s => s.GetStatusByFileId(file.Id)).ReturnsAsync(status);
-
-            // Assert that users with the CancelAllFileImports claim can cancel a non-finished-or-aborting Import
-            await AssertHandlerSucceedsWithCorrectClaims<CancelSpecificFileImportRequirement, File>(
-                handler: SetupHandler(importRepository.Object),
-                entity: file,
-                claimsExpectedToSucceed: [SecurityClaimTypes.CancelAllFileImports]
-            );
-        }
-    }
-
-    private CancelSpecificFileImportAuthorizationHandler SetupHandler(
+    private CancelSpecificFileImportAuthorizationHandler BuildHandler(
         IDataImportRepository? dataImportRepository = null
     ) => new(dataImportRepository ?? Mock.Of<IDataImportRepository>(MockBehavior.Strict));
 }
