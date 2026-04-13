@@ -68,7 +68,7 @@ public static class MethodologyVersionGeneratorExtensions
 
     public static Generator<MethodologyVersion> WithPreviousVersionId(
         this Generator<MethodologyVersion> generator,
-        Guid previousVersionId
+        Guid? previousVersionId
     ) => generator.ForInstance(s => s.SetPreviousVersionId(previousVersionId));
 
     public static Generator<MethodologyVersion> WithVersion(
@@ -149,7 +149,7 @@ public static class MethodologyVersionGeneratorExtensions
 
     private static InstanceSetters<MethodologyVersion> SetPreviousVersionId(
         this InstanceSetters<MethodologyVersion> setters,
-        Guid previousVersionId
+        Guid? previousVersionId
     ) => setters.Set(mv => mv.PreviousVersionId, previousVersionId);
 
     private static InstanceSetters<MethodologyVersion> SetVersion(

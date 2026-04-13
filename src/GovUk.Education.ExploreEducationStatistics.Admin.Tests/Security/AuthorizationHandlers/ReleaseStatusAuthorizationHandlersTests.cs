@@ -47,7 +47,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             public async Task ReleaseVersionPublished_FailsForAllClaims()
             {
                 await AssertHandlerFailsForAllClaims<MarkReleaseAsDraftRequirement, ReleaseVersion>(
-                    handler: SetupHandler(),
+                    handler: BuildHandler(),
                     entity: _publishedReleaseVersion,
                     userId: _userId
                 );
@@ -70,10 +70,10 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
                             }
                         )
                     )
-                    .ReturnsAsync([new()]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
                 await AssertHandlerFailsForAllClaims<MarkReleaseAsDraftRequirement, ReleaseVersion>(
-                    handler: SetupHandler(releasePublishingStatusRepository.Object),
+                    handler: BuildHandler(releasePublishingStatusRepository.Object),
                     entity: _draftReleaseVersion,
                     userId: _userId
                 );
@@ -83,7 +83,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             public async Task UnpublishedReleaseVersion_SucceedsOnlyForValidClaims()
             {
                 await AssertHandlerSucceedsWithCorrectClaims<MarkReleaseAsDraftRequirement, ReleaseVersion>(
-                    handler: SetupHandler(),
+                    handler: BuildHandler(),
                     entity: _draftReleaseVersion,
                     userId: _userId,
                     claimsExpectedToSucceed: [SecurityClaimTypes.MarkAllReleasesAsDraft]
@@ -97,7 +97,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             public async Task ReleaseVersionPublished_FailsWithoutCheckingRoles()
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
                 await AssertHandlerFailsWithoutCheckingRoles<MarkReleaseAsDraftRequirement, ReleaseVersion>(
                     handlerSupplier: handlerSuppler,
@@ -122,10 +122,10 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
                             }
                         )
                     )
-                    .ReturnsAsync([new()]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(
+                    BuildHandler(
                         releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                         authorizationHandlerService: authorizationHandlerService
                     );
@@ -140,7 +140,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             public async Task UnpublishedDraftReleaseVersion_SucceedsOnlyForValidPublicationRoles()
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
                 await AssertHandlerSucceedsForAnyValidPublicationRole<MarkReleaseAsDraftRequirement, ReleaseVersion>(
                     handlerSupplier: handlerSuppler,
@@ -154,7 +154,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             public async Task UnpublishedApprovedReleaseVersion_SucceedsOnlyForValidPublicationRoles()
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
                 await AssertHandlerSucceedsForAnyValidPublicationRole<MarkReleaseAsDraftRequirement, ReleaseVersion>(
                     handlerSupplier: handlerSuppler,
@@ -165,7 +165,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
             }
         }
 
-        private MarkReleaseAsDraftAuthorizationHandler SetupHandler(
+        private MarkReleaseAsDraftAuthorizationHandler BuildHandler(
             IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
             IAuthorizationHandlerService? authorizationHandlerService = null
         )
@@ -208,7 +208,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
                             }
                         )
                     )
-                    .ReturnsAsync([new()]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
                 await AssertHandlerFailsForAllClaims<MarkReleaseAsHigherLevelReviewRequirement, ReleaseVersion>(
                     handler: SetupHandler(releasePublishingStatusRepository.Object),
@@ -260,7 +260,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
                             }
                         )
                     )
-                    .ReturnsAsync([new()]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
                     SetupHandler(
@@ -352,7 +352,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
                             }
                         )
                     )
-                    .ReturnsAsync([new()]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
                 await AssertHandlerFailsForAllClaims<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
                     handler: SetupHandler(releasePublishingStatusRepository.Object),
@@ -404,7 +404,7 @@ public abstract class ReleaseStatusAuthorizationHandlersTests
                             }
                         )
                     )
-                    .ReturnsAsync([new()]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
                     SetupHandler(

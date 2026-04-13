@@ -39,7 +39,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         public async Task UnpublishedVersion_FailsForAllClaims()
         {
             await AssertHandlerFailsForAllClaims<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftReleaseVersion,
                 userId: _userId
             );
@@ -54,7 +54,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             await AssertHandlerFailsForAllClaims<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(releaseVersionRepository.Object),
+                handler: BuildHandler(releaseVersionRepository.Object),
                 entity: _publishedReleaseVersion,
                 userId: _userId
             );
@@ -64,8 +64,8 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         public async Task PublishedAndLatestVersion_SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
-                // IReleaseVersionRespository.IsLatestReleaseVersion has a default setup of returning 'true'
-                handler: SetupHandler(),
+                // IReleaseVersionRepository.IsLatestReleaseVersion has a default setup of returning 'true'
+                handler: BuildHandler(),
                 entity: _publishedReleaseVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.MakeAmendmentsOfAllReleases]
@@ -79,7 +79,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         public async Task UnpublishedVersion_FailsWithoutCheckingRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerFailsWithoutCheckingRoles<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
                 handlerSupplier: handlerSuppler,
@@ -96,7 +96,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(releaseVersionRepository.Object, authorizationHandlerService);
+                BuildHandler(releaseVersionRepository.Object, authorizationHandlerService);
 
             await AssertHandlerFailsWithoutCheckingRoles<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>(
                 handlerSupplier: handlerSuppler,
@@ -108,7 +108,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         public async Task PublishedAndLatestVersion_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 MakeAmendmentOfSpecificReleaseRequirement,
@@ -122,7 +122,7 @@ public abstract class MakeAmendmentOfSpecificReleaseAuthorizationHandlerTests
         }
     }
 
-    private MakeAmendmentOfSpecificReleaseAuthorizationHandler SetupHandler(
+    private MakeAmendmentOfSpecificReleaseAuthorizationHandler BuildHandler(
         IReleaseVersionRepository? releaseVersionRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )

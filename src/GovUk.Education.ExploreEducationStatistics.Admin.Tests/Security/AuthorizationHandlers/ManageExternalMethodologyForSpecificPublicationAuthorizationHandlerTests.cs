@@ -31,7 +31,7 @@ public abstract class ManageExternalMethodologyForSpecificPublicationAuthorizati
                 ManageExternalMethodologyForSpecificPublicationRequirement,
                 Publication
             >(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.CreateAnyMethodology]
@@ -48,7 +48,7 @@ public abstract class ManageExternalMethodologyForSpecificPublicationAuthorizati
                 ManageExternalMethodologyForSpecificPublicationRequirement,
                 Publication
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _publication,
                 publicationId: _publication.Id,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -56,7 +56,7 @@ public abstract class ManageExternalMethodologyForSpecificPublicationAuthorizati
         }
     }
 
-    private ManageExternalMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
+    private ManageExternalMethodologyForSpecificPublicationAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

@@ -28,7 +28,7 @@ public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
         public async Task SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<ManagePublicationReleaseSeriesRequirement, Publication>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllPublications]
@@ -45,7 +45,7 @@ public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
                 ManagePublicationReleaseSeriesRequirement,
                 Publication
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _publication,
                 publicationId: _publication.Id,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -53,7 +53,7 @@ public abstract class PublicationReleaseSeriesAuthorizationHandlersTests
         }
     }
 
-    private ManagePublicationReleaseSeriesAuthorizationHandler SetupHandler(
+    private ManagePublicationReleaseSeriesAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

@@ -17,7 +17,7 @@ public abstract class ViewReleaseStatusHistoryAuthorizationHandlerTests
     private readonly Guid _userId = Guid.NewGuid();
     private readonly ReleaseVersion _releaseVersion;
 
-    public ViewReleaseStatusHistoryAuthorizationHandlerTests()
+    protected ViewReleaseStatusHistoryAuthorizationHandlerTests()
     {
         _releaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -30,7 +30,7 @@ public abstract class ViewReleaseStatusHistoryAuthorizationHandlerTests
         public async Task SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<ViewReleaseStatusHistoryRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _releaseVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllReleases]
@@ -44,7 +44,7 @@ public abstract class ViewReleaseStatusHistoryAuthorizationHandlerTests
         public async Task SucceedsOnlyForValidPublicationRoles()
         {
             await AssertHandlerSucceedsForAnyValidPublicationRole<ViewReleaseStatusHistoryRequirement, ReleaseVersion>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _releaseVersion,
                 publicationId: _releaseVersion.Release.PublicationId,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -52,7 +52,7 @@ public abstract class ViewReleaseStatusHistoryAuthorizationHandlerTests
         }
     }
 
-    private ViewReleaseStatusHistoryAuthorizationHandler SetupHandler(
+    private ViewReleaseStatusHistoryAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

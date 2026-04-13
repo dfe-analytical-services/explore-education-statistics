@@ -15,19 +15,28 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
-    private readonly MethodologyVersion _draftReviewMethodologyVersion;
+    private readonly MethodologyVersion _draftMethodologyVersion;
+    private readonly MethodologyVersion _higherReviewMethodologyVersion;
     private readonly MethodologyVersion _approvedMethodologyVersion;
     private readonly Publication _owningPublication;
 
+    private IReadOnlyList<MethodologyVersion> AllTypesOfMethodologyVersion =>
+        [_draftMethodologyVersion, _higherReviewMethodologyVersion, _approvedMethodologyVersion];
+
     protected MarkMethodologyAsHigherReviewAuthorizationHandlerTests()
     {
-        _draftReviewMethodologyVersion = _dataFixture
+        _draftMethodologyVersion = _dataFixture
             .DefaultMethodologyVersion()
             .WithApprovalStatus(MethodologyApprovalStatus.Draft);
 
+        _higherReviewMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview);
+
         _approvedMethodologyVersion = _dataFixture
             .DefaultMethodologyVersion()
-            .WithApprovalStatus(MethodologyApprovalStatus.Approved);
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved)
+            .WithPublished(DateTime.UtcNow);
 
         _owningPublication = _dataFixture.DefaultPublication();
     }
@@ -37,15 +46,19 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         [Fact]
         public async Task NonLatestPublishedMethodologyVersion_SucceedsOnlyForValidClaims()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<
-                MarkMethodologyAsHigherLevelReviewRequirement,
-                MethodologyVersion
-            >(
-                handler: SetupHandler(),
-                entity: _draftReviewMethodologyVersion,
-                userId: _userId,
-                claimsExpectedToSucceed: [SecurityClaimTypes.SubmitAllMethodologiesToHigherReview]
-            );
+            // Should succeed for valid claims regardless of the methodology version's approval status, as long as it's not the latest published version
+            foreach (var methodologyVersion in AllTypesOfMethodologyVersion)
+            {
+                await AssertHandlerSucceedsWithCorrectClaims<
+                    MarkMethodologyAsHigherLevelReviewRequirement,
+                    MethodologyVersion
+                >(
+                    handler: BuildHandler(),
+                    entity: methodologyVersion,
+                    userId: _userId,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.SubmitAllMethodologiesToHigherReview]
+                );
+            }
         }
 
         [Fact]
@@ -53,31 +66,31 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         {
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             methodologyVersionRepository
-                .Setup(s => s.IsLatestPublishedVersion(_draftReviewMethodologyVersion))
+                .Setup(s => s.IsLatestPublishedVersion(_approvedMethodologyVersion))
                 .ReturnsAsync(true);
 
             await AssertHandlerFailsForAllClaims<MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>(
-                handler: SetupHandler(methodologyVersionRepository.Object),
-                entity: _draftReviewMethodologyVersion,
+                handler: BuildHandler(methodologyVersionRepository.Object),
+                entity: _approvedMethodologyVersion,
                 userId: _userId
             );
         }
     }
 
-    public abstract class PublicationRolesTests : MarkMethodologyAsHigherReviewAuthorizationHandlerTests
+    public class PublicationRolesTests : MarkMethodologyAsHigherReviewAuthorizationHandlerTests
     {
         [Fact]
         public async Task DraftMethodologyVersion_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 MarkMethodologyAsHigherLevelReviewRequirement,
                 MethodologyVersion
             >(
                 handlerSupplier: handlerSuppler,
-                entity: _draftReviewMethodologyVersion,
+                entity: _draftMethodologyVersion,
                 publicationId: _owningPublication.Id,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
             );
@@ -87,7 +100,7 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         public async Task ApprovedMethodologyVersion_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 MarkMethodologyAsHigherLevelReviewRequirement,
@@ -101,7 +114,7 @@ public abstract class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         }
     }
 
-    private MarkMethodologyAsHigherLevelReviewAuthorizationHandler SetupHandler(
+    private MarkMethodologyAsHigherLevelReviewAuthorizationHandler BuildHandler(
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null

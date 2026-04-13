@@ -37,7 +37,7 @@ public abstract class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTest
                 MakeAmendmentOfSpecificMethodologyRequirement,
                 MethodologyVersion
             >(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _methodologyVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.MakeAmendmentsOfAllMethodologies]
@@ -53,7 +53,7 @@ public abstract class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTest
                 .ReturnsAsync(false);
 
             await AssertHandlerFailsForAllClaims<MakeAmendmentOfSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(methodologyVersionRepository.Object),
+                handler: BuildHandler(methodologyVersionRepository.Object),
                 entity: _methodologyVersion,
                 userId: _userId
             );
@@ -66,7 +66,7 @@ public abstract class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTest
         public async Task LatestPublishedMethodologyVersion_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 MakeAmendmentOfSpecificMethodologyRequirement,
@@ -88,7 +88,7 @@ public abstract class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTest
                 .ReturnsAsync(false);
 
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(
+                BuildHandler(
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     authorizationHandlerService: authorizationHandlerService
                 );
@@ -100,7 +100,7 @@ public abstract class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTest
         }
     }
 
-    private MakeAmendmentOfSpecificMethodologyAuthorizationHandler SetupHandler(
+    private MakeAmendmentOfSpecificMethodologyAuthorizationHandler BuildHandler(
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null

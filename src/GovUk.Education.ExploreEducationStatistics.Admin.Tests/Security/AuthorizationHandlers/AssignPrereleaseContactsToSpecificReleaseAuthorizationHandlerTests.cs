@@ -43,7 +43,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 AssignPrereleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftReleaseVersion,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases],
                 userId: _userId
@@ -60,7 +60,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 AssignPrereleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _approvedReleaseVersion,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases],
                 userId: _userId
@@ -77,7 +77,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 AssignPrereleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _draftReleaseVersion,
                 publicationId: _draftReleaseVersion.Release.PublicationId,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -91,7 +91,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
                 AssignPrereleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _approvedReleaseVersion,
                 publicationId: _approvedReleaseVersion.Release.PublicationId,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -99,7 +99,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
         }
     }
 
-    private AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler SetupHandler(
+    private AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

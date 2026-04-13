@@ -15,7 +15,7 @@ public abstract class ViewSpecificPublicationAuthorizationHandlersTests
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Publication _publication;
 
-    public ViewSpecificPublicationAuthorizationHandlersTests()
+    protected ViewSpecificPublicationAuthorizationHandlersTests()
     {
         _publication = _dataFixture.DefaultPublication();
     }
@@ -26,7 +26,7 @@ public abstract class ViewSpecificPublicationAuthorizationHandlersTests
         public async Task SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<ViewSpecificPublicationRequirement, Publication>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllPublications]
@@ -40,14 +40,14 @@ public abstract class ViewSpecificPublicationAuthorizationHandlersTests
         public async Task SucceedsOnlyForValidPublicationRoles()
         {
             await AssertHandlerSucceedsIfUserHasAnyRoleOnPublication<ViewSpecificPublicationRequirement, Publication>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _publication,
                 publicationId: _publication.Id
             );
         }
     }
 
-    private ViewSpecificPublicationAuthorizationHandler SetupHandler(
+    private ViewSpecificPublicationAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

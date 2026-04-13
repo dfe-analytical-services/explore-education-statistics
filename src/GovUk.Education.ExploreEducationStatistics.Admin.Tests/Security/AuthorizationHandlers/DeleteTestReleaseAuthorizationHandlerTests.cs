@@ -66,7 +66,7 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         public async Task TestRelease_SucceedsOnlyForValidGlobalRoles()
         {
             await AssertHandlerSucceedsWithCorrectGlobalRoles<DeleteTestReleaseRequirement, ReleaseVersion>(
-                CreateHandler(enableThemeDeletion: true),
+                BuildHandler(enableThemeDeletion: true),
                 _testReleaseVersion,
                 rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
             );
@@ -76,7 +76,7 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         public async Task SeedRelease_SucceedsOnlyForValidGlobalRoles()
         {
             await AssertHandlerSucceedsWithCorrectGlobalRoles<DeleteTestReleaseRequirement, ReleaseVersion>(
-                CreateHandler(enableThemeDeletion: true),
+                BuildHandler(enableThemeDeletion: true),
                 _seedReleaseVersion,
                 rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
             );
@@ -86,7 +86,7 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         public async Task RealReleaseVersion_FailsForAllGlobalRoles()
         {
             await AssertHandlerFailsForAllGlobalRoles<DeleteTestReleaseRequirement, ReleaseVersion>(
-                CreateHandler(enableThemeDeletion: true),
+                BuildHandler(enableThemeDeletion: true),
                 _realReleaseVersion
             );
         }
@@ -95,16 +95,14 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         public async Task ThemeDeletionEnabledIsFalse_FailsForAllGlobalRoles()
         {
             await AssertHandlerFailsForAllGlobalRoles<DeleteTestReleaseRequirement, ReleaseVersion>(
-                CreateHandler(enableThemeDeletion: false),
+                BuildHandler(enableThemeDeletion: false),
                 _testReleaseVersion
             );
         }
     }
 
-    private DeleteTestReleaseAuthorizationHandler CreateHandler(bool enableThemeDeletion = false)
-    {
-        return new DeleteTestReleaseAuthorizationHandler(
+    private static DeleteTestReleaseAuthorizationHandler BuildHandler(bool enableThemeDeletion = false) =>
+        new DeleteTestReleaseAuthorizationHandler(
             appOptions: new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper()
         );
-    }
 }

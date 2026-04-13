@@ -16,12 +16,28 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
-    private readonly MethodologyVersion _methodologyVersion;
+    private readonly MethodologyVersion _draftMethodologyVersion;
+    private readonly MethodologyVersion _higherReviewMethodologyVersion;
+    private readonly MethodologyVersion _approvedMethodologyVersion;
     private readonly Publication _owningPublication;
+
+    private IReadOnlyList<MethodologyVersion> AllTypesOfMethodologyVersion =>
+        [_draftMethodologyVersion, _higherReviewMethodologyVersion, _approvedMethodologyVersion];
 
     protected MarkMethodologyAsApprovedAuthorizationHandlerTests()
     {
-        _methodologyVersion = _dataFixture.DefaultMethodologyVersion();
+        _draftMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Draft);
+
+        _higherReviewMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview);
+
+        _approvedMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved)
+            .WithPublished(DateTime.UtcNow);
 
         _owningPublication = _dataFixture.DefaultPublication();
     }
@@ -31,25 +47,35 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
         [Fact]
         public async Task NotLatestPublishedMethodologyVersion_SucceedsOnlyForValidClaims()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
-                entity: _methodologyVersion,
-                userId: _userId,
-                claimsExpectedToSucceed: [SecurityClaimTypes.ApproveAllMethodologies]
-            );
+            // Should succeed for valid claims regardless of the methodology version's approval status, as long as it's not the latest published version
+            foreach (var methodologyVersion in AllTypesOfMethodologyVersion)
+            {
+                await AssertHandlerSucceedsWithCorrectClaims<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
+                    handler: BuildHandler(),
+                    entity: methodologyVersion,
+                    userId: _userId,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.ApproveAllMethodologies]
+                );
+            }
         }
 
         [Fact]
         public async Task LatestPublishedMethodologyVersion_FailsForAllClaims()
         {
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-            methodologyVersionRepository.Setup(s => s.IsLatestPublishedVersion(_methodologyVersion)).ReturnsAsync(true);
+            // Should fail for all claims regardless of the methodology version's approval status if it is the latest published version
+            foreach (var methodologyVersion in AllTypesOfMethodologyVersion)
+            {
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+                methodologyVersionRepository
+                    .Setup(s => s.IsLatestPublishedVersion(methodologyVersion))
+                    .ReturnsAsync(true);
 
-            await AssertHandlerFailsForAllClaims<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
-                handler: SetupHandler(methodologyVersionRepository.Object),
-                entity: _methodologyVersion,
-                userId: _userId
-            );
+                await AssertHandlerFailsForAllClaims<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
+                    handler: BuildHandler(methodologyVersionRepository.Object),
+                    entity: methodologyVersion,
+                    userId: _userId
+                );
+            }
         }
     }
 
@@ -58,40 +84,46 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
         [Fact]
         public async Task NotLatestPublishedMethodologyVersion_SucceedsOnlyForValidPublicationRoles()
         {
-            var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+            // Should succeed for valid publication roles regardless of the methodology version's approval status, as long as it's not the latest published version
+            foreach (var methodologyVersion in AllTypesOfMethodologyVersion)
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
-            await AssertHandlerSucceedsForAnyValidPublicationRole<
-                MarkMethodologyAsApprovedRequirement,
-                MethodologyVersion
-            >(
-                handlerSupplier: handlerSuppler,
-                entity: _methodologyVersion,
-                publicationId: _owningPublication.Id,
-                publicationRolesExpectedToSucceed: [PublicationRole.Approver]
-            );
+                await AssertHandlerSucceedsForAnyValidPublicationRole<
+                    MarkMethodologyAsApprovedRequirement,
+                    MethodologyVersion
+                >(
+                    handlerSupplier: handlerSuppler,
+                    entity: methodologyVersion,
+                    publicationId: _owningPublication.Id,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Approver]
+                );
+            }
         }
 
         [Fact]
         public async Task LatestPublishedMethodologyVersion_FailsWithoutCheckingRoles()
         {
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-            methodologyVersionRepository.Setup(s => s.IsLatestPublishedVersion(_methodologyVersion)).ReturnsAsync(true);
+            methodologyVersionRepository
+                .Setup(s => s.IsLatestPublishedVersion(_approvedMethodologyVersion))
+                .ReturnsAsync(true);
 
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(
+                BuildHandler(
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     authorizationHandlerService: authorizationHandlerService
                 );
 
             await AssertHandlerFailsWithoutCheckingRoles<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
                 handlerSupplier: handlerSuppler,
-                entity: _methodologyVersion
+                entity: _approvedMethodologyVersion
             );
         }
     }
 
-    private MarkMethodologyAsApprovedAuthorizationHandler SetupHandler(
+    private MarkMethodologyAsApprovedAuthorizationHandler BuildHandler(
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
@@ -107,7 +139,7 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
     private IMethodologyVersionRepository CreateDefaultMethodologyVersionRepository()
     {
         var mock = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-        mock.Setup(s => s.IsLatestPublishedVersion(_methodologyVersion)).ReturnsAsync(false);
+        mock.Setup(s => s.IsLatestPublishedVersion(It.IsAny<MethodologyVersion>())).ReturnsAsync(false);
 
         return mock.Object;
     }
@@ -115,7 +147,7 @@ public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
     private IMethodologyRepository CreateDefaultMethodologyRepository()
     {
         var mock = new Mock<IMethodologyRepository>(MockBehavior.Strict);
-        mock.Setup(s => s.GetOwningPublication(_methodologyVersion.MethodologyId)).ReturnsAsync(_owningPublication);
+        mock.Setup(s => s.GetOwningPublication(It.IsAny<Guid>())).ReturnsAsync(_owningPublication);
 
         return mock.Object;
     }

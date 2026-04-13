@@ -39,7 +39,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         public async Task DraftMethodologyVersion_SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<UpdateSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftMethodologyVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllMethodologies]
@@ -50,7 +50,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         public async Task ApprovedMethodologyVersion_FailsForAllClaims()
         {
             await AssertHandlerFailsForAllClaims<UpdateSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _approvedMethodologyVersion,
                 userId: _userId
             );
@@ -63,7 +63,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         public async Task DraftMethodologyVersion_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 UpdateSpecificMethodologyRequirement,
@@ -80,7 +80,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         public async Task ApprovedMethodologyVersion_FailsWithoutCheckingRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerFailsWithoutCheckingRoles<UpdateSpecificMethodologyRequirement, MethodologyVersion>(
                 handlerSupplier: handlerSuppler,
@@ -89,7 +89,7 @@ public abstract class UpdateSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private UpdateSpecificMethodologyAuthorizationHandler SetupHandler(
+    private UpdateSpecificMethodologyAuthorizationHandler BuildHandler(
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )

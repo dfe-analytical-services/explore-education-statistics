@@ -67,7 +67,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
                 // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
                 // to failing any role check, within the SetupHandler method.
                 await AssertHandlerSucceedsWithCorrectClaims<DeleteSpecificCommentRequirement, Comment>(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: _commentForDraftReleaseVersion,
                     userId: _userId,
                     claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases]
@@ -76,7 +76,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task ArchivedPublication_FailsForAllClaims()
+        public async Task ApprovedReleaseVersion_FailsForAllClaims()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -89,7 +89,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await AssertHandlerFailsForAllClaims<DeleteSpecificCommentRequirement, Comment>(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: _commentForApprovedReleaseVersion,
                     userId: _userId
                 );
@@ -113,7 +113,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(context, authorizationHandlerService);
+                    BuildHandler(context, authorizationHandlerService);
 
                 await AssertHandlerSucceedsForAnyValidPublicationRole<DeleteSpecificCommentRequirement, Comment>(
                     handlerSupplier: handlerSuppler,
@@ -125,7 +125,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task ArchivedPublication_FailsWithoutCheckingRoles()
+        public async Task ApprovedReleaseVersion_FailsWithoutCheckingRoles()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -138,7 +138,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(context, authorizationHandlerService);
+                    BuildHandler(context, authorizationHandlerService);
 
                 await AssertHandlerFailsWithoutCheckingRoles<DeleteSpecificCommentRequirement, Comment>(
                     handlerSupplier: handlerSuppler,
@@ -148,7 +148,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
         }
     }
 
-    private DeleteSpecificCommentAuthorizationHandler SetupHandler(
+    private DeleteSpecificCommentAuthorizationHandler BuildHandler(
         ContentDbContext? contentDbContext = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )

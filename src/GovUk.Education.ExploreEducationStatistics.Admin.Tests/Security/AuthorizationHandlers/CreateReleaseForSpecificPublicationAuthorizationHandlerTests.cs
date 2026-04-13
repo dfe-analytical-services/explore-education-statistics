@@ -34,7 +34,7 @@ public abstract class CreateReleaseForSpecificPublicationAuthorizationHandlerTes
             // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
             // to failing any role check, within the SetupHandler method.
             await AssertHandlerSucceedsWithCorrectClaims<CreateReleaseForSpecificPublicationRequirement, Publication>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.CreateAnyRelease]
@@ -45,7 +45,7 @@ public abstract class CreateReleaseForSpecificPublicationAuthorizationHandlerTes
         public async Task ArchivedPublication_FailsForAllClaims()
         {
             await AssertHandlerFailsForAllClaims<CreateReleaseForSpecificPublicationRequirement, Publication>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _archivedPublication,
                 userId: _userId
             );
@@ -61,7 +61,7 @@ public abstract class CreateReleaseForSpecificPublicationAuthorizationHandlerTes
                 CreateReleaseForSpecificPublicationRequirement,
                 Publication
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _publication,
                 publicationId: _publication.Id,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -72,13 +72,13 @@ public abstract class CreateReleaseForSpecificPublicationAuthorizationHandlerTes
         public async Task ArchivedPublication_FailsWithoutCheckingRoles()
         {
             await AssertHandlerFailsWithoutCheckingRoles<CreateReleaseForSpecificPublicationRequirement, Publication>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _archivedPublication
             );
         }
     }
 
-    private CreateReleaseForSpecificPublicationAuthorizationHandler SetupHandler(
+    private CreateReleaseForSpecificPublicationAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

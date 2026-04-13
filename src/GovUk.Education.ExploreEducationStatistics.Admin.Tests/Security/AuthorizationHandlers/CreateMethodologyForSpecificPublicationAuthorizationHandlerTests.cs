@@ -30,15 +30,11 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
 
         _publicationWithOwnedMethodology = _dataFixture
             .DefaultPublication()
-            .WithMethodologies(
-                CollectionUtils.ListOf(new PublicationMethodology { Owner = true, MethodologyId = Guid.NewGuid() })
-            );
+            .WithMethodologies([new PublicationMethodology { Owner = true, MethodologyId = Guid.NewGuid() }]);
 
         _publicationWithAdoptedMethodology = _dataFixture
             .DefaultPublication()
-            .WithMethodologies(
-                CollectionUtils.ListOf(new PublicationMethodology { Owner = false, MethodologyId = Guid.NewGuid() })
-            );
+            .WithMethodologies([new PublicationMethodology { Owner = false, MethodologyId = Guid.NewGuid() }]);
     }
 
     public class ClaimsTests : CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
@@ -83,7 +79,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
                     CreateMethodologyForSpecificPublicationRequirement,
                     Publication
                 >(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: publication,
                     claimsExpectedToSucceed: [SecurityClaimTypes.CreateAnyMethodology],
                     userId: _userId
@@ -104,7 +100,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await AssertHandlerFailsForAllClaims<CreateMethodologyForSpecificPublicationRequirement, Publication>(
-                    handler: SetupHandler(context),
+                    handler: BuildHandler(context),
                     entity: publication,
                     userId: _userId
                 );
@@ -151,7 +147,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(context, authorizationHandlerService);
+                    BuildHandler(context, authorizationHandlerService);
 
                 await AssertHandlerSucceedsForAnyValidPublicationRole<
                     CreateMethodologyForSpecificPublicationRequirement,
@@ -178,7 +174,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                    SetupHandler(context, authorizationHandlerService);
+                    BuildHandler(context, authorizationHandlerService);
 
                 await AssertHandlerFailsWithoutCheckingRoles<
                     CreateMethodologyForSpecificPublicationRequirement,
@@ -188,7 +184,7 @@ public abstract class CreateMethodologyForSpecificPublicationAuthorizationHandle
         }
     }
 
-    private CreateMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
+    private CreateMethodologyForSpecificPublicationAuthorizationHandler BuildHandler(
         ContentDbContext? contentDbContext = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )

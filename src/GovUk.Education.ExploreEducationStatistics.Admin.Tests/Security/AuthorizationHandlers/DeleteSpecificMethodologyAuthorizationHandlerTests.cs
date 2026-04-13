@@ -56,7 +56,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
             // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
             // to failing any role check, within the SetupHandler method.
             await AssertHandlerSucceedsWithCorrectClaims<DeleteSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftFirstVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.DeleteAllMethodologies]
@@ -67,7 +67,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         public async Task ApprovedFirstVersion_FailsForAllClaims()
         {
             await AssertHandlerFailsForAllClaims<DeleteSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _approvedFirstVersion,
                 userId: _userId
             );
@@ -80,7 +80,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
             // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
             // to failing any role check, within the SetupHandler method.
             await AssertHandlerSucceedsWithCorrectClaims<DeleteSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftAmendmentVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.DeleteAllMethodologies]
@@ -91,7 +91,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         public async Task ApprovedAmendment_FailsForAllClaims()
         {
             await AssertHandlerFailsForAllClaims<DeleteSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _approvedAmendmentVersion,
                 userId: _userId
             );
@@ -104,7 +104,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         public async Task DraftFirstVersion_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 DeleteSpecificMethodologyRequirement,
@@ -121,7 +121,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         public async Task ApprovedFirstVersion_FailsWithoutCheckingRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerFailsWithoutCheckingRoles<DeleteSpecificMethodologyRequirement, MethodologyVersion>(
                 handlerSupplier: handlerSuppler,
@@ -133,7 +133,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         public async Task DraftAmendment_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 DeleteSpecificMethodologyRequirement,
@@ -150,7 +150,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         public async Task ApprovedAmendment_FailsWithoutCheckingRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerFailsWithoutCheckingRoles<DeleteSpecificMethodologyRequirement, MethodologyVersion>(
                 handlerSupplier: handlerSuppler,
@@ -159,7 +159,7 @@ public abstract class DeleteSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private DeleteSpecificMethodologyAuthorizationHandler SetupHandler(
+    private DeleteSpecificMethodologyAuthorizationHandler BuildHandler(
         IMethodologyRepository? methodologyRepository = null,
         IAuthorizationHandlerService? authorizationHandlerService = null
     )

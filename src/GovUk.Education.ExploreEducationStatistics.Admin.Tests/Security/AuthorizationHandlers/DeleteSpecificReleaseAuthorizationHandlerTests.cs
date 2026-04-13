@@ -48,7 +48,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that BAU users can delete the first version of a release
             await AssertHandlerSucceedsWithCorrectGlobalRoles<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _nonAmendmentReleaseVersion,
                 userId: _userId,
                 rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
@@ -60,7 +60,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that no users can delete an amendment release version that is approved
             await AssertHandlerFailsForAllGlobalRoles<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _approvedAmendmentReleaseVersion,
                 userId: _userId
             );
@@ -71,7 +71,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that no users can delete an amendment release version that is not yet approved
             await AssertHandlerFailsForAllGlobalRoles<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftAmendmentReleaseVersion,
                 userId: _userId
             );
@@ -85,7 +85,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that no users can delete the first version of a release
             await AssertHandlerFailsForAllClaims<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _nonAmendmentReleaseVersion,
                 userId: _userId
             );
@@ -96,7 +96,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that no users can delete an amendment release version that is approved
             await AssertHandlerFailsForAllClaims<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _approvedAmendmentReleaseVersion,
                 userId: _userId
             );
@@ -107,7 +107,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that users with the "DeleteAllReleaseAmendments" claim can delete an amendment release version that is not yet approved
             await AssertHandlerSucceedsWithCorrectClaims<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftAmendmentReleaseVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.DeleteAllReleaseAmendments]
@@ -122,7 +122,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that no User Publication roles will allow deleting the first version of a release
             await AssertHandlerFailsWithoutCheckingRoles<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _nonAmendmentReleaseVersion
             );
         }
@@ -132,7 +132,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that no User Publication roles will allow deleting an amendment release version when it is Approved
             await AssertHandlerFailsWithoutCheckingRoles<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _approvedAmendmentReleaseVersion
             );
         }
@@ -142,7 +142,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         {
             // Assert that users with the Publication Drafter or Approver role on an amendment release version can delete if it is not yet approved
             await AssertHandlerSucceedsForAnyValidPublicationRole<DeleteSpecificReleaseRequirement, ReleaseVersion>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _draftAmendmentReleaseVersion,
                 publicationId: _draftAmendmentReleaseVersion.Release.PublicationId,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -150,7 +150,7 @@ public abstract class DeleteSpecificReleaseAuthorizationHandlerTests
         }
     }
 
-    private DeleteSpecificReleaseAuthorizationHandler SetupHandler(
+    private DeleteSpecificReleaseAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

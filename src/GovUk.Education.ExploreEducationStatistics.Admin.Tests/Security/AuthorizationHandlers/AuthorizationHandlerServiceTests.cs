@@ -35,7 +35,7 @@ public abstract class AuthorizationHandlerServiceTests
         [Fact]
         public async Task NoRolesSupplied_Throws()
         {
-            var authorizationHandlerService = SetupService();
+            var authorizationHandlerService = BuildService();
 
             await Assert.ThrowsAsync<ArgumentException>(async () =>
                 await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
@@ -67,7 +67,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(false);
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
 
@@ -103,7 +103,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
 
@@ -148,7 +148,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(false);
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
@@ -188,7 +188,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
@@ -228,7 +228,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(false);
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
@@ -268,7 +268,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
@@ -300,7 +300,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(false);
 
-            var authorizationHandlerService = SetupService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+            var authorizationHandlerService = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await authorizationHandlerService.UserHasPrereleaseRoleOnReleaseVersion(
                 userId: _userId,
@@ -328,7 +328,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = SetupService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+            var authorizationHandlerService = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await authorizationHandlerService.UserHasPrereleaseRoleOnReleaseVersion(
                 userId: _userId,
@@ -346,7 +346,7 @@ public abstract class AuthorizationHandlerServiceTests
         [Fact]
         public async Task UserHasNoValidClaimsOrRoles()
         {
-            var authorizationHandlerService = SetupService();
+            var authorizationHandlerService = BuildService();
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(_releaseVersion, _user);
 
@@ -360,7 +360,7 @@ public abstract class AuthorizationHandlerServiceTests
                 .AuthenticatedUser(_userId)
                 .WithClaim(SecurityClaimTypes.AccessAllReleases.ToString());
 
-            var authorizationHandlerService = SetupService();
+            var authorizationHandlerService = BuildService();
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(_releaseVersion, user);
 
@@ -383,7 +383,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
             );
 
@@ -408,7 +408,7 @@ public abstract class AuthorizationHandlerServiceTests
                 )
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = SetupService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+            var authorizationHandlerService = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(_releaseVersion, _user);
 
@@ -423,7 +423,7 @@ public abstract class AuthorizationHandlerServiceTests
                 .Setup(mock => mock.GetPreReleaseWindowStatus(_releaseVersion, It.IsAny<DateTimeOffset>()))
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
-            var authorizationHandlerService = SetupService(preReleaseService: preReleaseService.Object);
+            var authorizationHandlerService = BuildService(preReleaseService: preReleaseService.Object);
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(_releaseVersion, _user);
 
@@ -451,7 +451,7 @@ public abstract class AuthorizationHandlerServiceTests
                 .Setup(mock => mock.GetPreReleaseWindowStatus(_releaseVersion, It.IsAny<DateTimeOffset>()))
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
-            var authorizationHandlerService = SetupService(
+            var authorizationHandlerService = BuildService(
                 userReleaseRoleRepository: userReleaseRoleRepository.Object,
                 preReleaseService: preReleaseService.Object
             );
@@ -469,7 +469,7 @@ public abstract class AuthorizationHandlerServiceTests
                 .Setup(mock => mock.IsLatestPublishedReleaseVersion(_releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var authorizationHandlerService = SetupService(releaseVersionRepository: releaseVersionRepository.Object);
+            var authorizationHandlerService = BuildService(releaseVersionRepository: releaseVersionRepository.Object);
 
             var result = await authorizationHandlerService.IsReleaseVersionViewableByUser(_releaseVersion, _user);
 
@@ -477,7 +477,7 @@ public abstract class AuthorizationHandlerServiceTests
         }
     }
 
-    private static AuthorizationHandlerService SetupService(
+    private static AuthorizationHandlerService BuildService(
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
