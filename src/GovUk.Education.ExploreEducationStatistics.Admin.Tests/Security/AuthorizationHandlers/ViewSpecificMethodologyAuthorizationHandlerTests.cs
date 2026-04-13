@@ -64,7 +64,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         public async Task SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<ViewSpecificMethodologyRequirement, MethodologyVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftMethodologyVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.AccessAllMethodologies]
@@ -78,7 +78,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         public async Task SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 ViewSpecificMethodologyRequirement,
@@ -104,7 +104,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 MethodologyVersion
             >(user, _draftMethodologyVersion);
 
-            var handler = SetupHandler();
+            var handler = BuildHandler();
 
             await handler.HandleAsync(authContext);
 
@@ -121,7 +121,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 MethodologyVersion
             >(user, _approvedMethodologyVersion);
 
-            var handler = SetupHandler();
+            var handler = BuildHandler();
 
             await handler.HandleAsync(authContext);
 
@@ -143,7 +143,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 MethodologyVersion
             >(user, _approvedMethodologyVersion);
 
-            var handler = SetupHandler(releaseVersionRepository: releaseVersionRepository.Object);
+            var handler = BuildHandler(releaseVersionRepository: releaseVersionRepository.Object);
 
             await handler.HandleAsync(authContext);
 
@@ -165,7 +165,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 MethodologyVersion
             >(user, _approvedMethodologyVersion);
 
-            var handler = SetupHandler(releaseVersionRepository: releaseVersionRepository.Object);
+            var handler = BuildHandler(releaseVersionRepository: releaseVersionRepository.Object);
 
             await handler.HandleAsync(authContext);
 
@@ -211,7 +211,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 MethodologyVersion
             >(user, _approvedMethodologyVersion);
 
-            var handler = SetupHandler(
+            var handler = BuildHandler(
                 releaseVersionRepository: releaseVersionRepository.Object,
                 authorizationHandlerService: authorizationHandlerService.Object,
                 preReleaseService: preReleaseService.Object
@@ -256,7 +256,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 MethodologyVersion
             >(user, _approvedMethodologyVersion);
 
-            var handler = SetupHandler(
+            var handler = BuildHandler(
                 releaseVersionRepository: releaseVersionRepository.Object,
                 authorizationHandlerService: authorizationHandlerService.Object,
                 preReleaseService: preReleaseService.Object
@@ -301,7 +301,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 MethodologyVersion
             >(user, _approvedMethodologyVersion);
 
-            var handler = SetupHandler(
+            var handler = BuildHandler(
                 releaseVersionRepository: releaseVersionRepository.Object,
                 authorizationHandlerService: authorizationHandlerService.Object,
                 preReleaseService: preReleaseService.Object
@@ -313,7 +313,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private ViewSpecificMethodologyAuthorizationHandler SetupHandler(
+    private ViewSpecificMethodologyAuthorizationHandler BuildHandler(
         IMethodologyRepository? methodologyRepository = null,
         IPreReleaseService? preReleaseService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,

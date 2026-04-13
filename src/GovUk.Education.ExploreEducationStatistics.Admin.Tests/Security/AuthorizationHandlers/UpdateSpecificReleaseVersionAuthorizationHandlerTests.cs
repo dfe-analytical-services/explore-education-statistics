@@ -36,7 +36,7 @@ public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         public async Task DraftReleaseVersion_SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _draftReleaseVersion,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases]
@@ -47,7 +47,7 @@ public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         public async Task ApprovedReleaseVersion_FailsForAllClaims()
         {
             await AssertHandlerFailsForAllClaims<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _approvedReleaseVersion,
                 userId: _userId
             );
@@ -57,10 +57,10 @@ public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
     public class PublicationRolesTests : UpdateSpecificReleaseVersionAuthorizationHandlerTests
     {
         [Fact]
-        public async Task DraftMethodologyVersion_SucceedsOnlyForValidPublicationRoles()
+        public async Task DraftReleaseVersion_SucceedsOnlyForValidPublicationRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerSucceedsForAnyValidPublicationRole<
                 UpdateSpecificReleaseVersionRequirement,
@@ -74,10 +74,10 @@ public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task ApprovedMethodologyVersion_FailsWithoutCheckingRoles()
+        public async Task ApprovedReleaseVersion_FailsWithoutCheckingRoles()
         {
             var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
-                SetupHandler(authorizationHandlerService: authorizationHandlerService);
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
             await AssertHandlerFailsWithoutCheckingRoles<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>(
                 handlerSupplier: handlerSuppler,
@@ -86,7 +86,7 @@ public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
         }
     }
 
-    private UpdateSpecificReleaseVersionAuthorizationHandler SetupHandler(
+    private UpdateSpecificReleaseVersionAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

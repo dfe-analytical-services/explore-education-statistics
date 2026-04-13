@@ -27,7 +27,7 @@ public abstract class UpdateContactAuthorizationHandlerTests
         public async Task SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<UpdateContactRequirement, Publication>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _publication,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllPublications]
@@ -41,7 +41,7 @@ public abstract class UpdateContactAuthorizationHandlerTests
         public async Task SucceedsOnlyForValidPublicationRoles()
         {
             await AssertHandlerSucceedsForAnyValidPublicationRole<UpdateContactRequirement, Publication>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _publication,
                 publicationId: _publication.Id,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -49,7 +49,7 @@ public abstract class UpdateContactAuthorizationHandlerTests
         }
     }
 
-    private UpdateContactAuthorizationHandler SetupHandler(
+    private UpdateContactAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

@@ -38,7 +38,7 @@ public abstract class DropMethodologyLinkAuthorizationHandlerTests
         public async Task NonOwningLink_SucceedsOnlyForValidClaims()
         {
             await AssertHandlerSucceedsWithCorrectClaims<DropMethodologyLinkRequirement, PublicationMethodology>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _nonOwningLink,
                 userId: _userId,
                 claimsExpectedToSucceed: [SecurityClaimTypes.AdoptAnyMethodology]
@@ -50,7 +50,7 @@ public abstract class DropMethodologyLinkAuthorizationHandlerTests
         {
             // No claims should allow dropping the link from a methodology to the owning publication
             await AssertHandlerFailsForAllClaims<DropMethodologyLinkRequirement, PublicationMethodology>(
-                handler: SetupHandler(),
+                handler: BuildHandler(),
                 entity: _owningLink,
                 userId: _userId
             );
@@ -66,7 +66,7 @@ public abstract class DropMethodologyLinkAuthorizationHandlerTests
                 DropMethodologyLinkRequirement,
                 PublicationMethodology
             >(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _nonOwningLink,
                 publicationId: _nonOwningLink.PublicationId,
                 publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
@@ -78,13 +78,13 @@ public abstract class DropMethodologyLinkAuthorizationHandlerTests
         {
             // No publication roles should allow dropping the link from a methodology to the owning publication
             await AssertHandlerFailsWithoutCheckingRoles<DropMethodologyLinkRequirement, PublicationMethodology>(
-                handlerSupplier: SetupHandler,
+                handlerSupplier: BuildHandler,
                 entity: _owningLink
             );
         }
     }
 
-    private DropMethodologyLinkAuthorizationHandler SetupHandler(
+    private DropMethodologyLinkAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
