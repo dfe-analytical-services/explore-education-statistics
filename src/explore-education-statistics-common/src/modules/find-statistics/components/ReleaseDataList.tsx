@@ -31,7 +31,9 @@ export default function ReleaseDataList({
         {actions}
         {!isDesktopMedia && toggle}
       </header>
-      <ul className={styles.list}>{children}</ul>
+      <ul className={styles.list} data-testid="release-data-list">
+        {children}
+      </ul>
     </article>
   );
 }
