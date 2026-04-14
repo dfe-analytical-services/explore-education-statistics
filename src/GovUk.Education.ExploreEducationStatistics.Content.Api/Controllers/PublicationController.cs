@@ -12,6 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class PublicationController(IPublicationService publicationService) : ControllerBase
 {
+    /// <summary>
+    /// Used only by the Content.Search.FunctionApp (Search Docs Function App).
+    /// </summary>
     [HttpGet("publicationInfos")]
     public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(
         [FromQuery] GetPublicationInfosRequest request,
