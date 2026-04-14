@@ -5,11 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class SearchableDocumentCheckerTests
 {
-    private readonly ReleaseSummaryRetrieverMockBuilder _releaseSummaryRetrieverMockBuilder = new();
+    private readonly ReleaseVersionSummaryRetrieverMockBuilder _releaseVersionSummaryRetrieverMockBuilder = new();
     private readonly BlobNameListerMockBuilder _blobNameListerMockBuilder = new();
 
     private SearchableDocumentChecker GetSut() =>
-        new(_blobNameListerMockBuilder.Build(), _releaseSummaryRetrieverMockBuilder.Build());
+        new(_blobNameListerMockBuilder.Build(), _releaseVersionSummaryRetrieverMockBuilder.Build());
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
@@ -29,7 +29,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(releaseIds);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
+        _releaseVersionSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -62,7 +62,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
+        _releaseVersionSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -97,7 +97,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
+        _releaseVersionSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -130,7 +130,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
+        _releaseVersionSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -163,7 +163,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
+        _releaseVersionSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 

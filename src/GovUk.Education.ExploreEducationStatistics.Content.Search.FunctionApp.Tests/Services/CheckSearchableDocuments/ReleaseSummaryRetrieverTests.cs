@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CheckSearchableDocuments;
 
-public class ReleaseSummaryRetrieverTests
+public class ReleaseVersionSummaryRetrieverTests
 {
     private readonly ContentApiClientMockBuilder _contentApiClient = new();
 
-    private ReleaseSummaryRetriever GetSut() =>
-        new(() => _contentApiClient.Build(), new NullLogger<ReleaseSummaryRetriever>());
+    private ReleaseVersionSummaryRetriever GetSut() =>
+        new(() => _contentApiClient.Build(), new NullLogger<ReleaseVersionSummaryRetriever>());
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());

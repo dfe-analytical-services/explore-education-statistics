@@ -4,12 +4,12 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CheckSearchableDocuments;
 
-public class ReleaseSummaryRetrieverMockBuilder
+public class ReleaseVersionSummaryRetrieverMockBuilder
 {
-    private readonly Mock<IReleaseSummaryRetriever> _mock = new(MockBehavior.Strict);
+    private readonly Mock<IReleaseVersionSummaryRetriever> _mock = new(MockBehavior.Strict);
     private IList<ReleaseVersionSummary> _releaseVersionSummaries = [];
 
-    public IReleaseSummaryRetriever Build()
+    public IReleaseVersionSummaryRetriever Build()
     {
         _mock
             .Setup(m => m.GetAllPublishedReleaseVersionSummaries(It.IsAny<CancellationToken>()))
@@ -18,7 +18,7 @@ public class ReleaseSummaryRetrieverMockBuilder
         return _mock.Object;
     }
 
-    public ReleaseSummaryRetrieverMockBuilder WhereReleaseVersionSummariesReturnedAre(
+    public ReleaseVersionSummaryRetrieverMockBuilder WhereReleaseVersionSummariesReturnedAre(
         IList<ReleaseVersionSummary> releaseVersionSummaries
     )
     {

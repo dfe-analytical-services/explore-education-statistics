@@ -5,17 +5,10 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
-public interface IReleaseSummaryRetriever
-{
-    Task<IList<ReleaseVersionSummary>> GetAllPublishedReleaseVersionSummaries(
-        CancellationToken cancellationToken = default
-    );
-}
-
-public class ReleaseSummaryRetriever(
+public class ReleaseVersionSummaryRetriever(
     Func<IContentApiClient> contentApiClientFactory,
-    ILogger<ReleaseSummaryRetriever> logger
-) : IReleaseSummaryRetriever
+    ILogger<ReleaseVersionSummaryRetriever> logger
+) : IReleaseVersionSummaryRetriever
 {
     public async Task<IList<ReleaseVersionSummary>> GetAllPublishedReleaseVersionSummaries(
         CancellationToken cancellationToken = default

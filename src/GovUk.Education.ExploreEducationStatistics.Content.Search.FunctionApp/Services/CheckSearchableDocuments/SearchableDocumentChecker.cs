@@ -2,7 +2,10 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
-public class SearchableDocumentChecker(IBlobNameLister blobNameLister, IReleaseSummaryRetriever releaseSummaryRetriever)
+public class SearchableDocumentChecker(
+    IBlobNameLister blobNameLister,
+    IReleaseVersionSummaryRetriever releaseVersionSummaryRetriever
+)
 {
     public async Task<CheckSearchableDocumentsReport> RunCheck(CancellationToken cancellationToken = default)
     {
@@ -10,7 +13,7 @@ public class SearchableDocumentChecker(IBlobNameLister blobNameLister, IReleaseS
         var blobNames = await blobNameLister.ListBlobsInContainer(cancellationToken);
 
         // Retrieve the latest published release version summaries for the latest published releases of all published publications
-        var releaseVersionSummaries = await releaseSummaryRetriever.GetAllPublishedReleaseVersionSummaries(
+        var releaseVersionSummaries = await releaseVersionSummaryRetriever.GetAllPublishedReleaseVersionSummaries(
             cancellationToken
         );
 
