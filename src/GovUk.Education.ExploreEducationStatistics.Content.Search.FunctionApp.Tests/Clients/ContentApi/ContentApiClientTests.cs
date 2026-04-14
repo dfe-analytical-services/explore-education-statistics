@@ -137,7 +137,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
         }
 
-        [Fact(Skip = "Call Content API to get release id's for a specified publication slug")]
+        [Fact(Skip = "Call Content API to get published release id's for a specified publication slug")]
         public async Task GetPublicationReleaseIds()
         {
             var sut = GetSut();

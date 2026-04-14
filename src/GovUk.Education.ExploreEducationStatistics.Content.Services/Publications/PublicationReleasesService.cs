@@ -48,7 +48,6 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
                 await contentDbContext
                     .ReleaseVersions.LatestReleaseVersions(publicationId: publication.Id, publishedOnly: true)
                     .Select(rv => rv.ReleaseId)
-                    .OrderBy(id => id)
                     .ToArrayAsync(cancellationToken)
             );
 

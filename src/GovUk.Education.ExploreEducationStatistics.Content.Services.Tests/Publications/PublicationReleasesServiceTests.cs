@@ -451,7 +451,7 @@ public abstract class PublicationReleasesServiceTests
                 .DefaultPublication()
                 .WithReleases(_ =>
                     [
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022), // Not published
                         _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2023),
                         _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
                         _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
@@ -479,42 +479,9 @@ public abstract class PublicationReleasesServiceTests
                 // Assert
                 var result = outcome.AssertRight();
 
+                // Expect only releases with at least one published version to be returned
                 Assert.Equal(publishedReleaseIds.Length, result.Length);
                 Assert.True(ComparerUtils.SequencesAreEqualIgnoringOrder(publishedReleaseIds, result));
-            }
-        }
-
-        [Fact]
-        public async Task WhenReleaseHasNoPublishedVersions_ReleaseIsExcludedFromResults()
-        {
-            // Arrange
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases([
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2025),
-                ]);
-            var publishedRelease = publication.Releases.Single(r => r.Year == 2024);
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Publications.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var outcome = await sut.GetPublicationReleaseIds(publication.Slug);
-
-                // Assert
-                var result = outcome.AssertRight();
-
-                // Only the id of the release with a published version should be in the result
-                Assert.Equal([publishedRelease.Id], result);
             }
         }
 
