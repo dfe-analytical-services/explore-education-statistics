@@ -18,11 +18,6 @@ import ReleaseSummarySection from '@admin/pages/release/content/components/Relea
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import {
-  preReleaseAccessListRoute,
-  releaseDataGuidanceRoute,
-} from '@admin/routes/routes';
 import releaseFileService from '@admin/services/releaseFileService';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
@@ -43,7 +38,6 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { generatePath, useLocation } from 'react-router';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 
 interface MethodologyLink {
@@ -59,7 +53,6 @@ const ReleaseContent = ({
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }) => {
   const { publicAppUrl } = useConfig();
-  const location = useLocation();
   const { setActiveSection, unsavedBlocks, unsavedCommentDeletions } =
     useEditingContext();
   const { release } = useReleaseContentState();
@@ -417,45 +410,6 @@ const ReleaseContent = ({
             <h3 className="govuk-heading-s">Related information</h3>
             <ul className="govuk-list" data-testid="related-information">
               <li>
-                <Link
-                  to={{
-                    pathname: generatePath<ReleaseRouteParams>(
-                      releaseDataGuidanceRoute.path,
-                      {
-                        publicationId: release.publication.id,
-                        releaseVersionId: release.id,
-                      },
-                    ),
-                    state: {
-                      backLink: location.pathname,
-                    },
-                  }}
-                >
-                  Data guidance
-                </Link>
-              </li>
-
-              {release.hasPreReleaseAccessList && (
-                <li>
-                  <Link
-                    to={{
-                      pathname: generatePath<ReleaseRouteParams>(
-                        preReleaseAccessListRoute.path,
-                        {
-                          publicationId: release.publication.id,
-                          releaseVersionId: release.id,
-                        },
-                      ),
-                      state: {
-                        backLink: location.pathname,
-                      },
-                    }}
-                  >
-                    Pre-release access list
-                  </Link>
-                </li>
-              )}
-              <li>
                 <a href="#contact-us">
                   Contact us<VisuallyHidden> about this release</VisuallyHidden>
                 </a>
@@ -565,24 +519,7 @@ const ReleaseContent = ({
               {`${file.name} (${file.extension}, ${file.size})`}
             </ButtonText>
           )}
-          renderDataGuidanceLink={
-            <Link
-              to={{
-                pathname: generatePath<ReleaseRouteParams>(
-                  releaseDataGuidanceRoute.path,
-                  {
-                    publicationId: release.publication.id,
-                    releaseVersionId: release.id,
-                  },
-                ),
-                state: {
-                  backLink: location.pathname,
-                },
-              }}
-            >
-              Data guidance
-            </Link>
-          }
+          renderDataGuidanceLink={<span>Data guidance</span>}
           renderDataCatalogueLink={
             <span>Data catalogue (public site only)</span>
           }
