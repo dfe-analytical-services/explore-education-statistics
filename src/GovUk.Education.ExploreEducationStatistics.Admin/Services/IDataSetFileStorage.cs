@@ -48,7 +48,7 @@ public interface IDataSetFileStorage
 
     Task UpdateDataSetUpload(
         Guid dataSetUploadId,
-        DataSetScreenerResponse? screenerResult,
+        DataSetScreenResponse? screenerResult,
         CancellationToken cancellationToken
     );
 

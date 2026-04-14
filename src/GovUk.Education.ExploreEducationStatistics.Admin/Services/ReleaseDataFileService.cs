@@ -2,6 +2,7 @@
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
@@ -21,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -43,9 +45,10 @@ public class ReleaseDataFileService(
     IDataSetFileStorage dataSetFileStorage,
     IDataBlockService dataBlockService,
     IFootnoteRepository footnoteRepository,
-    IDataSetScreenerClient dataSetScreenerClient,
+    IDataSetScreenerService dataSetScreenerService,
     IReplacementPlanService replacementPlanService,
-    IMapper mapper
+    IMapper mapper,
+    IOptions<DataScreenerOptions> screenerOptions
 ) : IReleaseDataFileService
 {
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid fileId, bool forceDelete = false)
@@ -289,12 +292,27 @@ public class ReleaseDataFileService(
         CancellationToken cancellationToken
     )
     {
+        return await DoUpload(releaseVersionId, dataFile, metaFile, dataSetTitle, cancellationToken)
+            .OnSuccess(async dataSetUploads =>
+                screenerOptions.Value.EnhancedScreenerJourney
+                    ? await StartDataSetUploadScreening([.. dataSetUploads], cancellationToken)
+                    : await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
+            );
+    }
+
+    private async Task<Either<ActionResult, List<DataSetUpload>>> DoUpload(
+        Guid releaseVersionId,
+        IManagedStreamFile dataFile,
+        IManagedStreamFile metaFile,
+        string dataSetTitle,
+        CancellationToken cancellationToken
+    )
+    {
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
-            {
-                return await ValidateDataSetCsvPair(releaseVersionId, dataFile, metaFile, dataSetTitle)
+                await ValidateDataSetCsvPair(releaseVersionId, dataFile, metaFile, dataSetTitle)
                     .OnSuccess(async dataSet =>
                         await dataSetFileStorage.UploadDataSetsToTemporaryStorage(
                             releaseVersionId,
@@ -311,10 +329,8 @@ public class ReleaseDataFileService(
                             )
                         )
                     )
-                    .OnSuccess(async dataSetUploads =>
-                        await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
-                    );
-            });
+            )
+            .OnSuccess(dataSetUploads => dataSetUploads.ToList());
     }
 
     public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
@@ -404,15 +420,15 @@ public class ReleaseDataFileService(
                     throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
                 }
 
-                var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
-                request.DataFileSasToken = dataFileToken.Right!.Token;
-                request.MetaFileSasToken = metaFileToken.Right!.Token;
+                var request = mapper.Map<DataSetScreenRequest>(dataSetUpload);
+                request.DataFileSasToken = dataFileToken.Right.Token;
+                request.MetaFileSasToken = metaFileToken.Right.Token;
 
-                DataSetScreenerResponse result;
+                DataSetScreenResponse result;
 
                 try
                 {
-                    result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+                    result = await dataSetScreenerService.ScreenDataSet(request, cancellationToken);
                 }
                 catch (DataScreenerException)
                 {
@@ -452,6 +468,57 @@ public class ReleaseDataFileService(
                 }
 
                 return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    private async Task<List<DataSetUploadViewModel>> StartDataSetUploadScreening(
+        List<DataSetUpload> dataSetUploads,
+        CancellationToken cancellationToken
+    )
+    {
+        return await dataSetUploads
+            .ToAsyncEnumerable()
+            .SelectAwait(async dataSetUpload =>
+            {
+                var dataFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.DataFileName,
+                    dataSetUpload.DataFilePath,
+                    cancellationToken
+                );
+                var metaFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.MetaFileName,
+                    dataSetUpload.MetaFilePath,
+                    cancellationToken
+                );
+
+                if (dataFileToken.IsLeft || metaFileToken.IsLeft)
+                {
+                    throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
+                }
+
+                var request = mapper.Map<DataSetStartScreeningRequest>(dataSetUpload);
+                request.DataFileSasToken = dataFileToken.Right.Token;
+                request.MetaFileSasToken = metaFileToken.Right.Token;
+
+                try
+                {
+                    await dataSetScreenerService.StartScreening(request, cancellationToken);
+
+                    return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                }
+                catch (DataScreenerException)
+                {
+                    await dataSetFileStorage.UpdateDataSetUpload(
+                        dataSetUpload.Id,
+                        screenerResult: null,
+                        cancellationToken
+                    );
+
+                    return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                }
             })
             .ToListAsync(cancellationToken);
     }

@@ -1,10 +1,14 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Options;
 
-public class DataScreenerClientOptions : IAzureAuthenticationOptions
+public class DataScreenerOptions : IAzureAuthenticationOptions
 {
     public const string Section = "DataScreener";
 
     public string Url { get; init; }
 
     public Guid AppRegistrationClientId { get; init; }
+
+    public string ScreenerStorage { get; init; }
+
+    public bool EnhancedScreenerJourney { get; init; }
 }

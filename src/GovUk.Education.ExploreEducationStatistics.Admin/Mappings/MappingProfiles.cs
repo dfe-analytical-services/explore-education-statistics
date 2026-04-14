@@ -139,28 +139,28 @@ public class MappingProfiles : CommonMappingProfile
                 m => m.MapFrom(upload => FileExtensions.DisplaySize(upload.MetaFileSizeInBytes))
             );
 
-        CreateMap<DataSetScreenerResponse, ScreenerResultViewModel>();
+        CreateMap<DataSetScreenResponse, ScreenerResultViewModel>();
 
         CreateMap<DataScreenerTestResult, ScreenerTestResultViewModel>()
             .ForMember(dest => dest.Result, m => m.MapFrom(upload => upload.Result.ToString()));
 
-        CreateMap<DataSetUpload, DataSetScreenerRequest>()
+        CreateMap<DataSetUpload, DataSetScreenRequest>()
             .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
     }
 
-    private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
+    private static string GetDataSetUploadStatus(DataSetScreenResponse screenResult)
     {
-        if (screenerResult is null)
+        if (screenResult is null)
         {
             return nameof(DataSetUploadStatus.SCREENER_ERROR);
         }
 
-        if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
+        if (screenResult.Passed && screenResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
             return nameof(DataSetUploadStatus.PENDING_REVIEW);
         }
 
-        return !screenerResult.Passed
+        return !screenResult.Passed
             ? nameof(DataSetUploadStatus.FAILED_SCREENING)
             : nameof(DataSetUploadStatus.PENDING_IMPORT);
     }

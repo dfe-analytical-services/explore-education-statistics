@@ -159,7 +159,7 @@ public class ContentDbContext : DbContext
             .Property(upload => upload.ScreenerResult)
             .HasConversion(
                 r => JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
-                r => JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null)
+                r => JsonSerializer.Deserialize<DataSetScreenResponse>(r, (JsonSerializerOptions)null)
             );
 
         modelBuilder

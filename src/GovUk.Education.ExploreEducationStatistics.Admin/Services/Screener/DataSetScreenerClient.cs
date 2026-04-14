@@ -1,41 +1,81 @@
 using System.Text;
 using System.Text.Json;
+using System.Web;
 using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 
 public class DataSetScreenerClient(
     HttpClient httpClient,
-    IHttpClientAzureAuthenticationManager<DataScreenerClientOptions> authenticationManager
+    IHttpClientAzureAuthenticationManager<DataScreenerOptions> authenticationManager
 ) : IDataSetScreenerClient
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case sensitive
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case-sensitive
     };
 
-    public async Task<DataSetScreenerResponse> ScreenDataSet(
-        DataSetScreenerRequest dataSetRequest,
+    public async Task<DataSetScreenResponse> ScreenDataSet(
+        DataSetScreenRequest dataSetScreenRequest,
         CancellationToken cancellationToken
     )
     {
         await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 
-        var json = JsonSerializer.Serialize(dataSetRequest, _jsonSerializerOptions);
+        var json = JsonSerializer.Serialize(dataSetScreenRequest, _jsonSerializerOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // TODO (EES-6301): Add cancellation token handling logic to terminate Azure Function processes
-        var response = await httpClient.PostAsync(httpClient.BaseAddress, content, CancellationToken.None);
+        var response = await httpClient.PostAsync($"{httpClient.BaseAddress}/screen", content, CancellationToken.None);
 
         return response.IsSuccessStatusCode
-            ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)
+            ? await response.Content.ReadFromJsonAsync<DataSetScreenResponse>(cancellationToken)
             : throw new DataScreenerException(
                 $"External data screening process failed with status code {response.StatusCode}."
             );
+    }
+
+    public async Task<List<DataSetScreenerProgressResponse>> GetScreeningProgress(
+        IList<Guid> dataSetIds,
+        CancellationToken cancellationToken
+    )
+    {
+        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
+
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        dataSetIds.ForEach(dataSetId => query.Add("dataSetId", dataSetId.ToString()));
+
+        var url = $"{httpClient.BaseAddress}/progress?{query}";
+        var response = await httpClient.GetAsync(url, cancellationToken);
+
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<List<DataSetScreenerProgressResponse>>(cancellationToken)
+            : throw new DataScreenerException(
+                $"Failed to get screener progress for dataSets {dataSetIds.JoinToString(",")}External data screening process failed with status code {response.StatusCode}."
+            );
+    }
+
+    public async Task DeleteScreeningProgress(IList<Guid> dataSetIds, CancellationToken cancellationToken)
+    {
+        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
+
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        dataSetIds.ForEach(dataSetId => query.Add("dataSetId", dataSetId.ToString()));
+
+        var url = $"{httpClient.BaseAddress}/progress?{query}";
+        var response = await httpClient.DeleteAsync(url, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new DataScreenerException(
+                $"External data screening process failed with status code {response.StatusCode}."
+            );
+        }
     }
 }

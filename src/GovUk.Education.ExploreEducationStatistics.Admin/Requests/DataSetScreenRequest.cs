@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
-public record DataSetScreenerRequest
+public record DataSetScreenRequest
 {
     public required string StorageContainerName { get; set; }
 
@@ -18,3 +18,5 @@ public record DataSetScreenerRequest
 
     public string MetaFileSasToken { get; set; } = string.Empty;
 }
+
+public record DataSetStartScreeningRequest(Guid DataSetId) : DataSetScreenRequest;

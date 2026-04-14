@@ -380,9 +380,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             configuration.GetSection(OpenIdConnectSpaClientOptions.Section)
         );
         services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-        services.Configure<DataScreenerClientOptions>(
-            configuration.GetRequiredSection(DataScreenerClientOptions.Section)
-        );
+        services.Configure<DataScreenerOptions>(configuration.GetRequiredSection(DataScreenerOptions.Section));
 
         StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -510,7 +508,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>(
             (provider, httpClient) =>
             {
-                var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
+                var options = provider.GetRequiredService<IOptions<DataScreenerOptions>>();
                 httpClient.BaseAddress = new Uri(options.Value.Url);
             }
         );

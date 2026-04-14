@@ -30,13 +30,13 @@ public class DataSetScreenerClientTests
         [Fact]
         public async Task AuthenticationManagerCalled()
         {
-            var responseBody = new DataSetScreenerResponse { OverallResult = "Failed", TestResults = [] };
+            var responseBody = new DataSetScreenResponse { OverallResult = "Failed", TestResults = [] };
 
             _mockHttp
                 .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
 
-            var authenticationManager = new Mock<IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>>(
+            var authenticationManager = new Mock<IHttpClientAzureAuthenticationManager<DataScreenerOptions>>(
                 MockBehavior.Strict
             );
 
@@ -47,7 +47,7 @@ public class DataSetScreenerClientTests
             var dataSetScreenerClient = BuildService(azureAuthenticationManager: authenticationManager.Object);
 
             await dataSetScreenerClient.ScreenDataSet(
-                new DataSetScreenerRequest
+                new DataSetScreenRequest
                 {
                     DataFileName = "",
                     DataFilePath = "",
@@ -70,7 +70,7 @@ public class DataSetScreenerClientTests
         [Fact]
         public async Task Success()
         {
-            var request = new DataSetScreenerRequest
+            var request = new DataSetScreenRequest
             {
                 DataFileName = "data-file-name",
                 DataFilePath = "data-file-path",
@@ -79,7 +79,7 @@ public class DataSetScreenerClientTests
                 StorageContainerName = "storage-container-name",
             };
 
-            var responseBody = new DataSetScreenerResponse
+            var responseBody = new DataSetScreenResponse
             {
                 OverallResult = "Failed",
                 TestResults =
@@ -116,7 +116,7 @@ public class DataSetScreenerClientTests
     }
 
     private DataSetScreenerClient BuildService(
-        IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>? azureAuthenticationManager = null
+        IHttpClientAzureAuthenticationManager<DataScreenerOptions>? azureAuthenticationManager = null
     )
     {
         var client = _mockHttp.ToHttpClient();
@@ -124,7 +124,7 @@ public class DataSetScreenerClientTests
 
         var authenticationManager =
             azureAuthenticationManager
-            ?? Mock.Of<IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>>(MockBehavior.Loose);
+            ?? Mock.Of<IHttpClientAzureAuthenticationManager<DataScreenerOptions>>(MockBehavior.Loose);
 
         return new DataSetScreenerClient(client, authenticationManager);
     }
