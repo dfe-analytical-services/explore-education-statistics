@@ -8,15 +8,14 @@ import {
   PublicationSortOption,
   publicationSortOptions,
 } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
-import {
-  AzureOrderByParam,
-  AzurePublicationListRequest,
-} from '@frontend/services/azurePublicationService';
+import { SearchDataPageQuery } from '@frontend/modules/search-data/SearchDataPage';
+import { AzureDataSetListRequest } from '@frontend/services/azureDataSetService';
+import { AzureOrderByParam } from '@frontend/services/azurePublicationService';
 import omitBy from 'lodash/omitBy';
 
-export default function createPublicationListRequest(
+export default function createDataSetListRequest(
   query: FindStatisticsPageQuery,
-): AzurePublicationListRequest {
+): AzureDataSetListRequest {
   const {
     releaseType,
     search: searchParam,
@@ -52,31 +51,31 @@ export default function createPublicationListRequest(
   );
 }
 
-export function createPublicationSuggestRequest(
-  query: FindStatisticsPageQuery,
-  searchTerm: string,
-): AzurePublicationListRequest {
-  const { releaseType, themeId } = getParamsFromQuery(query);
+// export function createDataSetSuggestRequest(
+//   query: FindStatisticsPageQuery,
+//   searchTerm: string,
+// ): AzurePublicationListRequest {
+//   const { releaseType, themeId } = getParamsFromQuery(query);
 
-  let filter: string | undefined;
-  if (releaseType && themeId) {
-    filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
-  } else if (releaseType) {
-    filter = odata`releaseType eq ${releaseType}`;
-  } else if (themeId) {
-    filter = odata`themeId eq ${themeId}`;
-  }
+//   let filter: string | undefined;
+//   if (releaseType && themeId) {
+//     filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
+//   } else if (releaseType) {
+//     filter = odata`releaseType eq ${releaseType}`;
+//   } else if (themeId) {
+//     filter = odata`themeId eq ${themeId}`;
+//   }
 
-  return omitBy(
-    {
-      filter,
-      releaseType,
-      search: searchTerm,
-      themeId,
-    },
-    value => typeof value === 'undefined',
-  );
-}
+//   return omitBy(
+//     {
+//       filter,
+//       releaseType,
+//       search: searchTerm,
+//       themeId,
+//     },
+//     value => typeof value === 'undefined',
+//   );
+// }
 
 function getSortParam(sortBy: PublicationSortOption): AzureOrderByParam {
   switch (sortBy) {
@@ -91,7 +90,7 @@ function getSortParam(sortBy: PublicationSortOption): AzureOrderByParam {
   }
 }
 
-export function getParamsFromQuery(query: FindStatisticsPageQuery) {
+export function getParamsFromQuery(query: SearchDataPageQuery) {
   return {
     page: getFirst(query.page),
     releaseType:
