@@ -39,6 +39,18 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
                 return PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(entryDtos, page, pageSize);
             });
 
+    public async Task<Either<ActionResult, Guid[]>> GetPublicationReleaseIds(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await GetPublicationBySlug(publicationSlug, cancellationToken)
+            .OnSuccess(async publication =>
+                await contentDbContext
+                    .ReleaseVersions.LatestReleaseVersions(publicationId: publication.Id, publishedOnly: true)
+                    .Select(rv => rv.ReleaseId)
+                    .ToArrayAsync(cancellationToken)
+            );
+
     private Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
         CancellationToken cancellationToken

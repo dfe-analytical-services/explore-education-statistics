@@ -19,17 +19,17 @@ internal class SearchableDocumentRemover(
         CancellationToken cancellationToken = default
     )
     {
-        var releaseInfos = await contentApiClient.GetReleasesForPublication(request.PublicationSlug, cancellationToken);
+        var releaseIds = await contentApiClient.GetPublicationReleaseIds(request.PublicationSlug, cancellationToken);
 
         var results = new Dictionary<Guid, bool>();
 
-        foreach (var releaseInfo in releaseInfos)
+        foreach (var releaseId in releaseIds)
         {
             var result = await RemoveSearchableDocument(
-                new RemoveSearchableDocumentRequest { ReleaseId = releaseInfo.ReleaseId },
+                new RemoveSearchableDocumentRequest { ReleaseId = releaseId },
                 cancellationToken
             );
-            results[releaseInfo.ReleaseId] = result.Success;
+            results[releaseId] = result.Success;
         }
 
         return new RemovePublicationSearchableDocumentsResponse(results);

@@ -45,6 +45,15 @@ public class PublicationsController(
             )
             .HandleFailuresOrOk();
 
+    [HttpGet("publications/{publicationSlug}/release-ids")]
+    public async Task<ActionResult<Guid[]>> GetPublicationReleaseIds(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await publicationReleasesService
+            .GetPublicationReleaseIds(publicationSlug, cancellationToken)
+            .HandleFailuresOrOk();
+
     [HttpGet("publications/{publicationId:guid}/summary")]
     public async Task<ActionResult<PublicationSummaryDto>> GetPublicationSummary(Guid publicationId) =>
         await publicationsService.GetPublicationSummary(publicationId).HandleFailuresOrOk();

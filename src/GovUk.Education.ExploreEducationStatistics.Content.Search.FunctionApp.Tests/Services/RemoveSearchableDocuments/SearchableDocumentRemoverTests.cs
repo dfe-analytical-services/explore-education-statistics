@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
@@ -27,21 +26,21 @@ public class SearchableDocumentRemoverTests
     public class RemovePublicationSearchableDocumentsTests : SearchableDocumentRemoverTests
     {
         [Fact]
-        public async Task ShouldRequestReleasesForPublicationFromContentApi()
+        public async Task ShouldRequestPublicationReleaseIdsFromContentApi()
         {
             var request = new RemovePublicationSearchableDocumentsRequest { PublicationSlug = "publication-slug" };
 
             await GetSut().RemovePublicationSearchableDocuments(request);
 
-            _contentApiClientMockBuilder.Assert.ReleasesRequestedForPublication("publication-slug");
+            _contentApiClientMockBuilder.Assert.ReleaseIdsRequestedForPublication("publication-slug");
         }
 
         [Fact]
-        public async Task ShouldNotDeleteBlobsIfNoReleasesFound()
+        public async Task ShouldNotDeleteBlobsIfPublicationHasNoReleases()
         {
-            ReleaseInfo[] releases = [];
+            Guid[] releaseIds = [];
             var request = new RemovePublicationSearchableDocumentsRequest { PublicationSlug = "publication-slug" };
-            _contentApiClientMockBuilder.WherePublicationHasReleases(releases);
+            _contentApiClientMockBuilder.WherePublicationHasReleaseIds(releaseIds);
 
             await GetSut().RemovePublicationSearchableDocuments(request);
 
@@ -57,9 +56,9 @@ public class SearchableDocumentRemoverTests
                 SearchableDocumentsContainerName = "searchable-documents-container-name",
             };
 
-            ReleaseInfo[] releases = [new() { ReleaseId = Guid.NewGuid() }];
+            Guid[] releaseIds = [Guid.NewGuid()];
             var request = new RemovePublicationSearchableDocumentsRequest { PublicationSlug = "publication-slug" };
-            _contentApiClientMockBuilder.WherePublicationHasReleases(releases);
+            _contentApiClientMockBuilder.WherePublicationHasReleaseIds(releaseIds);
 
             await GetSut().RemovePublicationSearchableDocuments(request);
 
@@ -71,29 +70,29 @@ public class SearchableDocumentRemoverTests
         [Fact]
         public async Task ShouldDeleteBlobsForReleases()
         {
-            ReleaseInfo[] releases = [new() { ReleaseId = Guid.NewGuid() }, new() { ReleaseId = Guid.NewGuid() }];
+            Guid[] releaseIds = [Guid.NewGuid(), Guid.NewGuid()];
             var request = new RemovePublicationSearchableDocumentsRequest { PublicationSlug = "publication-slug" };
-            _contentApiClientMockBuilder.WherePublicationHasReleases(releases);
+            _contentApiClientMockBuilder.WherePublicationHasReleaseIds(releaseIds);
 
             await GetSut().RemovePublicationSearchableDocuments(request);
 
-            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(blobName: releases[0].ReleaseId.ToString());
-            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(blobName: releases[1].ReleaseId.ToString());
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(blobName: releaseIds[0].ToString());
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(blobName: releaseIds[1].ToString());
         }
 
         [Fact]
         public async Task ShouldReturnDeletionResultInResponse()
         {
-            ReleaseInfo[] releases = [new() { ReleaseId = Guid.NewGuid() }, new() { ReleaseId = Guid.NewGuid() }];
+            Guid[] releaseIds = [Guid.NewGuid(), Guid.NewGuid()];
             var request = new RemovePublicationSearchableDocumentsRequest { PublicationSlug = "publication-slug" };
-            _contentApiClientMockBuilder.WherePublicationHasReleases(releases);
-            _azureBlobStorageClientMockBuilder.WhereDeleteBlobFailsFor(releases[0].ReleaseId.ToString());
+            _contentApiClientMockBuilder.WherePublicationHasReleaseIds(releaseIds);
+            _azureBlobStorageClientMockBuilder.WhereDeleteBlobFailsFor(releaseIds[0].ToString());
 
             var response = await GetSut().RemovePublicationSearchableDocuments(request);
 
             Assert.Equal(2, response.ReleaseIdToDeletionResult.Count);
-            Assert.False(response.ReleaseIdToDeletionResult[releases[0].ReleaseId]);
-            Assert.True(response.ReleaseIdToDeletionResult[releases[1].ReleaseId]);
+            Assert.False(response.ReleaseIdToDeletionResult[releaseIds[0]]);
+            Assert.True(response.ReleaseIdToDeletionResult[releaseIds[1]]);
         }
     }
 

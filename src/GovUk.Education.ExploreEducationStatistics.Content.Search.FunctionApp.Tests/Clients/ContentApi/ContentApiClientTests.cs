@@ -137,16 +137,16 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
         }
 
-        [Fact(Skip = "Call Content API to get releases for a specified publication slug")]
-        public async Task GetReleasesForPublication()
+        [Fact(Skip = "Call Content API to get published release id's for a specified publication slug")]
+        public async Task GetPublicationReleaseIds()
         {
             var sut = GetSut();
             const string publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
-            var releases = await sut.GetReleasesForPublication(publicationSlug);
-            Print($"{releases.Length} releases found");
-            foreach (var release in releases)
+            var releaseIds = await sut.GetPublicationReleaseIds(publicationSlug);
+            Print($"{releaseIds.Length} release id's found");
+            foreach (var releaseId in releaseIds)
             {
-                Print(release.ReleaseId.ToString());
+                Print(releaseId.ToString());
             }
         }
 

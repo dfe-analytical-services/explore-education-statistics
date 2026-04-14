@@ -21,7 +21,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 
     private const string GetPublicationReleaseSummaryEndpointFormat = "/api/publications/{0}/releases/{1}/summary";
 
-    private const string GetReleasesForPublicationEndpointFormat = "api/publications/{0}/releases";
+    private const string GetPublicationReleaseIdsEndpointFormat = "api/publications/{0}/release-ids";
 
     private const string GetThemesEndpoint = "/api/themes";
 
@@ -103,18 +103,18 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         );
     }
 
-    public async Task<ReleaseInfo[]> GetReleasesForPublication(
+    public async Task<Guid[]> GetPublicationReleaseIds(
         string publicationSlug,
         CancellationToken cancellationToken = default
     )
     {
-        var apiEndpoint = BuildGetReleasesForPublicationEndpoint(publicationSlug);
-        var response = await Get<ReleaseSummaryViewModelDto[]>(apiEndpoint, cancellationToken);
+        var apiEndpoint = BuildGetPublicationReleaseIdsEndpoint(publicationSlug);
+        var response = await Get<Guid[]>(apiEndpoint, cancellationToken);
 
         return Process(
             response,
-            onSuccess: dtos => dtos.Select(dto => new ReleaseInfo { ReleaseId = dto.ReleaseId }).ToArray(),
-            onError: errorMessage => new UnableToGetReleasesForPublicationException(publicationSlug, errorMessage)
+            onSuccess: releaseIds => releaseIds,
+            onError: errorMessage => new UnableToGetPublicationReleaseIdsException(publicationSlug, errorMessage)
         );
     }
 
@@ -149,19 +149,19 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         );
     }
 
-    private string BuildGetPublicationsByThemeEndpoint(Guid themeId) =>
+    private static string BuildGetPublicationsByThemeEndpoint(Guid themeId) =>
         string.Format(GetPublicationsByThemeEndpointFormat, themeId.ToString());
 
-    private string BuildGetPublicationReleaseSummaryEndpoint(string publicationSlug, string releaseSlug) =>
+    private static string BuildGetPublicationReleaseSummaryEndpoint(string publicationSlug, string releaseSlug) =>
         string.Format(GetPublicationReleaseSummaryEndpointFormat, publicationSlug, releaseSlug);
 
-    private string BuildGetReleasesForPublicationEndpoint(string publicationSlug) =>
-        string.Format(GetReleasesForPublicationEndpointFormat, publicationSlug);
+    private static string BuildGetPublicationReleaseIdsEndpoint(string publicationSlug) =>
+        string.Format(GetPublicationReleaseIdsEndpointFormat, publicationSlug);
 
-    private string BuildGetPublicationLatestReleaseSearchViewModelApiEndpoint(string publicationSlug) =>
+    private static string BuildGetPublicationLatestReleaseSearchViewModelApiEndpoint(string publicationSlug) =>
         string.Format(GetPublicationLatestReleaseSearchViewModelApiEndpointFormat, publicationSlug);
 
-    private TResult Process<TResponse, TResult>(
+    private static TResult Process<TResponse, TResult>(
         GetResponse<TResponse> response,
         Func<TResponse, TResult> onSuccess,
         Func<string, Exception> onError
