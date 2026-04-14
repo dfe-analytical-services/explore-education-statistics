@@ -8,10 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 /// </summary>
 public record PublicationInfoViewModel
 {
-    public Guid PublicationId { get; init; }
+    public required Guid PublicationId { get; init; }
     public required string PublicationSlug { get; init; }
 
-    public ReleaseInfoViewModel? LatestPublishedRelease { get; init; }
+    public required ReleaseInfoViewModel? LatestPublishedRelease { get; init; }
 
     public static PublicationInfoViewModel FromEntity(Publication publication) =>
         new()
