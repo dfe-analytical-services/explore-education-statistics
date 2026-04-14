@@ -1,0 +1,529 @@
+import BackToTopLink from '@common/components/BackToTopLink';
+import ButtonText from '@common/components/ButtonText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import WarningMessage from '@common/components/WarningMessage';
+import { useMobileMedia } from '@common/hooks/useMedia';
+import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import FilterResetButton from '@frontend/components/FilterResetButton';
+import FiltersMobile from '@frontend/components/FiltersMobile';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
+import Pagination from '@frontend/components/Pagination';
+import { SortOption } from '@frontend/components/SortControls';
+import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
+import Filters from '@frontend/modules/find-statistics/components/Filters';
+import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
+import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
+import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import {
+  PublicationFilter,
+  publicationFilters,
+} from '@frontend/modules/find-statistics/utils/publicationFilters';
+import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import azureDataSetQueries from '@frontend/queries/azureDataSetQueries';
+import azurePublicationQueries from '@frontend/queries/azurePublicationQueries';
+import themeQueries from '@frontend/queries/themeQueries';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
+import compact from 'lodash/compact';
+import omit from 'lodash/omit';
+import { GetServerSideProps, NextPage } from 'next';
+import { useRouter } from 'next/router';
+import { ParsedUrlQuery } from 'querystring';
+import React, { useState } from 'react';
+
+const defaultPageTitle = 'Explore our education statistics';
+
+type RoutePath = 'search-publications' | 'search-data';
+
+export interface SearchDataPageQuery {
+  page?: number;
+  releaseType?: ReleaseType;
+  search?: string;
+  sortBy?: PublicationSortOption;
+  themeId?: string;
+}
+
+const SearchDataPage: NextPage = () => {
+  const router = useRouter();
+  const { isMedia: isMobileMedia } = useMobileMedia();
+
+  const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
+  const currentRoute = router.query.searchRoute as RoutePath;
+  const isPublicationsSearch = currentRoute === 'search-publications';
+
+  const {
+    data: dataSetsData,
+    isError: isDataSetsError,
+    isFetching: isDataSetsFetching,
+    isLoading: isDataSetsLoading,
+  } = useQuery({
+    ...azureDataSetQueries.list(router.query),
+    keepPreviousData: true,
+    staleTime: 60000,
+    enabled: !isPublicationsSearch,
+  });
+
+  const {
+    data: publicationsData,
+    isError: isPublicationsError,
+    isFetching: isPublicationsFetching,
+    isLoading: isPublicationsLoading,
+  } = useQuery({
+    ...azurePublicationQueries.list(router.query),
+    keepPreviousData: true,
+    staleTime: 60000,
+    enabled: isPublicationsSearch,
+  });
+
+  const { data: themes = [] } = useQuery({
+    ...themeQueries.list(),
+    staleTime: Infinity,
+  });
+
+  const {
+    paging: dataSetsPaging,
+    results: dataSets = [],
+    // facets = { themeId: [], releaseType: [] },
+  } = dataSetsData ?? {};
+
+  const {
+    paging: publicationsPaging,
+    results: publications = [],
+    facets = { themeId: [], releaseType: [] },
+  } = publicationsData ?? {};
+
+  const {
+    page,
+    totalPages,
+    totalResults = 0,
+  } = (isPublicationsSearch ? publicationsPaging : dataSetsPaging) ?? {};
+
+  const { themeId: themeFacetResults, releaseType: releaseTypeFacetResults } =
+    facets;
+
+  const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
+    router.query,
+  );
+
+  const themesWithResultCounts = themes
+    .map(theme => {
+      const facetedResult = themeFacetResults?.find(
+        result => theme.id === result.value,
+      );
+      const count = facetedResult?.count ?? 0;
+      return {
+        label: `${theme.title} (${count})`,
+        value: theme.id,
+        count,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
+
+  const releaseTypesWithResultCounts = Object.keys(releaseTypes)
+    .map(type => {
+      const facetedResult = releaseTypeFacetResults?.find(
+        result => type === result.value,
+      );
+
+      const title = releaseTypes[type as ReleaseType];
+      const count = facetedResult?.count ?? 0;
+      return {
+        label: `${title} (${count})`,
+        value: type,
+        count,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
+
+  const isFiltered = !!search || !!releaseType || !!themeId;
+
+  const selectedTheme = themes.find(theme => theme.id === themeId);
+  const selectedReleaseType = releaseTypes[releaseType as ReleaseType];
+
+  const filteredByString = compact([
+    search,
+    selectedTheme?.title,
+    selectedReleaseType,
+  ]).join(', ');
+
+  const sortOptions: SortOption[] = [
+    { label: 'Newest', value: 'newest' },
+    { label: 'Oldest', value: 'oldest' },
+    { label: 'A to Z', value: 'title' },
+    ...(search
+      ? [
+          {
+            label: 'Relevance',
+            value: 'relevance',
+          } as SortOption,
+        ]
+      : []),
+  ];
+
+  const updateQueryParams = async (nextQuery: SearchDataPageQuery) => {
+    // When a query param is changed for the first time Next announces the page title,
+    // even if it hasn't changed.
+    // Set the title here so it's more useful the just announcing the default title.
+    // Have to set it before the route change otherwise the previous title will be announced.
+    // It won't be reannounced on subsequent query param changes.
+    setPageTitle(`${defaultPageTitle} - Search results`);
+    await router.push(
+      {
+        pathname: '/[searchRoute]',
+        query: { ...nextQuery, searchRoute: currentRoute },
+      },
+      undefined,
+      {
+        shallow: true,
+      },
+    );
+  };
+
+  const handleSortBy = async (nextSortBy: PublicationSortOption) => {
+    await updateQueryParams({
+      ...omit(router.query, 'page'),
+      sortBy: nextSortBy,
+    });
+
+    logEvent({
+      category: 'Find statistics and data',
+      action: 'Publications sorted',
+      label: nextSortBy,
+    });
+  };
+
+  const handleChangeFilter = async ({
+    filterType,
+    nextValue,
+  }: {
+    filterType: PublicationFilter;
+    nextValue: string;
+  }) => {
+    // If performing a search (by search term), reset sortBy to relevance
+    const nextSortBy =
+      filterType === 'search' && nextValue.length > 0 ? 'relevance' : sortBy;
+
+    const newParams =
+      nextValue === 'all'
+        ? omit(router.query, 'page', filterType)
+        : {
+            ...omit(router.query, 'page'),
+            [filterType]: nextValue,
+            sortBy: nextSortBy,
+          };
+
+    await updateQueryParams(newParams);
+
+    logEvent({
+      category: 'Find statistics and data',
+      action: `Publications filtered by ${filterType}`,
+      label: nextValue,
+    });
+  };
+
+  const handleResetFilter = async ({
+    filterType,
+  }: {
+    filterType: PublicationFilter | 'all';
+  }) => {
+    // Reset sortBy to newest if removing a search and sorting by relevance
+    const nextSortBy = search && sortBy === 'relevance' ? 'newest' : sortBy;
+
+    const newParams =
+      filterType === 'all'
+        ? {
+            ...omit(router.query, 'page', ...publicationFilters),
+            sortBy: nextSortBy,
+          }
+        : {
+            ...omit(router.query, filterType, 'page'),
+            sortBy: nextSortBy,
+          };
+    await updateQueryParams(newParams);
+
+    logEvent({
+      category: 'Find statistics and data',
+      action: `Reset ${filterType} filter`,
+    });
+  };
+
+  const totalResultsMessage = `${totalResults} ${
+    totalResults !== 1 ? 'results' : 'result'
+  }`;
+
+  const isLoading =
+    (!isPublicationsSearch && isDataSetsLoading) ||
+    (isPublicationsSearch && isPublicationsLoading);
+  const isFetching =
+    (!isPublicationsSearch && isDataSetsFetching) ||
+    (isPublicationsSearch && isPublicationsFetching);
+  const isError =
+    (!isPublicationsSearch && isDataSetsError) ||
+    (isPublicationsSearch && isPublicationsError);
+
+  return (
+    <Page
+      title={defaultPageTitle}
+      // Don't include the default meta title when filtered to prevent too much screen reader noise.
+      includeDefaultMetaTitle={pageTitle === defaultPageTitle}
+      metaTitle={pageTitle}
+    >
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <FindStatisticsSearchForm
+            label={isPublicationsSearch ? 'Search publications' : 'Search data'}
+            onSubmit={nextValue =>
+              handleChangeFilter({ filterType: 'search', nextValue })
+            }
+          />
+          <a href="#searchResults" className="govuk-skip-link">
+            Skip to search results
+          </a>
+
+          {isMobileMedia && isFiltered && (
+            <ButtonText
+              onClick={() => handleResetFilter({ filterType: 'all' })}
+              className="govuk-!-margin-top-2"
+            >
+              Reset filters
+            </ButtonText>
+          )}
+          {/* Using ScreenReaderMessage here as the message is announced twice if have
+          aria-live etc on the h2. */}
+          <ScreenReaderMessage message={totalResultsMessage} />
+        </div>
+        <div className="govuk-grid-column-one-third">Related information</div>
+      </div>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-full">
+          <div className="govuk-!-margin-top-3 govuk-!-padding-bottom-2 dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center dfe-border-bottom">
+            <Link
+              to={{
+                pathname: '/search-publications',
+                query: {
+                  ...router.query,
+                  searchRoute: undefined,
+                },
+              }}
+              shallow
+              unvisited
+            >
+              Search publications
+            </Link>
+            <Link
+              to={{
+                pathname: '/search-data',
+                query: { ...router.query, searchRoute: undefined },
+              }}
+              shallow
+              unvisited
+            >
+              Search data
+            </Link>
+          </div>
+        </div>
+      </div>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third">
+          {!isMobileMedia && (
+            <Filters
+              releaseType={releaseType}
+              releaseTypesWithResultCounts={releaseTypesWithResultCounts}
+              showResetFiltersButton={!isMobileMedia && isFiltered}
+              sortBy={sortBy}
+              sortOptions={sortOptions}
+              themeId={themeId}
+              themes={themes}
+              themesWithResultCounts={themesWithResultCounts}
+              onChange={handleChangeFilter}
+              onSortChange={handleSortBy}
+              onResetFilters={() => handleResetFilter({ filterType: 'all' })}
+            />
+          )}
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          {isMobileMedia && (
+            <FiltersMobile
+              title="Sort and filter publications"
+              totalResults={totalResults}
+            >
+              <Filters
+                releaseTypesWithResultCounts={releaseTypesWithResultCounts}
+                releaseType={releaseType}
+                sortBy={sortBy}
+                sortOptions={sortOptions}
+                themeId={themeId}
+                themes={themes}
+                themesWithResultCounts={themesWithResultCounts}
+                onChange={handleChangeFilter}
+                onSortChange={handleSortBy}
+              />
+            </FiltersMobile>
+          )}
+
+          <div className="govuk-!-margin-top-3 dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center">
+            <p className="govuk-!-margin-bottom-0" data-testid="total-results">
+              {`${totalResultsMessage}, ${
+                totalResults ? `page ${page} of ${totalPages}` : '0 pages'
+              }, ${isFiltered ? 'filtered by: ' : 'showing all publications'}`}
+            </p>
+
+            {isFiltered && <VisuallyHidden>{filteredByString}</VisuallyHidden>}
+
+            <div className="dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center">
+              {search && (
+                <FilterResetButton
+                  filterType="Search"
+                  name={search}
+                  onClick={() => handleResetFilter({ filterType: 'search' })}
+                />
+              )}
+
+              {selectedTheme && (
+                <FilterResetButton
+                  filterType="Theme"
+                  name={selectedTheme.title}
+                  onClick={() => handleResetFilter({ filterType: 'themeId' })}
+                />
+              )}
+              {selectedReleaseType && (
+                <FilterResetButton
+                  filterType="Release type"
+                  name={selectedReleaseType}
+                  onClick={() =>
+                    handleResetFilter({ filterType: 'releaseType' })
+                  }
+                />
+              )}
+            </div>
+
+            <VisuallyHidden>{` Sorted by ${
+              sortBy === 'title' ? 'A to Z' : sortBy
+            }`}</VisuallyHidden>
+          </div>
+
+          <LoadingSpinner
+            loading={isLoading || isFetching}
+            className="govuk-!-margin-top-4"
+          >
+            {isError ? (
+              <WarningMessage>
+                Cannot load{' '}
+                {isPublicationsSearch ? 'publications' : 'data sets'}, please
+                try again later.
+              </WarningMessage>
+            ) : (
+              <>
+                {totalResults === 0 ? (
+                  <div className="govuk-!-margin-top-5" id="searchResults">
+                    {isFiltered ? (
+                      <>
+                        <p className="govuk-!-font-weight-bold">
+                          There are no matching results.
+                        </p>
+                        <p>Improve your search results by:</p>
+                        <ul>
+                          <li>removing filters</li>
+                          <li>double-checking your spelling</li>
+                          <li>using fewer keywords</li>
+                          <li>searching for something less specific</li>
+                        </ul>
+                      </>
+                    ) : (
+                      <p>No data currently published.</p>
+                    )}
+                  </div>
+                ) : (
+                  <ul
+                    className="govuk-list"
+                    id="searchResults"
+                    data-testid={
+                      isPublicationsSearch
+                        ? 'publicationsList'
+                        : 'data-set-file-list'
+                    }
+                  >
+                    {isPublicationsSearch
+                      ? publications.map(pub => (
+                          <PublicationResultSummary
+                            key={pub.id}
+                            publication={pub}
+                          />
+                        ))
+                      : dataSets.map(dataSet => (
+                          <DataSetFileSummary
+                            key={dataSet.fileId}
+                            dataSetFile={dataSet}
+                            expandable={false}
+                            expanded
+                          />
+                        ))}
+                  </ul>
+                )}
+              </>
+            )}
+            {page && !!totalPages && (
+              <Pagination
+                currentPage={page}
+                shallow
+                totalPages={totalPages}
+                onClick={pageNumber => {
+                  // Make sure the page title is updated before the route change,
+                  // otherwise the wrong page number is announced.
+                  setPageTitle(`${defaultPageTitle} - page ${pageNumber}`);
+                  logEvent({
+                    category: 'Find statistics and data',
+                    action: `Pagination clicked`,
+                    label: `Page ${pageNumber}`,
+                  });
+                }}
+              />
+            )}
+          </LoadingSpinner>
+
+          {(isPublicationsSearch && publications.length > 0) ||
+            (!isPublicationsSearch && dataSets.length > 0 && (
+              <BackToTopLink className="govuk-!-margin-top-7" />
+            ))}
+        </div>
+      </div>
+    </Page>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({
+  query,
+  params,
+}) => {
+  const searchRoute = params?.searchRoute as string;
+
+  // TODO EES-7072 check about prototype route names, and if this approach allows nested routes
+  if (!['search-publications', 'search-data'].includes(searchRoute)) {
+    return { notFound: true };
+  }
+
+  if (process.env.APP_ENV === 'Production') {
+    return {
+      notFound: true,
+    };
+  }
+
+  const queryClient = new QueryClient();
+
+  // TODO EES-7072 prefetch different query based on route
+  await Promise.all([
+    queryClient.prefetchQuery(azureDataSetQueries.list(query)),
+    queryClient.prefetchQuery(themeQueries.list()),
+  ]);
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+};
+
+export default SearchDataPage;
