@@ -118,19 +118,19 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         );
     }
 
-    public async Task<ReleaseSummary> GetReleaseSummary(
+    public async Task<ReleaseVersionSummary> GetReleaseVersionSummary(
         string publicationSlug,
         string releaseSlug,
         CancellationToken cancellationToken = default
     )
     {
         var apiEndpoint = BuildGetReleaseVersionSummaryEndpoint(publicationSlug, releaseSlug);
-        var response = await Get<ReleaseSummaryDto>(apiEndpoint, cancellationToken);
+        var response = await Get<ReleaseVersionSummaryDto>(apiEndpoint, cancellationToken);
 
         return Process(
             response,
             onSuccess: dto => dto.ToModel(),
-            onError: errorMessage => new UnableToGetReleaseSummaryForPublicationException(
+            onError: errorMessage => new UnableToGetReleaseVersionSummaryException(
                 publicationSlug,
                 releaseSlug,
                 errorMessage

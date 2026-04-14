@@ -7,7 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public interface IReleaseSummaryRetriever
 {
-    Task<IList<ReleaseSummary>> GetAllPublishedReleaseSummaries(CancellationToken cancellationToken = default);
+    Task<IList<ReleaseVersionSummary>> GetAllPublishedReleaseVersionSummaries(
+        CancellationToken cancellationToken = default
+    );
 }
 
 public class ReleaseSummaryRetriever(
@@ -15,41 +17,41 @@ public class ReleaseSummaryRetriever(
     ILogger<ReleaseSummaryRetriever> logger
 ) : IReleaseSummaryRetriever
 {
-    public async Task<IList<ReleaseSummary>> GetAllPublishedReleaseSummaries(
+    public async Task<IList<ReleaseVersionSummary>> GetAllPublishedReleaseVersionSummaries(
         CancellationToken cancellationToken = default
     )
     {
-        // Get a list of all publication releases
+        // Retrieve all published publications, including details about the latest published releases for each
         var contentApiClient = contentApiClientFactory();
         var allLivePublicationInfos = await contentApiClient.GetAllLivePublicationInfos(cancellationToken);
 
-        // Retrieve the release summary for each of the publications
-        var releaseSummaries = await allLivePublicationInfos
+        // Get the latest published release version summary for each of the releases
+        return await allLivePublicationInfos
             .ToAsyncEnumerable()
-            .SelectAwait(async publicationInfo =>
-            {
-                try
+            .Select(
+                async (publicationInfo, ct) =>
                 {
-                    return await contentApiClient.GetReleaseSummary(
-                        publicationInfo.PublicationSlug,
-                        publicationInfo.LatestReleaseSlug,
-                        cancellationToken
-                    );
+                    try
+                    {
+                        return await contentApiClient.GetReleaseVersionSummary(
+                            publicationInfo.PublicationSlug,
+                            publicationInfo.LatestReleaseSlug,
+                            cancellationToken: ct
+                        );
+                    }
+                    catch (UnableToGetReleaseVersionSummaryException ex)
+                    {
+                        logger.LogError(
+                            ex,
+                            "Call to ContentApi GetReleaseVersionSummary failed: {PublicationSlug} {LatestReleaseSlug}",
+                            publicationInfo.PublicationSlug,
+                            publicationInfo.LatestReleaseSlug
+                        );
+                        return null;
+                    }
                 }
-                catch (UnableToGetReleaseSummaryForPublicationException ex)
-                {
-                    logger.LogError(
-                        ex,
-                        "Call to ContentApi GetReleaseSummary failed: {PublicationSlug} {LatestReleaseSlug}",
-                        publicationInfo.PublicationSlug,
-                        publicationInfo.LatestReleaseSlug
-                    );
-                    return null;
-                }
-            })
-            .OfType<ReleaseSummary>()
+            )
+            .OfType<ReleaseVersionSummary>()
             .ToArrayAsync(cancellationToken);
-
-        return releaseSummaries;
     }
 }

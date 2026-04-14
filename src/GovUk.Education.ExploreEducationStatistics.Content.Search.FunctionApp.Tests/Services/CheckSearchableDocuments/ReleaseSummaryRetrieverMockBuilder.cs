@@ -7,20 +7,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class ReleaseSummaryRetrieverMockBuilder
 {
     private readonly Mock<IReleaseSummaryRetriever> _mock = new(MockBehavior.Strict);
-    private IList<ReleaseSummary> _releaseSummaries = [];
+    private IList<ReleaseVersionSummary> _releaseVersionSummaries = [];
 
     public IReleaseSummaryRetriever Build()
     {
         _mock
-            .Setup(m => m.GetAllPublishedReleaseSummaries(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_releaseSummaries);
+            .Setup(m => m.GetAllPublishedReleaseVersionSummaries(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_releaseVersionSummaries);
 
         return _mock.Object;
     }
 
-    public ReleaseSummaryRetrieverMockBuilder WhereReleaseSummariesReturnedAre(IList<ReleaseSummary> releaseSummaries)
+    public ReleaseSummaryRetrieverMockBuilder WhereReleaseVersionSummariesReturnedAre(
+        IList<ReleaseVersionSummary> releaseVersionSummaries
+    )
     {
-        _releaseSummaries = releaseSummaries;
+        _releaseVersionSummaries = releaseVersionSummaries;
         return this;
     }
 }

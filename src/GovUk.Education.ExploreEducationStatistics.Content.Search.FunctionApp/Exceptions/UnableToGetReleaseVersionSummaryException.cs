@@ -1,15 +1,11 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 
 /// <summary>
-/// Exception thrown when the call to the Content API to retrieve the release summary for a publication fails.
+/// Exception thrown when the call to the Content API to retrieve the latest published release version summary fails.
 /// </summary>
-public class UnableToGetReleaseSummaryForPublicationException(
-    string publicationSlug,
-    string releaseSlug,
-    string errorMessage
-)
+public class UnableToGetReleaseVersionSummaryException(string publicationSlug, string releaseSlug, string errorMessage)
     : Exception(
         $"""
-        Unable to get release summary for release "{releaseSlug}" for publication "{publicationSlug}". Error: "{errorMessage}"
+        Unable to get the latest published release version summary for release "{releaseSlug}" under publication "{publicationSlug}". Error: "{errorMessage}"
         """
     );

@@ -19,8 +19,8 @@ public class SearchableDocumentCheckerTests
     {
         // Arrange
         string[] releaseIds = ["release-1", "release-2", "release-3"];
-        var releaseSummaries = releaseIds
-            .Select(releaseId => new ReleaseSummary
+        var releaseVersionSummaries = releaseIds
+            .Select(releaseId => new ReleaseVersionSummary
             {
                 Id = $"id for release {releaseId}",
                 ReleaseId = releaseId,
@@ -29,7 +29,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(releaseIds);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseSummariesReturnedAre(releaseSummaries);
+        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -52,8 +52,8 @@ public class SearchableDocumentCheckerTests
         // Arrange
         string[] blobNames = ["release-1", "release-3"];
         string[] releaseIds = ["release-1", "release-2", "release-3"];
-        var releaseSummaries = releaseIds
-            .Select(releaseId => new ReleaseSummary
+        var releaseVersionSummaries = releaseIds
+            .Select(releaseId => new ReleaseVersionSummary
             {
                 Id = $"id for release {releaseId}",
                 ReleaseId = releaseId,
@@ -62,7 +62,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseSummariesReturnedAre(releaseSummaries);
+        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -77,7 +77,7 @@ public class SearchableDocumentCheckerTests
         Assert.Equal(2, report.TotalBlobCount);
         Assert.Equal(3, report.TotalPublicationCount);
         var actualMissingBlobSummary = Assert.Single(report.MissingBlobSummaries);
-        var expectedMissingBlobSummary = ReleaseSummaryViewModel.FromModel(releaseSummaries[1]);
+        var expectedMissingBlobSummary = ReleaseVersionSummaryViewModel.FromModel(releaseVersionSummaries[1]);
         Assert.Equal(expectedMissingBlobSummary, actualMissingBlobSummary);
     }
 
@@ -87,8 +87,8 @@ public class SearchableDocumentCheckerTests
         // Arrange
         string[] blobNames = ["release-1", "release-2", "release-3", "release-4"];
         string[] releaseIds = ["release-1", "release-2", "release-3"];
-        var releaseSummaries = releaseIds
-            .Select(releaseId => new ReleaseSummary
+        var releaseVersionSummaries = releaseIds
+            .Select(releaseId => new ReleaseVersionSummary
             {
                 Id = $"id for release {releaseId}",
                 ReleaseId = releaseId,
@@ -97,7 +97,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseSummariesReturnedAre(releaseSummaries);
+        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -120,8 +120,8 @@ public class SearchableDocumentCheckerTests
         // Arrange
         string[] blobNames = ["release-A", "release-B", "release-C", "release-D"];
         string[] releaseIds = ["release-1", "release-2", "release-3"];
-        var releaseSummaries = releaseIds
-            .Select(releaseId => new ReleaseSummary
+        var releaseVersionSummaries = releaseIds
+            .Select(releaseId => new ReleaseVersionSummary
             {
                 Id = $"id for release {releaseId}",
                 ReleaseId = releaseId,
@@ -130,7 +130,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseSummariesReturnedAre(releaseSummaries);
+        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 
@@ -153,8 +153,8 @@ public class SearchableDocumentCheckerTests
         // Arrange
         string[] blobNames = ["release-1", "release-2", "release-3", "release-4", "release-5"];
         string[] releaseIds = ["release-4", "release-5", "release-6", "release-7", "release-8", "release-9"];
-        var releaseSummaries = releaseIds
-            .Select(releaseId => new ReleaseSummary
+        var releaseVersionSummaries = releaseIds
+            .Select(releaseId => new ReleaseVersionSummary
             {
                 Id = $"id for release {releaseId}",
                 ReleaseId = releaseId,
@@ -163,7 +163,7 @@ public class SearchableDocumentCheckerTests
             })
             .ToArray();
         _blobNameListerMockBuilder.WhereBlobNamesReturnedAre(blobNames);
-        _releaseSummaryRetrieverMockBuilder.WhereReleaseSummariesReturnedAre(releaseSummaries);
+        _releaseSummaryRetrieverMockBuilder.WhereReleaseVersionSummariesReturnedAre(releaseVersionSummaries);
 
         var sut = GetSut();
 

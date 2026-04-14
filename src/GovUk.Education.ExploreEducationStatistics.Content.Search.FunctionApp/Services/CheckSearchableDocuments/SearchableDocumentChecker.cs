@@ -9,24 +9,26 @@ public class SearchableDocumentChecker(IBlobNameLister blobNameLister, IReleaseS
         // Get a list of all blobs
         var blobNames = await blobNameLister.ListBlobsInContainer(cancellationToken);
 
-        // Retrieve the release summaries for all published publications
-        var releaseSummaries = await releaseSummaryRetriever.GetAllPublishedReleaseSummaries(cancellationToken);
+        // Retrieve the latest published release version summaries for the latest published releases of all published publications
+        var releaseVersionSummaries = await releaseSummaryRetriever.GetAllPublishedReleaseVersionSummaries(
+            cancellationToken
+        );
 
-        var expectedReleaseIds = releaseSummaries.Select(rs => rs.ReleaseId).ToArray();
+        var expectedReleaseIds = releaseVersionSummaries.Select(rs => rs.ReleaseId).ToArray();
 
-        // Compare the list of release summaries with the list of blobs
+        // Compare the list of release id's with the list of blob names
         var (leftOnly, both, rightOnly) = expectedReleaseIds.Diff(blobNames);
 
         return new CheckSearchableDocumentsReport
         {
             OkBlobCount = both.Length,
             TotalBlobCount = blobNames.Count,
-            TotalPublicationCount = releaseSummaries.Count,
+            TotalPublicationCount = releaseVersionSummaries.Count,
             MissingBlobs = leftOnly,
             ExtraneousBlobs = rightOnly,
             MissingBlobSummaries = leftOnly
-                .Select(id => releaseSummaries.First(rs => rs.ReleaseId == id))
-                .Select(ReleaseSummaryViewModel.FromModel)
+                .Select(id => releaseVersionSummaries.First(rs => rs.ReleaseId == id))
+                .Select(ReleaseVersionSummaryViewModel.FromModel)
                 .ToArray(),
         };
     }

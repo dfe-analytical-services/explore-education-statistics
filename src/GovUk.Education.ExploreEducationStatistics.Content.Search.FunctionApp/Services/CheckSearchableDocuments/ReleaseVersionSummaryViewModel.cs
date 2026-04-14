@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
-public record ReleaseSummaryViewModel
+public record ReleaseVersionSummaryViewModel
 {
     public string Id { get; init; }
     public string ReleaseId { get; init; }
@@ -18,21 +18,22 @@ public record ReleaseSummaryViewModel
     public string? PublicationTitle { get; init; }
     public string? PublicationSlug { get; init; }
 
-    private ReleaseSummaryViewModel(ReleaseSummary releaseSummary)
+    private ReleaseVersionSummaryViewModel(ReleaseVersionSummary releaseVersionSummary)
     {
-        Id = releaseSummary.Id;
-        ReleaseId = releaseSummary.ReleaseId;
-        Title = releaseSummary.Title;
-        Slug = releaseSummary.Slug;
-        YearTitle = releaseSummary.YearTitle;
-        CoverageTitle = releaseSummary.CoverageTitle;
-        Published = releaseSummary.Published;
-        Type = releaseSummary.Type;
-        IsLatestRelease = releaseSummary.IsLatestRelease;
-        PublicationId = releaseSummary.PublicationId;
-        PublicationTitle = releaseSummary.PublicationTitle;
-        PublicationSlug = releaseSummary.PublicationSlug;
+        Id = releaseVersionSummary.Id;
+        ReleaseId = releaseVersionSummary.ReleaseId;
+        Title = releaseVersionSummary.Title;
+        Slug = releaseVersionSummary.Slug;
+        YearTitle = releaseVersionSummary.YearTitle;
+        CoverageTitle = releaseVersionSummary.CoverageTitle;
+        Published = releaseVersionSummary.Published;
+        Type = releaseVersionSummary.Type;
+        IsLatestRelease = releaseVersionSummary.IsLatestRelease;
+        PublicationId = releaseVersionSummary.PublicationId;
+        PublicationTitle = releaseVersionSummary.PublicationTitle;
+        PublicationSlug = releaseVersionSummary.PublicationSlug;
     }
 
-    public static ReleaseSummaryViewModel FromModel(ReleaseSummary releaseSummary) => new(releaseSummary);
+    public static ReleaseVersionSummaryViewModel FromModel(ReleaseVersionSummary releaseVersionSummary) =>
+        new(releaseVersionSummary);
 }
