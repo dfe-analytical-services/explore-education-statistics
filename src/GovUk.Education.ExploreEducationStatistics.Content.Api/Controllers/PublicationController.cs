@@ -1,5 +1,4 @@
 #nullable enable
-using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -9,15 +8,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
 [ApiController]
 [Route("api")]
-[Produces(MediaTypeNames.Application.Json)]
 public class PublicationController(IPublicationService publicationService) : ControllerBase
 {
     /// <summary>
     /// Used only by the Content.Search.FunctionApp (Search Docs Function App).
     /// </summary>
     [HttpGet("publicationInfos")]
-    public async Task<ActionResult<IList<PublicationInfoViewModel>>> ListPublicationInfos(
+    public async Task<IList<PublicationInfoViewModel>> GetPublicationInfos(
         [FromQuery] GetPublicationInfosRequest request,
         CancellationToken cancellationToken = default
-    ) => Ok(await publicationService.ListPublicationInfos(request.ThemeId, cancellationToken));
+    ) => await publicationService.ListPublicationInfos(request.ThemeId, cancellationToken);
 }
