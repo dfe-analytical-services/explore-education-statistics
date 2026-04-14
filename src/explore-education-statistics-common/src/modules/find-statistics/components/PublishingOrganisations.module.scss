@@ -1,7 +1,18 @@
+@import '@common/styles/breakpoints';
 @import '~govuk-frontend/dist/govuk/base';
 
 .container {
   display: flex;
-  gap: 2rem;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+
+  @include govuk-media-query($from: 'mobile-lg') {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  @include govuk-media-query($from: 'tablet') {
+    gap: 2rem;
+  }
 }
