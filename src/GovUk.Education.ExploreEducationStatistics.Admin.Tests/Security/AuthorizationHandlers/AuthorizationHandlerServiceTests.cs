@@ -139,7 +139,7 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
+                    mock.UserHasPrereleaseRoleOnPublication(
                         _userId,
                         _publicationId,
                         ResourceRoleFilter.ActiveOnly,
@@ -179,7 +179,7 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
+                    mock.UserHasPrereleaseRoleOnPublication(
                         _userId,
                         _publicationId,
                         ResourceRoleFilter.ActiveOnly,
@@ -219,7 +219,7 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
+                    mock.UserHasPrereleaseRoleOnPublication(
                         _userId,
                         _publicationId,
                         ResourceRoleFilter.ActiveOnly,
@@ -259,7 +259,7 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
+                    mock.UserHasPrereleaseRoleOnPublication(
                         _userId,
                         _publicationId,
                         ResourceRoleFilter.ActiveOnly,
@@ -290,10 +290,9 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         _userId,
                         _releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.ActiveOnly,
                         It.IsAny<CancellationToken>()
                     )
@@ -320,10 +319,9 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         _userId,
                         _releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.ActiveOnly,
                         It.IsAny<CancellationToken>()
                     )
@@ -402,10 +400,9 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         _userId,
                         _releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.ActiveOnly,
                         It.IsAny<CancellationToken>()
                     )
@@ -442,10 +439,9 @@ public abstract class AuthorizationHandlerServiceTests
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
             userPrereleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasRoleOnReleaseVersion(
+                    mock.UserHasPrereleaseRoleOnReleaseVersion(
                         _userId,
                         _releaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer,
                         ResourceRoleFilter.ActiveOnly,
                         It.IsAny<CancellationToken>()
                     )
@@ -518,7 +514,7 @@ public abstract class AuthorizationHandlerServiceTests
         var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
         userPrereleaseRoleRepository
             .Setup(mock =>
-                mock.UserHasAnyRoleOnPublication(
+                mock.UserHasPrereleaseRoleOnPublication(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>(),
                     ResourceRoleFilter.ActiveOnly,
@@ -528,10 +524,9 @@ public abstract class AuthorizationHandlerServiceTests
             .ReturnsAsync(false);
         userPrereleaseRoleRepository
             .Setup(mock =>
-                mock.UserHasRoleOnReleaseVersion(
+                mock.UserHasPrereleaseRoleOnReleaseVersion(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>(),
-                    It.IsAny<ReleaseRole>(),
                     ResourceRoleFilter.ActiveOnly,
                     It.IsAny<CancellationToken>()
                 )
