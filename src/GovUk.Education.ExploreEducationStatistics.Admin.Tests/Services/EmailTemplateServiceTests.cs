@@ -25,7 +25,7 @@ public class EmailTemplateServiceTests
 
         string userEmail = "test@test.com";
 
-        HashSet<(string PublicationTitle, string ReleaseTitle)> prereleaseRolesInfo =
+        HashSet<(string PublicationTitle, string ReleaseTitle)> preReleaseRolesInfo =
         [
             ("Title 3", "Academic year Q1 2022/23"),
             ("Title 3", "Academic year Q1 2021/22"),
@@ -36,26 +36,26 @@ public class EmailTemplateServiceTests
 
         HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo =
         [
-            ("Title 2", PublicationRole.Owner),
-            ("Title 2", PublicationRole.Allower),
-            ("Title 1", PublicationRole.Allower),
-            ("Title 1", PublicationRole.Owner),
-            ("Title 3", PublicationRole.Owner),
-            ("Title 3", PublicationRole.Allower),
+            ("Title 2", PublicationRole.Drafter),
+            ("Title 2", PublicationRole.Approver),
+            ("Title 1", PublicationRole.Approver),
+            ("Title 1", PublicationRole.Drafter),
+            ("Title 3", PublicationRole.Drafter),
+            ("Title 3", PublicationRole.Approver),
         ];
 
         // These should be ordered by publication title, and then by role
         var expectedPublicationRoleList = """
-            * Title 1 - Owner
+            * Title 1 - Drafter
             * Title 1 - Approver
-            * Title 2 - Owner
+            * Title 2 - Drafter
             * Title 2 - Approver
-            * Title 3 - Owner
+            * Title 3 - Drafter
             * Title 3 - Approver
             """;
 
         // These should be ordered by publication title, and then by release title
-        var expectedPrereleaseRoleList = """
+        var expectedPreReleaseRoleList = """
             * Title 1, Academic year Q1 2022/23
             * Title 2, Academic year Q1 2021/22
             * Title 2, Academic year Q1 2022/23
@@ -66,7 +66,7 @@ public class EmailTemplateServiceTests
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
-            { "pre-release role list", expectedPrereleaseRoleList },
+            { "pre-release role list", expectedPreReleaseRoleList },
             { "publication role list", expectedPublicationRoleList },
         };
 
@@ -79,7 +79,7 @@ public class EmailTemplateServiceTests
 
         var result = service.SendInviteEmail(
             email: userEmail,
-            prereleaseRolesInfo: prereleaseRolesInfo,
+            preReleaseRolesInfo: preReleaseRolesInfo,
             publicationRolesInfo: publicationRolesInfo
         );
 
