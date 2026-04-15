@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
@@ -9,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -78,21 +78,6 @@ public class UserManagementService(
             });
     }
 
-    public async Task<Either<ActionResult, List<IdTitleViewModel>>> ListReleases()
-    {
-        return await userService
-            .CheckCanManageAllUsers()
-            .OnSuccess(async () =>
-                await contentDbContext
-                    .Releases.Select(r => new IdTitleViewModel
-                    {
-                        Id = r.Id,
-                        Title = $"{r.Publication.Title} - {r.Title}",
-                    })
-                    .ToListAsync()
-            );
-    }
-
     public async Task<Either<ActionResult, List<RoleViewModel>>> ListRoles()
     {
         return await userService
@@ -110,34 +95,6 @@ public class UserManagementService(
                     .OrderBy(x => x.Name)
                     .ToListAsync();
             });
-    }
-
-    public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
-    {
-        return await usersAndRolesDbContext
-            .Users.AsQueryable()
-            .Join(
-                usersAndRolesDbContext.UserRoles,
-                user => user.Id,
-                userRole => userRole.UserId,
-                (user, userRole) => new { user, userRoleId = userRole.RoleId }
-            )
-            .Join(
-                usersAndRolesDbContext.Roles,
-                prev => prev.userRoleId,
-                role => role.Id,
-                (prev, role) =>
-                    new UserViewModel
-                    {
-                        Id = Guid.Parse(prev.user.Id),
-                        Name = prev.user.FirstName + " " + prev.user.LastName,
-                        Email = prev.user.Email,
-                        Role = role.Name,
-                    }
-            )
-            .OrderBy(x => x.Name)
-            .Where(u => u.Role == Role.PrereleaseUser.GetEnumLabel())
-            .ToListAsync();
     }
 
     public async Task<Either<ActionResult, UserViewModel>> GetUser(Guid id)

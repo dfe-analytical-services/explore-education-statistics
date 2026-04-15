@@ -7,38 +7,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record UserViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; init; } = string.Empty;
 
-    public string Email { get; set; } = string.Empty;
+    public required string Email { get; init; } = string.Empty;
 
-    public string? Role { get; set; }
+    public string? Role { get; init; }
 
-    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; set; } = new();
+    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
 
-    public List<UserPrereleaseRoleViewModel> UserPrereleaseRoles { get; set; } = new();
+    public List<UserPrereleaseRoleViewModel> UserPrereleaseRoles { get; init; } = [];
 }
 
 public record UserPublicationRoleViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Publication { get; set; } = string.Empty;
+    public required string Publication { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public PublicationRole Role { get; set; }
+    public required PublicationRole Role { get; init; }
+}
 
-    public string UserName { get; set; } = string.Empty;
+public record UserPublicationRoleWithUserViewModel : UserPublicationRoleViewModel
+{
+    public required string UserName { get; init; }
 
-    public string Email { get; set; } = string.Empty;
+    public required string Email { get; init; }
 }
 
 public record UserPrereleaseRoleViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Publication { get; set; } = null!;
+    public required string Publication { get; init; }
 
-    public string Release { get; set; } = null!;
+    public required string Release { get; init; }
 }
