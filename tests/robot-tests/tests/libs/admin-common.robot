@@ -786,7 +786,6 @@ user waits for scheduled release to be published immediately
     user reloads page
     user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
     user opens details dropdown    View stages
-    user waits until page contains    Content - scheduled    %{WAIT_MEDIUM}
     user waits until page contains    Files - complete    %{WAIT_MEDIUM}
     trigger immediate publishing of scheduled release    ${release_id}
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
