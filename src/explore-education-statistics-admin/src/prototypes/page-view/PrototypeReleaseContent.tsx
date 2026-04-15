@@ -1,11 +1,9 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
-import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
-import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseNotesSection from '@admin/pages/release/content/components/ReleaseNotesSection';
 import ReleaseSummarySection from '@admin/pages/release/content/components/ReleaseSummarySection';
@@ -13,16 +11,14 @@ import { useReleaseContentState } from '@admin/pages/release/content/contexts/Re
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseFileService from '@admin/services/releaseFileService';
+import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedContent from '@common/components/RelatedContent';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
-import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import React, { useCallback, useMemo } from 'react';
-import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import PrototypeReleaseEditableBlock from './PrototypeReleaseEditableBlock';
 import PrototypeReleaseContentAccordion from './PrototypeReleaseContentAccordion';
 import PrototypeReleaseHeadlines from './PrototypeReleaseHeadlines';
@@ -136,22 +132,6 @@ const PrototypeReleaseContent = ({
               <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
                 {getReleaseApprovalStatusLabel(release.approvalStatus)}
               </Tag>
-            }
-            renderSubscribeLink={
-              <a
-                className="govuk-!-display-none-print govuk-!-font-weight-bold"
-                href="#"
-              >
-                Sign up for email alerts
-              </a>
-            }
-            renderProducerLink={
-              <Link
-                unvisited
-                to="https://www.gov.uk/government/organisations/department-for-education"
-              >
-                Department for Education
-              </Link>
             }
           />
 
@@ -326,95 +306,45 @@ const PrototypeReleaseContent = ({
         transformFeaturedTableLinks={transformFeaturedTableLinks}
       />
 
-      {(release.downloadFiles ||
-        release.hasPreReleaseAccessList ||
-        !!release.relatedDashboardsSection?.content.length) && (
-        <ReleaseDataAndFiles
-          downloadFiles={release.downloadFiles}
-          hasDataGuidance={release.hasDataGuidance}
-          renderAllFilesLink={
-            <ButtonText
-              preventDoubleClick
-              onClick={() => releaseFileService.downloadFilesAsZip(release.id)}
-            >
-              Download all data (ZIP)
-            </ButtonText>
-          }
-          renderDownloadLink={file => (
-            <ButtonText
-              onClick={() =>
-                downloadReleaseFileSecurely({
-                  releaseVersionId: release.id,
-                  fileId: file.id,
-                  fileName: file.fileName,
-                })
-              }
-            >
-              {`${file.name} (${file.extension}, ${file.size})`}
-            </ButtonText>
-          )}
-          renderDataGuidanceLink={<span>Data guidance</span>}
-          renderDataCatalogueLink={
-            <span>Data catalogue (public site only)</span>
-          }
-          renderCreateTablesLink={
-            <span>View or create your own tables (public site only)</span>
-          }
-          showDownloadFilesList
-          renderRelatedDashboards={
-            release.relatedDashboardsSection?.content.length ? (
-              <EditableSectionBlocks
-                blocks={release.relatedDashboardsSection.content}
-                renderBlock={block => (
-                  <ReleaseBlock block={block} releaseVersionId={release.id} />
-                )}
-                renderEditableBlock={block => (
-                  <PrototypeReleaseEditableBlock
-                    allowComments
-                    block={block}
-                    publicationId={release.publication.id}
-                    releaseVersionId={release.id}
-                  />
-                )}
-              />
-            ) : null
-          }
-        />
-      )}
-      {editingMode === 'edit' &&
-        !release.relatedDashboardsSection?.content.length && (
+      <div id="data-and-files-section" data-scroll>
+        <h2 className="govuk-heading-l" id="data-dashboards">
+          Data dashboards
+        </h2>
+        {release.relatedDashboardsSection?.content.length ? (
+          <AccordionSection
+            id="related-dashboards"
+            heading="View related dashboard(s)"
+          >
+            <EditableSectionBlocks
+              blocks={release.relatedDashboardsSection.content}
+              renderBlock={block => (
+                <ReleaseBlock block={block} releaseVersionId={release.id} />
+              )}
+              renderEditableBlock={block => (
+                <PrototypeReleaseEditableBlock
+                  allowComments
+                  block={block}
+                  publicationId={release.publication.id}
+                  releaseVersionId={release.id}
+                />
+              )}
+            />
+          </AccordionSection>
+        ) : null}
+
+        {!release.relatedDashboardsSection?.content.length && (
           <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
             <Button onClick={addRelatedDashboardsBlock}>
               Add dashboards section
             </Button>
           </div>
         )}
-
+      </div>
       <PrototypeReleaseContentAccordion
         release={release}
         sectionName="Contents"
         transformFeaturedTableLinks={transformFeaturedTableLinks}
       />
-
-      <ReleaseHelpAndSupportSection
-        publication={release.publication}
-        releaseType={release.type}
-        renderExternalMethodologyLink={externalMethodology => (
-          <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
-        )}
-        renderMethodologyLink={methodology => (
-          <>
-            {editingMode === 'edit' ? (
-              <a>{`${methodology.title}`}</a>
-            ) : (
-              <Link to={`/methodology/${methodology.id}/summary`}>
-                {methodology.title}
-              </Link>
-            )}
-          </>
-        )}
-      />
-      <PrintThisPage />
     </>
   );
 };

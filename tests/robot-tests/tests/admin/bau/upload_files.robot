@@ -149,28 +149,28 @@ Upload multiple ancillary files
 
     user checks there are x accordion sections    2    id:file-uploads
 
-Navigate to 'Content' page
+Navigate to 'Content' page preview
     user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+    user clicks radio    Preview release page
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Validate 'Explore data and files' section
-    ${section}=    user gets testid element    data-and-files
-
-    # All files zip
-    user checks element contains button    ${section}    Download all data (ZIP)
+    user checks page contains button    Download all data (ZIP)
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
 
     # Data files
-    user opens details dropdown    Download files
-    user checks list has x items    testid:data-files    1    ${section}
-    ${data_files_1}=    user gets list item element    testid:data-files    1    ${section}
-    user checks element contains button    ${data_files_1}    Updated Absence in PRUs (csv, 141 Kb)
+    ${datasets_section}=    user gets testid element    datasets-section
+    user checks list has x items    testid:release-data-list    1    ${datasets_section}
+    ${data_files_1}=    user gets list item element    testid:release-data-list    1    ${datasets_section}
+    user checks element should contain    ${data_files_1}    Updated Absence in PRUs
 
     # Ancillary files
-    user opens accordion section    Additional supporting files
-    ${other_files}=    user gets accordion section content element    Additional supporting files
-
-    user checks element contains button    ${other_files}    Test 1 (txt, 12 B)
-    user checks element should contain    ${other_files}    Test 1 summary
+    ${supporting_files_section}=    user gets testid element    supporting-files-section
+    user checks list has x items    testid:release-data-list    2    ${supporting_files_section}
+    ${data_files_1}=    user gets list item element    testid:release-data-list    1    ${supporting_files_section}
+    user checks element should contain    ${data_files_1}    Test 1
 
 Navigate back to 'Supporting file uploads' tab
     user clicks link    Data and files
