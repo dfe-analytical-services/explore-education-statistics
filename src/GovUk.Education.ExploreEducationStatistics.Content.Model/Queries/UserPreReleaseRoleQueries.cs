@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 
-public static class UserReleaseRoleQueries
+public static class UserPreReleaseRoleQueries
 {
     public static IQueryable<UserReleaseRole> WhereForUser(this IQueryable<UserReleaseRole> query, Guid userId) =>
         query.Where(urr => urr.UserId == userId);
