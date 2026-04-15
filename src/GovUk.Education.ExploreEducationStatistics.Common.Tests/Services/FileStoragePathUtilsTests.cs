@@ -9,8 +9,6 @@ public class FileStoragePathUtilsTests
 {
     public class PublicPathTests
     {
-        public static TheoryData<string> PublicationData = new() { "publication-slug", "  publication-SLUG  " };
-
         public static TheoryData<string, string> PublicationAndReleaseData = new()
         {
             { "publication-slug", "release-slug" },
@@ -28,53 +26,6 @@ public class FileStoragePathUtilsTests
             { "publication-slug", "release-slug", Guid.NewGuid(), 1 },
             { "  publication-SLUG  ", "  release-SLUG  ", Guid.NewGuid(), 1 },
         };
-
-        [Theory]
-        [MemberData(nameof(PublicationData))]
-        public void PublicContentPublicationPath(string publicationSlug)
-        {
-            Assert.Equal(
-                "publications/publication-slug/publication.json",
-                FileStoragePathUtils.PublicContentPublicationPath(publicationSlug: publicationSlug)
-            );
-        }
-
-        [Theory]
-        [MemberData(nameof(PublicationData))]
-        public void PublicContentLatestReleasePath(string publicationSlug)
-        {
-            Assert.Equal(
-                "publications/publication-slug/latest-release.json",
-                FileStoragePathUtils.PublicContentLatestReleasePath(publicationSlug: publicationSlug)
-            );
-
-            Assert.Equal(
-                "staging/publications/publication-slug/latest-release.json",
-                FileStoragePathUtils.PublicContentLatestReleasePath(publicationSlug: publicationSlug, staging: true)
-            );
-        }
-
-        [Theory]
-        [MemberData(nameof(PublicationAndReleaseData))]
-        public void PublicContentReleasePath(string publicationSlug, string releaseSlug)
-        {
-            Assert.Equal(
-                "publications/publication-slug/releases/release-slug.json",
-                FileStoragePathUtils.PublicContentReleasePath(
-                    publicationSlug: publicationSlug,
-                    releaseSlug: releaseSlug
-                )
-            );
-
-            Assert.Equal(
-                "staging/publications/publication-slug/releases/release-slug.json",
-                FileStoragePathUtils.PublicContentReleasePath(
-                    publicationSlug: publicationSlug,
-                    releaseSlug: releaseSlug,
-                    staging: true
-                )
-            );
-        }
 
         [Theory]
         [MemberData(nameof(PublicationReleaseAndIdData))]
