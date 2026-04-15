@@ -4,9 +4,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 
-public class CommonMappingProfile : Profile
+public abstract class CommonMappingProfile : Profile
 {
-    public CommonMappingProfile()
+    protected CommonMappingProfile()
     {
         CreateMap<Contact, ContactViewModel>();
     }

@@ -41,22 +41,6 @@ public record ReleaseSummaryViewModel
     public ReleaseSummaryViewModel() { }
 
     [SetsRequiredMembers]
-    public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
-    {
-        Id = release.Id;
-        ReleaseId = release.ReleaseId;
-        Title = release.Title;
-        Slug = release.Slug;
-        YearTitle = release.YearTitle;
-        CoverageTitle = release.CoverageTitle;
-        Published = release.Published;
-        NextReleaseDate = release.NextReleaseDate;
-        Type = release.Type;
-        LatestRelease = Id == publication.LatestReleaseId;
-        Publication = new PublicationSummaryViewModel(publication);
-    }
-
-    [SetsRequiredMembers]
     public ReleaseSummaryViewModel(ReleaseVersion releaseVersion, bool latestPublishedRelease)
     {
         Id = releaseVersion.Id;

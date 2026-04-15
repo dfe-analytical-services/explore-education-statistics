@@ -152,7 +152,7 @@ public class BauCacheController : ControllerBase
     [HttpDelete("public-cache/publications/publication-json")]
     public async Task<ActionResult> ClearPublicCachePublicationJson()
     {
-        var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(".", "\\.");
+        var publicationJsonFilenameRegex = "publication.json".Replace(".", "\\.");
 
         await _publicBlobStorageService.DeleteBlobs(
             BlobContainers.PublicContent,
@@ -177,7 +177,7 @@ public class BauCacheController : ControllerBase
     [HttpDelete("public-cache/publications/release-json")]
     public async Task<ActionResult> ClearPublicCacheReleaseJson()
     {
-        var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(".", "\\.");
+        var latestReleaseJsonFilenameRegex = "latest-release.json".Replace(".", "\\.");
 
         await _publicBlobStorageService.DeleteBlobs(
             BlobContainers.PublicContent,
