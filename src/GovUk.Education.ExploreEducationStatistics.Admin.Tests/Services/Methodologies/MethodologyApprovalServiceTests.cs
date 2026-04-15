@@ -359,7 +359,6 @@ public class MethodologyApprovalServiceTests
 
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-        var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
         contentService
@@ -370,10 +369,6 @@ public class MethodologyApprovalServiceTests
             .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
-        userReleaseRoleService
-            .Setup(mock => mock.ListLatestActiveUserReleaseRolesByPublication(publication.Id, ReleaseRole.Approver))
-            .ReturnsAsync([]);
-
         userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -382,19 +377,13 @@ public class MethodologyApprovalServiceTests
                 contentDbContext: context,
                 methodologyContentService: contentService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
-                userReleaseRoleService: userReleaseRoleService.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
 
             var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
             var updatedMethodologyVersion = result.AssertRight();
 
-            VerifyAllMocks(
-                contentService,
-                methodologyVersionRepository,
-                userPublicationRoleRepository,
-                userReleaseRoleService
-            );
+            VerifyAllMocks(contentService, methodologyVersionRepository, userPublicationRoleRepository);
 
             Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
             Assert.Equal(request.Status, updatedMethodologyVersion.Status);
@@ -444,7 +433,6 @@ public class MethodologyApprovalServiceTests
 
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-        var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
 
         contentService
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
@@ -454,17 +442,12 @@ public class MethodologyApprovalServiceTests
             .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
-        userReleaseRoleService
-            .Setup(mock => mock.ListLatestActiveUserReleaseRolesByPublication(publication.Id, ReleaseRole.Approver))
-            .ReturnsAsync([]);
-
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupService(
                 contentDbContext: context,
                 methodologyContentService: contentService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object,
-                userReleaseRoleService: userReleaseRoleService.Object
+                methodologyVersionRepository: methodologyVersionRepository.Object
             );
 
             var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
@@ -1189,7 +1172,7 @@ public class MethodologyApprovalServiceTests
             .ForIndex(
                 0,
                 s =>
-                    s.SetRole(PublicationRole.Allower)
+                    s.SetRole(PublicationRole.Approver)
                         .SetUser(_dataFixture.DefaultUser().WithEmail("publication-approver1@email.com"))
                         .SetPublication(publication)
             )
@@ -1197,7 +1180,7 @@ public class MethodologyApprovalServiceTests
             .ForIndex(
                 1,
                 s =>
-                    s.SetRole(PublicationRole.Owner)
+                    s.SetRole(PublicationRole.Drafter)
                         .SetUser(_dataFixture.DefaultUser().WithEmail("publication-owner@email.com"))
                         .SetPublication(publication)
             )
@@ -1205,7 +1188,7 @@ public class MethodologyApprovalServiceTests
             .ForIndex(
                 2,
                 s =>
-                    s.SetRole(PublicationRole.Allower)
+                    s.SetRole(PublicationRole.Approver)
                         .SetUser(_dataFixture.DefaultUser().WithEmail("publication-approver2@email.com"))
                         .SetPublication(_dataFixture.DefaultPublication())
             )
@@ -1221,7 +1204,6 @@ public class MethodologyApprovalServiceTests
 
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-        var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
         var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
@@ -1232,23 +1214,6 @@ public class MethodologyApprovalServiceTests
         methodologyVersionRepository
             .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
-
-        userReleaseRoleService
-            .Setup(mock => mock.ListLatestActiveUserReleaseRolesByPublication(publication.Id, ReleaseRole.Approver))
-            .ReturnsAsync([
-                _dataFixture
-                    .DefaultUserReleaseRole()
-                    .WithUser(_dataFixture.DefaultUser().WithEmail("release-approver@email.com"))
-                    .WithReleaseVersion(
-                        _dataFixture
-                            .DefaultReleaseVersion()
-                            .WithRelease(
-                                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
-                            )
-                    )
-                    .WithRole(ReleaseRole.Approver)
-                    .Generate(),
-            ]);
 
         userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
@@ -1277,7 +1242,6 @@ public class MethodologyApprovalServiceTests
                 contentDbContext: context,
                 methodologyContentService: contentService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
-                userReleaseRoleService: userReleaseRoleService.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
                 emailTemplateService: emailTemplateService.Object
             );
@@ -1286,12 +1250,7 @@ public class MethodologyApprovalServiceTests
                 await service.UpdateApprovalStatus(methodologyVersion.Id, request)
             ).AssertRight();
 
-            VerifyAllMocks(
-                contentService,
-                methodologyVersionRepository,
-                userPublicationRoleRepository,
-                userReleaseRoleService
-            );
+            VerifyAllMocks(contentService, methodologyVersionRepository, userPublicationRoleRepository);
 
             Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
 
@@ -1324,7 +1283,6 @@ public class MethodologyApprovalServiceTests
         IMethodologyImageService? methodologyImageService = null,
         IPublishingService? publishingService = null,
         IUserService? userService = null,
-        IUserReleaseRoleService? userReleaseRoleService = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IEmailTemplateService? emailTemplateService = null,
@@ -1340,7 +1298,6 @@ public class MethodologyApprovalServiceTests
             methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             userService ?? AlwaysTrueUserService(UserId).Object,
-            userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
