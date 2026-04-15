@@ -1,4 +1,4 @@
-import { FrontDoorCertificateType } from 'application/frontDoor/types.bicep'
+import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
@@ -17,6 +17,9 @@ param certificateType FrontDoorCertificateType = 'Provisioned'
 
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
+
+@description('Do Azure Monitor alerts need creating or updating?')
+param deployAlerts bool = false
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -63,6 +66,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
     publicSiteUrl: publicSiteUrl
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }

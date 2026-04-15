@@ -1,4 +1,15 @@
-trigger: none
+trigger:
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  paths:
+    include:
+      - infrastructure/templates/common/**
+      - infrastructure/templates/core/**
+
+pr: none
 
 parameters:
   - name: forceDeployToEnvironment
@@ -10,16 +21,13 @@ parameters:
       - test
       - preprod
     default: none
-
-resources:
-  pipelines:
-    - pipeline: MainBuild
-      source: Explore Education Statistics
-      trigger:
-        branches:
-          - dev
-          - test
-          - master
+  - name: deployAlerts
+    displayName: Do the Azure Monitor alerts need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
 
 variables:
   - group: Common
@@ -35,6 +43,8 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
+  - name: deployAlerts
+    value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
 
 pool:
   vmImage: $(vmImageName)

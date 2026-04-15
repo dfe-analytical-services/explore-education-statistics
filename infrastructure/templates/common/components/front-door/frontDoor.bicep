@@ -1,4 +1,6 @@
 import { abbreviations } from '../../abbreviations.bicep'
+import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../../../public-api/components/alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
 import { FrontDoorCertificateType } from 'types.bicep'
 
 @description('Resource prefix for all resources.')
@@ -30,6 +32,18 @@ param ruleSetNames string[]
 
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
+
+@description('Whether to create or update Azure Monitor alerts during this deploy.')
+param alerts {
+  latency: bool
+  originHealth: bool
+  percentage4XX: bool
+  percentage5XX: bool
+  requestCount: bool
+  cachedResponseRatio: bool
+  wafRequestCounts: bool
+  alertsGroupName: string
+}?
 
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -244,5 +258,142 @@ resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
         enabled: true
       }
     ]
+  }
+}
+
+module latencyAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+  name: '${frontDoorName}LatencyDeploy'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'TotalLatency'
+    }
+    config: {
+      ...staticAverageGreaterThanZero
+      nameSuffix: 'response-time'
+      threshold: '250'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module originHealthPercentageAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.originHealth) {
+  name: '${frontDoorName}OriginHealthPercentage'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'OriginHealthPercentage'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'origin-health-percentage'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module percentage4XXAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage4XX) {
+  name: '${frontDoorName}Percentage4XX'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'Percentage4XX'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'percentage-4xx'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module percentage5XXAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage5XX) {
+  name: '${frontDoorName}Percentage5XX'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'Percentage5XX'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'percentage-5xx'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module requestCountAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.requestCount) {
+  name: '${frontDoorName}RequestCount'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'RequestCount'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'request-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module cachedResponseRatioAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cachedResponseRatio) {
+  name: '${frontDoorName}CachedResponseRatio'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'ByteHitRatio'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'cached-response-ratio'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module wafJsRequestCountAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
+  name: '${frontDoorName}WafJsRequestCount'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'WebApplicationFirewallJsRequestCount'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'waf-js-request-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module wafCaptchaAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
+  name: '${frontDoorName}WafCaptchaRequestCount'
+  params: {
+    resourceName: frontDoorName
+    resourceMetric: {
+      resourceType: 'Microsoft.Cdn/profiles'
+      metric: 'WebApplicationFirewallCaptchaRequestCount'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'waf-captcha-request-count'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
   }
 }

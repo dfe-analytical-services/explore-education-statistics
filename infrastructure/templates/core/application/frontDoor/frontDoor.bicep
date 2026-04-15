@@ -28,6 +28,9 @@ param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
+@description('Whether to create or update Azure Monitor alerts during this deploy.')
+param deployAlerts bool
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -74,6 +77,16 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
     certificateName: certificateType == 'BringYourOwn' ? certificateName : null
     ruleSetNames: [nextJsRuleSetName]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    alerts: deployAlerts ? {
+      latency: true
+      originHealth: true
+      requestCount: true
+      percentage4XX: true
+      percentage5XX: true
+      cachedResponseRatio: true
+      wafRequestCounts: true
+      alertsGroupName: '${subscription}-ag-ees-alertedusers'
+    } : null
     tagValues: tagValues
   }
 }
