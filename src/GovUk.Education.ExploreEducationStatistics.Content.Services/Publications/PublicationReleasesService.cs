@@ -101,7 +101,8 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
                         releaseVersionsByReleaseId[releaseEntry.ReleaseId].Release,
                         isLatestRelease: releaseEntry == latestReleaseEntry,
                         lastUpdated: releaseVersionsByReleaseId[releaseEntry.ReleaseId].Published!.Value,
-                        published: releaseVersionsByReleaseId[releaseEntry.ReleaseId].PublishedDisplayDate!.Value
+                        published: releaseVersionsByReleaseId[releaseEntry.ReleaseId].PublishedDisplayDate!.Value,
+                        releaseType: releaseVersionsByReleaseId[releaseEntry.ReleaseId].Type
                     ),
 
                     _ => throw new ArgumentOutOfRangeException(nameof(e)),

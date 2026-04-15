@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
 
@@ -13,6 +14,7 @@ public class PublicationReleaseEntryDtoBuilder
     private string _title = "Title";
     private string _coverageTitle = "Calendar year";
     private string _yearTitle = "2024";
+    private ReleaseType _type = ReleaseType.OfficialStatistics;
 
     public PublicationReleaseEntryDto Build() =>
         new()
@@ -26,6 +28,7 @@ public class PublicationReleaseEntryDtoBuilder
             Title = _title,
             CoverageTitle = _coverageTitle,
             YearTitle = _yearTitle,
+            Type = _type,
         };
 
     public PublicationReleaseEntryDtoBuilder WithReleaseId(Guid releaseId)
@@ -79,6 +82,12 @@ public class PublicationReleaseEntryDtoBuilder
     public PublicationReleaseEntryDtoBuilder WithYearTitle(string yearTitle)
     {
         _yearTitle = yearTitle;
+        return this;
+    }
+
+    public PublicationReleaseEntryDtoBuilder WithType(ReleaseType type)
+    {
+        _type = type;
         return this;
     }
 }

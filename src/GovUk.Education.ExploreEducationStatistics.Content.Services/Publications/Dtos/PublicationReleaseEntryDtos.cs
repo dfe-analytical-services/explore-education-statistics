@@ -1,5 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 
@@ -28,11 +30,15 @@ public record PublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
 
     public required string YearTitle { get; init; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public required ReleaseType Type { get; init; }
+
     public static PublicationReleaseEntryDto FromRelease(
         Release release,
         bool isLatestRelease,
         DateTimeOffset lastUpdated,
-        DateTimeOffset published
+        DateTimeOffset published,
+        ReleaseType releaseType
     ) =>
         new()
         {
@@ -45,6 +51,7 @@ public record PublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
             Title = release.Title,
             CoverageTitle = release.TimePeriodCoverage.GetEnumLabel(),
             YearTitle = release.YearTitle,
+            Type = releaseType,
         };
 }
 
