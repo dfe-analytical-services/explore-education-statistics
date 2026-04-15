@@ -4,6 +4,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public record DataSetScreenerProgressResponse
 {
+    [JsonPropertyName("data_set_id")]
+    public required Guid DataSetId { get; init; }
+
     [JsonPropertyName("percentage_complete")]
     public required string PercentageComplete { get; init; }
 

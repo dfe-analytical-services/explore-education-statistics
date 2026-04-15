@@ -49,7 +49,7 @@ public class DataSetScreenerClient(
         await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 
         var query = HttpUtility.ParseQueryString(string.Empty);
-        dataSetIds.ForEach(dataSetId => query.Add("dataSetId", dataSetId.ToString()));
+        dataSetIds.ForEach(dataSetId => query.Add("data_set_id", dataSetId.ToString()));
 
         var url = $"{httpClient.BaseAddress}/progress?{query}";
         var response = await httpClient.GetAsync(url, cancellationToken);
@@ -66,7 +66,7 @@ public class DataSetScreenerClient(
         await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 
         var query = HttpUtility.ParseQueryString(string.Empty);
-        dataSetIds.ForEach(dataSetId => query.Add("dataSetId", dataSetId.ToString()));
+        dataSetIds.ForEach(dataSetId => query.Add("data_set_id", dataSetId.ToString()));
 
         var url = $"{httpClient.BaseAddress}/progress?{query}";
         var response = await httpClient.DeleteAsync(url, cancellationToken);

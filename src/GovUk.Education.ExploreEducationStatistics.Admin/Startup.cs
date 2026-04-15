@@ -420,6 +420,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
         services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
         services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
+        services.AddScoped<IDataSetScreenerService, DataSetScreenerService>();
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseImageService, ReleaseImageService>();
