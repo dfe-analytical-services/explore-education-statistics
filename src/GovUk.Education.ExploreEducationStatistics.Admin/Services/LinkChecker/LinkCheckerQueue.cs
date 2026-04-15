@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.LinkChecker;
 public class LinkCheckerQueue : ILinkCheckerQueue
 {
     private readonly Channel<LinkCheckerJob> _channel = Channel.CreateBounded<LinkCheckerJob>(
-        new BoundedChannelOptions(1) { SingleReader = true, SingleWriter = true }
+        new BoundedChannelOptions(100)
     );
 
     private readonly ConcurrentDictionary<Guid, LinkCheckerJob> _jobs = new();
