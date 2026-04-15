@@ -114,7 +114,7 @@ public abstract class UserManagementServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserManagementService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userRoleService: userRoleService.Object,
                     preReleaseUserService: preReleaseUserService.Object
@@ -148,7 +148,7 @@ public abstract class UserManagementServiceTests
 
             await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-            var service = SetupUserManagementService(
+            var service = SetupService(
                 usersAndRolesDbContext: userAndRolesDbContext,
                 userRoleService: userRoleService.Object
             );
@@ -218,7 +218,7 @@ public abstract class UserManagementServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext())
             {
-                var service = SetupUserManagementService(
+                var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
@@ -342,7 +342,7 @@ public abstract class UserManagementServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserManagementService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userRoleService: userRoleService.Object
                 );
@@ -477,7 +477,7 @@ public abstract class UserManagementServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserManagementService(
+                var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
@@ -637,7 +637,7 @@ public abstract class UserManagementServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserManagementService(
+                var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
@@ -687,7 +687,7 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.FindActiveUserByEmail(activeUser.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(activeUser);
 
-            var service = SetupUserManagementService(userRepository: userRepository.Object);
+            var service = SetupService(userRepository: userRepository.Object);
 
             var inviteRequest = new UserInviteCreateRequest
             {
@@ -714,7 +714,7 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            var service = SetupUserManagementService(userRepository: userRepository.Object);
+            var service = SetupService(userRepository: userRepository.Object);
 
             var inviteRequest = new UserInviteCreateRequest
             {
@@ -767,7 +767,7 @@ public abstract class UserManagementServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserManagementService(
+                var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
@@ -793,7 +793,7 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.FindPendingUserInviteByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            var service = SetupUserManagementService(userRepository: userRepository.Object);
+            var service = SetupService(userRepository: userRepository.Object);
 
             var result = await service.CancelInvite(email);
 
@@ -847,7 +847,7 @@ public abstract class UserManagementServiceTests
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserManagementService(
+                var service = SetupService(
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userManager: userManager.Object,
                     userRepository: userRepository.Object,
@@ -875,7 +875,7 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            var service = SetupUserManagementService(
+            var service = SetupService(
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userRepository: userRepository.Object
@@ -898,7 +898,7 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.FindActiveUserByEmail(internalUser.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(internalUser);
 
-            var service = SetupUserManagementService(
+            var service = SetupService(
                 contentDbContext: contentDbContext,
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userRepository: userRepository.Object
@@ -909,7 +909,7 @@ public abstract class UserManagementServiceTests
         }
     }
 
-    private static UserManagementService SetupUserManagementService(
+    private static UserManagementService SetupService(
         ContentDbContext? contentDbContext = null,
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
