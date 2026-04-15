@@ -39,3 +39,14 @@ public class LinkCheckerJob
         CancellationTokenSource.Cancel();
     }
 }
+
+public record LinkCheckerJobDetails
+{
+    public Guid Id { get; set; }
+    public string Status { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? StartedAt { get; set; }
+    public DateTimeOffset? CompletedAt { get; set; }
+    public string ErrorMessage { get; set; }
+    public List<LinksCsvItem> Results { get; set; }
+}

@@ -15,12 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.LinkChecker;
 /// <param name="httpClient"></param>
 public class LinksChecker(HttpClient httpClient) : ILinksChecker
 {
-    public async Task<List<LinkDetails>> ExtractReleaseLinksAsync(
+    public async Task<List<ContentLink>> ExtractReleaseLinksAsync(
         ContentDbContext context,
         CancellationToken cancellationToken = default
     )
     {
-        var releaseContentDetails = new List<LinkDetails>();
+        var releaseContentDetails = new List<ContentLink>();
         Console.WriteLine("Identifying latest published versions and extracting links...");
 
         var latestVersions = context
@@ -70,7 +70,7 @@ public class LinksChecker(HttpClient httpClient) : ILinksChecker
                 var href = node.GetAttributeValue("href", "");
                 var linkText = HtmlEntity.DeEntitize(node.InnerText).Trim();
 
-                releaseContentDetails.Add(LinkDetails.FromContentBodyDetails(row, href, linkText));
+                releaseContentDetails.Add(ContentLink.FromContentBodyDetails(row, href, linkText));
             }
         }
 
@@ -78,12 +78,13 @@ public class LinksChecker(HttpClient httpClient) : ILinksChecker
     }
 
     public async Task<List<LinksCsvItem>> TestReleaseLinksAsync(
-        List<LinkDetails> contentDetails,
-        CancellationToken cancellationToken = default
+        List<ContentLink> contentDetails,
+        CancellationToken cancellationToken = default,
+        CurrentEnvironment environment = CurrentEnvironment.Local
     )
     {
         var options = new ParallelOptions { MaxDegreeOfParallelism = 3, CancellationToken = cancellationToken }; // Only 3 active workers
-        var results = new ConcurrentBag<LinkDetailsStatusCode>();
+        var results = new ConcurrentBag<TestedContentLink>();
 
         await Parallel.ForEachAsync(
             contentDetails,
@@ -92,28 +93,49 @@ public class LinksChecker(HttpClient httpClient) : ILinksChecker
             {
                 try
                 {
-                    using var request = new HttpRequestMessage(HttpMethod.Head, contentDetail.Url); // only returns message-headers in the response
-                    using var response = await httpClient.SendAsync(
-                        request,
-                        HttpCompletionOption.ResponseHeadersRead,
-                        token
-                    ); // return as soon as the response headers have been fully read.
-                    var result = new LinkDetailsStatusCode((int)response.StatusCode, contentDetail);
+                    var web = new HtmlWeb();
+                    var containsAnchor = contentDetail.Url.Contains('#');
+                    TestedContentLink result;
+                    if (!containsAnchor)
+                    {
+                        using var request = new HttpRequestMessage(HttpMethod.Head, contentDetail.Url); // only returns message-headers in the response
+                        using var response = await httpClient.SendAsync(
+                            request,
+                            HttpCompletionOption.ResponseHeadersRead,
+                            token
+                        ); // return as soon as the response headers have been fully read.
+                        result = new TestedContentLink(environment, (int)response.StatusCode, null, contentDetail);
+                        results.Add(result);
+                        return;
+                    }
+
+                    string anchor = contentDetail.Url.Split('#')[1];
+                    var document = web.Load(contentDetail.Url.Split('#')[0]);
+                    var anchorExists = CheckAnchorExists(document, anchor);
+
+                    result = new TestedContentLink(environment, 200, anchorExists, contentDetail);
                     results.Add(result);
                 }
                 catch (HttpRequestException)
                 {
-                    var result = new LinkDetailsStatusCode(0, contentDetail);
+                    var result = new TestedContentLink(environment, 0, null, contentDetail);
                     results.Add(result);
                 } // Network/DNS issues
                 catch (TaskCanceledException)
                 {
-                    var result = new LinkDetailsStatusCode(408, contentDetail);
+                    var result = new TestedContentLink(environment, 408, null, contentDetail);
                     results.Add(result);
                 } // Timeout
             }
         );
 
         return results.Select(cd => cd.ToLinksCsvItem()).ToList();
+    }
+
+    public static bool CheckAnchorExists(HtmlDocument document, string anchor)
+    {
+        HtmlNode? node = document.GetElementbyId(anchor);
+
+        return node != null;
     }
 }

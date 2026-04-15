@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.LinkChecker;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using HtmlAgilityPack;
 using RichardSzalay.MockHttp;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
@@ -297,7 +298,7 @@ public class LinksCheckerTests
                 .When(HttpMethod.Head, "https://find-statistics/publication/test2")
                 .Respond(System.Net.HttpStatusCode.OK);
 
-            var linkDetails = new List<LinkDetails>
+            var linkDetails = new List<ContentLink>
             {
                 new(
                     PublicationTitle: "Publication 1",
@@ -342,7 +343,7 @@ public class LinksCheckerTests
                 .When(HttpMethod.Head, "https://find-statistics/forbidden")
                 .Respond(System.Net.HttpStatusCode.Forbidden);
 
-            var linkDetails = new List<LinkDetails>
+            var linkDetails = new List<ContentLink>
             {
                 CreateLinkDetails("https://find-statistics/found", "Link 1"),
                 CreateLinkDetails("https://find-statistics/not-found", "Link 2"),
@@ -370,7 +371,7 @@ public class LinksCheckerTests
                 .Expect(HttpMethod.Head, "https://find-statistics/network-error")
                 .Throw(new HttpRequestException("Network error"));
 
-            var linkDetails = new List<LinkDetails>
+            var linkDetails = new List<ContentLink>
             {
                 CreateLinkDetails("https://find-statistics/network-error", "Link with network error"),
             };
@@ -394,7 +395,7 @@ public class LinksCheckerTests
                 .Expect(HttpMethod.Head, "https://find-statistics/timeout")
                 .Throw(new TaskCanceledException("Request timeout"));
 
-            var linkDetails = new List<LinkDetails>
+            var linkDetails = new List<ContentLink>
             {
                 CreateLinkDetails("https://find-statistics/timeout", "Link with timeout"),
             };
@@ -444,7 +445,7 @@ public class LinksCheckerTests
             // Arrange
             _mockHttp.Expect(HttpMethod.Head, "https://find-statistics/test").Respond(System.Net.HttpStatusCode.OK);
 
-            var originalLink = new LinkDetails(
+            var originalLink = new ContentLink(
                 PublicationTitle: "Test Publication",
                 PublicationSlug: "test-publication",
                 ReleaseSlug: "test-release",
@@ -453,7 +454,7 @@ public class LinksCheckerTests
                 LinkText: "Test Link Text"
             );
 
-            var linkDetails = new List<LinkDetails> { originalLink };
+            var linkDetails = new List<ContentLink> { originalLink };
 
             var service = BuildService();
 
@@ -466,8 +467,8 @@ public class LinksCheckerTests
             Assert.Equal(originalLink.PublicationSlug, result[0].PublicationSlug);
             Assert.Equal(originalLink.ReleaseSlug, result[0].ReleaseSlug);
             Assert.Equal(originalLink.Heading, result[0].SectionHeading);
-            Assert.Equal(originalLink.Url, result[0].Url);
-            Assert.Equal(originalLink.LinkText, result[0].LinkText);
+            Assert.Equal(originalLink.Url, result[0].BrokenUrl);
+            Assert.Equal(originalLink.LinkText, result[0].BrokenLinkText);
             _mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -478,7 +479,7 @@ public class LinksCheckerTests
             var cts = new CancellationTokenSource();
             cts.Cancel();
 
-            var linkDetails = new List<LinkDetails> { CreateLinkDetails("https://find-statistics/test", "Link") };
+            var linkDetails = new List<ContentLink> { CreateLinkDetails("https://find-statistics/test", "Link") };
 
             var service = BuildService();
 
@@ -495,10 +496,29 @@ public class LinksCheckerTests
             var service = BuildService();
 
             // Act
-            var result = await service.TestReleaseLinksAsync(new List<LinkDetails>());
+            var result = await service.TestReleaseLinksAsync(new List<ContentLink>());
 
             // Assert
             Assert.Empty(result);
+        }
+    }
+
+    public class CheckAnchorExists : LinksCheckerTests
+    {
+        [Theory]
+        [InlineData("<html><body><div id='target'>Hello</div></body></html>", true)]
+        [InlineData("<html><body><div id='other'>Hello</div></body></html>", false)]
+        public void ProcessAnchor_WhenAnchorExists_ShouldReturnTrue(string html, bool expected)
+        {
+            // Mocking the 'web.Load' behavior with the provided HTML
+            var document = new HtmlDocument();
+            document.LoadHtml(html);
+
+            // Act
+            var anchorExists = LinksChecker.CheckAnchorExists(document, "target");
+
+            // Assert
+            Assert.Equal(anchorExists, expected);
         }
     }
 
@@ -508,7 +528,7 @@ public class LinksCheckerTests
         return new LinksChecker(httpClient);
     }
 
-    private static LinkDetails CreateLinkDetails(
+    private static ContentLink CreateLinkDetails(
         string url,
         string linkText,
         string publicationTitle = "Test Publication",
@@ -517,7 +537,7 @@ public class LinksCheckerTests
         string? sectionHeading = null
     )
     {
-        return new LinkDetails(
+        return new ContentLink(
             PublicationTitle: publicationTitle,
             PublicationSlug: publicationSlug,
             ReleaseSlug: releaseSlug,

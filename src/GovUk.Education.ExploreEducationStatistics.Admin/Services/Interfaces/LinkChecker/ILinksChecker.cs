@@ -5,13 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.L
 
 public interface ILinksChecker
 {
-    public Task<List<LinkDetails>> ExtractReleaseLinksAsync(
+    public Task<List<ContentLink>> ExtractReleaseLinksAsync(
         ContentDbContext context,
         CancellationToken cancellationToken
     );
 
     public Task<List<LinksCsvItem>> TestReleaseLinksAsync(
-        List<LinkDetails> contentDetails,
-        CancellationToken cancellationToken
+        List<ContentLink> contentDetails,
+        CancellationToken cancellationToken,
+        CurrentEnvironment environment = CurrentEnvironment.Local
     );
 }

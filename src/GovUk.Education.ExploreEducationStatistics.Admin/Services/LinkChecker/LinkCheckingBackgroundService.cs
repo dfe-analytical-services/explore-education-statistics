@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.LinkChecker;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.LinkChecker;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.LinkChecker;
@@ -46,10 +47,19 @@ public class LinkCheckerBackgroundService(
             {
                 using var scope = serviceProvider.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<ContentDbContext>();
+                var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+                var currentEnvironment =
+                    env.IsDevelopment() ? CurrentEnvironment.Local
+                    : env.IsStaging() ? CurrentEnvironment.Staging
+                    : env.IsProduction() ? CurrentEnvironment.Prod
+                    : CurrentEnvironment.Local;
+
                 var extractedLinks = await checker.ExtractReleaseLinksAsync(context, linkedCts.Token);
 
-                var failedLinks = (await checker.TestReleaseLinksAsync(extractedLinks, linkedCts.Token))
-                    .Where(tl => tl.StatusCode != 200)
+                var failedLinks = (
+                    await checker.TestReleaseLinksAsync(extractedLinks, linkedCts.Token, currentEnvironment)
+                )
+                    .Where(tl => tl.StatusCode != 200 || tl.AnchorExists is false)
                     .ToList();
 
                 job.Results.AddRange(failedLinks);

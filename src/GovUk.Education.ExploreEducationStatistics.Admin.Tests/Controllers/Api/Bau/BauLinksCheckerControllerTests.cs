@@ -43,7 +43,16 @@ public class BauLinksCheckerControllerTests : IClassFixture<WebApplicationFactor
             Status = LinkCheckerJobStatus.Completed,
             Results = new List<LinksCsvItem>()
             {
-                new("Test Publication", "Test Heading", "Test Slug", "Test Slug2", "test url", "Test link test", 200),
+                new(
+                    "Test Publication",
+                    "Test Heading",
+                    "Test Slug",
+                    "Test Slug2",
+                    "test url",
+                    "Test link test",
+                    "localhost",
+                    200
+                ),
                 new(
                     "Test Publication 2",
                     "Test Heading 2",
@@ -51,6 +60,7 @@ public class BauLinksCheckerControllerTests : IClassFixture<WebApplicationFactor
                     "Test Slug2 2",
                     "test url 2",
                     "Test link test 2",
+                    "localhost",
                     404
                 ),
             },
@@ -66,9 +76,9 @@ public class BauLinksCheckerControllerTests : IClassFixture<WebApplicationFactor
         var response = client.GetLinkCheckStatus(jobId);
 
         // Assert
-        var result = response.AssertOkObjectResult<LinkCheckerJob>();
+        var result = response.AssertOkObjectResult<LinkCheckerJobDetails>();
         Assert.Equal(job.Id, result.Id);
-        Assert.Equal(job.Status, result.Status);
+        Assert.Equal(Enum.GetName(typeof(LinkCheckerJobStatus), job.Status), result.Status);
         Assert.Equal(1, job.BrokenLinks);
         Assert.Equal(2, job.TotalLinks);
     }

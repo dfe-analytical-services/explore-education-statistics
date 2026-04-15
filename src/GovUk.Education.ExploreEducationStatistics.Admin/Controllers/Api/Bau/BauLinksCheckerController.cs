@@ -32,10 +32,10 @@ public class BauLinksCheckerController(ILinkCheckerQueue queue) : ControllerBase
         var result = job!;
 
         return Ok(
-            new LinkCheckerJob
+            new LinkCheckerJobDetails
             {
                 Id = result.Id,
-                Status = result.Status,
+                Status = Enum.GetName(typeof(LinkCheckerJobStatus), result.Status),
                 CreatedAt = result.CreatedAt,
                 StartedAt = result.StartedAt,
                 CompletedAt = result.CompletedAt,
@@ -64,7 +64,7 @@ public class BauLinksCheckerController(ILinkCheckerQueue queue) : ControllerBase
                 new
                 {
                     job.Id,
-                    job.Status,
+                    status = Enum.GetName(typeof(LinkCheckerJobStatus), job.Status),
                     message = "Job cannot be canceled.",
                 }
             );
@@ -76,7 +76,7 @@ public class BauLinksCheckerController(ILinkCheckerQueue queue) : ControllerBase
                 new
                 {
                     job.Id,
-                    job.Status,
+                    status = Enum.GetName(typeof(LinkCheckerJobStatus), job.Status),
                     message = "Cancel request failed.",
                 }
             );
@@ -86,7 +86,7 @@ public class BauLinksCheckerController(ILinkCheckerQueue queue) : ControllerBase
             new
             {
                 job.Id,
-                job.Status,
+                status = Enum.GetName(typeof(LinkCheckerJobStatus), job.Status),
                 message = "Cancellation requested.",
             }
         );
@@ -110,7 +110,7 @@ public class BauLinksCheckerController(ILinkCheckerQueue queue) : ControllerBase
                 new
                 {
                     result.Id,
-                    result.Status,
+                    status = Enum.GetName(typeof(LinkCheckerJobStatus), result.Status),
                     statusUrl = Url.Action(nameof(GetLinkCheckStatus), new { jobId }) ?? $"/api/links/check/{jobId}",
                 }
             ),
@@ -136,7 +136,7 @@ public class BauLinksCheckerController(ILinkCheckerQueue queue) : ControllerBase
                 new
                 {
                     result.Id,
-                    result.Status,
+                    status = Enum.GetName(typeof(LinkCheckerJobStatus), result.Status),
                     statusUrl = Url.Action(nameof(GetLinkCheckStatus), new { jobId }) ?? $"/api/links/check/{jobId}",
                 }
             ),
