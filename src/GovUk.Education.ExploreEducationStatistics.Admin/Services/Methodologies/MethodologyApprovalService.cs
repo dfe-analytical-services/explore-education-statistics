@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -30,7 +29,6 @@ public class MethodologyApprovalService(
     IMethodologyImageService methodologyImageService,
     IPublishingService publishingService,
     IUserService userService,
-    IUserReleaseRoleService userReleaseRoleService,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IMethodologyCacheService methodologyCacheService,
     IEmailTemplateService emailTemplateService,
@@ -126,35 +124,27 @@ public class MethodologyApprovalService(
             .Select(pm => pm.PublicationId)
             .SingleAsync();
 
-        var userReleaseRoles = await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
-            publicationId: owningPublicationId,
-            rolesToInclude: ReleaseRole.Approver
-        );
-
-        var userPublicationRoles = await userPublicationRoleRepository
+        var userEmailsWithApproverPublicationRoles = await userPublicationRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForPublication(owningPublicationId)
-            .WhereRolesIn(PublicationRole.Allower)
-            .Include(upr => upr.User)
+            .WhereRolesIn(PublicationRole.Approver)
+            .Select(upr => upr.User.Email)
+            .Distinct()
             .ToListAsync();
 
-        var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
-        if (notifyHigherReviewers)
+        if (!userEmailsWithApproverPublicationRoles.Any())
         {
-            userReleaseRoles
-                .Select(urr => urr.User.Email)
-                .Concat(userPublicationRoles.Select(upr => upr.User.Email))
-                .Distinct()
-                .ForEach(email =>
-                {
-                    emailTemplateService.SendMethodologyHigherReviewEmail(
-                        email,
-                        methodologyVersion.Id,
-                        methodologyVersion.Title
-                    );
-                });
+            return;
         }
+
+        userEmailsWithApproverPublicationRoles.ForEach(email =>
+        {
+            emailTemplateService.SendMethodologyHigherReviewEmail(
+                email,
+                methodologyVersion.Id,
+                methodologyVersion.Title
+            );
+        });
     }
 
     private async Task<Either<ActionResult, Unit>> CheckMethodologyCanDependOnRelease(
