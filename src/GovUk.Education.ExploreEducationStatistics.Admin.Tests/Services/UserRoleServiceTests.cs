@@ -59,7 +59,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object
                 );
@@ -103,7 +103,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object
                 );
@@ -154,7 +154,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object
                 );
@@ -186,7 +186,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object
                 );
@@ -217,7 +217,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object
                 );
@@ -299,7 +299,7 @@ public abstract class UserRoleServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
@@ -385,7 +385,7 @@ public abstract class UserRoleServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
@@ -469,7 +469,7 @@ public abstract class UserRoleServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
@@ -573,7 +573,7 @@ public abstract class UserRoleServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
@@ -627,7 +627,7 @@ public abstract class UserRoleServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
@@ -671,7 +671,7 @@ public abstract class UserRoleServiceTests
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext
                 );
@@ -708,7 +708,7 @@ public abstract class UserRoleServiceTests
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext
                 );
@@ -765,7 +765,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object
                 );
@@ -799,7 +799,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object
                 );
@@ -840,7 +840,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext);
+                var service = SetupService(usersAndRolesDbContext: userAndRolesDbContext);
 
                 var result = await service.GetAllGlobalRoles();
 
@@ -905,7 +905,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext);
+                var service = SetupService(usersAndRolesDbContext: userAndRolesDbContext);
 
                 var result = await service.GetGlobalRolesForUser(user.Id);
 
@@ -928,7 +928,7 @@ public abstract class UserRoleServiceTests
         public async Task NoUser_ReturnsNotFound()
         {
             await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
-            var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext);
+            var service = SetupService(usersAndRolesDbContext: userAndRolesDbContext);
 
             var result = await service.GetGlobalRolesForUser(Guid.NewGuid().ToString());
             result.AssertNotFound();
@@ -968,7 +968,7 @@ public abstract class UserRoleServiceTests
                 [userPublicationRole1, userPublicationRole2, userPublicationRole3]
             );
 
-            var service = SetupUserRoleService(
+            var service = SetupService(
                 userRepository: userRepository.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
@@ -1001,7 +1001,7 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.FindActiveUserById(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            var service = SetupUserRoleService(userRepository: userRepository.Object);
+            var service = SetupService(userRepository: userRepository.Object);
 
             var result = await service.GetPublicationRolesForUser(userId);
 
@@ -1055,7 +1055,7 @@ public abstract class UserRoleServiceTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     contentDbContext: contentDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
@@ -1087,7 +1087,7 @@ public abstract class UserRoleServiceTests
         public async Task GetPublicationRolesForPublication_NoPublication()
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
-            var service = SetupUserRoleService(contentDbContext: contentDbContext);
+            var service = SetupService(contentDbContext: contentDbContext);
 
             var result = await service.GetPublicationRolesForPublication(Guid.NewGuid());
 
@@ -1139,7 +1139,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
@@ -1164,7 +1164,7 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.GetById(userPublicationRoleGuid, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((UserPublicationRole?)null);
 
-            var service = SetupUserRoleService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+            var service = SetupService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             var result = await service.RemoveUserPublicationRole(userPublicationRoleGuid);
 
@@ -1188,7 +1188,7 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(false);
 
-            var service = SetupUserRoleService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+            var service = SetupService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await service.RemoveUserPublicationRole(userPublicationRole.Id)
@@ -1236,7 +1236,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
@@ -1296,7 +1296,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
@@ -1369,7 +1369,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
@@ -1434,7 +1434,7 @@ public abstract class UserRoleServiceTests
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(
+                var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
@@ -1456,7 +1456,7 @@ public abstract class UserRoleServiceTests
         return It.Is<ApplicationUser>(applicationUser => applicationUser.Id == user.Id);
     }
 
-    private UserRoleService SetupUserRoleService(
+    private UserRoleService SetupService(
         ContentDbContext? contentDbContext = null,
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
