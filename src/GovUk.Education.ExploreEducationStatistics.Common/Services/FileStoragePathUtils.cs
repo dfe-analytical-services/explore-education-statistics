@@ -9,34 +9,15 @@ public static class FileStoragePathUtils
     public const string DataBlocksDirectory = "data-blocks";
     public const string ReleasesDirectory = "releases";
     public const string SubjectMetaDirectory = "subject-meta";
-    public const string LatestReleaseFileName = "latest-release.json";
-    public const string PublicationFileName = "publication.json";
 
-    public static string PublicContentStagingPath() => "staging";
-
-    private static string PublicContentPublicationParentPath(string publicationSlug, bool staging = false)
+    private static string PublicContentPublicationParentPath(string publicationSlug)
     {
-        return $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{publicationSlug.TrimToLower()}";
+        return $"publications/{publicationSlug.TrimToLower()}";
     }
 
     public static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug)
     {
         return $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";
-    }
-
-    public static string PublicContentPublicationPath(string publicationSlug)
-    {
-        return $"{PublicContentPublicationParentPath(publicationSlug)}/{PublicationFileName}";
-    }
-
-    public static string PublicContentLatestReleasePath(string publicationSlug, bool staging = false)
-    {
-        return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{LatestReleaseFileName}";
-    }
-
-    public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, bool staging = false)
-    {
-        return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}.json";
     }
 
     public static string PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)
@@ -97,10 +78,5 @@ public static class FileStoragePathUtils
     {
         var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();
         return $"{rootPath}/{typeFolder}/";
-    }
-
-    private static string AppendPathSeparator(string? segment = null)
-    {
-        return segment == null ? "" : segment + "/";
     }
 }
