@@ -92,32 +92,6 @@ public class UserRoleService(
                     });
             });
 
-    public async Task<Either<ActionResult, Dictionary<string, List<string>>>> GetAllResourceRoles() =>
-        await userService
-            .CheckCanManageAllUsers()
-            .OnSuccess(_ =>
-            {
-                // This will be changed when we finally remove these OLD permissions systems roles
-                // from the enum in EES-6215
-                HashSet<string> publicationRolesNamesToFilter =
-                [
-                    nameof(PublicationRole.Allower),
-                    nameof(PublicationRole.Owner),
-                ];
-
-                return new Dictionary<string, List<string>>
-                {
-                    {
-                        "Publication",
-                        Enum.GetNames(typeof(PublicationRole))
-                            .Where(name => !publicationRolesNamesToFilter.Contains(name))
-                            .OrderBy(name => name)
-                            .ToList()
-                    },
-                    { "Release", [Enum.GetName(ReleaseRole.PrereleaseViewer)] },
-                };
-            });
-
     public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(
         Guid userId
     ) =>
@@ -136,15 +110,13 @@ public class UserRoleService(
                         Id = upr.Id,
                         Publication = upr.Publication.Title,
                         Role = upr.Role,
-                        UserName = upr.User.DisplayName,
-                        Email = upr.User.Email,
                     })
                     .ToListAsync()
             );
 
-    public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(
-        Guid publicationId
-    ) =>
+    public async Task<
+        Either<ActionResult, List<UserPublicationRoleWithUserViewModel>>
+    > GetPublicationRolesForPublication(Guid publicationId) =>
         await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId)
             .OnSuccess(userService.CheckCanViewPublication)
@@ -154,7 +126,7 @@ public class UserRoleService(
                         .WhereForPublication(publicationId)
                         .Include(upr => upr.User)
                         .Include(upr => upr.Publication)
-                        .Select(upr => new UserPublicationRoleViewModel
+                        .Select(upr => new UserPublicationRoleWithUserViewModel
                         {
                             Id = upr.Id,
                             Publication = upr.Publication.Title,

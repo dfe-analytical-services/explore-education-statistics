@@ -860,30 +860,6 @@ public abstract class UserRoleServiceTests
         }
     }
 
-    public class GetAllResourceRolesTests : UserRoleServiceTests
-    {
-        [Fact]
-        public async Task GetAllResourceRoles()
-        {
-            var service = SetupUserRoleService();
-
-            var result = await service.GetAllResourceRoles();
-
-            var resourceRoles = result.AssertRight();
-
-            Assert.True(resourceRoles.ContainsKey("Publication"));
-            Assert.True(resourceRoles.ContainsKey("Release"));
-
-            Assert.Equal(2, resourceRoles["Publication"].Count);
-            var onlyReleaseRole = Assert.Single(resourceRoles["Release"]);
-
-            Assert.Contains(nameof(PublicationRole.Drafter), resourceRoles["Publication"]);
-            Assert.Contains(nameof(PublicationRole.Approver), resourceRoles["Publication"]);
-
-            Assert.Contains(nameof(ReleaseRole.PrereleaseViewer), onlyReleaseRole);
-        }
-    }
-
     public class GetGlobalRolesForUserTests : UserRoleServiceTests
     {
         [Fact]
@@ -964,11 +940,7 @@ public abstract class UserRoleServiceTests
         [Fact]
         public async Task GetPublicationRolesForUser()
         {
-            User user = _dataFixture
-                .DefaultUser()
-                .WithFirstName("User")
-                .WithLastName("1")
-                .WithEmail("user1@example.com");
+            User user = _dataFixture.DefaultUser();
 
             UserPublicationRole userPublicationRole1 = _dataFixture
                 .DefaultUserPublicationRole()
@@ -1010,15 +982,11 @@ public abstract class UserRoleServiceTests
 
             Assert.Equal(userPublicationRole1.Id, userPublicationRoles[0].Id);
             Assert.Equal(userPublicationRole1.Publication.Title, userPublicationRoles[0].Publication);
-            Assert.Equal(user.DisplayName, userPublicationRoles[0].UserName);
             Assert.Equal(userPublicationRole1.Role, userPublicationRoles[0].Role);
-            Assert.Equal(user.Email, userPublicationRoles[0].Email);
 
             Assert.Equal(userPublicationRole2.Id, userPublicationRoles[1].Id);
             Assert.Equal(userPublicationRole2.Publication.Title, userPublicationRoles[1].Publication);
-            Assert.Equal(user.DisplayName, userPublicationRoles[1].UserName);
             Assert.Equal(userPublicationRole2.Role, userPublicationRoles[1].Role);
-            Assert.Equal(user.Email, userPublicationRoles[1].Email);
 
             VerifyAllMocks(userRepository, userPublicationRoleRepository);
         }
@@ -1048,17 +1016,9 @@ public abstract class UserRoleServiceTests
         [Fact]
         public async Task GetPublicationRolesForPublication()
         {
-            User user1 = _dataFixture
-                .DefaultUser()
-                .WithFirstName("User")
-                .WithLastName("1")
-                .WithEmail("user1@example.com");
+            User user1 = _dataFixture.DefaultUser();
 
-            User user2 = _dataFixture
-                .DefaultUser()
-                .WithFirstName("User")
-                .WithLastName("2")
-                .WithEmail("user2@example.com");
+            User user2 = _dataFixture.DefaultUser();
 
             Publication publication = _dataFixture.DefaultPublication();
 
@@ -1430,10 +1390,10 @@ public abstract class UserRoleServiceTests
         [Fact]
         public async Task RemoveAllUserResourceRoles()
         {
-            User targetUser = _dataFixture.DefaultUser().WithEmail("test@test.com");
+            User targetUser = _dataFixture.DefaultUser();
             var targetIdentityUser = new ApplicationUser { Id = targetUser.Id.ToString() };
 
-            User otherUser = _dataFixture.DefaultUser().WithEmail("otherTestUser@test.com");
+            User otherUser = _dataFixture.DefaultUser();
             var otherIdentityUser = new ApplicationUser { Id = otherUser.Id.ToString() };
 
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();

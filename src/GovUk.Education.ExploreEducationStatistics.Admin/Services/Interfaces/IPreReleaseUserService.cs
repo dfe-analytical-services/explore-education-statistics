@@ -7,7 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IPreReleaseUserService
 {
-    Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId);
+    Task<List<PreReleaseUserViewModel>> GetAllPreReleaseUsers();
+
+    Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GetPreReleaseUsers(Guid releaseVersionId);
 
     Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
         Guid releaseVersionId,
@@ -16,10 +18,14 @@ public interface IPreReleaseUserService
 
     Task<Either<ActionResult, List<UserPrereleaseRoleViewModel>>> GetPrereleaseRolesForUser(Guid userId);
 
-    Task<Either<ActionResult, List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
+    Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GrantPreReleaseAccessForMultipleUsers(
         Guid releaseVersionId,
         List<string> emails
     );
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId, string email);
+    Task<Either<ActionResult, Unit>> GrantPreReleaseAccess(Guid userId, Guid releaseId);
+
+    Task<Either<ActionResult, Unit>> RemovePreReleaseRoleByCompositeKey(Guid releaseVersionId, string email);
+
+    Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPrereleaseRoleId);
 }

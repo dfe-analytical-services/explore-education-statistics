@@ -10,19 +10,21 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.UserManagement;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class UserManagementControllerTestsFixture()
+public class UsersControllerTestsFixture()
     : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth]);
 
-[CollectionDefinition(nameof(UserManagementControllerTestsFixture))]
-public class UserManagementControllerTestsCollection : ICollectionFixture<UserManagementControllerTestsFixture>;
+[CollectionDefinition(nameof(UsersControllerTestsFixture))]
+public class UsersControllerTestsCollection : ICollectionFixture<UsersControllerTestsFixture>;
 
-[Collection(nameof(UserManagementControllerTestsFixture))]
-public abstract class UserManagementControllerTests(UserManagementControllerTestsFixture fixture)
+[Collection(nameof(UsersControllerTestsFixture))]
+public abstract class UsersControllerTests(UsersControllerTestsFixture fixture)
     : OptimisedIntegrationTestBase<Startup>(fixture)
 {
+    private const string BaseAddress = "/api/users";
+
     private static readonly DataFixture DataFixture = new();
 
-    public class DeleteUserTests(UserManagementControllerTestsFixture fixture) : UserManagementControllerTests(fixture)
+    public class DeleteUserTests(UsersControllerTestsFixture fixture) : UsersControllerTests(fixture)
     {
         [Theory]
         [InlineData("BAU User", false)]
@@ -37,7 +39,7 @@ public abstract class UserManagementControllerTests(UserManagementControllerTest
 
             var client = fixture.CreateClient(user: claimsPrincipal);
 
-            var response = await client.DeleteAsync("/api/user-management/user/ees-test.delete@education.gov.uk");
+            var response = await client.DeleteAsync($"{BaseAddress}/ees-test.delete@education.gov.uk");
 
             if (successExpected)
             {
