@@ -1,6 +1,6 @@
 import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../../../public-api/components/alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { dynamicAverageGreaterThan, dynamicAverageLessThan } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
 import { FrontDoorCertificateType } from 'types.bicep'
 
 @description('Resource prefix for all resources.')
@@ -10,7 +10,7 @@ param resourcePrefix string
 param legacyResourcePrefix string
 
 @description('Name of the resource.')
-param frontDoorName string
+param frontDoorProfileName string
 
 @description('Hostname used to reach Azure Front Door and its protected origin.')
 param siteHostName string
@@ -33,6 +33,9 @@ param ruleSetNames string[]
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
+@description('Whether to deploy a Web Application Firewall with this Front Door instance.')
+param deployWaf bool
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
   latency: bool
@@ -49,7 +52,7 @@ param alerts {
 param tagValues object
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
-  name: frontDoorName
+  name: frontDoorProfileName
   location: 'global' // CDN lives in a resource group, but must be global
   tags: tagValues
   sku: {
@@ -111,7 +114,7 @@ module certificateModule 'byoCertificate.bicep' = if (certificateType == 'BringY
   name: 'certificateModuleDeploy'
   params: {
     legacyResourcePrefix: legacyResourcePrefix
-    frontDoorName: frontDoorName
+    frontDoorName: frontDoorProfileName
     siteHostName: siteHostName
     certificateName: certificateName!
   }
@@ -144,6 +147,31 @@ resource customDomainWithoutCertificate 'Microsoft.Cdn/profiles/customdomains@20
       cipherSuiteSetType: 'TLS12_2023'
     }
   }
+}
+
+var wafPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafPolicies}'
+
+module wafPolicyModule 'wafPolicy.bicep' = if (deployWaf) {
+  name: '${frontDoorProfileName}WafPolicyModule'
+  params: {
+    policyName: wafPolicyName
+    tagValues: tagValues
+  }
+}
+
+module wafSecurityPolicyModule 'wafSecurityPolicy.bicep' = if (deployWaf) {
+  name: '${frontDoorProfileName}WafSecurityPolicyModule'
+  params: {
+    securityPolicyName: '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'
+    wafPolicyName: wafPolicyName
+    customDomainName: customDomainName
+    frontDoorProfileName: frontDoorProfileName
+  }
+  dependsOn: [
+    wafPolicyModule
+    customDomainWithCertificate
+    customDomainWithoutCertificate
+  ]
 }
 
 resource ruleSets 'Microsoft.Cdn/profiles/rulesets@2025-04-15' = [
@@ -262,9 +290,9 @@ resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
 }
 
 module latencyAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
-  name: '${frontDoorName}LatencyDeploy'
+  name: '${frontDoorProfileName}LatencyDeploy'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'TotalLatency'
@@ -280,9 +308,9 @@ module latencyAlert '../../../public-api/components/alerts/staticMetricAlert.bic
 }
 
 module originHealthPercentageAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.originHealth) {
-  name: '${frontDoorName}OriginHealthPercentage'
+  name: '${frontDoorProfileName}OriginHealthPercentage'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'OriginHealthPercentage'
@@ -297,9 +325,9 @@ module originHealthPercentageAlert '../../../public-api/components/alerts/static
 }
 
 module percentage4XXAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage4XX) {
-  name: '${frontDoorName}Percentage4XX'
+  name: '${frontDoorProfileName}Percentage4XX'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'Percentage4XX'
@@ -314,9 +342,9 @@ module percentage4XXAlert '../../../public-api/components/alerts/dynamicMetricAl
 }
 
 module percentage5XXAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage5XX) {
-  name: '${frontDoorName}Percentage5XX'
+  name: '${frontDoorProfileName}Percentage5XX'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'Percentage5XX'
@@ -331,9 +359,9 @@ module percentage5XXAlert '../../../public-api/components/alerts/dynamicMetricAl
 }
 
 module requestCountAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.requestCount) {
-  name: '${frontDoorName}RequestCount'
+  name: '${frontDoorProfileName}RequestCount'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'RequestCount'
@@ -348,15 +376,15 @@ module requestCountAlert '../../../public-api/components/alerts/dynamicMetricAle
 }
 
 module cachedResponseRatioAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cachedResponseRatio) {
-  name: '${frontDoorName}CachedResponseRatio'
+  name: '${frontDoorProfileName}CachedResponseRatio'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'ByteHitRatio'
     }
     config: {
-      ...dynamicAverageGreaterThan
+      ...dynamicAverageLessThan
       nameSuffix: 'cached-response-ratio'
     }
     alertsGroupName: alerts!.alertsGroupName
@@ -365,9 +393,9 @@ module cachedResponseRatioAlert '../../../public-api/components/alerts/dynamicMe
 }
 
 module wafJsRequestCountAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
-  name: '${frontDoorName}WafJsRequestCount'
+  name: '${frontDoorProfileName}WafJsRequestCount'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'WebApplicationFirewallJsRequestCount'
@@ -382,9 +410,9 @@ module wafJsRequestCountAlert '../../../public-api/components/alerts/dynamicMetr
 }
 
 module wafCaptchaAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
-  name: '${frontDoorName}WafCaptchaRequestCount'
+  name: '${frontDoorProfileName}WafCaptchaRequestCount'
   params: {
-    resourceName: frontDoorName
+    resourceName: frontDoorProfileName
     resourceMetric: {
       resourceType: 'Microsoft.Cdn/profiles'
       metric: 'WebApplicationFirewallCaptchaRequestCount'

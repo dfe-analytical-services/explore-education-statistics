@@ -60,6 +60,8 @@ var abbreviations = {
   frontDoorRoutes: 'fdr'
   frontDoorOriginGroups: 'fdog'
   frontDoorOrigins: 'fdo'
+  frontDoorWafPolicies: 'wafp'
+  frontDoorWafSecurityPolicies: 'wafsp'
   hdInsightClustersHadoop: 'hadoop'
   hdInsightClustersHbase: 'hbase'
   hdInsightClustersKafka: 'kafka'

@@ -34,7 +34,7 @@ param deployAlerts bool
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
+var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
 // TODO EES-6883 - remove the "afd.explore-education" lines below once we are ready to switch the public site DNS
 // over to Azure Front Door properly.  In the meantime, we will host the site through AFD on a temporary
@@ -65,9 +65,9 @@ var certificateName = '${legacyResourcePrefix}as-ees-public-site-afd-certificate
 var nextJsRuleSetName = 'nextjsruleset'
 
 module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' = {
-  name: frontDoorName
+  name: '${frontDoorProfileName}ModuleDeploy'
   params: {
-    frontDoorName: frontDoorName
+    frontDoorProfileName: frontDoorProfileName
     resourcePrefix: resourcePrefix
     legacyResourcePrefix: legacyResourcePrefix
     siteHostName: publicSiteHostName
@@ -77,6 +77,7 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
     certificateName: certificateType == 'BringYourOwn' ? certificateName : null
     ruleSetNames: [nextJsRuleSetName]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    deployWaf: true
     alerts: deployAlerts ? {
       latency: true
       originHealth: true
@@ -92,7 +93,7 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
 }
 
 resource nextJsRuleSet 'Microsoft.Cdn/profiles/rulesets@2025-04-15' existing = {
-  name: '${frontDoorName}/${nextJsRuleSetName}'
+  name: '${frontDoorProfileName}/${nextJsRuleSetName}'
 }
 
 /*
