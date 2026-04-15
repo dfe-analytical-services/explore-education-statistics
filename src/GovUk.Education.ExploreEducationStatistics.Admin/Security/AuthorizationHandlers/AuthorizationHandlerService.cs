@@ -35,13 +35,15 @@ public class AuthorizationHandlerService(
 
     public async Task<bool> UserHasAnyRoleOnPublication(Guid userId, Guid publicationId) =>
         await userPublicationRoleRepository.UserHasAnyRoleOnPublication(userId: userId, publicationId: publicationId)
-        || await userPrereleaseRoleRepository.UserHasAnyRoleOnPublication(userId: userId, publicationId: publicationId);
+        || await userPrereleaseRoleRepository.UserHasPrereleaseRoleOnPublication(
+            userId: userId,
+            publicationId: publicationId
+        );
 
     public async Task<bool> UserHasPrereleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
-        await userPrereleaseRoleRepository.UserHasRoleOnReleaseVersion(
+        await userPrereleaseRoleRepository.UserHasPrereleaseRoleOnReleaseVersion(
             userId: userId,
-            releaseVersionId: releaseVersionId,
-            ReleaseRole.PrereleaseViewer
+            releaseVersionId: releaseVersionId
         );
 
     public async Task<bool> IsReleaseVersionViewableByUser(ReleaseVersion releaseVersion, ClaimsPrincipal user)
