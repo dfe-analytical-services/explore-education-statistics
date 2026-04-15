@@ -36,6 +36,8 @@ public record ReleaseVersionSummaryDto
 
     public required int UpdateCount { get; init; }
 
+    public required ReleaseVersionSummaryPublicationDto Publication { get; init; }
+
     public static ReleaseVersionSummaryDto FromReleaseVersion(
         ReleaseVersion releaseVersion,
         bool isLatestRelease,
@@ -59,6 +61,7 @@ public record ReleaseVersionSummaryDto
             Type = releaseVersion.Type,
             PreReleaseAccessList = releaseVersion.PreReleaseAccessList,
             UpdateCount = updateCount,
+            Publication = ReleaseVersionSummaryPublicationDto.FromPublication(releaseVersion.Release.Publication),
         };
 }
 
@@ -85,5 +88,20 @@ public record PublishingOrganisationDto
             UseGISLogo = organisation.UseGISLogo,
             GISLogoHexCode = organisation.GISLogoHexCode,
             LogoFileName = organisation.LogoFileName,
+        };
+}
+
+public record ReleaseVersionSummaryPublicationDto
+{
+    public required Guid Id { get; init; }
+    public required string Slug { get; init; }
+    public required string Title { get; init; }
+
+    public static ReleaseVersionSummaryPublicationDto FromPublication(Publication publication) =>
+        new()
+        {
+            Id = publication.Id,
+            Slug = publication.Slug,
+            Title = publication.Title,
         };
 }
