@@ -1,27 +1,22 @@
 ﻿#nullable enable
-using System.ComponentModel.DataAnnotations;
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public record PreReleaseUserViewModel(string Email);
+public record PreReleaseUserSummaryViewModel(string Email);
 
-public class PreReleaseUserInvitePlan
+public record PreReleaseUserViewModel
 {
-    public List<string> AlreadyInvited { get; } = new();
+    public required Guid UserId { get; init; }
 
-    public List<string> AlreadyAccepted { get; } = new();
+    public required string Name { get; init; }
 
-    public List<string> Invitable { get; } = new();
+    public required string Email { get; init; }
 }
 
-public class PreReleaseUserInviteViewModel
+public record PreReleaseUserInvitePlan
 {
-    [MinLength(1, ErrorMessage = "Must have at least one email.")]
-    public List<string> Emails { get; set; } = new();
-}
+    public required List<string> AlreadyInvited { get; init; }
 
-public class PreReleaseUserRemoveRequest
-{
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public required List<string> AlreadyAccepted { get; init; }
+
+    public required List<string> Invitable { get; init; }
 }
