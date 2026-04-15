@@ -30,7 +30,7 @@ public class UserResourceRoleNotificationService(
             throw new ArgumentException($"User with ID {userId} is already active and does not need notifying.");
         }
 
-        var pendingUserPrereleaseRoles = await userPrereleaseRoleRepository
+        var pendingUserPreReleaseRoles = await userPrereleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .WhereForUser(user.Id)
@@ -55,8 +55,8 @@ public class UserResourceRoleNotificationService(
             })
             .ToListAsync(cancellationToken);
 
-        var prereleaseRolesInfo = pendingUserPrereleaseRoles
-            .Select(urr => (urr.PublicationTitle, urr.ReleaseTitle, urr.Role))
+        var preReleaseRolesInfo = pendingUserPreReleaseRoles
+            .Select(urr => (urr.PublicationTitle, urr.ReleaseTitle))
             .ToHashSet();
 
         var publicationRolesInfo = pendingUserPublicationRoles
@@ -73,7 +73,7 @@ public class UserResourceRoleNotificationService(
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
 
-            await pendingUserPrereleaseRoles
+            await pendingUserPreReleaseRoles
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async userPrereleaseRole =>
@@ -100,7 +100,7 @@ public class UserResourceRoleNotificationService(
             emailTemplateService
                 .SendInviteEmail(
                     email: user.Email,
-                    releaseRolesInfo: prereleaseRolesInfo,
+                    preReleaseRolesInfo: preReleaseRolesInfo,
                     publicationRolesInfo: publicationRolesInfo
                 )
                 .OrThrow(_ => throw new EmailSendFailedException($"Failed to send user invite email to {user.Email}."));
