@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
-using LinqToDB;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -191,10 +190,10 @@ public abstract class ReplacementServiceHelper
         // as much of the original ordering as we can."
         //
         // We create all replacementSequence groups in three broad steps:
-        // - Add replacement groups that can be mapped from originalSequence (by group label)
-        // - Then add new replacement groups from mapping.IndicatorMappings that haven't been mapped from
+        // - STEP 1: Add replacement groups that can be mapped from originalSequence (by group label)
+        // - STEP 2: Then add new replacement groups from mapping.IndicatorMappings that haven't been mapped from
         //   originalSequence
-        // - Finally, add any new replacement groups from mapping.UnmappedReplacementIndicators that haven't yet been
+        // - STEP 3: Finally, add any new replacement groups from mapping.UnmappedReplacementIndicators that haven't yet been
         //   added to replacementSequence.
         //
         // As we add replacement groups to replacementSequence, we must ensure that all replacement indicators belonging
@@ -204,7 +203,7 @@ public abstract class ReplacementServiceHelper
         // first (preserving the ordering as possible) but then also need to add other indicators belonging to that
         // replacement group from IndicationMappings (i.e. those that have moved group) and UnmappedReplacementIndicators.
         //
-        // Follow comments 1-6 in the code below to track the creation of all replacement sequence groups and indicators:
+        // Follow comments PART 1-6 in the code below to track the creation of all replacement sequence groups and indicators:
         // - Create all replacement groups with a label matching an originalSequence group (1,2,3)
         // - Create new groups for mapped indicators that previously belonged to an original group, but moved to a new
         //   group (4,5)
@@ -230,14 +229,15 @@ public abstract class ReplacementServiceHelper
                     )
                     .ToList();
 
-                if (mappingsForGroupWithReplacementSet.Count + unmappedIndicatorsForGroup.Count == 0)
+                if (!mappingsForGroupWithReplacementSet.Any() && !unmappedIndicatorsForGroup.Any())
                 {
                     // There should never be an IndicatorGroup with no Indicators, but if there was,
                     // this prevents an entry for that group being created in IndicatorSequence.
                     return null;
                 }
 
-                // 1. Create indicators for replacement group that can be mapped from originalSequence
+                // STEP 1
+                // PART 1. Create indicators for replacement group that can be mapped from originalSequence
                 var replacementChildSequence = originalGroupSequence
                     .ChildSequence.Select(originalIndicatorId =>
                         mappingsForGroupWithReplacementSet.SingleOrDefault(map => map.OriginalId == originalIndicatorId)
@@ -246,7 +246,7 @@ public abstract class ReplacementServiceHelper
                     .Select(map => map.ReplacementId!.Value)
                     .ToList();
 
-                // 2. Other mapped indicators for this group which weren't mapped from originalGroupSequence. These
+                // PART 2. Other mapped indicators for this group which weren't mapped from originalGroupSequence. These
                 // indicators originally belonged to a different group but moved into this group in the replacement
                 var newChildren = mappingsForGroupWithReplacementSet
                     .Where(map => !replacementChildSequence.Contains(map.ReplacementId!.Value))
@@ -257,7 +257,7 @@ public abstract class ReplacementServiceHelper
                     })
                     .ToList();
 
-                // 3. Unmapped unmapped replacement indicators that belong to this group
+                // PART 3. Unmapped replacement indicators that belong to this group
                 newChildren.AddRange(
                     unmappedIndicatorsForGroup.Select(unmappedIndicator => new
                     {
@@ -275,18 +275,20 @@ public abstract class ReplacementServiceHelper
             .WhereNotNull()
             .ToList();
 
-        var mappingsInNewGroups = mapping
+        // STEP 2
+        var groupIdsInReplacementSequence = replacementSequence.Select(groupSeq => groupSeq.Id).ToList();
+        var mappingsWithNewReplacementGroup = mapping
             .IndicatorMappings.Values.Where(map =>
                 map.ReplacementGroupId is not null
-                && !replacementSequence.Select(groupSeq => groupSeq.Id).ToList().Contains(map.ReplacementGroupId.Value)
+                && !groupIdsInReplacementSequence.Contains(map.ReplacementGroupId.Value)
             )
             .GroupBy(map => new { GroupId = map.OriginalGroupId, GroupLabel = map.OriginalGroupLabel })
             .OrderBy(group => group.Key.GroupLabel)
             .ToList();
 
-        foreach (var group in mappingsInNewGroups)
+        foreach (var group in mappingsWithNewReplacementGroup)
         {
-            // 4. Mapped replacement indicator that moved from an original preexisting group to a new group in the replacement
+            // PART 4. Mapped replacement indicator that moved from an original preexisting group to a new group in the replacement
             var childSequence = group
                 .Select(map => new
                 {
@@ -295,7 +297,7 @@ public abstract class ReplacementServiceHelper
                 })
                 .ToList();
 
-            // 5. Unmapped replacement indicators that belong to this group
+            // PART 5. Unmapped replacement indicators that belong to this group
             childSequence.AddRange(
                 mapping
                     .UnmappedReplacementIndicators.Where(unmappedIndicator =>
@@ -316,8 +318,9 @@ public abstract class ReplacementServiceHelper
             );
         }
 
-        // 6. Finally, add any unmapped replacement indicators that belong to a new group
-        var unmappedIndicatorsInNewGroups = mapping
+        // STEP 3
+        // PART 6. Finally, add any unmapped replacement indicators that belong to a new group
+        var unmappedReplacementIndicatorsWithNewGroups = mapping
             .UnmappedReplacementIndicators.Where(unmappedIndicator =>
                 !replacementSequence.Select(groupSeq => groupSeq.Id).ToList().Contains(unmappedIndicator.GroupId)
             )
@@ -330,7 +333,7 @@ public abstract class ReplacementServiceHelper
                     .Select(unmappedIndicator => unmappedIndicator.Id)
                     .ToList()
             ));
-        replacementSequence.AddRange(unmappedIndicatorsInNewGroups);
+        replacementSequence.AddRange(unmappedReplacementIndicatorsWithNewGroups);
 
         return replacementSequence;
     }

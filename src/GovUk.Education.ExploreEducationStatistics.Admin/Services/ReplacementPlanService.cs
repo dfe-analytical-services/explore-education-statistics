@@ -207,7 +207,8 @@ public class ReplacementPlanService(
 
         var timePeriods = await timePeriodService.GetTimePeriods(subjectId);
 
-        // indicators covered by DataSetMapping
+        // We don't need to include data about indicators here - DataSetMapping contains the data we require to
+        // validate the replacement
 
         return new ReplacementSubjectMeta
         {
