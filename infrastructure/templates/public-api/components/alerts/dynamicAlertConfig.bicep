@@ -69,6 +69,13 @@ var dynamicAverageGreaterThan = {
 }
 
 @export()
+var dynamicAverageLessThan = {
+  ...defaultDynamicAlertConfig
+  aggregation: 'Average'
+  operator: 'LessThan'
+}
+
+@export()
 var dynamicMaxGreaterThan = {
   ...defaultDynamicAlertConfig
   aggregation: 'Maximum'
