@@ -45,6 +45,7 @@ param alerts {
   requestCount: bool
   cachedResponseRatio: bool
   wafRequestCounts: bool
+  averageResponseTimeAlertThresholdMillis: int
   alertsGroupName: string
 }?
 
@@ -300,7 +301,7 @@ module latencyAlert '../../../public-api/components/alerts/staticMetricAlert.bic
     config: {
       ...staticAverageGreaterThanZero
       nameSuffix: 'response-time'
-      threshold: '250'
+      threshold: '${alerts!.averageResponseTimeAlertThresholdMillis}'
     }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
@@ -387,6 +388,7 @@ module cachedResponseRatioAlert '../../../public-api/components/alerts/dynamicMe
       ...dynamicAverageLessThan
       nameSuffix: 'cached-response-ratio'
     }
+    fullDescription: 'The ratio between requests with cache hits versus requests with cache misses. A lower-than-average ratio would indicate that a higher-than-average volume of traffic is bypassing the cache.'
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

@@ -28,6 +28,9 @@ param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
+@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
+param averagePublicSiteResponseTimeAlertThresholdMillis int
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
 
@@ -86,6 +89,7 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
       percentage5XX: true
       cachedResponseRatio: true
       wafRequestCounts: true
+      averageResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis
       alertsGroupName: '${subscription}-ag-ees-alertedusers'
     } : null
     tagValues: tagValues

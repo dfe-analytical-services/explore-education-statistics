@@ -4,3 +4,5 @@ using '../main.bicep'
 param environmentName = 'Production'
 
 param certificateType = 'Provisioned'
+
+param averagePublicSiteResponseTimeAlertThresholdMillis = 250
