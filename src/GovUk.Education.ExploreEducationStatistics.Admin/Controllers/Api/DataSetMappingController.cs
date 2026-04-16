@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -12,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [ApiController]
 public class DataSetMappingController(IDataSetMappingService dataSetMappingService) : ControllerBase
 {
-    [HttpPatch("releases/{releaseVersionId:guid}/data/replacements/mapping/indicator")]
+    [HttpPatch("releases/{releaseVersionId:guid}/data/replacements/mapping/indicators")]
     public async Task<ActionResult<List<IndicatorMappingDto>>> UpdateIndicatorMappings(
         [FromRoute] Guid releaseVersionId,
         [FromBody] IndicatorMappingUpdatesRequest request,

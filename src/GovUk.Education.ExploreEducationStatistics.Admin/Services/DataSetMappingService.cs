@@ -134,23 +134,18 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
             .SingleOrNotFoundAsync()
             .OnSuccess(async mapping =>
             {
-                var results = new List<Either<ActionResult, IndicatorMapping>>();
-                foreach (var update in request.Updates) // UpdateIndicatorMapping updates `mapping`, so cannot use async
-                {
-                    var result = UpdateIndicatorMapping(
-                        mapping,
-                        update.OriginalColumnName,
-                        update.NewReplacementColumnName
-                    );
-                    results.Add(result);
-                }
+                var updatedMappings = request
+                    .Updates.Select(update =>
+                        UpdateIndicatorMapping(mapping, update.OriginalColumnName, update.NewReplacementColumnName)
+                    )
+                    .ToList(); // cannot be async!
 
                 // we still save changes from the Updates that succeeded, even if some failed
                 await contentDbContext.SaveChangesAsync();
 
-                return results
+                return updatedMappings
                     .OnSuccessAll()
-                    .OnSuccess(mappings => mappings.Select(IndicatorMappingDto.FromModel).ToList());
+                    .OnSuccess(_ => mapping.IndicatorMappings.Values.Select(IndicatorMappingDto.FromModel).ToList());
             });
     }
 
@@ -168,6 +163,9 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
             return Common.Validators.ValidationUtils.ValidationResult(
                 new ErrorViewModel
                 {
+                    Path =
+                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.OriginalColumnName)}",
+                    Code = "IndicatorMatchingOriginalColumnNameNotFound",
                     Message =
                         $"Could not find indicator mapping matching original column name \"{originalColumnName}\"",
                 }
@@ -191,6 +189,9 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
             return Common.Validators.ValidationUtils.ValidationResult(
                 new ErrorViewModel
                 {
+                    Path =
+                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.NewReplacementColumnName)}",
+                    Code = "UnmappedIndicatorMatchingReplacementColumnNameNotFound",
                     Message =
                         $"No available unmapped indicator matching replacement column name \"{newReplacementColumnName}\"",
                 }

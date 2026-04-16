@@ -15,6 +15,10 @@ public class IndicatorMappingUpdatesRequest
     {
         public Validator()
         {
+            RuleFor(x => x.OriginalDataSetId).NotEmpty();
+
+            RuleFor(x => x.ReplacementDataSetId).NotEmpty();
+
             RuleForEach(x => x.Updates).SetValidator(new IndicatorMappingUpdateRequest.Validator());
 
             RuleFor(x => x.Updates)
