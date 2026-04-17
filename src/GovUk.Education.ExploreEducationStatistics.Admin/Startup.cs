@@ -434,7 +434,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseImageService, ReleaseImageService>();
-        services.AddTransient<IReleasePermissionService, ReleasePermissionService>();
         services.AddTransient<IDataImportService, DataImportService>();
         services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
         services.AddTransient<IPublishingService, PublishingService>();
@@ -483,8 +482,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
         services.AddTransient<IDataSetMappingService, DataSetMappingService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
-        services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
-        services.AddTransient<INewPermissionsSystemHelper, NewPermissionsSystemHelper>();
+        services.AddTransient<IPublicationRoleChangesHelper, PublicationRoleChangesHelper>();
         services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
         services.AddTransient<IUserPrereleaseRoleRepository, UserPrereleaseRoleRepository>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
