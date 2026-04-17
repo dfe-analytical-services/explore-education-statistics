@@ -545,38 +545,19 @@ public class ReleaseApprovalServiceTests
         var (activeUser1, activeUser2, activeUser3) = _fixture.DefaultUser().GenerateTuple3();
         var (pendingUserInvite1, pendingUserInvite2) = _fixture.DefaultUserWithPendingInvite().GenerateTuple2();
 
-        var userPrereleaseRoles = _fixture
-            .DefaultUserReleaseRole()
-            // PrereleaseViewer + Email NOT SENT + Active User
-            .ForIndex(
-                0,
-                s => s.SetUser(activeUser1).SetReleaseVersion(releaseVersion).SetRole(ReleaseRole.PrereleaseViewer)
-            )
-            // PrereleaseViewer + Email SENT + Active User
+        var userPreReleaseRoles = _fixture
+            .DefaultUserPrereleaseRole()
+            // Email NOT SENT + Active User
+            .ForIndex(0, s => s.SetUser(activeUser1).SetReleaseVersion(releaseVersion))
+            // Email SENT + Active User
             .ForIndex(
                 1,
-                s =>
-                    s.SetUser(activeUser2)
-                        .SetReleaseVersion(releaseVersion)
-                        .SetRole(ReleaseRole.PrereleaseViewer)
-                        .SetEmailSent(DateTimeOffset.UtcNow)
+                s => s.SetUser(activeUser2).SetReleaseVersion(releaseVersion).SetEmailSent(DateTimeOffset.UtcNow)
             )
-            // PrereleaseViewer + Email NOT SENT + Pending Invite
-            .ForIndex(
-                2,
-                s =>
-                    s.SetUser(pendingUserInvite1)
-                        .SetReleaseVersion(releaseVersion)
-                        .SetRole(ReleaseRole.PrereleaseViewer)
-            )
-            // PrereleaseViewer + Email NOT SENT + Pending User + Different ReleaseVersion
-            .ForIndex(
-                3,
-                s =>
-                    s.SetUser(pendingUserInvite1)
-                        .SetReleaseVersion(otherReleaseVersion)
-                        .SetRole(ReleaseRole.PrereleaseViewer)
-            )
+            // Email NOT SENT + Pending Invite
+            .ForIndex(2, s => s.SetUser(pendingUserInvite1).SetReleaseVersion(releaseVersion))
+            // Email NOT SENT + Pending User + Different ReleaseVersion
+            .ForIndex(3, s => s.SetUser(pendingUserInvite1).SetReleaseVersion(otherReleaseVersion))
             .GenerateList(4);
 
         var contextId = Guid.NewGuid().ToString();
@@ -612,13 +593,13 @@ public class ReleaseApprovalServiceTests
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPrereleaseRoles]);
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPreReleaseRoles]);
 
         userResourceRoleNotificationService
-            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPrereleaseRoles[0].Id, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPreReleaseRoles[0].Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
         userResourceRoleNotificationService
-            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPrereleaseRoles[2].Id, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPreReleaseRoles[2].Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
@@ -1064,10 +1045,9 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        var userPrereleaseRoles = _fixture
-            .DefaultUserReleaseRole()
+        var userPreReleaseRoles = _fixture
+            .DefaultUserPrereleaseRole()
             .WithReleaseVersion(releaseVersion)
-            .WithRole(ReleaseRole.PrereleaseViewer)
             .ForIndex(0, s => s.SetUser(_fixture.DefaultUser()))
             .ForIndex(1, s => s.SetUser(_fixture.DefaultUser()))
             .GenerateList(2);
@@ -1094,10 +1074,10 @@ public class ReleaseApprovalServiceTests
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPrereleaseRoles]);
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPreReleaseRoles]);
 
         userResourceRoleNotificationService
-            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPrereleaseRoles[0].Id, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPreReleaseRoles[0].Id, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EmailSendFailedException(""));
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1168,11 +1148,10 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        UserReleaseRole userPrereleaseRole = _fixture
-            .DefaultUserReleaseRole()
+        UserReleaseRole userPreReleaseRole = _fixture
+            .DefaultUserPrereleaseRole()
             .WithUser(_fixture.DefaultUser())
-            .WithReleaseVersion(releaseVersion)
-            .WithRole(ReleaseRole.PrereleaseViewer);
+            .WithReleaseVersion(releaseVersion);
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1193,10 +1172,10 @@ public class ReleaseApprovalServiceTests
             )
             .ReturnsAsync([]);
 
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPrereleaseRole);
+        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPreReleaseRole);
 
         userResourceRoleNotificationService
-            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPrereleaseRole.Id, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPreReleaseRole.Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         publishingService
