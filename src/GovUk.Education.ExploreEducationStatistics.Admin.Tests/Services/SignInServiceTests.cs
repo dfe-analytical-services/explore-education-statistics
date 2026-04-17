@@ -24,8 +24,6 @@ public class SignInServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    private static readonly Guid CreatedById = Guid.NewGuid();
-
     [Fact]
     public async Task RegisterOrSignIn_InvitedUser_ActivatesNewUser()
     {
@@ -46,25 +44,6 @@ public class SignInServiceTests
                     NormalizedName = "ROLE",
                 }
             );
-
-        var userReleaseRoles = _dataFixture
-            .DefaultUserReleaseRole()
-            .WithUser(invitedUser)
-            .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
-            .WithCreatedById(CreatedById)
-            .ForIndex(0, s => s.SetRole(ReleaseRole.Contributor))
-            .ForIndex(1, s => s.SetRole(ReleaseRole.Approver))
-            .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
-            .GenerateList(3);
-
-        var userPublicationRoles = _dataFixture
-            .DefaultUserPublicationRole()
-            .WithUser(invitedUser)
-            .WithPublication(_dataFixture.DefaultPublication())
-            .WithCreatedById(CreatedById)
-            .ForIndex(0, s => s.SetRole(PublicationRole.Owner))
-            .ForIndex(1, s => s.SetRole(PublicationRole.Allower))
-            .GenerateList(2);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
