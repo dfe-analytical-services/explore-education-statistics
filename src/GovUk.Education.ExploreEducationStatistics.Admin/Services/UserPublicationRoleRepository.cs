@@ -210,6 +210,13 @@ public class UserPublicationRoleRepository(
             return;
         }
 
+        if (userPublicationRoles.Any(dto => !dto.Role.IsNewPermissionsSystemPublicationRole()))
+        {
+            throw new ArgumentException(
+                $"Unexpected publication role found in the list of roles to create. All roles should be NEW permissions system roles."
+            );
+        }
+
         contentDbContext.UserPublicationRoles.RemoveRange(userPublicationRoles);
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
