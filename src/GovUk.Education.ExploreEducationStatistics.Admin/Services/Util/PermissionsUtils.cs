@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 
@@ -49,10 +48,7 @@ public static class PermissionsUtils
                 .IsRight(),
             CanManageReleaseSeries = await userService.CheckCanManageReleaseSeries(publication).IsRight(),
             CanUpdateContact = await userService.CheckCanUpdateContact(publication).IsRight(),
-            CanUpdateContributorReleaseRole = await userService
-                // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
-                .CheckCanUpdateDrafters(publication)
-                .IsRight(),
+            CanUpdateDrafters = await userService.CheckCanUpdateDrafters(publication).IsRight(),
             CanViewReleaseTeamAccess = await userService.CheckCanViewReleaseTeamAccess(publication).IsRight(),
         };
     }
