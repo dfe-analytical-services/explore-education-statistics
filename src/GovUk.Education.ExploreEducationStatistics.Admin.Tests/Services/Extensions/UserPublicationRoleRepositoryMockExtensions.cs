@@ -13,7 +13,5 @@ internal static class UserPublicationRoleRepositoryMockExtensions
         this Mock<IUserPublicationRoleRepository> mock,
         ResourceRoleFilter resourceRoleFilterToApply = ResourceRoleFilter.ActiveOnly,
         params UserPublicationRole[] userPublicationRolesToReturn
-    ) =>
-        mock.Setup(m => m.Query(resourceRoleFilterToApply))
-            .Returns(userPublicationRolesToReturn.BuildMock());
+    ) => mock.Setup(m => m.Query(resourceRoleFilterToApply)).Returns(userPublicationRolesToReturn.BuildMock());
 }
