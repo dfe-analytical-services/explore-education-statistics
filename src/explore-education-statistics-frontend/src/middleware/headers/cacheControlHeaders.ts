@@ -1,13 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
+import {
+  type NextFetchEvent,
+  type NextMiddleware,
+  NextRequest,
+} from 'next/server';
 
-export default function cacheControlHeaders(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const res = NextResponse.next();
+export default async function cacheControlHeaders(
+  req: NextRequest,
+  event: NextFetchEvent,
+  middleware: NextMiddleware,
+) {
+  const res = await middleware(req, event);
 
-  // Exclude altering any requests to /_next/* in any way. Next will handle these separately.
-  if (pathname.startsWith('/_next/')) {
-    return res;
+  if (!res) {
+    return null;
   }
+
+  const { pathname } = req.nextUrl;
 
   // Cache assets retrieved via Next API routes for a moderate duration.
   if (pathname.startsWith('/api/assets/')) {
