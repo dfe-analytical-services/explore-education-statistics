@@ -4,7 +4,7 @@ import _redirectService, {
 } from '@frontend/services/redirectService';
 import { NextResponse } from 'next/server';
 import { Dictionary } from '@common/types';
-import runMiddleware from './util/runMiddleware';
+import runMiddleware from '../../__tests__/util/runMiddleware';
 
 jest.mock('@frontend/services/redirectService');
 const redirectService = _redirectService as jest.Mocked<

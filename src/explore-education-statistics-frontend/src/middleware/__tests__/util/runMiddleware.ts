@@ -1,4 +1,4 @@
-import { ChainedMiddleware } from '@frontend/middleware/pages/chain';
+import { ChainedMiddleware } from '@frontend/middleware/chain';
 import { NextFetchEvent } from 'next/dist/server/web/spec-extension/fetch-event';
 import { NextRequest, NextResponse } from 'next/server';
 
