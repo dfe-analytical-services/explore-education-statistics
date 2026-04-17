@@ -1452,10 +1452,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task WithPreReleaseInviteForPendingUserInvite()
         {
-            UserReleaseRole prereleaseUserRole = _dataFixture
-                .DefaultUserReleaseRole()
+            UserReleaseRole preReleaseUserRole = _dataFixture
+                .DefaultUserPrereleaseRole()
                 .WithUser(_dataFixture.DefaultUserWithPendingInvite())
-                .WithRole(ReleaseRole.PrereleaseViewer)
                 .WithReleaseVersion(
                     _dataFixture
                         .DefaultReleaseVersion()
@@ -1465,12 +1464,12 @@ public abstract class ReleaseVersionServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseVersions.Add(prereleaseUserRole.ReleaseVersion);
+                context.ReleaseVersions.Add(preReleaseUserRole.ReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, prereleaseUserRole);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1479,7 +1478,7 @@ public abstract class ReleaseVersionServiceTests
                     userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
-                var result = await releaseVersionService.GetRelease(prereleaseUserRole.ReleaseVersionId);
+                var result = await releaseVersionService.GetRelease(preReleaseUserRole.ReleaseVersionId);
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1491,10 +1490,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task WithPreReleaseInviteForActiveUser()
         {
-            UserReleaseRole prereleaseUserRole = _dataFixture
-                .DefaultUserReleaseRole()
+            UserReleaseRole preReleaseUserRole = _dataFixture
+                .DefaultUserPrereleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
-                .WithRole(ReleaseRole.PrereleaseViewer)
                 .WithReleaseVersion(
                     _dataFixture
                         .DefaultReleaseVersion()
@@ -1504,12 +1502,12 @@ public abstract class ReleaseVersionServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseVersions.Add(prereleaseUserRole.ReleaseVersion);
+                context.ReleaseVersions.Add(preReleaseUserRole.ReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
             var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, prereleaseUserRole);
+            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1518,7 +1516,7 @@ public abstract class ReleaseVersionServiceTests
                     userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
                 );
 
-                var result = await releaseVersionService.GetRelease(prereleaseUserRole.ReleaseVersionId);
+                var result = await releaseVersionService.GetRelease(preReleaseUserRole.ReleaseVersionId);
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1767,10 +1765,10 @@ public abstract class ReleaseVersionServiceTests
                 Methodology = new Methodology { OwningPublicationTitle = "Methodology scheduled with another Release" },
             };
 
-            var userPrereleaseRoles = _dataFixture
-                .DefaultUserReleaseRole()
+            var userPreReleaseRoles = _dataFixture
+                .DefaultUserPrereleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
-                .ForIndex(0, s => s.SetReleaseVersion(releaseVersion).SetRole(ReleaseRole.PrereleaseViewer))
+                .ForIndex(0, s => s.SetReleaseVersion(releaseVersion))
                 // This one should not be removed as it is for another ReleaseVersion.
                 .ForIndex(1, s => s.SetReleaseVersion(anotherReleaseVersion))
                 .GenerateList(2);
@@ -1839,10 +1837,10 @@ public abstract class ReleaseVersionServiceTests
 
             userPrereleaseRoleRepository.SetupQuery(
                 ResourceRoleFilter.All,
-                [userPrereleaseRoles[0], userPrereleaseRoles[1]]
+                [userPreReleaseRoles[0], userPreReleaseRoles[1]]
             );
             userPrereleaseRoleRepository
-                .Setup(mock => mock.RemoveMany(ListOf(userPrereleaseRoles[0]), default))
+                .Setup(mock => mock.RemoveMany(ListOf(userPreReleaseRoles[0]), default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
@@ -2122,10 +2120,10 @@ public abstract class ReleaseVersionServiceTests
                 Methodology = new Methodology { OwningPublicationTitle = "Methodology scheduled with another Release" },
             };
 
-            var userPrereleaseRoles = _dataFixture
-                .DefaultUserReleaseRole()
+            var userPreReleaseRoles = _dataFixture
+                .DefaultUserPrereleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
-                .ForIndex(0, s => s.SetReleaseVersion(releaseVersion).SetRole(ReleaseRole.PrereleaseViewer))
+                .ForIndex(0, s => s.SetReleaseVersion(releaseVersion))
                 // This one should not be removed as it is for another ReleaseVersion.
                 .ForIndex(1, s => s.SetReleaseVersion(anotherReleaseVersion))
                 .GenerateList(2);
@@ -2199,10 +2197,10 @@ public abstract class ReleaseVersionServiceTests
 
             userPrereleaseRoleRepository.SetupQuery(
                 ResourceRoleFilter.All,
-                [userPrereleaseRoles[0], userPrereleaseRoles[1]]
+                [userPreReleaseRoles[0], userPreReleaseRoles[1]]
             );
             userPrereleaseRoleRepository
-                .Setup(mock => mock.RemoveMany(ListOf(userPrereleaseRoles[0]), default))
+                .Setup(mock => mock.RemoveMany(ListOf(userPreReleaseRoles[0]), default))
                 .Returns(Task.CompletedTask);
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
