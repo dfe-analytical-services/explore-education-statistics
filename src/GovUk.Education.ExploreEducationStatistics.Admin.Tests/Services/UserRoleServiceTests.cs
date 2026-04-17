@@ -964,7 +964,6 @@ public abstract class UserRoleServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(
                 ResourceRoleFilter.ActiveOnly,
-                false,
                 [userPublicationRole1, userPublicationRole2, userPublicationRole3]
             );
 
@@ -1049,7 +1048,6 @@ public abstract class UserRoleServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(
                 ResourceRoleFilter.ActiveOnly,
-                false,
                 [userPublicationRole1, userPublicationRole2, userPublicationRole3]
             );
 
@@ -1133,7 +1131,7 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
@@ -1232,7 +1230,7 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
@@ -1292,7 +1290,7 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, anotherUserPublicationRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, anotherUserPublicationRole);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
@@ -1365,7 +1363,7 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
