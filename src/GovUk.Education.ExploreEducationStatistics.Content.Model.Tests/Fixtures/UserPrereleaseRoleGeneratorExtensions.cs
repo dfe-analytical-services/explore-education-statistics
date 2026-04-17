@@ -61,7 +61,7 @@ public static class UserPrereleaseRoleGeneratorExtensions
             .SetDefault(urr => urr.ReleaseVersionId)
             .SetDefault(urr => urr.UserId)
             .SetDefault(urr => urr.Created)
-            // We need to set a default for the role here until EES-6215 when we finally
+            // We need to set a default for the role here until EES-6212 when we finally
             // remove the old enum values.
             .Set(urr => urr.Role, ReleaseRole.PrereleaseViewer);
 
