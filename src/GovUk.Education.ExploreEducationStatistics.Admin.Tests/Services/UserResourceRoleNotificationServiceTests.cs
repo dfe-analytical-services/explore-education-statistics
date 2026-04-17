@@ -81,10 +81,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Setup(r => r.FindUserById(inactiveUser.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(inactiveUser);
 
-            userPublicationRoleRepository.SetupQuery(
-                ResourceRoleFilter.PendingOnly,
-                [.. allUserPublicationRoles]
-            );
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. allUserPublicationRoles]);
 
             foreach (var publicationRole in publicationRolesForTargetUser)
             {
