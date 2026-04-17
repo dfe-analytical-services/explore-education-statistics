@@ -369,7 +369,7 @@ public class MethodologyApprovalServiceTests
             .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -1215,7 +1215,7 @@ public class MethodologyApprovalServiceTests
             .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
 
         emailTemplateService
             .Setup(mock =>

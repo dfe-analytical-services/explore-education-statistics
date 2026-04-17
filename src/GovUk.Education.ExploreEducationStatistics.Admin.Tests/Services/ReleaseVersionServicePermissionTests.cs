@@ -220,7 +220,7 @@ public class ReleaseVersionServicePermissionTests
         userPrereleaseRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
 
         var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-        userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+        userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupCheck(RegisteredUser)

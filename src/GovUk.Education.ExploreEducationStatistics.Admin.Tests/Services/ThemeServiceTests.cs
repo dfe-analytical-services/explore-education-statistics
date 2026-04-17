@@ -304,7 +304,7 @@ public class ThemeServiceTests
         userService.Setup(s => s.GetUserId()).Returns(user.Id);
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
 
         var service = SetupThemeService(
             userService: userService.Object,
