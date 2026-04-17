@@ -209,15 +209,6 @@ public class ReleaseVersionServicePermissionTests
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .GenerateTuple2();
 
-        UserReleaseRole userReleaseRole = _dataFixture
-            .DefaultUserReleaseRole()
-            .WithReleaseVersion(releaseVersion)
-            .WithUser(_dataFixture.DefaultUser().WithId(_userId))
-            .WithRole(ReleaseRole.Contributor);
-
-        var userPrereleaseRoleRepositoryMock = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-        userPrereleaseRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
-
         var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
         userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
@@ -259,7 +250,6 @@ public class ReleaseVersionServicePermissionTests
                 var service = BuildService(
                     contentDbContext: contextDbContext,
                     userService: userService.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepositoryMock.Object,
                     userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
                 );
 
@@ -269,11 +259,7 @@ public class ReleaseVersionServicePermissionTests
                 Assert.Single(viewModel);
                 Assert.Equal(releaseVersion.Id, viewModel[0].Id);
 
-                MockUtils.VerifyAllMocks(
-                    userService,
-                    userPrereleaseRoleRepositoryMock,
-                    userPublicationRoleRepositoryMock
-                );
+                MockUtils.VerifyAllMocks(userService, userPublicationRoleRepositoryMock);
 
                 return result;
             });
@@ -390,7 +376,6 @@ public class ReleaseVersionServicePermissionTests
                 ?? new ReleaseVersionRepository(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository,
                     userPublicationRoleRepository: userPublicationRoleRepository
                 ),
             Mock.Of<IReleaseFileRepository>(),
