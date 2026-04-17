@@ -533,14 +533,7 @@ public class PublicationServiceTests
                 .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanUpdateContact))
                 .ReturnsAsync(true);
             userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
-                            tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor
-                        ),
-                        CanUpdateDrafters
-                    )
-                )
+                .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanUpdateDrafters))
                 .ReturnsAsync(false);
             userService
                 .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanViewReleaseTeamAccess))
@@ -563,7 +556,7 @@ public class PublicationServiceTests
             Assert.False(result.Permissions.CanManageExternalMethodology);
             Assert.True(result.Permissions.CanManageReleaseSeries);
             Assert.True(result.Permissions.CanUpdateContact);
-            Assert.False(result.Permissions.CanUpdateContributorReleaseRole);
+            Assert.False(result.Permissions.CanUpdateDrafters);
         }
     }
 
