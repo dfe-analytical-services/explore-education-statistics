@@ -913,7 +913,7 @@ public class ReleaseApprovalServiceTests
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
 
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         contentService
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
@@ -1006,7 +1006,7 @@ public class ReleaseApprovalServiceTests
             )
             .ReturnsAsync(Unit.Instance);
 
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
@@ -1274,7 +1274,7 @@ public class ReleaseApprovalServiceTests
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
 
-        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
@@ -1353,7 +1353,7 @@ public class ReleaseApprovalServiceTests
                 .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, userPublicationApproverRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userPublicationApproverRole);
 
             emailTemplateService
                 .Setup(mock =>
@@ -1436,7 +1436,7 @@ public class ReleaseApprovalServiceTests
                 .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, userPublicationApproverRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userPublicationApproverRole);
 
             emailTemplateService
                 .Setup(mock =>
