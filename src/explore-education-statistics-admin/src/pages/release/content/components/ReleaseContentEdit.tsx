@@ -3,7 +3,7 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { toolbarConfigLinkOnly } from '@admin/config/ckEditorConfig';
+import { toolbarConfigWarningBlock } from '@admin/config/ckEditorConfig';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -275,7 +275,7 @@ const ReleaseContent = ({
                   }
                   sectionId={release.warningSection.id}
                   sectionKey="warningSection"
-                  toolbarConfig={toolbarConfigLinkOnly}
+                  toolbarConfig={toolbarConfigWarningBlock}
                   onAfterDeleteBlock={onAfterDeleteWarningBlock}
                 />
               )}
