@@ -70,6 +70,18 @@ public class ReleaseServicePermissionTests
             });
     }
 
+    [Fact]
+    public async Task ListReleases()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = BuildService(userService: userService.Object);
+                return await service.ListReleases();
+            });
+    }
+
     private static ReleaseService BuildService(
         IUserService userService,
         ContentDbContext? context = null,

@@ -1,10 +1,10 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -36,18 +36,6 @@ public class UserManagementServicePermissionTests
             {
                 var service = SetupUserManagementService(userService: userService.Object);
                 return await service.ListAllUsers();
-            });
-    }
-
-    [Fact]
-    public async Task ListReleases()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .ExpectCheckToFail(CanManageUsersOnSystem)
-            .AssertForbidden(async userService =>
-            {
-                var service = SetupUserManagementService(userService: userService.Object);
-                return await service.ListReleases();
             });
     }
 
@@ -203,6 +191,7 @@ public class UserManagementServicePermissionTests
         IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
+        IPreReleaseUserService? preReleaseUserService = null,
         UserManager<ApplicationUser>? userManager = null
     )
     {
@@ -219,6 +208,7 @@ public class UserManagementServicePermissionTests
             userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict),
+            preReleaseUserService ?? Mock.Of<IPreReleaseUserService>(Strict),
             userManager ?? MockUserManager().Object
         );
     }
