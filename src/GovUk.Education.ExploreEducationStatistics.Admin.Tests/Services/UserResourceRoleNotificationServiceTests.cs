@@ -83,7 +83,6 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             userPublicationRoleRepository.SetupQuery(
                 ResourceRoleFilter.PendingOnly,
-                false,
                 [.. allUserPublicationRoles]
             );
 
@@ -206,7 +205,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Setup(r => r.FindUserById(inactiveUser.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(inactiveUser);
 
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, false, [.. userPublicationRoles]);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userPublicationRoles]);
 
             foreach (var publicationRole in userPublicationRoles)
             {
@@ -269,7 +268,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             userPublicationRoleRepository
                 .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, false, userPublicationRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
 
             emailTemplateService
                 .Setup(s =>
@@ -295,7 +294,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         public async Task RoleDoesNotExist_ThrowsKeyNotFoundException()
         {
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, false, []);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             var service = BuildService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
@@ -320,7 +319,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             userPublicationRoleRepository
                 .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, false, userPublicationRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
 
             emailTemplateService
                 .Setup(s =>
