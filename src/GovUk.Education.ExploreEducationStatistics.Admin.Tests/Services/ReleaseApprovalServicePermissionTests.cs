@@ -164,7 +164,6 @@ public class ReleaseApprovalServicePermissionTests
             Mock.Of<IReleaseFileRepository>(),
             Mock.Of<IReleaseFileService>(),
             new ReleaseApprovalOptions().ToOptionsWrapper(),
-            Mock.Of<IUserReleaseRoleService>(),
             Mock.Of<IUserPrereleaseRoleRepository>(),
             Mock.Of<IUserPublicationRoleRepository>(),
             Mock.Of<IEmailTemplateService>()
