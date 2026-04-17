@@ -2561,7 +2561,6 @@ public abstract class ReleaseVersionServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(
                 ResourceRoleFilter.ActiveOnly,
-                false,
                 [
                     drafterPublicationRoleForUser,
                     approverPublicationRoleForUser,
