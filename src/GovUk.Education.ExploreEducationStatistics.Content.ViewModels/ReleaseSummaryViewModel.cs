@@ -7,6 +7,10 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
+/// <summary>
+/// Used as the return type for the Content API's <c>ReleaseController.ListReleases</c> endpoint,
+/// and as the type of the <see cref="ReleaseFileViewModel.Release"/> property.
+/// </summary>
 public record ReleaseSummaryViewModel
 {
     /// <summary>
