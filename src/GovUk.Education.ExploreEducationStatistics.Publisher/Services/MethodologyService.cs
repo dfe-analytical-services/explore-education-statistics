@@ -46,20 +46,6 @@ public class MethodologyService : IMethodologyService
             .ToListAsync();
     }
 
-    public async Task SetPublishedDatesIfApplicable(Guid publicationId)
-    {
-        var methodologyVersions = await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(
-            publicationId
-        );
-
-        _context.MethodologyVersions.UpdateRange(methodologyVersions);
-        methodologyVersions.ForEach(methodologyVersion =>
-        {
-            methodologyVersion.Published ??= DateTime.UtcNow;
-        });
-        await _context.SaveChangesAsync();
-    }
-
     public async Task Publish(MethodologyVersion methodologyVersion)
     {
         // NOTE: Methodology files are published separately
