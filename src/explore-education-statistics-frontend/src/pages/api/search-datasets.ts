@@ -49,11 +49,9 @@ export default withMethods({
         search = '',
       } = searchOptions;
 
-      // TODO EES-7072 reinstate orderBy, check queryType
       const searchOptionsBase: SharedSearchOptionsBase = {
         includeTotalCount: true,
-        // orderBy: orderBy ? [orderBy] : undefined,
-        orderBy: undefined,
+        orderBy: orderBy ? [orderBy] : undefined,
         queryType: 'full',
         searchMode: 'any',
         skip: page > 1 ? (page - 1) * 10 : 0,
@@ -65,9 +63,12 @@ export default withMethods({
         ...searchOptionsBase,
         filter,
         select: [
-          'id',
+          'fileId',
           'filename',
           'fileExtension',
+          'fileSize',
+          'title',
+          'content',
           'themeId',
           'themeTitle',
           'publicationId',
@@ -81,11 +82,11 @@ export default withMethods({
           'published',
           'lastUpdated',
           'api',
-          'NumDataFileRows',
+          'numDataFileRows',
           'geographicLevels',
           'indicators',
           'filters',
-          'release_type',
+          'releaseType',
           'timePeriodRange',
         ],
       });
@@ -107,9 +108,12 @@ export default withMethods({
       for await (const result of results) {
         const { document } = result;
         const {
-          id,
+          fileId,
+          fileSize,
           filename,
           fileExtension,
+          title,
+          content,
           themeId,
           themeTitle,
           publicationId,
@@ -123,7 +127,7 @@ export default withMethods({
           published,
           lastUpdated,
           api,
-          NumDataFileRows,
+          numDataFileRows,
           geographicLevels,
           indicators,
           filters,
@@ -131,13 +135,13 @@ export default withMethods({
         } = document;
 
         dataSetsResult.results.push({
-          id,
-          fileId: id,
+          id: fileId,
+          fileId,
           filename,
-          fileSize: 'missing',
+          fileSize,
           fileExtension,
-          title: releaseTitle,
-          content: 'missing',
+          title,
+          content,
           theme: {
             id: themeId,
             title: themeTitle,
@@ -156,14 +160,12 @@ export default withMethods({
           isSuperseded,
           published: new Date(published),
           lastUpdated,
-          api: api
-            ? {
-                id: 'missing',
-                version: '1.0.1',
-              }
-            : undefined,
+          api:
+            api.id.length > 0 // api will always be returned but we only want it on the FE if it has non-empty values
+              ? api
+              : undefined,
           meta: {
-            numDataFileRows: NumDataFileRows,
+            numDataFileRows,
             geographicLevels: geographicLevels.map(
               code => geographicLevelCodesMap[code].label,
             ),
