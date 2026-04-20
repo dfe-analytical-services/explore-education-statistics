@@ -139,19 +139,19 @@ public abstract class NotificationsServiceTests
                 .ForIndex(
                     0,
                     s =>
-                        s.SetRole(PublicationRole.Owner)
-                            .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-owner@example.com"))
+                        s.SetRole(PublicationRole.Drafter)
+                            .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-drafter@example.com"))
                 )
                 .ForIndex(
                     1,
                     s =>
-                        s.SetRole(PublicationRole.Allower)
+                        s.SetRole(PublicationRole.Approver)
                             .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-approver1@example.com"))
                 )
                 .ForIndex(
                     2,
                     s =>
-                        s.SetRole(PublicationRole.Allower)
+                        s.SetRole(PublicationRole.Approver)
                             .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-approver2@example.com"))
                 )
                 .GenerateList();
@@ -159,7 +159,7 @@ public abstract class NotificationsServiceTests
             // Only users associated with the affected publication, and with active accounts, should receive emails
             var otherPublicationTeam = _dataFixture
                 .DefaultUserPublicationRole()
-                .WithRole(PublicationRole.Owner)
+                .WithRole(PublicationRole.Drafter)
                 // Active user, but different publication
                 .ForIndex(
                     0,
@@ -239,36 +239,38 @@ public abstract class NotificationsServiceTests
 
                 Assert.Equal(3, feedbackEntries.Count);
 
-                var ownerFeedbackEntry = feedbackEntries.Single(f => f.UserPublicationRole == PublicationRole.Owner);
+                var drafterFeedbackEntry = feedbackEntries.Single(f =>
+                    f.UserPublicationRole == PublicationRole.Drafter
+                );
 
                 AssertNewFeedbackRecordCreatedOk(
-                    feedbackEntry: ownerFeedbackEntry,
+                    feedbackEntry: drafterFeedbackEntry,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Owner,
+                    expectedRole: PublicationRole.Drafter,
                     expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
                     expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title
                 );
 
                 var approverFeedbackEntry1 = feedbackEntries.First(f =>
-                    f.UserPublicationRole == PublicationRole.Allower
+                    f.UserPublicationRole == PublicationRole.Approver
                 );
 
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: approverFeedbackEntry1,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Allower,
+                    expectedRole: PublicationRole.Approver,
                     expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
                     expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title
                 );
 
                 var approverFeedbackEntry2 = feedbackEntries.Last(f =>
-                    f.UserPublicationRole == PublicationRole.Allower
+                    f.UserPublicationRole == PublicationRole.Approver
                 );
 
                 AssertNewFeedbackRecordCreatedOk(
                     feedbackEntry: approverFeedbackEntry2,
                     expectedReleaseVersionId: releaseVersionBeingPublished.Id,
-                    expectedRole: PublicationRole.Allower,
+                    expectedRole: PublicationRole.Approver,
                     expectedReleaseTimePeriod: releaseVersionBeingPublished.Release.Title,
                     expectedPublicationTitle: releaseVersionBeingPublished.Release.Publication.Title
                 );
@@ -278,7 +280,7 @@ public abstract class NotificationsServiceTests
                         mock.NotifyReleasePublishingFeedbackUsers(
                             new List<ReleasePublishingFeedbackMessage>
                             {
-                                new(ownerFeedbackEntry.Id, "affected-publication-owner@example.com"),
+                                new(drafterFeedbackEntry.Id, "affected-publication-drafter@example.com"),
                                 new(approverFeedbackEntry1.Id, "affected-publication-approver1@example.com"),
                                 new(approverFeedbackEntry2.Id, "affected-publication-approver2@example.com"),
                             },
@@ -301,18 +303,18 @@ public abstract class NotificationsServiceTests
             var release1Version = publication.Releases[0].Versions[0];
             var release2Version = publication.Releases[1].Versions[0];
 
-            UserPublicationRole publicationOwner = _dataFixture
+            UserPublicationRole publicationDrafter = _dataFixture
                 .DefaultUserPublicationRole()
                 .WithPublication(publication)
-                .WithRole(PublicationRole.Owner)
-                .WithUser(_dataFixture.DefaultUser().WithEmail("publication-owner@example.com"));
+                .WithRole(PublicationRole.Drafter)
+                .WithUser(_dataFixture.DefaultUser().WithEmail("publication-drafter@example.com"));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.AddRange(publication);
-                contentDbContext.UserPublicationRoles.AddRange(publicationOwner);
+                contentDbContext.UserPublicationRoles.AddRange(publicationDrafter);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -346,22 +348,26 @@ public abstract class NotificationsServiceTests
 
                 Assert.Equal(2, feedbackEntries.Count);
 
-                var release1OwnerFeedbackEntry = feedbackEntries.Single(f => f.ReleaseVersionId == release1Version.Id);
+                var release1DrafterFeedbackEntry = feedbackEntries.Single(f =>
+                    f.ReleaseVersionId == release1Version.Id
+                );
 
                 AssertNewFeedbackRecordCreatedOk(
-                    feedbackEntry: release1OwnerFeedbackEntry,
+                    feedbackEntry: release1DrafterFeedbackEntry,
                     expectedReleaseVersionId: release1Version.Id,
-                    expectedRole: PublicationRole.Owner,
+                    expectedRole: PublicationRole.Drafter,
                     expectedReleaseTimePeriod: release1Version.Release.Title,
                     expectedPublicationTitle: release1Version.Release.Publication.Title
                 );
 
-                var release2OwnerFeedbackEntry = feedbackEntries.Single(f => f.ReleaseVersionId == release2Version.Id);
+                var release2DrafterFeedbackEntry = feedbackEntries.Single(f =>
+                    f.ReleaseVersionId == release2Version.Id
+                );
 
                 AssertNewFeedbackRecordCreatedOk(
-                    feedbackEntry: release2OwnerFeedbackEntry,
+                    feedbackEntry: release2DrafterFeedbackEntry,
                     expectedReleaseVersionId: release2Version.Id,
-                    expectedRole: PublicationRole.Owner,
+                    expectedRole: PublicationRole.Drafter,
                     expectedReleaseTimePeriod: release2Version.Release.Title,
                     expectedPublicationTitle: release2Version.Release.Publication.Title
                 );
@@ -371,8 +377,8 @@ public abstract class NotificationsServiceTests
                         mock.NotifyReleasePublishingFeedbackUsers(
                             new List<ReleasePublishingFeedbackMessage>
                             {
-                                new(release1OwnerFeedbackEntry.Id, "publication-owner@example.com"),
-                                new(release2OwnerFeedbackEntry.Id, "publication-owner@example.com"),
+                                new(release1DrafterFeedbackEntry.Id, "publication-drafter@example.com"),
+                                new(release2DrafterFeedbackEntry.Id, "publication-drafter@example.com"),
                             },
                             CancellationToken.None
                         ),
