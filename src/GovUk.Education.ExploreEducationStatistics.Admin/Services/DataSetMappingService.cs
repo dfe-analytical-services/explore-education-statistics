@@ -1,8 +1,14 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -114,5 +120,119 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
             .ToList();
 
         return (initialMappingDictionary, unmappedReplacementIds);
+    }
+
+    public async Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(
+        IndicatorMappingUpdatesRequest request
+    )
+    {
+        return await contentDbContext
+            .DataSetMappings.Where(map =>
+                map.OriginalDataSetId == request.OriginalDataSetId
+                && map.ReplacementDataSetId == request.ReplacementDataSetId
+            )
+            .SingleOrNotFoundAsync()
+            .OnSuccess(async mapping =>
+            {
+                var updatedMappings = request
+                    .Updates.Select(update =>
+                        UpdateIndicatorMapping(mapping, update.OriginalColumnName, update.NewReplacementColumnName)
+                    )
+                    .ToList(); // cannot be async!
+
+                // we still save changes from the Updates that succeeded, even if some failed
+                await contentDbContext.SaveChangesAsync();
+
+                return updatedMappings
+                    .OnSuccessAll()
+                    .OnSuccess(_ => mapping.IndicatorMappings.Values.Select(IndicatorMappingDto.FromModel).ToList());
+            });
+    }
+
+    private Either<ActionResult, IndicatorMapping> UpdateIndicatorMapping(
+        DataSetMapping dataSetMapping,
+        string originalColumnName,
+        string? newReplacementColumnName = null
+    )
+    {
+        var indicatorMapping = dataSetMapping.IndicatorMappings.Values.SingleOrDefault(map =>
+            map.OriginalColumnName == originalColumnName
+        );
+        if (indicatorMapping == null)
+        {
+            return Common.Validators.ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.OriginalColumnName)}",
+                    Code = "IndicatorMatchingOriginalColumnNameNotFound",
+                    Message =
+                        $"Could not find indicator mapping matching original column name \"{originalColumnName}\"",
+                }
+            );
+        }
+
+        if (
+            indicatorMapping.ReplacementColumnName == newReplacementColumnName
+            && indicatorMapping.Status == MapStatus.ManuallySet
+        )
+        {
+            return indicatorMapping; // it is already mapped, so can skip
+        }
+
+        var availableUnmappedIndicator = dataSetMapping.UnmappedReplacementIndicators.SingleOrDefault(
+            unmappedIndicator => unmappedIndicator.ColumnName == newReplacementColumnName
+        );
+
+        if (newReplacementColumnName != null && availableUnmappedIndicator == null)
+        {
+            return Common.Validators.ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.NewReplacementColumnName)}",
+                    Code = "UnmappedIndicatorMatchingReplacementColumnNameNotFound",
+                    Message =
+                        $"No available unmapped indicator matching replacement column name \"{newReplacementColumnName}\"",
+                }
+            );
+        }
+
+        if (availableUnmappedIndicator != null)
+        {
+            // remove availableUnmappedIndicator from UnmappedReplacementIndicators as it's about to become mapped
+            dataSetMapping.UnmappedReplacementIndicators.Remove(availableUnmappedIndicator);
+            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementIndicators).IsModified = true;
+        }
+
+        if (
+            indicatorMapping.ReplacementId != null
+            && indicatorMapping.ReplacementColumnName != newReplacementColumnName
+        )
+        {
+            // We need to move the preexisting mapped indicator into UnmappedReplacementIndicators, as it will be overwritten
+            var newlyUnmappedIndicator = new UnmappedIndicator
+            {
+                Id = indicatorMapping.ReplacementId.Value,
+                ColumnName = indicatorMapping.ReplacementColumnName!,
+                Label = indicatorMapping.ReplacementLabel!,
+                GroupId = indicatorMapping.ReplacementGroupId!.Value,
+                GroupLabel = indicatorMapping.ReplacementGroupLabel!,
+            };
+            dataSetMapping.UnmappedReplacementIndicators.Add(newlyUnmappedIndicator);
+            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementIndicators).IsModified = true;
+        }
+
+        // mapping.Original* properties should never change
+        indicatorMapping.ReplacementId = availableUnmappedIndicator?.Id;
+        indicatorMapping.ReplacementColumnName = availableUnmappedIndicator?.ColumnName;
+        indicatorMapping.ReplacementLabel = availableUnmappedIndicator?.Label;
+        indicatorMapping.ReplacementGroupId = availableUnmappedIndicator?.GroupId;
+        indicatorMapping.ReplacementGroupLabel = availableUnmappedIndicator?.GroupLabel;
+        indicatorMapping.Status = MapStatus.ManuallySet;
+
+        contentDbContext.Entry(dataSetMapping).Property(x => x.IndicatorMappings).IsModified = true;
+
+        return indicatorMapping;
     }
 }

@@ -1,11 +1,14 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -264,11 +267,397 @@ public class DataSetMappingServiceTests
         }
     }
 
+    [Fact]
+    public async Task UpdateIndicatorMapping_Success()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var originalIndicator1Id = Guid.NewGuid();
+        var originalIndicator2Id = Guid.NewGuid();
+        var originalIndicator3Id = Guid.NewGuid();
+        var originalIndicator4Id = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator1Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator1Id,
+                        OriginalLabel = "Original indicator 1 label",
+                        OriginalColumnName = "original_indicator_1",
+                        OriginalGroupId = Guid.NewGuid(),
+                        OriginalGroupLabel = "Original indicator 1 group label",
+                        Status = MapStatus.Unset,
+                    }
+                },
+                {
+                    originalIndicator2Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator2Id,
+                        OriginalLabel = "Original indicator 2 label",
+                        OriginalColumnName = "original_indicator_2",
+                        OriginalGroupId = Guid.NewGuid(),
+                        OriginalGroupLabel = "Original indicator 2 group label",
+                        ReplacementId = Guid.NewGuid(),
+                        ReplacementLabel = "Replacement indicator 1 - that will be unset",
+                        ReplacementColumnName = "replacement_indicator_1",
+                        ReplacementGroupId = Guid.NewGuid(),
+                        ReplacementGroupLabel = "Replacement indicator 1 group label",
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    originalIndicator3Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator3Id,
+                        OriginalLabel = "Original indicator 3 label",
+                        OriginalColumnName = "original_indicator_3",
+                        OriginalGroupId = Guid.NewGuid(),
+                        OriginalGroupLabel = "Original indicator 3 group label",
+                        ReplacementId = Guid.NewGuid(),
+                        ReplacementLabel = "Replacement indicator 2 - that will be unset",
+                        ReplacementColumnName = "replacement_indicator_2",
+                        ReplacementGroupId = Guid.NewGuid(),
+                        ReplacementGroupLabel = "Replacement indicator 2 group label",
+                        Status = MapStatus.ManuallySet,
+                    }
+                },
+                {
+                    originalIndicator4Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator4Id,
+                        OriginalLabel = "Original indicator 4 label - to not change",
+                        OriginalColumnName = "original_indicator_4",
+                        OriginalGroupId = Guid.NewGuid(),
+                        OriginalGroupLabel = "Original indicator 4 group label",
+                        ReplacementId = Guid.NewGuid(),
+                        ReplacementLabel = "Replacement indicator 3 - that will remain",
+                        ReplacementColumnName = "replacement_indicator_3",
+                        ReplacementGroupId = Guid.NewGuid(),
+                        ReplacementGroupLabel = "Replacement indicator 3 group label",
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+            },
+            UnmappedReplacementIndicators =
+            [
+                new UnmappedIndicator
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Replacement indicator 4 - that will be mapped to Original indicator 1",
+                    ColumnName = "replacement_indicator_4",
+                    GroupId = Guid.NewGuid(),
+                    GroupLabel = "Replacement indicator 4 group label",
+                },
+                new UnmappedIndicator
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Replacement indicator 5 - that will be mapped to Original indicator 2",
+                    ColumnName = "replacement_indicator_5",
+                    GroupId = Guid.NewGuid(),
+                    GroupLabel = "Replacement indicator 5 group label",
+                },
+                new UnmappedIndicator
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Replacement indicator 6 - that will be remain unmapped",
+                    ColumnName = "replacement_indicator_6",
+                    GroupId = Guid.NewGuid(),
+                    GroupLabel = "Replacement indicator 6 group label",
+                },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateIndicatorMappings(
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates =
+                    [
+                        new()
+                        {
+                            OriginalColumnName = "original_indicator_1",
+                            NewReplacementColumnName = "replacement_indicator_4",
+                        },
+                        new()
+                        {
+                            OriginalColumnName = "original_indicator_2",
+                            NewReplacementColumnName = "replacement_indicator_5",
+                        },
+                        new() { OriginalColumnName = "original_indicator_3", NewReplacementColumnName = null },
+                    ],
+                }
+            );
+
+            var indicatorMappingList = result.AssertRight();
+
+            Assert.Equal(4, indicatorMappingList.Count);
+
+            var originalIndicator1Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_1"
+            );
+            var originalIndicator2Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_2"
+            );
+            var originalIndicator3Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_3"
+            );
+            var originalIndicator4Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_4"
+            );
+
+            Assert.Multiple(
+                () => Assert.Equal("replacement_indicator_4", originalIndicator1Mapping.ReplacementColumnName),
+                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator1Mapping.Status),
+                () => Assert.Equal("replacement_indicator_5", originalIndicator2Mapping.ReplacementColumnName),
+                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator2Mapping.Status),
+                () => Assert.Null(originalIndicator3Mapping.ReplacementColumnName),
+                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator3Mapping.Status),
+                () => Assert.Equal("replacement_indicator_3", originalIndicator4Mapping.ReplacementColumnName),
+                () => Assert.Equal(nameof(MapStatus.AutoSet), originalIndicator4Mapping.Status)
+            );
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = Assert.Single(contentDbContext.DataSetMappings.ToList());
+
+            var indicatorMappingList = dbMapping.IndicatorMappings.Values.ToList();
+            var originalIndicator1Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_1"
+            );
+            var originalIndicator2Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_2"
+            );
+            var originalIndicator3Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_3"
+            );
+            var originalIndicator4Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_4"
+            );
+
+            Assert.Multiple(
+                () => Assert.Equal("replacement_indicator_4", originalIndicator1Mapping.ReplacementColumnName),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator1Mapping.Status),
+                () => Assert.Equal("replacement_indicator_5", originalIndicator2Mapping.ReplacementColumnName),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator2Mapping.Status),
+                () => Assert.Null(originalIndicator3Mapping.ReplacementColumnName),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator3Mapping.Status),
+                () => Assert.Equal("replacement_indicator_3", originalIndicator4Mapping.ReplacementColumnName),
+                () => Assert.Equal(MapStatus.AutoSet, originalIndicator4Mapping.Status)
+            );
+
+            var unmappedReplacementIndicators = dbMapping.UnmappedReplacementIndicators.ToList();
+            Assert.Multiple(
+                () => Assert.Equal(3, unmappedReplacementIndicators.Count),
+                () =>
+                    Assert.NotNull(
+                        unmappedReplacementIndicators.FirstOrDefault(x => x.ColumnName == "replacement_indicator_1")
+                    ),
+                () =>
+                    Assert.NotNull(
+                        unmappedReplacementIndicators.FirstOrDefault(x => x.ColumnName == "replacement_indicator_2")
+                    ),
+                () =>
+                    Assert.NotNull(
+                        unmappedReplacementIndicators.FirstOrDefault(x => x.ColumnName == "replacement_indicator_6")
+                    )
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateIndicatorMapping_NoDataSetMapping_NotFound()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+            UnmappedReplacementIndicators = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateIndicatorMappings(
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = Guid.NewGuid(),
+                    Updates = [],
+                }
+            );
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task UpdateIndicatorMapping_OriginalIndicatorNotFound_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var originalIndicator1Id = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator1Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator1Id,
+                        OriginalColumnName = "original_indicator_1",
+                        ReplacementColumnName = "replacement_indicator_already_mapped",
+                    }
+                },
+            },
+            UnmappedReplacementIndicators = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateIndicatorMappings(
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates = [new() { OriginalColumnName = "does_not_exist", NewReplacementColumnName = null }],
+                }
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasError(
+                expectedPath: "Updates.OriginalColumnName",
+                expectedCode: "IndicatorMatchingOriginalColumnNameNotFound",
+                expectedMessage: $"Could not find indicator mapping matching original column name \"does_not_exist\""
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateIndicatorMapping_UnmappedReplacementIndicatorNotFound_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var originalIndicator1Id = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator1Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator1Id,
+                        OriginalColumnName = "original_indicator_1",
+                        ReplacementColumnName = "replacement_indicator_already_mapped",
+                    }
+                },
+            },
+            UnmappedReplacementIndicators = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateIndicatorMappings(
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates =
+                    [
+                        new()
+                        {
+                            OriginalColumnName = "original_indicator_1",
+                            NewReplacementColumnName = "replacement_indicator_already_mapped",
+                        },
+                    ],
+                }
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasError(
+                expectedPath: "Updates.NewReplacementColumnName",
+                expectedCode: "UnmappedIndicatorMatchingReplacementColumnNameNotFound",
+                expectedMessage: $"No available unmapped indicator matching replacement column name \"replacement_indicator_already_mapped\""
+            );
+        }
+    }
+
     private static DataSetMappingService SetupDataSetMappingService(
         ContentDbContext contentDbContext,
-        StatisticsDbContext statisticsDbContext
+        StatisticsDbContext? statisticsDbContext = null
     )
     {
-        return new DataSetMappingService(contentDbContext, statisticsDbContext);
+        return new DataSetMappingService(
+            contentDbContext,
+            statisticsDbContext ?? Mock.Of<StatisticsDbContext>(MockBehavior.Strict)
+        );
     }
 }
