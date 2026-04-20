@@ -11,7 +11,7 @@ internal class ContentApiClientMockBuilder
     private readonly ReleaseSearchableDocumentBuilder _releaseSearchableDocumentBuilder = new();
     private ReleaseSearchableDocument? _releaseSearchableDocument;
     private PublicationInfo[]? _publicationsForTheme;
-    private ReleaseInfo[]? _releasesForPublication;
+    private Guid[]? _publicationReleaseIds;
     private PublicationInfo[]? _publications;
 
     public ContentApiClientMockBuilder()
@@ -29,8 +29,8 @@ internal class ContentApiClientMockBuilder
             .ReturnsAsync(() => _publicationsForTheme ?? []);
 
         _mock
-            .Setup(m => m.GetReleasesForPublication(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => _releasesForPublication ?? []);
+            .Setup(m => m.GetPublicationReleaseIds(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _publicationReleaseIds ?? []);
 
         _mock
             .Setup(m => m.GetAllLivePublicationInfos(It.IsAny<CancellationToken>()))
@@ -78,9 +78,9 @@ internal class ContentApiClientMockBuilder
         return this;
     }
 
-    public ContentApiClientMockBuilder WherePublicationHasReleases(params ReleaseInfo[] releases)
+    public ContentApiClientMockBuilder WherePublicationHasReleaseIds(params Guid[] releaseIds)
     {
-        _releasesForPublication = releases;
+        _publicationReleaseIds = releaseIds;
         return this;
     }
 
@@ -139,9 +139,9 @@ internal class ContentApiClientMockBuilder
             mock.Verify(m => m.GetPublicationsForTheme(expectedThemeId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        public void ReleasesRequestedForPublication(string publicationSlug)
+        public void ReleaseIdsRequestedForPublication(string publicationSlug)
         {
-            mock.Verify(m => m.GetReleasesForPublication(publicationSlug, It.IsAny<CancellationToken>()), Times.Once);
+            mock.Verify(m => m.GetPublicationReleaseIds(publicationSlug, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         public void ReleaseSummaryRequestedForPublication(string publicationSlug, string releaseSlug)

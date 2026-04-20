@@ -188,6 +188,42 @@ public abstract class PublicationsControllerTests
         }
     }
 
+    public class GetPublicationReleaseIdsTests : PublicationsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsPublicationReleaseIds_ReturnsOk()
+        {
+            // Arrange
+            Guid[] releaseIds = [Guid.NewGuid(), Guid.NewGuid()];
+            _publicationReleasesService.WhereHasPublicationReleaseIds(releaseIds);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationReleaseIds(PublicationSlug);
+
+            // Assert
+            _publicationReleasesService.Assert.GetPublicationReleaseIdsWasCalled(PublicationSlug);
+            result.AssertOkResult(releaseIds);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _publicationReleasesService.WhereGetPublicationReleaseIdsReturnsNotFound();
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationReleaseIds(PublicationSlug);
+
+            // Assert
+            _publicationReleasesService.Assert.GetPublicationReleaseIdsWasCalled(PublicationSlug);
+            result.AssertNotFoundResult();
+        }
+    }
+
     public class GetPublicationSummaryTests : PublicationsControllerTests
     {
         private readonly Guid _publicationId = Guid.NewGuid();

@@ -7,10 +7,8 @@ import EducationInNumbersPage from '@admin/pages/education-in-numbers/EducationI
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
-import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
 import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
-import ReleaseDataGuidancePage from '@admin/pages/release/ReleaseDataGuidancePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
 import ThemeCreatePage from '@admin/pages/themes/ThemeCreatePage';
 import ThemeEditPage from '@admin/pages/themes/ThemeEditPage';
@@ -150,20 +148,6 @@ export const preReleaseRoute: ProtectedRouteProps = {
   protectionAction: permissions => permissions.canAccessPrereleasePages,
 };
 
-export const preReleaseAccessListRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease-access-list',
-  component: PreReleaseAccessListPage,
-  protectionAction: permissions => permissions.canAccessPrereleasePages,
-  exact: true,
-};
-
-export const releaseDataGuidanceRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data-guidance',
-  component: ReleaseDataGuidancePage,
-  protectionAction: permissions => permissions.canAccessPrereleasePages,
-  exact: true,
-};
-
 export const educationInNumbersListRoute: ProtectedRouteProps = {
   path: '/education-in-numbers',
   component: EducationInNumbersListPage,
@@ -206,8 +190,6 @@ const routes = {
   preReleaseRoute,
   preReleaseContentRoute,
   preReleaseTableToolRoute,
-  preReleaseAccessListRoute,
-  releaseDataGuidanceRoute,
   releaseRoute,
   releaseCreateRoute,
   publicationRoute,

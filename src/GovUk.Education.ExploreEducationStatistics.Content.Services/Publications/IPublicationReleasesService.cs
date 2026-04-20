@@ -13,4 +13,9 @@ public interface IPublicationReleasesService
         int pageSize = 10,
         CancellationToken cancellationToken = default
     );
+
+    Task<Either<ActionResult, Guid[]>> GetPublicationReleaseIds(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    );
 }

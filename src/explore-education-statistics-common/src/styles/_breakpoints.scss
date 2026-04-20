@@ -1,6 +1,7 @@
-// Adding desktop-lg and desktop-xl to the default govuk breakpoints.
+// Adding mobile-lg, desktop-lg and desktop-xl to the default govuk breakpoints.
 $govuk-breakpoints: (
   mobile: 320px,
+  mobile-lg: 400px,
   tablet: 641px,
   desktop: 769px,
   desktop-lg: 1024px,

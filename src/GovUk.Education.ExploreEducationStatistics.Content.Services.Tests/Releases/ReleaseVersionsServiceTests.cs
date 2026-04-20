@@ -70,6 +70,9 @@ public abstract class ReleaseVersionsServiceTests
                     Assert.Equal(releaseVersion.Type, result.Type);
                     Assert.Equal(releaseVersion.PreReleaseAccessList, result.PreReleaseAccessList);
                     Assert.Equal(expectedUpdateCount, result.UpdateCount);
+                    Assert.Equal(publication.Id, result.Publication.Id);
+                    Assert.Equal(publication.Slug, result.Publication.Slug);
+                    Assert.Equal(publication.Title, result.Publication.Title);
                 });
             }
         }

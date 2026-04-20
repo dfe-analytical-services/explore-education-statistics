@@ -11,6 +11,8 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deployAlerts
+    type: string
 
 steps:
   - task: AzureCLI@2
@@ -31,4 +33,5 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               publicSiteUrl='$(publicSiteUrl)' \
+              deployAlerts=${{ parameters.deployAlerts }} \
               resourceTags='$(resourceTags)'

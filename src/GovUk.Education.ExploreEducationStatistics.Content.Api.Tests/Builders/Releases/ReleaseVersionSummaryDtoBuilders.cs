@@ -19,6 +19,7 @@ public class ReleaseVersionSummaryDtoBuilder
     private ReleaseType _type = ReleaseType.OfficialStatistics;
     private string? _preReleaseAccessList = "Pre-release access list";
     private int _updateCount = 1;
+    private ReleaseVersionSummaryPublicationDto _publication = new ReleaseVersionSummaryPublicationDtoBuilder().Build();
 
     public ReleaseVersionSummaryDto Build() =>
         new()
@@ -37,6 +38,7 @@ public class ReleaseVersionSummaryDtoBuilder
             Type = _type,
             PreReleaseAccessList = _preReleaseAccessList,
             UpdateCount = _updateCount,
+            Publication = _publication,
         };
 
     public ReleaseVersionSummaryDtoBuilder WithId(Guid id)
@@ -124,6 +126,12 @@ public class ReleaseVersionSummaryDtoBuilder
         _updateCount = updateCount;
         return this;
     }
+
+    public ReleaseVersionSummaryDtoBuilder WithPublication(ReleaseVersionSummaryPublicationDto publication)
+    {
+        _publication = publication;
+        return this;
+    }
 }
 
 public class PublishingOrganisationDtoBuilder
@@ -179,6 +187,39 @@ public class PublishingOrganisationDtoBuilder
     public PublishingOrganisationDtoBuilder WithLogoFileName(string logoFileName)
     {
         _logoFileName = logoFileName;
+        return this;
+    }
+}
+
+public class ReleaseVersionSummaryPublicationDtoBuilder
+{
+    private Guid _id = Guid.NewGuid();
+    private string _slug = "Slug";
+    private string _title = "Title";
+
+    public ReleaseVersionSummaryPublicationDto Build() =>
+        new()
+        {
+            Id = _id,
+            Slug = _slug,
+            Title = _title,
+        };
+
+    public ReleaseVersionSummaryPublicationDtoBuilder WithId(Guid id)
+    {
+        _id = id;
+        return this;
+    }
+
+    public ReleaseVersionSummaryPublicationDtoBuilder WithSlug(string slug)
+    {
+        _slug = slug;
+        return this;
+    }
+
+    public ReleaseVersionSummaryPublicationDtoBuilder WithTitle(string title)
+    {
+        _title = title;
         return this;
     }
 }
