@@ -31,17 +31,4 @@ public class DataSetScreenerService(
             cancellationToken
         );
     }
-
-    public Task<List<DataSetScreenerProgressResponse>> GetScreeningProgress(
-        IList<Guid> dataSetIds,
-        CancellationToken cancellationToken
-    )
-    {
-        return dataSetScreenerClient.GetScreeningProgress(dataSetIds, cancellationToken);
-    }
-
-    public Task DeleteScreeningProgress(IList<Guid> dataSetIds, CancellationToken cancellationToken)
-    {
-        return dataSetScreenerClient.DeleteScreeningProgress(dataSetIds, cancellationToken);
-    }
 }

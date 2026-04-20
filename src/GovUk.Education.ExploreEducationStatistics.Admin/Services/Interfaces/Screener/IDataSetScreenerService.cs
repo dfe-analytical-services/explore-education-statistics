@@ -11,11 +11,4 @@ public interface IDataSetScreenerService
     );
 
     Task StartScreening(DataSetStartScreeningRequest dataSetScreenRequest, CancellationToken cancellationToken);
-
-    Task<List<DataSetScreenerProgressResponse>> GetScreeningProgress(
-        IList<Guid> dataSetIds,
-        CancellationToken cancellationToken
-    );
-
-    Task DeleteScreeningProgress(IList<Guid> dataSetIds, CancellationToken cancellationToken);
 }
