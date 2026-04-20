@@ -1,6 +1,9 @@
 import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
+import InfoIcon from '@common/components/InfoIcon';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import Modal from '@common/components/Modal';
+import RelatedInformation from '@common/components/RelatedInformation';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -22,6 +25,7 @@ import {
   publicationFilters,
 } from '@frontend/modules/find-statistics/utils/publicationFilters';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
 import azureDataSetQueries from '@frontend/queries/azureDataSetQueries';
 import azurePublicationQueries from '@frontend/queries/azurePublicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
@@ -42,6 +46,7 @@ export interface SearchDataPageQuery {
   page?: number;
   releaseType?: ReleaseType;
   search?: string;
+  showAllReleases?: string;
   sortBy?: PublicationSortOption;
   themeId?: string;
 }
@@ -62,6 +67,7 @@ const SearchDataPage: NextPage = () => {
   } = useQuery({
     ...azureDataSetQueries.list(router.query),
     keepPreviousData: true,
+    refetchOnWindowFocus: false,
     staleTime: 60000,
     enabled: !isPublicationsSearch,
   });
@@ -74,6 +80,7 @@ const SearchDataPage: NextPage = () => {
   } = useQuery({
     ...azurePublicationQueries.list(router.query),
     keepPreviousData: true,
+    refetchOnWindowFocus: false,
     staleTime: 60000,
     enabled: isPublicationsSearch,
   });
@@ -172,8 +179,11 @@ const SearchDataPage: NextPage = () => {
     setPageTitle(`${defaultPageTitle} - Search results`);
     await router.push(
       {
-        pathname: '/[searchRoute]',
-        query: { ...nextQuery, searchRoute: currentRoute },
+        // TODO EES-7072 decide if either of these is preferable
+        pathname: `/${currentRoute}`,
+        query: { ...nextQuery },
+        // pathname: '/[searchRoute]',
+        // query: { ...nextQuery, searchRoute: currentRoute },
       },
       undefined,
       {
@@ -295,35 +305,83 @@ const SearchDataPage: NextPage = () => {
           aria-live etc on the h2. */}
           <ScreenReaderMessage message={totalResultsMessage} />
         </div>
-        <div className="govuk-grid-column-one-third">Related information</div>
+        <div className="govuk-grid-column-one-third">
+          <div className={styles.helpColumn}>
+            <RelatedInformation heading="Help and related information">
+              <ul className="govuk-list">
+                <li>
+                  <Modal
+                    showClose
+                    title="What are statistical releases?"
+                    triggerButton={
+                      <ButtonText>
+                        What are statistical releases?{' '}
+                        <InfoIcon description="Information on statistical releases" />
+                      </ButtonText>
+                    }
+                  >
+                    <p>Information here</p>
+                  </Modal>
+                </li>
+                <li>
+                  <Modal
+                    showClose
+                    title="What is data?"
+                    triggerButton={
+                      <ButtonText>
+                        What is data?{' '}
+                        <InfoIcon description="Information on data" />
+                      </ButtonText>
+                    }
+                  >
+                    <p>Information here</p>
+                  </Modal>
+                </li>
+                <li>
+                  <Link to="/glossary">Glossary</Link>
+                </li>
+              </ul>
+            </RelatedInformation>
+          </div>
+        </div>
       </div>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-full">
-          <div className="govuk-!-margin-top-3 govuk-!-padding-bottom-2 dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center dfe-border-bottom">
-            <Link
-              to={{
-                pathname: '/search-publications',
-                query: {
-                  ...router.query,
-                  searchRoute: undefined,
-                },
-              }}
-              shallow
-              unvisited
-            >
-              Search publications
-            </Link>
-            <Link
-              to={{
-                pathname: '/search-data',
-                query: { ...router.query, searchRoute: undefined },
-              }}
-              shallow
-              unvisited
-            >
-              Search data
-            </Link>
-          </div>
+          <nav aria-label="Search mode">
+            <ul className={styles.nav}>
+              <li>
+                <Link
+                  to={{
+                    pathname: '/search-publications',
+                    query: {
+                      ...router.query,
+                      searchRoute: undefined,
+                    },
+                  }}
+                  shallow
+                  unvisited
+                  aria-current={isPublicationsSearch ? 'page' : undefined}
+                  className={styles.navItemLink}
+                >
+                  Statistical releases
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={{
+                    pathname: '/search-data',
+                    query: { ...router.query, searchRoute: undefined },
+                  }}
+                  shallow
+                  unvisited
+                  aria-current={!isPublicationsSearch ? 'page' : undefined}
+                  className={styles.navItemLink}
+                >
+                  Data
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
       <div className="govuk-grid-row">

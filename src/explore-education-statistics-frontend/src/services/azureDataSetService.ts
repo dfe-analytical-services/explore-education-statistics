@@ -1,18 +1,23 @@
 import { SortDirection } from '@common/services/types/sort';
 import { frontendApi } from '@common/services/api';
+import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
 import {
   AzureOrderByParam,
   PaginatedListWithAzureFacets,
 } from '@frontend/services/azurePublicationService';
-import { DataSetFileSummary } from '@frontend/services/dataSetFileService';
-import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
+import {
+  DataSetFileApi,
+  DataSetFileSummary,
+} from '@frontend/services/dataSetFileService';
 
-// TODO EES-7072 figure out which properties are needed
 export interface AzureDataSetSearchResult {
   '@search.score': string;
-  id: string;
+  fileId: string;
   filename: string;
   fileExtension: string;
+  fileSize: string;
+  title: string;
+  content: string;
   themeId: string;
   themeTitle: string;
   publicationId: string;
@@ -25,12 +30,12 @@ export interface AzureDataSetSearchResult {
   isSuperseded: boolean;
   published: string;
   lastUpdated: string;
-  api: boolean; // TODO needs changing
-  NumDataFileRows: number; // TODO rename
+  api: DataSetFileApi;
+  numDataFileRows: number;
   geographicLevels: GeographicLevelCode[];
   indicators: string[];
   filters: string[];
-  release_type: string; // TODO rename
+  releaseType: string;
   timePeriodRange: {
     from: string;
     to: string;
