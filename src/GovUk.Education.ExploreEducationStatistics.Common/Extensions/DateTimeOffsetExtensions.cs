@@ -34,7 +34,7 @@ public static class DateTimeOffsetExtensions
         // Convert the date and time to the UK time zone
         var inUkZone = dateTimeOffset.ConvertToUkTimeZone();
 
-        // Get the date component of that date in the UK time zone (DateTime at midnight) (This sets time to 00:00)
+        // Get the date component in the UK time zone, which sets the time to midnight (00:00)
         var ukMidnightDateTime = inUkZone.Date;
 
         // Get the correct UTC offset for midnight on that date in the UK time zone
@@ -55,28 +55,12 @@ public static class DateTimeOffsetExtensions
     /// </para>
     /// </summary>
     /// <param name="dateTimeOffset">The input <see cref="DateTimeOffset"/> to convert.</param>
+    /// <param name="includeFractionalSeconds">Sets the milliseconds component to .999 if true and .0 if false.</param>
     /// <returns>A <see cref="DateTimeOffset"/> in UTC corresponding to the start of the UK day for the provided input.</returns>
-    public static DateTimeOffset GetUkEndOfDayUtc(this DateTimeOffset dateTimeOffset)
-    {
-        // 1. Convert to UK time
-        var inUkZone = dateTimeOffset.ConvertToUkTimeZone();
-
-        // 2. Get the date at midnight, then add 1 day to get the start of the next day
-        var ukNextDayMidnight = inUkZone.Date.AddDays(1);
-
-        // 3. Subtract the smallest possible unit (1 tick) to get the end of the current day
-        // This results in 23:59:59.00
-        var ukEndOfDayDateTime = ukNextDayMidnight.AddSeconds(-1);
-
-        // 4. Get the offset for that specific moment
-        // (Crucial for days when the clocks change at midnight!)
-        var ukZoneOffset = UkTimeZone.GetUtcOffset(ukEndOfDayDateTime);
-
-        // 5. Create the DateTimeOffset and convert back to UTC
-        var ukEndOfDayDateTimeOffset = new DateTimeOffset(ukEndOfDayDateTime, ukZoneOffset);
-
-        return ukEndOfDayDateTimeOffset.ToUniversalTime();
-    }
+    public static DateTimeOffset GetUkEndOfDayUtc(
+        this DateTimeOffset dateTimeOffset,
+        bool includeFractionalSeconds = true
+    ) => dateTimeOffset.ToUkDateOnly().GetUkEndOfDayUtc(includeFractionalSeconds);
 
     /// <summary>
     /// <para>
