@@ -118,8 +118,8 @@ public class EmailTemplateServiceTests
     }
 
     [Theory]
-    [InlineData(PublicationRole.Owner, "Owner")]
-    [InlineData(PublicationRole.Allower, "Approver")]
+    [InlineData(PublicationRole.Drafter, "Drafter")]
+    [InlineData(PublicationRole.Approver, "Approver")]
     public void SendPublicationRoleEmail(PublicationRole role, string expectedRoleText)
     {
         string email = "test@test.com";

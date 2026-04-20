@@ -232,19 +232,19 @@ public class PublicationServiceTests
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication1)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication2)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication3)
                     .Generate()
             );
@@ -305,19 +305,19 @@ public class PublicationServiceTests
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication3)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication1)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication2)
                     .Generate()
             );
@@ -375,19 +375,19 @@ public class PublicationServiceTests
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication1)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication2)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication3)
                     .Generate()
             );
