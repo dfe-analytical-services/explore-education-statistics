@@ -2,7 +2,7 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { toolbarConfigLinkOnly } from '@admin/config/ckEditorConfig';
+import { toolbarConfigWarningBlock } from '@admin/config/ckEditorConfig';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -198,7 +198,7 @@ const ReleaseContentEdit = ({
                   }
                   sectionId={release.warningSection.id}
                   sectionKey="warningSection"
-                  toolbarConfig={toolbarConfigLinkOnly}
+                  toolbarConfig={toolbarConfigWarningBlock}
                   onAfterDeleteBlock={onAfterDeleteWarningBlock}
                 />
               )}

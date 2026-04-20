@@ -63,18 +63,6 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
   parseStyleAttributes: false,
 };
 
-export const releaseWarningBlockSanitizeOptions: SanitizeHtmlOptions = {
-  allowedTags: ['p', 'a'],
-  allowedAttributes: {
-    a: ['href', 'rel', 'target'],
-  },
-  allowedSchemesByTag: {
-    a: ['http', 'https', 'mailto', 'tel'],
-  },
-  // Copied from defaultSanitizeOptions
-  parseStyleAttributes: false,
-};
-
 export const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {
   'comment-start': ['name'],
   'comment-end': ['name'],
@@ -83,6 +71,19 @@ export const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {
 };
 
 export const commentTags = Object.keys(commentTagAttributes);
+
+export const releaseWarningBlockSanitizeOptions: SanitizeHtmlOptions = {
+  allowedTags: ['p', 'a', ...commentTags],
+  allowedAttributes: {
+    a: ['href', 'rel', 'target'],
+    ...commentTagAttributes,
+  },
+  allowedSchemesByTag: {
+    a: ['http', 'https', 'mailto', 'tel'],
+  },
+  // Copied from defaultSanitizeOptions
+  parseStyleAttributes: false,
+};
 
 export default function sanitizeHtml(
   dirtyHtml: string,
