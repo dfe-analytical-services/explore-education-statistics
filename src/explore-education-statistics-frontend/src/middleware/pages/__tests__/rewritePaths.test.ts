@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import runMiddleware from './util/runMiddleware';
+import runMiddleware from '../../__tests__/util/runMiddleware';
 import rewritePaths from '../rewritePaths';
 
 describe('rewritePaths', () => {
