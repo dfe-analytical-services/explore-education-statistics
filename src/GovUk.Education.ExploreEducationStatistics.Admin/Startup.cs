@@ -426,7 +426,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             implementationFactory: (serviceProvider, _) =>
             {
                 var screenerOptions = serviceProvider.GetRequiredService<IOptions<DataScreenerOptions>>();
-                return new QueueServiceClient(screenerOptions.Value.ScreenerStorage);
+                return screenerOptions.Value.EnhancedScreenerJourney
+                    ? new QueueServiceClient(screenerOptions.Value.ScreenerStorage)
+                    : new NoOpQueueServiceClient();
             }
         );
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
@@ -1154,4 +1156,26 @@ internal class NoOpPublicDataApiClient : IPublicDataApiClient
         string queryBody,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
+}
+
+internal class NoOpQueueServiceClient : IQueueServiceClient
+{
+    public Task SendMessagesAsJson<T>(
+        string queueName,
+        IReadOnlyList<T> messages,
+        CancellationToken cancellationToken = default
+    )
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SendMessageAsJson<T>(string queueName, T message, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SendMessage(string queueName, string message, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }
