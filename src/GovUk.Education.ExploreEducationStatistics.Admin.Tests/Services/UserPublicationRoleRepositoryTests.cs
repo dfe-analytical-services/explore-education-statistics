@@ -1206,7 +1206,7 @@ public abstract class UserPublicationRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                // Ignore query filters so that we can assess whether the correct NEW permissions system roles were deleted
+                // Ignore query filters so that we can assess whether ALL the permissions system roles were deleted (OLD & NEW)
                 var remainingRoles = await contentDbContext
                     .UserPublicationRoles.IgnoreQueryFilters()
                     .Include(upr => upr.User)

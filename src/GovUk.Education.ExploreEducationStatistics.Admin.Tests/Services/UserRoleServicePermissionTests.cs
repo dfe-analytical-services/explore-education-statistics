@@ -14,7 +14,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityP
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -42,7 +41,7 @@ public class UserRoleServicePermissionTests
             .AssertForbidden(async userService =>
             {
                 var service = SetupService(userService: userService.Object);
-                return await service.AddPublicationRole(Guid.NewGuid(), Guid.NewGuid(), Owner);
+                return await service.AddPublicationRole(Guid.NewGuid(), Guid.NewGuid(), PublicationRole.Drafter);
             });
     }
 
