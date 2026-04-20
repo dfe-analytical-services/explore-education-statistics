@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class DataSetScreenerService(
     IDataSetScreenerClient dataSetScreenerClient,
-    [FromKeyedServices(nameof(IDataSetScreenerClient))] IQueueServiceClient queueServiceClient
+    [FromKeyedServices(nameof(DataSetScreenerService))] IQueueServiceClient queueServiceClient
 ) : IDataSetScreenerService
 {
     public const string StartScreeningQueue = "start-screening";

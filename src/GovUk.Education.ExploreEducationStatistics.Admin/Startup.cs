@@ -422,7 +422,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
         services.AddScoped<IDataSetScreenerService, DataSetScreenerService>();
         services.AddKeyedSingleton<IQueueServiceClient>(
-            serviceKey: nameof(IDataSetScreenerService),
+            serviceKey: nameof(DataSetScreenerService),
             implementationFactory: (serviceProvider, _) =>
             {
                 var screenerOptions = serviceProvider.GetRequiredService<IOptions<DataScreenerOptions>>();
