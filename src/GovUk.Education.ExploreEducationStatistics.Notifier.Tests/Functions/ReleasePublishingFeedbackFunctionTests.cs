@@ -26,8 +26,8 @@ public class ReleasePublishingFeedbackFunctionTests
     };
 
     [Theory]
-    [InlineData(PublicationRole.Owner, "an owner")]
-    [InlineData(PublicationRole.Allower, "an approver")]
+    [InlineData(PublicationRole.Drafter, "a drafter")]
+    [InlineData(PublicationRole.Approver, "an approver")]
     public async Task SendReleasePublishingFeedbackEmail_Success(PublicationRole role, string expectedRoleDescription)
     {
         ReleaseVersion releaseVersion = DataFixture
