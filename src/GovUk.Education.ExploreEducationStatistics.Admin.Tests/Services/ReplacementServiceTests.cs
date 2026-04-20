@@ -154,6 +154,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -503,6 +504,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlockVersions.Add(dataBlockVersion);
             contentDbContext.DataImports.Add(dataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -674,8 +676,8 @@ public class ReplacementServiceTests
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
-        dataSetVersionMappingService
+        var apiDataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
+        apiDataSetVersionMappingService
             .Setup(service => service.GetMappingStatus(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 new MappingStatusViewModel
@@ -707,6 +709,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseVersions.Add(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataImports.Add(replacementDataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -727,7 +730,7 @@ public class ReplacementServiceTests
                     locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
-                    dataSetVersionMappingService: dataSetVersionMappingService.Object
+                    apiDataSetVersionMappingService: apiDataSetVersionMappingService.Object
                 )
             );
 
@@ -736,7 +739,12 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, dataSetVersionService, dataSetVersionMappingService);
+            VerifyAllMocks(
+                locationRepository,
+                timePeriodService,
+                dataSetVersionService,
+                apiDataSetVersionMappingService
+            );
             result.AssertRight();
         }
     }
@@ -1051,6 +1059,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlockVersions.Add(dataBlockVersion);
             contentDbContext.DataImports.Add(replacementDataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1555,6 +1564,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
             contentDbContext.DataImports.Add(replacementDataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1884,6 +1894,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataImports.Add(replacementDataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -2146,6 +2157,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataImports.Add(replacementDataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -2356,6 +2368,7 @@ public class ReplacementServiceTests
             contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataImports.Add(replacementDataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -2558,6 +2571,7 @@ public class ReplacementServiceTests
             contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataImports.Add(replacementDataImport);
+            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -2692,7 +2706,8 @@ public class ReplacementServiceTests
         ILocationRepository? locationRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
-        IDataSetVersionMappingService? dataSetVersionMappingService = null,
+        IDataSetVersionMappingService? apiDataSetVersionMappingService = null,
+        IDataSetMappingService? dataSetMappingService = null,
         IReleaseFileRepository? releaseFileRepository = null
     )
     {
@@ -2700,13 +2715,13 @@ public class ReplacementServiceTests
             contentDbContext,
             statisticsDbContext,
             filterRepository ?? Mock.Of<IFilterRepository>(Strict),
-            new IndicatorRepository(statisticsDbContext),
             locationRepository ?? Mock.Of<ILocationRepository>(Strict),
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             AlwaysTrueUserService().Object,
-            dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
+            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext),
+            apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );
     }
@@ -2726,7 +2741,6 @@ public class ReplacementServiceTests
             contentDbContext,
             statisticsDbContext,
             filterRepository ?? new FilterRepository(statisticsDbContext),
-            new IndicatorGroupRepository(statisticsDbContext),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),

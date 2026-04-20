@@ -399,12 +399,25 @@ public abstract class ReleaseVersionServiceTests
                 .WithReleaseVersion(releaseVersion)
                 .WithFile(replacementFile);
 
+            DataSetMapping mapping = new DataSetMapping
+            {
+                OriginalDataSetId = subject.Id,
+                ReplacementDataSetId = replacementSubject.Id,
+            };
+
+            DataSetMapping unrelatedMapping = new DataSetMapping
+            {
+                OriginalDataSetId = Guid.NewGuid(),
+                ReplacementDataSetId = Guid.NewGuid(),
+            };
+
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
+                contentDbContext.DataSetMappings.AddRange(mapping, unrelatedMapping);
                 await contentDbContext.SaveChangesAsync();
 
                 statisticsDbContext.Subject.AddRange(subject, replacementSubject);
@@ -505,6 +518,13 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // Check the related DataSetMapping has been removed - the unrelated mapping should remain
+                var dbUnrelatedMapping = Assert.Single(context.DataSetMappings.ToList());
+                Assert.Equal(unrelatedMapping.OriginalDataSetId, dbUnrelatedMapping.OriginalDataSetId);
             }
         }
 
