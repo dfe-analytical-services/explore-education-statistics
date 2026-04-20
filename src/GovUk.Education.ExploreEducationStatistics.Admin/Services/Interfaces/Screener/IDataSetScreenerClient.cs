@@ -5,8 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
 
 public interface IDataSetScreenerClient
 {
-    Task<DataSetScreenResponse> ScreenDataSet(
-        DataSetScreenRequest dataSetScreenRequest,
+    Task<DataSetScreenerResponse> ScreenDataSet(
+        DataSetScreenerRequest dataSetScreenerRequest,
         CancellationToken cancellationToken
     );
 

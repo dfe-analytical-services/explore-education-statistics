@@ -421,6 +421,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
         services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
         services.AddScoped<IDataSetScreenerService, DataSetScreenerService>();
+        services.AddKeyedSingleton<IQueueServiceClient>(
+            serviceKey: nameof(IDataSetScreenerService),
+            implementationFactory: (serviceProvider, _) =>
+            {
+                var screenerOptions = serviceProvider.GetRequiredService<IOptions<DataScreenerOptions>>();
+                return new QueueServiceClient(screenerOptions.Value.ScreenerStorage);
+            }
+        );
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseImageService, ReleaseImageService>();

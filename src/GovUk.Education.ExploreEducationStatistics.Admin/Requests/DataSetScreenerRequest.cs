@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
-public record DataSetScreenRequest
+public record DataSetScreenerRequest
 {
     public required string StorageContainerName { get; set; }
 

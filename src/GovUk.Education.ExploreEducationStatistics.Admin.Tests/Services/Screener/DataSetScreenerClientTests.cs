@@ -30,7 +30,7 @@ public class DataSetScreenerClientTests
         [Fact]
         public async Task AuthenticationManagerCalled()
         {
-            var responseBody = new DataSetScreenResponse { OverallResult = "Failed", TestResults = [] };
+            var responseBody = new DataSetScreenerResponse { OverallResult = "Failed", TestResults = [] };
 
             _mockHttp
                 .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
@@ -47,7 +47,7 @@ public class DataSetScreenerClientTests
             var dataSetScreenerClient = BuildService(azureAuthenticationManager: authenticationManager.Object);
 
             await dataSetScreenerClient.ScreenDataSet(
-                new DataSetScreenRequest
+                new DataSetScreenerRequest
                 {
                     DataFileName = "",
                     DataFilePath = "",
@@ -70,7 +70,7 @@ public class DataSetScreenerClientTests
         [Fact]
         public async Task Success()
         {
-            var request = new DataSetScreenRequest
+            var request = new DataSetScreenerRequest
             {
                 DataFileName = "data-file-name",
                 DataFilePath = "data-file-path",
@@ -79,7 +79,7 @@ public class DataSetScreenerClientTests
                 StorageContainerName = "storage-container-name",
             };
 
-            var responseBody = new DataSetScreenResponse
+            var responseBody = new DataSetScreenerResponse
             {
                 OverallResult = "Failed",
                 TestResults =

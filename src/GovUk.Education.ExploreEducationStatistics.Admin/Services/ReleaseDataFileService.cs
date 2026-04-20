@@ -421,11 +421,11 @@ public class ReleaseDataFileService(
                         throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
                     }
 
-                    var request = mapper.Map<DataSetScreenRequest>(dataSetUpload);
+                    var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
                     request.DataFileSasToken = dataFileToken.Right.Token;
                     request.MetaFileSasToken = metaFileToken.Right.Token;
 
-                    DataSetScreenResponse result;
+                    DataSetScreenerResponse result;
 
                     try
                     {

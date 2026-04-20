@@ -46,7 +46,7 @@ public class DataSetUploadMockBuilder
                 _screenerResult == "Failed" ? DataSetUploadStatus.FAILED_SCREENING : DataSetUploadStatus.PENDING_IMPORT,
             UploadedBy = "test@test.com",
             Created = DateTime.UtcNow,
-            ScreenerResult = new DataSetScreenResponse
+            ScreenerResult = new DataSetScreenerResponse
             {
                 OverallResult = _screenerResult ?? "Passed",
                 TestResults =

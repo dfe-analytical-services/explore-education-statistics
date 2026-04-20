@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-public record DataSetScreenResponse
+public record DataSetScreenerResponse
 {
     [JsonPropertyName("overall_stage")]
     public required string OverallResult { get; init; }

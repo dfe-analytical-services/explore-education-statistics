@@ -199,7 +199,7 @@ public class DataSetFileStorage(
 
     public async Task UpdateDataSetUpload(
         Guid dataSetUploadId,
-        DataSetScreenResponse? screenerResult,
+        DataSetScreenerResponse? screenerResult,
         CancellationToken cancellationToken
     )
     {

@@ -139,12 +139,12 @@ public class MappingProfiles : CommonMappingProfile
                 m => m.MapFrom(upload => FileExtensions.DisplaySize(upload.MetaFileSizeInBytes))
             );
 
-        CreateMap<DataSetScreenResponse, ScreenerResultViewModel>();
+        CreateMap<DataSetScreenerResponse, ScreenerResultViewModel>();
 
         CreateMap<DataScreenerTestResult, ScreenerTestResultViewModel>()
             .ForMember(dest => dest.Result, m => m.MapFrom(upload => upload.Result.ToString()));
 
-        CreateMap<DataSetUpload, DataSetScreenRequest>()
+        CreateMap<DataSetUpload, DataSetScreenerRequest>()
             .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
 
         CreateMap<DataSetUpload, DataSetStartScreeningRequest>()
@@ -152,19 +152,19 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(d => d.DataSetId, m => m.MapFrom(upload => upload.Id));
     }
 
-    private static string GetDataSetUploadStatus(DataSetScreenResponse screenResult)
+    private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
     {
-        if (screenResult is null)
+        if (screenerResult is null)
         {
             return nameof(DataSetUploadStatus.SCREENER_ERROR);
         }
 
-        if (screenResult.Passed && screenResult.TestResults.Any(test => test.Result == TestResult.WARNING))
+        if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
             return nameof(DataSetUploadStatus.PENDING_REVIEW);
         }
 
-        return !screenResult.Passed
+        return !screenerResult.Passed
             ? nameof(DataSetUploadStatus.FAILED_SCREENING)
             : nameof(DataSetUploadStatus.PENDING_IMPORT);
     }
