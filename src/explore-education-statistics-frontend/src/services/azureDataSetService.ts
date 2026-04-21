@@ -1,14 +1,12 @@
 import { SortDirection } from '@common/services/types/sort';
 import { frontendApi } from '@common/services/api';
 import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
-import {
-  AzureOrderByParam,
-  PaginatedListWithAzureFacets,
-} from '@frontend/services/azurePublicationService';
+import { AzureOrderByParam } from '@frontend/services/azurePublicationService';
 import {
   DataSetFileApi,
   DataSetFileSummary,
 } from '@frontend/services/dataSetFileService';
+import { PaginatedList } from '@common/services/types/pagination';
 
 export interface AzureDataSetSearchResult {
   '@search.score': string;
@@ -61,22 +59,10 @@ export interface AzureDataSetListRequest {
   themeId?: string;
 }
 
-// TODO EES-7072 - amend to what we actually need/expect - or check if this is actually needed
-// Can we just use the existing DataSetFileSummary instead?
-// export interface AzureDataSetListSummary {
-//   id: string;
-//   published: Date | string;
-//   rank: number;
-//   slug: string;
-//   theme: string;
-//   title: string;
-//   type: ReleaseType;
-// }
-
 const azureDataSetService = {
   async listDataSets(
     params: AzureDataSetListRequest,
-  ): Promise<PaginatedListWithAzureFacets<DataSetFileSummary>> {
+  ): Promise<PaginatedList<DataSetFileSummary>> {
     return frontendApi.post(`/search-datasets`, { searchOptions: params });
   },
   // async suggestPublications(

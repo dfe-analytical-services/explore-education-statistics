@@ -17,9 +17,10 @@ export default function createDataSetListRequest(
   query: FindStatisticsPageQuery,
 ): AzureDataSetListRequest {
   const {
+    dataSetType,
+    latestDataOnly,
     releaseType,
     search: searchParam,
-    showAllReleases,
     sortBy,
     themeId,
   } = getParamsFromQuery(query);
@@ -28,9 +29,10 @@ export default function createDataSetListRequest(
 
   // TOOD-7072 finish converting filters into arrays
   const filter = buildODataFilter({
+    dataSetType,
+    latestDataOnly,
     releaseType: releaseType ? [releaseType] : undefined,
-    showAllReleases,
-    themeId: themeId ? [themeId] : undefined,
+    themeId: themeId ? [themeId.toUpperCase()] : undefined,
   });
 
   const minSearchCharacters = 3;
@@ -41,22 +43,20 @@ export default function createDataSetListRequest(
     {
       filter,
       page: parseNumber(query.page) ?? 1,
-      releaseType,
       search,
       orderBy,
-      themeId,
     },
     value => typeof value === 'undefined',
   );
 }
 
 interface SearchFilters {
+  geographicLevels?: string[];
+  dataSetType: string;
+  latestDataOnly?: boolean;
+  releaseId?: string[];
   releaseType?: string[];
   themeId?: string[];
-  geographicLevels?: string[];
-  releaseId?: string[];
-  showAllReleases?: boolean;
-  hasApiDataSet?: boolean;
 }
 
 // TOOD-7072 add tests
@@ -83,12 +83,14 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
     conditions.push(odata`search.in(releaseId, ${joined}, '|')`);
   }
 
-  if (!filters.showAllReleases || filters.showAllReleases !== true) {
+  if (filters.latestDataOnly) {
     conditions.push(odata`latestData eq true`);
   }
 
-  if (typeof filters.hasApiDataSet === 'boolean') {
-    conditions.push(odata`api eq ${filters.hasApiDataSet}`);
+  if (filters.dataSetType === 'api') {
+    // conditions.push(odata`api eq ${filters.hasApiDataSet}`);
+    // "ne" stands for "not equal".
+    conditions.push(`api/id ne null and api/id ne ''`);
   }
 
   // 5. Combine everything or return undefined if no filters were provided
@@ -136,6 +138,8 @@ function getSortParam(sortBy: PublicationSortOption): AzureOrderByParam {
 
 export function getParamsFromQuery(query: SearchDataPageQuery) {
   return {
+    dataSetType: query.dataSetType === 'api' ? 'api' : 'all',
+    latestDataOnly: !query.latestDataOnly || query.latestDataOnly !== 'false',
     page: getFirst(query.page),
     releaseType:
       query.releaseType &&
@@ -143,8 +147,6 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
         ? query.releaseType
         : undefined,
     search: getFirst(query.search),
-    showAllReleases:
-      (query.showAllReleases && query.showAllReleases === 'true') || false,
     sortBy:
       query.sortBy && isOneOf(query.sortBy, publicationSortOptions)
         ? query.sortBy
