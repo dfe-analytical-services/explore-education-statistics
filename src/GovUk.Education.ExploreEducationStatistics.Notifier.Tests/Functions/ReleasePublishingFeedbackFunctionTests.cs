@@ -89,8 +89,8 @@ public class ReleasePublishingFeedbackFunctionTests
     }
 
     [Theory]
-    [InlineData(PublicationRole.Drafter)]
-    [InlineData(PublicationRole.Approver)]
+    [InlineData(PublicationRole.Owner)]
+    [InlineData(PublicationRole.Allower)]
     public async Task SendReleasePublishingFeedbackEmail_UnsupportedRoleUsed_NoEmailSent(PublicationRole role)
     {
         ReleaseVersion releaseVersion = DataFixture

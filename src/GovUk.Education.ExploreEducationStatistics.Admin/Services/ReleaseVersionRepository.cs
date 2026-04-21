@@ -31,17 +31,19 @@ public class ReleaseVersionRepository(
         params ReleaseApprovalStatus[] releaseApprovalStatuses
     )
     {
-        var userPublicationRolesQuery = userPublicationRoleRepository
+        var userPublicationRoleIds = await userPublicationRoleRepository
             .Query()
             .WhereForUser(userId)
-            .Select(upr => upr.PublicationId);
+            .Select(upr => upr.PublicationId)
+            .Distinct()
+            .ToListAsync();
 
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
             .Include(rv => rv.ReleaseStatuses)
             .Where(rv => releaseApprovalStatuses.Contains(rv.ApprovalStatus))
-            .Where(rv => userPublicationRolesQuery.Contains(rv.Release.PublicationId))
+            .Where(rv => userPublicationRoleIds.Contains(rv.Release.PublicationId))
             .ToListAsync();
     }
 

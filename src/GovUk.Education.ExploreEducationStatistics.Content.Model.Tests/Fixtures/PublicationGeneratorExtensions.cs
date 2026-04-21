@@ -266,7 +266,7 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetThemeId(this InstanceSetters<Publication> setters, Guid themeId) =>
         setters.Set(p => p.ThemeId, themeId);
 
-    private static InstanceSetters<Publication> SetTheme(this InstanceSetters<Publication> setters, Theme theme) =>
+    public static InstanceSetters<Publication> SetTheme(this InstanceSetters<Publication> setters, Theme theme) =>
         setters.Set(p => p.Theme, theme).SetThemeId(theme.Id);
 
     public static InstanceSetters<Publication> SetSlug(this InstanceSetters<Publication> setters, string slug) =>

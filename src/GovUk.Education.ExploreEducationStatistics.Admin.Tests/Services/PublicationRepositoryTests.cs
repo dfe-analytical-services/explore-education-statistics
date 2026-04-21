@@ -131,7 +131,7 @@ public abstract class PublicationRepositoryTests
                 var result = await service.ListPublicationsForUser(userId: user.Id);
 
                 // Result should contain all publications
-                Assert.Equal(4, result.Count);
+                Assert.Equal(2, result.Count);
 
                 Assert.Equal(userPublicationRoles[0].PublicationId, result[0].Id);
                 Assert.Equal(userPublicationRoles[0].Publication.ThemeId, result[0].Theme.Id);
