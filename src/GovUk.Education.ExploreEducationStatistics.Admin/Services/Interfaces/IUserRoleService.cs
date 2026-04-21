@@ -22,6 +22,12 @@ public interface IUserRoleService
 
     Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
+    Task<Either<ActionResult, Unit>> InviteDrafter(
+        string email,
+        Guid publicationId,
+        CancellationToken cancellationToken = default
+    );
+
     Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
 
     Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId);

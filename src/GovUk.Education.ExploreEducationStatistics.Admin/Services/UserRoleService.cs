@@ -1,6 +1,8 @@
 #nullable enable
+using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -172,6 +174,26 @@ public class UserRoleService(
                     });
             });
 
+    public async Task<Either<ActionResult, Unit>> InviteDrafter(
+        string email,
+        Guid publicationId,
+        CancellationToken cancellationToken = default
+    ) =>
+        await contentDbContext
+            .Publications.SingleOrNotFoundAsync(p => p.Id == publicationId, cancellationToken)
+            .OnSuccess(userService.CheckCanUpdateDrafters)
+            .OnSuccessDo(_ => ValidateDrafterRoleCanBeAdded(email, publicationId))
+            .OnSuccessVoid(
+                (Func<Publication, Task>)(
+                    async _ =>
+                        await AddDrafterRole(
+                            email: email,
+                            publicationId: publicationId,
+                            cancellationToken: cancellationToken
+                        )
+                )
+            );
+
     public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId) =>
         await userService
             .CheckCanManageAllUsers()
@@ -218,6 +240,16 @@ public class UserRoleService(
                         return Unit.Instance;
                     });
             });
+
+    private async Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(
+        string globalRoleNameToSet,
+        Guid userId
+    )
+    {
+        return await usersAndRolesPersistenceHelper
+            .CheckEntityExists<ApplicationUser, string>(userId.ToString())
+            .OnSuccessVoid(user => UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, user));
+    }
 
     internal async Task UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, ApplicationUser user)
     {
@@ -318,6 +350,70 @@ public class UserRoleService(
         }
 
         return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, Unit>> ValidateDrafterRoleCanBeAdded(string email, Guid publicationId)
+    {
+        var user = await userRepository.FindUserByEmail(email);
+
+        if (user is null)
+        {
+            return Unit.Instance;
+        }
+
+        if (
+            await userPublicationRoleRepository.UserHasAnyRoleOnPublication(
+                userId: user.Id,
+                publicationId: publicationId,
+                resourceRoleFilter: ResourceRoleFilter.All,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
+            )
+        )
+        {
+            return ValidationActionResult(UserAlreadyHasResourceRoleOrMorePowerfulRole);
+        }
+
+        return Unit.Instance;
+    }
+
+    private async Task AddDrafterRole(string email, Guid publicationId, CancellationToken cancellationToken)
+    {
+        var activeUser = await userRepository.FindActiveUserByEmail(email, cancellationToken);
+
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            var user =
+                activeUser
+                ?? await userRepository.CreateOrUpdate(
+                    email: email,
+                    role: Role.Analyst,
+                    createdById: userService.GetUserId(),
+                    cancellationToken: cancellationToken
+                );
+
+            var createdUserDrafterRole = await userPublicationRoleRepository.Create(
+                userId: user.Id,
+                publicationId: publicationId,
+                role: PublicationRole.Drafter,
+                createdById: userService.GetUserId(),
+                cancellationToken: cancellationToken
+            );
+
+            if (createdUserDrafterRole is null)
+            {
+                throw new UnreachableException("Unexpected error. Failed to create drafter role.");
+            }
+
+            await userResourceRoleNotificationService.NotifyUserOfNewDrafterRole(
+                userPublicationRoleId: createdUserDrafterRole.Id,
+                cancellationToken: cancellationToken
+            );
+
+            if (user.Active)
+            {
+                await UpgradeToGlobalRoleIfRequired(AssociatedGlobalRoleNameForPublicationRole, user.Id);
+            }
+        });
     }
 
     private async Task<Either<ActionResult, User>> FindActiveUser(Guid userId) =>
