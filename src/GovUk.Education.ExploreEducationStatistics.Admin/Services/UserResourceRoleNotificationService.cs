@@ -16,7 +16,7 @@ public class UserResourceRoleNotificationService(
     IPreReleaseService preReleaseService,
     IUserRepository userRepository,
     IEmailTemplateService emailTemplateService,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     TimeProvider timeProvider
 ) : IUserResourceRoleNotificationService
@@ -30,7 +30,7 @@ public class UserResourceRoleNotificationService(
             throw new ArgumentException($"User with ID {userId} is already active and does not need notifying.");
         }
 
-        var pendingUserPreReleaseRoles = await userPrereleaseRoleRepository
+        var pendingUserPreReleaseRoles = await userPreReleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .WhereForUser(user.Id)
@@ -73,10 +73,10 @@ public class UserResourceRoleNotificationService(
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
 
-            foreach (var userPrereleaseRole in pendingUserPreReleaseRoles)
+            foreach (var userPreReleaseRole in pendingUserPreReleaseRoles)
             {
-                await userPrereleaseRoleRepository.MarkEmailAsSent(
-                    userPrereleaseRoleId: userPrereleaseRole.Id,
+                await userPreReleaseRoleRepository.MarkEmailAsSent(
+                    userPreReleaseRoleId: userPreReleaseRole.Id,
                     dateSent: utcNow,
                     cancellationToken: cancellationToken
                 );
@@ -176,15 +176,15 @@ public class UserResourceRoleNotificationService(
     }
 
     public async Task NotifyUserOfNewPreReleaseRole(
-        Guid userPrereleaseRoleId,
+        Guid userPreReleaseRoleId,
         CancellationToken cancellationToken = default
     )
     {
-        var userPrereleaseRole = await CheckUserPrereleaseRoleExists(userPrereleaseRoleId, cancellationToken);
+        var userPreReleaseRole = await CheckUserPreReleaseRoleExists(userPreReleaseRoleId, cancellationToken);
 
-        var isNewUser = !userPrereleaseRole.User.Active;
+        var isNewUser = !userPreReleaseRole.User.Active;
 
-        var preReleaseWindow = preReleaseService.GetPreReleaseWindow(userPrereleaseRole.ReleaseVersion);
+        var preReleaseWindow = preReleaseService.GetPreReleaseWindow(userPreReleaseRole.ReleaseVersion);
 
         await contentDbContext.RequireTransaction(async () =>
         {
@@ -193,24 +193,24 @@ public class UserResourceRoleNotificationService(
             // would have sent an email for a role which has an unmarked `SentDate`.
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
-            await userPrereleaseRoleRepository.MarkEmailAsSent(
-                userPrereleaseRoleId: userPrereleaseRoleId,
+            await userPreReleaseRoleRepository.MarkEmailAsSent(
+                userPreReleaseRoleId: userPreReleaseRoleId,
                 cancellationToken: cancellationToken
             );
 
             emailTemplateService
                 .SendPreReleaseInviteEmail(
-                    email: userPrereleaseRole.User.Email,
-                    publicationTitle: userPrereleaseRole.ReleaseVersion.Release.Publication.Title,
-                    releaseTitle: userPrereleaseRole.ReleaseVersion.Release.Title,
+                    email: userPreReleaseRole.User.Email,
+                    publicationTitle: userPreReleaseRole.ReleaseVersion.Release.Publication.Title,
+                    releaseTitle: userPreReleaseRole.ReleaseVersion.Release.Title,
                     isNewUser: isNewUser,
-                    publicationId: userPrereleaseRole.ReleaseVersion.Release.PublicationId,
-                    releaseVersionId: userPrereleaseRole.ReleaseVersionId,
+                    publicationId: userPreReleaseRole.ReleaseVersion.Release.PublicationId,
+                    releaseVersionId: userPreReleaseRole.ReleaseVersionId,
                     preReleaseWindowStart: preReleaseWindow.Start,
-                    publishScheduled: userPrereleaseRole.ReleaseVersion.PublishScheduled!.Value
+                    publishScheduled: userPreReleaseRole.ReleaseVersion.PublishScheduled!.Value
                 )
                 .OrThrow(_ => new EmailSendFailedException(
-                    $"Failed to send pre-release role email for role with ID {userPrereleaseRoleId}."
+                    $"Failed to send pre-release role email for role with ID {userPreReleaseRoleId}."
                 ));
         });
     }
@@ -232,8 +232,8 @@ public class UserResourceRoleNotificationService(
         ;
     }
 
-    private async Task<UserReleaseRole> CheckUserPrereleaseRoleExists(
-        Guid userPrereleaseRoleId,
+    private async Task<UserReleaseRole> CheckUserPreReleaseRoleExists(
+        Guid userPreReleaseRoleId,
         CancellationToken cancellationToken
     )
     {
@@ -243,15 +243,15 @@ public class UserResourceRoleNotificationService(
         // Using AsNoTracking causes PublishScheduled to be null.
         // Reordering to notify after SaveChanges would avoid this, but breaks
         // unit tests because the in-memory provider does not support transactions.
-        return await userPrereleaseRoleRepository
+        return await userPreReleaseRoleRepository
                 .Query(ResourceRoleFilter.AllButExpired)
                 .Include(urr => urr.User)
                 .Include(urr => urr.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
                         .ThenInclude(r => r.Publication)
-                .SingleOrDefaultAsync(urr => urr.Id == userPrereleaseRoleId, cancellationToken)
+                .SingleOrDefaultAsync(urr => urr.Id == userPreReleaseRoleId, cancellationToken)
             ?? throw new KeyNotFoundException(
-                $"A non-expired pre-release role with ID {userPrereleaseRoleId} does not exist."
+                $"A non-expired pre-release role with ID {userPreReleaseRoleId} does not exist."
             );
         ;
     }

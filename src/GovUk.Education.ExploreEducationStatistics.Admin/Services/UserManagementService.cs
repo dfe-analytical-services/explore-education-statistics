@@ -32,7 +32,7 @@ public class UserManagementService(
     IUserRoleService userRoleService,
     IUserRepository userRepository,
     IUserService userService,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserResourceRoleNotificationService userResourceRoleNotificationService,
     IPreReleaseUserService preReleaseUserService,
@@ -46,13 +46,13 @@ public class UserManagementService(
             .OnSuccess(async () =>
             {
                 var roles = await usersAndRolesDbContext.Roles.ToListAsync();
-                var prereleaseRole = roles.Single(role => role.Name == RoleNames.PrereleaseUser);
+                var preReleaseRole = roles.Single(role => role.Name == RoleNames.PrereleaseUser);
                 var users = usersAndRolesDbContext.Users;
                 var userRoles = usersAndRolesDbContext.UserRoles;
-                var nonPrereleaseUsers = users.Where(user =>
-                    !userRoles.Any(userRole => userRole.UserId == user.Id && userRole.RoleId == prereleaseRole.Id)
+                var nonPreReleaseUsers = users.Where(user =>
+                    !userRoles.Any(userRole => userRole.UserId == user.Id && userRole.RoleId == preReleaseRole.Id)
                 );
-                var usersAndRoles = await nonPrereleaseUsers
+                var usersAndRoles = await nonPreReleaseUsers
                     .Select(user => new
                     {
                         Id = Guid.Parse(user.Id),
@@ -110,10 +110,10 @@ public class UserManagementService(
                         return await userRoleService
                             .GetGlobalRolesForUser(user.Id)
                             .OnSuccessCombineWith(_ => userRoleService.GetPublicationRolesForUser(id))
-                            .OnSuccessCombineWith(_ => preReleaseUserService.GetPrereleaseRolesForUser(id))
+                            .OnSuccessCombineWith(_ => preReleaseUserService.GetPreReleaseRolesForUser(id))
                             .OnSuccess(tuple =>
                             {
-                                var (globalRoles, publicationRoles, prereleaseRoles) = tuple;
+                                var (globalRoles, publicationRoles, preReleaseRoles) = tuple;
 
                                 // Currently we only allow a user to have a maximum of one global role,
                                 // and potentially no global role at all if other permissions in the system
@@ -127,7 +127,7 @@ public class UserManagementService(
                                     Email = user.Email!,
                                     Role = globalRole?.Id,
                                     UserPublicationRoles = publicationRoles,
-                                    UserPrereleaseRoles = prereleaseRoles,
+                                    UserPreReleaseRoles = preReleaseRoles,
                                 };
                             });
                     });
@@ -157,10 +157,10 @@ public class UserManagementService(
                     .Select(
                         async (pendingUserInvite, _, cancellationToken) =>
                         {
-                            var userPrereleaseRoles = await userPrereleaseRoleRepository
+                            var userPreReleaseRoles = await userPreReleaseRoleRepository
                                 .Query(ResourceRoleFilter.PendingOnly)
                                 .WhereForUser(pendingUserInvite.UserId)
-                                .Select(urr => new UserPrereleaseRoleViewModel
+                                .Select(urr => new UserPreReleaseRoleViewModel
                                 {
                                     Id = urr.Id,
                                     Publication = urr.ReleaseVersion.Release.Publication.Title,
@@ -184,7 +184,7 @@ public class UserManagementService(
                                 Email = pendingUserInvite.Email,
                                 Role = pendingUserInvite.Role!.Name!,
                                 UserPublicationRoles = userPublicationRoles,
-                                UserPrereleaseRoles = userPrereleaseRoles,
+                                UserPreReleaseRoles = userPreReleaseRoles,
                             };
                         }
                     )
@@ -218,16 +218,16 @@ public class UserManagementService(
 
                 // Clear out any pre-existing Release Roles or Publication Roles prior to adding
                 // new ones.
-                await userPrereleaseRoleRepository.RemoveForUser(user.Id);
+                await userPreReleaseRoleRepository.RemoveForUser(user.Id);
                 await userPublicationRoleRepository.RemoveForUser(user.Id);
 
-                foreach (var userPrereleaseRole in request.UserPrereleaseRoles)
+                foreach (var userPreReleaseRole in request.UserPreReleaseRoles)
                 {
                     var latestReleaseVersion = await contentDbContext
-                        .ReleaseVersions.LatestReleaseVersion(releaseId: userPrereleaseRole.ReleaseId)
+                        .ReleaseVersions.LatestReleaseVersion(releaseId: userPreReleaseRole.ReleaseId)
                         .SingleAsync();
 
-                    await userPrereleaseRoleRepository.Create(
+                    await userPreReleaseRoleRepository.Create(
                         userId: user.Id,
                         releaseVersionId: latestReleaseVersion!.Id,
                         createdById: userService.GetUserId(),
@@ -262,7 +262,7 @@ public class UserManagementService(
             {
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    await userPrereleaseRoleRepository.RemoveForUser(invitedUser.Id);
+                    await userPreReleaseRoleRepository.RemoveForUser(invitedUser.Id);
                     await userPublicationRoleRepository.RemoveForUser(invitedUser.Id);
 
                     await userRepository.SoftDeleteUser(invitedUser.Id, userService.GetUserId());
@@ -291,7 +291,7 @@ public class UserManagementService(
                 {
                     await userManager.DeleteAsync(identityUser);
 
-                    await userPrereleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
+                    await userPreReleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
                     await userPublicationRoleRepository.RemoveForUser(activeInternalUser.Id);
 
                     await userRepository.SoftDeleteUser(activeInternalUser.Id, userService.GetUserId());

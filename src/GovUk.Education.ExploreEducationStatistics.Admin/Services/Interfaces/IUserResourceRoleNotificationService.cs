@@ -9,5 +9,5 @@ public interface IUserResourceRoleNotificationService
 
     Task NotifyUserOfNewDrafterRole(Guid userPublicationRoleId, CancellationToken cancellationToken = default);
 
-    Task NotifyUserOfNewPreReleaseRole(Guid userPrereleaseRoleId, CancellationToken cancellationToken = default);
+    Task NotifyUserOfNewPreReleaseRole(Guid userPreReleaseRoleId, CancellationToken cancellationToken = default);
 }
