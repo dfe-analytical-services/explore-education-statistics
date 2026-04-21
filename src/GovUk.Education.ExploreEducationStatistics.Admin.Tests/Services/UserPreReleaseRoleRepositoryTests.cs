@@ -7,12 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPrereleaseRoleRepository;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPreReleaseRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class UserPrereleaseRoleRepositoryTests
+public abstract class UserPreReleaseRoleRepositoryTests
 {
     private readonly DataFixture _fixture = new();
 
@@ -29,7 +29,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         fixture => fixture.DefaultSoftDeletedUser(),
     ];
 
-    public class CreateTests : UserPrereleaseRoleRepositoryTests
+    public class CreateTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task NoSuppliedCreatedDate_SetsDateToUtcNow()
@@ -144,7 +144,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class CreateManyIfNotExistsTests : UserPrereleaseRoleRepositoryTests
+    public class CreateManyIfNotExistsTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ManyRoles_IgnoresRolesThatAlreadyExist()
@@ -168,7 +168,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var existingUserPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithCreated(existingRoleCreatedDate)
                 .WithCreatedById(createdBy.Id)
                 // One role for each User/Publication combination for user1/user2/releaseVersion1/releaseVersion2
@@ -180,7 +180,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .GenerateList(4);
 
             var newUserPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithCreated(newRolesCreatedDate)
                 .WithCreatedById(createdBy.Id)
                 // One role for each remaining User/Publication combination
@@ -193,7 +193,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
             UserReleaseRole[] allUserPreReleaseRoles = [.. existingUserPreReleaseRoles, .. newUserPreReleaseRoles];
             var allUserPreReleaseRolesCreateDtos = allUserPreReleaseRoles
-                .Select(uprr => new UserPrereleaseRoleCreateDto(
+                .Select(uprr => new UserPreReleaseRoleCreateDto(
                     UserId: uprr.UserId,
                     ReleaseVersionId: uprr.ReleaseVersionId,
                     CreatedById: uprr.CreatedById!.Value,
@@ -304,7 +304,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class GetByIdTests : UserPrereleaseRoleRepositoryTests
+    public class GetByIdTests : UserPreReleaseRoleRepositoryTests
     {
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
@@ -314,7 +314,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User createdBy = _fixture.DefaultUser();
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(
                     _fixture
@@ -361,7 +361,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class GetByCompositeKeyTests : UserPrereleaseRoleRepositoryTests
+    public class GetByCompositeKeyTests : UserPreReleaseRoleRepositoryTests
     {
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
@@ -371,7 +371,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User createdBy = _fixture.DefaultUser();
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(
                     _fixture
@@ -421,7 +421,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class QueryTests : UserPrereleaseRoleRepositoryTests
+    public class QueryTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ActiveOnlyFilter_ReturnsAllRolesForActiveUsers()
@@ -433,7 +433,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User softDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(
                     _fixture
                         .DefaultReleaseVersion()
@@ -491,7 +491,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User softDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(
                     _fixture
                         .DefaultReleaseVersion()
@@ -542,7 +542,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User softDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(
                     _fixture
                         .DefaultReleaseVersion()
@@ -600,7 +600,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User softDeletedUser2 = _fixture.DefaultSoftDeletedUser();
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(
                     _fixture
                         .DefaultReleaseVersion()
@@ -655,20 +655,20 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class RemoveByIdTests : UserPrereleaseRoleRepositoryTests
+    public class RemoveByIdTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task RoleExists_RemovesAndReturnsTrue()
         {
             Publication publication = _fixture.DefaultPublication();
             UserReleaseRole userPreReleaseRoleToRemove = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
                     _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
                 );
             UserReleaseRole otherPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
                     _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
@@ -713,7 +713,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class RemoveManyTests : UserPrereleaseRoleRepositoryTests
+    public class RemoveManyTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ManyRoles()
@@ -731,7 +731,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(publication2));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // One role for each User/Publication combination.
                 // We expect these to be removed.
                 .ForIndex(0, s => s.SetUser(user1).SetReleaseVersion(releaseVersion1))
@@ -784,7 +784,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         public async Task EmptyList_DoesNothing()
         {
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
                     _fixture
@@ -817,7 +817,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class RemoveForUserTests : UserPrereleaseRoleRepositoryTests
+    public class RemoveForUserTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task TargetUserHasRoles_RemovesTargetRoles()
@@ -833,7 +833,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // These 2 roles should be removed
                 .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1))
                 .ForIndex(0, s => s.SetUser(targetUser))
@@ -889,7 +889,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // These roles are for a different email and should not be removed
                 .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1))
                 .ForIndex(0, s => s.SetUser(otherUser))
@@ -928,7 +928,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class UserHasPrereleaseRoleOnReleaseVersionTests : UserPrereleaseRoleRepositoryTests
+    public class UserHasPreReleaseRoleOnReleaseVersionTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ExistingRoleNotForTargetUser_False()
@@ -938,7 +938,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -955,7 +955,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: Guid.NewGuid(),
                         releaseVersionId: targetReleaseVersion.Id
                     )
@@ -969,7 +969,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User targetActiveUser = _fixture.DefaultUser();
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(
                     _fixture
@@ -990,7 +990,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: Guid.NewGuid()
                     )
@@ -1007,7 +1007,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -1024,7 +1024,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
@@ -1033,7 +1033,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Also test that the default filter is ActiveOnly
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: targetReleaseVersion.Id
                     )
@@ -1052,7 +1052,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // Target role is for a PENDING User Invite
                 .ForIndex(0, s => s.SetUser(targetUserWithPendingInvite).SetReleaseVersion(targetReleaseVersion))
                 // Target role is for an EXPIRED User Invite
@@ -1075,21 +1075,21 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Each of these should return false as the roles are not for ACTIVE Users
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithPendingInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithExpiredInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetSoftDeletedUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
@@ -1107,7 +1107,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET ACTIVE user but DIFFERENT release version
                 .ForIndex(
                     0,
@@ -1138,7 +1138,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
@@ -1156,7 +1156,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetUserWithPendingInvite)
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -1173,7 +1173,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithPendingInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
@@ -1193,7 +1193,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // role is for a ACTIVE User
                 .ForIndex(0, s => s.SetUser(targetActiveUser).SetReleaseVersion(targetReleaseVersion))
                 // role is for an EXPIRED User Invite
@@ -1216,21 +1216,21 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Each of these should return false as the roles are not for PENDING User Invites
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithExpiredInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetSoftDeletedUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
@@ -1248,7 +1248,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET PENDING user invite + role but DIFFERENT release version
                 .ForIndex(
                     0,
@@ -1282,7 +1282,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithPendingInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
@@ -1301,7 +1301,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(targetReleaseVersion)
                 .ForIndex(0, s => s.SetUser(targetActiveUser))
                 .ForIndex(1, s => s.SetUser(targetUserWithPendingInvite))
@@ -1321,14 +1321,14 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Both of these should return true as the roles are for an ACTIVE User and a PENDING User Invite
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
                     )
                 );
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithPendingInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
@@ -1347,7 +1347,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // role is for an EXPIRED User Invite
                 .ForIndex(0, s => s.SetUser(targetUserWithExpiredInvite).SetReleaseVersion(targetReleaseVersion))
                 // role is for a SOFT DELETED User
@@ -1368,14 +1368,14 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Each of these should return false as the roles are not for ACTIVE Users or PENDING User Invites
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithExpiredInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetSoftDeletedUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
@@ -1394,7 +1394,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET ACTIVE user but DIFFERENT release version
                 .ForIndex(
                     0,
@@ -1443,14 +1443,14 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithPendingInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
@@ -1469,7 +1469,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetUser)
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -1486,7 +1486,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.All
@@ -1507,7 +1507,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET ACTIVE user but DIFFERENT release version
                 .ForIndex(
                     0,
@@ -1589,28 +1589,28 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetActiveUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.All
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithPendingInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.All
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetUserWithExpiredInvite.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.All
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnReleaseVersion(
+                    await repository.UserHasPreReleaseRoleOnReleaseVersion(
                         userId: targetSoftDeletedUser.Id,
                         releaseVersionId: targetReleaseVersion.Id,
                         resourceRoleFilter: ResourceRoleFilter.All
@@ -1620,7 +1620,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class UserHasPrereleaseRoleOnPublicationTests : UserPrereleaseRoleRepositoryTests
+    public class UserHasPreReleaseRoleOnPublicationTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task ExistingRoleNotForTargetUser_False()
@@ -1630,7 +1630,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -1647,7 +1647,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: Guid.NewGuid(),
                         publicationId: targetReleaseVersion.Release.PublicationId
                     )
@@ -1661,7 +1661,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             User targetActiveUser = _fixture.DefaultUser();
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(
                     _fixture
@@ -1682,7 +1682,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: Guid.NewGuid()
                     )
@@ -1699,7 +1699,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -1716,7 +1716,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
@@ -1725,7 +1725,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Also test that the default filter is ActiveOnly
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId
                     )
@@ -1745,7 +1745,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // role is for a PENDING User Invite
                 .ForIndex(0, s => s.SetUser(targetUserWithPendingInvite).SetReleaseVersion(targetReleaseVersion))
                 // role is for an EXPIRED User Invite
@@ -1768,21 +1768,21 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Each of these should return false as the roles are not for ACTIVE Users
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithPendingInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithExpiredInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetSoftDeletedUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
@@ -1800,7 +1800,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET ACTIVE user but DIFFERENT publication
                 .ForIndex(
                     0,
@@ -1831,7 +1831,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.ActiveOnly
@@ -1849,7 +1849,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetUserWithPendingInvite)
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -1866,7 +1866,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithPendingInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
@@ -1887,7 +1887,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // role is for a ACTIVE User
                 .ForIndex(0, s => s.SetUser(targetActiveUser).SetReleaseVersion(targetReleaseVersion))
                 // role is for an EXPIRED User Invite
@@ -1910,21 +1910,21 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Each of these should return false as the roles are not for PENDING User Invites
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithExpiredInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetSoftDeletedUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
@@ -1942,7 +1942,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET PENDING user invite but DIFFERENT publication
                 .ForIndex(
                     0,
@@ -1976,7 +1976,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithPendingInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.PendingOnly
@@ -1995,7 +1995,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(targetReleaseVersion)
                 .ForIndex(0, s => s.SetUser(targetActiveUser))
                 .ForIndex(1, s => s.SetUser(targetUserWithPendingInvite))
@@ -2015,14 +2015,14 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Both of these should return true as the roles are for an ACTIVE User and a PENDING User Invite
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
                     )
                 );
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithPendingInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
@@ -2042,7 +2042,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // role is for an EXPIRED User Invite
                 .ForIndex(0, s => s.SetUser(targetUserWithExpiredInvite).SetReleaseVersion(targetReleaseVersion))
                 // role is for a SOFT DELETED User
@@ -2063,14 +2063,14 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
                 // Each of these should return false as the roles are not for ACTIVE Users or PENDING User Invites
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithExpiredInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetSoftDeletedUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
@@ -2089,7 +2089,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET ACTIVE user but DIFFERENT publication
                 .ForIndex(
                     0,
@@ -2138,14 +2138,14 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithPendingInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.AllButExpired
@@ -2164,7 +2164,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(targetUser)
                 .WithReleaseVersion(targetReleaseVersion);
 
@@ -2181,7 +2181,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.True(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.All
@@ -2202,7 +2202,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var userPreReleaseRoles = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 // TARGET ACTIVE user but DIFFERENT publication
                 .ForIndex(
                     0,
@@ -2284,28 +2284,28 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 var repository = CreateRepository(contentDbContext);
 
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetActiveUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.All
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithPendingInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.All
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetUserWithExpiredInvite.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.All
                     )
                 );
                 Assert.False(
-                    await repository.UserHasPrereleaseRoleOnPublication(
+                    await repository.UserHasPreReleaseRoleOnPublication(
                         userId: targetSoftDeletedUser.Id,
                         publicationId: targetReleaseVersion.Release.PublicationId,
                         resourceRoleFilter: ResourceRoleFilter.All
@@ -2315,13 +2315,13 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    public class MarkEmailAsSentTests : UserPrereleaseRoleRepositoryTests
+    public class MarkEmailAsSentTests : UserPreReleaseRoleRepositoryTests
     {
         [Fact]
         public async Task Success_NoSuppliedDateSent()
         {
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
                     _fixture
@@ -2357,7 +2357,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         public async Task Success_SuppliedDateSent()
         {
             UserReleaseRole userPreReleaseRole = _fixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
                     _fixture
@@ -2404,7 +2404,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
         }
     }
 
-    private static UserPrereleaseRoleRepository CreateRepository(ContentDbContext? contentDbContext = null)
+    private static UserPreReleaseRoleRepository CreateRepository(ContentDbContext? contentDbContext = null)
     {
         contentDbContext ??= InMemoryApplicationDbContext();
 

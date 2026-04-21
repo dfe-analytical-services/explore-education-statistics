@@ -30,7 +30,7 @@ public class PreReleaseUserService(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserService userService,
     IUserRepository userRepository,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IReleaseVersionRepository releaseVersionRepository
 ) : IPreReleaseUserService
 {
@@ -78,10 +78,10 @@ public class PreReleaseUserService(
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-            .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
+            .OnSuccess(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
                 (
-                    await userPrereleaseRoleRepository
+                    await userPreReleaseRoleRepository
                         .Query(ResourceRoleFilter.All)
                         .WhereForReleaseVersion(releaseVersionId)
                         .Select(urr => urr.User.Email)
@@ -101,7 +101,7 @@ public class PreReleaseUserService(
     {
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
+            .OnSuccess(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
             .OnSuccess(_ => EmailValidator.ValidateEmailAddresses(emails))
             .OnSuccess<ActionResult, List<string>, PreReleaseUserInvitePlan>(async validEmails =>
             {
@@ -119,12 +119,12 @@ public class PreReleaseUserService(
                         continue;
                     }
 
-                    var userAlreadyHasPrereleaseRole = await CheckUserAlreadyHasPrereleaseRoleOnReleaseVersion(
+                    var userAlreadyHasPreReleaseRole = await CheckUserAlreadyHasPreReleaseRoleOnReleaseVersion(
                         userId: existingUser.Id,
                         releaseVersionId: releaseVersionId
                     );
 
-                    if (!userAlreadyHasPrereleaseRole)
+                    if (!userAlreadyHasPreReleaseRole)
                     {
                         invitable.Add(email);
                         continue;
@@ -153,14 +153,14 @@ public class PreReleaseUserService(
             });
     }
 
-    public async Task<Either<ActionResult, List<UserPrereleaseRoleViewModel>>> GetPrereleaseRolesForUser(Guid userId)
+    public async Task<Either<ActionResult, List<UserPreReleaseRoleViewModel>>> GetPreReleaseRolesForUser(Guid userId)
     {
         return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(_ => FindActiveUser(userId))
             .OnSuccess(async () =>
             {
-                var allPrereleaseRoles = await userPrereleaseRoleRepository
+                var allPreReleaseRoles = await userPreReleaseRoleRepository
                     .Query()
                     .AsNoTracking()
                     .WhereForUser(userId)
@@ -169,7 +169,7 @@ public class PreReleaseUserService(
                             .ThenInclude(r => r.Publication)
                     .ToListAsync();
 
-                var latestPrereleaseRoles = await allPrereleaseRoles
+                var latestPreReleaseRoles = await allPreReleaseRoles
                     .ToAsyncEnumerable()
                     .Where(
                         async (uprr, cancellationToken) =>
@@ -183,8 +183,8 @@ public class PreReleaseUserService(
                     .ThenBy(uprr => uprr.ReleaseVersion.Release.TimePeriodCoverage)
                     .ToListAsync();
 
-                return latestPrereleaseRoles
-                    .Select(uprr => new UserPrereleaseRoleViewModel
+                return latestPreReleaseRoles
+                    .Select(uprr => new UserPreReleaseRoleViewModel
                     {
                         Id = uprr.Id,
                         Publication = uprr.ReleaseVersion.Release.Publication.Title,
@@ -201,7 +201,7 @@ public class PreReleaseUserService(
     {
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
+            .OnSuccess(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
             .OnSuccessCombineWith(_ => GetPreReleaseUsersInvitePlan(releaseVersionId, emails))
             .OnSuccess(async releaseVersionAndPlan =>
             {
@@ -223,9 +223,9 @@ public class PreReleaseUserService(
             .SingleOrNotFoundAsync()
             .OnSuccessCombineWith(_ => FindUserById(userId))
             .OnSuccess(tuple => (ReleaseVersion: tuple.Item1, User: tuple.Item2))
-            .OnSuccessDo(tuple => userService.CheckCanAssignPrereleaseContactsToReleaseVersion(tuple.ReleaseVersion!))
+            .OnSuccessDo(tuple => userService.CheckCanAssignPreReleaseContactsToReleaseVersion(tuple.ReleaseVersion!))
             .OnSuccessDo(tuple =>
-                ValidatePrereleaseRoleCanBeAdded(userId: userId, releaseVersionId: tuple.ReleaseVersion!.Id)
+                ValidatePreReleaseRoleCanBeAdded(userId: userId, releaseVersionId: tuple.ReleaseVersion!.Id)
             )
             .OnSuccessVoid(tuple => GrantPreReleaseAccess(tuple.ReleaseVersion!, tuple.User));
     }
@@ -240,13 +240,13 @@ public class PreReleaseUserService(
             return ValidationActionResult(InvalidEmailAddress);
         }
 
-        return await CheckUserPrereleaseRoleExists(email: email, releaseVersionId: releaseVersionId)
+        return await CheckUserPreReleaseRoleExists(email: email, releaseVersionId: releaseVersionId)
             .OnSuccess(RemovePreReleaseRole);
     }
 
-    public async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPrereleaseRoleId)
+    public async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPreReleaseRoleId)
     {
-        return await CheckUserPrereleaseRoleExists(userPrereleaseRoleId: userPrereleaseRoleId)
+        return await CheckUserPreReleaseRoleExists(userPreReleaseRoleId: userPreReleaseRoleId)
             .OnSuccess(RemovePreReleaseRole);
     }
 
@@ -267,7 +267,7 @@ public class PreReleaseUserService(
                     createdById: userService.GetUserId()
                 );
 
-            await CreatePrereleaseRoleAndNotify(releaseVersion, userToUse);
+            await CreatePreReleaseRoleAndNotify(releaseVersion, userToUse);
         });
 
         return new PreReleaseUserSummaryViewModel(email);
@@ -285,13 +285,13 @@ public class PreReleaseUserService(
                     createdById: userService.GetUserId()
                 );
 
-            await CreatePrereleaseRoleAndNotify(releaseVersion, userToUse);
+            await CreatePreReleaseRoleAndNotify(releaseVersion, userToUse);
         });
     }
 
-    private async Task CreatePrereleaseRoleAndNotify(ReleaseVersion releaseVersion, User user)
+    private async Task CreatePreReleaseRoleAndNotify(ReleaseVersion releaseVersion, User user)
     {
-        var createdUserPrereleaseRole = await userPrereleaseRoleRepository.Create(
+        var createdUserPreReleaseRole = await userPreReleaseRoleRepository.Create(
             userId: user.Id,
             releaseVersionId: releaseVersion.Id,
             createdById: userService.GetUserId()
@@ -301,28 +301,28 @@ public class PreReleaseUserService(
 
         if (shouldSendEmail)
         {
-            await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(createdUserPrereleaseRole.Id);
+            await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(createdUserPreReleaseRole.Id);
         }
     }
 
-    private async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(UserReleaseRole userPrereleaseRole) =>
+    private async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(UserReleaseRole userPreReleaseRole) =>
         await userService
-            .CheckCanAssignPrereleaseContactsToReleaseVersion(userPrereleaseRole.ReleaseVersion)
+            .CheckCanAssignPreReleaseContactsToReleaseVersion(userPreReleaseRole.ReleaseVersion)
             .OnSuccessVoid(async _ =>
             {
-                var removed = await userPrereleaseRoleRepository.RemoveById(userPrereleaseRole.Id);
+                var removed = await userPreReleaseRoleRepository.RemoveById(userPreReleaseRole.Id);
 
                 if (!removed)
                 {
                     throw new InvalidOperationException(
-                        $"Failed to remove User Pre-Release Role with ID {userPrereleaseRole.Id}"
+                        $"Failed to remove User Pre-Release Role with ID {userPreReleaseRole.Id}"
                     );
                 }
             });
 
-    private async Task<Either<ActionResult, Unit>> ValidatePrereleaseRoleCanBeAdded(Guid userId, Guid releaseVersionId)
+    private async Task<Either<ActionResult, Unit>> ValidatePreReleaseRoleCanBeAdded(Guid userId, Guid releaseVersionId)
     {
-        if (await CheckUserAlreadyHasPrereleaseRoleOnReleaseVersion(userId, releaseVersionId))
+        if (await CheckUserAlreadyHasPreReleaseRoleOnReleaseVersion(userId, releaseVersionId))
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
         }
@@ -330,20 +330,20 @@ public class PreReleaseUserService(
         return Unit.Instance;
     }
 
-    private async Task<bool> CheckUserAlreadyHasPrereleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
-        await userPrereleaseRoleRepository.UserHasPrereleaseRoleOnReleaseVersion(
+    private async Task<bool> CheckUserAlreadyHasPreReleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
+        await userPreReleaseRoleRepository.UserHasPreReleaseRoleOnReleaseVersion(
             userId,
             releaseVersionId,
             ResourceRoleFilter.AllButExpired
         );
 
-    private async Task<Either<ActionResult, UserReleaseRole>> CheckUserPrereleaseRoleExists(
+    private async Task<Either<ActionResult, UserReleaseRole>> CheckUserPreReleaseRoleExists(
         string email,
         Guid releaseVersionId
     ) =>
         await FindUserByEmail(email)
             .OnSuccess(user =>
-                userPrereleaseRoleRepository
+                userPreReleaseRoleRepository
                     .Query(ResourceRoleFilter.All)
                     .WhereForUser(user.Id)
                     .WhereForReleaseVersion(releaseVersionId)
@@ -351,12 +351,12 @@ public class PreReleaseUserService(
                     .SingleOrNotFoundAsync()
             );
 
-    private async Task<Either<ActionResult, UserReleaseRole>> CheckUserPrereleaseRoleExists(
-        Guid userPrereleaseRoleId
+    private async Task<Either<ActionResult, UserReleaseRole>> CheckUserPreReleaseRoleExists(
+        Guid userPreReleaseRoleId
     ) =>
-        await userPrereleaseRoleRepository
+        await userPreReleaseRoleRepository
             .Query(ResourceRoleFilter.All)
-            .Where(uprr => uprr.Id == userPrereleaseRoleId)
+            .Where(uprr => uprr.Id == userPreReleaseRoleId)
             .Include(uprr => uprr.ReleaseVersion)
             .SingleOrNotFoundAsync();
 

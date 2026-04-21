@@ -36,7 +36,7 @@ public class ReleaseApprovalService(
     IReleaseFileRepository releaseFileRepository,
     IReleaseFileService releaseFileService,
     IOptions<ReleaseApprovalOptions> options,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IEmailTemplateService emailTemplateService
 ) : IReleaseApprovalService
@@ -184,7 +184,7 @@ public class ReleaseApprovalService(
 
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
-        var unsentUserPrereleaseRoleInvites = await userPrereleaseRoleRepository
+        var unsentUserPreReleaseRoleInvites = await userPreReleaseRoleRepository
             .Query(ResourceRoleFilter.AllButExpired)
             .AsNoTracking()
             .WhereForReleaseVersion(releaseVersion.Id)
@@ -197,7 +197,7 @@ public class ReleaseApprovalService(
         // now have pre-release access to a Release which isn't approved yet.
         // On the other hand, if we skip over failed emails and continue sending the rest, some people will not get notified
         // of their access even when the Release is now approved. This makes them hard to detect.
-        await unsentUserPrereleaseRoleInvites
+        await unsentUserPreReleaseRoleInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async invite =>
                 await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(invite.Id)

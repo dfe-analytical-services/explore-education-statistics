@@ -12,7 +12,7 @@ public enum SecurityPolicies
      * General role-based page access
      */
     CanAccessAnalystPages,
-    CanAccessPrereleasePages,
+    CanAccessPreReleasePages,
     CanManageUsersOnSystem,
     CanAccessAllImports,
     IsBauUser,

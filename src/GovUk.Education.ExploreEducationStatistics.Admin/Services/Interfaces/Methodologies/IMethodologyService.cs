@@ -27,7 +27,7 @@ public interface IMethodologyService
 
     Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
         Guid publicationId,
-        bool isPrerelease = false
+        bool isPreRelease = false
     );
 
     Task<Either<ActionResult, List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(

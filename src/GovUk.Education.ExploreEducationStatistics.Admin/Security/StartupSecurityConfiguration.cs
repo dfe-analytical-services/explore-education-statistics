@@ -54,8 +54,8 @@ public static class StartupSecurityConfiguration
             );
 
             options.AddPolicy(
-                nameof(SecurityPolicies.CanAccessPrereleasePages),
-                policy => policy.RequireClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
+                nameof(SecurityPolicies.CanAccessPreReleasePages),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.PreReleasePagesAccessGranted))
             );
 
             options.AddPolicy(
@@ -209,7 +209,7 @@ public static class StartupSecurityConfiguration
              */
             options.AddPolicy(
                 nameof(SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease),
-                policy => policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement())
+                policy => policy.Requirements.Add(new AssignPreReleaseContactsToSpecificReleaseRequirement())
             );
 
             /*
@@ -333,7 +333,7 @@ public static class StartupSecurityConfiguration
         /*
          * Pre Release management
          */
-        services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, AssignPreReleaseContactsToSpecificReleaseAuthorizationHandler>();
 
         /*
          * Methodology management
