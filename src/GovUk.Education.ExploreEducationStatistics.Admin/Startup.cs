@@ -18,9 +18,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.LinkChecker;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.LinkChecker;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
@@ -705,6 +707,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddSingleton<IPublisherClient, PublisherClient>(_ => new PublisherClient(
             configuration.GetRequiredValue("PublisherStorage")
         ));
+        services.AddSingleton<ILinkCheckerQueue, LinkCheckerQueue>();
+        services.AddTransient<ILinksChecker, LinksChecker>();
+
+        services.AddHostedService<LinkCheckerBackgroundService>();
 
         /*
          * Swagger

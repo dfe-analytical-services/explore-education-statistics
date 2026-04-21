@@ -93,6 +93,22 @@ public static class ActionResultTestUtils
         Assert.IsAssignableFrom<AcceptedResult>(result);
     }
 
+    public static T AssertAcceptedObjectResult<T>(this IActionResult result, T? expectedValue = null)
+        where T : class
+    {
+        var acceptedObject = Assert.IsAssignableFrom<AcceptedResult>(result);
+        var value = Assert.IsAssignableFrom<T>(acceptedObject.Value);
+
+        Assert.NotNull(value);
+
+        if (expectedValue != null)
+        {
+            Assert.Equal(expectedValue, value);
+        }
+
+        return value;
+    }
+
     public static void AssertInternalServerError(this IActionResult result)
     {
         var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
