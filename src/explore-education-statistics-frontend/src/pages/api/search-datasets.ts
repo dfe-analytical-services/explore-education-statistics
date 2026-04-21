@@ -1,5 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import logger from '@common/services/logger';
+import { PaginatedList } from '@common/services/types/pagination';
+import { geographicLevelCodesMap } from '@common/utils/locationLevelsMap';
 import withMethods from '@frontend/middleware/api/withMethods';
 import { initialiseAzureDataSetsSearchClient } from '@frontend/modules/api/search/initialiseAzureSearchClient';
 import { ErrorBody } from '@frontend/modules/api/types/error';
@@ -7,14 +9,12 @@ import {
   AzureDataSetListRequest,
   AzureDataSetSearchResult,
 } from '@frontend/services/azureDataSetService';
-import { PaginatedListWithAzureFacets } from '@frontend/services/azurePublicationService';
+import { DataSetFileSummary } from '@frontend/services/dataSetFileService';
 import {
   SearchOptions,
   SearchRequestQueryTypeOptions,
 } from '@azure/search-documents';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { DataSetFileSummary } from '@frontend/services/dataSetFileService';
-import { geographicLevelCodesMap } from '@common/utils/locationLevelsMap';
 
 interface Request extends NextApiRequest {
   body: {
@@ -30,9 +30,7 @@ type SharedSearchOptionsBase = Partial<
 export default withMethods({
   post: async function searchPublications(
     req: Request,
-    res: NextApiResponse<
-      PaginatedListWithAzureFacets<DataSetFileSummary> | ErrorBody
-    >,
+    res: NextApiResponse<PaginatedList<DataSetFileSummary> | ErrorBody>,
   ) {
     const {
       body: { searchOptions },
@@ -91,8 +89,8 @@ export default withMethods({
         ],
       });
 
-      // Now transform response into <PaginatedListWithAzureFacets<AzureDataSetListSummary>>
-      const { count = 0, results, facets = {} } = searchResults;
+      // Now transform response into <PaginatedList<AzureDataSetListSummary>>
+      const { count = 0, results } = searchResults;
 
       const dataSetsResult = {
         paging: {
@@ -102,7 +100,6 @@ export default withMethods({
           pageSize,
         },
         results: [] as DataSetFileSummary[],
-        facets,
       };
 
       for await (const result of results) {

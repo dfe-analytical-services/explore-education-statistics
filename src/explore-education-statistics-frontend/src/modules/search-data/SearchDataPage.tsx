@@ -16,26 +16,26 @@ import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import { SortOption } from '@frontend/components/SortControls';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
-import Filters from '@frontend/modules/find-statistics/components/Filters';
 import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
-import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
-import {
-  PublicationFilter,
-  publicationFilters,
-} from '@frontend/modules/find-statistics/utils/publicationFilters';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
 import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
+import { getParamsFromQuery } from '@frontend/modules/search-data/utils/createDataSetListRequest';
+import {
+  SearchDataFilter,
+  searchDataFilters,
+} from '@frontend/modules/search-data/utils/searchDataFilters';
 import azureDataSetQueries from '@frontend/queries/azureDataSetQueries';
 import azurePublicationQueries from '@frontend/queries/azurePublicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
+import { DataSetType } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { ParsedUrlQuery } from 'querystring';
 import React, { useState } from 'react';
 
 const defaultPageTitle = 'Explore our education statistics';
@@ -43,10 +43,11 @@ const defaultPageTitle = 'Explore our education statistics';
 type RoutePath = 'search-publications' | 'search-data';
 
 export interface SearchDataPageQuery {
+  dataSetType?: DataSetType;
+  latestDataOnly?: string;
   page?: number;
   releaseType?: ReleaseType;
   search?: string;
-  showAllReleases?: string;
   sortBy?: PublicationSortOption;
   themeId?: string;
 }
@@ -86,21 +87,14 @@ const SearchDataPage: NextPage = () => {
   });
 
   const { data: themes = [] } = useQuery({
-    ...themeQueries.list(),
+    ...themeQueries.listProdThemes(),
     staleTime: Infinity,
   });
 
-  const {
-    paging: dataSetsPaging,
-    results: dataSets = [],
-    // facets = { themeId: [], releaseType: [] },
-  } = dataSetsData ?? {};
+  const { paging: dataSetsPaging, results: dataSets = [] } = dataSetsData ?? {};
 
-  const {
-    paging: publicationsPaging,
-    results: publications = [],
-    facets = { themeId: [], releaseType: [] },
-  } = publicationsData ?? {};
+  const { paging: publicationsPaging, results: publications = [] } =
+    publicationsData ?? {};
 
   const {
     page,
@@ -108,42 +102,22 @@ const SearchDataPage: NextPage = () => {
     totalResults = 0,
   } = (isPublicationsSearch ? publicationsPaging : dataSetsPaging) ?? {};
 
-  const { themeId: themeFacetResults, releaseType: releaseTypeFacetResults } =
-    facets;
+  const { dataSetType, latestDataOnly, releaseType, search, sortBy, themeId } =
+    getParamsFromQuery(router.query);
 
-  const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
-    router.query,
-  );
+  const themeOptions = themes.map(theme => {
+    return {
+      label: theme.title,
+      value: theme.id,
+    };
+  });
 
-  const themesWithResultCounts = themes
-    .map(theme => {
-      const facetedResult = themeFacetResults?.find(
-        result => theme.id === result.value,
-      );
-      const count = facetedResult?.count ?? 0;
-      return {
-        label: `${theme.title} (${count})`,
-        value: theme.id,
-        count,
-      };
-    })
-    .sort((a, b) => b.count - a.count);
-
-  const releaseTypesWithResultCounts = Object.keys(releaseTypes)
-    .map(type => {
-      const facetedResult = releaseTypeFacetResults?.find(
-        result => type === result.value,
-      );
-
-      const title = releaseTypes[type as ReleaseType];
-      const count = facetedResult?.count ?? 0;
-      return {
-        label: `${title} (${count})`,
-        value: type,
-        count,
-      };
-    })
-    .sort((a, b) => b.count - a.count);
+  const releaseTypeOptions = Object.keys(releaseTypes).map(type => {
+    return {
+      label: releaseTypes[type as ReleaseType],
+      value: type,
+    };
+  });
 
   const isFiltered = !!search || !!releaseType || !!themeId;
 
@@ -209,7 +183,7 @@ const SearchDataPage: NextPage = () => {
     filterType,
     nextValue,
   }: {
-    filterType: PublicationFilter;
+    filterType: SearchDataFilter;
     nextValue: string;
   }) => {
     // If performing a search (by search term), reset sortBy to relevance
@@ -217,7 +191,7 @@ const SearchDataPage: NextPage = () => {
       filterType === 'search' && nextValue.length > 0 ? 'relevance' : sortBy;
 
     const newParams =
-      nextValue === 'all'
+      nextValue === 'all' && filterType !== 'dataSetType'
         ? omit(router.query, 'page', filterType)
         : {
             ...omit(router.query, 'page'),
@@ -237,7 +211,7 @@ const SearchDataPage: NextPage = () => {
   const handleResetFilter = async ({
     filterType,
   }: {
-    filterType: PublicationFilter | 'all';
+    filterType: SearchDataFilter | 'all';
   }) => {
     // Reset sortBy to newest if removing a search and sorting by relevance
     const nextSortBy = search && sortBy === 'relevance' ? 'newest' : sortBy;
@@ -245,7 +219,7 @@ const SearchDataPage: NextPage = () => {
     const newParams =
       filterType === 'all'
         ? {
-            ...omit(router.query, 'page', ...publicationFilters),
+            ...omit(router.query, 'page', ...searchDataFilters),
             sortBy: nextSortBy,
           }
         : {
@@ -320,7 +294,7 @@ const SearchDataPage: NextPage = () => {
                       </ButtonText>
                     }
                   >
-                    <p>Information here</p>
+                    <p>Information about statistical releases</p>
                   </Modal>
                 </li>
                 <li>
@@ -334,7 +308,7 @@ const SearchDataPage: NextPage = () => {
                       </ButtonText>
                     }
                   >
-                    <p>Information here</p>
+                    <p>Information about what is data</p>
                   </Modal>
                 </li>
                 <li>
@@ -387,15 +361,18 @@ const SearchDataPage: NextPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">
           {!isMobileMedia && (
-            <Filters
+            <SearchDataFilters
+              dataSetType={dataSetType as DataSetType}
+              includeDataFilters={!isPublicationsSearch}
+              latestDataOnly={latestDataOnly}
               releaseType={releaseType}
-              releaseTypesWithResultCounts={releaseTypesWithResultCounts}
+              releaseTypeOptions={releaseTypeOptions}
               showResetFiltersButton={!isMobileMedia && isFiltered}
               sortBy={sortBy}
               sortOptions={sortOptions}
               themeId={themeId}
               themes={themes}
-              themesWithResultCounts={themesWithResultCounts}
+              themeOptions={themeOptions}
               onChange={handleChangeFilter}
               onSortChange={handleSortBy}
               onResetFilters={() => handleResetFilter({ filterType: 'all' })}
@@ -408,14 +385,17 @@ const SearchDataPage: NextPage = () => {
               title="Sort and filter publications"
               totalResults={totalResults}
             >
-              <Filters
-                releaseTypesWithResultCounts={releaseTypesWithResultCounts}
+              <SearchDataFilters
+                dataSetType={dataSetType as DataSetType}
+                includeDataFilters={!isPublicationsSearch}
+                latestDataOnly={latestDataOnly}
+                releaseTypeOptions={releaseTypeOptions}
                 releaseType={releaseType}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
                 themeId={themeId}
                 themes={themes}
-                themesWithResultCounts={themesWithResultCounts}
+                themeOptions={themeOptions}
                 onChange={handleChangeFilter}
                 onSortChange={handleSortBy}
               />
