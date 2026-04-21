@@ -774,6 +774,7 @@ user approves release for scheduled publication
     user clicks button    Confirm
 
 user waits for scheduled release to be published immediately
+    # TODO EES-6432 Update this comment when the "stage scheduled releases" function is renamed.
     # It's possible that the actual scheduled "stage scheduled releases" function might pick up the staging of this
     # scheduled Release before we get a chance to manually trigger the "stage scheduled releases immediately" function
     # ourselves - hence we need to account for it going into "Started" state while it stages before we've manually

@@ -54,6 +54,9 @@ public class PublishScheduledReleasesFunction(
     /// </param>
     /// <param name="context"></param>
     /// <returns></returns>
+    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
+    // given that the 'staging' content task no longer exists. Be careful to make sure it remains disabled in the Prod
+    // environment after renaming.
     [Function(nameof(PublishStagedReleaseVersionContentImmediately))]
     public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
