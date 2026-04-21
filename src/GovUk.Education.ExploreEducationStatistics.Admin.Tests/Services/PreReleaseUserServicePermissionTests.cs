@@ -24,17 +24,39 @@ public class PreReleaseUserServicePermissionTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
+    private readonly ReleaseVersion _releaseVersion;
+
+    public PreReleaseUserServicePermissionTests()
+    {
+        _releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+    }
 
     [Fact]
     public async Task GetPreReleaseUsers()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(userService =>
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == _releaseVersion.Id,
+                CanAssignPreReleaseUsersToSpecificRelease
+            )
+            .AssertForbidden(async userService =>
             {
-                var service = SetupService(userService: userService.Object);
-                return service.GetPreReleaseUsers(_releaseVersion.Id);
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    contentDbContext.ReleaseVersions.Add(_releaseVersion);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupService(contentDbContext: contentDbContext, userService: userService.Object);
+                    var result = await service.GetPreReleaseUsers(_releaseVersion.Id);
+
+                    MockUtils.VerifyAllMocks(userService);
+
+                    return result;
+                }
             });
     }
 
@@ -89,7 +111,10 @@ public class PreReleaseUserServicePermissionTests
         userRepository.Setup(mock => mock.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanAssignPreReleaseUsersToSpecificRelease
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -197,8 +222,8 @@ public class PreReleaseUserServicePermissionTests
     )
     {
         return new(
-            contentDbContext ?? Mock.Of<ContentDbContext>(),
-            usersAndRolesDbContext ?? Mock.Of<UsersAndRolesDbContext>(),
+            contentDbContext ?? DbUtils.InMemoryApplicationDbContext(),
+            usersAndRolesDbContext ?? DbUtils.InMemoryUserAndRolesDbContext(),
             userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(MockBehavior.Strict),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
