@@ -689,7 +689,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         AddPersistenceHelper<ContentDbContext>(services);
         AddPersistenceHelper<StatisticsDbContext>(services);
         AddPersistenceHelper<UsersAndRolesDbContext>(services);
-        services.AddTransient<AuthorizationHandlerService>();
+        services.AddTransient<IAuthorizationHandlerService, AuthorizationHandlerService>();
         services.AddSingleton<DateTimeProvider>();
         services.AddSingleton(TimeProvider.System);
 
