@@ -26,6 +26,7 @@ public enum ValidationErrorMessages
     // User Management
     UserAlreadyExists,
     UserAlreadyHasResourceRole,
+    UserAlreadyHasResourceRoleOrMorePowerfulRole,
 
     // Invite
     InviteNotFound,

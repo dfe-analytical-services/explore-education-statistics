@@ -73,29 +73,23 @@ public class UserResourceRoleNotificationService(
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
 
-            await pendingUserPreReleaseRoles
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(
-                    async userPrereleaseRole =>
-                        await userPrereleaseRoleRepository.MarkEmailAsSent(
-                            userPrereleaseRoleId: userPrereleaseRole.Id,
-                            dateSent: utcNow,
-                            cancellationToken: cancellationToken
-                        ),
-                    cancellationToken
+            foreach (var userPrereleaseRole in pendingUserPreReleaseRoles)
+            {
+                await userPrereleaseRoleRepository.MarkEmailAsSent(
+                    userPrereleaseRoleId: userPrereleaseRole.Id,
+                    dateSent: utcNow,
+                    cancellationToken: cancellationToken
                 );
+            }
 
-            await pendingUserPublicationRoles
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(
-                    async userPublicationRole =>
-                        await userPublicationRoleRepository.MarkEmailAsSent(
-                            userPublicationRoleId: userPublicationRole.Id,
-                            dateSent: utcNow,
-                            cancellationToken: cancellationToken
-                        ),
-                    cancellationToken
+            foreach (var pendingUserPublicationRole in pendingUserPublicationRoles)
+            {
+                await userPublicationRoleRepository.MarkEmailAsSent(
+                    userPublicationRoleId: pendingUserPublicationRole.Id,
+                    dateSent: utcNow,
+                    cancellationToken: cancellationToken
                 );
+            }
 
             emailTemplateService
                 .SendInviteEmail(
@@ -137,6 +131,47 @@ public class UserResourceRoleNotificationService(
                         $"Failed to send publication role email for role with ID {userPublicationRoleId}."
                     )
                 );
+        });
+    }
+
+    public async Task NotifyUserOfNewDrafterRole(
+        Guid userPublicationRoleId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var userPublicationRole = await CheckUserPublicationRoleExists(userPublicationRoleId, cancellationToken);
+
+        var isDrafterRole = userPublicationRole.Role == PublicationRole.Drafter;
+
+        if (!isDrafterRole)
+        {
+            throw new ArgumentException("Expected the provided publication role ID to correspond to a Drafter role.");
+        }
+
+        var releasesInfo = userPublicationRole
+            .Publication.Releases.Distinct()
+            .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
+            .ToHashSet();
+
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
+            // But if we did it the other way, and the database transaction failed after sending the email, then we
+            // would have sent an email for a role which has an unmarked `SentDate`.
+            // At least this way, if the email fails to send, the database transaction will be rolled back.
+            // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
+            await userPublicationRoleRepository.MarkEmailAsSent(
+                userPublicationRoleId: userPublicationRoleId,
+                cancellationToken: cancellationToken
+            );
+
+            emailTemplateService
+                .SendDrafterInviteEmail(
+                    email: userPublicationRole.User.Email,
+                    publicationTitle: userPublicationRole.Publication.Title,
+                    releasesInfo: releasesInfo
+                )
+                .OrThrow(_ => throw new EmailSendFailedException($"Failed to send drafter invite email."));
         });
     }
 

@@ -75,6 +75,31 @@ public class EmailTemplateService(
         return emailService.SendEmail(email, template, emailValues);
     }
 
+    public Either<ActionResult, Unit> SendDrafterInviteEmail(
+        string email,
+        string publicationTitle,
+        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo
+    )
+    {
+        var url = appOptions.Value.Url;
+        var template = notifyOptions.Value.DrafterTemplateId;
+
+        var releaseTitles = releasesInfo
+            .OrderBy(r => r.Year)
+            .ThenBy(r => r.TimePeriodCoverage)
+            .Select(r => $"* {r.Title}")
+            .JoinToString('\n');
+
+        var emailValues = new Dictionary<string, dynamic>
+        {
+            { "url", url },
+            { "publication name", publicationTitle },
+            { "release list", releaseTitles },
+        };
+
+        return emailService.SendEmail(email, template, emailValues);
+    }
+
     public Either<ActionResult, Unit> SendPreReleaseInviteEmail(
         string email,
         string publicationTitle,

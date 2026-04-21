@@ -22,6 +22,22 @@ public class PublicationRolesController(IUserRoleService userRoleService) : Cont
             .HandleFailuresOrOk();
     }
 
+    [HttpPost("users/publication-roles/invite-drafter")]
+    [ProducesResponseType(200)]
+    public async Task<ActionResult<Unit>> InviteDrafter(
+        UserDrafterRoleCreateRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await userRoleService
+            .InviteDrafter(
+                email: request.Email,
+                publicationId: request.PublicationId,
+                cancellationToken: cancellationToken
+            )
+            .HandleFailuresOrOk();
+    }
+
     [HttpDelete("users/publication-roles/{id:guid}")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> DeleteUserPublicationRole(Guid id)

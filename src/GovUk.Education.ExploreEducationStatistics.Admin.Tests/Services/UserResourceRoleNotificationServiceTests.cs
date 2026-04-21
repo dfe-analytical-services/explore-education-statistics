@@ -341,6 +341,136 @@ public abstract class UserResourceRoleNotificationServiceTests
         }
     }
 
+    public class NotifyUserOfNewDrafterRolesTests : UserResourceRoleNotificationServiceTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            User user = _dataFixture.DefaultUser();
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_dataFixture.DefaultRelease().GenerateList(2));
+
+            UserPublicationRole userDrafterRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Drafter);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userDrafterRole);
+            userPublicationRoleRepository
+                .Setup(r => r.MarkEmailAsSent(userDrafterRole.Id, null, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var releasesInfo = userDrafterRole
+                .Publication.Releases.Distinct()
+                .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
+                .ToHashSet();
+
+            emailTemplateService
+                .Setup(s => s.SendDrafterInviteEmail(user.Email, publication.Title, releasesInfo))
+                .Returns(Unit.Instance);
+
+            var service = BuildService(
+                emailTemplateService: emailTemplateService.Object,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object
+            );
+
+            await service.NotifyUserOfNewDrafterRole(userDrafterRole.Id);
+
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, emailTemplateService);
+        }
+
+        [Fact]
+        public async Task RoleDoesNotExist_ThrowsKeyNotFoundException()
+        {
+            var existingUserDrafterRoles = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Drafter)
+                .GenerateList(3);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. existingUserDrafterRoles]);
+
+            var service = BuildService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+                await service.NotifyUserOfNewDrafterRole(Guid.NewGuid())
+            );
+
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task RoleIsNotDrafterRole_ThrowsArgumentException()
+        {
+            UserPublicationRole existingUserApproverRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Approver);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, existingUserApproverRole);
+
+            var service = BuildService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+                await service.NotifyUserOfNewDrafterRole(existingUserApproverRole.Id)
+            );
+
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task SendingEmailFails_ThrowsEmailSendFailedException()
+        {
+            User user = _dataFixture.DefaultUser();
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_dataFixture.DefaultRelease().GenerateList(2));
+
+            UserPublicationRole userDrafterRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Drafter);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userDrafterRole);
+            userPublicationRoleRepository
+                .Setup(r => r.MarkEmailAsSent(userDrafterRole.Id, null, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var releasesInfo = userDrafterRole
+                .Publication.Releases.Distinct()
+                .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
+                .ToHashSet();
+
+            emailTemplateService
+                .Setup(s => s.SendDrafterInviteEmail(user.Email, publication.Title, releasesInfo))
+                .Returns(new BadRequestResult());
+
+            var service = BuildService(
+                emailTemplateService: emailTemplateService.Object,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object
+            );
+
+            await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
+                await service.NotifyUserOfNewDrafterRole(userDrafterRole.Id)
+            );
+
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, emailTemplateService);
+        }
+    }
+
     public class NotifyUserOfNewPreReleaseRoleTests : UserResourceRoleNotificationServiceTests
     {
         [Fact]
