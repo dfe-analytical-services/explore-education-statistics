@@ -137,7 +137,7 @@ public class MethodologyService(
 
     public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
         Guid publicationId,
-        bool isPrerelease = false
+        bool isPreRelease = false
     )
     {
         return await persistenceHelper
@@ -158,7 +158,7 @@ public class MethodologyService(
                     {
                         var methodologyVersion = publicationMethodology.Methodology.LatestVersion();
 
-                        if (isPrerelease && methodologyVersion.Status != MethodologyApprovalStatus.Approved)
+                        if (isPreRelease && methodologyVersion.Status != MethodologyApprovalStatus.Approved)
                         {
                             // Get latest approved version
                             if (methodologyVersion.PreviousVersion == null)

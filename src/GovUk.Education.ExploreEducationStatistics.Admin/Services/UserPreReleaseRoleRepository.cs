@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : IUserPrereleaseRoleRepository
+public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : IUserPreReleaseRoleRepository
 {
     public async Task<UserReleaseRole> Create(
         Guid userId,
@@ -20,7 +20,7 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
     {
         createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
 
-        var newUserPrereleaseRole = new UserReleaseRole
+        var newUserPreReleaseRole = new UserReleaseRole
         {
             UserId = userId,
             ReleaseVersionId = releaseVersionId,
@@ -29,22 +29,22 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
             CreatedById = createdById,
         };
 
-        contentDbContext.UserReleaseRoles.Add(newUserPrereleaseRole);
+        contentDbContext.UserReleaseRoles.Add(newUserPreReleaseRole);
         await contentDbContext.SaveChangesAsync(cancellationToken);
 
-        return newUserPrereleaseRole;
+        return newUserPreReleaseRole;
     }
 
     public async Task<List<UserReleaseRole>> CreateManyIfNotExists(
-        IEnumerable<UserPrereleaseRoleCreateDto> userPrereleaseRolesToCreate,
+        IEnumerable<UserPreReleaseRoleCreateDto> userPreReleaseRolesToCreate,
         CancellationToken cancellationToken = default
     )
     {
-        return await userPrereleaseRolesToCreate
+        return await userPreReleaseRolesToCreate
             .ToAsyncEnumerable()
             .Where(
                 async (urr, ct) =>
-                    !await UserHasPrereleaseRoleOnReleaseVersion(
+                    !await UserHasPreReleaseRoleOnReleaseVersion(
                         userId: urr.UserId,
                         releaseVersionId: urr.ReleaseVersionId,
                         resourceRoleFilter: ResourceRoleFilter.All,
@@ -65,12 +65,12 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
     }
 
     public async Task<UserReleaseRole?> GetById(
-        Guid userPrereleaseRoleId,
+        Guid userPreReleaseRoleId,
         CancellationToken cancellationToken = default
     )
     {
         return await Query(ResourceRoleFilter.All)
-            .SingleOrDefaultAsync(urr => urr.Id == userPrereleaseRoleId, cancellationToken);
+            .SingleOrDefaultAsync(urr => urr.Id == userPreReleaseRoleId, cancellationToken);
     }
 
     public async Task<UserReleaseRole?> GetByCompositeKey(
@@ -87,28 +87,28 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
 
     public IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly)
     {
-        var userPrereleaseRoles = contentDbContext.UserReleaseRoles.AsQueryable();
+        var userPreReleaseRoles = contentDbContext.UserReleaseRoles.AsQueryable();
 
         return resourceRoleFilter switch
         {
-            ResourceRoleFilter.ActiveOnly => userPrereleaseRoles.WhereUserIsActive(),
-            ResourceRoleFilter.PendingOnly => userPrereleaseRoles.WhereUserHasPendingInvite(),
-            ResourceRoleFilter.AllButExpired => userPrereleaseRoles.WhereUserIsActiveOrHasPendingInvite(),
-            ResourceRoleFilter.All => userPrereleaseRoles,
+            ResourceRoleFilter.ActiveOnly => userPreReleaseRoles.WhereUserIsActive(),
+            ResourceRoleFilter.PendingOnly => userPreReleaseRoles.WhereUserHasPendingInvite(),
+            ResourceRoleFilter.AllButExpired => userPreReleaseRoles.WhereUserIsActiveOrHasPendingInvite(),
+            ResourceRoleFilter.All => userPreReleaseRoles,
             _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
         };
     }
 
-    public async Task<bool> RemoveById(Guid userPrereleaseRoleId, CancellationToken cancellationToken = default)
+    public async Task<bool> RemoveById(Guid userPreReleaseRoleId, CancellationToken cancellationToken = default)
     {
-        var userPrereleaseRole = await GetById(userPrereleaseRoleId, cancellationToken);
+        var userPreReleaseRole = await GetById(userPreReleaseRoleId, cancellationToken);
 
-        if (userPrereleaseRole is null)
+        if (userPreReleaseRole is null)
         {
             return false;
         }
 
-        await Remove(userPrereleaseRole, cancellationToken);
+        await Remove(userPreReleaseRole, cancellationToken);
 
         return true;
     }
@@ -119,47 +119,47 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
         CancellationToken cancellationToken = default
     )
     {
-        var userPrereleaseRole = await GetByCompositeKey(
+        var userPreReleaseRole = await GetByCompositeKey(
             userId: userId,
             releaseVersionId: releaseVersionId,
             cancellationToken: cancellationToken
         );
 
-        if (userPrereleaseRole is null)
+        if (userPreReleaseRole is null)
         {
             return false;
         }
 
-        await Remove(userPrereleaseRole, cancellationToken);
+        await Remove(userPreReleaseRole, cancellationToken);
 
         return true;
     }
 
     public async Task RemoveMany(
-        IEnumerable<UserReleaseRole> userPrereleaseRoles,
+        IEnumerable<UserReleaseRole> userPreReleaseRoles,
         CancellationToken cancellationToken = default
     )
     {
-        if (!userPrereleaseRoles.Any())
+        if (!userPreReleaseRoles.Any())
         {
             return;
         }
 
-        contentDbContext.UserReleaseRoles.RemoveRange(userPrereleaseRoles);
+        contentDbContext.UserReleaseRoles.RemoveRange(userPreReleaseRoles);
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userPrereleaseRoles = await Query(ResourceRoleFilter.All)
+        var userPreReleaseRoles = await Query(ResourceRoleFilter.All)
             .WhereForUser(userId)
             .ToListAsync(cancellationToken);
 
-        contentDbContext.UserReleaseRoles.RemoveRange(userPrereleaseRoles);
+        contentDbContext.UserReleaseRoles.RemoveRange(userPreReleaseRoles);
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> UserHasPrereleaseRoleOnReleaseVersion(
+    public async Task<bool> UserHasPreReleaseRoleOnReleaseVersion(
         Guid userId,
         Guid releaseVersionId,
         ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
@@ -172,7 +172,7 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
             .AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> UserHasPrereleaseRoleOnPublication(
+    public async Task<bool> UserHasPreReleaseRoleOnPublication(
         Guid userId,
         Guid publicationId,
         ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
@@ -186,33 +186,33 @@ public class UserPrereleaseRoleRepository(ContentDbContext contentDbContext) : I
     }
 
     public async Task MarkEmailAsSent(
-        Guid userPrereleaseRoleId,
+        Guid userPreReleaseRoleId,
         DateTimeOffset? dateSent = null,
         CancellationToken cancellationToken = default
     )
     {
-        var userPrereleaseRole = await GetById(
-            userPrereleaseRoleId: userPrereleaseRoleId,
+        var userPreReleaseRole = await GetById(
+            userPreReleaseRoleId: userPreReleaseRoleId,
             cancellationToken: cancellationToken
         );
 
-        if (userPrereleaseRole is null)
+        if (userPreReleaseRole is null)
         {
-            throw new InvalidOperationException($"No User Release Role found with ID {userPrereleaseRoleId}.");
+            throw new InvalidOperationException($"No User Release Role found with ID {userPreReleaseRoleId}.");
         }
 
-        userPrereleaseRole.EmailSent = dateSent ?? DateTimeOffset.UtcNow;
+        userPreReleaseRole.EmailSent = dateSent ?? DateTimeOffset.UtcNow;
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task Remove(UserReleaseRole userPrereleaseRole, CancellationToken cancellationToken = default)
+    private async Task Remove(UserReleaseRole userPreReleaseRole, CancellationToken cancellationToken = default)
     {
-        contentDbContext.UserReleaseRoles.Remove(userPrereleaseRole);
+        contentDbContext.UserReleaseRoles.Remove(userPreReleaseRole);
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public record UserPrereleaseRoleCreateDto(
+    public record UserPreReleaseRoleCreateDto(
         Guid UserId,
         Guid ReleaseVersionId,
         Guid CreatedById,

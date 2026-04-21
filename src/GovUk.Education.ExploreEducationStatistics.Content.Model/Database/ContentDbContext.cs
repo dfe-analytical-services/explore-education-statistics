@@ -125,7 +125,7 @@ public class ContentDbContext : DbContext
         ConfigurePermalink(modelBuilder);
         ConfigureUser(modelBuilder);
         ConfigureUserPublicationRole(modelBuilder);
-        ConfigureUserPrereleaseRole(modelBuilder);
+        ConfigureUserPreReleaseRole(modelBuilder);
         ConfigureGlossaryEntry(modelBuilder);
         ConfigureKeyStatisticsDataBlock(modelBuilder);
         ConfigureKeyStatisticsText(modelBuilder);
@@ -657,7 +657,7 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<UserPublicationRole>().HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
-    private static void ConfigureUserPrereleaseRole(ModelBuilder modelBuilder)
+    private static void ConfigureUserPreReleaseRole(ModelBuilder modelBuilder)
     {
         modelBuilder
             .Entity<UserReleaseRole>()

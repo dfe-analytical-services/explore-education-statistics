@@ -546,7 +546,7 @@ public class ReleaseApprovalServiceTests
         var (pendingUserInvite1, pendingUserInvite2) = _fixture.DefaultUserWithPendingInvite().GenerateTuple2();
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             // Email NOT SENT + Active User
             .ForIndex(0, s => s.SetUser(activeUser1).SetReleaseVersion(releaseVersion))
             // Email SENT + Active User
@@ -570,7 +570,7 @@ public class ReleaseApprovalServiceTests
         var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
         var publishingService = new Mock<IPublishingService>(MockBehavior.Strict);
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
-        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+        var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
@@ -593,7 +593,7 @@ public class ReleaseApprovalServiceTests
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPreReleaseRoles]);
+        userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPreReleaseRoles]);
 
         userResourceRoleNotificationService
             .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPreReleaseRoles[0].Id, It.IsAny<CancellationToken>()))
@@ -612,7 +612,7 @@ public class ReleaseApprovalServiceTests
                 publishingService: publishingService.Object,
                 contentService: contentService.Object,
                 userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
             var result = await releaseService.CreateReleaseStatus(
@@ -632,7 +632,7 @@ public class ReleaseApprovalServiceTests
                 publishingService,
                 releaseChecklistService,
                 userResourceRoleNotificationService,
-                userPrereleaseRoleRepository
+                userPreReleaseRoleRepository
             );
 
             result.AssertRight();
@@ -722,7 +722,7 @@ public class ReleaseApprovalServiceTests
                 }
             );
 
-            // We don't expect PrereleaseUserService.SendPreReleaseUserInviteEmails to be called if the
+            // We don't expect PreReleaseUserService.SendPreReleaseUserInviteEmails to be called if the
             // release version is being published immediately.
             VerifyAllMocks(contentService, publishingService, releaseChecklistService);
 
@@ -1046,7 +1046,7 @@ public class ReleaseApprovalServiceTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithReleaseVersion(releaseVersion)
             .ForIndex(0, s => s.SetUser(_fixture.DefaultUser()))
             .ForIndex(1, s => s.SetUser(_fixture.DefaultUser()))
@@ -1061,7 +1061,7 @@ public class ReleaseApprovalServiceTests
 
         var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
-        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+        var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
@@ -1074,7 +1074,7 @@ public class ReleaseApprovalServiceTests
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPreReleaseRoles]);
+        userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userPreReleaseRoles]);
 
         userResourceRoleNotificationService
             .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPreReleaseRoles[0].Id, It.IsAny<CancellationToken>()))
@@ -1087,7 +1087,7 @@ public class ReleaseApprovalServiceTests
                 releaseChecklistService: releaseChecklistService.Object,
                 contentService: contentService.Object,
                 userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
             await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
@@ -1107,7 +1107,7 @@ public class ReleaseApprovalServiceTests
                 contentService,
                 releaseChecklistService,
                 userResourceRoleNotificationService,
-                userPrereleaseRoleRepository
+                userPreReleaseRoleRepository
             );
         }
 
@@ -1149,7 +1149,7 @@ public class ReleaseApprovalServiceTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         UserReleaseRole userPreReleaseRole = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithUser(_fixture.DefaultUser())
             .WithReleaseVersion(releaseVersion);
 
@@ -1163,7 +1163,7 @@ public class ReleaseApprovalServiceTests
         var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
         var publishingService = new Mock<IPublishingService>(MockBehavior.Strict);
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
-        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+        var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
@@ -1172,7 +1172,7 @@ public class ReleaseApprovalServiceTests
             )
             .ReturnsAsync([]);
 
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPreReleaseRole);
+        userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPreReleaseRole);
 
         userResourceRoleNotificationService
             .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userPreReleaseRole.Id, It.IsAny<CancellationToken>()))
@@ -1200,7 +1200,7 @@ public class ReleaseApprovalServiceTests
                 publishingService: publishingService.Object,
                 contentService: contentService.Object,
                 userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
             var result = await releaseService.CreateReleaseStatus(
@@ -1219,7 +1219,7 @@ public class ReleaseApprovalServiceTests
                 publishingService,
                 releaseChecklistService,
                 userResourceRoleNotificationService,
-                userPrereleaseRoleRepository
+                userPreReleaseRoleRepository
             );
 
             result.AssertLeft();
@@ -1685,7 +1685,7 @@ public class ReleaseApprovalServiceTests
         IContentService? contentService = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IOptions<ReleaseApprovalOptions>? options = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IEmailTemplateService? emailTemplateService = null
     )
@@ -1705,7 +1705,7 @@ public class ReleaseApprovalServiceTests
             releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
             releaseFileService ?? Mock.Of<IReleaseFileService>(MockBehavior.Strict),
             options ?? DefaultReleaseApprovalOptions(),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict),
+            userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(MockBehavior.Strict)
         );

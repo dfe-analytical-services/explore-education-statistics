@@ -35,7 +35,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler(IAuthorizationHan
         }
 
         if (
-            await authorizationHandlerService.UserHasPrereleaseRoleOnReleaseVersion(
+            await authorizationHandlerService.UserHasPreReleaseRoleOnReleaseVersion(
                 userId: context.User.GetUserId(),
                 releaseVersionId: releaseVersion.Id
             )

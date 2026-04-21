@@ -16,7 +16,7 @@ public interface IPreReleaseUserService
         List<string> emails
     );
 
-    Task<Either<ActionResult, List<UserPrereleaseRoleViewModel>>> GetPrereleaseRolesForUser(Guid userId);
+    Task<Either<ActionResult, List<UserPreReleaseRoleViewModel>>> GetPreReleaseRolesForUser(Guid userId);
 
     Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GrantPreReleaseAccessForMultipleUsers(
         Guid releaseVersionId,
@@ -27,5 +27,5 @@ public interface IPreReleaseUserService
 
     Task<Either<ActionResult, Unit>> RemovePreReleaseRoleByCompositeKey(Guid releaseVersionId, string email);
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPrereleaseRoleId);
+    Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPreReleaseRoleId);
 }

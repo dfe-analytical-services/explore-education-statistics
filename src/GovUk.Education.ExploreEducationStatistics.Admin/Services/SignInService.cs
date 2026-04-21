@@ -20,7 +20,7 @@ public class SignInService(
     UsersAndRolesDbContext usersAndRolesDbContext,
     UserManager<ApplicationUser> userManager,
     ContentDbContext contentDbContext,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository
 ) : ISignInService
 {
@@ -116,7 +116,7 @@ public class SignInService(
     {
         await contentDbContext.RequireTransaction(async () =>
         {
-            await userPrereleaseRoleRepository.RemoveForUser(userId);
+            await userPreReleaseRoleRepository.RemoveForUser(userId);
             await userPublicationRoleRepository.RemoveForUser(userId);
 
             await contentDbContext.SaveChangesAsync();

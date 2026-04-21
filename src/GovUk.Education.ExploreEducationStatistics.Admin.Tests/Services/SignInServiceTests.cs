@@ -271,8 +271,8 @@ public class SignInServiceTests
             .Setup(mock => mock.FindByEmailAsync(userWithExpiredInvite.Email))
             .ReturnsAsync((ApplicationUser?)null);
 
-        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-        userPrereleaseRoleRepository
+        var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+        userPreReleaseRoleRepository
             .Setup(mock => mock.RemoveForUser(userWithExpiredInvite.Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
@@ -289,7 +289,7 @@ public class SignInServiceTests
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userService: userService.Object,
                 userManager: userManager.Object,
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
 
@@ -301,7 +301,7 @@ public class SignInServiceTests
             Assert.Null(signInResponse.UserProfile);
         }
 
-        VerifyAllMocks(userService, userManager, userPrereleaseRoleRepository, userPublicationRoleRepository);
+        VerifyAllMocks(userService, userManager, userPreReleaseRoleRepository, userPublicationRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -400,7 +400,7 @@ public class SignInServiceTests
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         UserManager<ApplicationUser>? userManager = null,
         ContentDbContext? contentDbContext = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
@@ -413,8 +413,8 @@ public class SignInServiceTests
             usersAndRolesDbContext: usersAndRolesDbContext,
             userManager: userManager ?? MockUserManager().Object,
             contentDbContext: contentDbContext,
-            userPrereleaseRoleRepository: userPrereleaseRoleRepository
-                ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
+            userPreReleaseRoleRepository: userPreReleaseRoleRepository
+                ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userPublicationRoleRepository: userPublicationRoleRepository
                 ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );

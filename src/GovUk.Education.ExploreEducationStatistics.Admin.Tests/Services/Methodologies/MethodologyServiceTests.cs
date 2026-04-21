@@ -1203,7 +1203,7 @@ public class MethodologyServiceTests
     }
 
     [Fact]
-    public async Task ListLatestMethodologyVersions_IsPrerelease()
+    public async Task ListLatestMethodologyVersions_IsPreRelease()
     {
         var methodology1 = new Methodology
         {
@@ -1312,7 +1312,7 @@ public class MethodologyServiceTests
         {
             var service = SetupMethodologyService(contentDbContext);
 
-            var result = await service.ListLatestMethodologyVersions(publication.Id, isPrerelease: true);
+            var result = await service.ListLatestMethodologyVersions(publication.Id, isPreRelease: true);
             var viewModels = result.AssertRight();
 
             // Check that the latest versions of the methodologies are returned in title order

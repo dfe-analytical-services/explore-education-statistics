@@ -3,9 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
-public static class UserPrereleaseRoleGeneratorExtensions
+public static class UserPreReleaseRoleGeneratorExtensions
 {
-    public static Generator<UserReleaseRole> DefaultUserPrereleaseRole(this DataFixture fixture) =>
+    public static Generator<UserReleaseRole> DefaultUserPreReleaseRole(this DataFixture fixture) =>
         fixture.Generator<UserReleaseRole>().WithDefaults();
 
     public static Generator<UserReleaseRole> WithDefaults(this Generator<UserReleaseRole> generator) =>

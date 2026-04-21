@@ -43,7 +43,7 @@ public abstract class PreReleaseUserServiceTests
 
             var userPreReleaseRoles = _dataFixture
                 // These should be returned, regardless of whether the user is active, pending or expired
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .ForIndex(0, s => s.SetUser(_dataFixture.DefaultUser()).SetReleaseVersion(releaseVersion))
                 .ForIndex(
                     1,
@@ -75,14 +75,14 @@ public abstract class PreReleaseUserServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>();
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [.. userPreReleaseRoles]);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>();
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [.. userPreReleaseRoles]);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupService(
                     contentDbContext: context,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.GetPreReleaseUsers(releaseVersion.Id);
@@ -100,7 +100,7 @@ public abstract class PreReleaseUserServiceTests
                 Assert.Equal(expectedRoleEmailsOrderedByEmail, resultEmails);
             }
 
-            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository);
         }
     }
 
@@ -169,10 +169,10 @@ public abstract class PreReleaseUserServiceTests
                 .Setup(mock => mock.FindUserByEmail(userWithPendingInvite.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userWithPendingInvite);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         activeUser.Id,
                         releaseVersion.Id,
                         ResourceRoleFilter.AllButExpired,
@@ -180,9 +180,9 @@ public abstract class PreReleaseUserServiceTests
                     )
                 )
                 .ReturnsAsync(true);
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         userWithPendingInvite.Id,
                         releaseVersion.Id,
                         ResourceRoleFilter.AllButExpired,
@@ -196,7 +196,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.GetPreReleaseUsersInvitePlan(
@@ -207,7 +207,7 @@ public abstract class PreReleaseUserServiceTests
                 result.AssertBadRequest(NoInvitableEmails);
             }
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
@@ -264,7 +264,7 @@ public abstract class PreReleaseUserServiceTests
                     .ReturnsAsync((User?)null);
             }
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
             foreach (var email in allEmails)
             {
                 if (!allExistingUsersByEmail.ContainsKey(email))
@@ -277,9 +277,9 @@ public abstract class PreReleaseUserServiceTests
                     || activeUsersWithPreReleaseRoleByEmail.TryGetValue(email, out user)
                 )
                 {
-                    userPrereleaseRoleRepository
+                    userPreReleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasPrereleaseRoleOnReleaseVersion(
+                            mock.UserHasPreReleaseRoleOnReleaseVersion(
                                 user.Id,
                                 releaseVersion.Id,
                                 ResourceRoleFilter.AllButExpired,
@@ -298,9 +298,9 @@ public abstract class PreReleaseUserServiceTests
                     ? userWithPendingInvite
                     : activeUsersWithNoRoleEmail[email];
 
-                userPrereleaseRoleRepository
+                userPreReleaseRoleRepository
                     .Setup(mock =>
-                        mock.UserHasPrereleaseRoleOnReleaseVersion(
+                        mock.UserHasPreReleaseRoleOnReleaseVersion(
                             userWithoutRole.Id,
                             releaseVersion.Id,
                             ResourceRoleFilter.AllButExpired,
@@ -315,7 +315,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.GetPreReleaseUsersInvitePlan(releaseVersion.Id, allEmails);
@@ -339,7 +339,7 @@ public abstract class PreReleaseUserServiceTests
                 Assert.Equal(activeUsersWithNoRole[1].Email, plan.Invitable[5]);
             }
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
     }
 
@@ -407,10 +407,10 @@ public abstract class PreReleaseUserServiceTests
                 .Setup(mock => mock.FindUserByEmail(userWithPendingInvite.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userWithPendingInvite);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         activeUser.Id,
                         releaseVersion.Id,
                         ResourceRoleFilter.AllButExpired,
@@ -418,9 +418,9 @@ public abstract class PreReleaseUserServiceTests
                     )
                 )
                 .ReturnsAsync(true);
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         userWithPendingInvite.Id,
                         releaseVersion.Id,
                         ResourceRoleFilter.AllButExpired,
@@ -434,7 +434,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.GrantPreReleaseAccessForMultipleUsers(
@@ -445,7 +445,7 @@ public abstract class PreReleaseUserServiceTests
                 result.AssertBadRequest(NoInvitableEmails);
             }
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
@@ -510,16 +510,16 @@ public abstract class PreReleaseUserServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var createUserPrereleaseRoleFunc = (string email) =>
+            var createUserPreReleaseRoleFunc = (string email) =>
                 _dataFixture
-                    .DefaultUserPrereleaseRole()
+                    .DefaultUserPreReleaseRole()
                     .WithUserId(
                         existingUsersByEmail.TryGetValue(email, out var user) ? user.Id : newUserIdsByEmail[email]
                     )
                     .WithReleaseVersion(releaseVersion)
                     .Generate();
 
-            var createdUserPrereleaseRolesByEmail = new Dictionary<string, UserReleaseRole>();
+            var createdUserPreReleaseRolesByEmail = new Dictionary<string, UserReleaseRole>();
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             foreach (var email in allEmails)
@@ -583,7 +583,7 @@ public abstract class PreReleaseUserServiceTests
                     );
             }
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
             foreach (var email in allEmails)
             {
                 if (
@@ -591,9 +591,9 @@ public abstract class PreReleaseUserServiceTests
                     || usersWithPendingInvitesAndExistingRoleByEmail.TryGetValue(email, out user)
                 )
                 {
-                    userPrereleaseRoleRepository
+                    userPreReleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasPrereleaseRoleOnReleaseVersion(
+                            mock.UserHasPreReleaseRoleOnReleaseVersion(
                                 user.Id,
                                 releaseVersion.Id,
                                 ResourceRoleFilter.AllButExpired,
@@ -607,9 +607,9 @@ public abstract class PreReleaseUserServiceTests
 
                 if (existingUsersByEmail.TryGetValue(email, out var existingUser))
                 {
-                    userPrereleaseRoleRepository
+                    userPreReleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasPrereleaseRoleOnReleaseVersion(
+                            mock.UserHasPreReleaseRoleOnReleaseVersion(
                                 existingUser.Id,
                                 releaseVersion.Id,
                                 ResourceRoleFilter.AllButExpired,
@@ -619,13 +619,13 @@ public abstract class PreReleaseUserServiceTests
                         .ReturnsAsync(false);
                 }
 
-                var createdUserPrereleaseRole = createUserPrereleaseRoleFunc(email);
-                createdUserPrereleaseRolesByEmail.Add(email, createdUserPrereleaseRole);
+                var createdUserPreReleaseRole = createUserPreReleaseRoleFunc(email);
+                createdUserPreReleaseRolesByEmail.Add(email, createdUserPreReleaseRole);
 
                 var userId = existingUser?.Id ?? newUserIdsByEmail[email];
-                userPrereleaseRoleRepository
+                userPreReleaseRoleRepository
                     .Setup(mock => mock.Create(userId, releaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(createdUserPrereleaseRole);
+                    .ReturnsAsync(createdUserPreReleaseRole);
             }
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(
@@ -641,11 +641,11 @@ public abstract class PreReleaseUserServiceTests
                     continue;
                 }
 
-                var createdUserPrereleaseRole = createdUserPrereleaseRolesByEmail[email];
+                var createdUserPreReleaseRole = createdUserPreReleaseRolesByEmail[email];
 
                 userResourceRoleNotificationService
                     .Setup(mock =>
-                        mock.NotifyUserOfNewPreReleaseRole(createdUserPrereleaseRole.Id, It.IsAny<CancellationToken>())
+                        mock.NotifyUserOfNewPreReleaseRole(createdUserPreReleaseRole.Id, It.IsAny<CancellationToken>())
                     )
                     .Returns(Task.CompletedTask);
             }
@@ -655,7 +655,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -685,7 +685,7 @@ public abstract class PreReleaseUserServiceTests
                 Assert.All(expectedEmails, email => Assert.Contains(email, preReleaseEmails));
             }
 
-            MockUtils.VerifyAllMocks(userResourceRoleNotificationService, userPrereleaseRoleRepository, userRepository);
+            MockUtils.VerifyAllMocks(userResourceRoleNotificationService, userPreReleaseRoleRepository, userRepository);
         }
 
         [Fact]
@@ -810,7 +810,7 @@ public abstract class PreReleaseUserServiceTests
                     );
             }
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
             foreach (var email in allEmails)
             {
                 if (
@@ -818,9 +818,9 @@ public abstract class PreReleaseUserServiceTests
                     || usersWithPendingInvitesAndExistingRoleByEmail.TryGetValue(email, out user)
                 )
                 {
-                    userPrereleaseRoleRepository
+                    userPreReleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasPrereleaseRoleOnReleaseVersion(
+                            mock.UserHasPreReleaseRoleOnReleaseVersion(
                                 user.Id,
                                 releaseVersion.Id,
                                 ResourceRoleFilter.AllButExpired,
@@ -834,9 +834,9 @@ public abstract class PreReleaseUserServiceTests
 
                 if (existingUsersByEmail.TryGetValue(email, out var existingUser))
                 {
-                    userPrereleaseRoleRepository
+                    userPreReleaseRoleRepository
                         .Setup(mock =>
-                            mock.UserHasPrereleaseRoleOnReleaseVersion(
+                            mock.UserHasPreReleaseRoleOnReleaseVersion(
                                 existingUser.Id,
                                 releaseVersion.Id,
                                 ResourceRoleFilter.AllButExpired,
@@ -847,11 +847,11 @@ public abstract class PreReleaseUserServiceTests
                 }
 
                 var userId = existingUser?.Id ?? newUserIdsByEmail[email];
-                userPrereleaseRoleRepository
+                userPreReleaseRoleRepository
                     .Setup(mock => mock.Create(userId, releaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(
                         _dataFixture
-                            .DefaultUserPrereleaseRole()
+                            .DefaultUserPreReleaseRole()
                             .WithUser(_dataFixture.DefaultUser())
                             .WithReleaseVersion(
                                 _dataFixture
@@ -868,7 +868,7 @@ public abstract class PreReleaseUserServiceTests
             {
                 var service = SetupService(
                     contentDbContext,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -898,7 +898,7 @@ public abstract class PreReleaseUserServiceTests
                 Assert.All(expectedEmails, email => Assert.Contains(email, preReleaseEmails));
             }
 
-            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository, userRepository);
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userRepository);
         }
     }
 
@@ -917,7 +917,7 @@ public abstract class PreReleaseUserServiceTests
             var latestReleaseVersion = release.Versions[0];
 
             UserReleaseRole createdUserPreReleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(latestReleaseVersion);
 
@@ -932,10 +932,10 @@ public abstract class PreReleaseUserServiceTests
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository.Setup(mock => mock.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         user.Id,
                         latestReleaseVersion.Id,
                         ResourceRoleFilter.AllButExpired,
@@ -943,7 +943,7 @@ public abstract class PreReleaseUserServiceTests
                     )
                 )
                 .ReturnsAsync(false);
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(s => s.Create(user.Id, latestReleaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(createdUserPreReleaseRole);
 
@@ -961,7 +961,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object
                 );
 
@@ -970,7 +970,7 @@ public abstract class PreReleaseUserServiceTests
                 result.AssertRight();
             }
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository, userResourceRoleNotificationService);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository, userResourceRoleNotificationService);
         }
 
         [Fact]
@@ -986,7 +986,7 @@ public abstract class PreReleaseUserServiceTests
             var latestReleaseVersion = release.Versions.Single(rv => rv.ApprovalStatus == ReleaseApprovalStatus.Draft);
 
             UserReleaseRole createdUserPreReleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(latestReleaseVersion);
 
@@ -1001,10 +1001,10 @@ public abstract class PreReleaseUserServiceTests
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository.Setup(mock => mock.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         user.Id,
                         latestReleaseVersion.Id,
                         ResourceRoleFilter.AllButExpired,
@@ -1012,7 +1012,7 @@ public abstract class PreReleaseUserServiceTests
                     )
                 )
                 .ReturnsAsync(false);
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(s => s.Create(user.Id, latestReleaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(createdUserPreReleaseRole);
 
@@ -1021,7 +1021,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.GrantPreReleaseAccess(userId: user.Id, releaseId: release.Id);
@@ -1029,7 +1029,7 @@ public abstract class PreReleaseUserServiceTests
                 result.AssertRight();
             }
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
@@ -1047,7 +1047,7 @@ public abstract class PreReleaseUserServiceTests
             var latestReleaseVersion = release.Versions[0];
 
             UserReleaseRole createdUserPreReleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(latestReleaseVersion);
 
@@ -1075,10 +1075,10 @@ public abstract class PreReleaseUserServiceTests
                 )
                 .ReturnsAsync(updatedUser);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         existingUser.Id,
                         release.Versions[0].Id,
                         ResourceRoleFilter.AllButExpired,
@@ -1086,7 +1086,7 @@ public abstract class PreReleaseUserServiceTests
                     )
                 )
                 .ReturnsAsync(false);
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(s =>
                     s.Create(updatedUser.Id, latestReleaseVersion.Id, _userId, null, It.IsAny<CancellationToken>())
                 )
@@ -1106,7 +1106,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object
                 );
 
@@ -1115,7 +1115,7 @@ public abstract class PreReleaseUserServiceTests
                 result.AssertRight();
             }
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository, userResourceRoleNotificationService);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository, userResourceRoleNotificationService);
         }
 
         [Fact]
@@ -1140,10 +1140,10 @@ public abstract class PreReleaseUserServiceTests
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository.Setup(mock => mock.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.UserHasPrereleaseRoleOnReleaseVersion(
+                    mock.UserHasPreReleaseRoleOnReleaseVersion(
                         user.Id,
                         release.Versions[0].Id,
                         ResourceRoleFilter.AllButExpired,
@@ -1157,7 +1157,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.GrantPreReleaseAccess(userId: user.Id, releaseId: release.Id);
@@ -1165,7 +1165,7 @@ public abstract class PreReleaseUserServiceTests
                 result.AssertBadRequest(UserAlreadyHasResourceRole);
             }
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
@@ -1240,7 +1240,7 @@ public abstract class PreReleaseUserServiceTests
         public async Task Success()
         {
             UserReleaseRole userPreReleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
 
@@ -1249,15 +1249,15 @@ public abstract class PreReleaseUserServiceTests
                 .Setup(m => m.FindUserByEmail(userPreReleaseRole.User.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPreReleaseRole.User);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userPreReleaseRole]);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userPreReleaseRole]);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveById(userPreReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             var service = SetupService(
                 userRepository: userRepository.Object,
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
             var result = await service.RemovePreReleaseRoleByCompositeKey(
@@ -1267,7 +1267,7 @@ public abstract class PreReleaseUserServiceTests
 
             result.AssertRight();
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
@@ -1278,26 +1278,26 @@ public abstract class PreReleaseUserServiceTests
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository.Setup(m => m.FindUserByEmail(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
 
             var service = SetupService(
                 userRepository: userRepository.Object,
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
             var result = await service.RemovePreReleaseRoleByCompositeKey(Guid.NewGuid(), user.Email);
 
             result.AssertNotFound();
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
         public async Task RoleRemovalFails_Throws()
         {
             UserReleaseRole userPreReleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
 
@@ -1306,15 +1306,15 @@ public abstract class PreReleaseUserServiceTests
                 .Setup(m => m.FindUserByEmail(userPreReleaseRole.User.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPreReleaseRole.User);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userPreReleaseRole);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userPreReleaseRole);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveById(userPreReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
             var service = SetupService(
                 userRepository: userRepository.Object,
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
@@ -1324,7 +1324,7 @@ public abstract class PreReleaseUserServiceTests
                 )
             );
 
-            MockUtils.VerifyAllMocks(userRepository, userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
@@ -1343,63 +1343,63 @@ public abstract class PreReleaseUserServiceTests
         public async Task Success()
         {
             UserReleaseRole userPreReleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userPreReleaseRole]);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userPreReleaseRole]);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveById(userPreReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var service = SetupService(userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object);
+            var service = SetupService(userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object);
 
             var result = await service.RemovePreReleaseRole(userPreReleaseRole.Id);
 
             result.AssertRight();
 
-            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository);
         }
 
         [Fact]
         public async Task RoleDoesNotExist_ReturnsNotFound()
         {
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
 
-            var service = SetupService(userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object);
+            var service = SetupService(userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object);
 
             var result = await service.RemovePreReleaseRole(Guid.NewGuid());
 
             result.AssertNotFound();
 
-            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository);
         }
 
         [Fact]
         public async Task RoleRemovalFails_Throws()
         {
             UserReleaseRole userPreReleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userPreReleaseRole]);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userPreReleaseRole]);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveById(userPreReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
-            var service = SetupService(userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object);
+            var service = SetupService(userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await service.RemovePreReleaseRole(userPreReleaseRole.Id)
             );
 
-            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository);
         }
     }
 
-    public class GetPrereleaseRolesForUserTests : PreReleaseUserServiceTests
+    public class GetPreReleaseRolesForUserTests : PreReleaseUserServiceTests
     {
         [Fact]
         public async Task Success()
@@ -1411,75 +1411,75 @@ public abstract class PreReleaseUserServiceTests
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)])
                 .GenerateTuple4();
 
-            UserReleaseRole userPrereleaseRole1 = _dataFixture
-                .DefaultUserPrereleaseRole()
+            UserReleaseRole userPreReleaseRole1 = _dataFixture
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication1.Releases[0].Versions[1])
                 .WithUser(user);
 
-            UserReleaseRole userPrereleaseRole2 = _dataFixture
-                .DefaultUserPrereleaseRole()
+            UserReleaseRole userPreReleaseRole2 = _dataFixture
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication2.Releases[0].Versions[1])
                 .WithUser(user);
 
             // Role assignment for a non-latest release version, which should be filtered out of the results
-            UserReleaseRole userPrereleaseRole3 = _dataFixture
-                .DefaultUserPrereleaseRole()
+            UserReleaseRole userPreReleaseRole3 = _dataFixture
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication3.Releases[0].Versions[0])
                 .WithUser(user);
 
             // Role assignment for a different user, which should be filtered out of the results
-            UserReleaseRole userPrereleaseRole4 = _dataFixture
-                .DefaultUserPrereleaseRole()
+            UserReleaseRole userPreReleaseRole4 = _dataFixture
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication3.Releases[0].Versions[1])
                 .WithUser(_dataFixture.DefaultUser().Generate());
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository.Setup(m => m.FindActiveUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-            userPrereleaseRoleRepository.SetupQuery(
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository.SetupQuery(
                 ResourceRoleFilter.ActiveOnly,
-                [userPrereleaseRole1, userPrereleaseRole2, userPrereleaseRole3, userPrereleaseRole4]
+                [userPreReleaseRole1, userPreReleaseRole2, userPreReleaseRole3, userPreReleaseRole4]
             );
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
             releaseVersionRepository
                 .Setup(m =>
-                    m.IsLatestReleaseVersion(userPrereleaseRole1.ReleaseVersionId, It.IsAny<CancellationToken>())
+                    m.IsLatestReleaseVersion(userPreReleaseRole1.ReleaseVersionId, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(true);
             releaseVersionRepository
                 .Setup(m =>
-                    m.IsLatestReleaseVersion(userPrereleaseRole2.ReleaseVersionId, It.IsAny<CancellationToken>())
+                    m.IsLatestReleaseVersion(userPreReleaseRole2.ReleaseVersionId, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(true);
             releaseVersionRepository
                 .Setup(m =>
-                    m.IsLatestReleaseVersion(userPrereleaseRole3.ReleaseVersionId, It.IsAny<CancellationToken>())
+                    m.IsLatestReleaseVersion(userPreReleaseRole3.ReleaseVersionId, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(false);
 
             var service = SetupService(
-                userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                 userRepository: userRepository.Object,
                 releaseVersionRepository: releaseVersionRepository.Object
             );
 
-            var result = await service.GetPrereleaseRolesForUser(user.Id);
+            var result = await service.GetPreReleaseRolesForUser(user.Id);
 
             var userReleaseRoles = result.AssertRight();
 
             Assert.Equal(2, userReleaseRoles.Count);
 
-            Assert.Equal(userPrereleaseRole1.Id, userReleaseRoles[0].Id);
+            Assert.Equal(userPreReleaseRole1.Id, userReleaseRoles[0].Id);
             Assert.Equal(publication1.Title, userReleaseRoles[0].Publication);
             Assert.Equal(publication1.Releases[0].Title, userReleaseRoles[0].Release);
 
-            Assert.Equal(userPrereleaseRole2.Id, userReleaseRoles[1].Id);
+            Assert.Equal(userPreReleaseRole2.Id, userReleaseRoles[1].Id);
             Assert.Equal(publication2.Title, userReleaseRoles[1].Publication);
             Assert.Equal(publication2.Releases[0].Title, userReleaseRoles[1].Release);
 
-            MockUtils.VerifyAllMocks(userPrereleaseRoleRepository, userRepository, releaseVersionRepository);
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userRepository, releaseVersionRepository);
         }
 
         [Fact]
@@ -1494,7 +1494,7 @@ public abstract class PreReleaseUserServiceTests
 
             var service = SetupService(userRepository: userRepository.Object);
 
-            var result = await service.GetPrereleaseRolesForUser(userId);
+            var result = await service.GetPreReleaseRolesForUser(userId);
 
             result.AssertNotFound();
 
@@ -1509,7 +1509,7 @@ public abstract class PreReleaseUserServiceTests
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IUserRepository? userRepository = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IReleaseVersionRepository? releaseVersionRepository = null
     )
     {
@@ -1523,7 +1523,7 @@ public abstract class PreReleaseUserServiceTests
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             userService ?? MockUtils.AlwaysTrueUserService(_userId).Object,
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict),
+            userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict)
         );
     }

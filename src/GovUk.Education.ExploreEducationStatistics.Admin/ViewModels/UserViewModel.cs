@@ -17,7 +17,7 @@ public record UserViewModel
 
     public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
 
-    public List<UserPrereleaseRoleViewModel> UserPrereleaseRoles { get; init; } = [];
+    public List<UserPreReleaseRoleViewModel> UserPreReleaseRoles { get; init; } = [];
 }
 
 public record UserPublicationRoleViewModel
@@ -37,7 +37,7 @@ public record UserPublicationRoleWithUserViewModel : UserPublicationRoleViewMode
     public required string Email { get; init; }
 }
 
-public record UserPrereleaseRoleViewModel
+public record UserPreReleaseRoleViewModel
 {
     public required Guid Id { get; init; }
 

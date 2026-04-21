@@ -579,7 +579,7 @@ public abstract class UserRoleServiceTests
             var userManager = MockUserManager();
 
             // Here we are checking to see that the user is "upgraded" to the higher-powered Analyst role by their
-            // existing PrereleaseUser role being removed and the higher-powered Analyst role being added.
+            // existing PreReleaseUser role being removed and the higher-powered Analyst role being added.
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(user))).ReturnsAsync(ListOf(RoleNames.PrereleaseUser));
 
             userManager
@@ -1084,7 +1084,7 @@ public abstract class UserRoleServiceTests
 
             var userManager = MockUserManager();
             // Here we are checking to see that the user is "upgraded" to the higher-powered Analyst role by their
-            // existing PrereleaseUser role being removed and the higher-powered Analyst role being added.
+            // existing PreReleaseUser role being removed and the higher-powered Analyst role being added.
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(user))).ReturnsAsync(ListOf(RoleNames.PrereleaseUser));
             userManager
                 .Setup(s => s.AddToRoleAsync(ItIsUser(user), RoleNames.Analyst))
@@ -1772,7 +1772,7 @@ public abstract class UserRoleServiceTests
 
             var userManager = MockUserManager();
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
 
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
             userManager
@@ -1787,7 +1787,7 @@ public abstract class UserRoleServiceTests
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
@@ -1795,7 +1795,7 @@ public abstract class UserRoleServiceTests
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
@@ -1876,8 +1876,8 @@ public abstract class UserRoleServiceTests
             // a BAU user and do not have any roles removed.
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.BauUser));
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
@@ -1892,7 +1892,7 @@ public abstract class UserRoleServiceTests
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
@@ -1900,7 +1900,7 @@ public abstract class UserRoleServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userManager, userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userManager, userPublicationRoleRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
@@ -1936,8 +1936,8 @@ public abstract class UserRoleServiceTests
             // they still have need of it in other Publication roles.
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
@@ -1952,7 +1952,7 @@ public abstract class UserRoleServiceTests
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
@@ -1960,11 +1960,11 @@ public abstract class UserRoleServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userManager, userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userManager, userPublicationRoleRepository, userPreReleaseRoleRepository);
         }
 
         [Fact]
-        public async Task RemoveUserPublicationRole_DowngradeToPrereleaseRole()
+        public async Task RemoveUserPublicationRole_DowngradeToPreReleaseRole()
         {
             User user = _dataFixture.DefaultUser();
 
@@ -1976,8 +1976,8 @@ public abstract class UserRoleServiceTests
                 .WithPublication(_dataFixture.DefaultPublication())
                 .WithRole(PublicationRole.Drafter);
 
-            UserReleaseRole prereleaseRole = _dataFixture
-                .DefaultUserPrereleaseRole()
+            UserReleaseRole preReleaseRole = _dataFixture
+                .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(
                     _dataFixture
@@ -1996,7 +1996,7 @@ public abstract class UserRoleServiceTests
             var userManager = MockUserManager();
 
             // Here the user has the Analyst role currently.  We will test that they lose the Analyst role but gain the
-            // PrereleaseUser role, as they have need of this role elsewhere.
+            // PreReleaseUser role, as they have need of this role elsewhere.
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
 
             userManager
@@ -2009,8 +2009,8 @@ public abstract class UserRoleServiceTests
                 .Setup(s => s.AddToRoleAsync(ItIsUser(identityUser), RoleNames.PrereleaseUser))
                 .ReturnsAsync(new IdentityResult());
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, prereleaseRole);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, preReleaseRole);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
@@ -2025,7 +2025,7 @@ public abstract class UserRoleServiceTests
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
@@ -2033,7 +2033,7 @@ public abstract class UserRoleServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userManager, userPublicationRoleRepository, userPrereleaseRoleRepository);
+            VerifyAllMocks(userManager, userPublicationRoleRepository, userPreReleaseRoleRepository);
         }
     }
 
@@ -2074,8 +2074,8 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.FindActiveUserById(targetUser.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(targetUser);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository
                 .Setup(m => m.RemoveForUser(targetUser.Id, default))
                 .Returns(Task.CompletedTask);
 
@@ -2089,7 +2089,7 @@ public abstract class UserRoleServiceTests
                 var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
@@ -2099,7 +2099,7 @@ public abstract class UserRoleServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userManager, userRepository, userPrereleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userManager, userRepository, userPreReleaseRoleRepository, userPublicationRoleRepository);
         }
     }
 
@@ -2115,7 +2115,7 @@ public abstract class UserRoleServiceTests
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserRepository? userRepository = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null
@@ -2135,7 +2135,7 @@ public abstract class UserRoleServiceTests
             userResourceRoleNotificationService ?? new Mock<IUserResourceRoleNotificationService>(Strict).Object,
             userService ?? AlwaysTrueUserService(_user.Id).Object,
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
+            userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userManager ?? MockUserManager().Object
         );

@@ -45,8 +45,8 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithScope(SecurityScopes.AccessAdminApiScope)
             .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted))
             .WithClaim(nameof(SecurityClaimTypes.AnalystPagesAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.CanViewPrereleaseContacts));
+            .WithClaim(nameof(SecurityClaimTypes.PreReleasePagesAccessGranted))
+            .WithClaim(nameof(SecurityClaimTypes.CanViewPreReleaseContacts));
     }
 
     public static Generator<ClaimsPrincipal> PreReleaseUser(this DataFixture fixture)
@@ -57,7 +57,7 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithRole(GlobalRoles.RoleNames.PrereleaseUser)
             .WithScope(SecurityScopes.AccessAdminApiScope)
             .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted));
+            .WithClaim(nameof(SecurityClaimTypes.PreReleasePagesAccessGranted));
     }
 
     public static Generator<ClaimsPrincipal> WithId(this Generator<ClaimsPrincipal> generator, Guid userId) =>

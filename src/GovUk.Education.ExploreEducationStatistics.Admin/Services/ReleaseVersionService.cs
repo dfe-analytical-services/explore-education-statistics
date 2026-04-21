@@ -58,7 +58,7 @@ public class ReleaseVersionService(
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     ILogger<ReleaseVersionService> logger
@@ -75,7 +75,7 @@ public class ReleaseVersionService(
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
-                var prereleaseRolesAdded = await userPrereleaseRoleRepository
+                var prereleaseRolesAdded = await userPreReleaseRoleRepository
                     .Query(ResourceRoleFilter.AllButExpired)
                     .WhereForReleaseVersion(releaseVersionId)
                     .AnyAsync();
@@ -279,12 +279,12 @@ public class ReleaseVersionService(
     {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
-        var prereleaseRolesToRemove = await userPrereleaseRoleRepository
+        var preReleaseRolesToRemove = await userPreReleaseRoleRepository
             .Query(ResourceRoleFilter.All)
             .WhereForReleaseVersion(releaseVersion.Id)
             .ToListAsync(cancellationToken);
 
-        await userPrereleaseRoleRepository.RemoveMany(prereleaseRolesToRemove, cancellationToken);
+        await userPreReleaseRoleRepository.RemoveMany(preReleaseRolesToRemove, cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(ReleaseVersion releaseVersion, CancellationToken cancellationToken)

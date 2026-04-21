@@ -63,7 +63,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
                 )
                 .ReturnsAsync(true);
             authorizationHandlerService
-                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(false);
 
             var handler = BuildHandler(authorizationHandlerService.Object);
@@ -94,7 +94,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
                 )
                 .ReturnsAsync(false);
             authorizationHandlerService
-                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(false);
 
             var handler = BuildHandler(authorizationHandlerService.Object);
@@ -105,7 +105,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
         }
     }
 
-    public class PrereleaseRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
+    public class PreReleaseRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         [Fact]
         public async Task HasPreReleaseRole_Succeeds()
@@ -128,7 +128,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
                 )
                 .ReturnsAsync(false);
             authorizationHandlerService
-                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(true);
 
             var handler = BuildHandler(authorizationHandlerService.Object);
@@ -159,7 +159,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
                 )
                 .ReturnsAsync(false);
             authorizationHandlerService
-                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
+                .Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id))
                 .ReturnsAsync(false);
 
             var handler = BuildHandler(authorizationHandlerService.Object);
@@ -190,7 +190,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
                 )
             )
             .ReturnsAsync(false);
-        mock.Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id)).ReturnsAsync(false);
+        mock.Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _releaseVersion.Id)).ReturnsAsync(false);
 
         return mock.Object;
     }

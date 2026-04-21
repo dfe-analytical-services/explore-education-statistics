@@ -9,5 +9,5 @@ public record PendingInviteViewModel
 
     public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
 
-    public List<UserPrereleaseRoleViewModel> UserPrereleaseRoles { get; init; } = [];
+    public List<UserPreReleaseRoleViewModel> UserPreReleaseRoles { get; init; } = [];
 }

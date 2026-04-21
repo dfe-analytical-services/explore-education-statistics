@@ -23,7 +23,7 @@ public class ViewSpecificPublicationAuthorizationHandler(IAuthorizationHandlerSe
             return;
         }
 
-        // If the user has any role (including both publication roles and prerelease roles) on the publication, they can see it.
+        // If the user has any role (including both publication roles and pre-release roles) on the publication, they can see it.
         if (
             await authorizationHandlerService.UserHasAnyRoleOnPublication(
                 userId: context.User.GetUserId(),

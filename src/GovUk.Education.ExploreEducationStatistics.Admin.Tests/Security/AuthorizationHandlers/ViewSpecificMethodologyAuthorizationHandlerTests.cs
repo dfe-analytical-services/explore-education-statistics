@@ -176,7 +176,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         [InlineData(PreReleaseAccess.NoneSet)]
         [InlineData(PreReleaseAccess.Before)]
         [InlineData(PreReleaseAccess.After)]
-        public async Task ApprovedMethodologyVersion_AnyPublicationsLatestReleaseVersionIsApproved_UserHasPrereleaseRole_IsNotWithinPrereleaseWindow_Fails(
+        public async Task ApprovedMethodologyVersion_AnyPublicationsLatestReleaseVersionIsApproved_UserHasPreReleaseRole_IsNotWithinPreReleaseWindow_Fails(
             PreReleaseAccess preReleaseAccessWindowStatus
         )
         {
@@ -196,7 +196,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 )
                 .ReturnsAsync(false);
             authorizationHandlerService
-                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _approvedReleaseVersion.Id))
+                .Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _approvedReleaseVersion.Id))
                 .ReturnsAsync(true);
 
             var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
@@ -223,7 +223,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task ApprovedMethodologyVersion_AnyPublicationsLatestReleaseVersionIsApproved_UserDoesNotHavePrereleaseRole_IsWithinPrereleaseWindow_Fails()
+        public async Task ApprovedMethodologyVersion_AnyPublicationsLatestReleaseVersionIsApproved_UserDoesNotHavePreReleaseRole_IsWithinPreReleaseWindow_Fails()
         {
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
             releaseVersionRepository
@@ -241,7 +241,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 )
                 .ReturnsAsync(false);
             authorizationHandlerService
-                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _approvedReleaseVersion.Id))
+                .Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _approvedReleaseVersion.Id))
                 .ReturnsAsync(false);
 
             var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
@@ -268,7 +268,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task ApprovedMethodologyVersion_AnyPublicationsLatestReleaseVersionIsApproved_UserHasPrereleaseRole_IsWithinPrereleaseWindow_Passes()
+        public async Task ApprovedMethodologyVersion_AnyPublicationsLatestReleaseVersionIsApproved_UserHasPreReleaseRole_IsWithinPreReleaseWindow_Passes()
         {
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
             releaseVersionRepository
@@ -286,7 +286,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 )
                 .ReturnsAsync(false);
             authorizationHandlerService
-                .Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, _approvedReleaseVersion.Id))
+                .Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, _approvedReleaseVersion.Id))
                 .ReturnsAsync(true);
 
             var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
@@ -366,7 +366,7 @@ public abstract class ViewSpecificMethodologyAuthorizationHandlerTests
                 )
             )
             .ReturnsAsync(false);
-        mock.Setup(s => s.UserHasPrereleaseRoleOnReleaseVersion(_userId, It.IsAny<Guid>())).ReturnsAsync(false);
+        mock.Setup(s => s.UserHasPreReleaseRoleOnReleaseVersion(_userId, It.IsAny<Guid>())).ReturnsAsync(false);
 
         return mock.Object;
     }

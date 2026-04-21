@@ -81,7 +81,7 @@ public class ViewSpecificMethodologyAuthorizationHandler(
             }
 
             if (
-                await authorizationHandlerService.UserHasPrereleaseRoleOnReleaseVersion(
+                await authorizationHandlerService.UserHasPreReleaseRoleOnReleaseVersion(
                     userId: context.User.GetUserId(),
                     releaseVersionId: latestReleaseVersion.Id
                 )

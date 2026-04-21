@@ -370,14 +370,14 @@ public class ReleaseVersionServicePermissionTests
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
         contentDbContext ??= Mock.Of<ContentDbContext>();
         statisticsDbContext ??= Mock.Of<StatisticsDbContext>();
 
-        userPrereleaseRoleRepository ??= Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
+        userPreReleaseRoleRepository ??= Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
         userPublicationRoleRepository ??= Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict);
 
         return new ReleaseVersionService(
@@ -406,7 +406,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IProcessorClient>(),
             Mock.Of<IPrivateBlobCacheService>(),
             new OrganisationsValidatorMockBuilder().Build(),
-            userPrereleaseRoleRepository,
+            userPreReleaseRoleRepository,
             userPublicationRoleRepository,
             Mock.Of<IReleaseSlugValidator>(),
             Mock.Of<ILogger<ReleaseVersionService>>()

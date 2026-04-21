@@ -11,14 +11,14 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
+public abstract class AssignPreReleaseContactsToSpecificReleaseAuthorizationHandlerTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
     private readonly ReleaseVersion _draftReleaseVersion;
     private readonly ReleaseVersion _approvedReleaseVersion;
 
-    protected AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests()
+    protected AssignPreReleaseContactsToSpecificReleaseAuthorizationHandlerTests()
     {
         _draftReleaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -31,7 +31,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
             .WithApprovalStatus(ReleaseApprovalStatus.Approved);
     }
 
-    public class ClaimsTests : AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
+    public class ClaimsTests : AssignPreReleaseContactsToSpecificReleaseAuthorizationHandlerTests
     {
         [Fact]
         public async Task ReleaseVersionNotApproved_SucceedsOnlyForValidClaims()
@@ -40,7 +40,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
             // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
             // to failing any role check, within the SetupHandler method.
             await AssertHandlerSucceedsWithCorrectClaims<
-                AssignPrereleaseContactsToSpecificReleaseRequirement,
+                AssignPreReleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
                 handler: BuildHandler(),
@@ -57,7 +57,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
             // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
             // to failing any role check, within the SetupHandler method.
             await AssertHandlerSucceedsWithCorrectClaims<
-                AssignPrereleaseContactsToSpecificReleaseRequirement,
+                AssignPreReleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
                 handler: BuildHandler(),
@@ -68,13 +68,13 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
         }
     }
 
-    public class PublicationRolesTests : AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
+    public class PublicationRolesTests : AssignPreReleaseContactsToSpecificReleaseAuthorizationHandlerTests
     {
         [Fact]
         public async Task ReleaseVersionNotApproved_SucceedsOnlyForValidPublicationRoles()
         {
             await AssertHandlerSucceedsForAnyValidPublicationRole<
-                AssignPrereleaseContactsToSpecificReleaseRequirement,
+                AssignPreReleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
                 handlerSupplier: BuildHandler,
@@ -88,7 +88,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
         public async Task ReleaseVersionApproved_SucceedsOnlyForValidPublicationRoles()
         {
             await AssertHandlerSucceedsForAnyValidPublicationRole<
-                AssignPrereleaseContactsToSpecificReleaseRequirement,
+                AssignPreReleaseContactsToSpecificReleaseRequirement,
                 ReleaseVersion
             >(
                 handlerSupplier: BuildHandler,
@@ -99,7 +99,7 @@ public abstract class AssignPrereleaseContactsToSpecificReleaseAuthorizationHand
         }
     }
 
-    private AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler BuildHandler(
+    private AssignPreReleaseContactsToSpecificReleaseAuthorizationHandler BuildHandler(
         IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {

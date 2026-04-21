@@ -38,7 +38,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: false,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: false,
+                CanAccessPreReleasePages: false,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 IsApprover: false
@@ -58,7 +58,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: true,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: true,
                 IsBauUser: true,
                 // Expect "IsApprover" to be false even for BAU as we don't expect BAU users to be assigned
@@ -97,7 +97,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 // Expect this to be false if the user isn't an approver
@@ -132,7 +132,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 // Expect this to be true if the user is a Publication approver
@@ -153,7 +153,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: false,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 IsApprover: false
