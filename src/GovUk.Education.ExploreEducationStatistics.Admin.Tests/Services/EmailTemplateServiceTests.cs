@@ -148,6 +148,61 @@ public class EmailTemplateServiceTests
         result.AssertRight();
     }
 
+    [Fact]
+    public void SendDrafterInviteEmail()
+    {
+        string email = "test@test.com";
+        string publicationTitle = "Publication Title";
+
+        const string expectedTemplateId = "drafter-template-id";
+
+        // Purposefully creating the release info out of order to ensure sorting is working as expected when generating the formatted release titles for the email.
+        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo =
+        [
+            (2021, TimeIdentifier.AcademicYearQ2, "Academic year Q2 2021/22"),
+            (2020, TimeIdentifier.AcademicYearQ1, "Academic year Q1 2020/21"),
+            (2022, TimeIdentifier.AcademicYearQ2, "Academic year Q2 2022/23"),
+            (2020, TimeIdentifier.AcademicYearQ2, "Academic year Q2 2020/21"),
+            (2022, TimeIdentifier.AcademicYearQ1, "Academic year Q1 2022/23"),
+            (2021, TimeIdentifier.AcademicYearQ1, "Academic year Q1 2021/22"),
+        ];
+
+        // These should be ordered by release year and then time period coverage
+        var expectedReleaseList = """
+            * Academic year Q1 2020/21
+            * Academic year Q2 2020/21
+            * Academic year Q1 2021/22
+            * Academic year Q2 2021/22
+            * Academic year Q1 2022/23
+            * Academic year Q2 2022/23
+            """;
+
+        var expectedValues = new Dictionary<string, dynamic>
+        {
+            { "url", "https://admin-uri" },
+            { "publication name", publicationTitle },
+            { "release list", expectedReleaseList },
+        };
+
+        var emailService = new Mock<IEmailService>(Strict);
+
+        emailService.Setup(mock => mock.SendEmail(email, expectedTemplateId, expectedValues)).Returns(Unit.Instance);
+
+        var service = SetupEmailTemplateService(emailService: emailService.Object);
+
+        var result = service.SendDrafterInviteEmail(
+            email: email,
+            publicationTitle: publicationTitle,
+            releasesInfo: releasesInfo
+        );
+
+        result.AssertRight();
+
+        emailService.Verify(s => s.SendEmail(email, expectedTemplateId, expectedValues), Times.Once);
+
+        VerifyAllMocks(emailService);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -284,6 +339,7 @@ public class EmailTemplateServiceTests
         {
             InviteWithRolesTemplateId = "invite-with-roles-template-id",
             PublicationRoleTemplateId = "publication-role-template-id",
+            DrafterTemplateId = "drafter-template-id",
             ReleaseHigherReviewersTemplateId = "notify-release-higher-reviewers-template-id",
             MethodologyHigherReviewersTemplateId = "notify-methodology-higher-reviewers-template-id",
             PreReleaseTemplateId = "prerelease-template-id",
