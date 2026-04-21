@@ -13,11 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Screen
 
 public class DataSetScreenerClientTests
 {
-    private static readonly Uri BaseUri = new("http://localhost/api/screen");
+    private static readonly Uri BaseUri = new("http://localhost/api");
     private readonly MockHttpMessageHandler _mockHttp;
     private readonly JsonSerializerOptions _requestSerializerOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case sensitive
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case-sensitive.
     };
 
     protected DataSetScreenerClientTests()
@@ -33,7 +33,7 @@ public class DataSetScreenerClientTests
             var responseBody = new DataSetScreenerResponse { OverallResult = "Failed", TestResults = [] };
 
             _mockHttp
-                .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
+                .Expect(HttpMethod.Post, $"{BaseUri.AbsoluteUri}/screen")
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
 
             var authenticationManager = new Mock<IHttpClientAzureAuthenticationManager<DataScreenerOptions>>(
@@ -101,7 +101,7 @@ public class DataSetScreenerClientTests
             };
 
             _mockHttp
-                .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
+                .Expect(HttpMethod.Post, $"{BaseUri.AbsoluteUri}/screen")
                 .WithJsonContent(request, _requestSerializerOptions)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
 
