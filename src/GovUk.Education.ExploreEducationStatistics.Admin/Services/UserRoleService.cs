@@ -30,7 +30,7 @@ public class UserRoleService(
     IUserResourceRoleNotificationService userResourceRoleNotificationService,
     IUserService userService,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserPrereleaseRoleRepository userPrereleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserRepository userRepository,
     UserManager<ApplicationUser> identityUserManager
 ) : IUserRoleService
@@ -225,7 +225,7 @@ public class UserRoleService(
                 return await FindActiveUser(userId)
                     .OnSuccess(async _ =>
                     {
-                        await userPrereleaseRoleRepository.RemoveForUser(userId);
+                        await userPreReleaseRoleRepository.RemoveForUser(userId);
                         await userPublicationRoleRepository.RemoveForUser(userId);
 
                         await usersAndRolesPersistenceHelper
@@ -296,15 +296,15 @@ public class UserRoleService(
     {
         var userId = Guid.Parse(user.Id);
 
-        var userHasAPrereleaseRole = await userPrereleaseRoleRepository.Query().WhereForUser(userId).AnyAsync();
+        var userHasAPreReleaseRole = await userPreReleaseRoleRepository.Query().WhereForUser(userId).AnyAsync();
 
         var userHasAPublicationRole = await userPublicationRoleRepository.Query().WhereForUser(userId).AnyAsync();
 
         var globalRoles = new List<string>();
 
-        if (userHasAPrereleaseRole)
+        if (userHasAPreReleaseRole)
         {
-            globalRoles.Add(AssociatedGlobalRoleNameForPrereleaseRole);
+            globalRoles.Add(AssociatedGlobalRoleNameForPreReleaseRole);
         }
 
         if (userHasAPublicationRole)
@@ -423,7 +423,7 @@ public class UserRoleService(
         await userPublicationRoleRepository.GetById(userPublicationRoleId)
         ?? new Either<ActionResult, UserPublicationRole>(new NotFoundResult());
 
-    private static string AssociatedGlobalRoleNameForPrereleaseRole => RoleNames.PrereleaseUser;
+    private static string AssociatedGlobalRoleNameForPreReleaseRole => RoleNames.PrereleaseUser;
 
     private static string AssociatedGlobalRoleNameForPublicationRole => RoleNames.Analyst;
 }

@@ -80,14 +80,14 @@ public abstract class UserManagementServiceTests
                 }
             );
 
-            var prereleaseRoles = ListOf(
-                new UserPrereleaseRoleViewModel
+            var preReleaseRoles = ListOf(
+                new UserPreReleaseRoleViewModel
                 {
                     Id = Guid.NewGuid(),
                     Publication = "Test Publication 1",
                     Release = "December 2020",
                 },
-                new UserPrereleaseRoleViewModel
+                new UserPreReleaseRoleViewModel
                 {
                     Id = Guid.NewGuid(),
                     Publication = "Test Publication 2",
@@ -110,7 +110,7 @@ public abstract class UserManagementServiceTests
 
             userRoleService.Setup(mock => mock.GetPublicationRolesForUser(userId)).ReturnsAsync(publicationRoles);
 
-            preReleaseUserService.Setup(mock => mock.GetPrereleaseRolesForUser(userId)).ReturnsAsync(prereleaseRoles);
+            preReleaseUserService.Setup(mock => mock.GetPreReleaseRolesForUser(userId)).ReturnsAsync(preReleaseRoles);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
@@ -133,11 +133,11 @@ public abstract class UserManagementServiceTests
                 // Currently we only allow a user to have a maximum of one global role
                 Assert.Equal(globalRoles[0].Id, userViewModel.Role);
                 Assert.Equal(publicationRoles, userViewModel.UserPublicationRoles);
-                Assert.Equal(prereleaseRoles, userViewModel.UserPrereleaseRoles);
+                Assert.Equal(preReleaseRoles, userViewModel.UserPreReleaseRoles);
 
                 userRoleService.Verify(mock => mock.GetGlobalRolesForUser(user.Id), Times.Once);
                 userRoleService.Verify(mock => mock.GetPublicationRolesForUser(userId), Times.Once);
-                preReleaseUserService.Verify(mock => mock.GetPrereleaseRolesForUser(userId), Times.Once);
+                preReleaseUserService.Verify(mock => mock.GetPreReleaseRolesForUser(userId), Times.Once);
             }
         }
 
@@ -175,8 +175,8 @@ public abstract class UserManagementServiceTests
                 .DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var userPrereleaseRoles = _dataFixture
-                .DefaultUserPrereleaseRole()
+            var userPreReleaseRoles = _dataFixture
+                .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .ForIndex(0, s => s.SetUser(pendingUserInvites[0]))
                 .ForIndex(1, s => s.SetUser(pendingUserInvites[1]))
@@ -209,8 +209,8 @@ public abstract class UserManagementServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userPrereleaseRoles]);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userPreReleaseRoles]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userPublicationRoles]);
@@ -222,7 +222,7 @@ public abstract class UserManagementServiceTests
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.ListPendingInvites();
@@ -240,34 +240,34 @@ public abstract class UserManagementServiceTests
                 var pendingInvite1 = pendingInvites.Single(pi => pi.Email == expectedUserInvite1.Email);
 
                 var expectedUserPublicationRoles1 = CreateUserPublicationRoleViewModels(userPublicationRoles[..2]);
-                var expectedUserPrereleaseRoles1 = CreateUserPrereleaseRoleViewModels([userPrereleaseRoles[0]]);
+                var expectedUserPreReleaseRoles1 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[0]]);
 
                 Assert.Equal(expectedUserInvite1.Email, pendingInvite1.Email);
                 Assert.Equal(expectedUserInvite1.Role!.Name, pendingInvite1.Role);
                 Assert.Equal(expectedUserPublicationRoles1, pendingInvite1.UserPublicationRoles);
-                Assert.Equal(expectedUserPrereleaseRoles1, pendingInvite1.UserPrereleaseRoles);
+                Assert.Equal(expectedUserPreReleaseRoles1, pendingInvite1.UserPreReleaseRoles);
 
                 var expectedUserInvite2 = pendingUserInvites[1];
                 var pendingInvite2 = pendingInvites.Single(pi => pi.Email == expectedUserInvite2.Email);
 
                 var expectedUserPublicationRoles2 = CreateUserPublicationRoleViewModels(userPublicationRoles[2..4]);
-                var expectedUserPrereleaseRoles2 = CreateUserPrereleaseRoleViewModels([userPrereleaseRoles[1]]);
+                var expectedUserPreReleaseRoles2 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[1]]);
 
                 Assert.Equal(expectedUserInvite2.Email, pendingInvite2.Email);
                 Assert.Equal(expectedUserInvite2.Role!.Name, pendingInvite2.Role);
                 Assert.Equal(expectedUserPublicationRoles2, pendingInvite2.UserPublicationRoles);
-                Assert.Equal(expectedUserPrereleaseRoles2, pendingInvite2.UserPrereleaseRoles);
+                Assert.Equal(expectedUserPreReleaseRoles2, pendingInvite2.UserPreReleaseRoles);
 
                 var expectedUserInvite3 = pendingUserInvites[2];
                 var pendingInvite3 = pendingInvites.Single(pi => pi.Email == expectedUserInvite3.Email);
 
                 var expectedUserPublicationRoles3 = CreateUserPublicationRoleViewModels(userPublicationRoles[4..6]);
-                var expectedUserPrereleaseRoles3 = CreateUserPrereleaseRoleViewModels([userPrereleaseRoles[2]]);
+                var expectedUserPreReleaseRoles3 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[2]]);
 
                 Assert.Equal(expectedUserInvite3.Email, pendingInvite3.Email);
                 Assert.Equal(expectedUserInvite3.Role!.Name, pendingInvite3.Role);
                 Assert.Equal(expectedUserPublicationRoles3, pendingInvite3.UserPublicationRoles);
-                Assert.Equal(expectedUserPrereleaseRoles3, pendingInvite3.UserPrereleaseRoles);
+                Assert.Equal(expectedUserPreReleaseRoles3, pendingInvite3.UserPreReleaseRoles);
 
                 // This user has no associated roles
                 var expectedUserInvite4 = pendingUserInvites[3];
@@ -276,10 +276,10 @@ public abstract class UserManagementServiceTests
                 Assert.Equal(expectedUserInvite4.Email, pendingInvite4.Email);
                 Assert.Equal(expectedUserInvite4.Role!.Name, pendingInvite4.Role);
                 Assert.Empty(pendingInvite4.UserPublicationRoles);
-                Assert.Empty(pendingInvite4.UserPrereleaseRoles);
+                Assert.Empty(pendingInvite4.UserPreReleaseRoles);
             }
 
-            VerifyAllMocks(userPrereleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
         }
 
         private static List<UserPublicationRoleViewModel> CreateUserPublicationRoleViewModels(
@@ -297,13 +297,13 @@ public abstract class UserManagementServiceTests
             ];
         }
 
-        private static List<UserPrereleaseRoleViewModel> CreateUserPrereleaseRoleViewModels(
-            List<UserReleaseRole> userPrereleaseRoles
+        private static List<UserPreReleaseRoleViewModel> CreateUserPreReleaseRoleViewModels(
+            List<UserReleaseRole> userPreReleaseRoles
         )
         {
             return
             [
-                .. userPrereleaseRoles.Select(urr => new UserPrereleaseRoleViewModel
+                .. userPreReleaseRoles.Select(urr => new UserPreReleaseRoleViewModel
                 {
                     Id = urr.Id,
                     Publication = urr.ReleaseVersion.Release.Publication.Title,
@@ -388,7 +388,7 @@ public abstract class UserManagementServiceTests
             var releaseVersion = release.Versions.Single();
 
             var publicationRole = PublicationRole.Drafter;
-            var userPrereleaseRoles = ListOf(new UserPrereleaseRoleCreateRequest { ReleaseId = release.Id });
+            var userPreReleaseRoles = ListOf(new UserPreReleaseRoleCreateRequest { ReleaseId = release.Id });
             var userPublicationRoles = ListOf(
                 new UserPublicationRoleCreateRequest
                 {
@@ -416,11 +416,11 @@ public abstract class UserManagementServiceTests
                 )
                 .ReturnsAsync(userToCreate);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(mock =>
                     mock.Create(
                         userToCreate.Id,
@@ -480,7 +480,7 @@ public abstract class UserManagementServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object
@@ -490,7 +490,7 @@ public abstract class UserManagementServiceTests
                 {
                     Email = email,
                     RoleId = role.Id,
-                    UserPrereleaseRoles = userPrereleaseRoles,
+                    UserPreReleaseRoles = userPreReleaseRoles,
                     UserPublicationRoles = userPublicationRoles,
                     CreatedDate = createdDate,
                 };
@@ -511,7 +511,7 @@ public abstract class UserManagementServiceTests
             }
 
             VerifyAllMocks(
-                userPrereleaseRoleRepository,
+                userPreReleaseRoleRepository,
                 userPublicationRoleRepository,
                 userRepository,
                 userResourceRoleNotificationService
@@ -550,7 +550,7 @@ public abstract class UserManagementServiceTests
             var publicationRole1 = PublicationRole.Drafter;
             var publicationRole2 = PublicationRole.Approver;
 
-            var userPrereleaseRoles = new List<UserPrereleaseRoleCreateRequest>()
+            var userPreReleaseRoles = new List<UserPreReleaseRoleCreateRequest>()
             {
                 new() { ReleaseId = release1.Id },
                 new() { ReleaseId = release2.Id },
@@ -586,16 +586,16 @@ public abstract class UserManagementServiceTests
                 )
                 .ReturnsAsync(userToCreate);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(mock =>
                     mock.Create(userToCreate.Id, releaseVersion1.Id, CreatedById, null, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(It.IsAny<UserReleaseRole>());
-            userPrereleaseRoleRepository
+            userPreReleaseRoleRepository
                 .Setup(mock =>
                     mock.Create(userToCreate.Id, releaseVersion2.Id, CreatedById, null, It.IsAny<CancellationToken>())
                 )
@@ -640,7 +640,7 @@ public abstract class UserManagementServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object
@@ -650,7 +650,7 @@ public abstract class UserManagementServiceTests
                 {
                     Email = email,
                     RoleId = role.Id,
-                    UserPrereleaseRoles = userPrereleaseRoles,
+                    UserPreReleaseRoles = userPreReleaseRoles,
                     UserPublicationRoles = userPublicationRoles,
                 };
 
@@ -670,7 +670,7 @@ public abstract class UserManagementServiceTests
             }
 
             VerifyAllMocks(
-                userPrereleaseRoleRepository,
+                userPreReleaseRoleRepository,
                 userPublicationRoleRepository,
                 userRepository,
                 userResourceRoleNotificationService
@@ -693,7 +693,7 @@ public abstract class UserManagementServiceTests
             {
                 Email = activeUser.Email,
                 RoleId = Guid.NewGuid().ToString(),
-                UserPrereleaseRoles = [],
+                UserPreReleaseRoles = [],
                 UserPublicationRoles = [],
             };
 
@@ -720,7 +720,7 @@ public abstract class UserManagementServiceTests
             {
                 Email = email,
                 RoleId = Guid.NewGuid().ToString(),
-                UserPrereleaseRoles = [],
+                UserPreReleaseRoles = [],
                 UserPublicationRoles = [],
             };
 
@@ -742,8 +742,8 @@ public abstract class UserManagementServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveForUser(userToCancelInvitesFor.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -770,7 +770,7 @@ public abstract class UserManagementServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
@@ -780,7 +780,7 @@ public abstract class UserManagementServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userPrereleaseRoleRepository, userPublicationRoleRepository, userRepository);
+            VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository, userRepository);
         }
 
         [Fact]
@@ -835,8 +835,8 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.SoftDeleteUser(internalUser.Id, CreatedById, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository
                 .Setup(mock => mock.RemoveForUser(internalUser.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -851,7 +851,7 @@ public abstract class UserManagementServiceTests
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userManager: userManager.Object,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
@@ -859,7 +859,7 @@ public abstract class UserManagementServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userManager, userRepository, userPrereleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userManager, userRepository, userPreReleaseRoleRepository, userPublicationRoleRepository);
         }
 
         [Fact]
@@ -916,7 +916,7 @@ public abstract class UserManagementServiceTests
         IUserRoleService? userRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IPreReleaseUserService? preReleaseUserService = null,
@@ -933,7 +933,7 @@ public abstract class UserManagementServiceTests
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(Strict),
+            userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict),
             preReleaseUserService ?? Mock.Of<IPreReleaseUserService>(Strict),

@@ -61,14 +61,14 @@ public class PreReleaseUserServicePermissionTests
     }
 
     [Fact]
-    public async Task GetPrereleaseRolesForUser()
+    public async Task GetPreReleaseRolesForUser()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(CanManageUsersOnSystem)
             .AssertForbidden(async userService =>
             {
                 var service = SetupService(userService: userService.Object);
-                return await service.GetPrereleaseRolesForUser(Guid.NewGuid());
+                return await service.GetPreReleaseRolesForUser(Guid.NewGuid());
             });
     }
 
@@ -147,7 +147,7 @@ public class PreReleaseUserServicePermissionTests
         User user = _dataFixture.DefaultUser();
 
         UserReleaseRole userPreReleaseRole = _dataFixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithReleaseVersion(_releaseVersion)
             .WithUser(user);
 
@@ -156,8 +156,8 @@ public class PreReleaseUserServicePermissionTests
             .Setup(mock => mock.FindUserByEmail(user.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userPreReleaseRole);
+        var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+        userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userPreReleaseRole);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
@@ -166,12 +166,12 @@ public class PreReleaseUserServicePermissionTests
                 var service = SetupService(
                     userService: userService.Object,
                     userRepository: userRepository.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = service.RemovePreReleaseRoleByCompositeKey(_releaseVersion.Id, user.Email);
 
-                MockUtils.VerifyAllMocks(userService, userRepository, userPrereleaseRoleRepository);
+                MockUtils.VerifyAllMocks(userService, userRepository, userPreReleaseRoleRepository);
 
                 return result;
             });
@@ -181,12 +181,12 @@ public class PreReleaseUserServicePermissionTests
     public async Task RemoveUserReleaseRole()
     {
         UserReleaseRole userPreReleaseRole = _dataFixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithReleaseVersion(_releaseVersion)
             .WithUser(_dataFixture.DefaultUser());
 
-        var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(MockBehavior.Strict);
-        userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userPreReleaseRole);
+        var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+        userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userPreReleaseRole);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
@@ -194,12 +194,12 @@ public class PreReleaseUserServicePermissionTests
             {
                 var service = SetupService(
                     userService: userService.Object,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.RemovePreReleaseRole(userPreReleaseRole.Id);
 
-                MockUtils.VerifyAllMocks(userService, userPrereleaseRoleRepository);
+                MockUtils.VerifyAllMocks(userService, userPreReleaseRoleRepository);
 
                 return result;
             });
@@ -217,7 +217,7 @@ public class PreReleaseUserServicePermissionTests
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IUserRepository? userRepository = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IReleaseVersionRepository? releaseVersionRepository = null
     )
     {
@@ -228,7 +228,7 @@ public class PreReleaseUserServicePermissionTests
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict),
+            userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict)
         );
     }

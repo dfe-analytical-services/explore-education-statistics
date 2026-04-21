@@ -15,10 +15,10 @@ public class ManageContentPageController(IManageContentPageService manageContent
     [HttpGet("releaseVersions/{releaseVersionId:guid}/content")]
     public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(
         Guid releaseVersionId,
-        [FromQuery] bool isPrerelease = false,
+        [FromQuery] bool isPreRelease = false,
         CancellationToken cancellationToken = default
     ) =>
         await manageContentPageService
-            .GetManageContentPageViewModel(releaseVersionId, isPrerelease, cancellationToken)
+            .GetManageContentPageViewModel(releaseVersionId, isPreRelease, cancellationToken)
             .HandleFailuresOrOk();
 }
