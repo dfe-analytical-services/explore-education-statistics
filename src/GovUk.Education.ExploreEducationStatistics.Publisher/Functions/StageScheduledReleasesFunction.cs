@@ -30,6 +30,8 @@ public class StageScheduledReleasesFunction(
     /// </summary>
     /// <param name="timer"></param>
     /// <param name="context"></param>
+    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
+    // given that the 'staging' content task no longer exists.
     [Function(nameof(StageScheduledReleases))]
     public async Task StageScheduledReleases(
         [TimerTrigger("%App:StageScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
@@ -80,6 +82,9 @@ public class StageScheduledReleasesFunction(
     /// the scope of the Function to only the provided release version id's.
     /// </param>
     /// <param name="context"></param>
+    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
+    // given that the 'staging' content task no longer exists. Be careful to make sure it remains disabled in the Prod
+    // environment after renaming.
     [Function(nameof(StageScheduledReleaseVersionsImmediately))]
     public async Task<ActionResult<ManualTriggerResponse>> StageScheduledReleaseVersionsImmediately(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
