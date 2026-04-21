@@ -83,7 +83,7 @@ public class UserManagementServicePermissionTests
             .AssertForbidden(async userService =>
             {
                 var service = SetupUserManagementService(userService: userService.Object);
-                return await service.InviteUser(new UserInviteCreateRequest());
+                return await service.InviteUser(new UserInviteCreateRequest { Email = "test@test.com" });
             });
     }
 

@@ -35,7 +35,7 @@ public abstract class UserPublicationRoleRepositoryTests
         // (e.g. active, pending invite, expired invite, soft deleted)
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
-        public async Task NoPublicationRoleChanges(Func<DataFixture, User> userFactory)
+        public async Task RoleAlreadyExists_Throws(Func<DataFixture, User> userFactory)
         {
             var publicationRoleToRemain = PublicationRole.Approver;
 
@@ -60,10 +60,9 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.Create(user.Id, publication.Id, publicationRoleToRemain, createdBy.Id);
-
-                // Should not have created a new role, as the same role already exists for the user/publication combination
-                Assert.Null(result);
+                await Assert.ThrowsAsync<ArgumentException>(async () =>
+                    await repository.Create(user.Id, publication.Id, publicationRoleToRemain, createdBy.Id)
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -72,13 +71,7 @@ public abstract class UserPublicationRoleRepositoryTests
 
                 var unchangedPublicationRole = Assert.Single(userPublicationRoles);
 
-                Assert.NotEqual(Guid.Empty, unchangedPublicationRole.Id);
-                Assert.Equal(user.Id, unchangedPublicationRole.UserId);
-                Assert.Equal(publication.Id, unchangedPublicationRole.PublicationId);
-                Assert.Equal(publicationRoleToRemain, unchangedPublicationRole.Role);
-                unchangedPublicationRole.Created.AssertUtcNow();
-                Assert.Equal(createdBy.Id, unchangedPublicationRole.CreatedById);
-                Assert.Null(unchangedPublicationRole.EmailSent);
+                Assert.Equal(existingPublicationRole.Id, unchangedPublicationRole.Id);
             }
         }
 
@@ -331,9 +324,9 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
 
-                // Should have 8 roles in total: 4 existing + 4 new
+                // Should have 9 roles in total: 4 existing + 5 new
                 // The existing roles should be unchanged
-                Assert.Equal(8, userPublicationRoles.Count);
+                Assert.Equal(9, userPublicationRoles.Count);
 
                 Assert.All(
                     userPublicationRoles,
@@ -375,11 +368,14 @@ public abstract class UserPublicationRoleRepositoryTests
             User user = _fixture.DefaultUser();
             User createdBy = _fixture.DefaultUser();
             Publication publication = _fixture.DefaultPublication();
+            var createdDate = DateTime.UtcNow.AddDays(-1);
             UserPublicationRole existingPublicationRole = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithPublication(publication)
-                .WithRole(publicationRoleToRemain);
+                .WithRole(publicationRoleToRemain)
+                .WithCreated(createdDate)
+                .WithCreatedBy(createdBy);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -411,15 +407,13 @@ public abstract class UserPublicationRoleRepositoryTests
                 var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
 
                 // Existing role should still exist, and no new roles should have been created
-                Assert.Equal(2, userPublicationRoles.Count);
-
                 var userPublicationRole = Assert.Single(userPublicationRoles);
 
                 Assert.NotEqual(Guid.Empty, userPublicationRole.Id);
                 Assert.Equal(user.Id, userPublicationRole.UserId);
                 Assert.Equal(publication.Id, userPublicationRole.PublicationId);
                 Assert.Equal(existingPublicationRole.Role, userPublicationRole.Role);
-                userPublicationRole.Created.AssertUtcNow();
+                Assert.Equal(createdDate, userPublicationRole.Created);
                 Assert.Equal(createdBy.Id, userPublicationRole.CreatedById);
                 Assert.Null(userPublicationRole.EmailSent);
             }
@@ -1005,7 +999,7 @@ public abstract class UserPublicationRoleRepositoryTests
         [Theory]
         [InlineData(PublicationRole.Owner)]
         [InlineData(PublicationRole.Allower)]
-        public async Task OldRole_Throws(PublicationRole oldPublicationRoleToRemove)
+        public async Task OldRole_ReturnsFalseEvenIfExists(PublicationRole oldPublicationRoleToRemove)
         {
             UserPublicationRole oldSystemUserPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -1025,9 +1019,9 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext: contentDbContext);
 
-                await Assert.ThrowsAsync<ArgumentException>(async () =>
-                    await repository.RemoveById(oldSystemUserPublicationRole.Id)
-                );
+                var result = await repository.RemoveById(oldSystemUserPublicationRole.Id);
+
+                Assert.False(result);
             }
         }
     }
@@ -1089,12 +1083,19 @@ public abstract class UserPublicationRoleRepositoryTests
                 // Should have removed just the 2 specified roles, and left the other 6
                 Assert.Equal(6, remainingUserPublicationRoles.Count);
 
-                Assert.Equal(userPublicationRoles[0].Id, remainingUserPublicationRoles[0].Id);
-                Assert.Equal(userPublicationRoles[1].Id, remainingUserPublicationRoles[1].Id);
-                Assert.Equal(userPublicationRoles[3].Id, remainingUserPublicationRoles[3].Id);
-                Assert.Equal(userPublicationRoles[4].Id, remainingUserPublicationRoles[4].Id);
-                Assert.Equal(userPublicationRoles[5].Id, remainingUserPublicationRoles[5].Id);
-                Assert.Equal(userPublicationRoles[7].Id, remainingUserPublicationRoles[7].Id);
+                var expectedRemainingPublicationRoleIds = new HashSet<Guid>
+                {
+                    userPublicationRoles[0].Id,
+                    userPublicationRoles[1].Id,
+                    userPublicationRoles[3].Id,
+                    userPublicationRoles[4].Id,
+                    userPublicationRoles[5].Id,
+                    userPublicationRoles[7].Id,
+                };
+
+                var actualRemainingPublicationRoleIds = remainingUserPublicationRoles.Select(upr => upr.Id).ToHashSet();
+
+                Assert.Equal(expectedRemainingPublicationRoleIds, actualRemainingPublicationRoleIds);
             }
         }
 
@@ -1174,20 +1175,15 @@ public abstract class UserPublicationRoleRepositoryTests
             Publication publication1 = _fixture.DefaultPublication();
             Publication publication2 = _fixture.DefaultPublication();
 
-            // The OLD roles here will be removed in EES-6212
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
-                // These 4 roles should be removed (including the OLD permissions system roles)
-                .ForIndex(0, s => s.SetPublication(publication1).SetUser(targetUser).SetRole(PublicationRole.Allower))
-                .ForIndex(1, s => s.SetPublication(publication1).SetUser(targetUser).SetRole(PublicationRole.Owner))
-                .ForIndex(2, s => s.SetPublication(publication2).SetUser(targetUser).SetRole(PublicationRole.Drafter))
-                .ForIndex(3, s => s.SetPublication(publication2).SetUser(targetUser).SetRole(PublicationRole.Approver))
-                // These roles are for a different email and should not be removed
-                .ForIndex(4, s => s.SetPublication(publication1).SetUser(otherUser).SetRole(PublicationRole.Allower))
-                .ForIndex(5, s => s.SetPublication(publication1).SetUser(otherUser).SetRole(PublicationRole.Owner))
-                .ForIndex(6, s => s.SetPublication(publication2).SetUser(otherUser).SetRole(PublicationRole.Drafter))
-                .ForIndex(7, s => s.SetPublication(publication2).SetUser(otherUser).SetRole(PublicationRole.Approver))
-                .GenerateList(8);
+                // These 2 roles should be removed
+                .ForIndex(0, s => s.SetPublication(publication1).SetUser(targetUser).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetPublication(publication2).SetUser(targetUser).SetRole(PublicationRole.Drafter))
+                // These roles are for a different user and sould not be removed
+                .ForIndex(2, s => s.SetPublication(publication1).SetUser(otherUser).SetRole(PublicationRole.Approver))
+                .ForIndex(3, s => s.SetPublication(publication2).SetUser(otherUser).SetRole(PublicationRole.Drafter))
+                .GenerateList(4);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1206,26 +1202,16 @@ public abstract class UserPublicationRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                // Ignore query filters so that we can assess whether ALL the permissions system roles were deleted (OLD & NEW)
-                var remainingRoles = await contentDbContext
-                    .UserPublicationRoles.IgnoreQueryFilters()
-                    .Include(upr => upr.User)
-                    .ToListAsync();
+                var remainingRoles = await contentDbContext.UserPublicationRoles.Include(upr => upr.User).ToListAsync();
 
-                Assert.Equal(4, remainingRoles.Count);
+                Assert.Equal(2, remainingRoles.Count);
 
                 Assert.Equal(publication1.Id, remainingRoles[0].PublicationId);
                 Assert.Equal(otherUser.Id, remainingRoles[0].User.Id);
-                Assert.Equal(PublicationRole.Allower, remainingRoles[0].Role);
-                Assert.Equal(publication1.Id, remainingRoles[1].PublicationId);
+                Assert.Equal(PublicationRole.Approver, remainingRoles[0].Role);
+                Assert.Equal(publication2.Id, remainingRoles[1].PublicationId);
                 Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
-                Assert.Equal(PublicationRole.Owner, remainingRoles[1].Role);
-                Assert.Equal(publication2.Id, remainingRoles[2].PublicationId);
-                Assert.Equal(otherUser.Id, remainingRoles[2].User.Id);
-                Assert.Equal(PublicationRole.Drafter, remainingRoles[2].Role);
-                Assert.Equal(publication2.Id, remainingRoles[3].PublicationId);
-                Assert.Equal(otherUser.Id, remainingRoles[3].User.Id);
-                Assert.Equal(PublicationRole.Approver, remainingRoles[3].Role);
+                Assert.Equal(PublicationRole.Drafter, remainingRoles[1].Role);
             }
         }
 

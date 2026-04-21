@@ -1445,7 +1445,7 @@ public class ReleaseApprovalServiceTests
                         It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)
                     )
                 )
-                .Returns(Unit.Instance);
+                .Returns(new BadRequestResult());
 
             var releaseService = BuildService(
                 contentDbContext: context,

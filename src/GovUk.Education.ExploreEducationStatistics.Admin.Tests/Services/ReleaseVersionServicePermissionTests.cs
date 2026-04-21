@@ -206,12 +206,25 @@ public class ReleaseVersionServicePermissionTests
     {
         var (releaseVersion, otherReleaseVersion) = _dataFixture
             .DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            .ForIndex(
+                0,
+                s => s.SetRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            )
+            .ForIndex(
+                1,
+                s => s.SetRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            )
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .GenerateTuple2();
 
+        UserPublicationRole userPublicationRole = _dataFixture
+            .DefaultUserPublicationRole()
+            .WithPublication(releaseVersion.Release.Publication)
+            .WithUser(_dataFixture.DefaultUser().WithId(_userId))
+            .WithRole(PublicationRole.Approver);
+
         var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-        userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+        userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, userPublicationRole);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupCheck(RegisteredUser)

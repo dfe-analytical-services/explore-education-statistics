@@ -132,6 +132,7 @@ public class DataSetVersionService(
     {
         var releaseFile = await contentDbContext
             .ReleaseFiles.Include(rf => rf.ReleaseVersion)
+                .ThenInclude(rv => rv.Release)
             .SingleAsync(r => r.Id == releaseFileId, cancellationToken);
 
         return await userService
@@ -194,7 +195,8 @@ public class DataSetVersionService(
             )
             .OnSuccess(async releaseFile =>
                 await contentDbContext
-                    .ReleaseVersions.AsNoTracking()
+                    .ReleaseVersions.Include(rv => rv.Release)
+                    .AsNoTracking()
                     .SingleAsync(r => r.Id == releaseFile.ReleaseVersionId, cancellationToken)
             )
             .OnSuccess(async releaseVersion =>

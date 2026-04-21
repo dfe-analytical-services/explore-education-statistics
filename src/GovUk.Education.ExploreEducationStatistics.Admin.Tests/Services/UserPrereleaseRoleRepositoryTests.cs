@@ -678,7 +678,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRoleToRemove);
+                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoleToRemove, otherPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -753,6 +753,8 @@ public abstract class UserPrereleaseRoleRepositoryTests
                 )
                 .GenerateList(5);
 
+            var userPreReleaseRolesToRemove = userPreReleaseRoles.Take(4).ToList();
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -765,7 +767,7 @@ public abstract class UserPrereleaseRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                await repository.RemoveMany(userPreReleaseRoles);
+                await repository.RemoveMany(userPreReleaseRolesToRemove);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

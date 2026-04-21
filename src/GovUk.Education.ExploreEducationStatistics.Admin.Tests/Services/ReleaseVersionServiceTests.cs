@@ -1656,15 +1656,19 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success()
         {
-            var releaseBeingDeleted = new ReleaseVersion { Id = Guid.NewGuid() };
+            ReleaseVersion releaseVersionBeingDeleted = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
-            // This is just another unrelated Release that should not be affected.
-            var releaseNotBeingDeleted = new ReleaseVersion { Id = Guid.NewGuid() };
+            // This is just another unrelated Release Version that should not be affected.
+            ReleaseVersion releaseVersionNotBeingDeleted = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             var methodology1ScheduledWithRelease1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                ScheduledWithReleaseVersionId = releaseBeingDeleted.Id,
+                ScheduledWithReleaseVersionId = releaseVersionBeingDeleted.Id,
                 AlternativeTitle = "Methodology 1 with alternative title",
                 Methodology = new Methodology { OwningPublicationTitle = "Methodology 1 owned Publication title" },
             };
@@ -1672,14 +1676,14 @@ public abstract class ReleaseVersionServiceTests
             var methodology2ScheduledWithRelease1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                ScheduledWithReleaseVersionId = releaseBeingDeleted.Id,
+                ScheduledWithReleaseVersionId = releaseVersionBeingDeleted.Id,
                 Methodology = new Methodology { OwningPublicationTitle = "Methodology 2 with owned Publication title" },
             };
 
             var methodologyScheduledWithRelease2 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                ScheduledWithReleaseVersionId = releaseNotBeingDeleted.Id,
+                ScheduledWithReleaseVersionId = releaseVersionNotBeingDeleted.Id,
             };
 
             var methodologyNotScheduled = new MethodologyVersion { Id = Guid.NewGuid() };
@@ -1688,7 +1692,7 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseVersions.AddRange(releaseBeingDeleted, releaseNotBeingDeleted);
+                context.ReleaseVersions.AddRange(releaseVersionBeingDeleted, releaseVersionNotBeingDeleted);
                 context.MethodologyVersions.AddRange(
                     methodology1ScheduledWithRelease1,
                     methodology2ScheduledWithRelease1,
@@ -1702,7 +1706,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildService(context);
 
-                var result = await releaseVersionService.GetDeleteReleaseVersionPlan(releaseBeingDeleted.Id);
+                var result = await releaseVersionService.GetDeleteReleaseVersionPlan(releaseVersionBeingDeleted.Id);
 
                 var plan = result.AssertRight();
 
@@ -1979,11 +1983,13 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ProcessorReturns400_Returns400()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() },
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(
+                    _dataFixture
+                        .DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
+                );
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2034,11 +2040,13 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ProcessorThrows_Throws()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() },
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(
+                    _dataFixture
+                        .DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
+                );
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2296,11 +2304,13 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ProcessorReturns400_Returns400()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() },
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(
+                    _dataFixture
+                        .DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
+                );
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2355,11 +2365,13 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ProcessorThrows_Throws()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication { Theme = new Theme() },
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(
+                    _dataFixture
+                        .DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
+                );
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2820,14 +2832,10 @@ public abstract class ReleaseVersionServiceTests
                 ]
             );
 
-            var userPrereleaseRoleRepository = new Mock<IUserPrereleaseRoleRepository>(Strict);
-            userPrereleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var service = BuildService(
                     context,
-                    userPrereleaseRoleRepository: userPrereleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
@@ -2842,7 +2850,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion2WithApproverRoleForUser.Id, viewModels[1].Id);
             }
 
-            VerifyAllMocks(userPrereleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userPublicationRoleRepository);
         }
     }
 

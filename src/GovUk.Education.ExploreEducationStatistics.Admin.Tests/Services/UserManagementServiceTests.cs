@@ -240,7 +240,7 @@ public abstract class UserManagementServiceTests
                 var pendingInvite1 = pendingInvites.Single(pi => pi.Email == expectedUserInvite1.Email);
 
                 var expectedUserPublicationRoles1 = CreateUserPublicationRoleViewModels(userPublicationRoles[..2]);
-                var expectedUserPrereleaseRoles1 = CreateUserPrereleaseRoleViewModels(userPrereleaseRoles[..2]);
+                var expectedUserPrereleaseRoles1 = CreateUserPrereleaseRoleViewModels([userPrereleaseRoles[0]]);
 
                 Assert.Equal(expectedUserInvite1.Email, pendingInvite1.Email);
                 Assert.Equal(expectedUserInvite1.Role!.Name, pendingInvite1.Role);
@@ -251,7 +251,7 @@ public abstract class UserManagementServiceTests
                 var pendingInvite2 = pendingInvites.Single(pi => pi.Email == expectedUserInvite2.Email);
 
                 var expectedUserPublicationRoles2 = CreateUserPublicationRoleViewModels(userPublicationRoles[2..4]);
-                var expectedUserPrereleaseRoles2 = CreateUserPrereleaseRoleViewModels(userPrereleaseRoles[2..4]);
+                var expectedUserPrereleaseRoles2 = CreateUserPrereleaseRoleViewModels([userPrereleaseRoles[1]]);
 
                 Assert.Equal(expectedUserInvite2.Email, pendingInvite2.Email);
                 Assert.Equal(expectedUserInvite2.Role!.Name, pendingInvite2.Role);
@@ -262,7 +262,7 @@ public abstract class UserManagementServiceTests
                 var pendingInvite3 = pendingInvites.Single(pi => pi.Email == expectedUserInvite3.Email);
 
                 var expectedUserPublicationRoles3 = CreateUserPublicationRoleViewModels(userPublicationRoles[4..6]);
-                var expectedUserPrereleaseRoles3 = CreateUserPrereleaseRoleViewModels(userPrereleaseRoles[4..6]);
+                var expectedUserPrereleaseRoles3 = CreateUserPrereleaseRoleViewModels([userPrereleaseRoles[2]]);
 
                 Assert.Equal(expectedUserInvite3.Email, pendingInvite3.Email);
                 Assert.Equal(expectedUserInvite3.Role!.Name, pendingInvite3.Role);

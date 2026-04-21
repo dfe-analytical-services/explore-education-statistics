@@ -278,18 +278,20 @@ public class ThemeServiceTests
 
         var (publication1, publication2, publication3) = _fixture
             .DefaultPublication()
-            .WithTheme(_fixture.DefaultTheme())
+            .ForIndex(0, s => s.SetTheme(_fixture.DefaultTheme()))
+            .ForIndex(1, s => s.SetTheme(_fixture.DefaultTheme()))
+            .ForIndex(2, s => s.SetTheme(_fixture.DefaultTheme()))
             .GenerateTuple3();
 
         var userPublicationRoles = _fixture
             .DefaultUserPublicationRole()
             // These roles should result in the theme being included.
             .ForIndex(0, s => s.SetUser(user).SetPublication(publication1).SetRole(PublicationRole.Approver))
+            .ForIndex(1, s => s.SetUser(user).SetPublication(publication2).SetRole(PublicationRole.Drafter))
             // This one should not result in a duplicate as the role above already exists for the same publication with the same theme
             // (although, in theory, you should only have 1 publication role at a time per publication, we included it here for completeness to ensure
             // that duplicates aren't returned).
-            .ForIndex(1, s => s.SetUser(user).SetPublication(publication1).SetRole(PublicationRole.Drafter))
-            .ForIndex(2, s => s.SetUser(user).SetPublication(publication2).SetRole(PublicationRole.Drafter))
+            .ForIndex(2, s => s.SetUser(user).SetPublication(publication1).SetRole(PublicationRole.Drafter))
             // This role should not result in the theme being included.
             // This role is for a different user
             .ForIndex(

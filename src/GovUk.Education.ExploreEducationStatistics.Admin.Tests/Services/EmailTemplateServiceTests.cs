@@ -46,12 +46,12 @@ public class EmailTemplateServiceTests
 
         // These should be ordered by publication title, and then by role
         var expectedPublicationRoleList = """
-            * Title 1 - Drafter
             * Title 1 - Approver
-            * Title 2 - Drafter
+            * Title 1 - Drafter
             * Title 2 - Approver
-            * Title 3 - Drafter
+            * Title 2 - Drafter
             * Title 3 - Approver
+            * Title 3 - Drafter
             """;
 
         // These should be ordered by publication title, and then by release title
@@ -66,7 +66,7 @@ public class EmailTemplateServiceTests
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
-            { "pre-release role list", expectedPreReleaseRoleList },
+            { "pre-release list", expectedPreReleaseRoleList },
             { "publication role list", expectedPublicationRoleList },
         };
 
@@ -99,7 +99,7 @@ public class EmailTemplateServiceTests
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
-            { "pre-release role list", "* No pre-release permissions granted" },
+            { "pre-release list", "* No pre-release permissions granted" },
             { "publication role list", "* No publication permissions granted" },
         };
 

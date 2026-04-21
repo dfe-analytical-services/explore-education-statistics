@@ -24,7 +24,7 @@ public class EmailTemplateService(
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
-        var preReleaseRoleList = preReleaseRolesInfo
+        var preReleaseList = preReleaseRolesInfo
             .OrderBy(rri => rri.PublicationTitle)
             .ThenBy(rri => rri.ReleaseTitle)
             .Select(rri => $"* {rri.PublicationTitle}, {rri.ReleaseTitle}")
@@ -32,7 +32,7 @@ public class EmailTemplateService(
 
         var publicationRoleList = publicationRolesInfo
             .OrderBy(pri => pri.PublicationTitle)
-            .ThenBy(pri => pri.Role)
+            .ThenBy(pri => pri.Role.ToString())
             .Select(pri => $"* {pri.PublicationTitle} - {pri.Role}")
             .ToList();
 
@@ -40,10 +40,10 @@ public class EmailTemplateService(
         {
             { "url", url },
             {
-                "pre-release role list",
-                preReleaseRoleList.IsNullOrEmpty()
+                "pre-release list",
+                preReleaseList.IsNullOrEmpty()
                     ? "* No pre-release permissions granted"
-                    : preReleaseRoleList.JoinToString("\n")
+                    : preReleaseList.JoinToString("\n")
             },
             {
                 "publication role list",
@@ -68,7 +68,7 @@ public class EmailTemplateService(
         var emailValues = new Dictionary<string, dynamic>
         {
             { "url", url },
-            { "role", role },
+            { "role", role.ToString() },
             { "publication", publicationTitle },
         };
 
