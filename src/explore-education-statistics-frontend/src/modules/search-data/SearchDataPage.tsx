@@ -119,7 +119,11 @@ const SearchDataPage: NextPage = () => {
     };
   });
 
-  const isFiltered = !!search || !!releaseType || !!themeId;
+  const isFiltered =
+    !!search ||
+    !!releaseType ||
+    !!themeId ||
+    (!isPublicationsSearch && dataSetType === 'api');
 
   const selectedTheme = themes.find(theme => theme.id === themeId);
   const selectedReleaseType = releaseTypes[releaseType as ReleaseType];
@@ -406,7 +410,13 @@ const SearchDataPage: NextPage = () => {
             <p className="govuk-!-margin-bottom-0" data-testid="total-results">
               {`${totalResultsMessage}, ${
                 totalResults ? `page ${page} of ${totalPages}` : '0 pages'
-              }, ${isFiltered ? 'filtered by: ' : 'showing all publications'}`}
+              }, ${
+                isFiltered
+                  ? 'filtered by: '
+                  : `showing ${
+                      isPublicationsSearch ? 'all publications' : 'data sets'
+                    }`
+              }`}
             </p>
 
             {isFiltered && <VisuallyHidden>{filteredByString}</VisuallyHidden>}
@@ -433,6 +443,15 @@ const SearchDataPage: NextPage = () => {
                   name={selectedReleaseType}
                   onClick={() =>
                     handleResetFilter({ filterType: 'releaseType' })
+                  }
+                />
+              )}
+              {!isPublicationsSearch && dataSetType === 'api' && (
+                <FilterResetButton
+                  filterType="Data set type"
+                  name="API"
+                  onClick={() =>
+                    handleResetFilter({ filterType: 'dataSetType' })
                   }
                 />
               )}
