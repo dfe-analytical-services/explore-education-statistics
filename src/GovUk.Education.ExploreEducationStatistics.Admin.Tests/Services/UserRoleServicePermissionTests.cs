@@ -129,7 +129,7 @@ public class UserRoleServicePermissionTests
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IUserPrereleaseRoleRepository? userPrereleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserRepository? userRepository = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null
@@ -146,7 +146,7 @@ public class UserRoleServicePermissionTests
             userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(MockBehavior.Strict),
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
-            userPrereleaseRoleRepository ?? Mock.Of<IUserPrereleaseRoleRepository>(MockBehavior.Strict),
+            userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             userManager ?? MockUserManager().Object
         );

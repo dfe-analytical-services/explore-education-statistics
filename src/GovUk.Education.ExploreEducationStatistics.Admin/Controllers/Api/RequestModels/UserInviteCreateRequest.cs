@@ -14,7 +14,7 @@ public record UserInviteCreateRequest
 
     public DateTimeOffset? CreatedDate { get; init; }
 
-    public IReadOnlyList<UserPrereleaseRoleCreateRequest> UserPrereleaseRoles { get; init; } = [];
+    public IReadOnlyList<UserPreReleaseRoleCreateRequest> UserPreReleaseRoles { get; init; } = [];
 
     public IReadOnlyList<UserPublicationRoleCreateRequest> UserPublicationRoles { get; init; } = [];
 }

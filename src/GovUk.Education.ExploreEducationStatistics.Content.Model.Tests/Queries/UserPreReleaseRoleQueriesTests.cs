@@ -18,7 +18,7 @@ public class UserPreReleaseRoleQueriesTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithReleaseVersion(releaseVersion)
             .ForIndex(0, s => s.SetUser(user1))
             .ForIndex(1, s => s.SetUser(user1))
@@ -41,7 +41,7 @@ public class UserPreReleaseRoleQueriesTests
             .GenerateTuple2();
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithUser(user)
             .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1))
             .ForIndex(1, s => s.SetReleaseVersion(releaseVersion1))
@@ -67,7 +67,7 @@ public class UserPreReleaseRoleQueriesTests
             .GenerateList(3);
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithUser(user)
             .ForIndex(0, s => s.SetReleaseVersion(releaseVersions[0]))
             .ForIndex(1, s => s.SetReleaseVersion(releaseVersions[1]))
@@ -89,7 +89,7 @@ public class UserPreReleaseRoleQueriesTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithUser(user)
             .WithReleaseVersion(releaseVersion)
             // These two should be filtered out
@@ -111,7 +111,7 @@ public class UserPreReleaseRoleQueriesTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithReleaseVersion(releaseVersion)
             .ForIndex(0, s => s.SetUser(_fixture.DefaultUser()))
             .ForIndex(1, s => s.SetUser(_fixture.DefaultUser()))
@@ -134,7 +134,7 @@ public class UserPreReleaseRoleQueriesTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithReleaseVersion(releaseVersion)
             .ForIndex(0, s => s.SetUser(_fixture.DefaultUserWithPendingInvite()))
             .ForIndex(1, s => s.SetUser(_fixture.DefaultUserWithPendingInvite()))
@@ -157,7 +157,7 @@ public class UserPreReleaseRoleQueriesTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         var userPreReleaseRoles = _fixture
-            .DefaultUserPrereleaseRole()
+            .DefaultUserPreReleaseRole()
             .WithReleaseVersion(releaseVersion)
             .ForIndex(0, s => s.SetUser(_fixture.DefaultUser()))
             .ForIndex(1, s => s.SetUser(_fixture.DefaultUser()))
