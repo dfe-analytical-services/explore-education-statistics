@@ -2,12 +2,13 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Screener;
 
 public abstract class DataSetScreenerServiceTests
 {

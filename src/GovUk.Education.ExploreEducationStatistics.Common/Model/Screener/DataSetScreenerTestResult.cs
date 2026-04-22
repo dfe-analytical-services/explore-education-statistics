@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 
 public class DataScreenerTestResult
 {

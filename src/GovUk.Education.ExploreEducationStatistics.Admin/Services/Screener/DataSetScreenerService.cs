@@ -1,12 +1,13 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 
 public class DataSetScreenerService(
     IDataSetScreenerClient dataSetScreenerClient,
@@ -42,7 +43,7 @@ public class DataSetScreenerService(
     {
         var dataSetsUndergoingScreening = await contentDbContext
             .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
-            .Include(upload => upload.ScreeningProgress)
+            .Include(upload => upload.ScreenerProgress)
             .ToListAsync(cancellationToken: cancellationToken);
 
         var dataSetIdsUndergoingScreening = dataSetsUndergoingScreening.Select(upload => upload.Id).ToList();
@@ -56,11 +57,11 @@ public class DataSetScreenerService(
         {
             var dataSetToUpdate = dataSetsUndergoingScreening.First(dataSet => dataSet.Id == progressUpdate.DataSetId);
 
-            dataSetToUpdate.ScreeningProgress ??= new DataSetScreeningProgress();
-            dataSetToUpdate.ScreeningProgress.PercentageComplete = (int)progressUpdate.PercentageComplete;
-            dataSetToUpdate.ScreeningProgress.Stage = progressUpdate.Stage;
-            dataSetToUpdate.ScreeningProgress.Completed = progressUpdate.Completed;
-            dataSetToUpdate.ScreeningProgress.Passed = progressUpdate.Passed;
+            dataSetToUpdate.ScreenerProgress ??= new DataSetScreenerProgress();
+            dataSetToUpdate.ScreenerProgress.PercentageComplete = (int)progressUpdate.PercentageComplete;
+            dataSetToUpdate.ScreenerProgress.Stage = progressUpdate.Stage;
+            dataSetToUpdate.ScreenerProgress.Completed = progressUpdate.Completed;
+            dataSetToUpdate.ScreenerProgress.Passed = progressUpdate.Passed;
         });
 
         contentDbContext.DataSetUploads.UpdateRange(dataSetsUndergoingScreening);

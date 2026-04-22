@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     /// <inheritdoc />
@@ -11,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "ScreeningProgress",
+                name: "ScreenerProgress",
                 table: "DataSetUploads",
                 type: "nvarchar(max)",
                 nullable: true
@@ -21,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(name: "ScreeningProgress", table: "DataSetUploads");
+            migrationBuilder.DropColumn(name: "ScreenerProgress", table: "DataSetUploads");
         }
     }
 }

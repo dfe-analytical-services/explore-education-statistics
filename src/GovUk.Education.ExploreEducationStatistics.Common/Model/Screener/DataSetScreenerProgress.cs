@@ -1,6 +1,6 @@
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 
-public record DataSetScreeningProgress
+public record DataSetScreenerProgress
 {
     public int PercentageComplete { get; set; }
 

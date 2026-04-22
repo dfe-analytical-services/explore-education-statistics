@@ -1,6 +1,7 @@
+#nullable enable
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 
 public record DataSetScreenerProgressResponse
 {
