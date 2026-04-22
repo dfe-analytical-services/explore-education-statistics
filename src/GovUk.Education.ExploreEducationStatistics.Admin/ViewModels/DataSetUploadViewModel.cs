@@ -1,4 +1,6 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record DataSetUploadViewModel
@@ -18,6 +20,8 @@ public record DataSetUploadViewModel
     public required string Status { get; set; }
 
     public ScreenerResultViewModel? ScreenerResult { get; set; }
+
+    public ScreenerProgressViewModel? ScreenerProgress { get; set; }
 
     public required DateTime Created { get; set; }
 
