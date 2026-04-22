@@ -12,7 +12,7 @@ public interface IDataSetScreenerClient
         CancellationToken cancellationToken
     );
 
-    Task<List<DataSetScreenerProgressResponse>> GetScreeningProgress(
+    Task<List<DataSetScreenerProgressResponse>> GetScreenerProgress(
         IList<Guid> dataSetIds,
         CancellationToken cancellationToken
     );

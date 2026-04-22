@@ -43,7 +43,7 @@ public class DataSetScreenerClient(
             );
     }
 
-    public async Task<List<DataSetScreenerProgressResponse>> GetScreeningProgress(
+    public async Task<List<DataSetScreenerProgressResponse>> GetScreenerProgress(
         IList<Guid> dataSetIds,
         CancellationToken cancellationToken
     )

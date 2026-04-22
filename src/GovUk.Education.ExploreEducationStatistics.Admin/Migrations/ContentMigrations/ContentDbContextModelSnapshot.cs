@@ -404,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("ScreenerResult")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ScreeningProgress")
+                    b.Property<string>("ScreenerProgress")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")

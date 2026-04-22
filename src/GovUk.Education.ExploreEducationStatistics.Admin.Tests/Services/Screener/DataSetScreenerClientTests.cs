@@ -151,7 +151,7 @@ public class DataSetScreenerClientTests
 
             var dataSetScreenerClient = BuildService();
 
-            var response = await dataSetScreenerClient.GetScreeningProgress(
+            var response = await dataSetScreenerClient.GetScreenerProgress(
                 dataSetIds: dataSetIds,
                 CancellationToken.None
             );

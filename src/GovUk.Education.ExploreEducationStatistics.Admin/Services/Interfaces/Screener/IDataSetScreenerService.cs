@@ -19,5 +19,11 @@ public interface IDataSetScreenerService
 
     Task StartScreening(DataSetStartScreeningRequest dataSetScreenRequest, CancellationToken cancellationToken);
 
+    // ReSharper disable once UnusedMemberInSuper.Global
+    /// <summary>
+    /// This method will find data sets that are currently undergoing screening, and will request
+    /// progress updates for them from the Screener API.  To prevent excessive numbers of checks,
+    /// this method will also exclude any data sets that had their progress updated very recently.
+    /// </summary>
     Task<List<DataSetScreenerProgressResponse>> UpdateScreeningProgress(CancellationToken cancellationToken);
 }
