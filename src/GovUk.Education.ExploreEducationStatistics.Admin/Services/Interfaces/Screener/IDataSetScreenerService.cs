@@ -16,4 +16,6 @@ public interface IDataSetScreenerService
     );
 
     Task StartScreening(DataSetStartScreeningRequest dataSetScreenRequest, CancellationToken cancellationToken);
+
+    Task<List<DataSetScreenerProgressResponse>> UpdateScreeningProgress(CancellationToken cancellationToken);
 }

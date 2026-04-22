@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -85,12 +86,14 @@ public abstract class DataSetScreenerServiceTests
 
     private DataSetScreenerService BuildService(
         IDataSetScreenerClient? screenerClient = null,
-        IQueueServiceClient? queueServiceClient = null
+        IQueueServiceClient? queueServiceClient = null,
+        ContentDbContext? contentDbContext = null
     )
     {
         return new DataSetScreenerService(
             dataSetScreenerClient: screenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
-            queueServiceClient: queueServiceClient ?? Mock.Of<IQueueServiceClient>(MockBehavior.Strict)
+            queueServiceClient: queueServiceClient ?? Mock.Of<IQueueServiceClient>(MockBehavior.Strict),
+            contentDbContext: contentDbContext ?? Mock.Of<ContentDbContext>(MockBehavior.Strict)
         );
     }
 }

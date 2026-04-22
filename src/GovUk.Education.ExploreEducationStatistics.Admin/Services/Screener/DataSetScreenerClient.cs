@@ -40,4 +40,24 @@ public class DataSetScreenerClient(
                 $"External data screening process failed with status code {response.StatusCode}."
             );
     }
+
+    public async Task<List<DataSetScreenerProgressResponse>> GetScreeningProgress(
+        IList<Guid> dataSetIds,
+        CancellationToken cancellationToken
+    )
+    {
+        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
+
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        dataSetIds.ForEach(dataSetId => query.Add("data_set_id", dataSetId.ToString()));
+
+        var url = $"{httpClient.BaseAddress}/progress?{query}";
+        var response = await httpClient.GetAsync(url, cancellationToken);
+
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<List<DataSetScreenerProgressResponse>>(cancellationToken)
+            : throw new DataScreenerException(
+                $"Failed to get screener progress for data set ids {dataSetIds.JoinToString(",")} - status code {response.StatusCode}."
+            );
+    }
 }

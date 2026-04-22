@@ -40,6 +40,8 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
     public DataSetScreenerResponse? ScreenerResult { get; set; }
 
+    public DataSetScreeningProgress? ScreeningProgress { get; set; }
+
     public DateTime Created { get; set; }
 
     public required string UploadedBy { get; set; }

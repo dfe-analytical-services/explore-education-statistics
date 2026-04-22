@@ -115,6 +115,51 @@ public class DataSetScreenerClientTests
         }
     }
 
+    public class GetScreeningProgressTests : DataSetScreenerClientTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            Guid[] dataSetIds = [Guid.NewGuid(), Guid.NewGuid()];
+
+            DataSetScreenerProgressResponse[] responseBody =
+            [
+                new()
+                {
+                    DataSetId = dataSetIds[0],
+                    PercentageComplete = 50.12,
+                    Completed = false,
+                    Passed = false,
+                    Stage = "Validation",
+                },
+                new()
+                {
+                    DataSetId = dataSetIds[1],
+                    PercentageComplete = 100.00,
+                    Completed = true,
+                    Passed = true,
+                    Stage = "Screening",
+                },
+            ];
+
+            _mockHttp
+                .Expect(HttpMethod.Get, $"{BaseUri.AbsoluteUri}/progress")
+                .WithQueryString($"data_set_id={dataSetIds[0]}&data_set_id={dataSetIds[1]}")
+                .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
+
+            var dataSetScreenerClient = BuildService();
+
+            var response = await dataSetScreenerClient.GetScreeningProgress(
+                dataSetIds: dataSetIds,
+                CancellationToken.None
+            );
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            Assert.Equivalent(responseBody, response);
+        }
+    }
+
     private DataSetScreenerClient BuildService(
         IHttpClientAzureAuthenticationManager<DataScreenerOptions>? azureAuthenticationManager = null
     )

@@ -165,6 +165,14 @@ public class ContentDbContext : DbContext
 
         modelBuilder
             .Entity<DataSetUpload>()
+            .Property(upload => upload.ScreeningProgress)
+            .HasConversion(
+                r => JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
+                r => JsonSerializer.Deserialize<DataSetScreeningProgress>(r, (JsonSerializerOptions)null)
+            );
+
+        modelBuilder
+            .Entity<DataSetUpload>()
             .Property(m => m.Created)
             .HasConversion(d => d, d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
     }
