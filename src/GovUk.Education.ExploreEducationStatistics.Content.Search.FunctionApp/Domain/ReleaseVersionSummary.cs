@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
-public record ReleaseSummary
+public record ReleaseVersionSummary
 {
     public required string Id { get; init; }
     public required string ReleaseId { get; init; }

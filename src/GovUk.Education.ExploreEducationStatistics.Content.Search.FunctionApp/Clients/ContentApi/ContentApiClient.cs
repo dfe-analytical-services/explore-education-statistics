@@ -19,7 +19,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 
     private const string GetPublicationsByThemeEndpointFormat = "/api/publicationInfos?ThemeId={0}";
 
-    private const string GetPublicationReleaseSummaryEndpointFormat = "/api/publications/{0}/releases/{1}/summary";
+    private const string GetReleaseVersionSummaryEndpointFormat = "/api/publications/{0}/releases/{1}/version-summary";
 
     private const string GetPublicationReleaseIdsEndpointFormat = "api/publications/{0}/release-ids";
 
@@ -118,19 +118,19 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         );
     }
 
-    public async Task<ReleaseSummary> GetReleaseSummary(
+    public async Task<ReleaseVersionSummary> GetReleaseVersionSummary(
         string publicationSlug,
         string releaseSlug,
         CancellationToken cancellationToken = default
     )
     {
-        var apiEndpoint = BuildGetPublicationReleaseSummaryEndpoint(publicationSlug, releaseSlug);
-        var response = await Get<ReleaseSummaryDto>(apiEndpoint, cancellationToken);
+        var apiEndpoint = BuildGetReleaseVersionSummaryEndpoint(publicationSlug, releaseSlug);
+        var response = await Get<ReleaseVersionSummaryDto>(apiEndpoint, cancellationToken);
 
         return Process(
             response,
             onSuccess: dto => dto.ToModel(),
-            onError: errorMessage => new UnableToGetReleaseSummaryForPublicationException(
+            onError: errorMessage => new UnableToGetReleaseVersionSummaryException(
                 publicationSlug,
                 releaseSlug,
                 errorMessage
@@ -152,8 +152,8 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     private static string BuildGetPublicationsByThemeEndpoint(Guid themeId) =>
         string.Format(GetPublicationsByThemeEndpointFormat, themeId.ToString());
 
-    private static string BuildGetPublicationReleaseSummaryEndpoint(string publicationSlug, string releaseSlug) =>
-        string.Format(GetPublicationReleaseSummaryEndpointFormat, publicationSlug, releaseSlug);
+    private static string BuildGetReleaseVersionSummaryEndpoint(string publicationSlug, string releaseSlug) =>
+        string.Format(GetReleaseVersionSummaryEndpointFormat, publicationSlug, releaseSlug);
 
     private static string BuildGetPublicationReleaseIdsEndpoint(string publicationSlug) =>
         string.Format(GetPublicationReleaseIdsEndpointFormat, publicationSlug);

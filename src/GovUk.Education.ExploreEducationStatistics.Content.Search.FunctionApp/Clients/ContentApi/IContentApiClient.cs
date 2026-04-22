@@ -50,9 +50,13 @@ public interface IContentApiClient
     Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieve the Release Summary for the specified publication slug and release slug
+    /// Retrieve the latest published release version summary for the specified publication slug and release slug
     /// </summary>
-    Task<ReleaseSummary> GetReleaseSummary(
+    /// <param name="publicationSlug">the publication slug</param>
+    /// <param name="releaseSlug">the release slug</param>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns>The latest published release version summary for the specified publication slug and release slug</returns>
+    Task<ReleaseVersionSummary> GetReleaseVersionSummary(
         string publicationSlug,
         string releaseSlug,
         CancellationToken cancellationToken = default

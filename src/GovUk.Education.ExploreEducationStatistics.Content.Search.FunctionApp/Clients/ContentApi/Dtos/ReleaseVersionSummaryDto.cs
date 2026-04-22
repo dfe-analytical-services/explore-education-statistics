@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exte
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi.Dtos;
 
-public record ReleaseSummaryDto
+public record ReleaseVersionSummaryDto
 {
     public string? Id { get; init; }
     public string? ReleaseId { get; init; }
@@ -14,9 +14,9 @@ public record ReleaseSummaryDto
     public DateTimeOffset? Published { get; init; }
     public string? Type { get; init; }
     public bool? LatestRelease { get; init; }
-    public ReleaseSummaryPublicationDto? Publication { get; init; }
+    public ReleaseVersionSummaryPublicationDto? Publication { get; init; }
 
-    public ReleaseSummary ToModel() =>
+    public ReleaseVersionSummary ToModel() =>
         new()
         {
             Id = Id.ThrowIfBlank(nameof(Id)),
@@ -34,7 +34,7 @@ public record ReleaseSummaryDto
         };
 }
 
-public record ReleaseSummaryPublicationDto
+public record ReleaseVersionSummaryPublicationDto
 {
     public string? Id { get; init; }
     public string? Title { get; init; }
