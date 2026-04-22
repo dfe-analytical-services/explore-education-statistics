@@ -2027,7 +2027,7 @@
         "PublicDataApi__AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
-        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api/screen')]",
+        "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api')]",
         "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
         "DataScreener__ScreenerStorage": "",
         "DataScreener__EnhancedScreenerJourney": false
