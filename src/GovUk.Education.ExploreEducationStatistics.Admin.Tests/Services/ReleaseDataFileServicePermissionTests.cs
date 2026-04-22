@@ -1,11 +1,14 @@
-#nullable enable
+﻿#nullable enable
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -232,7 +235,7 @@ public class ReleaseDataFileServicePermissionTests
         IDataSetFileStorage? dataSetFileStorage = null,
         IDataBlockService? dataBlockService = null,
         IFootnoteRepository? footnoteRepository = null,
-        IDataSetScreenerClient? dataSetScreenerClient = null,
+        IDataSetScreenerService? dataSetScreenerService = null,
         IReplacementPlanService? replacementPlanService = null,
         IMapper? mapper = null
     )
@@ -252,9 +255,10 @@ public class ReleaseDataFileServicePermissionTests
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(MockBehavior.Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-            dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
+            dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(MockBehavior.Strict),
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
-            mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
+            mapper ?? Mock.Of<IMapper>(MockBehavior.Strict),
+            new DataScreenerOptions().ToOptionsWrapper()
         );
     }
 

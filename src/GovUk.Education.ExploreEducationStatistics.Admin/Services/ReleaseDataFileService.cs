@@ -1,9 +1,11 @@
-#nullable enable
+﻿#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -20,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -42,9 +45,10 @@ public class ReleaseDataFileService(
     IDataSetFileStorage dataSetFileStorage,
     IDataBlockService dataBlockService,
     IFootnoteRepository footnoteRepository,
-    IDataSetScreenerClient dataSetScreenerClient,
+    IDataSetScreenerService dataSetScreenerService,
     IReplacementPlanService replacementPlanService,
-    IMapper mapper
+    IMapper mapper,
+    IOptions<DataScreenerOptions> screenerOptions
 ) : IReleaseDataFileService
 {
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid fileId, bool forceDelete = false)
@@ -288,12 +292,27 @@ public class ReleaseDataFileService(
         CancellationToken cancellationToken
     )
     {
+        return await DoUpload(releaseVersionId, dataFile, metaFile, dataSetTitle, cancellationToken)
+            .OnSuccess(async dataSetUploads =>
+                screenerOptions.Value.EnhancedScreenerJourney
+                    ? await StartDataSetUploadScreening([.. dataSetUploads], cancellationToken)
+                    : await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
+            );
+    }
+
+    private async Task<Either<ActionResult, List<DataSetUpload>>> DoUpload(
+        Guid releaseVersionId,
+        IManagedStreamFile dataFile,
+        IManagedStreamFile metaFile,
+        string dataSetTitle,
+        CancellationToken cancellationToken
+    )
+    {
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
-            {
-                return await ValidateDataSetCsvPair(releaseVersionId, dataFile, metaFile, dataSetTitle)
+                await ValidateDataSetCsvPair(releaseVersionId, dataFile, metaFile, dataSetTitle)
                     .OnSuccess(async dataSet =>
                         await dataSetFileStorage.UploadDataSetsToTemporaryStorage(
                             releaseVersionId,
@@ -310,10 +329,8 @@ public class ReleaseDataFileService(
                             )
                         )
                     )
-                    .OnSuccess(async dataSetUploads =>
-                        await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
-                    );
-            });
+            )
+            .OnSuccess(dataSetUploads => dataSetUploads.ToList());
     }
 
     public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> UploadFromZip(
@@ -383,75 +400,130 @@ public class ReleaseDataFileService(
     {
         return await dataSetUploads
             .ToAsyncEnumerable()
-            .SelectAwait(async dataSetUpload =>
-            {
-                var dataFileToken = await privateBlobStorageService.GetBlobDownloadToken(
-                    PrivateReleaseTempFiles,
-                    dataSetUpload.DataFileName,
-                    dataSetUpload.DataFilePath,
-                    cancellationToken
-                );
-                var metaFileToken = await privateBlobStorageService.GetBlobDownloadToken(
-                    PrivateReleaseTempFiles,
-                    dataSetUpload.MetaFileName,
-                    dataSetUpload.MetaFilePath,
-                    cancellationToken
-                );
-
-                if (dataFileToken.IsLeft || metaFileToken.IsLeft)
+            .Select(
+                async (dataSetUpload, _, ct) =>
                 {
-                    throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
-                }
-
-                var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
-                request.DataFileSasToken = dataFileToken.Right!.Token;
-                request.MetaFileSasToken = metaFileToken.Right!.Token;
-
-                DataSetScreenerResponse result;
-
-                try
-                {
-                    result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
-                }
-                catch (DataScreenerException)
-                {
-                    await dataSetFileStorage.UpdateDataSetUpload(
-                        dataSetUpload.Id,
-                        screenerResult: null,
-                        cancellationToken
+                    var dataFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                        PrivateReleaseTempFiles,
+                        dataSetUpload.DataFileName,
+                        dataSetUpload.DataFilePath,
+                        cancellationToken: ct
                     );
+                    var metaFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                        PrivateReleaseTempFiles,
+                        dataSetUpload.MetaFileName,
+                        dataSetUpload.MetaFilePath,
+                        cancellationToken: ct
+                    );
+
+                    if (dataFileToken.IsLeft || metaFileToken.IsLeft)
+                    {
+                        throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
+                    }
+
+                    var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
+                    request.DataFileSasToken = dataFileToken.Right.Token;
+                    request.MetaFileSasToken = metaFileToken.Right.Token;
+
+                    DataSetScreenerResponse result;
+
+                    try
+                    {
+                        result = await dataSetScreenerService.ScreenDataSet(request, cancellationToken: ct);
+                    }
+                    catch (DataScreenerException)
+                    {
+                        await dataSetFileStorage.UpdateDataSetUpload(
+                            dataSetUpload.Id,
+                            screenerResult: null,
+                            cancellationToken: ct
+                        );
+
+                        return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                    }
+
+                    // TODO (EES-6693): Remove this automatic warning once the external screener is no longer required.
+                    result.TestResults.Add(
+                        new DataScreenerTestResult
+                        {
+                            Result = TestResult.WARNING,
+                            TestFunctionName = "External screening",
+                            Notes =
+                                "I confirm that this data set has been separately screened by, and passed, the EES data screener (https://rsconnect/rsc/dfe-published-data-qa/).",
+                            Stage = "Manual acknowledgement",
+                        }
+                    );
+
+                    await dataSetFileStorage.UpdateDataSetUpload(dataSetUpload.Id, result, cancellationToken: ct);
+
+                    var hasWarnings = result.TestResults.Any(test => test.Result == TestResult.WARNING);
+                    var hasFailures = result.TestResults.Any(test => test.Result == TestResult.FAIL);
+
+                    if (!hasWarnings && !hasFailures)
+                    {
+                        await SaveDataSetsFromTemporaryBlobStorage(
+                            dataSetUpload.ReleaseVersionId,
+                            [dataSetUpload.Id],
+                            cancellationToken: ct
+                        );
+                    }
 
                     return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                 }
+            )
+            .ToListAsync(cancellationToken);
+    }
 
-                // TODO (EES-6693): Remove this automatic warning once the external screener is no longer required.
-                result.TestResults.Add(
-                    new DataScreenerTestResult
-                    {
-                        Result = TestResult.WARNING,
-                        TestFunctionName = "External screening",
-                        Notes =
-                            "I confirm that this data set has been separately screened by, and passed, the EES data screener (https://rsconnect/rsc/dfe-published-data-qa/).",
-                        Stage = "Manual acknowledgement",
-                    }
-                );
-
-                await dataSetFileStorage.UpdateDataSetUpload(dataSetUpload.Id, result, cancellationToken);
-
-                var hasWarnings = result.TestResults.Any(test => test.Result == TestResult.WARNING);
-                var hasFailures = result.TestResults.Any(test => test.Result == TestResult.FAIL);
-
-                if (!hasWarnings && !hasFailures)
+    private async Task<List<DataSetUploadViewModel>> StartDataSetUploadScreening(
+        List<DataSetUpload> dataSetUploads,
+        CancellationToken cancellationToken
+    )
+    {
+        return await dataSetUploads
+            .ToAsyncEnumerable()
+            .Select(
+                async (dataSetUpload, _, ct) =>
                 {
-                    await SaveDataSetsFromTemporaryBlobStorage(
-                        dataSetUpload.ReleaseVersionId,
-                        [dataSetUpload.Id],
-                        cancellationToken
+                    var dataFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                        PrivateReleaseTempFiles,
+                        dataSetUpload.DataFileName,
+                        dataSetUpload.DataFilePath,
+                        cancellationToken: ct
                     );
-                }
+                    var metaFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                        PrivateReleaseTempFiles,
+                        dataSetUpload.MetaFileName,
+                        dataSetUpload.MetaFilePath,
+                        cancellationToken: ct
+                    );
 
-                return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
-            })
+                    if (dataFileToken.IsLeft || metaFileToken.IsLeft)
+                    {
+                        throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
+                    }
+
+                    var request = mapper.Map<DataSetStartScreeningRequest>(dataSetUpload);
+                    request.DataFileSasToken = dataFileToken.Right.Token;
+                    request.MetaFileSasToken = metaFileToken.Right.Token;
+
+                    try
+                    {
+                        await dataSetScreenerService.StartScreening(request, cancellationToken: ct);
+
+                        return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                    }
+                    catch (DataScreenerException)
+                    {
+                        await dataSetFileStorage.UpdateDataSetUpload(
+                            dataSetUpload.Id,
+                            screenerResult: null,
+                            cancellationToken: ct
+                        );
+
+                        return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                    }
+                }
+            )
             .ToListAsync(cancellationToken);
     }
 
@@ -674,9 +746,9 @@ public class ReleaseDataFileService(
         // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
         var permissionsDict = await files
             .ToAsyncEnumerable()
-            .ToDictionaryAwaitAsync(
-                file => ValueTask.FromResult(file.Id),
-                async file => await userService.GetDataFilePermissions(file)
+            .ToDictionaryAsync(
+                (file, _) => ValueTask.FromResult(file.Id),
+                async (file, _) => await userService.GetDataFilePermissions(file)
             );
 
         var result = await releaseFiles.SelectAsync(async releaseFile =>

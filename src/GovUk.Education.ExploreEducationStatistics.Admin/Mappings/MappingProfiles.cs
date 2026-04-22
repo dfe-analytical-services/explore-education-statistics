@@ -146,6 +146,10 @@ public class MappingProfiles : CommonMappingProfile
 
         CreateMap<DataSetUpload, DataSetScreenerRequest>()
             .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
+
+        CreateMap<DataSetUpload, DataSetStartScreeningRequest>()
+            .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles)
+            .ForMember(d => d.DataSetId, m => m.MapFrom(upload => upload.Id));
     }
 
     private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)

@@ -3,21 +3,21 @@ using System.Net;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Moq;
 using RichardSzalay.MockHttp;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Screener;
 
 public class DataSetScreenerClientTests
 {
-    private static readonly Uri BaseUri = new("http://localhost/api/screen");
+    private static readonly Uri BaseUri = new("http://localhost/api");
     private readonly MockHttpMessageHandler _mockHttp;
     private readonly JsonSerializerOptions _requestSerializerOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case sensitive
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case-sensitive.
     };
 
     protected DataSetScreenerClientTests()
@@ -33,10 +33,10 @@ public class DataSetScreenerClientTests
             var responseBody = new DataSetScreenerResponse { OverallResult = "Failed", TestResults = [] };
 
             _mockHttp
-                .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
+                .Expect(HttpMethod.Post, $"{BaseUri.AbsoluteUri}/screen")
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
 
-            var authenticationManager = new Mock<IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>>(
+            var authenticationManager = new Mock<IHttpClientAzureAuthenticationManager<DataScreenerOptions>>(
                 MockBehavior.Strict
             );
 
@@ -101,7 +101,7 @@ public class DataSetScreenerClientTests
             };
 
             _mockHttp
-                .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
+                .Expect(HttpMethod.Post, $"{BaseUri.AbsoluteUri}/screen")
                 .WithJsonContent(request, _requestSerializerOptions)
                 .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
 
@@ -116,7 +116,7 @@ public class DataSetScreenerClientTests
     }
 
     private DataSetScreenerClient BuildService(
-        IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>? azureAuthenticationManager = null
+        IHttpClientAzureAuthenticationManager<DataScreenerOptions>? azureAuthenticationManager = null
     )
     {
         var client = _mockHttp.ToHttpClient();
@@ -124,7 +124,7 @@ public class DataSetScreenerClientTests
 
         var authenticationManager =
             azureAuthenticationManager
-            ?? Mock.Of<IHttpClientAzureAuthenticationManager<DataScreenerClientOptions>>(MockBehavior.Loose);
+            ?? Mock.Of<IHttpClientAzureAuthenticationManager<DataScreenerOptions>>(MockBehavior.Loose);
 
         return new DataSetScreenerClient(client, authenticationManager);
     }
