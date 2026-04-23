@@ -424,15 +424,6 @@ const publicationService = {
     return contentApi.get(`/publications/${publicationSlug}/releases`);
   },
   // Currently used within table tool
-  getPublicationRelease(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<ReleaseVersion> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}`,
-    );
-  },
-  // Currently used within table tool
   getLatestPublicationRelease(
     publicationSlug: string,
   ): Promise<ReleaseVersion> {
