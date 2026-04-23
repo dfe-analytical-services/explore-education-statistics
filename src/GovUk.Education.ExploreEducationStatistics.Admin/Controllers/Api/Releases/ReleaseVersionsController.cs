@@ -3,7 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -16,46 +18,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Relea
 [Route("api")]
 [ApiController]
 [Authorize]
-public class ReleaseVersionsController : ControllerBase
+public class ReleaseVersionsController(
+    IReleaseVersionService releaseVersionService,
+    IReleaseAmendmentService releaseAmendmentService,
+    IReleaseApprovalService releaseApprovalService,
+    IReleaseDataFileService releaseDataFileService,
+    IReleasePublishingStatusService releasePublishingStatusService,
+    IReleaseChecklistService releaseChecklistService,
+    IDataImportService dataImportService,
+    IDataSetUploadRepository dataSetUploadRepository,
+    IDataSetFileStorage dataSetFileStorage,
+    IDataSetScreenerService dataSetScreenerService
+) : ControllerBase
 {
-    private readonly IReleaseVersionService _releaseVersionService;
-    private readonly IReleaseAmendmentService _releaseAmendmentService;
-    private readonly IReleaseApprovalService _releaseApprovalService;
-    private readonly IReleaseDataFileService _releaseDataFileService;
-    private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-    private readonly IReleaseChecklistService _releaseChecklistService;
-    private readonly IDataImportService _dataImportService;
-    private readonly IDataSetUploadRepository _dataSetUploadRepository;
-    private readonly IDataSetFileStorage _dataSetFileStorage;
-
-    public ReleaseVersionsController(
-        IReleaseVersionService releaseVersionService,
-        IReleaseAmendmentService releaseAmendmentService,
-        IReleaseApprovalService releaseApprovalService,
-        IReleaseDataFileService releaseDataFileService,
-        IReleasePublishingStatusService releasePublishingStatusService,
-        IReleaseChecklistService releaseChecklistService,
-        IDataImportService dataImportService,
-        IDataSetUploadRepository dataSetUploadRepository,
-        IDataSetFileStorage dataSetFileStorage
-    )
-    {
-        _releaseVersionService = releaseVersionService;
-        _releaseAmendmentService = releaseAmendmentService;
-        _releaseApprovalService = releaseApprovalService;
-        _releaseDataFileService = releaseDataFileService;
-        _releasePublishingStatusService = releasePublishingStatusService;
-        _releaseChecklistService = releaseChecklistService;
-        _dataImportService = dataImportService;
-        _dataSetUploadRepository = dataSetUploadRepository;
-        _dataSetFileStorage = dataSetFileStorage;
-    }
-
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpDelete("release/{releaseVersionId:guid}")]
     public async Task<ActionResult> DeleteReleaseVersion(Guid releaseVersionId, CancellationToken cancellationToken)
     {
-        return await _releaseVersionService
+        return await releaseVersionService
             .DeleteReleaseVersion(releaseVersionId, cancellationToken)
             .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
     }
@@ -64,13 +44,13 @@ public class ReleaseVersionsController : ControllerBase
     [HttpPost("release/{releaseVersionId:guid}/amendment")]
     public async Task<ActionResult<IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
     {
-        return await _releaseAmendmentService.CreateReleaseAmendment(releaseVersionId).HandleFailuresOrOk();
+        return await releaseAmendmentService.CreateReleaseAmendment(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/data/{fileId:guid}")]
     public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
     {
-        return await _releaseDataFileService.GetInfo(releaseVersionId, fileId).HandleFailuresOrOk();
+        return await releaseDataFileService.GetInfo(releaseVersionId, fileId).HandleFailuresOrOk();
     }
 
     [HttpGet(
@@ -83,7 +63,7 @@ public class ReleaseVersionsController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        return await _dataSetFileStorage
+        return await dataSetFileStorage
             .GetTemporaryFileDownloadToken(releaseVersionId, dataSetUploadId, fileType, cancellationToken)
             .OnSuccess(token => token.ToBase64JsonString())
             .HandleFailuresOrOk();
@@ -96,7 +76,7 @@ public class ReleaseVersionsController : ControllerBase
         Guid fileId
     )
     {
-        return await _releaseDataFileService
+        return await releaseDataFileService
             .GetAccoutrementsSummary(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrOk();
     }
@@ -104,7 +84,7 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("releaseVersions/{releaseVersionId:guid}/data")]
     public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
     {
-        return await _releaseDataFileService.ListAll(releaseVersionId).HandleFailuresOrOk();
+        return await releaseDataFileService.ListAll(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads")]
@@ -113,7 +93,7 @@ public class ReleaseVersionsController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        return await _dataSetUploadRepository.ListAll(releaseVersionId, cancellationToken).HandleFailuresOrOk();
+        return await dataSetUploadRepository.ListAll(releaseVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpDelete("releaseVersions/{releaseVersionId:guid}/upload/{dataSetUploadId:guid}")]
@@ -123,16 +103,26 @@ public class ReleaseVersionsController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        return await _dataSetUploadRepository
+        return await dataSetUploadRepository
             .Delete(releaseVersionId, dataSetUploadId, cancellationToken)
             .HandleFailuresOrNoContent();
+    }
+
+    [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads/screener/progress")]
+    public async Task<
+        ActionResult<List<ScreenerProgressWithDataSetUploadIdViewModel>>
+    > GetDataSetUploadScreenerProgress(Guid releaseVersionId, CancellationToken cancellationToken)
+    {
+        return await dataSetScreenerService
+            .GetScreenerProgress(releaseVersionId, cancellationToken)
+            .HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpPut("release/{releaseVersionId:guid}/data/order")]
     public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseVersionId, List<Guid> fileIds)
     {
-        return await _releaseDataFileService.ReorderDataFiles(releaseVersionId, fileIds).HandleFailuresOrOk();
+        return await releaseDataFileService.ReorderDataFiles(releaseVersionId, fileIds).HandleFailuresOrOk();
     }
 
     [HttpPost("releaseVersions/data")]
@@ -146,7 +136,7 @@ public class ReleaseVersionsController : ControllerBase
         await using var dataFile = new ManagedStreamFormFile(request.DataFile);
         await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
 
-        return await _releaseDataFileService
+        return await releaseDataFileService
             .Upload(request.ReleaseVersionId, dataFile, metaFile, request.Title, cancellationToken)
             .HandleFailuresOrOk();
     }
@@ -161,7 +151,7 @@ public class ReleaseVersionsController : ControllerBase
     {
         await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
 
-        return await _releaseDataFileService
+        return await releaseDataFileService
             .UploadFromZip(request.ReleaseVersionId, zipFile, request.Title, cancellationToken)
             .HandleFailuresOrOk();
     }
@@ -176,7 +166,7 @@ public class ReleaseVersionsController : ControllerBase
     {
         await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
 
-        return await _releaseDataFileService
+        return await releaseDataFileService
             .UploadFromBulkZip(request.ReleaseVersionId, zipFile, cancellationToken)
             .HandleFailuresOrOk();
     }
@@ -188,7 +178,7 @@ public class ReleaseVersionsController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        return await _releaseDataFileService
+        return await releaseDataFileService
             .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetUploadIds, cancellationToken)
             .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
     }
@@ -197,14 +187,14 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("releases/{releaseVersionId:guid}")]
     public async Task<ActionResult<ReleaseVersionViewModel>> GetReleaseVersion(Guid releaseVersionId)
     {
-        return await _releaseVersionService.GetRelease(releaseVersionId).HandleFailuresOrOk();
+        return await releaseVersionService.GetRelease(releaseVersionId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("releases/{releaseVersionId:guid}/status")]
     public async Task<ActionResult<List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
     {
-        return await _releaseApprovalService.ListReleaseStatuses(releaseVersionId).HandleFailuresOrOk();
+        return await releaseApprovalService.ListReleaseStatuses(releaseVersionId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -213,7 +203,7 @@ public class ReleaseVersionsController : ControllerBase
         Guid releaseVersionId
     )
     {
-        return await _releaseVersionService.GetReleasePublicationStatus(releaseVersionId).HandleFailuresOrOk();
+        return await releaseVersionService.GetReleasePublicationStatus(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpPatch("releaseVersions/{releaseVersionId:guid}")]
@@ -222,7 +212,7 @@ public class ReleaseVersionsController : ControllerBase
         Guid releaseVersionId
     )
     {
-        return await _releaseVersionService.UpdateReleaseVersion(releaseVersionId, request).HandleFailuresOrOk();
+        return await releaseVersionService.UpdateReleaseVersion(releaseVersionId, request).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
@@ -232,9 +222,9 @@ public class ReleaseVersionsController : ControllerBase
         Guid releaseVersionId
     )
     {
-        return await _releaseApprovalService
+        return await releaseApprovalService
             .CreateReleaseStatus(releaseVersionId, request)
-            .OnSuccess(_ => _releaseVersionService.GetRelease(releaseVersionId))
+            .OnSuccess(_ => releaseVersionService.GetRelease(releaseVersionId))
             .HandleFailuresOrOk();
     }
 
@@ -242,14 +232,14 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("publications/{publicationId:guid}/releases/template")]
     public async Task<ActionResult<IdTitleViewModel>> GetTemplateRelease([Required] Guid publicationId)
     {
-        return await _releaseVersionService.GetLatestPublishedRelease(publicationId).HandleFailuresOrOk();
+        return await releaseVersionService.GetLatestPublishedRelease(publicationId).HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("releases/draft")]
     public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListDraftReleases()
     {
-        return await _releaseVersionService
+        return await releaseVersionService
             .ListReleasesWithStatuses(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
             .HandleFailuresOrOk();
     }
@@ -258,21 +248,21 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("releases/approvals")]
     public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval()
     {
-        return await _releaseVersionService.ListUsersReleasesForApproval().HandleFailuresOrOk();
+        return await releaseVersionService.ListUsersReleasesForApproval().HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("releases/scheduled")]
     public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases()
     {
-        return await _releaseVersionService.ListScheduledReleases().HandleFailuresOrOk();
+        return await releaseVersionService.ListScheduledReleases().HandleFailuresOrOk();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895
     [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/import/status")]
     public Task<ActionResult<DataImportStatusViewModel>> GetDataUploadStatus(Guid releaseVersionId, Guid fileId)
     {
-        return _releaseVersionService
+        return releaseVersionService
             .GetDataFileImportStatus(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrOk();
     }
@@ -284,7 +274,7 @@ public class ReleaseVersionsController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        return await _releaseVersionService
+        return await releaseVersionService
             .GetDeleteReleaseVersionPlan(releaseVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
@@ -297,7 +287,7 @@ public class ReleaseVersionsController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        return await _releaseVersionService
+        return await releaseVersionService
             .GetDeleteDataFilePlan(
                 releaseVersionId: releaseVersionId,
                 fileId: fileId,
@@ -310,7 +300,7 @@ public class ReleaseVersionsController : ControllerBase
     [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}")]
     public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
     {
-        return await _releaseVersionService
+        return await releaseVersionService
             .RemoveDataFiles(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrNoContent();
     }
@@ -319,7 +309,7 @@ public class ReleaseVersionsController : ControllerBase
     [HttpPost("release/{releaseVersionId:guid}/data/{fileId:guid}/import/cancel")]
     public async Task<ActionResult> CancelFileImport(Guid releaseVersionId, Guid fileId)
     {
-        return await _dataImportService
+        return await dataImportService
             .CancelImport(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOr(_ => new AcceptedResult());
     }
@@ -328,13 +318,13 @@ public class ReleaseVersionsController : ControllerBase
     [HttpGet("releases/{releaseVersionId:guid}/stage-status")]
     public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseVersionId)
     {
-        return await _releasePublishingStatusService.GetReleaseStatusAsync(releaseVersionId).HandleFailuresOrOk();
+        return await releasePublishingStatusService.GetReleaseStatusAsync(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/checklist")]
     public async Task<ActionResult<ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
     {
-        return await _releaseChecklistService.GetChecklist(releaseVersionId).HandleFailuresOrOk();
+        return await releaseChecklistService.GetChecklist(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpPatch("releaseVersions/{releaseVersionId:guid}/prerelease-access-list")]
@@ -343,9 +333,9 @@ public class ReleaseVersionsController : ControllerBase
         ReleaseVersionPreReleaseAccessListUpdateRequest request,
         CancellationToken cancellationToken = default
     ) =>
-        await _releaseVersionService
+        await releaseVersionService
             .UpdatePreReleaseAccessList(releaseVersionId, request, cancellationToken)
-            .OnSuccess(_ => _releaseVersionService.GetRelease(releaseVersionId))
+            .OnSuccess(_ => releaseVersionService.GetRelease(releaseVersionId))
             .HandleFailuresOrOk();
 
     [HttpPatch("releaseVersions/{releaseVersionId:guid}/published-display-date")]
@@ -354,7 +344,7 @@ public class ReleaseVersionsController : ControllerBase
         ReleaseVersionPublishedDisplayDateUpdateRequest request
     )
     {
-        return await _releaseVersionService
+        return await releaseVersionService
             .UpdatePublishedDisplayDate(releaseVersionId, request)
             .HandleFailuresOrNoContent();
     }

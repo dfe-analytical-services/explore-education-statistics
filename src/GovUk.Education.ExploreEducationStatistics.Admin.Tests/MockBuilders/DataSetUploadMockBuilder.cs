@@ -12,7 +12,7 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
     private Guid? _releaseVersionId;
     private string? _screenerResult;
     private List<DataScreenerTestResult>? _testResults;
-    private TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
+    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
     public DataSetUpload BuildInitialEntity()
     {
