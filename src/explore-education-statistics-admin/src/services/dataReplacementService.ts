@@ -161,83 +161,72 @@ export interface DataReplacementPlan {
   footnotes: FootnoteReplacementPlan[];
   apiDataSetVersionPlan: ApiDataSetVersionPlan;
   valid: boolean;
-  mappings: PlanMappings;
+  mapping: PlanMappings;
 }
+
+type PlanMappingIndicatorsUpdateResponse = {
+  originalId: string;
+  originalLabel: string;
+  originalColumnName: string;
+  originalGroupId: string;
+  originalGroupLabel: string;
+  status: MappingType;
+  replacementId?: string;
+  replacementLabel?: string;
+  replacementColumnName?: string;
+  replacementGroupId?: string;
+  replacementGroupLabel?: string;
+}[];
 
 const dataReplacementService = {
   async getReplacementPlan(
     releaseVersionId: string,
     originalFileId: string,
   ): Promise<DataReplacementPlan> {
-    // TODO 6913
-    const dummyIndicatorsMappings: IndicatorsMapping = {
-      mappings: {
-        enrolments_again: {
-          source: {
-            label: 'Enrolments_Again',
-          },
-          type: 'Unset',
-        },
-        enrolments: {
-          source: {
-            label: 'Enrolments',
-          },
-          type: 'Unset',
-        },
-        sess_possible: {
-          source: {
-            label: 'Number of possible sessions',
-          },
-          type: 'AutoSet',
-          candidateKey: 'sess_possible',
-        },
-        sess_authorised: {
-          source: {
-            label: 'Number of authorised sessions',
-          },
-          type: 'AutoSet',
-          candidateKey: 'sess_authorised',
-        },
-        sess_unauthorised: {
-          source: {
-            label: 'Number of unauthorised sessions',
-          },
-          type: 'AutoSet',
-          candidateKey: 'sess_unauthorised',
-        },
-        sess_unauthorised_percent: {
-          source: {
-            label: 'Percentage of unauthorised sessions',
-          },
-          type: 'AutoSet',
-          candidateKey: 'sess_unauthorised_percent',
-        },
-      },
-      candidates: {
-        sess_possible: {
-          label: 'Number of possible sessions',
-        },
-        sess_authorised: {
-          label: 'Number of authorised sessions',
-        },
-        sess_unauthorised: {
-          label: 'Number of unauthorised sessions',
-        },
-        number_of_enrolments_again: {
-          label: 'Number of enrolments again',
-        },
-        number_of_enrolments: {
-          label: 'Number of enrolments',
-        },
-        sess_unauthorised_percent: {
-          label: 'Percentage of unauthorised sessions',
-        },
-      },
-    };
     const plan: DataReplacementPlan = await client.get(
       `releases/${releaseVersionId}/data/${originalFileId}/replacement-plan`,
     );
-    return { ...plan, mappings: { indicators: dummyIndicatorsMappings } };
+    return plan;
+  },
+  async updatePlanIndicatorMappings(
+    releaseVersionId: string,
+    originalDataSetId: string,
+    replacementDataSetId: string,
+    updates: {
+      originalColumnName: string;
+      newReplacementColumnName?: string;
+    }[],
+  ): Promise<DataReplacementPlan['mapping']['indicators']['mappings']> {
+    const indicatorsMappings: PlanMappingIndicatorsUpdateResponse =
+      await client.patch(
+        `releases/${releaseVersionId}/data/replacements/mapping/indicators`,
+        {
+          originalDataSetId,
+          replacementDataSetId,
+          updates,
+        },
+      );
+
+    const planIndicatorMappings: PlanMappings['indicators']['mappings'] =
+      Object.fromEntries(
+        indicatorsMappings.map(
+          ({
+            originalLabel,
+            originalColumnName,
+            status,
+            replacementColumnName,
+          }) => [
+            originalColumnName,
+            {
+              source: { label: originalLabel },
+              type: status,
+              candidateKey: replacementColumnName,
+            },
+          ],
+        ),
+      );
+
+    return planIndicatorMappings;
   },
   replaceData(
     releaseVersionId: string,
