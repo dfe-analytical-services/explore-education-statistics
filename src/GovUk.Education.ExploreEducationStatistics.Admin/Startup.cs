@@ -366,7 +366,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.Configure<AppOptions>(configuration.GetRequiredSection(AppOptions.Section));
         services.Configure<AppInsightsOptions>(configuration.GetSection(AppInsightsOptions.Section));
-        services.Configure<NotifyOptions>(configuration.GetSection(NotifyOptions.Section));
+        services.Configure<NotifyOptions>(configuration.GetRequiredSection(NotifyOptions.Section));
         services.Configure<PublicAppOptions>(configuration.GetRequiredSection(PublicAppOptions.Section));
         services.Configure<PublicDataProcessorOptions>(
             configuration.GetRequiredSection(PublicDataProcessorOptions.Section)

@@ -348,43 +348,6 @@
         "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
       }
     },
-    "notifyInviteWithRolesTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me",
-      "metadata": {
-        "description": "Gov UK Notify service template Id for new user invites"
-      }
-    },
-    "notifyPublicationRoleTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
-    "notifyReleaseRoleTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
-    "notifyPreReleaseTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
-    "notifyContributorTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
-    "notifyReleaseHigherReviewersTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me",
-      "metadata": {
-        "description": "Gov UK Notify service template ID for release higher review approver notifications"
-      }
-    },
-    "notifyMethodologyHigherReviewersTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me",
-      "metadata": {
-        "description": "Gov UK Notify service template ID for methodology higher review approver notifications"
-      }
-    },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "type": "bool",
       "defaultValue": false,
@@ -1992,13 +1955,6 @@
         "IdentityServer__IssuerUri": "[concat('urn=', parameters('adminUri'))]",
         "IdentityServer__Key__Name": "[concat('CN=', parameters('adminUri'))]",
         "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-admin-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "Notify__InviteWithRolesTemplateId": "[parameters('notifyInviteWithRolesTemplateId')]",
-        "Notify__PublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
-        "Notify__ReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
-        "Notify__PreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
-        "Notify__ContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
-        "Notify__ReleaseHigherReviewersTemplateId": "[parameters('notifyReleaseHigherReviewersTemplateId')]",
-        "Notify__MethodologyHigherReviewersTemplateId": "[parameters('notifyMethodologyHigherReviewersTemplateId')]",
         "OpenIdConnectIdentityFramework__ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectIdentityFramework__Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-audience'), '2018-02-14').secretUriWithVersion, ')')]",
