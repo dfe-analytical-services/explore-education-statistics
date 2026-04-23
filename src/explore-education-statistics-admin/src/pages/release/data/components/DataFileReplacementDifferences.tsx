@@ -1,5 +1,5 @@
 import { IndicatorSource } from '@admin/services/apiDataSetVersionService';
-import {
+import dataReplacementService, {
   IndicatorMappingWithKey,
   IndicatorsMappingsPlan,
   MappingWithKey,
@@ -27,13 +27,15 @@ import classNames from 'classnames';
 import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
 import startCase from 'lodash/startCase';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
 
 interface Props {
   releaseVersionId: string;
   fileId: string;
-  mappings: PlanMappings;
+  replacementFileId: string;
+  mapping: PlanMappings;
+  reloadPlan: () => void;
 }
 
 type SourceItem = IndicatorSource /* | FilterSource | LocationSource */;
@@ -41,14 +43,18 @@ type SourceItem = IndicatorSource /* | FilterSource | LocationSource */;
 export default function DataFileReplacementDifferences({
   releaseVersionId,
   fileId,
-  mappings,
+  replacementFileId,
+  mapping,
+  reloadPlan,
 }: Props) {
-  const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(mappings);
+  const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(mapping);
+
+  useEffect(() => {
+    updatePlanMappings(mapping);
+  }, [mapping]);
 
   const handleIndicatorsMappingUpdate = useCallback(
     async (payload: UpdateMappingPayloadMultiple) => {
-      console.log({ payload });
-
       updatePlanMappings(draft => {
         payload.forEach(({ sourceKey, candidateKey }) => {
           draft.indicators.mappings[sourceKey].candidateKey = candidateKey;
@@ -57,16 +63,17 @@ export default function DataFileReplacementDifferences({
         });
       });
 
-      /* const freshIndicatorsMappingsPlan: PlanMappings['indicators'] =
-        await new Promise(() => {
-          //TODO 6913
-          // send updates and get fresh indicators mappings plan
-        });
+      await dataReplacementService.updatePlanIndicatorMappings(
+        releaseVersionId,
+        fileId,
+        replacementFileId,
+        payload.map(({ sourceKey, candidateKey }) => ({
+          originalColumnName: sourceKey,
+          newReplacementColumnName: candidateKey,
+        })),
+      );
 
-      updatePlanMappings(draft => {
-        // overwrite
-        return { indicators: freshIndicatorsMappingsPlan };
-      }); */
+      reloadPlan();
     },
     [updatePlanMappings],
   );
@@ -132,7 +139,7 @@ export default function DataFileReplacementDifferences({
         </caption>
         <thead>
           <VisuallyHidden as="tr">
-            <th className="govuk-!-width-one-quarter">Item Type</th>
+            {/* <th className="govuk-!-width-one-quarter">Item Type</th> */}
             <th className="govuk-!-width-one-quarter">Original Item</th>
             <th className="govuk-!-width-one-quarter">Mapping</th>
             <th className="govuk-!-text-align-right">Actions</th>
@@ -251,7 +258,7 @@ function DifferencesMappingTableRows({
               'rowHighlight--alert': isUnset,
             })}
           >
-            <td>
+            {/* <td>
               <strong>
                 {index === 0 ? (
                   startCase(itemType)
@@ -259,7 +266,7 @@ function DifferencesMappingTableRows({
                   <VisuallyHidden>{itemType}</VisuallyHidden>
                 )}
               </strong>
-            </td>
+            </td> */}
             <td>{source.label}</td>
             <td>
               {isUnset ? (

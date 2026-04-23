@@ -1,13 +1,12 @@
-import { IndicatorsMapping } from '@admin/services/releaseDataFileService';
+import { IndicatorsMapping } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import DataFileReplacementDifferences from '../DataFileReplacementDifferences';
 
-jest.mock('@admin/services/releaseDataFileService');
+jest.mock('@admin/services/dataReplacementService');
 
 const dummyIndicatorsMappings: IndicatorsMapping = {
   mappings: {
-    // old indicators and their mapping/lack there of
     enrolments_again: {
       source: {
         label: 'Enrolments_Again',
@@ -73,16 +72,20 @@ const dummyIndicatorsMappings: IndicatorsMapping = {
 };
 
 describe('DataFileReplacementDifferences', () => {
-  const tableId = 'replacements-differences-table';
-  test('renders differences/mappings table with options and available actions', async () => {
-    const { user } = render(
+  const sharedRender = () =>
+    render(
       <DataFileReplacementDifferences
+        replacementFileId="replacementFileId"
+        reloadPlan={jest.fn}
         fileId="fileId"
         releaseVersionId="releaseVersionId"
-        mappings={{ indicators: dummyIndicatorsMappings }}
+        mapping={{ indicators: dummyIndicatorsMappings }}
       />,
     );
 
+  const tableId = 'replacements-differences-table';
+  test('renders differences/mappings table with options and available actions', async () => {
+    const { user } = sharedRender();
     // check table is there
     await waitFor(() => {
       expect(screen.getByTestId(tableId)).toBeInTheDocument();
@@ -122,13 +125,7 @@ describe('DataFileReplacementDifferences', () => {
   });
 
   test('mapping new indicator to a pre-existing indicator option', async () => {
-    const { user } = render(
-      <DataFileReplacementDifferences
-        fileId="fileId"
-        releaseVersionId="releaseVersionId"
-        mappings={{ indicators: dummyIndicatorsMappings }}
-      />,
-    );
+    const { user } = sharedRender();
 
     await waitFor(() => {
       expect(screen.getByTestId(tableId)).toBeInTheDocument();
@@ -140,11 +137,10 @@ describe('DataFileReplacementDifferences', () => {
     const rows = within(tbody).getAllByRole('row');
     const enrolmentsAgainRow = rows[0];
 
-    expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent('Indicator');
-    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
+    expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
       'Enrolments_Again',
     );
-    expect(enrolmentsAgainRow.childNodes[2]).toHaveTextContent('not present');
+    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent('not present');
 
     expect(
       within(enrolmentsAgainRow).getByText('not present'),
@@ -177,13 +173,7 @@ describe('DataFileReplacementDifferences', () => {
 
     expect(modal).not.toBeInTheDocument();
 
-    /* waitFor(async () => {
-      expect(
-        releaseDataFileService.updateDataFileIndicatorsMapping,
-      ).toHaveBeenCalled();
-    }); */
-
-    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
+    expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
       'Enrolments_Again',
     );
 
@@ -198,13 +188,7 @@ describe('DataFileReplacementDifferences', () => {
   });
 
   test('mapping new indicator to "No mapping" action', async () => {
-    const { user } = render(
-      <DataFileReplacementDifferences
-        fileId="fileId"
-        releaseVersionId="releaseVersionId"
-        mappings={{ indicators: dummyIndicatorsMappings }}
-      />,
-    );
+    const { user } = sharedRender();
 
     await waitFor(() => {
       expect(screen.getByTestId(tableId)).toBeInTheDocument();
@@ -216,7 +200,7 @@ describe('DataFileReplacementDifferences', () => {
     const rows = within(tbody).getAllByRole('row');
     const enrolmentsAgainRow = rows[0];
 
-    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
+    expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
       'Enrolments_Again',
     );
     expect(
@@ -237,10 +221,10 @@ describe('DataFileReplacementDifferences', () => {
       ).toHaveBeenCalled(); */
     });
 
-    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
+    expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
       'Enrolments_Again',
     );
 
-    expect(enrolmentsAgainRow.childNodes[2]).toHaveTextContent('No mapping');
+    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent('No mapping');
   });
 });
