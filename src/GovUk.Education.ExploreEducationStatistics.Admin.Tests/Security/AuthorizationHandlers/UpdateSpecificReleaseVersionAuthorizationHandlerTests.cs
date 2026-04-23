@@ -1,164 +1,112 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
-using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
+public abstract class UpdateSpecificReleaseVersionAuthorizationHandlerTests
 {
-    private static readonly DataFixture _fixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _approvedReleaseVersion;
 
-    public class ClaimTests
+    protected UpdateSpecificReleaseVersionAuthorizationHandlerTests()
     {
-        // Test that Releases Versions that are in any approval state other than Approved can be updated
-        // if the current user has the "UpdateAllReleases" Claim.
-        [Fact]
-        public async Task UpdateAllReleases_ClaimSucceedsIfNotApproved()
-        {
-            await GetEnums<ReleaseApprovalStatus>()
-                .Where(releaseStatus => releaseStatus != Approved)
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-                    await AssertHandlerSucceedsWithCorrectClaims<
-                        ReleaseVersion,
-                        UpdateSpecificReleaseVersionRequirement
-                    >(HandlerSupplier, releaseVersion, SecurityClaimTypes.UpdateAllReleases);
-                });
+        _approvedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
+
+    public class ClaimsTests : UpdateSpecificReleaseVersionAuthorizationHandlerTests
+    {
+        [Fact]
+        public async Task DraftReleaseVersion_SucceedsOnlyForValidClaims()
+        {
+            await AssertHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>(
+                handler: BuildHandler(),
+                entity: _draftReleaseVersion,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllReleases]
+            );
         }
 
-        // Test that Releases Versions that are Approved cannot be updated by a user having any Claim.
         [Fact]
-        public async Task AllClaimsFailIfApproved()
+        public async Task ApprovedReleaseVersion_FailsForAllClaims()
         {
-            ReleaseVersion releaseVersion = _fixture
-                .DefaultReleaseVersion()
-                .WithApprovalStatus(Approved)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-            await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseVersionRequirement>(
-                HandlerSupplier,
-                releaseVersion,
-                claimsExpectedToSucceed: []
+            await AssertHandlerFailsForAllClaims<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>(
+                handler: BuildHandler(),
+                entity: _approvedReleaseVersion,
+                userId: _userId
             );
         }
     }
 
-    public class PublicationRoleTests
+    public class PublicationRolesTests : UpdateSpecificReleaseVersionAuthorizationHandlerTests
     {
         [Fact]
-        public async Task PublicationOwnerAndApproversCanUpdateUnapprovedReleaseVersion()
+        public async Task DraftReleaseVersion_SucceedsOnlyForValidPublicationRoles()
         {
-            await GetEnums<ReleaseApprovalStatus>()
-                .Where(releaseStatus => releaseStatus != Approved)
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+            var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
-                    // Assert that a Publication Owner or Approver can update the Release Version in any approval
-                    // state other than Admin
-                    await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<UpdateSpecificReleaseVersionRequirement>(
-                        HandlerSupplier,
-                        releaseVersion,
-                        rolesExpectedToSucceed: [PublicationRole.Owner, PublicationRole.Allower]
-                    );
-                });
+            await AssertHandlerSucceedsForAnyValidPublicationRole<
+                UpdateSpecificReleaseVersionRequirement,
+                ReleaseVersion
+            >(
+                handlerSupplier: handlerSuppler,
+                entity: _draftReleaseVersion,
+                publicationId: _draftReleaseVersion.Release.PublicationId,
+                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+            );
         }
 
         [Fact]
-        public async Task NoRolesCanUpdateApprovedReleaseVersion()
+        public async Task ApprovedReleaseVersion_FailsWithoutCheckingRoles()
         {
-            ReleaseVersion releaseVersion = _fixture
-                .DefaultReleaseVersion()
-                .WithApprovalStatus(Approved)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+            var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
-            // Assert that no Publication Role can update the Release Version if it is Approved.
-            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<UpdateSpecificReleaseVersionRequirement>(
-                HandlerSupplier,
-                releaseVersion,
-                rolesExpectedToSucceed: []
+            await AssertHandlerFailsWithoutCheckingRoles<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>(
+                handlerSupplier: handlerSuppler,
+                entity: _approvedReleaseVersion
             );
         }
     }
 
-    public class ReleaseRoleTests
+    private UpdateSpecificReleaseVersionAuthorizationHandler BuildHandler(
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
     {
-        [Fact]
-        public async Task EditorsCanUpdateUnapprovedReleaseVersion()
-        {
-            await GetEnums<ReleaseApprovalStatus>()
-                .Where(releaseStatus => releaseStatus != Approved)
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
 
-                    // Assert that a Release Editor (Contributor, Approver) can update the Release
-                    // Version in any approval state other than Approved.
-                    await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseVersionRequirement>(
-                        HandlerSupplier,
-                        releaseVersion,
-                        rolesExpectedToSucceed: [ReleaseRole.Contributor, ReleaseRole.Approver]
-                    );
-                });
-        }
-
-        [Fact]
-        public async Task NoRolesCanUpdateApprovedReleaseVersion()
-        {
-            ReleaseVersion releaseVersion = _fixture
-                .DefaultReleaseVersion()
-                .WithApprovalStatus(Approved)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-            // Assert that no Publication Role can update the Release Version if it is Approved.
-            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseVersionRequirement>(
-                HandlerSupplier,
-                releaseVersion,
-                rolesExpectedToSucceed: []
-            );
-        }
+        return new(authorizationHandlerService);
     }
 
-    private static UpdateSpecificReleaseVersionAuthorizationHandler HandlerSupplier(ContentDbContext contentDbContext)
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            contentDbContext
-        );
-
-        return new UpdateSpecificReleaseVersionAuthorizationHandler(
-            new AuthorizationHandlerService(
-                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: userReleaseRoleRepository,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    It.IsAny<Guid>(),
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

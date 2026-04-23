@@ -1,455 +1,169 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class MarkMethodologyAsApprovedAuthorizationHandlerTests
+public abstract class MarkMethodologyAsApprovedAuthorizationHandlerTests
 {
-    private static readonly Guid UserId = Guid.NewGuid();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly MethodologyVersion _draftMethodologyVersion;
+    private readonly MethodologyVersion _higherReviewMethodologyVersion;
+    private readonly MethodologyVersion _approvedMethodologyVersion;
+    private readonly Publication _owningPublication;
 
-    private static readonly MethodologyVersion MethodologyVersion = new()
+    private IReadOnlyList<MethodologyVersion> AllTypesOfMethodologyVersion =>
+        [_draftMethodologyVersion, _higherReviewMethodologyVersion, _approvedMethodologyVersion];
+
+    protected MarkMethodologyAsApprovedAuthorizationHandlerTests()
     {
-        Id = Guid.NewGuid(),
-        MethodologyId = Guid.NewGuid(),
-    };
+        _draftMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Draft);
 
-    private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
+        _higherReviewMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview);
 
-    private static readonly DataFixture DataFixture = new();
+        _approvedMethodologyVersion = _dataFixture
+            .DefaultMethodologyVersion()
+            .WithApprovalStatus(MethodologyApprovalStatus.Approved)
+            .WithPublished(DateTime.UtcNow);
 
-    public class ClaimsTests
+        _owningPublication = _dataFixture.DefaultPublication();
+    }
+
+    public class ClaimsTests : MarkMethodologyAsApprovedAuthorizationHandlerTests
     {
         [Fact]
-        public async Task NoClaimsAllowApprovingLatestPublishedMethodologyVersion()
+        public async Task NotLatestPublishedMethodologyVersion_SucceedsOnlyForValidClaims()
         {
-            await ForEachSecurityClaimAsync(async claim =>
+            // Should succeed for valid claims regardless of the methodology version's approval status, as long as it's not the latest published version
+            foreach (var methodologyVersion in AllTypesOfMethodologyVersion)
             {
-                var (handler, _, methodologyVersionRepository, _, _) = CreateHandlerAndDependencies();
+                await AssertHandlerSucceedsWithCorrectClaims<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
+                    handler: BuildHandler(),
+                    entity: methodologyVersion,
+                    userId: _userId,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.ApproveAllMethodologies]
+                );
+            }
+        }
 
+        [Fact]
+        public async Task LatestPublishedMethodologyVersion_FailsForAllClaims()
+        {
+            // Should fail for all claims regardless of the methodology version's approval status if it is the latest published version
+            foreach (var methodologyVersion in AllTypesOfMethodologyVersion)
+            {
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
                 methodologyVersionRepository
-                    .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
+                    .Setup(s => s.IsLatestPublishedVersion(methodologyVersion))
                     .ReturnsAsync(true);
 
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    MarkMethodologyAsApprovedRequirement,
-                    MethodologyVersion
-                >(user, MethodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyVersionRepository);
-
-                // No claims should allow a publicly accessible Methodology to be approved
-                Assert.False(authContext.HasSucceeded);
-            });
-        }
-
-        [Fact]
-        public async Task UserWithCorrectClaimCanApproveNonLatestPublishedDraftMethodologyVersion()
-        {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                MethodologyId = Guid.NewGuid(),
-                Status = Draft,
-            };
-
-            await ForEachSecurityClaimAsync(async claim =>
-            {
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository
-                    .Setup(mock => mock.IsLatestPublishedVersion(methodologyVersion))
-                    .ReturnsAsync(false);
-
-                // Only the ApproveAllMethodologies claim should allow approving a Methodology
-                var expectedToPassByClaimAlone = claim == ApproveAllMethodologies;
-
-                if (!expectedToPassByClaimAlone)
-                {
-                    methodologyRepository
-                        .Setup(s => s.GetOwningPublication(methodologyVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
-
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                UserId,
-                                OwningPublication.Id,
-                                ResourceRoleFilter.ActiveOnly,
-                                It.IsAny<CancellationToken>(),
-                                PublicationRole.Allower
-                            )
-                        )
-                        .ReturnsAsync(false);
-
-                    userReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                UserId,
-                                OwningPublication.Id,
-                                ResourceRoleFilter.ActiveOnly,
-                                It.IsAny<CancellationToken>(),
-                                ReleaseRole.Approver
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    MarkMethodologyAsApprovedRequirement,
-                    MethodologyVersion
-                >(user, methodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository
+                await AssertHandlerFailsForAllClaims<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
+                    handler: BuildHandler(methodologyVersionRepository.Object),
+                    entity: methodologyVersion,
+                    userId: _userId
                 );
-
-                Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
-            });
-        }
-
-        [Fact]
-        public async Task UserWithCorrectClaimCanApproveNonLatestPublishedApprovedMethodologyVersion()
-        {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                MethodologyId = Guid.NewGuid(),
-                Status = Approved,
-            };
-
-            await ForEachSecurityClaimAsync(async claim =>
-            {
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository
-                    .Setup(mock => mock.IsLatestPublishedVersion(methodologyVersion))
-                    .ReturnsAsync(false);
-
-                // Only the ApproveAllMethodologies claim should allow approving a Methodology
-                var expectedToPassByClaimAlone = claim == ApproveAllMethodologies;
-
-                if (!expectedToPassByClaimAlone)
-                {
-                    methodologyRepository
-                        .Setup(s => s.GetOwningPublication(methodologyVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
-
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                UserId,
-                                OwningPublication.Id,
-                                ResourceRoleFilter.ActiveOnly,
-                                It.IsAny<CancellationToken>(),
-                                PublicationRole.Allower
-                            )
-                        )
-                        .ReturnsAsync(false);
-
-                    userReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                UserId,
-                                OwningPublication.Id,
-                                ResourceRoleFilter.ActiveOnly,
-                                It.IsAny<CancellationToken>(),
-                                ReleaseRole.Approver
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    MarkMethodologyAsApprovedRequirement,
-                    MethodologyVersion
-                >(user, methodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                );
-
-                Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
-            });
+            }
         }
     }
 
-    public class PublicationRoleTests
+    public class PublicationRolesTests : MarkMethodologyAsApprovedAuthorizationHandlerTests
     {
         [Fact]
-        public async Task ApproversOnOwningPublicationCanApprove()
+        public async Task NotLatestPublishedMethodologyVersion_SucceedsOnlyForValidPublicationRoles()
         {
-            await ForEachPublicationRoleAsync(async publicationRole =>
+            // Should succeed for valid publication roles regardless of the methodology version's approval status, as long as it's not the latest published version
+            foreach (var methodologyVersion in AllTypesOfMethodologyVersion)
             {
-                // If the user has the Approver role on the owning Publication, they are allowed to approve it.
-                var isApproverRole = publicationRole == PublicationRole.Allower;
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository
-                    .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
-                    .ReturnsAsync(false);
-
-                methodologyRepository
-                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                    .ReturnsAsync(OwningPublication);
-
-                userPublicationRoleRepository
-                    .Setup(mock =>
-                        mock.UserHasAnyRoleOnPublication(
-                            UserId,
-                            OwningPublication.Id,
-                            ResourceRoleFilter.ActiveOnly,
-                            It.IsAny<CancellationToken>(),
-                            PublicationRole.Allower
-                        )
-                    )
-                    .ReturnsAsync(isApproverRole);
-
-                if (!isApproverRole)
-                {
-                    userReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                UserId,
-                                OwningPublication.Id,
-                                ResourceRoleFilter.ActiveOnly,
-                                It.IsAny<CancellationToken>(),
-                                ReleaseRole.Approver
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
-
-                var authContext = CreateAuthorizationHandlerContext<
+                await AssertHandlerSucceedsForAnyValidPublicationRole<
                     MarkMethodologyAsApprovedRequirement,
                     MethodologyVersion
-                >(user, MethodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
+                >(
+                    handlerSupplier: handlerSuppler,
+                    entity: methodologyVersion,
+                    publicationId: _owningPublication.Id,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Approver]
                 );
-
-                Assert.Equal(isApproverRole, authContext.HasSucceeded);
-            });
-        }
-    }
-
-    public class ReleaseRoleTests
-    {
-        [Fact]
-        public async Task ApproversOnAnyOwningPublicationReleaseCanApprove()
-        {
-            await ForEachReleaseRoleAsync(async releaseRole =>
-            {
-                // If the user has the Approver role on any Releases of the owning Publication of this
-                // Methodology, they are allowed to approve it.
-                var isApproverRole = releaseRole == ReleaseRole.Approver;
-
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository
-                    .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
-                    .ReturnsAsync(false);
-
-                methodologyRepository
-                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                    .ReturnsAsync(OwningPublication);
-
-                userPublicationRoleRepository
-                    .Setup(mock =>
-                        mock.UserHasAnyRoleOnPublication(
-                            UserId,
-                            OwningPublication.Id,
-                            ResourceRoleFilter.ActiveOnly,
-                            It.IsAny<CancellationToken>(),
-                            PublicationRole.Allower
-                        )
-                    )
-                    .ReturnsAsync(false);
-
-                userReleaseRoleRepository
-                    .Setup(mock =>
-                        mock.UserHasAnyRoleOnPublication(
-                            UserId,
-                            OwningPublication.Id,
-                            ResourceRoleFilter.ActiveOnly,
-                            It.IsAny<CancellationToken>(),
-                            ReleaseRole.Approver
-                        )
-                    )
-                    .ReturnsAsync(isApproverRole);
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    MarkMethodologyAsApprovedRequirement,
-                    MethodologyVersion
-                >(user, MethodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                );
-
-                Assert.Equal(isApproverRole, authContext.HasSucceeded);
-            });
+            }
         }
 
         [Fact]
-        public async Task NoReleaseRolesOnAnyOwningPublicationReleaseSoCannotApprove()
+        public async Task LatestPublishedMethodologyVersion_FailsWithoutCheckingRoles()
         {
-            var (
-                handler,
-                methodologyRepository,
-                methodologyVersionRepository,
-                userReleaseRoleRepository,
-                userPublicationRoleRepository
-            ) = CreateHandlerAndDependencies();
-
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             methodologyVersionRepository
-                .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
-                .ReturnsAsync(false);
+                .Setup(s => s.IsLatestPublishedVersion(_approvedMethodologyVersion))
+                .ReturnsAsync(true);
 
-            methodologyRepository
-                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                .ReturnsAsync(OwningPublication);
+            var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                BuildHandler(
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    authorizationHandlerService: authorizationHandlerService
+                );
 
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        UserId,
-                        OwningPublication.Id,
-                        ResourceRoleFilter.ActiveOnly,
-                        It.IsAny<CancellationToken>(),
-                        PublicationRole.Allower
-                    )
-                )
-                .ReturnsAsync(false);
-
-            userReleaseRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        UserId,
-                        OwningPublication.Id,
-                        ResourceRoleFilter.ActiveOnly,
-                        It.IsAny<CancellationToken>(),
-                        ReleaseRole.Approver
-                    )
-                )
-                .ReturnsAsync(false);
-
-            var user = DataFixture.AuthenticatedUser(userId: UserId);
-
-            var authContext = CreateAuthorizationHandlerContext<
-                MarkMethodologyAsApprovedRequirement,
-                MethodologyVersion
-            >(user, MethodologyVersion);
-
-            await handler.HandleAsync(authContext);
-            VerifyAllMocks(
-                methodologyRepository,
-                methodologyVersionRepository,
-                userPublicationRoleRepository,
-                userReleaseRoleRepository
+            await AssertHandlerFailsWithoutCheckingRoles<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
+                handlerSupplier: handlerSuppler,
+                entity: _approvedMethodologyVersion
             );
-
-            Assert.False(authContext.HasSucceeded);
         }
     }
 
-    private static (
-        MarkMethodologyAsApprovedAuthorizationHandler,
-        Mock<IMethodologyRepository>,
-        Mock<IMethodologyVersionRepository>,
-        Mock<IUserReleaseRoleRepository>,
-        Mock<IUserPublicationRoleRepository>
-    ) CreateHandlerAndDependencies()
+    private MarkMethodologyAsApprovedAuthorizationHandler BuildHandler(
+        IMethodologyVersionRepository? methodologyVersionRepository = null,
+        IMethodologyRepository? methodologyRepository = null,
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
     {
-        var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+        methodologyVersionRepository ??= CreateDefaultMethodologyVersionRepository();
+        methodologyRepository ??= CreateDefaultMethodologyRepository();
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
 
-        var handler = new MarkMethodologyAsApprovedAuthorizationHandler(
-            methodologyVersionRepository.Object,
-            methodologyRepository.Object,
-            new AuthorizationHandlerService(
-                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                userReleaseRoleRepository.Object,
-                userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict)
+        return new(methodologyVersionRepository, methodologyRepository, authorizationHandlerService);
+    }
+
+    private IMethodologyVersionRepository CreateDefaultMethodologyVersionRepository()
+    {
+        var mock = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        mock.Setup(s => s.IsLatestPublishedVersion(It.IsAny<MethodologyVersion>())).ReturnsAsync(false);
+
+        return mock.Object;
+    }
+
+    private IMethodologyRepository CreateDefaultMethodologyRepository()
+    {
+        var mock = new Mock<IMethodologyRepository>(MockBehavior.Strict);
+        mock.Setup(s => s.GetOwningPublication(It.IsAny<Guid>())).ReturnsAsync(_owningPublication);
+
+        return mock.Object;
+    }
+
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    _owningPublication.Id,
+                    CollectionUtils.SetOf(PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
 
-        return (
-            handler,
-            methodologyRepository,
-            methodologyVersionRepository,
-            userReleaseRoleRepository,
-            userPublicationRoleRepository
-        );
+        return mock.Object;
     }
 }

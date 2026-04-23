@@ -24,7 +24,7 @@ public static class StartupSecurityConfiguration
             // that the user has any roles yet.  This policy is useful in cases where protected endpoints can be
             // called by a user who is not yet fully registered on the service.
             options.AddPolicy(
-                SecurityPolicies.AuthenticatedByIdentityProvider.ToString(),
+                nameof(SecurityPolicies.AuthenticatedByIdentityProvider),
                 policy => policy.RequireAssertion(context => context.User.HasScope(SecurityScopes.AccessAdminApiScope))
             );
 
@@ -34,11 +34,11 @@ public static class StartupSecurityConfiguration
             // the majority of the API endpoints.  This policy is useful for protecting endpoints where we expect
             // the user to have registered successfully with the service already.
             options.AddPolicy(
-                SecurityPolicies.RegisteredUser.ToString(),
+                nameof(SecurityPolicies.RegisteredUser),
                 policy =>
                     policy.RequireAssertion(context =>
                         context.User.HasClaim(claim =>
-                            claim.Type == SecurityClaimTypes.ApplicationAccessGranted.ToString()
+                            claim.Type == nameof(SecurityClaimTypes.ApplicationAccessGranted)
                         ) && context.User.HasScope(SecurityScopes.AccessAdminApiScope)
                     )
             );
@@ -46,68 +46,68 @@ public static class StartupSecurityConfiguration
             /*
              * General role-based page access
              */
-            options.AddPolicy(SecurityPolicies.IsBauUser.ToString(), policy => policy.RequireRole(RoleNames.BauUser));
+            options.AddPolicy(nameof(SecurityPolicies.IsBauUser), policy => policy.RequireRole(RoleNames.BauUser));
 
             options.AddPolicy(
-                SecurityPolicies.CanAccessAnalystPages.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.AnalystPagesAccessGranted.ToString())
+                nameof(SecurityPolicies.CanAccessAnalystPages),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.AnalystPagesAccessGranted))
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanAccessPrereleasePages.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString())
+                nameof(SecurityPolicies.CanAccessPrereleasePages),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanManageUsersOnSystem.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString())
+                nameof(SecurityPolicies.CanManageUsersOnSystem),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.ManageAnyUser))
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanAccessAllImports.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.AccessAllImports.ToString())
+                nameof(SecurityPolicies.CanAccessAllImports),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.AccessAllImports))
             );
 
             /*
              * Publication management
              */
             options.AddPolicy(
-                SecurityPolicies.CanViewAllPublications.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.AccessAllPublications.ToString())
+                nameof(SecurityPolicies.CanViewAllPublications),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.AccessAllPublications))
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanViewSpecificPublication.ToString(),
+                nameof(SecurityPolicies.CanViewSpecificPublication),
                 policy => policy.Requirements.Add(new ViewSpecificPublicationRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificPublicationSummary.ToString(),
+                nameof(SecurityPolicies.CanUpdateSpecificPublicationSummary),
                 policy => policy.Requirements.Add(new UpdatePublicationSummaryRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdatePublication.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString())
+                nameof(SecurityPolicies.CanUpdatePublication),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.UpdateAllPublications))
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateContact.ToString(),
+                nameof(SecurityPolicies.CanUpdateContact),
                 policy => policy.Requirements.Add(new UpdateContactRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(),
-                policy => policy.Requirements.Add(new UpdateReleaseRoleRequirement())
+                nameof(SecurityPolicies.CanUpdateDrafters),
+                policy => policy.Requirements.Add(new UpdateDraftersRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanViewReleaseTeamAccess.ToString(),
+                nameof(SecurityPolicies.CanViewReleaseTeamAccess),
                 policy => policy.Requirements.Add(new ViewSpecificPublicationReleaseTeamAccessRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanManagePublicationReleaseSeries.ToString(),
+                nameof(SecurityPolicies.CanManagePublicationReleaseSeries),
                 policy => policy.Requirements.Add(new ManagePublicationReleaseSeriesRequirement())
             );
 
@@ -115,97 +115,92 @@ public static class StartupSecurityConfiguration
              * Release management
              */
             options.AddPolicy(
-                SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(),
+                nameof(SecurityPolicies.CanCreateReleaseForSpecificPublication),
                 policy => policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificRelease.ToString(),
+                nameof(SecurityPolicies.CanUpdateSpecificRelease),
                 policy => policy.Requirements.Add(new UpdateSpecificReleaseRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanViewAllReleases.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString())
+                nameof(SecurityPolicies.CanViewAllReleases),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.AccessAllReleases))
             );
 
             options.AddPolicy(
-                ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(),
-                policy => policy.Requirements.Add(new ViewReleaseRequirement())
+                nameof(ContentSecurityPolicies.CanViewSpecificReleaseVersion),
+                policy => policy.Requirements.Add(new ViewReleaseVersionRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificReleaseVersion.ToString(),
+                nameof(SecurityPolicies.CanUpdateSpecificReleaseVersion),
                 policy => policy.Requirements.Add(new UpdateSpecificReleaseVersionRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(),
+                nameof(SecurityPolicies.CanMarkSpecificReleaseAsDraft),
                 policy => policy.Requirements.Add(new MarkReleaseAsDraftRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(),
+                nameof(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview),
                 policy => policy.Requirements.Add(new MarkReleaseAsHigherLevelReviewRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanApproveSpecificRelease.ToString(),
+                nameof(SecurityPolicies.CanApproveSpecificRelease),
                 policy => policy.Requirements.Add(new MarkReleaseAsApprovedRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanMakeAmendmentOfSpecificReleaseVersion.ToString(),
+                nameof(SecurityPolicies.CanMakeAmendmentOfSpecificReleaseVersion),
                 policy => policy.Requirements.Add(new MakeAmendmentOfSpecificReleaseRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanPublishSpecificRelease.ToString(),
-                policy => policy.Requirements.Add(new PublishSpecificReleaseRequirement())
-            );
-
-            options.AddPolicy(
-                SecurityPolicies.CanDeleteSpecificReleaseVersion.ToString(),
+                nameof(SecurityPolicies.CanDeleteSpecificReleaseVersion),
                 policy => policy.Requirements.Add(new DeleteSpecificReleaseRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanDeleteTestRelease.ToString(),
+                nameof(SecurityPolicies.CanDeleteTestRelease),
                 policy => policy.Requirements.Add(new DeleteTestReleaseRequirement())
             );
 
             options.AddPolicy(
-                DataSecurityPolicies.CanViewSubjectData.ToString(),
+                nameof(DataSecurityPolicies.CanViewSubjectData),
                 policy => policy.Requirements.Add(new ViewSubjectDataRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanViewSpecificPreReleaseSummary.ToString(),
+                nameof(SecurityPolicies.CanViewSpecificPreReleaseSummary),
                 policy => policy.Requirements.Add(new ViewSpecificPreReleaseSummaryRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanResolveSpecificComment.ToString(),
+                nameof(SecurityPolicies.CanResolveSpecificComment),
                 policy => policy.Requirements.Add(new ResolveSpecificCommentRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificComment.ToString(),
+                nameof(SecurityPolicies.CanUpdateSpecificComment),
                 policy => policy.Requirements.Add(new UpdateSpecificCommentRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanDeleteSpecificComment.ToString(),
+                nameof(SecurityPolicies.CanDeleteSpecificComment),
                 policy => policy.Requirements.Add(new DeleteSpecificCommentRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanCancelOngoingImports.ToString(),
+                nameof(SecurityPolicies.CanCancelOngoingImports),
                 policy => policy.Requirements.Add(new CancelSpecificFileImportRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanViewReleaseStatusHistory.ToString(),
+                nameof(SecurityPolicies.CanViewReleaseStatusHistory),
                 policy => policy.Requirements.Add(new ViewReleaseStatusHistoryRequirement())
             );
 
@@ -213,7 +208,7 @@ public static class StartupSecurityConfiguration
              * Pre Release management
              */
             options.AddPolicy(
-                SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease.ToString(),
+                nameof(SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease),
                 policy => policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement())
             );
 
@@ -221,12 +216,12 @@ public static class StartupSecurityConfiguration
              * Taxonomy management
              */
             options.AddPolicy(
-                SecurityPolicies.CanManageAllTaxonomy.ToString(),
-                policy => policy.RequireClaim(SecurityClaimTypes.ManageAllTaxonomy.ToString())
+                nameof(SecurityPolicies.CanManageAllTaxonomy),
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.ManageAllTaxonomy))
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanCreatePublicationForSpecificTheme.ToString(),
+                nameof(SecurityPolicies.CanCreatePublicationForSpecificTheme),
                 policy => policy.Requirements.Add(new CreatePublicationForSpecificThemeRequirement())
             );
 
@@ -234,57 +229,57 @@ public static class StartupSecurityConfiguration
              * Methodology management
              */
             options.AddPolicy(
-                SecurityPolicies.CanAdoptMethodologyForSpecificPublication.ToString(),
+                nameof(SecurityPolicies.CanAdoptMethodologyForSpecificPublication),
                 policy => policy.Requirements.Add(new AdoptMethodologyForSpecificPublicationRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanCreateMethodologyForSpecificPublication.ToString(),
+                nameof(SecurityPolicies.CanCreateMethodologyForSpecificPublication),
                 policy => policy.Requirements.Add(new CreateMethodologyForSpecificPublicationRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanDropMethodologyLink.ToString(),
+                nameof(SecurityPolicies.CanDropMethodologyLink),
                 policy => policy.Requirements.Add(new DropMethodologyLinkRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanManageExternalMethodologyForSpecificPublication.ToString(),
+                nameof(SecurityPolicies.CanManageExternalMethodologyForSpecificPublication),
                 policy => policy.Requirements.Add(new ManageExternalMethodologyForSpecificPublicationRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanViewSpecificMethodology.ToString(),
+                nameof(SecurityPolicies.CanViewSpecificMethodology),
                 policy => policy.Requirements.Add(new ViewSpecificMethodologyRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanUpdateSpecificMethodology.ToString(),
+                nameof(SecurityPolicies.CanUpdateSpecificMethodology),
                 policy => policy.Requirements.Add(new UpdateSpecificMethodologyRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanMarkSpecificMethodologyAsDraft.ToString(),
+                nameof(SecurityPolicies.CanMarkSpecificMethodologyAsDraft),
                 policy => policy.Requirements.Add(new MarkMethodologyAsDraftRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanSubmitSpecificMethodologyToHigherReview.ToString(),
+                nameof(SecurityPolicies.CanSubmitSpecificMethodologyToHigherReview),
                 policy => policy.Requirements.Add(new MarkMethodologyAsHigherLevelReviewRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanApproveSpecificMethodology.ToString(),
+                nameof(SecurityPolicies.CanApproveSpecificMethodology),
                 policy => policy.Requirements.Add(new MarkMethodologyAsApprovedRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanMakeAmendmentOfSpecificMethodology.ToString(),
+                nameof(SecurityPolicies.CanMakeAmendmentOfSpecificMethodology),
                 policy => policy.Requirements.Add(new MakeAmendmentOfSpecificMethodologyRequirement())
             );
 
             options.AddPolicy(
-                SecurityPolicies.CanDeleteSpecificMethodology.ToString(),
+                nameof(SecurityPolicies.CanDeleteSpecificMethodology),
                 policy => policy.Requirements.Add(new DeleteSpecificMethodologyRequirement())
             );
         });
@@ -317,7 +312,7 @@ public static class StartupSecurityConfiguration
         /*
          * Release management
          */
-        services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseVersionAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseVersionAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, DeleteSpecificReleaseAuthorizationHandler>();
@@ -327,14 +322,13 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationHandler, MarkReleaseAsApprovedAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, PublishSpecificReleaseAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ResolveSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, DeleteSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, CancelSpecificFileImportAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewReleaseStatusHistoryAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, UpdateReleaseRoleAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, UpdateDraftersAuthorizationHandler>();
 
         /*
          * Pre Release management

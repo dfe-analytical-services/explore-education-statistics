@@ -103,7 +103,8 @@ public class UserRoleService(
                 .ThenInclude(r => r.Publication)
             .LatestReleaseVersion(releaseId: releaseId)
             .SingleOrNotFoundAsync()
-            .OnSuccessDo(rv => userService.CheckCanUpdateReleaseRole(rv!.Release.Publication, role))
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
+            .OnSuccessDo(rv => userService.CheckCanUpdateDrafters(rv!.Release.Publication))
             .OnSuccessDo(rv => ValidateReleaseRoleCanBeAdded(userId: userId, releaseVersionId: rv!.Id, role))
             .OnSuccessCombineWith(_ =>
                 usersAndRolesDbContext.Users.SingleOrNotFoundAsync(u => u.Id == userId.ToString())
@@ -451,10 +452,8 @@ public class UserRoleService(
     {
         return await FindUserReleaseRole(userReleaseRoleId)
             .OnSuccessDo(async userReleaseRole =>
-                await userService.CheckCanUpdateReleaseRole(
-                    userReleaseRole.ReleaseVersion.Release.Publication,
-                    userReleaseRole.Role
-                )
+                // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
+                await userService.CheckCanUpdateDrafters(userReleaseRole.ReleaseVersion.Release.Publication)
             )
             .OnSuccessDo(async userReleaseRole =>
             {

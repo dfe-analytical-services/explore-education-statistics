@@ -66,6 +66,16 @@ public static class MethodologyVersionGeneratorExtensions
         Func<SetterContext, IEnumerable<MethodologyRedirect>> methodologyRedirects
     ) => generator.ForInstance(s => s.SetRedirects(methodologyRedirects.Invoke));
 
+    public static Generator<MethodologyVersion> WithPreviousVersionId(
+        this Generator<MethodologyVersion> generator,
+        Guid? previousVersionId
+    ) => generator.ForInstance(s => s.SetPreviousVersionId(previousVersionId));
+
+    public static Generator<MethodologyVersion> WithVersion(
+        this Generator<MethodologyVersion> generator,
+        int version
+    ) => generator.ForInstance(s => s.SetVersion(version));
+
     public static InstanceSetters<MethodologyVersion> SetDefaults(this InstanceSetters<MethodologyVersion> setters) =>
         setters
             .SetDefault(p => p.Id)
@@ -136,4 +146,14 @@ public static class MethodologyVersionGeneratorExtensions
                 return list;
             }
         );
+
+    private static InstanceSetters<MethodologyVersion> SetPreviousVersionId(
+        this InstanceSetters<MethodologyVersion> setters,
+        Guid? previousVersionId
+    ) => setters.Set(mv => mv.PreviousVersionId, previousVersionId);
+
+    private static InstanceSetters<MethodologyVersion> SetVersion(
+        this InstanceSetters<MethodologyVersion> setters,
+        int version
+    ) => setters.Set(mv => mv.Version, version);
 }

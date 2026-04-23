@@ -3,29 +3,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class UpdateSpecificMethodologyRequirement : IAuthorizationRequirement { }
 
-public class UpdateSpecificMethodologyAuthorizationHandler
-    : AuthorizationHandler<UpdateSpecificMethodologyRequirement, MethodologyVersion>
+public class UpdateSpecificMethodologyAuthorizationHandler(
+    IMethodologyRepository methodologyRepository,
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<UpdateSpecificMethodologyRequirement, MethodologyVersion>
 {
-    private readonly IMethodologyRepository _methodologyRepository;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public UpdateSpecificMethodologyAuthorizationHandler(
-        IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _methodologyRepository = methodologyRepository;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         UpdateSpecificMethodologyRequirement requirement,
@@ -37,20 +24,19 @@ public class UpdateSpecificMethodologyAuthorizationHandler
             return;
         }
 
-        if (SecurityUtils.HasClaim(context.User, UpdateAllMethodologies))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.UpdateAllMethodologies))
         {
             context.Succeed(requirement);
             return;
         }
 
-        var owningPublication = await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+        var owningPublication = await methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
-                context.User.GetUserId(),
-                owningPublication.Id,
-                SetOf(PublicationRole.Owner, PublicationRole.Allower),
-                ReleaseEditorAndApproverRoles
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: owningPublication.Id,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

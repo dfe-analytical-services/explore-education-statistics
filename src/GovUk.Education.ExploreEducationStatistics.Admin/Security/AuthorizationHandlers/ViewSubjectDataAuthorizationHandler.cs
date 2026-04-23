@@ -7,20 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ViewSubjectDataAuthorizationHandler : AuthorizationHandler<ViewSubjectDataRequirement, ReleaseSubject>
+public class ViewSubjectDataAuthorizationHandler(
+    ContentDbContext contentDbContext,
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<ViewSubjectDataRequirement, ReleaseSubject>
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public ViewSubjectDataAuthorizationHandler(
-        ContentDbContext contentDbContext,
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _contentDbContext = contentDbContext;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewSubjectDataRequirement requirement,
@@ -28,11 +19,11 @@ public class ViewSubjectDataAuthorizationHandler : AuthorizationHandler<ViewSubj
     )
     {
         // If this data has been published, it is visible to anyone.
-        var releaseVersion = await _contentDbContext.ReleaseVersions.FirstAsync(rv =>
+        var releaseVersion = await contentDbContext.ReleaseVersions.SingleAsync(rv =>
             rv.Id == releaseSubject.ReleaseVersionId
         );
 
-        if (await _authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, context.User))
+        if (await authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, context.User))
         {
             context.Succeed(requirement);
         }

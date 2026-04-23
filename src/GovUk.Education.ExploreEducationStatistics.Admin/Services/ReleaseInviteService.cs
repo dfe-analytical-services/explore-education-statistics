@@ -37,7 +37,8 @@ public class ReleaseInviteService(
     {
         return await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId)
-            .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
+            .OnSuccessDo(userService.CheckCanUpdateDrafters)
             .OnSuccessDo(() => ValidateReleaseVersionIds(publicationId, releaseVersionIds))
             .OnSuccessVoid(async publication =>
                 await InviteContributor(
@@ -55,10 +56,11 @@ public class ReleaseInviteService(
     )
     {
         return await contentPersistenceHelper
-            .CheckEntityExists<Publication>(publicationId, query => query.Include(p => p.ReleaseVersions))
+            .CheckEntityExists<Publication>(publicationId)
             .OnSuccessCombineWith(_ => GetPendingUserInvite(email))
             .OnSuccess(tuple => (Publication: tuple.Item1, User: tuple.Item2))
-            .OnSuccessDo(tuple => userService.CheckCanUpdateReleaseRole(tuple.Publication, releaseRole))
+            // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
+            .OnSuccessDo(tuple => userService.CheckCanUpdateDrafters(tuple.Publication))
             .OnSuccess(async tuple =>
             {
                 var releaseRoleIdsToRemove = (

@@ -4,24 +4,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class DeleteSpecificReleaseRequirement : IAuthorizationRequirement { }
 
-public class DeleteSpecificReleaseAuthorizationHandler
+public class DeleteSpecificReleaseAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
     : AuthorizationHandler<DeleteSpecificReleaseRequirement, ReleaseVersion>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public DeleteSpecificReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         DeleteSpecificReleaseRequirement requirement,
@@ -39,25 +30,25 @@ public class DeleteSpecificReleaseAuthorizationHandler
             {
                 context.Succeed(requirement);
             }
-        }
-        else
-        {
-            if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
-            {
-                context.Succeed(requirement);
-                return;
-            }
 
-            if (
-                await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
-                    userId: context.User.GetUserId(),
-                    publicationId: releaseVersion.PublicationId,
-                    Owner
-                )
+            return;
+        }
+
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.DeleteAllReleaseAmendments))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+
+        if (
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
-            {
-                context.Succeed(requirement);
-            }
+        )
+        {
+            context.Succeed(requirement);
         }
     }
 }

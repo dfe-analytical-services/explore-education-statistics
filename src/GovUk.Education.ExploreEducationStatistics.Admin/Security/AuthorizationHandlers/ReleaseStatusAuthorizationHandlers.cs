@@ -4,28 +4,17 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
-    : AuthorizationHandler<TRequirement, ReleaseVersion>
+public abstract class ReleaseStatusAuthorizationHandler<TRequirement>(
+    IReleasePublishingStatusRepository releasePublishingStatusRepository,
+    IAuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<TRequirement, ReleaseVersion>
     where TRequirement : IAuthorizationRequirement
 {
-    private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    protected ReleaseStatusAuthorizationHandler(
-        IReleasePublishingStatusRepository releasePublishingStatusRepository,
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _releasePublishingStatusRepository = releasePublishingStatusRepository;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected abstract ReleaseApprovalStatus TargetApprovalStatus { get; }
 
     protected override async Task HandleRequirementAsync(
@@ -34,7 +23,7 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
         ReleaseVersion releaseVersion
     )
     {
-        var statuses = await _releasePublishingStatusRepository.GetAllByOverallStage(
+        var statuses = await releasePublishingStatusRepository.GetAllByOverallStage(
             releaseVersion.Id,
             ReleasePublishingStatusOverallStage.Started,
             ReleasePublishingStatusOverallStage.Complete
@@ -74,12 +63,10 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
         }
 
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 userId: context.User.GetUserId(),
-                publicationId: releaseVersion.PublicationId,
-                releaseVersionId: releaseVersion.Id,
-                SetOf(PublicationRole.Allower),
-                SetOf(ReleaseRole.Approver)
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: [PublicationRole.Approver]
             )
         )
         {
@@ -101,19 +88,14 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
 
         var allowedPublicationRoles =
             releaseVersion.ApprovalStatus == Approved
-                ? SetOf(PublicationRole.Allower)
-                : SetOf(PublicationRole.Owner, PublicationRole.Allower);
-
-        var allowedReleaseRoles =
-            releaseVersion.ApprovalStatus == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
+                ? SetOf(PublicationRole.Approver)
+                : SetOf(PublicationRole.Drafter, PublicationRole.Approver);
 
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 userId: context.User.GetUserId(),
-                publicationId: releaseVersion.PublicationId,
-                releaseVersionId: releaseVersion.Id,
-                allowedPublicationRoles,
-                allowedReleaseRoles
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: allowedPublicationRoles
             )
         )
         {
@@ -135,19 +117,14 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
 
         var allowedPublicationRoles =
             releaseVersion.ApprovalStatus == Approved
-                ? SetOf(PublicationRole.Allower)
-                : SetOf(PublicationRole.Owner, PublicationRole.Allower);
-
-        var allowedReleaseRoles =
-            releaseVersion.ApprovalStatus == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
+                ? SetOf(PublicationRole.Approver)
+                : SetOf(PublicationRole.Drafter, PublicationRole.Approver);
 
         if (
-            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 userId: context.User.GetUserId(),
-                publicationId: releaseVersion.PublicationId,
-                releaseVersionId: releaseVersion.Id,
-                allowedPublicationRoles,
-                allowedReleaseRoles
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: allowedPublicationRoles
             )
         )
         {
@@ -158,41 +135,42 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
 
 public class MarkReleaseAsDraftRequirement : IAuthorizationRequirement { }
 
-public class MarkReleaseAsDraftAuthorizationHandler : ReleaseStatusAuthorizationHandler<MarkReleaseAsDraftRequirement>
-{
-    public MarkReleaseAsDraftAuthorizationHandler(
-        IReleasePublishingStatusRepository releasePublishingStatusRepository,
-        AuthorizationHandlerService authorizationHandlerService
+public class MarkReleaseAsDraftAuthorizationHandler(
+    IReleasePublishingStatusRepository releasePublishingStatusRepository,
+    IAuthorizationHandlerService authorizationHandlerService
+)
+    : ReleaseStatusAuthorizationHandler<MarkReleaseAsDraftRequirement>(
+        releasePublishingStatusRepository,
+        authorizationHandlerService
     )
-        : base(releasePublishingStatusRepository, authorizationHandlerService) { }
-
+{
     protected override ReleaseApprovalStatus TargetApprovalStatus => Draft;
 }
 
 public class MarkReleaseAsHigherLevelReviewRequirement : IAuthorizationRequirement { }
 
-public class MarkReleaseAsHigherLevelReviewAuthorizationHandler
-    : ReleaseStatusAuthorizationHandler<MarkReleaseAsHigherLevelReviewRequirement>
-{
-    public MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-        IReleasePublishingStatusRepository releasePublishingStatusRepository,
-        AuthorizationHandlerService authorizationHandlerService
+public class MarkReleaseAsHigherLevelReviewAuthorizationHandler(
+    IReleasePublishingStatusRepository releasePublishingStatusRepository,
+    IAuthorizationHandlerService authorizationHandlerService
+)
+    : ReleaseStatusAuthorizationHandler<MarkReleaseAsHigherLevelReviewRequirement>(
+        releasePublishingStatusRepository,
+        authorizationHandlerService
     )
-        : base(releasePublishingStatusRepository, authorizationHandlerService) { }
-
+{
     protected override ReleaseApprovalStatus TargetApprovalStatus => HigherLevelReview;
 }
 
 public class MarkReleaseAsApprovedRequirement : IAuthorizationRequirement { }
 
-public class MarkReleaseAsApprovedAuthorizationHandler
-    : ReleaseStatusAuthorizationHandler<MarkReleaseAsApprovedRequirement>
-{
-    public MarkReleaseAsApprovedAuthorizationHandler(
-        IReleasePublishingStatusRepository releasePublishingStatusRepository,
-        AuthorizationHandlerService authorizationHandlerService
+public class MarkReleaseAsApprovedAuthorizationHandler(
+    IReleasePublishingStatusRepository releasePublishingStatusRepository,
+    IAuthorizationHandlerService authorizationHandlerService
+)
+    : ReleaseStatusAuthorizationHandler<MarkReleaseAsApprovedRequirement>(
+        releasePublishingStatusRepository,
+        authorizationHandlerService
     )
-        : base(releasePublishingStatusRepository, authorizationHandlerService) { }
-
+{
     protected override ReleaseApprovalStatus TargetApprovalStatus => Approved;
 }

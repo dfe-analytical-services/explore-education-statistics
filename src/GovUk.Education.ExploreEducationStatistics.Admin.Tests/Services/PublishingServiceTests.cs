@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,59 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public class PublishingServiceTests
 {
     private readonly DataFixture _fixture = new();
-
-    [Fact]
-    public async Task RetryReleasePublishing()
-    {
-        ReleaseVersion releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithApprovalStatus(ReleaseApprovalStatus.Approved);
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            await context.SaveChangesAsync();
-        }
-
-        var publisherClient = new Mock<IPublisherClient>(MockBehavior.Strict);
-
-        publisherClient
-            .Setup(s => s.RetryReleasePublishing(releaseVersion.Id, CancellationToken.None))
-            .Returns(Task.CompletedTask);
-
-        await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var publishingService = BuildPublishingService(
-                contentDbContext: context,
-                publisherClient: publisherClient.Object
-            );
-
-            var result = await publishingService.RetryReleasePublishing(releaseVersion.Id);
-
-            publisherClient.Verify(
-                s => s.RetryReleasePublishing(releaseVersion.Id, CancellationToken.None),
-                Times.Once()
-            );
-
-            result.AssertRight();
-        }
-
-        VerifyAllMocks(publisherClient);
-    }
-
-    [Fact]
-    public async Task RetryReleasePublishing_ReleaseNotFound()
-    {
-        await using var context = InMemoryApplicationDbContext();
-
-        var publishingService = BuildPublishingService(contentDbContext: context);
-
-        var result = await publishingService.RetryReleasePublishing(Guid.NewGuid());
-
-        result.AssertNotFound();
-    }
 
     [Fact]
     public async Task ReleaseChanged()
@@ -184,14 +130,12 @@ public class PublishingServiceTests
 
     private static PublishingService BuildPublishingService(
         ContentDbContext contentDbContext,
-        IPublisherClient? publisherClient = null,
-        IUserService? userService = null
+        IPublisherClient? publisherClient = null
     )
     {
         return new PublishingService(
             contentDbContext,
             publisherClient ?? Mock.Of<IPublisherClient>(MockBehavior.Strict),
-            userService ?? AlwaysTrueUserService().Object,
             new Mock<ILogger<PublishingService>>().Object
         );
     }

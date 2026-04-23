@@ -50,7 +50,8 @@ public static class PermissionsUtils
             CanManageReleaseSeries = await userService.CheckCanManageReleaseSeries(publication).IsRight(),
             CanUpdateContact = await userService.CheckCanUpdateContact(publication).IsRight(),
             CanUpdateContributorReleaseRole = await userService
-                .CheckCanUpdateReleaseRole(publication, Contributor)
+                // TODO - THIS METHOD NEEDS CHANGING IN FOLLOW-UP PR EES-7041
+                .CheckCanUpdateDrafters(publication)
                 .IsRight(),
             CanViewReleaseTeamAccess = await userService.CheckCanViewReleaseTeamAccess(publication).IsRight(),
         };
