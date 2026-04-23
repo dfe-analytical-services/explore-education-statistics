@@ -209,7 +209,7 @@ export interface ReleaseVersion<
 export interface ReleaseVersionSummary {
   coverageTitle: string;
   id: string;
-  isLatestRelease?: boolean;
+  isLatestRelease: boolean;
   label?: string;
   lastUpdated: string;
   published: string;
