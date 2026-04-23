@@ -13,6 +13,9 @@
     <Content Include="Migrations\ContentMigrations\*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Migrations\ContentMigrations\Archive\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Migrations\UsersAndRolesMigrations\*.sql">

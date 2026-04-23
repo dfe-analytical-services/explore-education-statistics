@@ -16,7 +16,7 @@ public partial class EES3988KeyStatisticCleanUp : Migration
 
         migrationBuilder.DropColumn(name: "DataBlock_Summary", table: "ContentBlock");
 
-        migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_CleanUpKeyStatData.sql");
+        migrationBuilder.SqlFromFile(ContentMigrationsArchivePath, $"{MigrationId}_CleanUpKeyStatData.sql");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

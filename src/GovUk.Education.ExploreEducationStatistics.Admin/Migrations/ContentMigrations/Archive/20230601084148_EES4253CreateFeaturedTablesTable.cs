@@ -84,7 +84,7 @@ public partial class EES4253CreateFeaturedTablesTable : Migration
         migrationBuilder.Sql("GRANT SELECT ON [dbo].[FeaturedTables] TO [content]");
 
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_MigrateFeaturedTableData.sql"
         );
     }

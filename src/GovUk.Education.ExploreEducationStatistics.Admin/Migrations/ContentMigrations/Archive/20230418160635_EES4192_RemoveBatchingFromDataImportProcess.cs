@@ -34,7 +34,7 @@ public partial class EES4192_RemoveBatchingFromDataImportProcess : Migration
         );
 
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_EES4192_RemoveBatchingFromDataImportProcess.sql"
         );
     }

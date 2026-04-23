@@ -119,8 +119,11 @@ public partial class EES3828AddKeyStatisticsTablesTPT : Migration
             column: "DataBlockId"
         );
 
-        migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_GrantPermissionsForKeyStatTables.sql");
-        migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_MigrateKeyStatDataBlockData.sql");
+        migrationBuilder.SqlFromFile(
+            ContentMigrationsArchivePath,
+            $"{MigrationId}_GrantPermissionsForKeyStatTables.sql"
+        );
+        migrationBuilder.SqlFromFile(ContentMigrationsArchivePath, $"{MigrationId}_MigrateKeyStatDataBlockData.sql");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
             // Migrate existing UNACCEPTED UserInvites to Users
             migrationBuilder.SqlFromFile(
-                MigrationConstants.ContentMigrationsPath,
+                MigrationConstants.ContentMigrationsArchivePath,
                 $"{MigrationId}_{nameof(Ees6504MigrateExistingUserInvitesToUsers)}.sql"
             );
         }

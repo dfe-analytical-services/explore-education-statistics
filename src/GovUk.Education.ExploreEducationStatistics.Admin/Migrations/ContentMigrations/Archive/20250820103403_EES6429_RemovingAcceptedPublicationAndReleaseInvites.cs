@@ -1,24 +1,22 @@
-﻿using System.Diagnostics.CodeAnalysis;
+#nullable disable
+
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
-
-#nullable disable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
-[ExcludeFromCodeCoverage]
-public partial class Ees6940InsertContentSections : Migration
+public partial class EES6429_RemovingAcceptedPublicationAndReleaseInvites : Migration
 {
-    private const string MigrationId = "20260302153355";
+    private const string MigrationId = "20250820103403";
 
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        // Insert content sections for existing release versions
+        // Delete all Accepted UserPublicationInvites and UserReleaseInvites
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_{nameof(Ees6940InsertContentSections)}.sql"
+            MigrationConstants.ContentMigrationsArchivePath,
+            $"{MigrationId}_{nameof(EES6429_RemovingAcceptedPublicationAndReleaseInvites)}.sql"
         );
     }
 

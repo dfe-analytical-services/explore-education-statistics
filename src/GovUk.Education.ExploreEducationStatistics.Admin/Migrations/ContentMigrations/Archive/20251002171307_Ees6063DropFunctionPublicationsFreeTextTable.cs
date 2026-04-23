@@ -30,12 +30,12 @@ public partial class Ees6063DropFunctionPublicationsFreeTextTable : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath,
+            ContentMigrationsArchivePath,
             $"{PreviousPublicationsFullTextCatalogAndIndexMigrationId}_PublicationsFullTextCatalogAndIndex.sql",
             suppressTransaction: true
         );
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath,
+            ContentMigrationsArchivePath,
             $"{PreviousPublicationsFreeTextTableMigrationId}_Routine_PublicationsFreeTextTable.sql"
         );
         migrationBuilder.Sql("GRANT SELECT ON dbo.PublicationsFreeTextTable TO [content]");

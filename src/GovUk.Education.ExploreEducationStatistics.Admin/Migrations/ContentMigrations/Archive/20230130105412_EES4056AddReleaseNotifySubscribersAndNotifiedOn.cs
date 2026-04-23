@@ -24,7 +24,7 @@ public partial class EES4056AddReleaseNotifySubscribersAndNotifiedOn : Migration
         );
 
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_EES4056AddReleaseNotifySubscribersAndNotifiedOn.sql"
         );
     }

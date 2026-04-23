@@ -82,7 +82,7 @@ public partial class EES6317_AddReleaseVersionPublishingOrganisations : Migratio
 
         // Insert seed Organisations
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_{nameof(EES6317_AddReleaseVersionPublishingOrganisations)}.sql"
         );
     }

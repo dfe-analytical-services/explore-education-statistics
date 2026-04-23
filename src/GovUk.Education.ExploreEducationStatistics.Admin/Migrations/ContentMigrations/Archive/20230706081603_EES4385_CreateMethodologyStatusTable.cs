@@ -55,7 +55,7 @@ public partial class EES4385_CreateMethodologyStatusTable : Migration
         );
 
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_MigrateMethodologyInternalReleaseNotes.sql"
         );
     }

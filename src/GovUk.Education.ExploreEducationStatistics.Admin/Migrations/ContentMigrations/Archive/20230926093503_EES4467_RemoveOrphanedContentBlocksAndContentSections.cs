@@ -14,7 +14,7 @@ public partial class EES4467_RemoveOrphanedContentBlocksAndContentSections : Mig
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath,
+            ContentMigrationsArchivePath,
             $"{MigrationId}_{nameof(EES4467_RemoveOrphanedContentBlocksAndContentSections)}.sql"
         );
     }

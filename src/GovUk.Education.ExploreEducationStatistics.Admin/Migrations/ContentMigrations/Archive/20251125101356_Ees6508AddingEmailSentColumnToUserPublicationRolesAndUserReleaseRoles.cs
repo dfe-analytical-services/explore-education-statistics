@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             // Migrate 'EmailSent' values for existing UserPublicationRoles and UserReleaseRoles to be `Null` or `DateTimeOffset.MinValue`.
             migrationBuilder.SqlFromFile(
-                MigrationConstants.ContentMigrationsPath,
+                MigrationConstants.ContentMigrationsArchivePath,
                 $"{MigrationId}_{nameof(Ees6508AddingEmailSentColumnToUserPublicationRolesAndUserReleaseRoles)}.sql"
             );
         }

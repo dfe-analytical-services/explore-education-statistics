@@ -73,7 +73,7 @@ public partial class EES6502_AddingNewColumnsToUsersTable : Migration
         // Migrate 'Active', 'RoleId', 'Created' and 'CreatedById' values for existing Users.
         // Also create the placeholder 'Deleted User' record.
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_{nameof(EES6502_AddingNewColumnsToUsersTable)}.sql"
         );
 

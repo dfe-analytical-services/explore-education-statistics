@@ -102,7 +102,7 @@ public partial class EES4467_AddDataBlockAndDataBlockVersion : Migration
         );
 
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath,
+            ContentMigrationsArchivePath,
             $"{MigrationId}_{nameof(EES4467_AddDataBlockAndDataBlockVersion)}.sql"
         );
 

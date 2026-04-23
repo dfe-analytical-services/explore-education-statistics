@@ -52,7 +52,7 @@ public partial class EES4482_CreateAlternativeSlugAndOwningPublicationSlugForMet
         migrationBuilder.Sql("GRANT SELECT ON dbo.MethodologyRedirects TO [publisher]");
 
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_EES4482_MigrateMethodologyOwningPublicationSlug.sql"
         );
     }

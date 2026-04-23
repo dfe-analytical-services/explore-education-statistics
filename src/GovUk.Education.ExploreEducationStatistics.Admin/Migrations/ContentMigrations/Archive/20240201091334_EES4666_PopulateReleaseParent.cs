@@ -16,7 +16,7 @@ public partial class EES4666_PopulateReleaseParent : Migration
     {
         // Populate new ReleaseParentId's for all existing Releases
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_PopulateReleaseParent.sql"
         );
 

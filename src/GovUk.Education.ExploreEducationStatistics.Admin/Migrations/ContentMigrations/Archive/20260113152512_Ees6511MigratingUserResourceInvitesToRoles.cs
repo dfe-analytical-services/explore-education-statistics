@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             // Migrate existing UserPublicationInvites/UserReleaseInvites to corresponding UserPublicationRoles/UserReleaseRoles
             migrationBuilder.SqlFromFile(
-                MigrationConstants.ContentMigrationsPath,
+                MigrationConstants.ContentMigrationsArchivePath,
                 $"{MigrationId}_{nameof(Ees6511MigratingUserResourceInvitesToRoles)}.sql"
             );
         }

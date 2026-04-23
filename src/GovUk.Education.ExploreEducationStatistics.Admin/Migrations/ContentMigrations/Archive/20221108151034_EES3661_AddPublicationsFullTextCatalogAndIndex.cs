@@ -17,7 +17,7 @@ public partial class EES3661_AddPublicationsFullTextCatalogAndIndex : Migration
     {
         // Add a full-text catalog with an index on the Publications Summary and Title columns
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath,
+            ContentMigrationsArchivePath,
             $"{MigrationId}_PublicationsFullTextCatalogAndIndex.sql",
             suppressTransaction: true
         );

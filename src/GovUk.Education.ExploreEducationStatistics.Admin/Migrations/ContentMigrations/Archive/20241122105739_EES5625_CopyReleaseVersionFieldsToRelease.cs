@@ -44,7 +44,7 @@ public partial class EES5625_CopyReleaseVersionFieldsToRelease : Migration
 
         // Copy attributes from ReleaseVersions to Releases based on the latest versions of each release
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
+            MigrationConstants.ContentMigrationsArchivePath,
             $"{MigrationId}_{nameof(EES5625_CopyReleaseVersionFieldsToRelease)}.sql"
         );
 

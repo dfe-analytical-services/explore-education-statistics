@@ -7,36 +7,32 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 // ReSharper disable once InconsistentNaming
-public partial class EES4467_AddReleaseIdToContentSection : Migration
+public partial class EES4467_AddReleaseIdToContentBlock : Migration
 {
-    private const string MigrationId = "20230926125228";
+    private const string MigrationId = "20230926104318";
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.AddColumn<Guid>(
             name: "ReleaseId",
-            table: "ContentSections",
+            table: "ContentBlock",
             type: "uniqueidentifier",
             nullable: true
         );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_ContentSections_ReleaseId",
-            table: "ContentSections",
-            column: "ReleaseId"
-        );
+        migrationBuilder.CreateIndex(name: "IX_ContentBlock_ReleaseId", table: "ContentBlock", column: "ReleaseId");
 
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES4467_AddReleaseIdToContentSection)}.sql"
+            ContentMigrationsArchivePath,
+            $"{MigrationId}_{nameof(EES4467_AddReleaseIdToContentBlock)}.sql"
         );
 
         // Initially create this foreign key with "Restrict" delete cascade behaviour. This is so as to not
         // cause potential cyclical delete cascades with the existing cascade delete behaviour from
-        // Releases -> ReleaseContentSections -> ContentSections.
+        // Releases -> ReleaseContentBlocks -> ContentBlock.
         migrationBuilder.AddForeignKey(
-            name: "FK_ContentSections_Releases_ReleaseId",
-            table: "ContentSections",
+            name: "FK_ContentBlock_Releases_ReleaseId",
+            table: "ContentBlock",
             column: "ReleaseId",
             principalTable: "Releases",
             principalColumn: "Id",
@@ -45,7 +41,7 @@ public partial class EES4467_AddReleaseIdToContentSection : Migration
 
         migrationBuilder.AlterColumn<Guid>(
             name: "ReleaseId",
-            table: "ContentSections",
+            table: "ContentBlock",
             nullable: false,
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
@@ -55,10 +51,10 @@ public partial class EES4467_AddReleaseIdToContentSection : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(name: "FK_ContentSections_Releases_ReleaseId", table: "ContentSections");
+        migrationBuilder.DropForeignKey(name: "FK_ContentBlock_Releases_ReleaseId", table: "ContentBlock");
 
-        migrationBuilder.DropIndex(name: "IX_ContentSections_ReleaseId", table: "ContentSections");
+        migrationBuilder.DropIndex(name: "IX_ContentBlock_ReleaseId", table: "ContentBlock");
 
-        migrationBuilder.DropColumn(name: "ReleaseId", table: "ContentSections");
+        migrationBuilder.DropColumn(name: "ReleaseId", table: "ContentBlock");
     }
 }

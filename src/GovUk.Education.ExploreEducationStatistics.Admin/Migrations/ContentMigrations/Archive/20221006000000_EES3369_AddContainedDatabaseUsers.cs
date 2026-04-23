@@ -1,20 +1,17 @@
-﻿#nullable disable
-
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.MigrationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 // ReSharper disable once InconsistentNaming
-public partial class EES4002_RemovePreReleaseUsersFromAmendments : Migration
+public partial class EES3369_AddContainedDatabaseUsers : Migration
 {
-    private const string MigrationId = "20230215154534";
-
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_EES4002_RemovePreReleaseUsersFromAmendments.sql"
+            ContentMigrationsArchivePath,
+            "20221006000000_EES3369_AddContainedDatabaseUsers.sql"
         );
     }
 

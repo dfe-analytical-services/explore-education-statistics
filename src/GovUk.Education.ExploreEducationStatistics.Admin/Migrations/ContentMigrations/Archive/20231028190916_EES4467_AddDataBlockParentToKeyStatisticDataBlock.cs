@@ -21,7 +21,7 @@ public partial class EES4467_AddDataBlockParentToKeyStatisticDataBlock : Migrati
         );
 
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath,
+            ContentMigrationsArchivePath,
             $"{MigrationId}_{nameof(EES4467_AddDataBlockParentToKeyStatisticDataBlock)}.sql"
         );
 

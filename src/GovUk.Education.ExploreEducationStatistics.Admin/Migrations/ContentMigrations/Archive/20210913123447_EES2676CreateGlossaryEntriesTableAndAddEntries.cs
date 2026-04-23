@@ -39,7 +39,7 @@ public partial class EES2676CreateGlossaryEntriesTableAndAddEntries : Migration
             column: "CreatedById"
         );
 
-        migrationBuilder.SqlFromFile(ContentMigrationsPath, GlossaryEntriesSqlFile);
+        migrationBuilder.SqlFromFile(ContentMigrationsArchivePath, GlossaryEntriesSqlFile);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

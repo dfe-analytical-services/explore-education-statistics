@@ -1,22 +1,24 @@
-#nullable disable
+﻿#nullable disable
 
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
-public partial class EES6429_RemovingAcceptedPublicationAndReleaseInvites : Migration
+[ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
+public partial class EES5091_AddPublicDataProcessorContainedDatabaseUser : Migration
 {
-    private const string MigrationId = "20250820103403";
+    private const string MigrationId = "20240426105013";
 
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        // Delete all Accepted UserPublicationInvites and UserReleaseInvites
         migrationBuilder.SqlFromFile(
-            MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES6429_RemovingAcceptedPublicationAndReleaseInvites)}.sql"
+            MigrationConstants.ContentMigrationsArchivePath,
+            $"{MigrationId}_EES5091_AddPublicDataProcessorContainedDatabaseUser.sql"
         );
     }
 
