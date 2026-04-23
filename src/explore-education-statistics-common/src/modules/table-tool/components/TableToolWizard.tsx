@@ -200,9 +200,14 @@ export default function TableToolWizard({
       tableBuilderService.listLatestReleaseFeaturedTables(publication.id),
     ]);
 
-    const latestRelease =
-      await publicationService.getLatestPublicationReleaseSummary(
+    const publicationSummary = await publicationService.getPublicationSummary(
+      publication.slug,
+    );
+    const { latestRelease } = publicationSummary;
+    const selectedReleaseVersion =
+      await publicationService.getReleaseVersionSummary(
         publication.slug,
+        latestRelease.slug,
       );
 
     const updatedDataSetTitle =
@@ -218,11 +223,11 @@ export default function TableToolWizard({
       draft.selectedPublication = {
         ...publication,
         selectedRelease: {
-          id: latestRelease.id,
-          latestData: latestRelease.latestRelease,
-          slug: latestRelease.slug,
-          title: latestRelease.title,
-          type: latestRelease.type,
+          id: selectedReleaseVersion.id,
+          latestData: selectedReleaseVersion.isLatestRelease,
+          slug: selectedReleaseVersion.slug,
+          title: selectedReleaseVersion.title,
+          type: selectedReleaseVersion.type,
         },
         latestRelease: {
           title: latestRelease.title,

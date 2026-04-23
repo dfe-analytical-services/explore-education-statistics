@@ -367,10 +367,6 @@ export interface ReleaseSummary {
   latestRelease: boolean;
 }
 
-export interface PublicationReleaseSummary extends ReleaseSummary {
-  publication: PublicationSummaryPreview;
-}
-
 export interface PublicationTreeSummary {
   id: string;
   title: string;
@@ -428,23 +424,6 @@ const publicationService = {
     publicationSlug: string,
   ): Promise<ReleaseVersion> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
-  },
-  // Currently used within table tool
-  getPublicationReleaseSummary(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
-    );
-  },
-  // Currently used within table tool
-  getLatestPublicationReleaseSummary(
-    publicationSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/latest/summary`,
-    );
   },
   getReleaseVersionSummary(
     publicationSlug: string,
