@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 /// <summary>
-/// TODO EES-6432 EES-6433: This service is due to be removed by EES-6432/EES-6433 once the release page redesign is live.
+/// This service contains a <c>List</c> method retained after the Release page redesign, which is required by the
+/// Public site frontend Data Catalogue page. Newer release-related services can be found in the
+/// <see cref="GovUk.Education.ExploreEducationStatistics.Content.Services.Releases"/> namespace.
 /// </summary>
 public class ReleaseService(
     ContentDbContext contentDbContext,
