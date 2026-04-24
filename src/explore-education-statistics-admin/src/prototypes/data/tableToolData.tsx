@@ -3,7 +3,10 @@ import {
   SubjectMeta,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
-import { PublicationReleaseSummary } from '@common/services/publicationService';
+import {
+  ReleaseVersionSummary,
+  PublicationSummary,
+} from '@common/services/publicationService';
 
 // eslint-disable-next-line import/prefer-default-export
 export const subjects: Subject[] = [
@@ -673,32 +676,41 @@ export const subjects: Subject[] = [
   },
 ];
 
-export const summary: PublicationReleaseSummary = {
-  id: 'dc190008-a8f7-41a4-faa6-08d973655eae',
-  title: 'Reporting Year 2021',
-  slug: '2021',
-  yearTitle: '2021',
-  coverageTitle: 'Reporting Year',
+export const publicationSummary: PublicationSummary = {
+  id: '89869bba-0c00-40f7-b7d6-e28cb904ad37',
+  title: 'Characteristics of children in need',
+  slug: "Statistics on children in need in England, including child protection plans and referrals to and assessments completed by children's social care services.",
+  summary: 'Publication summary',
+  latestRelease: {
+    id: 'dc190008-a8f7-41a4-faa6-08d973655eae',
+    slug: '2021',
+    title: 'Reporting Year 2021',
+  },
+  contact: {
+    teamName: 'Contact Team Name',
+    teamEmail: 'Contact Team Email',
+    contactName: 'Contact Name',
+  },
+  theme: {
+    id: 'a05c8110-9f6e-49c3-a715-dfcee76aaa9a',
+    title: "Children's social care",
+    summary:
+      'Including children in need and child protection, children looked after and social work workforce statistics.',
+  },
+};
+
+export const releaseVersionSummary: ReleaseVersionSummary = {
+  id: '7bfe9a51-ec89-486e-aa6d-09fb45ae1a43',
+  isLatestRelease: true,
+  lastUpdated: '2021-10-28T08:30:02.6926703',
   published: '2021-10-28T08:30:02.6926703',
-  nextReleaseDate: {
-    year: '2022',
-    month: '10',
-    day: '',
-  },
+  slug: '2021',
+  title: 'Reporting Year 2021',
+  coverageTitle: 'Reporting Year',
+  yearTitle: '2021',
   type: 'AccreditedOfficialStatistics',
-  latestRelease: true,
-  publication: {
-    id: '89869bba-0c00-40f7-b7d6-e28cb904ad37',
-    title: 'Characteristics of children in need',
-    slug: 'characteristics-of-children-in-need',
-    latestReleaseSlug: 'latest-release-slug',
-    owner: true,
-    contact: {
-      teamName: 'Contact Team Name',
-      teamEmail: 'Contact Team Email',
-      contactName: 'Contact Name',
-    },
-  },
+  updateCount: 1,
+  preReleaseAccessList: '',
 };
 
 export const subjectMeta: SubjectMeta = {
