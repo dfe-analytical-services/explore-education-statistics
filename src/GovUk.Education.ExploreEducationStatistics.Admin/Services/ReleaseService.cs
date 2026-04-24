@@ -28,7 +28,6 @@ public partial class ReleaseService(
     IUserService userService,
     IReleaseVersionService releaseVersionService,
     IReleaseCacheService releaseCacheService,
-    IPublicationCacheService publicationCacheService,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
     IRedirectsCacheService redirectsCacheService,
     IAdminEventRaiser adminEventRaiser,
@@ -126,12 +125,10 @@ public partial class ReleaseService(
                 var releaseData = (releaseAndSlugs, slugHasChanged, releaseIsLive);
 
                 return releaseIsLive
-                    ? await UpdateReleaseCache(
+                    ? await RemoveReleaseCache(
                             slugHasChanged: slugHasChanged,
                             oldReleaseSlug: releaseAndSlugs.oldReleaseSlug,
-                            newReleaseSlug: releaseAndSlugs.newReleaseSlug,
-                            publicationSlug: releaseAndSlugs.release.Publication.Slug,
-                            latestReleaseVersionId: latestPublishedReleaseVersion!.Id
+                            publicationSlug: releaseAndSlugs.release.Publication.Slug
                         )
                         .OnSuccess(_ => releaseData)
                     : releaseData;
@@ -305,12 +302,10 @@ public partial class ReleaseService(
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
-    private async Task<Either<ActionResult, Unit>> UpdateReleaseCache(
+    private async Task<Either<ActionResult, Unit>> RemoveReleaseCache(
         bool slugHasChanged,
         string oldReleaseSlug,
-        string newReleaseSlug,
-        string publicationSlug,
-        Guid latestReleaseVersionId
+        string publicationSlug
     )
     {
         if (slugHasChanged)
@@ -319,22 +314,6 @@ public partial class ReleaseService(
             // the path should also change
             await releaseCacheService.RemoveRelease(publicationSlug: publicationSlug, releaseSlug: oldReleaseSlug);
         }
-
-        // Update release-specific path cache
-        await releaseCacheService.UpdateRelease(
-            releaseVersionId: latestReleaseVersionId,
-            publicationSlug: publicationSlug,
-            releaseSlug: newReleaseSlug
-        );
-
-        // Update latest release path cache
-        await releaseCacheService.UpdateRelease(
-            releaseVersionId: latestReleaseVersionId,
-            publicationSlug: publicationSlug
-        );
-
-        // Update publication cache (view-model contains release related data that has now been updated)
-        await publicationCacheService.UpdatePublication(publicationSlug);
 
         return Unit.Instance;
     }

@@ -475,7 +475,6 @@ public abstract class ReleaseServiceTests
                     context,
                     releaseVersionService: releaseVersionService.Build(),
                     releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
-                    publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
                     redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
                     adminEventRaiser: adminEventRaiser.Build()
@@ -553,7 +552,6 @@ public abstract class ReleaseServiceTests
                 context,
                 releaseVersionService: releaseVersionService.Build(),
                 releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
-                publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
                 redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                 releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
                 adminEventRaiser: adminEventRaiser.Build()
@@ -626,7 +624,6 @@ public abstract class ReleaseServiceTests
                 context,
                 releaseVersionService: releaseVersionService.Build(),
                 releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
-                publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
                 redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                 releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
                 adminEventRaiser: adminEventRaiser.Build()
@@ -681,7 +678,6 @@ public abstract class ReleaseServiceTests
         ContentDbContext contentDbContext,
         IReleaseVersionService? releaseVersionService = null,
         IReleaseCacheService? releaseCacheService = null,
-        IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
         IAdminEventRaiser? adminEventRaiser = null,
@@ -697,7 +693,6 @@ public abstract class ReleaseServiceTests
             userService: userService.Object,
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
-            publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
             releasePublishingStatusRepository: releasePublishingStatusRepository
                 ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),

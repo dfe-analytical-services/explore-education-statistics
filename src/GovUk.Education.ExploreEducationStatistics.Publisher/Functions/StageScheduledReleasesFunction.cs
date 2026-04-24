@@ -25,12 +25,13 @@ public class StageScheduledReleasesFunction(
     private readonly AppOptions _appOptions = appOptions.Value;
 
     /// <summary>
-    /// Azure function which triggers publishing files and staging content for all release versions that are scheduled to
-    /// be published later during the day. This operates on a schedule which by default occurs at midnight every
-    /// night.
+    /// Azure function which triggers copying files for all release versions that are scheduled to be published
+    /// later during the day. This operates on a schedule which by default occurs at midnight every night.
     /// </summary>
     /// <param name="timer"></param>
     /// <param name="context"></param>
+    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
+    // given that the 'staging' content task no longer exists.
     [Function(nameof(StageScheduledReleases))]
     public async Task StageScheduledReleases(
         [TimerTrigger("%App:StageScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
@@ -56,17 +57,17 @@ public class StageScheduledReleasesFunction(
             );
 
         // Fetch releases scheduled for publishing before or on the next run time
-        var releasesToBeStaged = await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
+        var scheduledReleases = await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
             DateComparison.BeforeOrOn,
             nextScheduledPublishingTime
         );
 
-        await QueueReleaseFilesAndContentTasks(releasesToBeStaged);
+        await QueueReleaseFilesTask(scheduledReleases);
 
         logger.LogInformation(
             "{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            releasesToBeStaged.ToReleaseVersionIdsString()
+            scheduledReleases.ToReleaseVersionIdsString()
         );
     }
 
@@ -81,6 +82,9 @@ public class StageScheduledReleasesFunction(
     /// the scope of the Function to only the provided release version id's.
     /// </param>
     /// <param name="context"></param>
+    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
+    // given that the 'staging' content task no longer exists. Be careful to make sure it remains disabled in the Prod
+    // environment after renaming.
     [Function(nameof(StageScheduledReleaseVersionsImmediately))]
     public async Task<ActionResult<ManualTriggerResponse>> StageScheduledReleaseVersionsImmediately(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
@@ -94,7 +98,7 @@ public class StageScheduledReleasesFunction(
         var now = timeProvider.GetLocalNow();
         var startOfToday = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset);
 
-        var releasesToBeStaged =
+        var scheduledReleases =
             releaseVersionIds?.Length > 0
                 ? await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
                     DateComparison.AfterOrOn,
@@ -105,40 +109,38 @@ public class StageScheduledReleasesFunction(
                     startOfToday.AddDays(1)
                 );
 
-        var selectedReleasesToBeStaged =
+        var selectedReleases =
             releaseVersionIds?.Length > 0
-                ? releasesToBeStaged.Where(key => releaseVersionIds.Contains(key.ReleaseVersionId)).ToList()
-                : releasesToBeStaged;
+                ? scheduledReleases.Where(key => releaseVersionIds.Contains(key.ReleaseVersionId)).ToList()
+                : scheduledReleases;
 
-        await QueueReleaseFilesAndContentTasks(selectedReleasesToBeStaged);
+        await QueueReleaseFilesTask(selectedReleases);
 
         logger.LogInformation(
             "{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            selectedReleasesToBeStaged.ToReleaseVersionIdsString()
+            selectedReleases.ToReleaseVersionIdsString()
         );
 
-        return new ManualTriggerResponse(selectedReleasesToBeStaged.ToReleaseVersionIds());
+        return new ManualTriggerResponse(selectedReleases.ToReleaseVersionIds());
     }
 
-    private async Task QueueReleaseFilesAndContentTasks(IReadOnlyList<ReleasePublishingKey> scheduled)
+    private async Task QueueReleaseFilesTask(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
     {
-        if (!scheduled.Any())
+        if (!releasePublishingKeys.Any())
         {
             return;
         }
 
-        await scheduled
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async key =>
-                await releasePublishingStatusService.UpdateState(
-                    key,
-                    ReleasePublishingStatusStates.ScheduledReleaseStartedState
-                )
+        foreach (var key in releasePublishingKeys)
+        {
+            await releasePublishingStatusService.UpdateState(
+                key,
+                ReleasePublishingStatusStates.ScheduledReleaseStartedState
             );
+        }
 
-        await queueService.QueuePublishReleaseFilesMessages(scheduled);
-        await queueService.QueueStageReleaseContentMessages(scheduled);
+        await queueService.QueuePublishReleaseFilesMessages(releasePublishingKeys);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local

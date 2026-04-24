@@ -13,7 +13,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -366,24 +365,6 @@ public class PublishingServiceTests
             privateBlobStorageService,
             releaseService
         );
-    }
-
-    [Fact]
-    public async Task PublishStagedReleaseContent()
-    {
-        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
-
-        publicBlobStorageService
-            .Setup(mock =>
-                mock.MoveDirectory(PublicContent, PublicContentStagingPath(), PublicContent, string.Empty, null)
-            )
-            .Returns(Task.CompletedTask);
-
-        var service = BuildPublishingService(publicBlobStorageService: publicBlobStorageService.Object);
-
-        await service.PublishStagedReleaseContent();
-
-        MockUtils.VerifyAllMocks(publicBlobStorageService);
     }
 
     private static PublishingService BuildPublishingService(

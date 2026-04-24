@@ -90,9 +90,10 @@ public class PublishReleaseFilesFunction(
         ReleasePublishingStatusLogMessage? logMessage = null
     )
     {
-        await releasePublishingKeys
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(key => releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage));
+        foreach (var key in releasePublishingKeys)
+        {
+            await releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage);
+        }
     }
 
     private async Task UpdatePublishingStage(
@@ -101,8 +102,9 @@ public class PublishReleaseFilesFunction(
         ReleasePublishingStatusLogMessage? logMessage = null
     )
     {
-        await releasePublishingKeys
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(key => releasePublishingStatusService.UpdatePublishingStage(key, stage, logMessage));
+        foreach (var key in releasePublishingKeys)
+        {
+            await releasePublishingStatusService.UpdatePublishingStage(key, stage, logMessage);
+        }
     }
 }

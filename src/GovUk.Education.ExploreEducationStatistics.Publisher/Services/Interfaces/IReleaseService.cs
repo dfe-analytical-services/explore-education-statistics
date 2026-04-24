@@ -12,10 +12,7 @@ public interface IReleaseService
 
     Task<List<File>> GetFiles(Guid releaseVersionId, params FileType[] types);
 
-    Task<ReleaseVersion> GetLatestPublishedReleaseVersion(
-        Guid publicationId,
-        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null
-    );
+    Task<ReleaseVersion> GetLatestPublishedReleaseVersion(Guid publicationId);
 
     Task CompletePublishing(Guid releaseVersionId, DateTimeOffset actualPublishedDate);
 }

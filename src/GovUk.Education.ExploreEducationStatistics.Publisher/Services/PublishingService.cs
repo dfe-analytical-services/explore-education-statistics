@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Utils.CopyDirectoryCallbacks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -22,17 +21,6 @@ public class PublishingService(
 ) : IPublishingService
 {
     private readonly AppOptions _appOptions = appOptions.Value;
-
-    public async Task PublishStagedReleaseContent()
-    {
-        logger.LogInformation("Moving staged release content");
-        await publicBlobStorageService.MoveDirectory(
-            sourceContainerName: PublicContent,
-            sourceDirectoryPath: PublicContentStagingPath(),
-            destinationContainerName: PublicContent,
-            destinationDirectoryPath: string.Empty
-        );
-    }
 
     public async Task PublishMethodologyFiles(Guid methodologyId)
     {

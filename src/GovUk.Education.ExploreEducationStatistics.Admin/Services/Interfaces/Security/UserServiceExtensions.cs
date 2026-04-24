@@ -376,14 +376,6 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanViewSpecificPreReleaseSummary);
     }
 
-    public static Task<Either<ActionResult, ReleaseVersion>> CheckCanPublishReleaseVersion(
-        this IUserService userService,
-        ReleaseVersion releaseVersion
-    )
-    {
-        return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanPublishSpecificRelease);
-    }
-
     public static Task<Either<ActionResult, Comment>> CheckCanResolveComment(
         this IUserService userService,
         Comment comment

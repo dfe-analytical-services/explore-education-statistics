@@ -16,7 +16,6 @@ public class PublishingCompletionServiceTests
     private readonly MethodologyServiceMockBuilder _methodologyService = new();
     private readonly NotificationsServiceMockBuilder _notificationsService = new();
     private readonly ReleasePublishingStatusServiceMockBuilder _releasePublishingStatusService = new();
-    private readonly PublicationCacheServiceMockBuilder _publicationCacheService = new();
     private readonly ReleaseServiceMockBuilder _releaseService = new();
     private readonly RedirectsCacheServiceMockBuilder _redirectsCacheService = new();
     private readonly DataSetPublishingServiceMockBuilder _dataSetPublishingService = new();
@@ -35,7 +34,6 @@ public class PublishingCompletionServiceTests
             _methodologyService.Build(),
             _notificationsService.Build(),
             _releasePublishingStatusService.Build(),
-            _publicationCacheService.Build(),
             _releaseService.Build(),
             _redirectsCacheService.Build(),
             _dataSetPublishingService.Build(),
@@ -70,12 +68,12 @@ public class PublishingCompletionServiceTests
                 // ARRANGE
                 ReleasePublishingKey releasePublishingKey1 = new(Guid.NewGuid(), Guid.NewGuid());
                 var releasePublishingStatus1 = new ReleasePublishingStatusBuilder(releasePublishingKey1)
-                    .WhereContentStatusIs(ReleasePublishingStatusContentStage.Queued)
+                    .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                     .Build();
 
                 ReleasePublishingKey releasePublishingKey2 = new(Guid.NewGuid(), Guid.NewGuid());
                 var releasePublishingStatus2 = new ReleasePublishingStatusBuilder(releasePublishingKey2)
-                    .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
+                    .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.Started)
                     .Build();
 
                 var notReadyKeys = new List<ReleasePublishingKey>() { releasePublishingKey1, releasePublishingKey2 };
@@ -152,7 +150,7 @@ public class PublishingCompletionServiceTests
                     _releasePublishingStatusService.WhereGetReturns(
                         readyKey,
                         new ReleasePublishingStatusBuilder(readyKey)
-                            .WhereContentStatusIs(ReleasePublishingStatusContentStage.Complete)
+                            .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.Complete)
                             .Build()
                     );
                 }
@@ -192,7 +190,7 @@ public class PublishingCompletionServiceTests
                         _releasePublishingStatusService.WhereGetReturns(
                             notReadyKey,
                             new ReleasePublishingStatusBuilder(notReadyKey)
-                                .WhereContentStatusIs(ReleasePublishingStatusContentStage.Scheduled)
+                                .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                                 .Build()
                         );
                     }
@@ -238,7 +236,7 @@ public class PublishingCompletionServiceTests
                         _releasePublishingStatusService.WhereGetReturns(
                             notReadyKey,
                             new ReleasePublishingStatusBuilder(notReadyKey)
-                                .WhereContentStatusIs(ReleasePublishingStatusContentStage.Scheduled)
+                                .WhereFilesStatusIs(ReleasePublishingStatusFilesStage.NotStarted)
                                 .Build()
                         );
                     }
@@ -456,78 +454,6 @@ public class PublishingCompletionServiceTests
                         PublicationId1,
                         releaseVersionId1V2
                     );
-                }
-            }
-
-            public class UpdatePublicationCacheTests : ReadyTests
-            {
-                [Fact]
-                public async Task AllPublicationsUpdatedInCache()
-                {
-                    // ARRANGE
-                    var readyKeys = SetupHappyPath();
-                    var sut = GetSut();
-
-                    // ACT
-                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
-
-                    // ASSERT
-                    _publicationCacheService.Assert.PublicationUpdated(_releaseVersion1.Release.Publication.Slug);
-                    _publicationCacheService.Assert.PublicationUpdated(_releaseVersion2.Release.Publication.Slug);
-                }
-
-                [Fact]
-                public async Task GivenASupersededPublication_WhenPublicationIsAlreadyPublished_ThenSupersededPublicationNotUpdatedInCache()
-                {
-                    // ARRANGE
-                    var readyKeys = SetupHappyPath();
-
-                    // Set publication 1 to have a published release prior to the current publishing run
-                    WherePreviousPublicationLatestPublishedReleaseVersionIs(
-                        publicationId: PublicationId1,
-                        releaseVersion: new ReleaseVersionBuilder()
-                            .WithPublicationId(PublicationId1)
-                            .ForRelease(release => release.WithReleaseSlug("release-slug-previous"))
-                            .Build()
-                    );
-
-                    // Create a publication that is superseded by publication 1
-                    var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
-                        .SupersededBy(_releaseVersion1.Release.Publication.Id)
-                        .Build();
-                    _contentDbContext.With(supersededPublication);
-
-                    var sut = GetSut();
-
-                    // ACT
-                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
-
-                    // ASSERT
-                    // The publication cache should not be updated for the superseded publication
-                    _publicationCacheService.Assert.PublicationNotUpdated(supersededPublication.Slug);
-                }
-
-                [Fact]
-                public async Task GivenASupersededPublication_WhenPublicationIsNotAlreadyPublished_ThenSupersededPublicationUpdatedInCache()
-                {
-                    // ARRANGE
-                    var readyKeys = SetupHappyPath();
-
-                    // Create a publication that is superseded by publication 1.
-                    // Publication 1 has no published releases prior to the current publishing run
-                    var supersededPublication = new PublicationBuilder(Guid.NewGuid(), "publication-slug-superseded")
-                        .SupersededBy(_releaseVersion1.Release.Publication.Id)
-                        .Build();
-                    _contentDbContext.With(supersededPublication);
-
-                    var sut = GetSut();
-
-                    // ACT
-                    await sut.CompletePublishingIfAllPriorStagesComplete(readyKeys);
-
-                    // ASSERT
-                    // The publication cache should be updated for the superseded publication
-                    _publicationCacheService.Assert.PublicationUpdated(supersededPublication.Slug);
                 }
             }
 

@@ -324,11 +324,10 @@ public class ReleaseVersionsController : ControllerBase
             .HandleFailuresOr(_ => new AcceptedResult());
     }
 
-    // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-    [HttpGet("releases/{releaseVersionId:guid}/stage-status")]
-    public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseVersionId)
+    [HttpGet("releaseVersions/{releaseVersionId:guid}/stage-status")]
+    public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatuses(Guid releaseVersionId)
     {
-        return await _releasePublishingStatusService.GetReleaseStatusAsync(releaseVersionId).HandleFailuresOrOk();
+        return await _releasePublishingStatusService.GetReleaseStatus(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/checklist")]

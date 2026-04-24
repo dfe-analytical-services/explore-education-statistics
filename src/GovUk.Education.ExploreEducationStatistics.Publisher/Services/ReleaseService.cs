@@ -28,28 +28,20 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
             .ToListAsync();
     }
 
-    public async Task<ReleaseVersion> GetLatestPublishedReleaseVersion(
-        Guid publicationId,
-        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null
-    )
+    public async Task<ReleaseVersion> GetLatestPublishedReleaseVersion(Guid publicationId)
     {
         var publication = await contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
 
         // Get the publications release id's by the order they appear in the release series
         var releaseSeriesReleaseIds = publication.ReleaseSeries.ReleaseIds();
 
-        // Work out the publication's latest published release version.
-        // This is the latest published version of the first release which has either a published version
-        // or one of the included (about to be published) release version ids
+        // The latest published release version for a publication is determined by finding the latest published version
+        // of the first release in the series that has a published version.
         ReleaseVersion? latestPublishedReleaseVersion = null;
         foreach (var releaseId in releaseSeriesReleaseIds)
         {
             latestPublishedReleaseVersion = await contentDbContext
-                .ReleaseVersions.LatestReleaseVersion(
-                    releaseId: releaseId,
-                    publishedOnly: true,
-                    includeUnpublishedVersionIds: includeUnpublishedVersionIds
-                )
+                .ReleaseVersions.LatestReleaseVersion(releaseId: releaseId, publishedOnly: true)
                 .SingleOrDefaultAsync();
 
             if (latestPublishedReleaseVersion != null)

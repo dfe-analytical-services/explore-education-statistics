@@ -156,7 +156,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IIndicatorRepository, IndicatorRepository>();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
-        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
         services.AddTransient<IPublicationsService, PublicationsService>();
@@ -168,11 +167,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IMethodologyRepository, MethodologyRepository>();
         services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
         services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-        services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
         services.AddTransient<IReleaseRepository, ReleaseRepository>();
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IReleaseService, ReleaseService>();
-        services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
         services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();

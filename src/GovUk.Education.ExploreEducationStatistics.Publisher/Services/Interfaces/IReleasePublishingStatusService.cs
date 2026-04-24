@@ -57,12 +57,6 @@ public interface IReleasePublishingStatusService
 
     Task UpdateState(ReleasePublishingKey releasePublishingKey, ReleasePublishingStatusState state);
 
-    Task UpdateContentStage(
-        ReleasePublishingKey releasePublishingKey,
-        ReleasePublishingStatusContentStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null
-    );
-
     Task UpdateFilesStage(
         ReleasePublishingKey releasePublishingKey,
         ReleasePublishingStatusFilesStage stage,
