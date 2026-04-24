@@ -343,7 +343,7 @@ export const getServerSideProps: GetServerSideProps<
   const selectedReleaseVersion =
     await publicationService.getReleaseVersionSummary(
       publicationSlug,
-      releaseSlug ?? latestRelease.slug,
+      releaseSlug || latestRelease.slug,
     );
 
   const [subjects, featuredTables, fullPublication] = await Promise.all([
