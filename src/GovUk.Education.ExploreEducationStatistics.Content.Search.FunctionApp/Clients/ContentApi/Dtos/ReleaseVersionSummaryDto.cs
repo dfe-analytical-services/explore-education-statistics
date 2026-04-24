@@ -13,7 +13,7 @@ public record ReleaseVersionSummaryDto
     public string? CoverageTitle { get; init; }
     public DateTimeOffset? Published { get; init; }
     public string? Type { get; init; }
-    public bool? LatestRelease { get; init; }
+    public bool? IsLatestRelease { get; init; }
     public ReleaseVersionSummaryPublicationDto? Publication { get; init; }
 
     public ReleaseVersionSummary ToModel() =>
@@ -27,7 +27,7 @@ public record ReleaseVersionSummaryDto
             CoverageTitle = CoverageTitle,
             Published = Published,
             Type = Type,
-            IsLatestRelease = LatestRelease,
+            IsLatestRelease = IsLatestRelease,
             PublicationId = Publication?.Id,
             PublicationTitle = Publication?.Title,
             PublicationSlug = Publication?.Slug,
