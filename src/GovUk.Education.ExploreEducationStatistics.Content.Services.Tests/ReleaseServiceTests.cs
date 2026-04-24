@@ -13,9 +13,6 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 
-/// <summary>
-/// TODO EES-6432 EES-6433: This service is due to be removed by EES-6432/EES-6433 once the release page redesign is live.
-/// </summary>
 public class ReleaseServiceTests
 {
     private readonly DataFixture _dataFixture = new();

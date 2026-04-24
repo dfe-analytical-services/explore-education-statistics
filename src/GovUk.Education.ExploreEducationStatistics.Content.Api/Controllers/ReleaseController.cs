@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
+/// <summary>
+/// This controller contains an endpoint retained after the Release page redesign, which continues to serve
+/// the Public site frontend Data Catalogue page. Newer release-related controllers can be found in the
+/// <see cref="GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Releases"/> namespace.
+/// </summary>
 [ApiController]
 [Route("api")]
 public class ReleaseController(IReleaseService releaseService) : ControllerBase
