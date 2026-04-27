@@ -1,7 +1,7 @@
 import _userService, {
   RemoveUser,
   UserStatus,
-} from '@admin/services/userService';
+} from '@admin/services/user-management/userService';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';

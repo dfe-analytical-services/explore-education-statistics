@@ -1,6 +1,6 @@
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from 'src/services/types/common';
-import { PublicationRole } from './types/PublicationRole';
+import { PublicationRole } from '../types/PublicationRole';
 
 export interface UserStatus {
   id: string;

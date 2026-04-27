@@ -4,7 +4,7 @@ import {
   testResourceRoles,
   testReleases,
 } from '@admin/pages/users/__data__/testUserData';
-import _userService from '@admin/services/userService';
+import _userService from '@admin/services/user-management/userService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';

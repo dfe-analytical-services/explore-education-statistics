@@ -3,7 +3,7 @@ import usePublicationContext from '@admin/pages/publication/contexts/Publication
 import { PublicationManageTeamRouteParams } from '@admin/routes/publicationRoutes';
 import releasePermissionService, {
   UserReleaseRole,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import releaseVersionService, {
   ReleaseVersion,
 } from '@admin/services/releaseVersionService';

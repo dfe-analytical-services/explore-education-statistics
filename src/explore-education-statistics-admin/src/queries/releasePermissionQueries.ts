@@ -1,5 +1,5 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
-import releasePermissionService from '@admin/services/releasePermissionService';
+import releasePermissionService from '@admin/services/user-management/releasePermissionService';
 
 const releasePermissionQueries = createQueryKeys('releasePermission', {
   listRoles(releaseId: string) {

@@ -1,7 +1,7 @@
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import _preReleaseUserService, {
   PreReleaseUser,
-} from '@admin/services/preReleaseUserService';
+} from '@admin/services/user-management/preReleaseUserService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 

@@ -1,7 +1,7 @@
 import {
   UserReleaseRole,
   UserReleaseInvite,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import ButtonText from '@common/components/ButtonText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import styles from '@admin/pages/publication/components/ReleaseUserTable.module.scss';

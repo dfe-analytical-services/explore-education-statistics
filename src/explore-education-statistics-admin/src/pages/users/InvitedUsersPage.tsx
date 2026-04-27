@@ -1,6 +1,8 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService, { PendingInvite } from '@admin/services/userService';
+import userService, {
+  PendingInvite,
+} from '@admin/services/user-management/userService';
 import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';

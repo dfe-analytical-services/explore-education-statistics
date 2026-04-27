@@ -6,8 +6,8 @@ import {
   PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
-import releasePermissionService from '@admin/services/releasePermissionService';
-import userService from '@admin/services/userService';
+import releasePermissionService from '@admin/services/user-management/releasePermissionService';
+import userService from '@admin/services/user-management/userService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';

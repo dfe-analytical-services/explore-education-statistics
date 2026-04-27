@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService from '@admin/services/userService';
+import userService from '@admin/services/user-management/userService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';

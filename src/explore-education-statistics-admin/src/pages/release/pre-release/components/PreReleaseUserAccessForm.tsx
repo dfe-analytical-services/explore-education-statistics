@@ -1,7 +1,7 @@
 import PreReleaseInvitePlanModal from '@admin/pages/release/pre-release/components/PreReleaseInvitePlanModal';
 import preReleaseUserService, {
   PreReleaseInvitePlan,
-} from '@admin/services/preReleaseUserService';
+} from '@admin/services/user-management/preReleaseUserService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';

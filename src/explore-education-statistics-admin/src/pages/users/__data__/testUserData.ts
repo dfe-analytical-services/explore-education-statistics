@@ -1,6 +1,10 @@
 import { PublicationSummaryPreview } from '@common/services/publicationService';
 import { IdTitlePair } from '@admin/services/types/common';
-import { Role, ResourceRoles, User } from '@admin/services/userService';
+import {
+  Role,
+  ResourceRoles,
+  User,
+} from '@admin/services/user-management/userService';
 
 export const testUser: User = {
   id: 'user-1-id',

@@ -16,7 +16,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
-import { UserPublicationRole } from '@admin/services/userService';
+import { UserPublicationRole } from '@admin/services/user-management/userService';
 import orderBy from 'lodash/orderBy';
 import ButtonLink from '@admin/components/ButtonLink';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';

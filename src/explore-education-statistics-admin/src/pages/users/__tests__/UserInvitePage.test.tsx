@@ -7,7 +7,7 @@ import {
 } from '@admin/pages/users/__data__/testUserData';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService from '@admin/services/publicationService';
-import _userService from '@admin/services/userService';
+import _userService from '@admin/services/user-management/userService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
