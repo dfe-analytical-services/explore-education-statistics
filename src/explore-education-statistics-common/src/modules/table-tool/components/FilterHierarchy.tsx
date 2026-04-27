@@ -38,6 +38,11 @@ export interface FilterHierarchyProps {
   onToggle?: (isOpen: boolean) => void;
 }
 
+interface TierSelectionState {
+  tier: number;
+  selected: boolean;
+}
+
 function FilterHierarchy({
   optionLabelsMap,
   filterHierarchy,
@@ -56,6 +61,29 @@ function FilterHierarchy({
   const errorMessage = get(errors, name)?.message;
 
   const tiersTotal = filterHierarchy.length + 1;
+
+  const tiersInitialState = () => {
+    const tierState: TierSelectionState[] = [];
+    for (let i = 0; i < tiersTotal; i += 1) {
+      tierState.push({ tier: i, selected: false });
+    }
+
+    return tierState;
+  };
+
+  const [tierSelectionState, setTierSelectionState] =
+    useState<TierSelectionState[]>(tiersInitialState);
+
+  const toggleTierSelection = (tier: number) => {
+    setTierSelectionState(prev => ({
+      ...prev,
+      [tier]: {
+        ...prev[tier],
+        selected: !prev[tier].selected,
+      },
+    }));
+  };
+
   const [expandedOptionsList, setExpandedOptionsList] = useState<string[]>([]);
 
   const filterLabels: string[] = [
@@ -311,8 +339,9 @@ function FilterHierarchy({
                       : undefined
                   }
                 >
-                  <ButtonText>
-                    Select all {filterLabel} (tier {index + 1})
+                  <ButtonText onClick={() => toggleTierSelection(index)}>
+                    {tierSelectionState[index].selected ? 'Deselect' : 'Select'}{' '}
+                    all {filterLabel} (tier {index + 1})
                   </ButtonText>
                 </div>
               );
@@ -395,6 +424,7 @@ function mapOptionTreesRecursively({
     ]);
 
     return {
+      tier,
       value: optionValue,
       label: optionLabelsMap[optionId]?.trim(),
       filterLabel: optionLabelsMap[filterHierarchy[tier]?.filterId] ?? '',
