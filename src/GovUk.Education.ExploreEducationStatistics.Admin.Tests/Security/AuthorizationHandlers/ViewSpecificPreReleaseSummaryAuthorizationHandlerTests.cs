@@ -105,7 +105,7 @@ public abstract class ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
         }
     }
 
-    public class PreReleaseRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
+    public class PreReleaseRolesTests : ViewSpecificPreReleaseSummaryAuthorizationHandlerTests
     {
         [Fact]
         public async Task HasPreReleaseRole_Succeeds()
