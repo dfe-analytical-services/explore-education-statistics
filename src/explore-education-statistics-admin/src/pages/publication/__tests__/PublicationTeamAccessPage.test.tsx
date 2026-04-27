@@ -15,7 +15,7 @@ import _publicationService, {
 import _releasePermissionService, {
   UserReleaseInvite,
   UserReleaseRole,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { generatePath, MemoryRouter, Route } from 'react-router';

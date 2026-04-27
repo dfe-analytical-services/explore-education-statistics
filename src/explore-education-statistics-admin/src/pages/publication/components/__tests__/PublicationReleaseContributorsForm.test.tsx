@@ -3,7 +3,7 @@ import React from 'react';
 import PublicationReleaseContributorsForm from '@admin/pages/publication/components/PublicationReleaseContributorsForm';
 import _releasePermissionService, {
   UserReleaseRole,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/releasePermissionService');

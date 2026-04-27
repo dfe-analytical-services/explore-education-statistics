@@ -1,4 +1,7 @@
-import userService, { Role, User } from '@admin/services/userService';
+import userService, {
+  Role,
+  User,
+} from '@admin/services/user-management/userService';
 import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
 import FormProvider from '@common/components/form/FormProvider';

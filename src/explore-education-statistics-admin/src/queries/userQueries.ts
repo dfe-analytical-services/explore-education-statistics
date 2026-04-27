@@ -1,5 +1,5 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
-import userService from '@admin/services/userService';
+import userService from '@admin/services/user-management/userService';
 
 const userQueries = createQueryKeys('user', {
   get(userId: string) {

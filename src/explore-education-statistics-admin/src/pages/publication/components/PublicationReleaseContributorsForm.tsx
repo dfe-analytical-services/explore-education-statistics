@@ -4,7 +4,7 @@ import {
 } from '@admin/routes/publicationRoutes';
 import releasePermissionService, {
   UserReleaseRole,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';

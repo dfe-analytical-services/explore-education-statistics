@@ -1,6 +1,6 @@
 import { testReleaseSummaries } from '@admin/pages/publication/__data__/testReleases';
 import { Publication } from '@admin/services/publicationService';
-import userService from '@admin/services/userService';
+import userService from '@admin/services/user-management/userService';
 import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
