@@ -18,15 +18,6 @@ import {
 import { UseQueryOptions } from '@tanstack/react-query';
 
 const publicationQueries = {
-  getLatestPublicationRelease(
-    publicationSlug: string,
-  ): UseQueryOptions<ReleaseVersion> {
-    return {
-      queryKey: ['latestPublicationRelease', publicationSlug],
-      queryFn: () =>
-        publicationService.getLatestPublicationRelease(publicationSlug),
-    };
-  },
   getPublicationSummary(
     publicationSlug: string,
   ): UseQueryOptions<PublicationSummary> {
