@@ -753,5 +753,49 @@ describe('redirectPages', () => {
         expect(nextSpy).toHaveBeenCalledTimes(2);
       },
     );
+
+    test('excludes subscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/subscriptions/release-name/confirm-subscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    test('excludes unsubscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/subscriptions/release-name/confirm-unsubscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    test('excludes API subscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/api-subscriptions/release-name/confirm-subscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    test('excludes API unsubscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/api-subscriptions/release-name/confirm-unsubscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
   });
 });
