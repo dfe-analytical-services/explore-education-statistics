@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -55,29 +54,20 @@ public class ReleaseVersionRepositoryTests
                 )
                 .GenerateTuple4();
 
-            var userReleaseRoles = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(user)
-                .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1).SetRole(ReleaseRole.Contributor))
-                .ForIndex(1, s => s.SetReleaseVersion(releaseVersion1).SetRole(ReleaseRole.Approver))
-                // This release version is double-counted across different resource roles (see publication roles below) to test distinctness
-                .ForIndex(2, s => s.SetReleaseVersion(releaseVersion2).SetRole(ReleaseRole.Approver))
-                // This one should be filtered out
-                .ForIndex(3, s => s.SetReleaseVersion(releaseVersion3).SetRole(ReleaseRole.PrereleaseViewer))
-                .GenerateList(4);
-
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(user)
-                .ForIndex(0, s => s.SetPublication(releaseVersion4.Release.Publication).SetRole(PublicationRole.Owner))
+                .ForIndex(
+                    0,
+                    s => s.SetPublication(releaseVersion1.Release.Publication).SetRole(PublicationRole.Drafter)
+                )
                 .ForIndex(
                     1,
-                    s => s.SetPublication(releaseVersion4.Release.Publication).SetRole(PublicationRole.Allower)
+                    s => s.SetPublication(releaseVersion2.Release.Publication).SetRole(PublicationRole.Approver)
                 )
-                // This release version is double-counted across different resource roles (see release roles above) to test distinctness
                 .ForIndex(
                     2,
-                    s => s.SetPublication(releaseVersion2.Release.Publication).SetRole(PublicationRole.Allower)
+                    s => s.SetPublication(releaseVersion3.Release.Publication).SetRole(PublicationRole.Approver)
                 )
                 .GenerateList(3);
 
@@ -94,25 +84,74 @@ public class ReleaseVersionRepositoryTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
-
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(
                     contentDbContext: contentDbContext,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await repository.ListReleasesForUser(userId: user.Id, releaseApprovalStatus);
 
-                Assert.Equal([releaseVersion1.Id, releaseVersion2.Id, releaseVersion4.Id], result.Select(rv => rv.Id));
+                Assert.Equal([releaseVersion1.Id, releaseVersion2.Id, releaseVersion3.Id], result.Select(rv => rv.Id));
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Theory]
+        [InlineData(ReleaseApprovalStatus.Approved, PublicationRole.Approver)]
+        [InlineData(ReleaseApprovalStatus.Approved, PublicationRole.Drafter)]
+        [InlineData(ReleaseApprovalStatus.HigherLevelReview, PublicationRole.Approver)]
+        [InlineData(ReleaseApprovalStatus.HigherLevelReview, PublicationRole.Drafter)]
+        [InlineData(ReleaseApprovalStatus.Draft, PublicationRole.Approver)]
+        [InlineData(ReleaseApprovalStatus.Draft, PublicationRole.Drafter)]
+        public async Task ListReleasesForUser_IncludesAllReleaseVersionsAssociatedWithAPublication(
+            ReleaseApprovalStatus releaseApprovalStatus,
+            PublicationRole publicationRole
+        )
+        {
+            User user = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            var (releaseVersion1, releaseVersion2, releaseVersion3) = _fixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(releaseApprovalStatus)
+                .ForIndex(0, s => s.SetRelease(_fixture.DefaultRelease().WithPublication(publication)))
+                .ForIndex(1, s => s.SetRelease(_fixture.DefaultRelease().WithPublication(publication)))
+                .ForIndex(2, s => s.SetRelease(_fixture.DefaultRelease().WithPublication(publication)))
+                .GenerateTuple3();
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2, releaseVersion3);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userPublicationRole);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
+
+                var result = await repository.ListReleasesForUser(userId: user.Id, releaseApprovalStatus);
+
+                Assert.Equal([releaseVersion1.Id, releaseVersion2.Id, releaseVersion3.Id], result.Select(rv => rv.Id));
+            }
+
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
         }
 
         [Theory]
@@ -129,28 +168,12 @@ public class ReleaseVersionRepositoryTests
                 .Except([releaseApprovalStatus])
                 .ToList();
 
-            var userReleaseRoles = otherReleaseApprovalStatus
-                .Select(status =>
-                    _fixture
-                        .DefaultUserReleaseRole()
-                        .WithUser(user)
-                        .WithReleaseVersion(
-                            _fixture
-                                .DefaultReleaseVersion()
-                                .WithApprovalStatus(status)
-                                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-                        )
-                        .WithRole(ReleaseRole.Contributor)
-                        .Generate()
-                )
-                .ToList();
-
             var userPublicationRoles = otherReleaseApprovalStatus
                 .Select(status =>
                     _fixture
                         .DefaultUserPublicationRole()
                         .WithUser(user)
-                        .WithRole(PublicationRole.Owner)
+                        .WithRole(PublicationRole.Drafter)
                         .WithPublication(
                             _fixture
                                 .DefaultPublication()
@@ -171,23 +194,18 @@ public class ReleaseVersionRepositoryTests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
                 contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
-
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(
                     contentDbContext: contentDbContext,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await repository.ListReleasesForUser(userId: user.Id, releaseApprovalStatus);
@@ -195,7 +213,7 @@ public class ReleaseVersionRepositoryTests
                 Assert.Empty(result);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
         }
 
         [Fact]
@@ -203,21 +221,10 @@ public class ReleaseVersionRepositoryTests
         {
             User user = _fixture.DefaultUser();
 
-            UserReleaseRole userReleaseRole = _fixture
-                .DefaultUserReleaseRole()
-                .WithUser(user)
-                .WithReleaseVersion(
-                    _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-                )
-                .WithRole(ReleaseRole.Contributor);
-
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(user)
-                .WithRole(PublicationRole.Owner)
+                .WithRole(PublicationRole.Drafter)
                 .WithPublication(
                     _fixture
                         .DefaultPublication()
@@ -233,25 +240,18 @@ public class ReleaseVersionRepositoryTests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.AddRange([
-                    userReleaseRole.ReleaseVersion,
-                    userPublicationRole.Publication.Releases[0].Versions[0],
-                ]);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, userPublicationRole);
-
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userPublicationRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(
                     contentDbContext: contentDbContext,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await repository.ListReleasesForUser(
@@ -262,7 +262,7 @@ public class ReleaseVersionRepositoryTests
                 Assert.Empty(result);
             }
 
-            MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
         }
     }
 
@@ -372,15 +372,13 @@ public class ReleaseVersionRepositoryTests
     private static ReleaseVersionRepository BuildRepository(
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
         return new ReleaseVersionRepository(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>()
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>()
         );
     }
 }

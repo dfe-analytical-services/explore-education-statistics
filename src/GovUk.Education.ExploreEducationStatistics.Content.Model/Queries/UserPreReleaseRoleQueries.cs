@@ -1,8 +1,6 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
-
-public static class UserReleaseRoleQueries
+public static class UserPreReleaseRoleQueries
 {
     public static IQueryable<UserReleaseRole> WhereForUser(this IQueryable<UserReleaseRole> query, Guid userId) =>
         query.Where(urr => urr.UserId == userId);
@@ -16,32 +14,6 @@ public static class UserReleaseRoleQueries
         this IQueryable<UserReleaseRole> query,
         Guid publicationId
     ) => query.Where(urr => urr.ReleaseVersion.Release.PublicationId == publicationId);
-
-    public static IQueryable<UserReleaseRole> WhereRolesIn(
-        this IQueryable<UserReleaseRole> query,
-        params ReleaseRole[] roles
-    )
-    {
-        if (roles.IsNullOrEmpty())
-        {
-            throw new ArgumentException($"{nameof(roles)} should not be empty or NULL.");
-        }
-
-        return query.Where(urr => roles.Contains(urr.Role));
-    }
-
-    public static IQueryable<UserReleaseRole> WhereRolesNotIn(
-        this IQueryable<UserReleaseRole> query,
-        params ReleaseRole[] roles
-    )
-    {
-        if (roles.IsNullOrEmpty())
-        {
-            throw new ArgumentException($"{nameof(roles)} should not be empty or NULL.");
-        }
-
-        return query.Where(urr => !roles.Contains(urr.Role));
-    }
 
     public static IQueryable<UserReleaseRole> WhereEmailNotSent(this IQueryable<UserReleaseRole> query) =>
         query.Where(urr => urr.EmailSent == null);

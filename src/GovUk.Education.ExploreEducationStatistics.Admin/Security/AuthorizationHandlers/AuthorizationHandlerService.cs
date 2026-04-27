@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class AuthorizationHandlerService(
     IReleaseVersionRepository releaseVersionRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IPreReleaseService preReleaseService
 ) : IAuthorizationHandlerService
@@ -35,13 +35,15 @@ public class AuthorizationHandlerService(
 
     public async Task<bool> UserHasAnyRoleOnPublication(Guid userId, Guid publicationId) =>
         await userPublicationRoleRepository.UserHasAnyRoleOnPublication(userId: userId, publicationId: publicationId)
-        || await userReleaseRoleRepository.UserHasAnyRoleOnPublication(userId: userId, publicationId: publicationId);
-
-    public async Task<bool> UserHasPrereleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
-        await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(
+        || await userPreReleaseRoleRepository.UserHasPreReleaseRoleOnPublication(
             userId: userId,
-            releaseVersionId: releaseVersionId,
-            ReleaseRole.PrereleaseViewer
+            publicationId: publicationId
+        );
+
+    public async Task<bool> UserHasPreReleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
+        await userPreReleaseRoleRepository.UserHasPreReleaseRoleOnReleaseVersion(
+            userId: userId,
+            releaseVersionId: releaseVersionId
         );
 
     public async Task<bool> IsReleaseVersionViewableByUser(ReleaseVersion releaseVersion, ClaimsPrincipal user)
@@ -67,7 +69,7 @@ public class AuthorizationHandlerService(
         // If the user has the Pre-release Viewer role on this Release and the Release is within its open
         // Pre-release window, they can see the release version.
         if (
-            await UserHasPrereleaseRoleOnReleaseVersion(userId: user.GetUserId(), releaseVersionId: releaseVersion.Id)
+            await UserHasPreReleaseRoleOnReleaseVersion(userId: user.GetUserId(), releaseVersionId: releaseVersion.Id)
             && preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTimeOffset.UtcNow).Access
                 == PreReleaseAccess.Within
         )

@@ -405,7 +405,7 @@ public abstract class ManageContentPageServiceTests
                     releaseFileService: releaseFileService.Object
                 );
 
-                var outcome = await service.GetManageContentPageViewModel(releaseVersion.Id, isPrerelease: true);
+                var outcome = await service.GetManageContentPageViewModel(releaseVersion.Id, isPreRelease: true);
                 var result = outcome.AssertRight();
                 var contentRelease = result.Release;
 

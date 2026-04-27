@@ -7,11 +7,11 @@ using Moq.Language.Flow;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 
-internal static class UserReleaseRoleRepositoryMockExtensions
+internal static class UserPreReleaseRoleRepositoryMockExtensions
 {
-    public static IReturnsResult<IUserReleaseRoleRepository> SetupQuery(
-        this Mock<IUserReleaseRoleRepository> mock,
+    public static IReturnsResult<IUserPreReleaseRoleRepository> SetupQuery(
+        this Mock<IUserPreReleaseRoleRepository> mock,
         ResourceRoleFilter resourceRoleFilterToApply = ResourceRoleFilter.ActiveOnly,
-        params UserReleaseRole[] userReleaseRolesToReturn
-    ) => mock.Setup(m => m.Query(resourceRoleFilterToApply)).Returns(userReleaseRolesToReturn.BuildMock());
+        params UserReleaseRole[] userPreReleaseRolesToReturn
+    ) => mock.Setup(m => m.Query(resourceRoleFilterToApply)).Returns(userPreReleaseRolesToReturn.BuildMock());
 }

@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -37,6 +38,21 @@ public partial class ReleaseService(
     IReleaseSlugValidator releaseSlugValidator
 ) : IReleaseService
 {
+    public async Task<Either<ActionResult, List<IdTitleViewModel>>> ListReleases()
+    {
+        return await userService
+            .CheckCanManageAllUsers()
+            .OnSuccess(async () =>
+                await context
+                    .Releases.Select(r => new IdTitleViewModel
+                    {
+                        Id = r.Id,
+                        Title = $"{r.Publication.Title} - {r.Title}",
+                    })
+                    .ToListAsync()
+            );
+    }
+
     public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
     {
         return await ReleaseCreateRequestValidator

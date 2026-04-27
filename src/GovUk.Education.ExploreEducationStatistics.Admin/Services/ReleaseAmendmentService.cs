@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -23,8 +22,7 @@ public class ReleaseAmendmentService(
     ContentDbContext context,
     IUserService userService,
     IFootnoteRepository footnoteRepository,
-    StatisticsDbContext statisticsDbContext,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    StatisticsDbContext statisticsDbContext
 ) : IReleaseAmendmentService
 {
     public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
@@ -39,7 +37,6 @@ public class ReleaseAmendmentService(
             .OnSuccess(originalReleaseVersion =>
                 CreateBasicReleaseAmendment(originalReleaseVersion, createdDate)
                     .OnSuccessDo(CreateStatisticsReleaseAmendment)
-                    .OnSuccessDo(amendment => CopyReleaseRoles(releaseVersionId, amendment.Id, createdDate))
                     .OnSuccessDo(amendment => CopyFootnotes(releaseVersionId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalReleaseVersion, amendment))
                     .OnSuccess(amendment => new IdViewModel(amendment.Id))
@@ -501,37 +498,6 @@ public class ReleaseAmendmentService(
 
             await statisticsDbContext.SaveChangesAsync();
         }
-
-        return Unit.Instance;
-    }
-
-    private async Task<Either<ActionResult, Unit>> CopyReleaseRoles(
-        Guid originalReleaseId,
-        Guid amendmentReleaseVersionId,
-        DateTime createdDate
-    )
-    {
-        // Copy all current roles apart from Prerelease Users to the Release amendment.
-        var newRoles = await userReleaseRoleRepository
-            .Query()
-            .WhereForReleaseVersion(originalReleaseId)
-            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
-            .Select(urr => new UserReleaseRole
-            {
-                // Assign a new Id.
-                Id = Guid.NewGuid(),
-                // Assign it to the amended release version.
-                ReleaseVersionId = amendmentReleaseVersionId,
-                // Copy certain fields from the original.
-                Role = urr.Role,
-                UserId = urr.UserId,
-                // Assign the new created date.
-                Created = createdDate,
-            })
-            .ToListAsync();
-
-        context.AddRange(newRoles);
-        await context.SaveChangesAsync();
 
         return Unit.Instance;
     }

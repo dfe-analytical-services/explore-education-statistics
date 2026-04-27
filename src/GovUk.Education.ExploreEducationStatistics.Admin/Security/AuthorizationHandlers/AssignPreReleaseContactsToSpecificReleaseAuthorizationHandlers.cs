@@ -5,15 +5,15 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement { }
+public class AssignPreReleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement { }
 
-public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
+public class AssignPreReleaseContactsToSpecificReleaseAuthorizationHandler(
     IAuthorizationHandlerService authorizationHandlerService
-) : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, ReleaseVersion>
+) : AuthorizationHandler<AssignPreReleaseContactsToSpecificReleaseRequirement, ReleaseVersion>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        AssignPrereleaseContactsToSpecificReleaseRequirement requirement,
+        AssignPreReleaseContactsToSpecificReleaseRequirement requirement,
         ReleaseVersion releaseVersion
     )
     {

@@ -13,8 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseVersionRepository(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : IReleaseVersionRepository
 {
     public async Task<List<ReleaseVersion>> ListReleases(params ReleaseApprovalStatus[] releaseApprovalStatuses)
@@ -32,35 +31,19 @@ public class ReleaseVersionRepository(
         params ReleaseApprovalStatus[] releaseApprovalStatuses
     )
     {
-        var releaseRoleReleaseVersionIds = await userReleaseRoleRepository
-            .Query()
-            .WhereForUser(userId)
-            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
-            .Select(urr => urr.ReleaseVersionId)
-            .ToListAsync();
-
-        var publicationRolePublicationIds = await userPublicationRoleRepository
+        var userPublicationRoleIds = await userPublicationRoleRepository
             .Query()
             .WhereForUser(userId)
             .Select(upr => upr.PublicationId)
-            .ToListAsync();
-
-        var publicationRoleReleaseVersionIds = await contentDbContext
-            .ReleaseVersions.Where(rv => publicationRolePublicationIds.Contains(rv.Release.PublicationId))
-            .Select(rv => rv.Id)
-            .ToListAsync();
-
-        var allReleaseVersionIds = releaseRoleReleaseVersionIds
-            .Concat(publicationRoleReleaseVersionIds)
             .Distinct()
-            .ToList();
+            .ToListAsync();
 
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
             .Include(rv => rv.ReleaseStatuses)
             .Where(rv => releaseApprovalStatuses.Contains(rv.ApprovalStatus))
-            .Where(rv => allReleaseVersionIds.Contains(rv.Id))
+            .Where(rv => userPublicationRoleIds.Contains(rv.Release.PublicationId))
             .ToListAsync();
     }
 

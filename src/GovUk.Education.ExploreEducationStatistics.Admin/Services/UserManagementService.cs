@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
@@ -9,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -32,9 +32,10 @@ public class UserManagementService(
     IUserRoleService userRoleService,
     IUserRepository userRepository,
     IUserService userService,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserResourceRoleNotificationService userResourceRoleNotificationService,
+    IPreReleaseUserService preReleaseUserService,
     UserManager<ApplicationUser> userManager
 ) : IUserManagementService
 {
@@ -45,13 +46,13 @@ public class UserManagementService(
             .OnSuccess(async () =>
             {
                 var roles = await usersAndRolesDbContext.Roles.ToListAsync();
-                var prereleaseRole = roles.Single(role => role.Name == RoleNames.PrereleaseUser);
+                var preReleaseRole = roles.Single(role => role.Name == RoleNames.PrereleaseUser);
                 var users = usersAndRolesDbContext.Users;
                 var userRoles = usersAndRolesDbContext.UserRoles;
-                var nonPrereleaseUsers = users.Where(user =>
-                    !userRoles.Any(userRole => userRole.UserId == user.Id && userRole.RoleId == prereleaseRole.Id)
+                var nonPreReleaseUsers = users.Where(user =>
+                    !userRoles.Any(userRole => userRole.UserId == user.Id && userRole.RoleId == preReleaseRole.Id)
                 );
-                var usersAndRoles = await nonPrereleaseUsers
+                var usersAndRoles = await nonPreReleaseUsers
                     .Select(user => new
                     {
                         Id = Guid.Parse(user.Id),
@@ -77,21 +78,6 @@ public class UserManagementService(
             });
     }
 
-    public async Task<Either<ActionResult, List<IdTitleViewModel>>> ListReleases()
-    {
-        return await userService
-            .CheckCanManageAllUsers()
-            .OnSuccess(async () =>
-                await contentDbContext
-                    .Releases.Select(r => new IdTitleViewModel
-                    {
-                        Id = r.Id,
-                        Title = $"{r.Publication.Title} - {r.Title}",
-                    })
-                    .ToListAsync()
-            );
-    }
-
     public async Task<Either<ActionResult, List<RoleViewModel>>> ListRoles()
     {
         return await userService
@@ -111,34 +97,6 @@ public class UserManagementService(
             });
     }
 
-    public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
-    {
-        return await usersAndRolesDbContext
-            .Users.AsQueryable()
-            .Join(
-                usersAndRolesDbContext.UserRoles,
-                user => user.Id,
-                userRole => userRole.UserId,
-                (user, userRole) => new { user, userRoleId = userRole.RoleId }
-            )
-            .Join(
-                usersAndRolesDbContext.Roles,
-                prev => prev.userRoleId,
-                role => role.Id,
-                (prev, role) =>
-                    new UserViewModel
-                    {
-                        Id = Guid.Parse(prev.user.Id),
-                        Name = prev.user.FirstName + " " + prev.user.LastName,
-                        Email = prev.user.Email,
-                        Role = role.Name,
-                    }
-            )
-            .OrderBy(x => x.Name)
-            .Where(u => u.Role == Role.PrereleaseUser.GetEnumLabel())
-            .ToListAsync();
-    }
-
     public async Task<Either<ActionResult, UserViewModel>> GetUser(Guid id)
     {
         return await userService
@@ -150,12 +108,12 @@ public class UserManagementService(
                     .OnSuccess(async user =>
                     {
                         return await userRoleService
-                            .GetGlobalRoles(user.Id)
+                            .GetGlobalRolesForUser(user.Id)
                             .OnSuccessCombineWith(_ => userRoleService.GetPublicationRolesForUser(id))
-                            .OnSuccessCombineWith(_ => userRoleService.GetReleaseRoles(id))
+                            .OnSuccessCombineWith(_ => preReleaseUserService.GetPreReleaseRolesForUser(id))
                             .OnSuccess(tuple =>
                             {
-                                var (globalRoles, publicationRoles, releaseRoles) = tuple;
+                                var (globalRoles, publicationRoles, preReleaseRoles) = tuple;
 
                                 // Currently we only allow a user to have a maximum of one global role,
                                 // and potentially no global role at all if other permissions in the system
@@ -166,10 +124,10 @@ public class UserManagementService(
                                 {
                                     Id = id,
                                     Name = user.FirstName + " " + user.LastName,
-                                    Email = user.Email,
+                                    Email = user.Email!,
                                     Role = globalRole?.Id,
                                     UserPublicationRoles = publicationRoles,
-                                    UserReleaseRoles = releaseRoles,
+                                    UserPreReleaseRoles = preReleaseRoles,
                                 };
                             });
                     });
@@ -196,39 +154,40 @@ public class UserManagementService(
 
                 return await pendingUserInvites
                     .ToAsyncEnumerable()
-                    .SelectAwait(async pendingUserInvite =>
-                    {
-                        var userReleaseRoles = await userReleaseRoleRepository
-                            .Query(ResourceRoleFilter.PendingOnly)
-                            .WhereForUser(pendingUserInvite.UserId)
-                            .Select(urr => new UserReleaseRoleViewModel
-                            {
-                                Id = urr.Id,
-                                Publication = urr.ReleaseVersion.Release.Publication.Title,
-                                Release = urr.ReleaseVersion.Release.Title,
-                                Role = urr.Role,
-                            })
-                            .ToListAsync();
-
-                        var userPublicationRoles = await userPublicationRoleRepository
-                            .Query(ResourceRoleFilter.PendingOnly)
-                            .WhereForUser(pendingUserInvite.UserId)
-                            .Select(upr => new UserPublicationRoleViewModel
-                            {
-                                Id = upr.Id,
-                                Publication = upr.Publication.Title,
-                                Role = upr.Role,
-                            })
-                            .ToListAsync();
-
-                        return new PendingInviteViewModel
+                    .Select(
+                        async (pendingUserInvite, _, cancellationToken) =>
                         {
-                            Email = pendingUserInvite.Email,
-                            Role = pendingUserInvite.Role.Name,
-                            UserPublicationRoles = userPublicationRoles,
-                            UserReleaseRoles = userReleaseRoles,
-                        };
-                    })
+                            var userPreReleaseRoles = await userPreReleaseRoleRepository
+                                .Query(ResourceRoleFilter.PendingOnly)
+                                .WhereForUser(pendingUserInvite.UserId)
+                                .Select(urr => new UserPreReleaseRoleViewModel
+                                {
+                                    Id = urr.Id,
+                                    Publication = urr.ReleaseVersion.Release.Publication.Title,
+                                    Release = urr.ReleaseVersion.Release.Title,
+                                })
+                                .ToListAsync(cancellationToken);
+
+                            var userPublicationRoles = await userPublicationRoleRepository
+                                .Query(ResourceRoleFilter.PendingOnly)
+                                .WhereForUser(pendingUserInvite.UserId)
+                                .Select(upr => new UserPublicationRoleViewModel
+                                {
+                                    Id = upr.Id,
+                                    Publication = upr.Publication.Title,
+                                    Role = upr.Role,
+                                })
+                                .ToListAsync(cancellationToken);
+
+                            return new PendingInviteViewModel
+                            {
+                                Email = pendingUserInvite.Email,
+                                Role = pendingUserInvite.Role!.Name!,
+                                UserPublicationRoles = userPublicationRoles,
+                                UserPreReleaseRoles = userPreReleaseRoles,
+                            };
+                        }
+                    )
                     .ToListAsync();
             });
     }
@@ -259,19 +218,18 @@ public class UserManagementService(
 
                 // Clear out any pre-existing Release Roles or Publication Roles prior to adding
                 // new ones.
-                await userReleaseRoleRepository.RemoveForUser(user.Id);
+                await userPreReleaseRoleRepository.RemoveForUser(user.Id);
                 await userPublicationRoleRepository.RemoveForUser(user.Id);
 
-                foreach (var userReleaseRole in request.UserReleaseRoles)
+                foreach (var userPreReleaseRole in request.UserPreReleaseRoles)
                 {
                     var latestReleaseVersion = await contentDbContext
-                        .ReleaseVersions.LatestReleaseVersion(releaseId: userReleaseRole.ReleaseId)
+                        .ReleaseVersions.LatestReleaseVersion(releaseId: userPreReleaseRole.ReleaseId)
                         .SingleAsync();
 
-                    await userReleaseRoleRepository.Create(
+                    await userPreReleaseRoleRepository.Create(
                         userId: user.Id,
                         releaseVersionId: latestReleaseVersion!.Id,
-                        role: userReleaseRole.ReleaseRole,
                         createdById: userService.GetUserId(),
                         createdDate: request.CreatedDate?.UtcDateTime
                     );
@@ -304,7 +262,7 @@ public class UserManagementService(
             {
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    await userReleaseRoleRepository.RemoveForUser(invitedUser.Id);
+                    await userPreReleaseRoleRepository.RemoveForUser(invitedUser.Id);
                     await userPublicationRoleRepository.RemoveForUser(invitedUser.Id);
 
                     await userRepository.SoftDeleteUser(invitedUser.Id, userService.GetUserId());
@@ -316,7 +274,7 @@ public class UserManagementService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => userRoleService.SetGlobalRole(userId, roleId));
+            .OnSuccess(() => userRoleService.SetGlobalRoleForUser(userId, roleId));
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteUser(string email)
@@ -333,7 +291,7 @@ public class UserManagementService(
                 {
                     await userManager.DeleteAsync(identityUser);
 
-                    await userReleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
+                    await userPreReleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
                     await userPublicationRoleRepository.RemoveForUser(activeInternalUser.Id);
 
                     await userRepository.SoftDeleteUser(activeInternalUser.Id, userService.GetUserId());

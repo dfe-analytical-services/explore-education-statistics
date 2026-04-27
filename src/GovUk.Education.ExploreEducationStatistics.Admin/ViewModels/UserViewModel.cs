@@ -7,41 +7,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record UserViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; init; } = string.Empty;
 
-    public string Email { get; set; } = string.Empty;
+    public required string Email { get; init; } = string.Empty;
 
-    public string? Role { get; set; }
+    public string? Role { get; init; }
 
-    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; set; } = new();
+    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
 
-    public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
+    public List<UserPreReleaseRoleViewModel> UserPreReleaseRoles { get; init; } = [];
 }
 
 public record UserPublicationRoleViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Publication { get; set; } = string.Empty;
+    public required string Publication { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public PublicationRole Role { get; set; }
-
-    public string UserName { get; set; } = string.Empty;
-
-    public string Email { get; set; } = string.Empty;
+    public required PublicationRole Role { get; init; }
 }
 
-public record UserReleaseRoleViewModel
+public record UserPublicationRoleWithUserViewModel : UserPublicationRoleViewModel
 {
-    public Guid Id { get; set; }
+    public required string UserName { get; init; }
 
-    public string Publication { get; set; } = null!;
+    public required string Email { get; init; }
+}
 
-    public string Release { get; set; } = null!;
+public record UserPreReleaseRoleViewModel
+{
+    public required Guid Id { get; init; }
 
-    [JsonConverter(typeof(StringEnumConverter))]
-    public ReleaseRole Role { get; set; }
+    public required string Publication { get; init; }
+
+    public required string Release { get; init; }
 }

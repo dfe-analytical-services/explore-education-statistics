@@ -32,7 +32,7 @@ public class ManageContentPageService(
 {
     public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
         Guid releaseVersionId,
-        bool isPrerelease = false,
+        bool isPreRelease = false,
         CancellationToken cancellationToken = default
     ) =>
         await persistenceHelper
@@ -50,7 +50,7 @@ public class ManageContentPageService(
                     publication.Id
                 );
 
-                if (isPrerelease)
+                if (isPreRelease)
                 {
                     // Get latest approved methodology version
                     methodologyVersions = await methodologyVersions

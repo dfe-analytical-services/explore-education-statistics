@@ -591,18 +591,18 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            UserReleaseRole userReleaseRole = DataFixture
-                .DefaultUserReleaseRole()
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
                 .WithUser(user)
-                .WithRole(ReleaseRole.Approver)
-                .WithReleaseVersion(releaseFile.ReleaseVersion);
+                .WithPublication(releaseFile.ReleaseVersion.Release.Publication)
+                .WithRole(PublicationRole.Approver);
 
             await fixture
                 .GetContentDbContext()
                 .AddTestData(context =>
                 {
                     context.ReleaseFiles.Add(releaseFile);
-                    context.UserReleaseRoles.Add(userReleaseRole);
+                    context.UserPublicationRoles.Add(userPublicationRole);
                 });
 
             var dataSetId = Guid.NewGuid();

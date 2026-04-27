@@ -1,10 +1,10 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -36,18 +36,6 @@ public class UserManagementServicePermissionTests
             {
                 var service = SetupUserManagementService(userService: userService.Object);
                 return await service.ListAllUsers();
-            });
-    }
-
-    [Fact]
-    public async Task ListReleases()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .ExpectCheckToFail(CanManageUsersOnSystem)
-            .AssertForbidden(async userService =>
-            {
-                var service = SetupUserManagementService(userService: userService.Object);
-                return await service.ListReleases();
             });
     }
 
@@ -95,7 +83,7 @@ public class UserManagementServicePermissionTests
             .AssertForbidden(async userService =>
             {
                 var service = SetupUserManagementService(userService: userService.Object);
-                return await service.InviteUser(new UserInviteCreateRequest());
+                return await service.InviteUser(new UserInviteCreateRequest { Email = "test@test.com" });
             });
     }
 
@@ -147,8 +135,8 @@ public class UserManagementServicePermissionTests
 
                 userService.Setup(mock => mock.GetUserId()).Returns(CreatedById);
 
-                var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-                userReleaseRoleRepository
+                var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+                userPreReleaseRoleRepository
                     .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
 
@@ -176,13 +164,18 @@ public class UserManagementServicePermissionTests
                     userService: userService.Object,
                     userRepository: userRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userManager: userManager.Object
                 );
 
                 var result = await service.DeleteUser(user.Email);
 
-                VerifyAllMocks(userRepository, userPublicationRoleRepository, userReleaseRoleRepository, userManager);
+                VerifyAllMocks(
+                    userRepository,
+                    userPublicationRoleRepository,
+                    userPreReleaseRoleRepository,
+                    userManager
+                );
 
                 return result;
             });
@@ -195,9 +188,10 @@ public class UserManagementServicePermissionTests
         IUserRoleService? userRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
+        IPreReleaseUserService? preReleaseUserService = null,
         UserManager<ApplicationUser>? userManager = null
     )
     {
@@ -211,9 +205,10 @@ public class UserManagementServicePermissionTests
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict),
+            preReleaseUserService ?? Mock.Of<IPreReleaseUserService>(Strict),
             userManager ?? MockUserManager().Object
         );
     }

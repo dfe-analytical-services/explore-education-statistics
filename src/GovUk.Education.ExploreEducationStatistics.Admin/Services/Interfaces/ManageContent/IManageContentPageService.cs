@@ -9,7 +9,7 @@ public interface IManageContentPageService
 {
     Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
         Guid releaseVersionId,
-        bool isPrerelease = false,
+        bool isPreRelease = false,
         CancellationToken cancellationToken = default
     );
 }

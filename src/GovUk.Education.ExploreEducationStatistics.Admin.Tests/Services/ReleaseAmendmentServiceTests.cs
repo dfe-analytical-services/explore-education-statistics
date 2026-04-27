@@ -1,8 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -219,39 +216,6 @@ public class ReleaseAmendmentServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        UserReleaseRole approverReleaseRole = _fixture
-            .DefaultUserReleaseRole()
-            .WithUser(_fixture.DefaultUser())
-            .WithReleaseVersion(originalReleaseVersion)
-            .WithRole(ReleaseRole.Approver);
-
-        UserReleaseRole approverReleaseRoleForDifferentReleaseVersion = _fixture
-            .DefaultUserReleaseRole()
-            .WithUser(_fixture.DefaultUser())
-            .WithReleaseVersion(otherReleaseVersion)
-            .WithRole(ReleaseRole.Approver);
-
-        UserReleaseRole contributorReleaseRole = _fixture
-            .DefaultUserReleaseRole()
-            .WithUser(_fixture.DefaultUser())
-            .WithReleaseVersion(originalReleaseVersion)
-            .WithRole(ReleaseRole.Contributor);
-
-        UserReleaseRole prereleaseReleaseRole = _fixture
-            .DefaultUserReleaseRole()
-            .WithUser(_fixture.DefaultUser())
-            .WithReleaseVersion(originalReleaseVersion)
-            .WithRole(ReleaseRole.PrereleaseViewer);
-
-        var userReleaseRoles = new List<UserReleaseRole>
-        {
-            approverReleaseRole,
-            contributorReleaseRole,
-            // These should be filtered out
-            approverReleaseRoleForDifferentReleaseVersion,
-            prereleaseReleaseRole,
-        };
-
         var dataFile1 = new File
         {
             Id = Guid.NewGuid(),
@@ -328,18 +292,11 @@ public class ReleaseAmendmentServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
-
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var releaseAmendmentService = BuildService(
-                contentDbContext,
-                statisticsDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
-            );
+            var releaseAmendmentService = BuildService(contentDbContext, statisticsDbContext);
 
             // Method under test
             var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
@@ -349,8 +306,6 @@ public class ReleaseAmendmentServiceTests
             Assert.NotEqual(originalReleaseVersion.Id, viewModel.Id);
             amendmentId = viewModel.Id;
         }
-
-        VerifyAllMocks(userReleaseRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -552,20 +507,6 @@ public class ReleaseAmendmentServiceTests
             Assert.Equal(originalEmbedBlockLink.EmbedBlock.Title, amendmentEmbedBlockLink.EmbedBlock.Title);
             Assert.Equal(originalEmbedBlockLink.EmbedBlock.Url, amendmentEmbedBlockLink.EmbedBlock.Url);
 
-            var amendmentReleaseRoles = contentDbContext
-                .UserReleaseRoles.Where(r => r.ReleaseVersionId == amendment.Id)
-                .ToList();
-
-            // Expect two fewer UserReleaseRoles on the Amendment, as the Pre-release role shouldn't be copied over,
-            // and neither should the Approver role for the other ReleaseVersion.
-            Assert.Equal(userReleaseRoles.Count - 2, amendmentReleaseRoles.Count);
-            var approverAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Approver);
-            AssertAmendedReleaseRoleCorrect(approverReleaseRole, approverAmendmentRole, amendment);
-
-            var contributorAmendmentRole = amendmentReleaseRoles.Single(r => r.Role == ReleaseRole.Contributor);
-            Assert.NotEqual(contributorReleaseRole.Id, contributorAmendmentRole.Id);
-            AssertAmendedReleaseRoleCorrect(contributorReleaseRole, contributorAmendmentRole, amendment);
-
             var amendmentDataFiles = contentDbContext
                 .ReleaseFiles.Include(f => f.File)
                 .Where(f => f.ReleaseVersionId == amendment.Id)
@@ -721,16 +662,12 @@ public class ReleaseAmendmentServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var releaseAmendmentService = BuildService(
                 contentDbContext,
-                statisticsDbContext: InMemoryStatisticsDbContext(),
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                statisticsDbContext: InMemoryStatisticsDbContext()
             );
 
             var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
@@ -738,8 +675,6 @@ public class ReleaseAmendmentServiceTests
 
             Assert.NotEqual(originalReleaseVersion.Id, amendmentId);
         }
-
-        VerifyAllMocks(userReleaseRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -784,16 +719,12 @@ public class ReleaseAmendmentServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var releaseAmendmentService = BuildService(
                 contentDbContext,
-                statisticsDbContext: InMemoryStatisticsDbContext(),
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                statisticsDbContext: InMemoryStatisticsDbContext()
             );
 
             // Method under test
@@ -804,8 +735,6 @@ public class ReleaseAmendmentServiceTests
             Assert.NotEqual(originalReleaseVersion.Id, amendment.Id);
             amendmentId = amendment.Id;
         }
-
-        VerifyAllMocks(userReleaseRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -884,18 +813,11 @@ public class ReleaseAmendmentServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var releaseAmendmentService = BuildService(
-                contentDbContext,
-                statisticsDbContext,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
-            );
+            var releaseAmendmentService = BuildService(contentDbContext, statisticsDbContext);
 
             // Method under test
             var result = await releaseAmendmentService.CreateReleaseAmendment(originalStatsReleaseVersion.Id);
@@ -905,8 +827,6 @@ public class ReleaseAmendmentServiceTests
             Assert.NotEqual(originalStatsReleaseVersion.Id, viewModel.Id);
             amendmentId = viewModel.Id;
         }
-
-        VerifyAllMocks(userReleaseRoleRepository);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
@@ -1062,22 +982,6 @@ public class ReleaseAmendmentServiceTests
     }
 
     [UsedImplicitly]
-    private static void AssertAmendedReleaseRoleCorrect(
-        UserReleaseRole originalReleaseRole,
-        UserReleaseRole amendedReleaseRole,
-        ReleaseVersion amendment
-    )
-    {
-        Assert.NotEqual(originalReleaseRole.Id, amendedReleaseRole.Id);
-        Assert.Equal(amendment, amendedReleaseRole.ReleaseVersion);
-        Assert.Equal(amendment.Id, amendedReleaseRole.ReleaseVersionId);
-        Assert.Equal(originalReleaseRole.UserId, amendedReleaseRole.UserId);
-        Assert.Equal(originalReleaseRole.Role, amendedReleaseRole.Role);
-        amendedReleaseRole.Created.AssertUtcNow();
-        Assert.Equal(originalReleaseRole.CreatedById, amendedReleaseRole.CreatedById);
-    }
-
-    [UsedImplicitly]
     private static void AssertAmendedReleaseFileCorrect(
         ReleaseFile originalFile,
         ReleaseFile amendmentDataFile,
@@ -1114,16 +1018,14 @@ public class ReleaseAmendmentServiceTests
     private ReleaseAmendmentService BuildService(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
-        IUserService? userService = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null
+        IUserService? userService = null
     )
     {
         return new ReleaseAmendmentService(
             contentDbContext,
             userService ?? UserServiceMock().Object,
             new FootnoteRepository(statisticsDbContext),
-            statisticsDbContext,
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict)
+            statisticsDbContext
         );
     }
 }

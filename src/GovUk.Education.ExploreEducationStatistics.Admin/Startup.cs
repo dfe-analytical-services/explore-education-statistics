@@ -434,7 +434,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseImageService, ReleaseImageService>();
-        services.AddTransient<IReleasePermissionService, ReleasePermissionService>();
         services.AddTransient<IDataImportService, DataImportService>();
         services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
         services.AddTransient<IPublishingService, PublishingService>();
@@ -483,11 +482,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
         services.AddTransient<IDataSetMappingService, DataSetMappingService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
-        services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
-        services.AddTransient<UserReleaseRoleQueryRepository>();
-        services.AddTransient<INewPermissionsSystemHelper, NewPermissionsSystemHelper>();
+        services.AddTransient<IPublicationRoleChangesHelper, PublicationRoleChangesHelper>();
         services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
-        services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
+        services.AddTransient<IUserPreReleaseRoleRepository, UserPreReleaseRoleRepository>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
@@ -665,7 +662,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
         services.AddSingleton<DataServiceMemoryCache<BoundaryData>, DataServiceMemoryCache<BoundaryData>>();
         services.AddTransient<IUserManagementService, UserManagementService>();
-        services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
@@ -693,7 +689,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         AddPersistenceHelper<ContentDbContext>(services);
         AddPersistenceHelper<StatisticsDbContext>(services);
         AddPersistenceHelper<UsersAndRolesDbContext>(services);
-        services.AddTransient<AuthorizationHandlerService>();
+        services.AddTransient<IAuthorizationHandlerService, AuthorizationHandlerService>();
         services.AddSingleton<DateTimeProvider>();
         services.AddSingleton(TimeProvider.System);
 

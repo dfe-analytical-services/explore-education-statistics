@@ -31,7 +31,8 @@ internal class DataSetCandidateService(ContentDbContext contentDbContext, IUserS
     )
     {
         return await contentDbContext
-            .ReleaseVersions.AsNoTracking()
+            .ReleaseVersions.Include(rv => rv.Release)
+            .AsNoTracking()
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
     }
 

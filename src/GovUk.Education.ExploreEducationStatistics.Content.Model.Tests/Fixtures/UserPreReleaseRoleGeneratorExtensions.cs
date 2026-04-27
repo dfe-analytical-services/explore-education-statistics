@@ -3,9 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
-public static class UserReleaseRoleGeneratorExtensions
+public static class UserPreReleaseRoleGeneratorExtensions
 {
-    public static Generator<UserReleaseRole> DefaultUserReleaseRole(this DataFixture fixture) =>
+    public static Generator<UserReleaseRole> DefaultUserPreReleaseRole(this DataFixture fixture) =>
         fixture.Generator<UserReleaseRole>().WithDefaults();
 
     public static Generator<UserReleaseRole> WithDefaults(this Generator<UserReleaseRole> generator) =>
@@ -39,19 +39,6 @@ public static class UserReleaseRoleGeneratorExtensions
     public static Generator<UserReleaseRole> WithUserId(this Generator<UserReleaseRole> generator, Guid userId) =>
         generator.ForInstance(s => s.SetUserId(userId));
 
-    public static Generator<UserReleaseRole> WithRole(this Generator<UserReleaseRole> generator, ReleaseRole role) =>
-        generator.ForInstance(s => s.SetRole(role));
-
-    public static Generator<UserReleaseRole> WithRoles(
-        this Generator<UserReleaseRole> generator,
-        IEnumerable<ReleaseRole> roles
-    )
-    {
-        roles.ForEach((role, index) => generator.ForIndex(index, s => s.SetRole(role)));
-
-        return generator;
-    }
-
     public static Generator<UserReleaseRole> WithCreated(this Generator<UserReleaseRole> generator, DateTime created) =>
         generator.ForInstance(s => s.SetCreated(created));
 
@@ -73,7 +60,10 @@ public static class UserReleaseRoleGeneratorExtensions
             .SetDefault(urr => urr.Id)
             .SetDefault(urr => urr.ReleaseVersionId)
             .SetDefault(urr => urr.UserId)
-            .SetDefault(urr => urr.Created);
+            .SetDefault(urr => urr.Created)
+            // We need to set a default for the role here until EES-6212 when we finally
+            // remove the old enum values.
+            .Set(urr => urr.Role, ReleaseRole.PrereleaseViewer);
 
     public static InstanceSetters<UserReleaseRole> SetReleaseVersion(
         this InstanceSetters<UserReleaseRole> setters,
@@ -92,11 +82,6 @@ public static class UserReleaseRoleGeneratorExtensions
         this InstanceSetters<UserReleaseRole> setters,
         Guid userId
     ) => setters.Set(urr => urr.UserId, userId);
-
-    public static InstanceSetters<UserReleaseRole> SetRole(
-        this InstanceSetters<UserReleaseRole> setters,
-        ReleaseRole role
-    ) => setters.Set(urr => urr.Role, role);
 
     public static InstanceSetters<UserReleaseRole> SetCreated(
         this InstanceSetters<UserReleaseRole> setters,

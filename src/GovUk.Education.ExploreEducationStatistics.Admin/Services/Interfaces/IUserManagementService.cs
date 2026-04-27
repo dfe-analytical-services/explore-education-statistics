@@ -1,7 +1,7 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +12,6 @@ public interface IUserManagementService
     Task<Either<ActionResult, UserViewModel>> GetUser(Guid id);
 
     Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers();
-
-    Task<Either<ActionResult, List<IdTitleViewModel>>> ListReleases();
-
-    Task<List<UserViewModel>> ListPreReleaseUsersAsync();
 
     Task<Either<ActionResult, List<PendingInviteViewModel>>> ListPendingInvites();
 

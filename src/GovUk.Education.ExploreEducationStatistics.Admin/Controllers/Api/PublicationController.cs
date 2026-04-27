@@ -140,7 +140,7 @@ public class PublicationController(IPublicationService publicationService, IUser
     }
 
     [HttpGet("api/publications/{publicationId:guid}/roles")]
-    public async Task<ActionResult<List<UserPublicationRoleViewModel>>> GetRoles(Guid publicationId)
+    public async Task<ActionResult<List<UserPublicationRoleWithUserViewModel>>> GetRoles(Guid publicationId)
     {
         return await roleService.GetPublicationRolesForPublication(publicationId).HandleFailuresOrOk();
     }
