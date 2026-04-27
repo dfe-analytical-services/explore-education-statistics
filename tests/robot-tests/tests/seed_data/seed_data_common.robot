@@ -85,14 +85,8 @@ user creates a fully populated draft release
     user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
     # add data guidance
-    user clicks link    Data guidance
-    user waits until page finishes loading
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
-    user adds data guidance for subject
-    ...    ${SUBJECT_NAME}
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
     ...    data guidance content
-    user clicks button    Save guidance
-    user waits until page finishes loading
 
     # add footnote
     user clicks link    Footnotes

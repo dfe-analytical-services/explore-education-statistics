@@ -602,10 +602,11 @@ user uploads subject
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    user waits until page contains element    testid:Data files table
+    user waits until page finishes loading    %{WAIT_DATA_FILE_IMPORT}
+    user waits until page contains data uploads table
 
     IF    "${IMPORT_STATUS}" == "Complete"
-        User confirms upload to complete import    ${SUBJECT_NAME}
+        user confirms upload to complete import    ${SUBJECT_NAME}
     ELSE
         user waits until data file import is in status    ${SUBJECT_NAME}    ${IMPORT_STATUS}
     END
@@ -622,24 +623,30 @@ user uploads subject replacement
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
+    user waits until page contains data uploads table
 
 user confirms upload to complete import
     [Arguments]
     ...    ${SUBJECT_NAME}
+    ...    ${WAIT_FOR_IMPORT_TO_COMPLETE}=True
     ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
     ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
     ${button}=    user gets button element    View details    ${row}
     user clicks element    ${button}
 
     IF    '${statusText}' == 'Pending review'
-        user acknowledges any warnings in modal
+        user acknowledges any warnings in screener modal
         user clicks button    Continue import with warnings
     ELSE
-        User waits until h3 is visible    Screener test failures
+        user waits until h3 is visible    Screener test failures
         user clicks button    Continue import (override failures)
     END
 
-    user waits until data file import is complete    ${SUBJECT_NAME}
+    user waits until modal is not visible    Screener test warnings
+
+    IF    ${WAIT_FOR_IMPORT_TO_COMPLETE}
+        user waits until data file import is complete    ${SUBJECT_NAME}
+    END
 
 user confirms replacement upload
     [Arguments]
@@ -651,7 +658,7 @@ user confirms replacement upload
     user waits until modal is visible    Data set details
     ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
     IF    '${statusText}' == 'Pending review'
-        user acknowledges any warnings in modal
+        user acknowledges any warnings in screener modal
         user clicks button    Continue import with warnings
     ELSE
         User waits until h3 is visible    Screener test failures
@@ -703,9 +710,9 @@ user waits until page contains data uploads table
 user waits until page does not contain data uploads table
     user waits until page does not contain testid    Data files table
 
-user acknowledges any warnings in modal
+user acknowledges any warnings in screener modal
     user clicks element    id:screener-results-filtered-tab
-    User waits until h3 is visible    Screener test warnings
+    user waits until h3 is visible    Screener test warnings
     user clicks all checkboxes in parent    screener-results-filtered
 
 user puts release into draft
@@ -1112,6 +1119,20 @@ user adds data guidance for subject
     user waits until page contains accordion section    ${subject_name}
     user enters text into data guidance data file content editor    ${subject_name}
     ...    ${guidance_text}
+
+user navigates to Data Guidance page and adds data guidance for subject
+    [Arguments]
+    ...    ${subject_name}
+    ...    ${guidance_text}
+    user clicks link    Data and files
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${subject_name}
+    user enters text into data guidance data file content editor    ${subject_name}    ${guidance_text}
+    user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 user clicks edit data block link
     [Arguments]

@@ -55,6 +55,7 @@ Add data guidance to subjects
 
 Save data guidance
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 User clicks on 'Cancel' button while after selecting 1st API data set
     user scrolls to the top of the page

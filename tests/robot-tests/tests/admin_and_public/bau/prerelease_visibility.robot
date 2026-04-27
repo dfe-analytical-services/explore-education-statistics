@@ -83,14 +83,7 @@ Update public prerelease access list
     user updates public prerelease access list    Updated test public access list
 
 Add data guidance to subject
-    user clicks link    Data and files
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    UI test subject
-    user enters text into data guidance data file content editor    UI test subject    dataguidance content
-    user clicks button    Save guidance
+    user navigates to Data Guidance page and adds data guidance for subject    UI test subject    dataguidance content
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}

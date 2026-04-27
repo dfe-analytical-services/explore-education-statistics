@@ -40,17 +40,8 @@ Add data guidance to subjects
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_1_NAME}
-
-    user enters text into data guidance data file content editor    ${SUBJECT_1_NAME}
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_1_NAME}
     ...    ${SUBJECT_1_NAME} Main guidance content
-
-    user clicks button    Save guidance
 
 Create the initial API data set version
     user scrolls to the top of the page
@@ -95,17 +86,8 @@ Add data guidance to second release
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_2_NAME}
-
-    user enters text into data guidance data file content editor    ${SUBJECT_2_NAME}
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_2_NAME}
     ...    ${SUBJECT_2_NAME} Main guidance content
-
-    user clicks button    Save guidance
 
 Create a different version of an API data set with major changes
     user scrolls to the top of the page

@@ -32,15 +32,8 @@ Upload subject
     user confirms upload to complete import    Dates test subject
 
 Add data guidance
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    Dates test subject
-
-    user enters text into data guidance data file content editor    Dates test subject
+    user navigates to Data Guidance page and adds data guidance for subject    Dates test subject
     ...    Dates test subject test data guidance content
-    user clicks button    Save guidance
 
 Create data block table
     user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}    Dates table title
