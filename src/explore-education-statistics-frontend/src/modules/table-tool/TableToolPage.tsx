@@ -209,7 +209,8 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           </Link>
         )}
         renderRelatedInfo={
-          selectedPublication && (
+          selectedPublication &&
+          publicationMethodologies && (
             <TableToolInfoWrapper
               selectedPublication={selectedPublication}
               publicationMethodologies={publicationMethodologies}
