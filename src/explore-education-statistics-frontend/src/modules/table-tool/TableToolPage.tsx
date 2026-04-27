@@ -13,7 +13,7 @@ import tableBuilderService, {
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import publicationService, {
-  ReleaseVersion,
+  PublicationMethodologiesList,
   Theme,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
@@ -36,7 +36,7 @@ export interface TableToolPageProps {
   fastTrack?: FastTrackTable;
   featuredTables?: FeaturedTable[];
   selectedPublication?: SelectedPublication;
-  fullPublication?: ReleaseVersion;
+  publicationMethodologies?: PublicationMethodologiesList;
   selectedSubjectId?: string;
   subjects?: Subject[];
   subjectMeta?: SubjectMeta;
@@ -47,7 +47,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   fastTrack,
   featuredTables = [],
   selectedPublication,
-  fullPublication,
+  publicationMethodologies,
   selectedSubjectId,
   subjects,
   subjectMeta,
@@ -133,6 +133,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           filters: [],
           locationIds: [],
         },
+        publicationMethodologies,
         selectedPublication,
         subjectMeta,
       };
@@ -150,11 +151,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         filters: [],
         locationIds: [],
       },
+      publicationMethodologies,
       selectedPublication,
     };
   }, [
     subjects,
     fastTrack,
+    publicationMethodologies,
     subjectMeta,
     selectedSubjectId,
     featuredTables,
@@ -209,7 +212,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           selectedPublication && (
             <TableToolInfoWrapper
               selectedPublication={selectedPublication}
-              fullPublication={fullPublication}
+              publicationMethodologies={publicationMethodologies}
             />
           )
         }
@@ -346,11 +349,12 @@ export const getServerSideProps: GetServerSideProps<
       releaseSlug || latestRelease.slug,
     );
 
-  const [subjects, featuredTables, fullPublication] = await Promise.all([
-    tableBuilderService.listReleaseSubjects(selectedReleaseVersion.id),
-    tableBuilderService.listReleaseFeaturedTables(selectedReleaseVersion.id),
-    publicationService.getLatestPublicationRelease(publicationSlug),
-  ]);
+  const [subjects, featuredTables, publicationMethodologies] =
+    await Promise.all([
+      tableBuilderService.listReleaseSubjects(selectedReleaseVersion.id),
+      tableBuilderService.listReleaseFeaturedTables(selectedReleaseVersion.id),
+      publicationService.getPublicationMethodologies(publicationSlug),
+    ]);
 
   if (subjectId && subjects.some(subject => subject.id === subjectId)) {
     const subjectMeta = await tableBuilderService.getSubjectMeta(
@@ -361,12 +365,15 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         featuredTables,
-        fullPublication,
+        publicationMethodologies,
         selectedPublication: {
           ...selectedPublication,
+          contact: publicationSummary.contact,
           selectedRelease: {
             id: selectedReleaseVersion.id,
             latestData: selectedReleaseVersion.isLatestRelease,
+            publishingOrganisations:
+              selectedReleaseVersion.publishingOrganisations,
             slug: selectedReleaseVersion.slug,
             title: selectedReleaseVersion.title,
             type: selectedReleaseVersion.type,
@@ -387,12 +394,15 @@ export const getServerSideProps: GetServerSideProps<
   return {
     props: {
       themeMeta,
-      fullPublication,
+      publicationMethodologies,
       selectedPublication: {
         ...selectedPublication,
+        contact: publicationSummary.contact,
         selectedRelease: {
           id: selectedReleaseVersion.id,
           latestData: selectedReleaseVersion.isLatestRelease,
+          publishingOrganisations:
+            selectedReleaseVersion.publishingOrganisations,
           slug: selectedReleaseVersion.slug,
           title: selectedReleaseVersion.title,
           type: selectedReleaseVersion.type,

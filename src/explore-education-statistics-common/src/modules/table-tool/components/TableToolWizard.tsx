@@ -28,6 +28,7 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import publicationService, {
+  PublicationMethodologiesList,
   PublicationTreeSummary,
   Theme,
 } from '@common/services/publicationService';
@@ -61,6 +62,7 @@ export interface InitialTableToolState {
   selectedPublication?: SelectedPublication;
   subjects?: Subject[];
   featuredTables?: FeaturedTable[];
+  publicationMethodologies?: PublicationMethodologiesList;
   subjectMeta?: SubjectMeta;
   query?: ReleaseTableDataQuery;
   response?: {
@@ -195,10 +197,12 @@ export default function TableToolWizard({
   }) => {
     onPublicationFormSubmit?.(publication);
 
-    const [subjects, featuredTables] = await Promise.all([
-      tableBuilderService.listLatestReleaseSubjects(publication.id),
-      tableBuilderService.listLatestReleaseFeaturedTables(publication.id),
-    ]);
+    const [subjects, featuredTables, publicationMethodologies] =
+      await Promise.all([
+        tableBuilderService.listLatestReleaseSubjects(publication.id),
+        tableBuilderService.listLatestReleaseFeaturedTables(publication.id),
+        publicationService.getPublicationMethodologies(publication.slug),
+      ]);
 
     const publicationSummary = await publicationService.getPublicationSummary(
       publication.slug,
@@ -220,11 +224,15 @@ export default function TableToolWizard({
       draft.featuredTables = featuredTables;
       draft.query.releaseVersionId = undefined;
       draft.query.publicationId = publication.id;
+      draft.publicationMethodologies = publicationMethodologies;
       draft.selectedPublication = {
         ...publication,
+        contact: publicationSummary.contact,
         selectedRelease: {
           id: selectedReleaseVersion.id,
           latestData: selectedReleaseVersion.isLatestRelease,
+          publishingOrganisations:
+            selectedReleaseVersion.publishingOrganisations,
           slug: selectedReleaseVersion.slug,
           title: selectedReleaseVersion.title,
           type: selectedReleaseVersion.type,
