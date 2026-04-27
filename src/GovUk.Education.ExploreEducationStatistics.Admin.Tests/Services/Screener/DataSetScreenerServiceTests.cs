@@ -3,11 +3,15 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -480,9 +484,231 @@ public abstract class DataSetScreenerServiceTests
         }
     }
 
+    public class GetScreenerProgressTests : DataSetScreenerServiceTests
+    {
+        [Fact]
+        public async Task DataSetsBeingScreened_ProgressUpdatesReturned()
+        {
+            // Arrange
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+
+            var dataSetsUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithReleaseVersionId(releaseVersion.Id)
+                .WithStatus(DataSetUploadStatus.SCREENING)
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetScreenerProgress(
+                            new DataSetScreenerProgress
+                            {
+                                Completed = false,
+                                Passed = false,
+                                PercentageComplete = 50,
+                                Stage = "validation",
+                            }
+                        )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetScreenerProgress(
+                            new DataSetScreenerProgress
+                            {
+                                Completed = false,
+                                Passed = false,
+                                PercentageComplete = 70,
+                                Stage = "screening",
+                            }
+                        )
+                )
+                .GenerateList();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetsUndergoingScreening);
+                await context.ReleaseVersions.AddRangeAsync(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var result = await service.GetScreenerProgress(
+                    releaseVersionId: releaseVersion.Id,
+                    cancellationToken: CancellationToken.None
+                );
+
+                // Assert
+                List<ScreenerProgressWithDataSetUploadIdViewModel> expectedProgressUpdates =
+                [
+                    new()
+                    {
+                        DataSetUploadId = dataSetsUndergoingScreening[0].Id,
+                        PercentageComplete = dataSetsUndergoingScreening[0].ScreenerProgress!.PercentageComplete,
+                        Stage = dataSetsUndergoingScreening[0].ScreenerProgress!.Stage,
+                    },
+                    new()
+                    {
+                        DataSetUploadId = dataSetsUndergoingScreening[1].Id,
+                        PercentageComplete = dataSetsUndergoingScreening[1].ScreenerProgress!.PercentageComplete,
+                        Stage = dataSetsUndergoingScreening[1].ScreenerProgress!.Stage,
+                    },
+                ];
+
+                result.AssertRight(expectedProgressUpdates);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetBeingScreened_DifferentReleaseVersion_ProgressUpdatesNotReturned()
+        {
+            // Arrange
+            ReleaseVersion unrelatedReleaseVersion = _dataFixture.DefaultReleaseVersion();
+
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                // Assign these DataSetUploads to a different ReleaseVersion.
+                .WithReleaseVersionId(Guid.NewGuid())
+                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = false,
+                        Passed = false,
+                        PercentageComplete = 50,
+                        Stage = "validation",
+                    }
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.ReleaseVersions.AddRangeAsync(unrelatedReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var result = await service.GetScreenerProgress(
+                    releaseVersionId: unrelatedReleaseVersion.Id,
+                    cancellationToken: CancellationToken.None
+                );
+
+                // Assert
+                result.AssertRight([]);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetBeingScreened_NoProgressUpdatesYet_DefaultProgressUpdateReturned()
+        {
+            // Arrange
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithReleaseVersionId(releaseVersion.Id)
+                .WithStatus(DataSetUploadStatus.SCREENING)
+                // No progress update has yet been fetched for this data set.
+                .WithScreenerProgress(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.ReleaseVersions.AddRangeAsync(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var result = await service.GetScreenerProgress(
+                    releaseVersionId: releaseVersion.Id,
+                    cancellationToken: CancellationToken.None
+                );
+
+                List<ScreenerProgressWithDataSetUploadIdViewModel> expectedProgressUpdates =
+                [
+                    new()
+                    {
+                        DataSetUploadId = dataSetUndergoingScreening.Id,
+                        PercentageComplete = 0,
+                        Stage = null,
+                    },
+                ];
+
+                // Assert
+                result.AssertRight(expectedProgressUpdates);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetNotCurrentlyUndergoingScreening_NoProgressUpdateReturned()
+        {
+            // Arrange
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+
+            DataSetUpload dataSetNotUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithReleaseVersionId(releaseVersion.Id)
+                // Not currently undergoing screening.
+                .WithStatus(DataSetUploadStatus.PENDING_REVIEW);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetNotUndergoingScreening);
+                await context.ReleaseVersions.AddRangeAsync(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var result = await service.GetScreenerProgress(
+                    releaseVersionId: releaseVersion.Id,
+                    cancellationToken: CancellationToken.None
+                );
+
+                // Assert
+                result.AssertRight([]);
+            }
+        }
+
+        [Fact]
+        public async Task ReleaseVersionDoesNotExist_ReturnsNotFound()
+        {
+            await using var context = InMemoryContentDbContext();
+            var service = BuildService(contentDbContext: context);
+
+            // Act
+            var result = await service.GetScreenerProgress(
+                releaseVersionId: Guid.NewGuid(),
+                cancellationToken: CancellationToken.None
+            );
+
+            // Assert
+            result.AssertNotFound();
+        }
+    }
+
     private DataSetScreenerService BuildService(
         IDataSetScreenerClient? screenerClient = null,
         IQueueServiceClient? queueServiceClient = null,
+        IUserService? userService = null,
         ContentDbContext? contentDbContext = null,
         TimeProvider? timeProvider = null
     )
@@ -490,6 +716,7 @@ public abstract class DataSetScreenerServiceTests
         return new DataSetScreenerService(
             dataSetScreenerClient: screenerClient ?? Mock.Of<IDataSetScreenerClient>(MockBehavior.Strict),
             queueServiceClient: queueServiceClient ?? Mock.Of<IQueueServiceClient>(MockBehavior.Strict),
+            userService: userService ?? MockUtils.AlwaysTrueUserService().Object,
             contentDbContext: contentDbContext ?? Mock.Of<ContentDbContext>(),
             timeProvider: timeProvider ?? TimeProvider.System,
             options: new DataScreenerOptions { ScreenerProgressUpdateIntervalSeconds = 5 }.ToOptionsWrapper()

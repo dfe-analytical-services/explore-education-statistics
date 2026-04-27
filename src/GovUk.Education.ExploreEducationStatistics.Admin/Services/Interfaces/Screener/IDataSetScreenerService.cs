@@ -1,7 +1,9 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 
@@ -26,4 +28,12 @@ public interface IDataSetScreenerService
     /// this method will also exclude any data sets that had their progress updated very recently.
     /// </summary>
     Task<List<DataSetScreenerProgressResponse>> UpdateScreeningProgress(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Get the progress of all data sets undergoing screening for a given ReleaseVersion.
+    /// </summary>
+    Task<Either<ActionResult, List<ScreenerProgressWithDataSetUploadIdViewModel>>> GetScreenerProgress(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    );
 }

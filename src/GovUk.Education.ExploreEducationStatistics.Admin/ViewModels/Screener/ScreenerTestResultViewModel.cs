@@ -1,5 +1,5 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 
 public record ScreenerTestResultViewModel
 {
