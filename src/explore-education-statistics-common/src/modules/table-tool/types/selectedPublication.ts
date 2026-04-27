@@ -6,7 +6,7 @@ import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType } from '@common/services/types/releaseType';
 
 export interface SelectedPublication extends PublicationTreeSummary {
-  contact: Contact;
+  contact?: Contact;
   selectedRelease: SelectedRelease;
   latestRelease: {
     title: string;
