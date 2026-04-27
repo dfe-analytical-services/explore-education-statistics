@@ -148,11 +148,6 @@ public class UserResourceRoleNotificationService(
             throw new ArgumentException("Expected the provided publication role ID to correspond to a Drafter role.");
         }
 
-        var releasesInfo = userPublicationRole
-            .Publication.Releases.Distinct()
-            .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
-            .ToHashSet();
-
         await contentDbContext.RequireTransaction(async () =>
         {
             // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
@@ -168,8 +163,7 @@ public class UserResourceRoleNotificationService(
             emailTemplateService
                 .SendDrafterInviteEmail(
                     email: userPublicationRole.User.Email,
-                    publicationTitle: userPublicationRole.Publication.Title,
-                    releasesInfo: releasesInfo
+                    publicationTitle: userPublicationRole.Publication.Title
                 )
                 .OrThrow(_ => throw new EmailSendFailedException($"Failed to send drafter invite email."));
         });
