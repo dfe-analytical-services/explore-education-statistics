@@ -50,7 +50,7 @@ export default function PublicationAccessForm({
   const handleRemovePublicationAccess = async (
     userPublicationRole: UserPublicationRole,
   ) => {
-    await userService.removeUserPublicationRole(user.id, userPublicationRole);
+    await userService.removeUserPublicationRole(userPublicationRole);
     onUpdate();
   };
 
