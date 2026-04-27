@@ -83,7 +83,6 @@ user opens the browser
     ${authenticated_url_with_random_string}=    Set Variable
     ...    ${authenticated_url}/contact-us?cacheBust=${random_string}
 
-    log to console    Loading page in browser: ${authenticated_url_with_random_string}
     # if the tests fail for you here, update chrome/chromedriver and ensure the public site is running
     go to    ${authenticated_url_with_random_string}
 

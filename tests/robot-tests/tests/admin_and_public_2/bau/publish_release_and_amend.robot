@@ -57,6 +57,7 @@ Add data guidance
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
     ...    ${SUBJECT_NAME} test data guidance content
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Add ancillary file
     user clicks link    Supporting file uploads
@@ -522,6 +523,7 @@ Update existing data guidance for amendment
     ...    Amended ${SUBJECT_NAME} test data guidance content
 
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Navigate to 'Footnotes' section for amendment
     user clicks link    Footnotes

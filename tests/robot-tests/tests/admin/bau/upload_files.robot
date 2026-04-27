@@ -47,7 +47,7 @@ Check the screening results
     user clicks button in table cell    1    4    View details    testid:Data files table
     user waits until modal is visible    Data set details
 
-    user acknowledges any warnings in modal
+    user acknowledges any warnings in screener modal
 
     user clicks element    id:screener-results-all-tab
     user waits until h3 is visible    Full breakdown of

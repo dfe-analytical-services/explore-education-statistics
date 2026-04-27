@@ -38,20 +38,9 @@ Verify release summary
 
 Upload original file and add data guidance
     user uploads subject and waits until complete    ${SUBJECT_NAME}    tiny-one-filter.csv    tiny-one-filter.meta.csv
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
 
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-
-    user checks summary list contains    Filename    tiny-one-filter.csv
-    user checks summary list contains    Geographic levels    National
-    user checks summary list contains    Time period    2017/18
-
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
     ...    ${SUBJECT_NAME} test data guidance content
-    user clicks button    Save guidance
 
 Create data block table
     user clicks link    Data blocks
