@@ -10,7 +10,7 @@ import _releaseVersionService, {
 } from '@admin/services/releaseVersionService';
 import _releasePermissionService, {
   UserReleaseRole,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import { render, screen, waitFor } from '@testing-library/react';
 import { generatePath, Route } from 'react-router';
 import React from 'react';

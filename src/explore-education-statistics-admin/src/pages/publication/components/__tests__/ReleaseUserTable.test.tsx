@@ -2,7 +2,7 @@ import ReleaseUserTable from '@admin/pages/publication/components/ReleaseUserTab
 import {
   UserReleaseInvite,
   UserReleaseRole,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import userEvent from '@testing-library/user-event';

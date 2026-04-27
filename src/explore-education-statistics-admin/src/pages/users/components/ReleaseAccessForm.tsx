@@ -1,7 +1,7 @@
 import userService, {
   User,
   UserReleaseRole,
-} from '@admin/services/userService';
+} from '@admin/services/user-management/userService';
 import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';

@@ -1,5 +1,7 @@
 import Page from '@admin/components/Page';
-import userService, { UserInvite } from '@admin/services/userService';
+import userService, {
+  UserInvite,
+} from '@admin/services/user-management/userService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import FormProvider from '@common/components/form/FormProvider';
