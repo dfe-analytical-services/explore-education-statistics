@@ -425,6 +425,11 @@ function FilterHierarchy({
                   <ButtonText
                     onClick={() => toggleTierSelection(index)}
                     disabled={tierSelectionState[index].disabled}
+                    title={
+                      tierSelectionState[index].disabled
+                        ? 'This element is not clickable as there are no options available in this tier'
+                        : undefined
+                    }
                   >
                     {tierSelectionState[index].selected ? 'Unselect' : 'Select'}{' '}
                     {hierarchySearchTerm ? '' : 'all'} {filterLabel} (tier{' '}

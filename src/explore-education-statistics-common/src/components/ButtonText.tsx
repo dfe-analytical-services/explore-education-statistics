@@ -7,12 +7,14 @@ export interface ButtonTextProps extends ButtonOptions {
   ref?: Ref<HTMLButtonElement>;
   underline?: boolean;
   variant?: 'secondary' | 'warning';
+  title?: string;
 }
 
 const ButtonText = ({
   ref,
   underline = true,
   variant,
+  title,
   ...props
 }: ButtonTextProps) => {
   const { className, ...button } = useButton(props);
@@ -32,6 +34,7 @@ const ButtonText = ({
         className,
       )}
       ref={ref}
+      title={title}
     />
   );
 };
