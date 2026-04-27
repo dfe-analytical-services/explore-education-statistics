@@ -44,20 +44,6 @@ Add data guidance to subjects
     user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
     ...    ${SUBJECT_NAME} Main guidance content
 
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
-    ...    ${SUBJECT_NAME} guidance content
-
-Save data guidance
-    user clicks button    Save guidance
-    user waits until page contains button    Edit guidance
-
 Create API data set
     user scrolls to the top of the page
     user clicks link    API data sets
