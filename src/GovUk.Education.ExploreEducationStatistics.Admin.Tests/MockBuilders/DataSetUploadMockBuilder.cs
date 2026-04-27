@@ -1,9 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Org.BouncyCastle.Asn1.X509;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 
