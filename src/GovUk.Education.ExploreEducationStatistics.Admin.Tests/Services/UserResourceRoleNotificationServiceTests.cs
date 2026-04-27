@@ -347,9 +347,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         public async Task Success()
         {
             User user = _dataFixture.DefaultUser();
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease().GenerateList(2));
+            Publication publication = _dataFixture.DefaultPublication();
 
             UserPublicationRole userDrafterRole = _dataFixture
                 .DefaultUserPublicationRole()
@@ -365,13 +363,8 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Setup(r => r.MarkEmailAsSent(userDrafterRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var releasesInfo = userDrafterRole
-                .Publication.Releases.Distinct()
-                .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
-                .ToHashSet();
-
             emailTemplateService
-                .Setup(s => s.SendDrafterInviteEmail(user.Email, publication.Title, releasesInfo))
+                .Setup(s => s.SendDrafterInviteEmail(user.Email, publication.Title))
                 .Returns(Unit.Instance);
 
             var service = BuildService(
@@ -431,9 +424,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         public async Task SendingEmailFails_ThrowsEmailSendFailedException()
         {
             User user = _dataFixture.DefaultUser();
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease().GenerateList(2));
+            Publication publication = _dataFixture.DefaultPublication();
 
             UserPublicationRole userDrafterRole = _dataFixture
                 .DefaultUserPublicationRole()
@@ -449,13 +440,8 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Setup(r => r.MarkEmailAsSent(userDrafterRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var releasesInfo = userDrafterRole
-                .Publication.Releases.Distinct()
-                .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
-                .ToHashSet();
-
             emailTemplateService
-                .Setup(s => s.SendDrafterInviteEmail(user.Email, publication.Title, releasesInfo))
+                .Setup(s => s.SendDrafterInviteEmail(user.Email, publication.Title))
                 .Returns(new BadRequestResult());
 
             var service = BuildService(
