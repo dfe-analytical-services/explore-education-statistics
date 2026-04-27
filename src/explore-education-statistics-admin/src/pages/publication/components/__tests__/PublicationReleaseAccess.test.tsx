@@ -1,11 +1,11 @@
 import baseRender from '@common-test/render';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
-import _userService from '@admin/services/userService';
+import _userService from '@admin/services/user-management/userService';
 import _releasePermissionService, {
   UserReleaseInvite,
   UserReleaseRole,
-} from '@admin/services/releasePermissionService';
+} from '@admin/services/user-management/releasePermissionService';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';

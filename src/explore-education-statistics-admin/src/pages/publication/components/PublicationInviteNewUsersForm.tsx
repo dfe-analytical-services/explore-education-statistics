@@ -4,7 +4,7 @@ import {
 } from '@admin/routes/publicationRoutes';
 import { Publication } from '@admin/services/publicationService';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
-import userService from '@admin/services/userService';
+import userService from '@admin/services/user-management/userService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
