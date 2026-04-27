@@ -298,6 +298,26 @@ function FilterHierarchy({
         error={errorMessage?.toString()}
       >
         <div data-testid="filter-hierarchy-options">
+          <div className="dfe-flex dfe-gap-4">
+            {filterLabels.map((filterLabel, index) => {
+              const isLast = index + 1 === filterLabels.length;
+
+              return (
+                <div
+                  key={filterLabel}
+                  className={
+                    !isLast
+                      ? 'dfe-border-right govuk-!-padding-right-5'
+                      : undefined
+                  }
+                >
+                  <ButtonText>
+                    Select all {filterLabel} (tier {index + 1})
+                  </ButtonText>
+                </div>
+              );
+            })}
+          </div>
           {rootOptionTrees.map(optionTree => {
             return (
               <FilterHierarchyOptions
