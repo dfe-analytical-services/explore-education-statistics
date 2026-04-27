@@ -1986,7 +1986,8 @@
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api')]",
         "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
         "DataScreener__ScreenerStorage": "",
-        "DataScreener__EnhancedScreenerJourney": false
+        "DataScreener__EnhancedScreenerJourney": false,
+        "DataScreener__ScreenerProgressUpdateIntervalSeconds": 5
       }
     },
     {

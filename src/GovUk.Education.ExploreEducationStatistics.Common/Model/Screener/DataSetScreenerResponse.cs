@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 
 public record DataSetScreenerResponse
 {
@@ -14,5 +14,5 @@ public record DataSetScreenerResponse
     public List<DataScreenerTestResult> TestResults { get; init; } = [];
 
     [JsonPropertyName("api_suitable")]
-    public bool PublicApiCompatible { get; set; }
+    public bool PublicApiCompatible { get; init; }
 }

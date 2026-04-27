@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -161,6 +162,14 @@ public class ContentDbContext : DbContext
             .HasConversion(
                 r => JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
                 r => JsonSerializer.Deserialize<DataSetScreenerResponse>(r, (JsonSerializerOptions)null)
+            );
+
+        modelBuilder
+            .Entity<DataSetUpload>()
+            .Property(upload => upload.ScreenerProgress)
+            .HasConversion(
+                r => JsonSerializer.Serialize(r, (JsonSerializerOptions)null),
+                r => JsonSerializer.Deserialize<DataSetScreenerProgress>(r, (JsonSerializerOptions)null)
             );
 
         modelBuilder

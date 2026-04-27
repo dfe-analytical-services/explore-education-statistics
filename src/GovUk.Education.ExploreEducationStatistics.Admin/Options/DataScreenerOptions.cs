@@ -11,4 +11,6 @@ public class DataScreenerOptions : IAzureAuthenticationOptions
     public string ScreenerStorage { get; init; }
 
     public bool EnhancedScreenerJourney { get; init; }
+
+    public int ScreenerProgressUpdateIntervalSeconds { get; init; }
 }

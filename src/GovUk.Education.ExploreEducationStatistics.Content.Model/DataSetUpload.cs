@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -39,6 +40,8 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
     public required DataSetUploadStatus Status { get; set; }
 
     public DataSetScreenerResponse? ScreenerResult { get; set; }
+
+    public DataSetScreenerProgress? ScreenerProgress { get; set; }
 
     public DateTime Created { get; set; }
 
