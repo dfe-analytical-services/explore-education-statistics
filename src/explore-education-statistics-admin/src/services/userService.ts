@@ -97,7 +97,6 @@ export interface UsersService {
     userPublicationRole: UserPublicationRoleSubmission,
   ) => Promise<boolean>;
   removeUserPublicationRole: (
-    userId: string,
     userPublicationRole: UserPublicationRole,
   ) => Promise<boolean>;
 
@@ -167,7 +166,6 @@ const userService: UsersService = {
     );
   },
   removeUserPublicationRole(
-    userId: string,
     userPublicationRole: UserPublicationRole,
   ): Promise<boolean> {
     return client.delete(
