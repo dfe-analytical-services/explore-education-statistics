@@ -1,8 +1,8 @@
+import { BasicLink } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
-import { BasicLink } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import ButtonGroup from '@common/components/ButtonGroup';
 import React from 'react';

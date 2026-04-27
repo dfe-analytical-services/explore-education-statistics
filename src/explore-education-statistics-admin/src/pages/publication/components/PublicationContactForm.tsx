@@ -1,6 +1,4 @@
-import publicationService, {
-  Contact,
-} from '@admin/services/publicationService';
+import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -9,6 +7,7 @@ import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
+import { Contact } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ObjectSchema } from 'yup';

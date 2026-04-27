@@ -1,3 +1,4 @@
+import { ReleaseVersion } from '@admin/services/publicationService';
 import {
   ContentBlockPostModel,
   ContentBlockPutModel,
@@ -11,7 +12,6 @@ import {
 import client from '@admin/services/utils/service';
 import {
   ContentSection,
-  ReleaseVersion,
   ReleaseApprovalStatus,
   ReleaseVersionDataContent,
 } from '@common/services/publicationService';

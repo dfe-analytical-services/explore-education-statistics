@@ -1,3 +1,4 @@
+import { ReleaseVersion } from '@admin/services/publicationService';
 import {
   Comment,
   EditableBlock,
@@ -6,7 +7,6 @@ import {
 import {
   ContentSection,
   KeyStatistic,
-  ReleaseVersion,
 } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 
