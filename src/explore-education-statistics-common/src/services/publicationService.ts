@@ -419,12 +419,6 @@ const publicationService = {
   listReleases(publicationSlug: string): Promise<ReleaseSummary[]> {
     return contentApi.get(`/publications/${publicationSlug}/releases`);
   },
-  // Currently used within table tool
-  getLatestPublicationRelease(
-    publicationSlug: string,
-  ): Promise<ReleaseVersion> {
-    return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
-  },
   getReleaseVersionSummary(
     publicationSlug: string,
     releaseSlug: string,

@@ -1,13 +1,11 @@
 import TableToolFinalStep from '@frontend/modules/table-tool/components/TableToolFinalStep';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import _publicationService from '@common/services/publicationService';
 import {
   testTable,
   testTableHeaders,
   testQuery,
   testSelectedPublicationWithLatestRelease,
   testSelectedPublicationWithNonLatestRelease,
-  testPublicationRelease,
 } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -15,16 +13,8 @@ import React from 'react';
 
 jest.mock('@common/services/publicationService');
 
-const publicationService = _publicationService as jest.Mocked<
-  typeof _publicationService
->;
-
 describe('TableToolFinalStep', () => {
   test('renders the final step successfully', async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
-
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -76,10 +66,6 @@ describe('TableToolFinalStep', () => {
   });
 
   test('shows and hides table header reordering controls successfully', async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
-
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -112,9 +98,6 @@ describe('TableToolFinalStep', () => {
   });
 
   test('renders correctly when this is the latest data', async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -135,9 +118,6 @@ describe('TableToolFinalStep', () => {
   });
 
   test(`renders correctly if this is not the latest data`, async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
     render(
       <TableToolFinalStep
         query={testQuery}
@@ -168,24 +148,20 @@ describe('TableToolFinalStep', () => {
   });
 
   test('renders a warning when the publication is superseded', async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue({
-      ...testPublicationRelease,
-      publication: {
-        ...testPublicationRelease.publication,
-        isSuperseded: true,
-        supersededBy: {
-          id: 'superseding-id',
-          slug: 'superseding-slug',
-          title: 'Superseding publication',
-        },
-      },
-    });
     render(
       <TableToolFinalStep
         query={testQuery}
         table={testTable}
         tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithLatestRelease}
+        selectedPublication={{
+          ...testSelectedPublicationWithLatestRelease,
+          isSuperseded: true,
+          supersededBy: {
+            id: 'superseding-id',
+            slug: 'superseding-slug',
+            title: 'Superseding publication',
+          },
+        }}
         onReorderTableHeaders={noop}
       />,
     );
@@ -219,9 +195,6 @@ describe('TableToolFinalStep', () => {
   });
 
   test('does not render a warning when the publication is not superseded', async () => {
-    publicationService.getLatestPublicationRelease.mockResolvedValue(
-      testPublicationRelease,
-    );
     render(
       <TableToolFinalStep
         query={testQuery}

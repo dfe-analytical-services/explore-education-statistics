@@ -250,6 +250,12 @@ describe('TableToolWizard', () => {
           },
           selectedPublication: {
             ...testThemeWithSupercededPublication.publications[0],
+            contact: {
+              teamName: 'The team name',
+              teamEmail: 'team@name.com',
+              contactName: 'A person',
+              contactTelNo: '012345',
+            },
             selectedRelease: {
               id: 'selected-release',
               latestData: false,

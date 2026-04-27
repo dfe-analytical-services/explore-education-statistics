@@ -5,7 +5,6 @@ import publicationService, {
   PublicationTreeOptions,
   RelatedInformationItem,
   ReleaseSummary,
-  ReleaseVersion,
   ReleaseVersionDataContent,
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
