@@ -703,6 +703,11 @@ export const releaseVersionSummary: ReleaseVersionSummary = {
   id: '7bfe9a51-ec89-486e-aa6d-09fb45ae1a43',
   isLatestRelease: true,
   lastUpdated: '2021-10-28T08:30:02.6926703',
+  publication: {
+    id: 'publication-summary-1',
+    title: 'Characteristics of children in need',
+    slug: 'publication-slug',
+  },
   published: '2021-10-28T08:30:02.6926703',
   slug: '2021',
   title: 'Reporting Year 2021',

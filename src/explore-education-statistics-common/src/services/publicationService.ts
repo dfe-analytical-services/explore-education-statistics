@@ -140,6 +140,11 @@ export interface ReleaseVersionSummary {
   isLatestRelease: boolean;
   label?: string;
   lastUpdated: string;
+  publication: {
+    id: string;
+    slug: string;
+    title: string;
+  };
   published: string;
   publishingOrganisations?: Organisation[];
   slug: string;
