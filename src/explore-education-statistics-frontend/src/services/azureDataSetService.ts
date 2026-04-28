@@ -8,7 +8,7 @@ import {
 } from '@frontend/services/dataSetFileService';
 import { PaginatedList } from '@common/services/types/pagination';
 
-export interface AzureDataSetSearchResult {
+export interface AzureDataSetIndexItem {
   '@search.score': string;
   fileId: string;
   filename: string;
@@ -31,6 +31,7 @@ export interface AzureDataSetSearchResult {
   api: DataSetFileApi;
   numDataFileRows: number;
   geographicLevels: GeographicLevelCode[];
+  geographicLevelsLabels: string[];
   indicators: string[];
   filters: string[];
   releaseType: string;

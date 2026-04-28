@@ -1,13 +1,12 @@
 /* eslint-disable no-restricted-syntax */
 import logger from '@common/services/logger';
 import { PaginatedList } from '@common/services/types/pagination';
-import { geographicLevelCodesMap } from '@common/utils/locationLevelsMap';
 import withMethods from '@frontend/middleware/api/withMethods';
 import { initialiseAzureDataSetsSearchClient } from '@frontend/modules/api/search/initialiseAzureSearchClient';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import {
   AzureDataSetListRequest,
-  AzureDataSetSearchResult,
+  AzureDataSetIndexItem,
 } from '@frontend/services/azureDataSetService';
 import { DataSetFileSummary } from '@frontend/services/dataSetFileService';
 import {
@@ -22,9 +21,7 @@ interface Request extends NextApiRequest {
   };
 }
 
-type SharedSearchOptionsBase = Partial<
-  SearchOptions<AzureDataSetSearchResult>
-> &
+type SharedSearchOptionsBase = Partial<SearchOptions<AzureDataSetIndexItem>> &
   SearchRequestQueryTypeOptions;
 
 export default withMethods({
@@ -81,7 +78,7 @@ export default withMethods({
           'lastUpdated',
           'api',
           'numDataFileRows',
-          'geographicLevels',
+          'geographicLevelsLabels',
           'indicators',
           'filters',
           'releaseType',
@@ -125,7 +122,7 @@ export default withMethods({
           lastUpdated,
           api,
           numDataFileRows,
-          geographicLevels,
+          geographicLevelsLabels: geographicLevels,
           indicators,
           filters,
           timePeriodRange,
@@ -163,9 +160,7 @@ export default withMethods({
               : undefined,
           meta: {
             numDataFileRows,
-            geographicLevels: geographicLevels.map(
-              code => geographicLevelCodesMap[code].label,
-            ),
+            geographicLevels,
             timePeriodRange,
             filters,
             indicators,
