@@ -13,7 +13,7 @@ param environmentName string
 param publicSiteUrl string = ''
 
 @description('Certificate type for Azure Front Door.')
-param certificateType FrontDoorCertificateType = 'Provisioned'
+param certificateType FrontDoorCertificateType = 'BringYourOwn'
 
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
