@@ -43,15 +43,18 @@ var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}
 // over to Azure Front Door properly.  In the meantime, we will host the site through AFD on a temporary
 // https://<env name>afd.explore-education-statistics.service.gov.uk with an associated certificate so as
 // not to break the use of the environment for others.
+//
+// Note that this only applies to Prod and Pre-Prod now, as Dev and Test can now use their proper public site
+// URLs to reach AFD.
 var publicSiteHostName = replaceMultiple(publicSiteUrl, {
   
   // Handle the case for Prod to allow access via "https://afd.explore-education-statistics.service.gov.uk" during
   // testing.
   'https://explore-education': 'afd.explore-education'
   
-  // Handle the case for all other environments to allow access via
-  // "https://<env>afd.explore-education-statistics.service.gov.uk" during testing.
-  '.explore-education': 'afd.explore-education'
+  // Handle the case for Pre-Production to allow access via
+  // "https://pre-productionafd.explore-education-statistics.service.gov.uk" during testing.
+  'pre-production.explore-education': 'pre-productionafd.explore-education'
   
   // Finally, remove the "https://" from the URL to leave just the domain name.
   'https://': ''
@@ -63,7 +66,13 @@ var publicSiteHostName = replaceMultiple(publicSiteUrl, {
 // a temporary https://<env name>afd.explore-education-statistics.service.gov.uk
 // URL with an associated certificate so as not to break the use of the environment
 // for others.
-var certificateName = '${legacyResourcePrefix}as-ees-public-site-afd-certificate'
+//
+// Note that Dev and Test now have the original public site URLs pointing towards
+// their AFD instances now rather than the original App Service, so they can serve
+// up the real certificate rather than the temporary testing one.  
+var certificateName = subscription == 's101d01' || subscription == 's101t01'
+    ? '${legacyResourcePrefix}as-ees-public-site-certificate'
+    : '${legacyResourcePrefix}as-ees-public-site-afd-certificate'
 
 var nextJsRuleSetName = 'nextjsruleset'
 
