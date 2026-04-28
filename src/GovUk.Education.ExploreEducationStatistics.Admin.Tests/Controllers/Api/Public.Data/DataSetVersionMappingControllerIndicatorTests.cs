@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data.DataSetVersionMappingControllerIndicatorTestsHelpers;
+using IndicatorMapping = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMapping;
 
 #pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
@@ -173,7 +174,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                     new IndicatorMappingUpdateResponseViewModel
                     {
                         SourceKey = "indicator-1-key",
-                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key")! with
+                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key") with
                         {
                             Type = MappingType.ManualMapped,
                             CandidateKey = "indicator-3-key",
@@ -182,7 +183,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                     new IndicatorMappingUpdateResponseViewModel
                     {
                         SourceKey = "indicator-2-key",
-                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key")! with
+                        Mapping = mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key") with
                         {
                             Type = MappingType.ManualNone,
                             CandidateKey = null,
@@ -204,7 +205,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
             {
                 {
                     "indicator-1-key",
-                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key")! with
+                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-1-key") with
                     {
                         Type = MappingType.ManualMapped,
                         CandidateKey = "indicator-3-key",
@@ -212,7 +213,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                 },
                 {
                     "indicator-2-key",
-                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key")! with
+                    mapping.GetIndicatorMapping(indicatorColumn: "indicator-2-key") with
                     {
                         Type = MappingType.ManualNone,
                         CandidateKey = null,
@@ -222,7 +223,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
 
             // Test that the updated mappings retrieved from the database reflect the updates
             // that were requested.
-            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+            updatedMapping.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFullMappings,
                 ignoreCollectionOrders: true
             );
@@ -439,8 +440,8 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                 .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
-            retrievedMappings.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
-                mapping.IndicatorMappingPlan!.Mappings,
+            retrievedMappings.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
+                mapping.IndicatorMappingPlan.Mappings,
                 ignoreCollectionOrders: true
             );
         }
@@ -532,8 +533,8 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                 .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
-            retrievedMappings.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
-                mapping.IndicatorMappingPlan!.Mappings,
+            retrievedMappings.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
+                mapping.IndicatorMappingPlan.Mappings,
                 ignoreCollectionOrders: true
             );
         }

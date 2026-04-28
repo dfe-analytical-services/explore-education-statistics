@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.25")
+                .HasAnnotation("ProductVersion", "8.0.26")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -337,6 +337,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("DataSetFileVersionGeographicLevels");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IndicatorMappings")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OriginalDataSetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReplacementDataSetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UnmappedReplacementIndicators")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DataSetMappings");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetUpload", b =>
                 {
                     b.Property<Guid>("Id")
@@ -377,6 +402,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ScreenerResult")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScreenerProgress")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")

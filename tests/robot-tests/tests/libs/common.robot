@@ -83,7 +83,6 @@ user opens the browser
     ${authenticated_url_with_random_string}=    Set Variable
     ...    ${authenticated_url}/contact-us?cacheBust=${random_string}
 
-    log to console    Loading page in browser: ${authenticated_url_with_random_string}
     # if the tests fail for you here, update chrome/chromedriver and ensure the public site is running
     go to    ${authenticated_url_with_random_string}
 
@@ -829,7 +828,7 @@ user chooses select option at index
 user chooses file
     [Arguments]    ${locator}    ${file_path}
     user waits until element is visible    ${locator}
-    choose file    ${locator}    ${file_path}
+    choose file    ${locator}-input    ${file_path}
 
 user clears element text
     [Arguments]    ${selector}

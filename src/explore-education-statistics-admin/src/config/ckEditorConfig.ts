@@ -84,6 +84,12 @@ export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
 
 export const toolbarConfigLinkOnly: ReadonlyArray<ToolbarOption> = ['link'];
 
+export const toolbarConfigWarningBlock: ReadonlyArray<ToolbarOption> = [
+  'link',
+  '|',
+  'comment',
+];
+
 export const corePlugins: ReadonlySet<PluginName> = new Set<PluginName>([
   'Essentials',
   'Paragraph',

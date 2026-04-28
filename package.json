@@ -99,7 +99,7 @@
       "python3 -m pipenv run isort"
     ],
     "*.{cs,csproj}": [
-      "dotnet csharpier check"
+      "dotnet csharpier format"
     ]
   }
 }

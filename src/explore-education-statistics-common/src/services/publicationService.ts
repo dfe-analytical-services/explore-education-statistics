@@ -209,7 +209,7 @@ export interface ReleaseVersion<
 export interface ReleaseVersionSummary {
   coverageTitle: string;
   id: string;
-  isLatestRelease?: boolean;
+  isLatestRelease: boolean;
   label?: string;
   lastUpdated: string;
   published: string;
@@ -313,6 +313,8 @@ export interface DataSetItem {
   };
   title: string;
   summary?: string;
+  isApiEnabled: boolean;
+  publicApiDataSetId?: string;
 }
 
 export interface FeaturedTableItem {
@@ -365,10 +367,6 @@ export interface ReleaseSummary {
   latestRelease: boolean;
 }
 
-export interface PublicationReleaseSummary extends ReleaseSummary {
-  publication: PublicationSummaryPreview;
-}
-
 export interface PublicationTreeSummary {
   id: string;
   title: string;
@@ -397,7 +395,7 @@ export interface Theme {
 }
 
 export interface PublicationTreeOptions {
-  publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
+  filter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
 }
 
 export interface PublicationSitemapItem {
@@ -422,36 +420,10 @@ const publicationService = {
     return contentApi.get(`/publications/${publicationSlug}/releases`);
   },
   // Currently used within table tool
-  getPublicationRelease(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<ReleaseVersion> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}`,
-    );
-  },
-  // Currently used within table tool
   getLatestPublicationRelease(
     publicationSlug: string,
   ): Promise<ReleaseVersion> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
-  },
-  // Currently used within table tool
-  getPublicationReleaseSummary(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
-    );
-  },
-  // Currently used within table tool
-  getLatestPublicationReleaseSummary(
-    publicationSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/latest/summary`,
-    );
   },
   getReleaseVersionSummary(
     publicationSlug: string,
@@ -498,11 +470,11 @@ const publicationService = {
   ): Promise<PublicationMethodologiesList> {
     return contentApi.get(`/publications/${publicationSlug}/methodologies`);
   },
-  getPublicationTree({
-    publicationFilter,
-  }: PublicationTreeOptions = {}): Promise<Theme[]> {
-    return contentApi.get('/publication-tree', {
-      params: { publicationFilter },
+  getPublicationTree({ filter }: PublicationTreeOptions = {}): Promise<
+    Theme[]
+  > {
+    return contentApi.get('/publications/tree', {
+      params: { filter },
     });
   },
   listSitemapItems(): Promise<PublicationSitemapItem[]> {

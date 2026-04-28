@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -20,7 +21,7 @@ public class ContentService : IContentService
     private readonly IReleaseService _releaseService;
     private readonly IMethodologyCacheService _methodologyCacheService;
     private readonly IReleaseCacheService _releaseCacheService;
-    private readonly IPublicationCacheService _publicationCacheService;
+    private readonly IPublicationsTreeService _publicationsTreeService;
 
     public ContentService(
         ContentDbContext contentDbContext,
@@ -30,7 +31,7 @@ public class ContentService : IContentService
         IReleaseService releaseService,
         IMethodologyCacheService methodologyCacheService,
         IReleaseCacheService releaseCacheService,
-        IPublicationCacheService publicationCacheService
+        IPublicationsTreeService publicationsTreeService
     )
     {
         _contentDbContext = contentDbContext;
@@ -40,7 +41,7 @@ public class ContentService : IContentService
         _releaseService = releaseService;
         _methodologyCacheService = methodologyCacheService;
         _releaseCacheService = releaseCacheService;
-        _publicationCacheService = publicationCacheService;
+        _publicationsTreeService = publicationsTreeService;
     }
 
     public async Task DeletePreviousVersionsContent(IReadOnlyList<Guid> releaseVersionIds)
@@ -171,7 +172,7 @@ public class ContentService : IContentService
     public async Task UpdateCachedTaxonomyBlobs()
     {
         await _methodologyCacheService.UpdateSummariesTree();
-        await _publicationCacheService.UpdatePublicationTree();
+        await _publicationsTreeService.UpdateCachedPublicationsTree();
     }
 
     private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey

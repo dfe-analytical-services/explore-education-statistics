@@ -137,16 +137,16 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
         }
 
-        [Fact(Skip = "Call Content API to get releases for a specified publication slug")]
-        public async Task GetReleasesForPublication()
+        [Fact(Skip = "Call Content API to get published release id's for a specified publication slug")]
+        public async Task GetPublicationReleaseIds()
         {
             var sut = GetSut();
             const string publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
-            var releases = await sut.GetReleasesForPublication(publicationSlug);
-            Print($"{releases.Length} releases found");
-            foreach (var release in releases)
+            var releaseIds = await sut.GetPublicationReleaseIds(publicationSlug);
+            Print($"{releaseIds.Length} release id's found");
+            foreach (var releaseId in releaseIds)
             {
-                Print(release.ReleaseId.ToString());
+                Print(releaseId.ToString());
             }
         }
 
@@ -162,14 +162,16 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
         }
 
-        [Fact(Skip = "Call Content API to get release summary for publication and release slug")]
-        public async Task GetReleaseSummary()
+        [Fact(
+            Skip = "Call Content API to get the latest published release version summary for the specified publication slug and release slug"
+        )]
+        public async Task GetReleaseVersionSummary()
         {
             var sut = GetSut();
-            var publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
-            var releaseSlug = "2016-17";
-            var releaseSummary = await sut.GetReleaseSummary(publicationSlug, releaseSlug);
-            PrintAsJson(releaseSummary);
+            const string publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
+            const string releaseSlug = "2016-17";
+            var releaseVersionSummary = await sut.GetReleaseVersionSummary(publicationSlug, releaseSlug);
+            PrintAsJson(releaseVersionSummary);
         }
 
         [Fact(Skip = "Ping Content API")]

@@ -56,6 +56,7 @@ Add metadata guidance
     user enters text into element    id:dataGuidanceForm-dataSets-0-content    Test file guidance content
 
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}

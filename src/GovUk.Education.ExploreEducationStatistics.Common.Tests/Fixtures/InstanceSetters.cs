@@ -116,6 +116,11 @@ public class InstanceSetters<T>
         return Set(property, (faker, _, context) => offset + GetDisplayIndex(context, faker));
     }
 
+    public InstanceSetters<T> SetDefault(Expression<Func<T, long?>> property, long? offset = 0)
+    {
+        return Set(property, (faker, _, context) => offset + GetDisplayIndex(context, faker));
+    }
+
     public InstanceSetters<T> SetDefault(Expression<Func<T, DateTime?>> property)
     {
         return Set(property, DateTime.UtcNow.AddDays(-1));

@@ -3,6 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
+import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
@@ -128,6 +129,13 @@ const ReleaseExploreDataPage = ({
           title={dataset.title}
           description={dataset.summary}
           metaInfo={dataset.meta.geographicLevels.join(', ')}
+          tag={
+            dataset.isApiEnabled && (
+              <Tag className="govuk-!-margin-bottom-2" colour="grey">
+                Available by API
+              </Tag>
+            )
+          }
           actions={
             <>
               <Link

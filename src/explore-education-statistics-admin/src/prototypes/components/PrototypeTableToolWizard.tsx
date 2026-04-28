@@ -39,7 +39,8 @@ import {
   timePeriodSubjectMeta,
   subjectMeta,
   subjects,
-  summary,
+  publicationSummary,
+  releaseVersionSummary,
 } from '@admin/prototypes/data/tableToolData';
 
 export interface InitialTableToolState {
@@ -141,10 +142,19 @@ const PrototypeTableToolWizard = ({
 
     const featuredTables: FeaturedTable[] = [];
 
-    // const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
+    // const publicationSummary = await publicationService.getPublicationSummary(
     //   publication.slug,
     // );
-    const latestRelease = summary;
+
+    const { latestRelease } = publicationSummary;
+
+    // const selectedReleaseVersion =
+    //   await publicationService.getReleaseVersionSummary(
+    //     publication.slug,
+    //     latestRelease.slug,
+    //   );
+
+    const selectedReleaseVersion = releaseVersionSummary;
 
     updateState(draft => {
       draft.subjects = subjects;
@@ -156,11 +166,11 @@ const PrototypeTableToolWizard = ({
         slug: publication.slug,
         title: publication.title,
         selectedRelease: {
-          id: latestRelease.id,
-          latestData: latestRelease.latestRelease,
-          slug: latestRelease.slug,
-          title: latestRelease.title,
-          type: latestRelease.type,
+          id: selectedReleaseVersion.id,
+          latestData: selectedReleaseVersion.isLatestRelease,
+          slug: selectedReleaseVersion.slug,
+          title: selectedReleaseVersion.title,
+          type: selectedReleaseVersion.type,
         },
         latestRelease: {
           title: latestRelease.title,

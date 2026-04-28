@@ -31,6 +31,21 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
                 );
             });
 
+    public async Task<Either<ActionResult, PublicationSummaryDto>> GetPublicationSummary(Guid publicationId) =>
+        await contentDbContext
+            .Publications.AsNoTracking()
+            .Include(p => p.LatestPublishedReleaseVersion)
+            .SingleOrNotFoundAsync(p => p.Id == publicationId)
+            .OnSuccess(publication =>
+            {
+                if (publication.LatestPublishedReleaseVersionId == null)
+                {
+                    return new Either<ActionResult, PublicationSummaryDto>(new NotFoundResult());
+                }
+
+                return PublicationSummaryDto.FromPublication(publication);
+            });
+
     public async Task<Either<ActionResult, PublicationTitleDto>> GetPublicationTitle(
         string publicationSlug,
         CancellationToken cancellationToken = default

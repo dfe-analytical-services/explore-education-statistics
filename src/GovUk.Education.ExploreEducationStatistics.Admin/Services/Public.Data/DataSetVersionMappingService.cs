@@ -70,7 +70,6 @@ public class DataSetVersionMappingService(
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
 
-    // TODO EES-6993 - remove null-forgiving operator.
     public Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default
@@ -79,7 +78,7 @@ public class DataSetVersionMappingService(
         return userService
             .CheckIsBauUser()
             .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
-            .OnSuccess(mapping => mapping.IndicatorMappingPlan)!;
+            .OnSuccess(mapping => mapping.IndicatorMappingPlan);
     }
 
     public async Task<MappingStatusViewModel?> GetMappingStatus(
@@ -343,9 +342,7 @@ public class DataSetVersionMappingService(
     {
         return await publicDataDbContext
             .DataSetVersionMappings.Where(mapping => mapping.TargetDataSetVersionId == targetDataSetVersionId)
-            .Select(mapping =>
-                mapping.HasDeletedIndicators || mapping.HasDeletedGeographicLevels || mapping.HasDeletedTimePeriods
-            )
+            .Select(mapping => mapping.HasDeletedGeographicLevels || mapping.HasDeletedTimePeriods)
             .SingleOrDefaultAsync(cancellationToken);
     }
 

@@ -14,7 +14,8 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { releaseTypes } from '@common/services/types/releaseType';
-import React from 'react';
+import getListStringSeparator from '@common/utils/string/getListStringSeparator';
+import React, { Fragment } from 'react';
 import { generatePath, useLocation } from 'react-router';
 
 const ReleaseSummaryPage = () => {
@@ -58,9 +59,15 @@ const ReleaseSummaryPage = () => {
             </SummaryListItem>
             <SummaryListItem term="Published by">
               {releaseVersion.publishingOrganisations?.length
-                ? releaseVersion.publishingOrganisations
-                    .map(org => org.title)
-                    .join(' and ')
+                ? releaseVersion.publishingOrganisations.map((org, index) => (
+                    <Fragment key={org.id}>
+                      {getListStringSeparator(
+                        releaseVersion.publishingOrganisations ?? [],
+                        index,
+                      )}
+                      {org.title}
+                    </Fragment>
+                  ))
                 : 'Department for Education'}
             </SummaryListItem>
           </SummaryList>

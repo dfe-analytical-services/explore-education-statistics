@@ -28,129 +28,85 @@ param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
+@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
+param averagePublicSiteResponseTimeAlertThresholdMillis int
+
+@description('Whether to create or update Azure Monitor alerts during this deploy.')
+param deployAlerts bool
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
+var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
 // TODO EES-6883 - remove the "afd.explore-education" lines below once we are ready to switch the public site DNS
 // over to Azure Front Door properly.  In the meantime, we will host the site through AFD on a temporary
 // https://<env name>afd.explore-education-statistics.service.gov.uk with an associated certificate so as
 // not to break the use of the environment for others.
+//
+// Note that this only applies to Prod and Pre-Prod now, as Dev and Test can now use their proper public site
+// URLs to reach AFD.
 var publicSiteHostName = replaceMultiple(publicSiteUrl, {
   
   // Handle the case for Prod to allow access via "https://afd.explore-education-statistics.service.gov.uk" during
   // testing.
   'https://explore-education': 'afd.explore-education'
   
-  // Handle the case for all other environments to allow access via
-  // "https://<env>afd.explore-education-statistics.service.gov.uk" during testing.
-  '.explore-education': 'afd.explore-education'
+  // Handle the case for Pre-Production to allow access via
+  // "https://pre-productionafd.explore-education-statistics.service.gov.uk" during testing.
+  'pre-production.explore-education': 'pre-productionafd.explore-education'
   
   // Finally, remove the "https://" from the URL to leave just the domain name.
   'https://': ''
 })
 
-resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
-  name: frontDoorName
-  location: 'global' // CDN lives in a resource group, but must be global
-  tags: tagValues
-  sku: {
-    name: 'Standard_AzureFrontDoor'
-  }
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    originResponseTimeoutSeconds: 220 // Timeout set to just under Azure's standard App Service timeout of 3.8 minutes.
-  }
-}
+// TODO EES-6883 - remove the "afd" from the line below once we're ready to
+// switch DNS over to point at Azure Front Door rather than the Public Site
+// App Service.  During testing we will host the public site through AFD on
+// a temporary https://<env name>afd.explore-education-statistics.service.gov.uk
+// URL with an associated certificate so as not to break the use of the environment
+// for others.
+//
+// Note that Dev and Test now have the original public site URLs pointing towards
+// their AFD instances now rather than the original App Service, so they can serve
+// up the real certificate rather than the temporary testing one.  
+var certificateName = subscription == 's101d01' || subscription == 's101t01'
+    ? '${legacyResourcePrefix}as-ees-public-site-certificate'
+    : '${legacyResourcePrefix}as-ees-public-site-afd-certificate'
 
-resource endpoints 'Microsoft.Cdn/profiles/afdendpoints@2025-04-15' = {
-  parent: frontDoor
-  name: '${resourcePrefix}-${abbreviations.frontDoorEndpoints}'
-  location: 'global'
-  tags: tagValues
-  properties: {
-    enabledState: 'Enabled'
-  }
-}
+var nextJsRuleSetName = 'nextjsruleset'
 
-resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
-  parent: frontDoor
-  name: '${resourcePrefix}-${abbreviations.frontDoorOriginGroups}'
-  properties: {
-    loadBalancingSettings: {
-      sampleSize: 4
-      successfulSamplesRequired: 3
-      additionalLatencyInMilliseconds: 50
-    }
-    healthProbeSettings: {
-      probePath: '/api/health'
-      probeRequestType: 'HEAD'
-      probeProtocol: 'Https'
-      probeIntervalInSeconds: 100
-    }
-    sessionAffinityState: 'Disabled'
-  }
-}
-
-resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
-  parent: originGroup
-  name: '${resourcePrefix}-${abbreviations.frontDoorOrigins}'
-  properties: {
-    hostName: '${subscription}-as-ees-public-site.azurewebsites.net'
-    httpPort: 80
-    httpsPort: 443
-    originHostHeader: '${subscription}-as-ees-public-site.azurewebsites.net'
-    priority: 1
-    weight: 1000
-    enabledState: 'Enabled'
-    enforceCertificateNameCheck: true
-  }
-}
-
-module publicSiteCertificateModule 'publicSiteCertificate.bicep' = if (certificateType == 'BringYourOwn') {
-  name: 'publicSiteCertificateModuleDeploy'
+module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' = {
+  name: '${frontDoorProfileName}ModuleDeploy'
   params: {
+    frontDoorProfileName: frontDoorProfileName
+    resourcePrefix: resourcePrefix
     legacyResourcePrefix: legacyResourcePrefix
-    frontDoorName: frontDoorName
-    publicSiteHostName: publicSiteHostName
+    siteHostName: publicSiteHostName
+    originHostName: '${subscription}-as-ees-public-site.azurewebsites.net'
+    customDomainName: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+    certificateType: certificateType
+    certificateName: certificateType == 'BringYourOwn' ? certificateName : null
+    ruleSetNames: [nextJsRuleSetName]
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    deployWaf: true
+    alerts: deployAlerts ? {
+      latency: true
+      originHealth: true
+      requestCount: true
+      percentage4XX: true
+      percentage5XX: true
+      cachedResponseRatio: true
+      wafRequestCounts: true
+      averageResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis
+      alertsGroupName: '${subscription}-ag-ees-alertedusers'
+    } : null
+    tagValues: tagValues
   }
 }
 
-resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = if (certificateType == 'BringYourOwn') {
-  parent: frontDoor
-  name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
-  properties: {
-    hostName: publicSiteHostName
-    tlsSettings: {
-      certificateType: 'CustomerCertificate'
-      minimumTlsVersion: 'TLS12'
-      cipherSuiteSetType: 'TLS12_2023'
-      secret: {
-        id: publicSiteCertificateModule!.outputs.certificateSecretId
-      }
-    }
-  }
-}
-
-resource customDomainWithoutCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = if (certificateType == 'Provisioned') {
-  parent: frontDoor
-  name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
-  properties: {
-    hostName: publicSiteHostName
-    tlsSettings: {
-      certificateType: 'ManagedCertificate'
-      minimumTlsVersion: 'TLS12'
-      cipherSuiteSetType: 'TLS12_2023'
-    }
-  }
-}
-
-resource nextJsRuleSet 'Microsoft.Cdn/profiles/rulesets@2025-04-15' = {
-  parent: frontDoor
-  name: 'nextjsruleset'
+resource nextJsRuleSet 'Microsoft.Cdn/profiles/rulesets@2025-04-15' existing = {
+  name: '${frontDoorProfileName}/${nextJsRuleSetName}'
 }
 
 /*
@@ -215,113 +171,5 @@ resource doNotServeCachedContentForNextJsPrefetchesRule 'Microsoft.Cdn/profiles/
       }
     ]
     matchProcessingBehavior: 'Continue'
-  }
-}
-
-resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
-  parent: endpoints
-  name: '${resourcePrefix}-${abbreviations.frontDoorRoutes}'
-  properties: {
-    cacheConfiguration: {
-      compressionSettings: {
-        isCompressionEnabled: true
-        contentTypesToCompress: [
-          // Below list generated by exporting new AFD route from Azure Portal
-          'application/eot'
-          'application/font'
-          'application/font-sfnt'
-          'application/javascript'
-          'application/json'
-          'application/opentype'
-          'application/otf'
-          'application/pkcs7-mime'
-          'application/truetype'
-          'application/ttf'
-          'application/vnd.ms-fontobject'
-          'application/xhtml+xml'
-          'application/xml'
-          'application/xml+rss'
-          'application/x-font-opentype'
-          'application/x-font-truetype'
-          'application/x-font-ttf'
-          'application/x-httpd-cgi'
-          'application/x-javascript'
-          'application/x-mpegurl'
-          'application/x-opentype'
-          'application/x-otf'
-          'application/x-perl'
-          'application/x-ttf'
-          'font/eot'
-          'font/ttf'
-          'font/otf'
-          'font/opentype'
-          'image/svg+xml'
-          'text/css'
-          'text/csv'
-          'text/html'
-          'text/javascript'
-          'text/js'
-          'text/plain'
-          'text/richtext'
-          'text/tab-separated-values'
-          'text/xml'
-          'text/x-script'
-          'text/x-component'
-          'text/x-java-source'
-
-          // Our additions
-          'font/woff'
-          'font/woff2'
-        ]
-      }
-      queryStringCachingBehavior: 'UseQueryString'
-    }
-    customDomains: [
-      {
-        id: certificateType == 'BringYourOwn' ? customDomainWithCertificate.id : customDomainWithoutCertificate.id
-      }
-    ]
-    originGroup: {
-      id: originGroup.id
-    }
-    ruleSets: [
-      {
-        id: nextJsRuleSet.id
-      }
-    ]
-    supportedProtocols: [
-      'Http'
-      'Https'
-    ]
-    patternsToMatch: [
-      '/*'
-    ]
-    forwardingProtocol: 'MatchRequest'
-    linkToDefaultDomain: 'Enabled'
-    httpsRedirect: 'Enabled'
-    enabledState: 'Enabled'
-  }
-  dependsOn: [
-    origin
-  ]
-}
-
-resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: 'afd-diagnostic-setting'
-  scope: frontDoor
-  properties: {
-    workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
   }
 }

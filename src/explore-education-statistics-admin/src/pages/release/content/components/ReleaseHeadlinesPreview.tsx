@@ -37,7 +37,6 @@ const ReleaseHeadlinesRedesign = ({
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
                 guidanceText={keyStat.guidanceText}
-                isRedesignStyle
               />
             );
           }
@@ -50,7 +49,6 @@ const ReleaseHeadlinesRedesign = ({
               trend={keyStat.trend}
               guidanceTitle={keyStat.guidanceTitle}
               guidanceText={keyStat.guidanceText}
-              isRedesignStyle
             />
           );
         })}

@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,7 @@ public class PublicationService(
     IReleaseVersionRepository releaseVersionRepository,
     IMethodologyService methodologyService,
     IPublicationCacheService publicationCacheService,
+    IPublicationsTreeService publicationsTreeService,
     IReleaseCacheService releaseCacheService,
     IMethodologyCacheService methodologyCacheService,
     IRedirectsCacheService redirectsCacheService,
@@ -240,7 +242,7 @@ public class PublicationService(
                 if (publication.Live)
                 {
                     await methodologyCacheService.UpdateSummariesTree();
-                    await publicationCacheService.UpdatePublicationTree();
+                    await publicationsTreeService.UpdateCachedPublicationsTree();
                     await publicationCacheService.UpdatePublication(publication.Slug);
 
                     if (slugChanged)

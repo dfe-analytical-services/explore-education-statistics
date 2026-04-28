@@ -79,6 +79,19 @@ type FileServiceMetric = {
     }[]?
 }
 
+type FrontDoorMetric = {
+  resourceType: 'Microsoft.Cdn/profiles'
+  metric:
+    | 'TotalLatency'
+    | 'OriginHealthPercentage'
+    | 'ByteHitRatio'
+    | 'Percentage4XX'
+    | 'Percentage5XX'
+    | 'RequestCount'
+    | 'WebApplicationFirewallCaptchaRequestCount'
+    | 'WebApplicationFirewallJsRequestCount'
+}
+
 type PostgreSqlMetric = {
   resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
   dimensions: {
@@ -140,6 +153,7 @@ type ResourceMetric =
   | ContainerAppMetric
   | EventGridCustomTopicMetric
   | FileServiceMetric
+  | FrontDoorMetric
   | PostgreSqlMetric
   | SearchServiceMetric
   | SiteMetric

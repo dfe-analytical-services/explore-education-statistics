@@ -536,6 +536,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
       },
       title: 'Test dataset 1',
       summary: '<p>Test dataset 1 summary</p>',
+      isApiEnabled: false,
     },
     {
       dataSetFileId: 'test-dataset-2-datasetfileid',
@@ -556,6 +557,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
       },
       title: 'Test dataset 2',
       summary: '<p>Test dataset 2 summary</p>',
+      isApiEnabled: false,
     },
   ],
   featuredTables: [

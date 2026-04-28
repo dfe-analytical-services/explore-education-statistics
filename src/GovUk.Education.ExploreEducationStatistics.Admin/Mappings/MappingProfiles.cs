@@ -3,9 +3,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -128,7 +129,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Status, m => m.MapFrom(upload => GetDataSetUploadStatus(upload.ScreenerResult)))
             .ForMember(
                 dest => dest.PublicApiCompatible,
-                m => m.MapFrom(upload => upload.ScreenerResult.PublicApiCompatible)
+                m => m.MapFrom(upload => upload.ScreenerResult != null && upload.ScreenerResult.PublicApiCompatible)
             )
             .ForMember(
                 dest => dest.DataFileSize,
@@ -141,14 +142,20 @@ public class MappingProfiles : CommonMappingProfile
 
         CreateMap<DataSetScreenerResponse, ScreenerResultViewModel>();
 
+        CreateMap<DataSetScreenerProgress, ScreenerProgressViewModel>();
+
         CreateMap<DataScreenerTestResult, ScreenerTestResultViewModel>()
             .ForMember(dest => dest.Result, m => m.MapFrom(upload => upload.Result.ToString()));
 
         CreateMap<DataSetUpload, DataSetScreenerRequest>()
             .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
+
+        CreateMap<DataSetUpload, DataSetStartScreeningRequest>()
+            .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles)
+            .ForMember(d => d.DataSetId, m => m.MapFrom(upload => upload.Id));
     }
 
-    private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
+    private static string GetDataSetUploadStatus(DataSetScreenerResponse? screenerResult)
     {
         if (screenerResult is null)
         {

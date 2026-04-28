@@ -57,6 +57,7 @@ Add data guidance to subjects and verify the expected variables are there
     ...    ${SUBJECT_1_NAME} Main guidance content
 
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}

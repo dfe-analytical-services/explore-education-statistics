@@ -7,7 +7,7 @@ public record PublicationInfoDto
 {
     public Guid? PublicationId { get; init; }
     public string? PublicationSlug { get; init; }
-    public ReleaseInfoDto? LatestPublishedRelease { get; init; }
+    public PublicationInfoReleaseDto? LatestPublishedRelease { get; init; }
 
     public PublicationInfo ToModel() =>
         IsValid
@@ -26,4 +26,10 @@ public record PublicationInfoDto
         !string.IsNullOrEmpty(PublicationSlug)
         && LatestPublishedRelease != null
         && !string.IsNullOrEmpty(LatestPublishedRelease.ReleaseSlug);
+}
+
+public record PublicationInfoReleaseDto
+{
+    public Guid? ReleaseId { get; init; }
+    public string? ReleaseSlug { get; init; }
 }

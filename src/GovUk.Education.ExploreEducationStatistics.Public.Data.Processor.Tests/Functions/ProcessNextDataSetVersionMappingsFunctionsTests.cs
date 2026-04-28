@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
 using Microsoft.EntityFrameworkCore;
+using IndicatorMapping = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMapping;
 
 #pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
@@ -548,8 +549,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 }
             );
 
-            // TODO EES-6993 - remove null-forgiving operator.
-            mapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+            mapping.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedIndicatorMappings,
                 ignoreCollectionOrders: true
             );
@@ -574,8 +574,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 elementSelector: indicator => new MappableIndicator { Label = indicator.Label }
             );
 
-            // TODO EES-6993 - remove null-forgiving operator.
-            mapping.IndicatorMappingPlan!.Candidates.AssertDeepEqualTo(
+            mapping.IndicatorMappingPlan.Candidates.AssertDeepEqualTo(
                 expectedIndicatorTargets,
                 ignoreCollectionOrders: true
             );
@@ -627,28 +626,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
 
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
-        }
-
-        [Fact]
-        public async Task Success_HasDeletedIndicators_MajorUpdate()
-        {
-            var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
-                Stage.PreviousStage()
-            );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(originalVersion.Id)
-                .WithTargetDataSetVersionId(nextVersion.Id)
-                .WithHasDeletedIndicators(true);
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ApplyAutoMappings(instanceId);
-
-            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
-
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
@@ -1166,50 +1143,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
         }
 
         [Fact]
-        public async Task Complete_HasDeletedIndicators_MajorUpdate()
-        {
-            var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
-                Stage.PreviousStage()
-            );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(originalVersion.Id)
-                .WithTargetDataSetVersionId(nextVersion.Id)
-                .WithLocationMappingPlan(
-                    DataFixture
-                        .DefaultLocationMappingPlan()
-                        .AddLevel(
-                            level: GeographicLevel.LocalAuthority,
-                            mappings: DataFixture
-                                .DefaultLocationLevelMappings()
-                                .AddMapping(
-                                    sourceKey: "location-1-key",
-                                    mapping: DataFixture
-                                        .DefaultLocationOptionMapping()
-                                        .WithSource(DataFixture.DefaultMappableLocationOption())
-                                        .WithNoMapping()
-                                )
-                                .AddCandidate(
-                                    targetKey: "location-1-key",
-                                    candidate: DataFixture.DefaultMappableLocationOption()
-                                )
-                        )
-                )
-                // Has deleted indicators that cannot be mapped
-                .WithHasDeletedIndicators(true);
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ApplyAutoMappings(instanceId);
-
-            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
-
-            // Is an exact match but as there are deleted indicators so needs to be a major update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
-        }
-
-        [Fact]
         public async Task Complete_HasDeletedGeographicLevels_MajorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
@@ -1422,7 +1355,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
 
             Assert.False(updatedMapping.FilterMappingsComplete);
 
-            // Some source filter options have no equivalent candidate to be mapped to, thus
+            // Some source filter options have not yet been mapped to equivalent candidates, thus
             // resulting in a major version update.
             await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
@@ -1547,7 +1480,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
 
             Assert.True(updatedMapping.FilterMappingsComplete);
 
-            // All source filter options have equivalent candidates to be mapped to, thus
+            // All source filter options have been mapped to equivalent candidates, thus
             // resulting in a minor version update.
             await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
@@ -1747,50 +1680,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
         }
 
         [Fact]
-        public async Task Complete_HasDeletedIndicators_MajorUpdate()
-        {
-            var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
-                Stage.PreviousStage()
-            );
-
-            DataSetVersionMapping mapping = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(originalVersion.Id)
-                .WithTargetDataSetVersionId(nextVersion.Id)
-                .WithFilterMappingPlan(
-                    DataFixture
-                        .DefaultFilterMappingPlan()
-                        .AddFilterMapping(
-                            "filter-1-key",
-                            DataFixture
-                                .DefaultFilterMapping()
-                                .WithNoMapping()
-                                .AddOptionMapping(
-                                    "filter-1-option-1-key",
-                                    DataFixture.DefaultFilterOptionMapping().WithNoMapping()
-                                )
-                        )
-                        .AddFilterCandidate(
-                            "filter-1-key",
-                            DataFixture
-                                .DefaultFilterMappingCandidate()
-                                .AddOptionCandidate("filter-1-option-1-key", DataFixture.DefaultMappableFilterOption())
-                        )
-                )
-                // Has deleted indicators that cannot be mapped
-                .WithHasDeletedIndicators(true);
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
-
-            await ApplyAutoMappings(instanceId);
-
-            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
-
-            // Is an exact match but as there are deleted indicators so needs to be a major update.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
-        }
-
-        [Fact]
         public async Task Complete_HasDeletedGeographicLevels_MajorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
@@ -1934,7 +1823,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
             {
                 {
                     "indicator_1",
-                    mapping.GetIndicatorMapping("indicator_1")! with
+                    mapping.GetIndicatorMapping("indicator_1") with
                     {
                         // The code did not manage to establish an automapping for this indicator.
                         Type = MappingType.AutoNone,
@@ -1943,7 +1832,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 },
                 {
                     "indicator_2",
-                    mapping.GetIndicatorMapping("indicator_2")! with
+                    mapping.GetIndicatorMapping("indicator_2") with
                     {
                         // The code managed to establish an automapping for this indicator.
                         Type = MappingType.AutoMapped,
@@ -1952,16 +1841,16 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 },
             };
 
-            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+            updatedMapping.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedIndicatorMappings,
                 ignoreCollectionOrders: true
             );
 
             Assert.False(updatedMapping.IndicatorMappingsComplete);
 
-            // Some source indicators have not yet been mapped but possible candidates exist, thus
-            // resulting in a minor version update for now.
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+            // Some source indicators have not yet been mapped to equivalent candidates, thus
+            // resulting in a major version update for now.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
@@ -2016,7 +1905,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
             {
                 {
                     "indicator_1",
-                    mapping.GetIndicatorMapping("indicator_1")! with
+                    mapping.GetIndicatorMapping("indicator_1") with
                     {
                         // The code managed to establish an automapping for this indicator.
                         Type = MappingType.AutoMapped,
@@ -2025,7 +1914,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 },
                 {
                     "indicator_2",
-                    mapping.GetIndicatorMapping("indicator_2")! with
+                    mapping.GetIndicatorMapping("indicator_2") with
                     {
                         // The code managed to establish an automapping for this indicator.
                         Type = MappingType.AutoMapped,
@@ -2034,7 +1923,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 },
             };
 
-            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+            updatedMapping.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedIndicatorMappings,
                 ignoreCollectionOrders: true
             );
@@ -2091,7 +1980,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
             {
                 {
                     "indicator_1",
-                    mapping.GetIndicatorMapping("indicator_1")! with
+                    mapping.GetIndicatorMapping("indicator_1") with
                     {
                         // The code managed to establish an automapping for this indicator.
                         Type = MappingType.AutoMapped,
@@ -2100,7 +1989,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
                 },
             };
 
-            updatedMapping.IndicatorMappingPlan!.Mappings.AssertDeepEqualTo(
+            updatedMapping.IndicatorMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedIndicatorMappings,
                 ignoreCollectionOrders: true
             );

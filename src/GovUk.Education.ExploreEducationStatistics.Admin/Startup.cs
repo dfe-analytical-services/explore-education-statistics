@@ -21,9 +21,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -47,6 +49,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -169,7 +172,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services
             .AddMvc(options =>
             {
-                options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
+                options.Filters.Add(new AuthorizeFilter(nameof(SecurityPolicies.RegisteredUser)));
                 options.Filters.Add(new OperationCancelledExceptionFilter());
                 options.Filters.Add(new ProblemDetailsResultFilter());
                 options.EnableEndpointRouting = false;
@@ -363,7 +366,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.Configure<AppOptions>(configuration.GetRequiredSection(AppOptions.Section));
         services.Configure<AppInsightsOptions>(configuration.GetSection(AppInsightsOptions.Section));
-        services.Configure<NotifyOptions>(configuration.GetSection(NotifyOptions.Section));
+        services.Configure<NotifyOptions>(configuration.GetRequiredSection(NotifyOptions.Section));
         services.Configure<PublicAppOptions>(configuration.GetRequiredSection(PublicAppOptions.Section));
         services.Configure<PublicDataProcessorOptions>(
             configuration.GetRequiredSection(PublicDataProcessorOptions.Section)
@@ -377,9 +380,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             configuration.GetSection(OpenIdConnectSpaClientOptions.Section)
         );
         services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-        services.Configure<DataScreenerClientOptions>(
-            configuration.GetRequiredSection(DataScreenerClientOptions.Section)
-        );
+        services.Configure<DataScreenerOptions>(configuration.GetRequiredSection(DataScreenerOptions.Section));
 
         StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -402,7 +403,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
         services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+        services.AddTransient<IPublicationsTreeService, PublicationsTreeService>();
         services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 
         // Content.Model repositories
@@ -419,6 +420,17 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
         services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
         services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
+        services.AddScoped<IDataSetScreenerService, DataSetScreenerService>();
+        services.AddKeyedSingleton<IQueueServiceClient>(
+            serviceKey: nameof(DataSetScreenerService),
+            implementationFactory: (serviceProvider, _) =>
+            {
+                var screenerOptions = serviceProvider.GetRequiredService<IOptions<DataScreenerOptions>>();
+                return screenerOptions.Value.EnhancedScreenerJourney
+                    ? new QueueServiceClient(screenerOptions.Value.ScreenerStorage)
+                    : new NoOpQueueServiceClient();
+            }
+        );
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseImageService, ReleaseImageService>();
@@ -469,6 +481,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReplacementService, ReplacementService>();
         services.AddTransient<IReplacementBatchService, ReplacementBatchService>();
         services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
+        services.AddTransient<IDataSetMappingService, DataSetMappingService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
         services.AddTransient<UserReleaseRoleQueryRepository>();
@@ -507,7 +520,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>(
             (provider, httpClient) =>
             {
-                var options = provider.GetRequiredService<IOptions<DataScreenerClientOptions>>();
+                var options = provider.GetRequiredService<IOptions<DataScreenerOptions>>();
                 httpClient.BaseAddress = new Uri(options.Value.Url);
             }
         );
@@ -1144,4 +1157,26 @@ internal class NoOpPublicDataApiClient : IPublicDataApiClient
         string queryBody,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
+}
+
+internal class NoOpQueueServiceClient : IQueueServiceClient
+{
+    public Task SendMessagesAsJson<T>(
+        string queueName,
+        IReadOnlyList<T> messages,
+        CancellationToken cancellationToken = default
+    )
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SendMessageAsJson<T>(string queueName, T message, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SendMessage(string queueName, string message, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }

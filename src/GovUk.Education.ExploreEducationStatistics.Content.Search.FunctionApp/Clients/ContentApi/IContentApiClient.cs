@@ -33,16 +33,13 @@ public interface IContentApiClient
     Task<PublicationInfo[]> GetPublicationsForTheme(Guid themeId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the releases for the specified publication.
+    /// Retrieves the published release id's for the specified publication.
     /// </summary>
     /// <param name="publicationSlug">the publication slug</param>
     /// <param name="cancellationToken">cancellation token</param>
-    /// <returns> An array of releases for the specified publication.</returns>
-    /// <exception cref="UnableToGetReleasesForPublicationException">Thrown if the call to the API was unsuccessful</exception>
-    Task<ReleaseInfo[]> GetReleasesForPublication(
-        string publicationSlug,
-        CancellationToken cancellationToken = default
-    );
+    /// <returns> An array of published release id's for the specified publication.</returns>
+    /// <exception cref="UnableToGetPublicationReleaseIdsException">Thrown if the call to the API was unsuccessful</exception>
+    Task<Guid[]> GetPublicationReleaseIds(string publicationSlug, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves a small amount of information for all live publications e.g. the publication id and slug
@@ -53,9 +50,13 @@ public interface IContentApiClient
     Task<PublicationInfo[]> GetAllLivePublicationInfos(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieve the Release Summary for the specified publication slug and release slug
+    /// Retrieve the latest published release version summary for the specified publication slug and release slug
     /// </summary>
-    Task<ReleaseSummary> GetReleaseSummary(
+    /// <param name="publicationSlug">the publication slug</param>
+    /// <param name="releaseSlug">the release slug</param>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns>The latest published release version summary for the specified publication slug and release slug</returns>
+    Task<ReleaseVersionSummary> GetReleaseVersionSummary(
         string publicationSlug,
         string releaseSlug,
         CancellationToken cancellationToken = default

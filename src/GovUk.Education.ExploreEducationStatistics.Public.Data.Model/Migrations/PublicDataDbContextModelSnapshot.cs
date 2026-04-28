@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.24")
+                .HasAnnotation("ProductVersion", "8.0.25")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -189,13 +189,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<bool>("HasDeletedGeographicLevels")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("HasDeletedIndicators")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("HasDeletedTimePeriods")
                         .HasColumnType("boolean");
 
                     b.Property<string>("IndicatorMappingPlan")
+                        .IsRequired()
                         .HasColumnType("jsonb");
 
                     b.Property<bool>("IndicatorMappingsComplete")

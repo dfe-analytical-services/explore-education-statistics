@@ -523,11 +523,11 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
 
             // Manually set the original "Enrolments" Indicator's candidate key to point to the
             // renamed "Enrolment numbers" Indicator.
-            mapping.IndicatorMappingPlan!.Mappings[originalIndicators[0].Column].CandidateKey = nextData
+            mapping.IndicatorMappingPlan.Mappings[originalIndicators[0].Column].CandidateKey = nextData
                 .ExpectedIndicators[0]
                 .Column;
 
-            foreach (var indicatorMapping in mapping.IndicatorMappingPlan!.Mappings.Values)
+            foreach (var indicatorMapping in mapping.IndicatorMappingPlan.Mappings.Values)
             {
                 indicatorMapping.Type = mappingType;
             }
@@ -594,9 +594,8 @@ public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFix
                     )
                 );
 
-            // TODO EES-6993 - remove null-forgiving operator.
             // Set a couple of the new data set version's Indicators to not be mapped to original Indicators.
-            foreach (var indicatorMapping in mapping.IndicatorMappingPlan!.Mappings.Values)
+            foreach (var indicatorMapping in mapping.IndicatorMappingPlan.Mappings.Values)
             {
                 indicatorMapping.Type = mappingType;
             }

@@ -1,5 +1,5 @@
 {
-  "num_datasets": "1072 data sets",
+  "num_datasets": "1078 data sets",
   "themes": [
     {
       "publications": [
@@ -89,6 +89,7 @@
         "Detailed destinations of 16 to 18 year olds in Further Education",
         "FE learners going into employment and learning destinations by local authority district",
         "Further education and skills",
+        "Further education college workforce using teacher pension data",
         "Further education workforce",
         "Skills Bootcamps starts",
         "Skills bootcamps starts, completions and outcomes",
@@ -180,7 +181,8 @@
         "Postgraduate initial teacher training targets",
         "School Leadership retention",
         "School workforce in England",
-        "Teacher and leader development: ECF and NPQs"
+        "Teacher and leader development: ECF and NPQs",
+        "Teacher demand and postgraduate trainee need"
       ],
       "theme_heading": "Teachers and school workforce"
     },

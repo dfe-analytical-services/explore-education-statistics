@@ -1,14 +1,12 @@
 import { useConfig } from '@admin/contexts/ConfigContext';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
-import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { toolbarConfigLinkOnly } from '@admin/config/ckEditorConfig';
+import { toolbarConfigWarningBlock } from '@admin/config/ckEditorConfig';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
-import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseContentAccordion from '@admin/pages/release/content/components/ReleaseContentAccordion';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
@@ -18,48 +16,24 @@ import ReleaseSummarySection from '@admin/pages/release/content/components/Relea
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import {
-  preReleaseAccessListRoute,
-  releaseDataGuidanceRoute,
-} from '@admin/routes/routes';
-import releaseFileService from '@admin/services/releaseFileService';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import RelatedContent from '@common/components/RelatedContent';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
-import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
-import getUrlAttributes from '@common/utils/url/getUrlAttributes';
-import getListStringSeparator from '@common/utils/string/getListStringSeparator';
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
-import { generatePath, useLocation } from 'react-router';
-import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
-interface MethodologyLink {
-  key: string;
-  title: string;
-  url: string;
-  external?: boolean;
-}
-
-const ReleaseContent = ({
+const ReleaseContentEdit = ({
   transformFeaturedTableLinks,
 }: {
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }) => {
   const { publicAppUrl } = useConfig();
-  const location = useLocation();
   const { setActiveSection, unsavedBlocks, unsavedCommentDeletions } =
     useEditingContext();
   const { release } = useReleaseContentState();
@@ -135,32 +109,6 @@ const ReleaseContent = ({
     rsi => rsi.isLegacyLink || rsi.description !== release.title,
   );
 
-  const allMethodologies = useMemo<MethodologyLink[]>(() => {
-    const methodologies = publication.methodologies.map(methodology => ({
-      key: methodology.id,
-      title: methodology.title,
-      url: `/methodology/${methodology.id}/summary`,
-      external: false,
-    }));
-
-    if (publication.externalMethodology) {
-      methodologies.push({
-        key: publication.externalMethodology.url,
-        title: publication.externalMethodology.title,
-        url: publication.externalMethodology.url,
-        external: true,
-      });
-    }
-
-    return methodologies;
-  }, [publication.externalMethodology, publication.methodologies]);
-
-  const hasAllFilesButton = release.downloadFiles.some(
-    file =>
-      file.type === 'Data' ||
-      (file.type === 'Ancillary' && file.name !== 'All files'),
-  );
-
   const [handleScroll] = useDebouncedCallback(() => {
     const sections = document.querySelectorAll('[data-scroll]');
 
@@ -227,38 +175,6 @@ const ReleaseContent = ({
                 {getReleaseApprovalStatusLabel(release.approvalStatus)}
               </Tag>
             }
-            renderSubscribeLink={
-              <a
-                className="govuk-!-display-none-print govuk-!-font-weight-bold"
-                href="#"
-              >
-                Sign up for email alerts
-              </a>
-            }
-            renderProducerLink={
-              release.publishingOrganisations?.length ? (
-                <span>
-                  {release.publishingOrganisations.map((org, index) => (
-                    <Fragment key={org.id}>
-                      {getListStringSeparator(
-                        release.publishingOrganisations ?? [],
-                        index,
-                      )}
-                      <Link unvisited to={org.url}>
-                        {org.title}
-                      </Link>
-                    </Fragment>
-                  ))}
-                </span>
-              ) : (
-                <Link
-                  unvisited
-                  to="https://www.gov.uk/government/organisations/department-for-education"
-                >
-                  Department for Education
-                </Link>
-              )
-            }
             trackScroll
           />
           <div id="releaseWarning" data-testid="release-warning">
@@ -282,7 +198,7 @@ const ReleaseContent = ({
                   }
                   sectionId={release.warningSection.id}
                   sectionKey="warningSection"
-                  toolbarConfig={toolbarConfigLinkOnly}
+                  toolbarConfig={toolbarConfigWarningBlock}
                   onAfterDeleteBlock={onAfterDeleteWarningBlock}
                 />
               )}
@@ -384,19 +300,6 @@ const ReleaseContent = ({
               data-testid="quick-links"
             >
               <ul className="govuk-list">
-                {hasAllFilesButton && (
-                  <li>
-                    <Button
-                      className="govuk-!-margin-bottom-3"
-                      preventDoubleClick
-                      onClick={() =>
-                        releaseFileService.downloadFilesAsZip(release.id)
-                      }
-                    >
-                      Download all data (ZIP)
-                    </Button>
-                  </li>
-                )}
                 {!!release.relatedDashboardsSection?.content.length && (
                   <li>
                     <a href="#related-dashboards">View related dashboard(s)</a>
@@ -405,62 +308,8 @@ const ReleaseContent = ({
                 <li>
                   <a href="#releaseMainContent">Release contents</a>
                 </li>
-                <li>
-                  <a href="#explore-data-and-files">Explore data</a>
-                </li>
-                <li>
-                  <a href="#help-and-support">Help and support</a>
-                </li>
               </ul>
             </nav>
-
-            <h3 className="govuk-heading-s">Related information</h3>
-            <ul className="govuk-list" data-testid="related-information">
-              <li>
-                <Link
-                  to={{
-                    pathname: generatePath<ReleaseRouteParams>(
-                      releaseDataGuidanceRoute.path,
-                      {
-                        publicationId: release.publication.id,
-                        releaseVersionId: release.id,
-                      },
-                    ),
-                    state: {
-                      backLink: location.pathname,
-                    },
-                  }}
-                >
-                  Data guidance
-                </Link>
-              </li>
-
-              {release.hasPreReleaseAccessList && (
-                <li>
-                  <Link
-                    to={{
-                      pathname: generatePath<ReleaseRouteParams>(
-                        preReleaseAccessListRoute.path,
-                        {
-                          publicationId: release.publication.id,
-                          releaseVersionId: release.id,
-                        },
-                      ),
-                      state: {
-                        backLink: location.pathname,
-                      },
-                    }}
-                  >
-                    Pre-release access list
-                  </Link>
-                </li>
-              )}
-              <li>
-                <a href="#contact-us">
-                  Contact us<VisuallyHidden> about this release</VisuallyHidden>
-                </a>
-              </li>
-            </ul>
 
             {!!releaseSeries.length && (
               <>
@@ -508,23 +357,6 @@ const ReleaseContent = ({
               </>
             )}
 
-            {allMethodologies.length > 0 && (
-              <>
-                <h3
-                  className="govuk-heading-s govuk-!-padding-top-0"
-                  id="methodologies"
-                >
-                  Methodologies
-                </h3>
-                <ul className="govuk-list" data-testid="methodologies-list">
-                  {allMethodologies.map(methodology => (
-                    <li key={methodology.key}>
-                      <a>{methodology.title}</a>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
             <RelatedPagesSection release={release} />
           </RelatedContent>
         </div>
@@ -537,61 +369,24 @@ const ReleaseContent = ({
         transformFeaturedTableLinks={transformFeaturedTableLinks}
       />
 
-      {(release.downloadFiles ||
-        release.hasPreReleaseAccessList ||
-        !!release.relatedDashboardsSection?.content.length) && (
-        <ReleaseDataAndFiles
-          downloadFiles={release.downloadFiles}
-          hasDataGuidance={release.hasDataGuidance}
-          headingClassName="govuk-heading-l"
-          renderAllFilesLink={
-            <ButtonText
-              preventDoubleClick
-              onClick={() => releaseFileService.downloadFilesAsZip(release.id)}
+      <div>
+        <h2 className="govuk-heading-l" id="data-dashboards">
+          Data dashboards
+        </h2>
+        <p>
+          Related dashboards will appear in the 'Explore and download data' tab
+          of the release page.
+        </p>
+        {release.relatedDashboardsSection?.content.length ? (
+          <Accordion
+            id="data-accordion"
+            showOpenAll={false}
+            onSectionOpen={({ id }) => setActiveSection(id)}
+          >
+            <AccordionSection
+              id="related-dashboards"
+              heading="View related dashboard(s)"
             >
-              Download all data (ZIP)
-            </ButtonText>
-          }
-          renderDownloadLink={file => (
-            <ButtonText
-              onClick={() =>
-                downloadReleaseFileSecurely({
-                  releaseVersionId: release.id,
-                  fileId: file.id,
-                  fileName: file.fileName,
-                })
-              }
-            >
-              {`${file.name} (${file.extension}, ${file.size})`}
-            </ButtonText>
-          )}
-          renderDataGuidanceLink={
-            <Link
-              to={{
-                pathname: generatePath<ReleaseRouteParams>(
-                  releaseDataGuidanceRoute.path,
-                  {
-                    publicationId: release.publication.id,
-                    releaseVersionId: release.id,
-                  },
-                ),
-                state: {
-                  backLink: location.pathname,
-                },
-              }}
-            >
-              Data guidance
-            </Link>
-          }
-          renderDataCatalogueLink={
-            <span>Data catalogue (public site only)</span>
-          }
-          renderCreateTablesLink={
-            <span>View or create your own tables (public site only)</span>
-          }
-          showDownloadFilesList
-          renderRelatedDashboards={
-            release.relatedDashboardsSection?.content.length ? (
               <EditableSectionBlocks
                 blocks={release.relatedDashboardsSection.content}
                 renderBlock={block => (
@@ -610,19 +405,18 @@ const ReleaseContent = ({
                   />
                 )}
               />
-            ) : null
-          }
-          trackScroll
-          onSectionOpen={({ id }) => setActiveSection(id)}
-        />
-      )}
-      {!release.relatedDashboardsSection?.content.length && (
-        <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-          <Button onClick={addRelatedDashboardsBlock}>
-            Add dashboards section
-          </Button>
-        </div>
-      )}
+            </AccordionSection>
+          </Accordion>
+        ) : null}
+
+        {!release.relatedDashboardsSection?.content.length && (
+          <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+            <Button onClick={addRelatedDashboardsBlock}>
+              Add dashboards section
+            </Button>
+          </div>
+        )}
+      </div>
 
       <ReleaseContentAccordion
         release={release}
@@ -630,33 +424,8 @@ const ReleaseContent = ({
         transformFeaturedTableLinks={transformFeaturedTableLinks}
         onSectionOpen={({ id }) => setActiveSection(id)}
       />
-
-      <ReleaseHelpAndSupportSection
-        publication={release.publication}
-        publishingOrganisations={release.publishingOrganisations}
-        releaseType={release.type}
-        renderExternalMethodologyLink={externalMethodology => {
-          const externalMethodologyAttributes = getUrlAttributes(
-            externalMethodology.url,
-          );
-          return (
-            <Link
-              to={externalMethodology.url}
-              rel={`noopener noreferrer nofollow ${
-                !externalMethodologyAttributes?.isTrusted ? 'external' : ''
-              }`}
-              target="_blank"
-            >
-              {externalMethodology.title} (opens in new tab)
-            </Link>
-          );
-        }}
-        renderMethodologyLink={methodology => <a>{`${methodology.title}`}</a>}
-        trackScroll
-      />
-      <PrintThisPage />
     </>
   );
 };
 
-export default ReleaseContent;
+export default ReleaseContentEdit;

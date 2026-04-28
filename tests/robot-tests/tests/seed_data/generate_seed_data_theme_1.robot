@@ -96,7 +96,7 @@ Add data guidance to ${RELEASE_1_NAME}
     user adds data guidance for subject    Absence by characteristic    Absence by characteristic data guidance content
     user adds data guidance for subject    Absence in PRUs    Absence in PRUs data guidance content
     user clicks button    Save guidance
-    user waits until page finishes loading
+    user waits until page contains button    Edit guidance
 
 Create data block 1 for ${RELEASE_1_NAME}
     @{locations}=    create list    England
@@ -560,7 +560,7 @@ Add data guidance to ${RELEASE_2_NAME}
     user adds data guidance for subject    Exclusions by geographic level
     ...    Exclusions by geographic level data guidance content
     user clicks button    Save guidance
-    user waits until page finishes loading
+    user waits until page contains button    Edit guidance
 
 Create data block 1 for ${RELEASE_2_NAME}
     @{locations}=    create list    England

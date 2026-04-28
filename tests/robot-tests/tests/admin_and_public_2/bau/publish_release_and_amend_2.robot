@@ -51,6 +51,7 @@ Add data guidance to second Subject
     user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
     ...    data guidance content
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user waits until page contains accordion section    ${SECOND_SUBJECT}
 
@@ -392,6 +393,7 @@ Add data guidance to third subject
     user clicks link    Data guidance
     user enters text into data guidance data file content editor    ${THIRD_SUBJECT}    meta content
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Navigate to 'Footnotes' Tab
     user clicks link    Footnotes

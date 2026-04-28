@@ -2,54 +2,9 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer');
 const path = require('path');
 
-const defaultPublicSiteCacheMaxAgeSeconds = process.env
-  .DEFAULT_CACHE_MAX_AGE_SECONDS
-  ? Number(process.env.DEFAULT_CACHE_MAX_AGE_SECONDS)
-  : 30;
-
-const defaultCacheControlHeaders = `public, max-age=0, s-maxage=${defaultPublicSiteCacheMaxAgeSeconds}, stale-while-revalidate=30`;
-
 /**
  * @type {import('next').NextConfig}
  */
-
-const assetHeaders = [
-  {
-    key: 'Cache-Control',
-    value: 'public, max-age=31536000, immutable',
-  },
-];
-
-const metaHeaders = [
-  {
-    key: 'Cache-Control',
-    value: 'public, max-age=3600',
-  },
-];
-
-const generalHeaders = [
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
-  },
-];
-
-let generalCacheControlValue;
-switch (process.env.NODE_ENV) {
-  case 'production':
-    // for all environments, not just production! - see where NODE_ENV is set in ARM template
-    generalCacheControlValue = defaultCacheControlHeaders;
-    break;
-  default:
-    // for hotreload when running locally
-    generalCacheControlValue = 'no-store, no-cache, must-revalidate';
-    break;
-}
-
-generalHeaders.push({
-  key: 'Cache-Control',
-  value: generalCacheControlValue,
-});
 
 const nextConfig = {
   compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
@@ -75,43 +30,7 @@ const nextConfig = {
     AZURE_SEARCH_QUERY_KEY: process.env.AZURE_SEARCH_QUERY_KEY,
     AZURE_SEARCH_ENDPOINT: process.env.AZURE_SEARCH_ENDPOINT,
     AZURE_SEARCH_INDEX: process.env.AZURE_SEARCH_INDEX,
-  },
-  async headers() {
-    return [
-      // general case
-      {
-        // use next.js defaults for /_next/*
-        source: '/((?!_next/).*)',
-        headers: generalHeaders,
-      },
-      // specific cases (that override the general case headers)
-      {
-        source: '/api/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate',
-          },
-        ],
-      },
-      {
-        source: '/api/assets/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400', // 1 day
-          },
-        ],
-      },
-      {
-        source: '/:file(favicon.svg|manifest.json)',
-        headers: metaHeaders,
-      },
-      {
-        source: '/assets/:path*',
-        headers: assetHeaders,
-      },
-    ];
+    DEFAULT_CACHE_MAX_AGE_SECONDS: process.env.DEFAULT_CACHE_MAX_AGE_SECONDS,
   },
   async redirects() {
     return [

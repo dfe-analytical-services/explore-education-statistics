@@ -3,13 +3,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
@@ -140,183 +138,6 @@ public class PublicationCacheServiceTests
     }
 
     [Fact]
-    public async Task GetPublicationTree_NoCachedTreeExists()
-    {
-        var publicationTree = ListOf(
-            new PublicationTreeThemeViewModel
-            {
-                Title = "Theme A",
-                Publications = ListOf(
-                    new PublicationTreePublicationViewModel { Title = "Publication A", AnyLiveReleaseHasData = true }
-                ),
-            }
-        );
-
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
-            .ReturnsAsync((object?)null);
-
-        var publicationService = new Mock<IPublicationService>(Strict);
-
-        publicationService.Setup(s => s.GetPublicationTree()).ReturnsAsync(publicationTree);
-
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(), publicationTree))
-            .Returns(Task.CompletedTask);
-
-        var service = BuildService(publicationService.Object, publicBlobCacheService: publicBlobCacheService.Object);
-
-        var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
-
-        VerifyAllMocks(publicBlobCacheService);
-
-        var filteredTree = result.AssertRight();
-        filteredTree.AssertDeepEqualTo(publicationTree);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_CachedTreeExists()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel { Title = "Publication A", AnyLiveReleaseHasData = true }
-            ),
-        };
-
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
-            .ReturnsAsync(ListOf(publicationTree));
-
-        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
-
-        var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
-
-        VerifyAllMocks(publicBlobCacheService);
-
-        var filteredTree = result.AssertRight();
-        filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_DataCatalogue_SomeLiveReleaseHasData_Included()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel { Title = "Publication A", AnyLiveReleaseHasData = true }
-            ),
-        };
-
-        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataCatalogue);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_DataCatalogue_NoLiveReleaseHasData_Excluded()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel { Title = "Publication A", AnyLiveReleaseHasData = false }
-            ),
-        };
-
-        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataCatalogue);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_DataTables_NonSupersededPublicationWithDataOnLatestRelease_Included()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel
-                {
-                    Title = "Publication A",
-                    IsSuperseded = false,
-                    LatestReleaseHasData = true,
-                }
-            ),
-        };
-
-        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_DataTables_SupersededPublicationWithDataOnLatestRelease_Included()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel
-                {
-                    Title = "Publication A",
-                    IsSuperseded = true,
-                    LatestReleaseHasData = true,
-                }
-            ),
-        };
-
-        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_DataTables_NonSupersededPublicationWithNoDataOnLatestRelease_Excluded()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel
-                {
-                    Title = "Publication A",
-                    IsSuperseded = false,
-                    LatestReleaseHasData = false,
-                }
-            ),
-        };
-
-        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataTables);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_FastTrack_SomeLiveReleaseHasData_Included()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel { Title = "Publication A", AnyLiveReleaseHasData = true }
-            ),
-        };
-
-        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FastTrack);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_FastTrack_NoLiveReleaseHasData_Excluded()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Publications = ListOf(
-                new PublicationTreePublicationViewModel { Title = "Publication A", AnyLiveReleaseHasData = false }
-            ),
-        };
-
-        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FastTrack);
-    }
-
-    [Fact]
     public async Task UpdatePublication()
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);
@@ -346,90 +167,10 @@ public class PublicationCacheServiceTests
     }
 
     [Fact]
-    public async Task UpdatePublicationTree()
-    {
-        var publicationTree = ListOf(new PublicationTreeThemeViewModel { Title = "Theme A" });
-
-        var publicationService = new Mock<IPublicationService>(Strict);
-
-        publicationService.Setup(s => s.GetPublicationTree()).ReturnsAsync(publicationTree);
-
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
-        // of the latest tree and then it being cached.
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(), publicationTree))
-            .Returns(Task.CompletedTask);
-
-        var service = BuildService(publicationService.Object, publicBlobCacheService: publicBlobCacheService.Object);
-
-        var filteredTree = await service.UpdatePublicationTree();
-
-        VerifyAllMocks(publicBlobCacheService);
-
-        publicationTree.AssertDeepEqualTo(filteredTree);
-    }
-
-    [Fact]
     public void PublicationCacheViewModel_SerializeAndDeserialize()
     {
         var converted = DeserializeObject<PublicationCacheViewModel>(SerializeObject(_publicationViewModel));
         converted.AssertDeepEqualTo(_publicationViewModel);
-    }
-
-    [Fact]
-    public void PublicationTree_SerializeAndDeserialize()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Publications = new List<PublicationTreePublicationViewModel> { new() },
-        };
-
-        var converted = DeserializeObject<PublicationTreeThemeViewModel>(SerializeObject(publicationTree));
-        converted.AssertDeepEqualTo(publicationTree);
-    }
-
-    private async Task AssertPublicationTreeUnfiltered(
-        PublicationTreeThemeViewModel publicationTree,
-        PublicationTreeFilter filter
-    )
-    {
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
-            .ReturnsAsync(ListOf(publicationTree));
-
-        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
-
-        var result = await service.GetPublicationTree(filter);
-
-        VerifyAllMocks(publicBlobCacheService);
-
-        var filteredTree = result.AssertRight();
-        filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
-    }
-
-    private async Task AssertPublicationTreeEmpty(
-        PublicationTreeThemeViewModel publicationTree,
-        PublicationTreeFilter filter
-    )
-    {
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
-            .ReturnsAsync(ListOf(publicationTree));
-
-        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
-
-        var result = await service.GetPublicationTree(filter);
-
-        VerifyAllMocks(publicBlobCacheService);
-
-        var filteredTree = result.AssertRight();
-        Assert.Empty(filteredTree);
     }
 
     private static PublicationCacheService BuildService(

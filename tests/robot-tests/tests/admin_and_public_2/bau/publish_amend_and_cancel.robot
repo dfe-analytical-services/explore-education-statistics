@@ -31,16 +31,8 @@ Upload subject
     user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
 
 Add data guidance
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    Dates test subject
-
-    user enters text into data guidance data file content editor    Dates test subject
+    user navigates to Data Guidance page and adds data guidance for subject    Dates test subject
     ...    Dates test subject test data guidance content
-    user clicks button    Save guidance
 
 Add ancillary file
     user clicks link    Supporting file uploads

@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -934,9 +935,9 @@ public class PublicationServiceTests
             Assert.Empty(publicationRedirects);
         }
 
-        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationTree();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationEntry("new-title");
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
         AssertOnPublicationChangedEventsNotRaised();
     }
 
@@ -1044,9 +1045,9 @@ public class PublicationServiceTests
             AssertOnPublicationChangedEventRaised(updatedPublication);
         }
 
-        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationTree();
         _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationEntry("new-title");
         _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
     }
 
     [Theory]
@@ -1260,6 +1261,7 @@ public class PublicationServiceTests
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationsTreeService = new Mock<IPublicationsTreeService>(Strict);
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
             methodologyService
@@ -1282,9 +1284,9 @@ public class PublicationServiceTests
                 .Setup(mock => mock.UpdatePublication("new-title"))
                 .ReturnsAsync(new PublicationCacheViewModel());
 
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
+            publicationsTreeService
+                .Setup(mock => mock.UpdateCachedPublicationsTree(It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
 
             publicationCacheService.Setup(mock => mock.RemovePublication("old-title")).ReturnsAsync(Unit.Instance);
 
@@ -1302,6 +1304,7 @@ public class PublicationServiceTests
                 context,
                 methodologyService: methodologyService.Object,
                 publicationCacheService: publicationCacheService.Object,
+                publicationsTreeService: publicationsTreeService.Object,
                 methodologyCacheService: methodologyCacheService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
@@ -1317,7 +1320,12 @@ public class PublicationServiceTests
                 }
             );
 
-            VerifyAllMocks(methodologyService, methodologyCacheService, publicationCacheService);
+            VerifyAllMocks(
+                methodologyService,
+                methodologyCacheService,
+                publicationCacheService,
+                publicationsTreeService
+            );
 
             var viewModel = result.AssertRight();
 
@@ -1448,6 +1456,7 @@ public class PublicationServiceTests
         {
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationsTreeService = new Mock<IPublicationsTreeService>(Strict);
 
             publicationCacheService
                 .Setup(mock => mock.UpdatePublication(publication.Slug))
@@ -1461,9 +1470,9 @@ public class PublicationServiceTests
                 .Setup(mock => mock.UpdatePublication(supersededPublication2.Slug))
                 .ReturnsAsync(new PublicationCacheViewModel());
 
-            publicationCacheService
-                .Setup(mock => mock.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
+            publicationsTreeService
+                .Setup(mock => mock.UpdateCachedPublicationsTree(It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
 
             methodologyCacheService
                 .Setup(mock => mock.UpdateSummariesTree())
@@ -1476,6 +1485,7 @@ public class PublicationServiceTests
             var publicationService = BuildPublicationService(
                 context,
                 publicationCacheService: publicationCacheService.Object,
+                publicationsTreeService: publicationsTreeService.Object,
                 methodologyCacheService: methodologyCacheService.Object
             );
 
@@ -1489,7 +1499,12 @@ public class PublicationServiceTests
                 }
             );
 
-            VerifyAllMocks(methodologyCacheService, publicationCacheService, publicationCacheService);
+            VerifyAllMocks(
+                methodologyCacheService,
+                publicationCacheService,
+                publicationCacheService,
+                publicationsTreeService
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal(publication.Id, viewModel.Id);
@@ -1561,9 +1576,6 @@ public class PublicationServiceTests
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
             methodologyService
-                .Setup(mock => mock.ValidateMethodologySlug("new-title", null, null))
-                .ReturnsAsync(Unit.Instance);
-            methodologyService
                 .Setup(mock =>
                     mock.PublicationTitleOrSlugChanged(publication.Id, "current-title", "New title", "new-title")
                 )
@@ -1580,12 +1592,14 @@ public class PublicationServiceTests
 
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
             publicationCacheService
-                .Setup(mock => mock.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-            publicationCacheService
                 .Setup(mock => mock.UpdatePublication("new-title"))
                 .ReturnsAsync(new PublicationCacheViewModel());
             publicationCacheService.Setup(mock => mock.RemovePublication("current-title")).ReturnsAsync(Unit.Instance);
+
+            var publicationsTreeService = new Mock<IPublicationsTreeService>(Strict);
+            publicationsTreeService
+                .Setup(mock => mock.UpdateCachedPublicationsTree(It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
 
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
@@ -1603,12 +1617,21 @@ public class PublicationServiceTests
                 methodologyService: methodologyService.Object,
                 methodologyCacheService: methodologyCacheService.Object,
                 publicationCacheService: publicationCacheService.Object,
+                publicationsTreeService: publicationsTreeService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
 
             var result = await publicationService.UpdatePublication(
                 publication.Id,
                 new PublicationSaveRequest { Title = "New title", ThemeId = theme.Id }
+            );
+
+            VerifyAllMocks(
+                methodologyService,
+                methodologyCacheService,
+                publicationCacheService,
+                publicationsTreeService,
+                redirectsCacheService
             );
 
             var viewModel = result.AssertRight();
@@ -1658,9 +1681,6 @@ public class PublicationServiceTests
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
             methodologyService
-                .Setup(mock => mock.ValidateMethodologySlug("older-title", null, null))
-                .ReturnsAsync(Unit.Instance);
-            methodologyService
                 .Setup(mock =>
                     mock.PublicationTitleOrSlugChanged(publication.Id, "title", "Older title", "older-title")
                 )
@@ -1677,12 +1697,14 @@ public class PublicationServiceTests
 
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
             publicationCacheService
-                .Setup(mock => mock.UpdatePublicationTree())
-                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-            publicationCacheService
                 .Setup(mock => mock.UpdatePublication("older-title"))
                 .ReturnsAsync(new PublicationCacheViewModel());
             publicationCacheService.Setup(mock => mock.RemovePublication("title")).ReturnsAsync(Unit.Instance);
+
+            var publicationTreeService = new Mock<IPublicationsTreeService>(Strict);
+            publicationTreeService
+                .Setup(mock => mock.UpdateCachedPublicationsTree(It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
 
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
@@ -1700,12 +1722,21 @@ public class PublicationServiceTests
                 methodologyService: methodologyService.Object,
                 methodologyCacheService: methodologyCacheService.Object,
                 publicationCacheService: publicationCacheService.Object,
+                publicationsTreeService: publicationTreeService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
 
             var result = await publicationService.UpdatePublication(
                 publication.Id,
                 new PublicationSaveRequest { Title = "Older title", ThemeId = theme.Id }
+            );
+
+            VerifyAllMocks(
+                methodologyService,
+                methodologyCacheService,
+                publicationCacheService,
+                publicationTreeService,
+                redirectsCacheService
             );
 
             var viewModel = result.AssertRight();
@@ -3487,22 +3518,22 @@ public class PublicationServiceTests
         IReleaseVersionRepository? releaseVersionRepository = null,
         IMethodologyService? methodologyService = null,
         IPublicationCacheService? publicationCacheService = null,
+        IPublicationsTreeService? publicationsTreeService = null,
         IReleaseCacheService? releaseCacheService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null
     )
     {
-        publicationRepository ??= CreatePublicationRepository(context, publicationRepository);
-
         return new(
             context,
             AdminMapper(),
             new PersistenceHelper<ContentDbContext>(context),
             userService ?? AlwaysTrueUserService().Object,
-            publicationRepository,
+            publicationRepository ?? CreatePublicationRepository(context),
             releaseVersionRepository ?? new ReleaseVersionRepository(context),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),
+            publicationsTreeService ?? _publicationsTreeServiceMockBuilder.Build(),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
@@ -3510,10 +3541,7 @@ public class PublicationServiceTests
         );
     }
 
-    private static PublicationRepository CreatePublicationRepository(
-        ContentDbContext context,
-        IPublicationRepository? publicationRepository
-    )
+    private static PublicationRepository CreatePublicationRepository(ContentDbContext context)
     {
         var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
             context
@@ -3528,6 +3556,7 @@ public class PublicationServiceTests
 
     private readonly AdminEventRaiserMockBuilder _adminEventRaiserMockBuilder = new();
     private readonly PublicationCacheServiceMockBuilder _publicationCacheServiceMockBuilder = new();
+    private readonly PublicationsTreeServiceMockBuilder _publicationsTreeServiceMockBuilder = new();
 
     private void AssertOnPublicationArchivedEventRaised(Publication publication) =>
         _adminEventRaiserMockBuilder.Assert.OnPublicationArchivedWasRaised(

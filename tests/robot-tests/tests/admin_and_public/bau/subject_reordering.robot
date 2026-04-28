@@ -181,6 +181,7 @@ Add data guidance for all subjects
     ...    Four guidance content
 
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}

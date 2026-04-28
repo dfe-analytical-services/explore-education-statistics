@@ -163,9 +163,18 @@ Validate checklist errors and warnings after adding content to text blocks
 
 Resolve comment
     user clicks link    Content
-    user opens accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${accordion}    user opens accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user clicks button    View comments
+
+    user checks list has x items    testid:comments-unresolved    1    ${accordion}
+
     user clicks button    Resolve
+
+    user waits until parent contains element
+    ...    ${accordion}
+    ...    testid:Expand Details Section Resolved comments (1)
+    ...    10
+
     user clicks button    Save & close
 
 Submit release for Higher Review
@@ -384,17 +393,13 @@ Navigate to data upload and confirm data replacement
     user clicks link    Data and files
     user waits until page contains element    testid:Data file replacements table
     user clicks button    Confirm replacement
+    user waits until page contains data uploads table
 
-Upload the larger data file via data upload
-    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
-    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
-
-    user uploads subject    ${SUBJECT_NAME}-updated    large-data-set.csv    large-data-set.meta.csv    Complete
+Upload the larger data file via data upload and start it importing
+    user uploads subject    ${SUBJECT_NAME}-updated    large-data-set.csv    large-data-set.meta.csv    Pending review
+    user confirms upload to complete import    ${SUBJECT_NAME}-updated    WAIT_FOR_IMPORT_TO_COMPLETE=False
 
 Validate checklist errors (3rd release)
-    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
-    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
-
     user clicks link    Publishing checklist
 
     user checks checklist errors contains
@@ -421,9 +426,6 @@ Add data guidance to subject
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
     ...    ${SUBJECT_NAME} Main guidance content
 
-    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
-    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
-
     user waits until page contains accordion section    ${SUBJECT_NAME}-updated
 
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}-updated
@@ -431,15 +433,12 @@ Add data guidance to subject
 
 Save data guidance (third release)
     user clicks button    Save guidance
-    user waits for caches to expire    #prevent intermittent failure in pipeline - data guidance to be saved    before navigating to content page
+    user waits until page contains button    Edit guidance
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
-
-    # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
-    Skip    Skipping until the "large-data-set.csv" is compatible with screener.
     user waits until data upload is completed    ${SUBJECT_NAME}-updated
 
 Publish the release immediately

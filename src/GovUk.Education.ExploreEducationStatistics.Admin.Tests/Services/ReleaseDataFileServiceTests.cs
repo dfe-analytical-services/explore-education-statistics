@@ -1,8 +1,10 @@
 #nullable enable
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -1005,27 +1007,27 @@ public class ReleaseDataFileServiceTests
         var releaseMetaFile1 = new ReleaseFile
         {
             ReleaseVersion = releaseDataFile1.ReleaseVersion,
-            File = new File { Type = FileType.Metadata },
+            File = new File { Type = Metadata },
         };
         var releaseMetaFile2 = new ReleaseFile
         {
             ReleaseVersion = releaseDataFile2.ReleaseVersion,
-            File = new File { Type = FileType.Metadata },
+            File = new File { Type = Metadata },
         };
         var releaseMetaFile3 = new ReleaseFile
         {
             ReleaseVersion = releaseDataFile3.ReleaseVersion,
-            File = new File { Type = FileType.Metadata },
+            File = new File { Type = Metadata },
         };
         var releaseMetaFile4 = new ReleaseFile
         {
             ReleaseVersion = releaseDataFile4.ReleaseVersion,
-            File = new File { Type = FileType.Metadata },
+            File = new File { Type = Metadata },
         };
         var releaseMetaFile5 = new ReleaseFile
         {
             ReleaseVersion = releaseDataFile5.ReleaseVersion,
-            File = new File { Type = FileType.Metadata },
+            File = new File { Type = Metadata },
         };
 
         var dataImports = new List<DataImport>
@@ -1732,7 +1734,7 @@ public class ReleaseDataFileServiceTests
 
         var dataFile = _fixture.DefaultFile().WithType(FileType.Data).Generate();
 
-        var metaFile = _fixture.DefaultFile().WithType(FileType.Metadata).Generate();
+        var metaFile = _fixture.DefaultFile().WithType(Metadata).Generate();
 
         var dataSetUpload = new DataSetUploadMockBuilder()
             .WithReleaseVersionId(releaseVersion.Id)
@@ -1804,7 +1806,7 @@ public class ReleaseDataFileServiceTests
 
         var dataFile = _fixture.DefaultFile().WithType(FileType.Data).Generate();
 
-        var metaFile = _fixture.DefaultFile().WithType(FileType.Metadata).Generate();
+        var metaFile = _fixture.DefaultFile().WithType(Metadata).Generate();
 
         var dataSetUpload = new DataSetUploadMockBuilder()
             .WithReleaseVersionId(releaseVersion.Id)
@@ -1873,7 +1875,7 @@ public class ReleaseDataFileServiceTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
         var dataFile = _fixture.DefaultFile().WithType(FileType.Data).Generate();
-        var metaFile = _fixture.DefaultFile().WithType(FileType.Metadata).Generate();
+        var metaFile = _fixture.DefaultFile().WithType(Metadata).Generate();
 
         var dataSetUpload = new DataSetUploadMockBuilder()
             .WithReleaseVersionId(releaseVersion.Id)
@@ -1950,7 +1952,7 @@ public class ReleaseDataFileServiceTests
         IDataSetFileStorage? dataSetFileStorage = null,
         IDataBlockService? dataBlockService = null,
         IFootnoteRepository? footnoteRepository = null,
-        IDataSetScreenerClient? dataSetScreenerClient = null,
+        IDataSetScreenerService? dataSetScreenerService = null,
         IReplacementPlanService? replacementPlanService = null,
         IMapper? mapper = null
     )
@@ -1971,9 +1973,10 @@ public class ReleaseDataFileServiceTests
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
-            dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(Strict),
+            dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(Strict),
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),
-            mapper ?? Mock.Of<IMapper>(Strict)
+            mapper ?? Mock.Of<IMapper>(Strict),
+            new DataScreenerOptions().ToOptionsWrapper()
         );
     }
 }

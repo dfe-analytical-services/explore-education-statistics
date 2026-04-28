@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSearchDocumentChecker(this IServiceCollection serviceCollection) =>
         serviceCollection
             .AddTransient<SearchableDocumentChecker>()
-            .AddTransient<IReleaseSummaryRetriever, ReleaseSummaryRetriever>()
+            .AddTransient<IReleaseVersionSummaryRetriever, ReleaseVersionSummaryRetriever>()
             .AddTransient<IBlobNameLister, BlobNameLister>();
 
     public static IServiceCollection ConfigureLogging(

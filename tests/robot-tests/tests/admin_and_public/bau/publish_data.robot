@@ -318,6 +318,7 @@ Validate data guidance footnotes
 
 Save data guidance
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Navigate to Data blocks page
     user clicks link    Data blocks

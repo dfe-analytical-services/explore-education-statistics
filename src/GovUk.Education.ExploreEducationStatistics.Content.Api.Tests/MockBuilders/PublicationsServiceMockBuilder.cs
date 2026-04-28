@@ -14,11 +14,17 @@ public class PublicationsServiceMockBuilder
 
     private PublicationDto? _publication;
 
+    private PublicationSummaryDto? _publicationSummary;
+
     private PublicationTitleDto? _publicationTitle;
 
     private static readonly Expression<
         Func<IPublicationsService, Task<Either<ActionResult, PublicationDto>>>
     > GetPublication = m => m.GetPublication(It.IsAny<string>(), It.IsAny<CancellationToken>());
+
+    private static readonly Expression<
+        Func<IPublicationsService, Task<Either<ActionResult, PublicationSummaryDto>>>
+    > GetPublicationSummary = m => m.GetPublicationSummary(It.IsAny<Guid>());
 
     private static readonly Expression<
         Func<IPublicationsService, Task<Either<ActionResult, PublicationTitleDto>>>
@@ -27,6 +33,9 @@ public class PublicationsServiceMockBuilder
     public PublicationsServiceMockBuilder()
     {
         _mock.Setup(GetPublication).ReturnsAsync(() => _publication ?? new PublicationDtoBuilder().Build());
+        _mock
+            .Setup(GetPublicationSummary)
+            .ReturnsAsync(() => _publicationSummary ?? new PublicationSummaryDtoBuilder().Build());
         _mock
             .Setup(GetPublicationTitle)
             .ReturnsAsync(() => _publicationTitle ?? new PublicationTitleDtoBuilder().Build());
@@ -37,6 +46,12 @@ public class PublicationsServiceMockBuilder
     public PublicationsServiceMockBuilder WhereHasPublication(PublicationDto publication)
     {
         _publication = publication;
+        return this;
+    }
+
+    public PublicationsServiceMockBuilder WhereHasPublicationSummary(PublicationSummaryDto publicationSummary)
+    {
+        _publicationSummary = publicationSummary;
         return this;
     }
 
@@ -51,6 +66,13 @@ public class PublicationsServiceMockBuilder
         _mock
             .Setup(m => m.GetPublication(publicationSlug, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
+
+        return this;
+    }
+
+    public PublicationsServiceMockBuilder WhereGetPublicationSummaryReturnsNotFound(Guid publicationId)
+    {
+        _mock.Setup(m => m.GetPublicationSummary(publicationId)).ReturnsAsync(new NotFoundResult());
 
         return this;
     }
@@ -76,6 +98,14 @@ public class PublicationsServiceMockBuilder
                         It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
                         It.IsAny<CancellationToken>()
                     ),
+                Times.Once
+            );
+        }
+
+        public void GetPublicationSummaryWasCalled(Guid? publicationId = null)
+        {
+            mock.Verify(
+                m => m.GetPublicationSummary(It.Is<Guid>(actual => publicationId == null || actual == publicationId)),
                 Times.Once
             );
         }

@@ -382,18 +382,8 @@ Cancel reordering indicators after data replacement
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
 
 Add data guidance to subject
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
     ...    ${SUBJECT_NAME} Main guidance content
-
-Save data guidance
-    user clicks button    Save guidance
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}

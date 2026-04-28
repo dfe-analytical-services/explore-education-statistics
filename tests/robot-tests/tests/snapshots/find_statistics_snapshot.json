@@ -2,14 +2,14 @@
   {
     "publication_summary": "Students sustaining an education, apprenticeship or employment destination after 16-18 study in England. Includes disadvantage, ethnicity and other breakdowns.",
     "publication_title": "16-18 destination measures",
-    "published": "26 Mar 2026",
+    "published": "23 Apr 2026",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
   {
     "publication_summary": "Attainment and retention data for A level and other qualifications by age 16-18 in England. Includes region, institution type, characteristics, and subject.",
     "publication_title": "A level and other 16 to 18 results",
-    "published": "26 Mar 2026",
+    "published": "23 Apr 2026",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -273,6 +273,13 @@
     "theme": "Further education"
   },
   {
+    "publication_summary": "Analysis focusing on the further education college workforce in England using teachers\u2019 pensions scheme data. Covers the years 2002/03 to 2024/25.",
+    "publication_title": "Further education college workforce using teacher pension data",
+    "published": "23 Apr 2026",
+    "release_type": "Ad hoc statistics",
+    "theme": "Further education"
+  },
+  {
     "publication_summary": "Sustained employment and learning destinations, and earnings of further education learners in England. Annual statistics with demographic and other breakdowns.",
     "publication_title": "Further education outcomes",
     "published": "18 Dec 2025",
@@ -331,7 +338,7 @@
   {
     "publication_summary": "Key stage 2 attainment statistics by pupil characteristics, school characteristics, region and local authority.",
     "publication_title": "Key stage 2 attainment",
-    "published": "11 Dec 2025",
+    "published": "23 Apr 2026",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -345,14 +352,14 @@
   {
     "publication_summary": "Pupils sustaining an education, apprenticeship or employment destination after GCSEs in England. Includes disadvantage, ethnicity and other breakdowns.",
     "publication_title": "Key stage 4 destination measures",
-    "published": "26 Mar 2026",
+    "published": "23 Apr 2026",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
   {
     "publication_summary": "GCSE results of pupils at the end of KS4 attending state-funded schools in England at national & LA level. This release includes pupil characteristic breakdowns",
     "publication_title": "Key stage 4 performance",
-    "published": "16 Oct 2025",
+    "published": "23 Apr 2026",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -387,7 +394,7 @@
   {
     "publication_summary": "Annual level 2 and 3 attainment figures age 16 to 25 in England. Includes qualification type, institution type, characteristics and geographical breakdowns.",
     "publication_title": "Level 2 and 3 attainment age 16 to 25",
-    "published": "24 Apr 2025",
+    "published": "23 Apr 2026",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -513,7 +520,7 @@
   {
     "publication_summary": "Rates and value-added scores of level 3 (e.g., A level) students that sustain a higher education or apprenticeship destination. Includes various breakdowns.",
     "publication_title": "Progression to higher education or training",
-    "published": "16 Oct 2025",
+    "published": "23 Apr 2026",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -534,7 +541,7 @@
   {
     "publication_summary": "Fortnightly data on pupil attendance, including by reason, phase and geography.",
     "publication_title": "Pupil attendance in schools",
-    "published": "2 Apr 2026",
+    "published": "16 Apr 2026",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -676,6 +683,13 @@
     "publication_title": "Teacher and leader development: ECF and NPQs",
     "published": "10 Jul 2025",
     "release_type": "Official statistics in development",
+    "theme": "Teachers and school workforce"
+  },
+  {
+    "publication_summary": "Annual teacher demand trajectories, and postgraduate initial teacher trainee need for those starting training in the relevant academic year, in England.",
+    "publication_title": "Teacher demand and postgraduate trainee need",
+    "published": "23 Apr 2026",
+    "release_type": "Official statistics",
     "theme": "Teachers and school workforce"
   },
   {

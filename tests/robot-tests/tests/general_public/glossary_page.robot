@@ -8,6 +8,10 @@ Test Setup          fail test fast if required
 Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 
+*** Variables ***
+${FEEDBACK_LINK}    sign up for a research session using our online form.
+
+
 *** Test Cases ***
 Navigate to glossary page
     user navigates to public site homepage
@@ -24,6 +28,13 @@ Validate glossary accordion sections
     user checks accordion is in position    C    3
     user checks accordion is in position    D    4
     user checks accordion is in position    Z    26
+
+Check feedback link is present
+    user waits until page contains link    ${FEEDBACK_LINK}
+    user checks element attribute value should be    link:${FEEDBACK_LINK}    href
+    ...    https://forms.office.com/e/brCmzrQfXU
+    user checks element attribute value should be    link:${FEEDBACK_LINK}    target    _blank
+    user checks element attribute value should be    link:${FEEDBACK_LINK}    rel    noreferrer
 
 Search for Voluntary repayment
     user verifies accordion is closed    V

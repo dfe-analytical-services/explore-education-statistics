@@ -4,7 +4,7 @@ import _redirectService, {
 } from '@frontend/services/redirectService';
 import { NextResponse } from 'next/server';
 import { Dictionary } from '@common/types';
-import runMiddleware from './util/runMiddleware';
+import runMiddleware from '../../__tests__/util/runMiddleware';
 
 jest.mock('@frontend/services/redirectService');
 const redirectService = _redirectService as jest.Mocked<
@@ -753,5 +753,49 @@ describe('redirectPages', () => {
         expect(nextSpy).toHaveBeenCalledTimes(2);
       },
     );
+
+    test('excludes subscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/subscriptions/release-name/confirm-subscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    test('excludes unsubscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/subscriptions/release-name/confirm-unsubscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    test('excludes API subscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/api-subscriptions/release-name/confirm-subscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    test('excludes API unsubscription verification urls from uppercase-to-lowercase redirects', async () => {
+      redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/api-subscriptions/release-name/confirm-unsubscription/AbC',
+      );
+
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalled();
+    });
   });
 });

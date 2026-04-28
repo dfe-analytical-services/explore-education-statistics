@@ -34,6 +34,21 @@ const redirectPatterns: URLPattern[] = [
   }),
 ];
 
+const lowercaseRedirectsExclusionPatterns: URLPattern[] = [
+  new URLPattern({
+    pathname: `/subscriptions/:${publicationSlugKey}/confirm-subscription/.*`,
+  }),
+  new URLPattern({
+    pathname: `/subscriptions/:${publicationSlugKey}/confirm-unsubscription/.*`,
+  }),
+  new URLPattern({
+    pathname: `/api-subscriptions/:${publicationSlugKey}/confirm-subscription/.*`,
+  }),
+  new URLPattern({
+    pathname: `/api-subscriptions/:${publicationSlugKey}/confirm-unsubscription/.*`,
+  }),
+];
+
 export default async function redirectPages(
   request: NextRequest,
   event: NextFetchEvent,
@@ -61,14 +76,25 @@ export default async function redirectPages(
     }
   }
 
-  // Redirect any URLs with uppercase characters to lowercase.
-  if (decodedPathname !== lowerCasedPathname) {
+  // Redirect any URLs with uppercase characters to lowercase, unless explicitly excluded.
+  if (
+    !requestExcludedFromLowercaseRedirects(decodedPathname) &&
+    decodedPathname !== lowerCasedPathname
+  ) {
     const url = nextUrl.clone();
     url.pathname = lowerCasedPathname;
     return NextResponse.redirect(url, 301);
   }
 
   return middleware(request, event);
+}
+
+function requestExcludedFromLowercaseRedirects(lowerCasedPathname: string) {
+  return lowercaseRedirectsExclusionPatterns.some(exclusionPattern =>
+    exclusionPattern.exec({
+      pathname: lowerCasedPathname,
+    }),
+  );
 }
 
 function findRouteSlugsBySlugKey(

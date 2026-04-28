@@ -10,10 +10,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
@@ -645,6 +647,39 @@ public class ReleaseVersionsControllerUnitTests
         result.AssertOkResult(amendmentCreatedResponse);
     }
 
+    [Fact]
+    public async Task GetDataSetUploadScreenerProgress()
+    {
+        // Arrange
+        var releaseVersionId = Guid.NewGuid();
+
+        List<ScreenerProgressWithDataSetUploadIdViewModel> response =
+        [
+            new()
+            {
+                DataSetUploadId = Guid.NewGuid(),
+                PercentageComplete = 100,
+                Stage = "completed",
+            },
+        ];
+
+        var dataSetScreenerService = new Mock<IDataSetScreenerService>(Strict);
+
+        dataSetScreenerService
+            .Setup(s => s.GetScreenerProgress(releaseVersionId, CancellationToken.None))
+            .ReturnsAsync(response);
+
+        var controller = BuildController(dataSetScreenerService: dataSetScreenerService.Object);
+
+        // Act
+        var result = await controller.GetDataSetUploadScreenerProgress(releaseVersionId, CancellationToken.None);
+
+        // Assert
+        VerifyAllMocks(dataSetScreenerService);
+
+        result.AssertOkResult(response);
+    }
+
     private static IFormFile MockFile(string fileName, bool isZip = false)
     {
         var fileMock = new Mock<IFormFile>(Strict);
@@ -682,7 +717,8 @@ public class ReleaseVersionsControllerUnitTests
         IReleaseChecklistService? releaseChecklistService = null,
         IDataImportService? importService = null,
         IDataSetUploadRepository? dataSetUploadRepository = null,
-        IDataSetFileStorage? dataSetFileStorage = null
+        IDataSetFileStorage? dataSetFileStorage = null,
+        IDataSetScreenerService? dataSetScreenerService = null
     )
     {
         return new ReleaseVersionsController(
@@ -694,7 +730,8 @@ public class ReleaseVersionsControllerUnitTests
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
             importService ?? Mock.Of<IDataImportService>(Strict),
             dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
-            dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict)
+            dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
+            dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(Strict)
         );
     }
 
