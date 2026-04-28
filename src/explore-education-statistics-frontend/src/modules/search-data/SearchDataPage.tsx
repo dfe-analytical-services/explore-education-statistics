@@ -40,7 +40,7 @@ import React, { useState } from 'react';
 
 const defaultPageTitle = 'Explore our education statistics';
 
-type RoutePath = 'search-publications' | 'search-data';
+type RoutePath = 'search-releases' | 'search-data';
 
 export interface SearchDataPageQuery {
   dataSetType?: DataSetType;
@@ -57,8 +57,8 @@ const SearchDataPage: NextPage = () => {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
-  const currentRoute = router.query.searchRoute as RoutePath;
-  const isPublicationsSearch = currentRoute === 'search-publications';
+  const currentRoute = router.pathname as RoutePath;
+  const isPublicationsSearch = currentRoute.includes('search-releases');
 
   const {
     data: dataSetsData,
@@ -157,11 +157,7 @@ const SearchDataPage: NextPage = () => {
     setPageTitle(`${defaultPageTitle} - Search results`);
     await router.push(
       {
-        // TODO EES-7072 decide if either of these is preferable
-        pathname: `/${currentRoute}`,
         query: { ...nextQuery },
-        // pathname: '/[searchRoute]',
-        // query: { ...nextQuery, searchRoute: currentRoute },
       },
       undefined,
       {
@@ -330,10 +326,9 @@ const SearchDataPage: NextPage = () => {
               <li>
                 <Link
                   to={{
-                    pathname: '/search-publications',
+                    pathname: '/search-releases',
                     query: {
                       ...router.query,
-                      searchRoute: undefined,
                     },
                   }}
                   shallow
@@ -348,7 +343,7 @@ const SearchDataPage: NextPage = () => {
                 <Link
                   to={{
                     pathname: '/search-data',
-                    query: { ...router.query, searchRoute: undefined },
+                    query: { ...router.query },
                   }}
                   shallow
                   unvisited
@@ -553,27 +548,23 @@ const SearchDataPage: NextPage = () => {
 
 export const getServerSideProps: GetServerSideProps = async ({
   query,
-  params,
+  resolvedUrl,
 }) => {
-  const searchRoute = params?.searchRoute as string;
-
-  // TODO EES-7072 check about prototype route names, and if this approach allows nested routes
-  if (!['search-publications', 'search-data'].includes(searchRoute)) {
-    return { notFound: true };
-  }
-
   if (process.env.APP_ENV === 'Production') {
     return {
       notFound: true,
     };
   }
 
+  const isPublicationsSearch = resolvedUrl.startsWith('/search-releases');
+
   const queryClient = new QueryClient();
 
-  // TODO EES-7072 prefetch different query based on route
   await Promise.all([
-    queryClient.prefetchQuery(azureDataSetQueries.list(query)),
-    queryClient.prefetchQuery(themeQueries.list()),
+    isPublicationsSearch
+      ? queryClient.prefetchQuery(azurePublicationQueries.list(query))
+      : queryClient.prefetchQuery(azureDataSetQueries.list(query)),
+    queryClient.prefetchQuery(themeQueries.listProdThemes()),
   ]);
 
   return {
