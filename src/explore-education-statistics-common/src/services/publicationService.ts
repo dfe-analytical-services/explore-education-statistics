@@ -134,7 +134,6 @@ export interface PublicationListRequest {
   themeId?: string;
 }
 
-// Used for the release pages
 export interface ReleaseVersionSummary {
   coverageTitle: string;
   id: string;
