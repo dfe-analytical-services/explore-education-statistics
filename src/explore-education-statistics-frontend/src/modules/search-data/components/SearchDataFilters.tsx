@@ -61,7 +61,7 @@ export default function Filters({
 }: Props) {
   return (
     <form className={styles.form} id={formId}>
-      <h2 className="govuk-heading-m">Sort and filter publications</h2>
+      <h2 className="govuk-heading-m">Filter and sort</h2>
       <FormGroup>
         <FormSelect
           className="govuk-!-width-full govuk-!-margin-bottom-1"

@@ -14,6 +14,7 @@ import { truncate } from 'lodash';
 import { useRouter } from 'next/router';
 
 interface Props {
+  isSearchData?: boolean;
   label?: string;
   onSubmit: (value: string) => void;
 }
@@ -22,7 +23,11 @@ interface Props {
 // accessible-autocomplete lib is managing its own state, and we can't
 // access the generated text input to be able to hook into its value easily
 
-export default function SearchForm({ label = 'Search', onSubmit }: Props) {
+export default function SearchForm({
+  isSearchData = false,
+  label = 'Search',
+  onSubmit,
+}: Props) {
   const router = useRouter();
 
   const wrapper = useRef<HTMLFormElement>(null);
@@ -153,7 +158,8 @@ export default function SearchForm({ label = 'Search', onSubmit }: Props) {
             'aria-labelledby': 'search-label',
           }}
           minLength={3}
-          source={fetchResults}
+          // TODO EES-7072 implement search data suggestion autocomplete
+          source={isSearchData ? () => [] : fetchResults}
           templates={{
             inputValue: result => result?.title,
             suggestion: suggestionTemplate,

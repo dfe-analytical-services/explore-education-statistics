@@ -258,10 +258,11 @@ const SearchDataPage: NextPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <FindStatisticsSearchForm
-            label={isPublicationsSearch ? 'Search publications' : 'Search data'}
+            label={isPublicationsSearch ? 'Search releases' : 'Search data'}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
             }
+            isSearchData={!isPublicationsSearch}
           />
           <a href="#searchResults" className="govuk-skip-link">
             Skip to search results
@@ -294,6 +295,7 @@ const SearchDataPage: NextPage = () => {
                       </ButtonText>
                     }
                   >
+                    {/* TODO EES-7072 add in content */}
                     <p>Information about statistical releases</p>
                   </Modal>
                 </li>
@@ -308,6 +310,7 @@ const SearchDataPage: NextPage = () => {
                       </ButtonText>
                     }
                   >
+                    {/* TODO EES-7072 add in content */}
                     <p>Information about what is data</p>
                   </Modal>
                 </li>
@@ -380,10 +383,7 @@ const SearchDataPage: NextPage = () => {
         </div>
         <div className="govuk-grid-column-two-thirds">
           {isMobileMedia && (
-            <FiltersMobile
-              title="Sort and filter publications"
-              totalResults={totalResults}
-            >
+            <FiltersMobile title="Filter and sort" totalResults={totalResults}>
               <SearchDataFilters
                 dataSetType={dataSetType as DataSetType}
                 includeDataFilters={!isPublicationsSearch}
@@ -401,17 +401,17 @@ const SearchDataPage: NextPage = () => {
             </FiltersMobile>
           )}
 
-          <div className="govuk-!-margin-top-3 dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center">
-            <p className="govuk-!-margin-bottom-0" data-testid="total-results">
-              {`${totalResultsMessage}, ${
-                totalResults ? `page ${page} of ${totalPages}` : '0 pages'
-              }, ${
-                isFiltered
-                  ? 'filtered by: '
-                  : `showing ${
-                      isPublicationsSearch ? 'all publications' : 'data sets'
-                    }`
-              }`}
+          <h3
+            className="govuk-!-margin-top-3 govuk-!-margin-bottom-0"
+            data-testid="total-results"
+          >
+            {totalResultsMessage}
+          </h3>
+          <div className="dfe-flex dfe-flex-wrap dfe-gap-2 dfe-align-items--center">
+            <p className="govuk-!-margin-bottom-0">
+              {totalResults ? `Page ${page} of ${totalPages}` : '0 pages'},
+              sorted by {sortBy === 'title' ? 'A to Z' : sortBy}
+              {isFiltered ? ', filtered by: ' : ''}
             </p>
 
             {isFiltered && <VisuallyHidden>{filteredByString}</VisuallyHidden>}
@@ -451,10 +451,6 @@ const SearchDataPage: NextPage = () => {
                 />
               )}
             </div>
-
-            <VisuallyHidden>{` Sorted by ${
-              sortBy === 'title' ? 'A to Z' : sortBy
-            }`}</VisuallyHidden>
           </div>
 
           <LoadingSpinner
@@ -463,9 +459,8 @@ const SearchDataPage: NextPage = () => {
           >
             {isError ? (
               <WarningMessage>
-                Cannot load{' '}
-                {isPublicationsSearch ? 'publications' : 'data sets'}, please
-                try again later.
+                Cannot load {isPublicationsSearch ? 'releases' : 'data sets'},
+                please try again later.
               </WarningMessage>
             ) : (
               <>
