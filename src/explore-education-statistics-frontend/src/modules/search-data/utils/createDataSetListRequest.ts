@@ -32,7 +32,7 @@ export default function createDataSetListRequest(
     dataSetType,
     latestDataOnly,
     releaseType: releaseType ? [releaseType] : undefined,
-    themeId: themeId ? [themeId.toUpperCase()] : undefined,
+    themeId: themeId ? [themeId] : undefined,
   });
 
   const minSearchCharacters = 3;
@@ -93,35 +93,9 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
     conditions.push(`api/id ne null and api/id ne ''`);
   }
 
-  // 5. Combine everything or return undefined if no filters were provided
+  // Combine everything or return undefined if no filters were provided
   return conditions.length > 0 ? conditions.join(' and ') : undefined;
 }
-
-// export function createDataSetSuggestRequest(
-//   query: FindStatisticsPageQuery,
-//   searchTerm: string,
-// ): AzurePublicationListRequest {
-//   const { releaseType, themeId } = getParamsFromQuery(query);
-
-//   let filter: string | undefined;
-//   if (releaseType && themeId) {
-//     filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
-//   } else if (releaseType) {
-//     filter = odata`releaseType eq ${releaseType}`;
-//   } else if (themeId) {
-//     filter = odata`themeId eq ${themeId}`;
-//   }
-
-//   return omitBy(
-//     {
-//       filter,
-//       releaseType,
-//       search: searchTerm,
-//       themeId,
-//     },
-//     value => typeof value === 'undefined',
-//   );
-// }
 
 function getSortParam(sortBy: PublicationSortOption): AzureOrderByParam {
   switch (sortBy) {

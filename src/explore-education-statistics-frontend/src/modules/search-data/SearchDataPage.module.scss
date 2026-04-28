@@ -5,7 +5,7 @@
 
   @include govuk-media-query($from: tablet) {
     margin-top: 0;
-    margin-bottom: -30px; // shift tabs closer
+    margin-bottom: -30px; // shift tabs higher to match design
   }
 }
 
