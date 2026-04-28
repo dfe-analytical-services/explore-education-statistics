@@ -50,7 +50,7 @@ public abstract class DateTimeOffsetExtensionsTests
             string description
         )
         {
-            var actual = dateTimeOffset.GetUkEndOfDayUtc(includeFractionalSeconds: false);
+            var actual = dateTimeOffset.GetUkEndOfDayUtc(includeFractionalSeconds: true);
 
             Assert.Equal(TimeSpan.Zero, actual.Offset);
             Assert.True(

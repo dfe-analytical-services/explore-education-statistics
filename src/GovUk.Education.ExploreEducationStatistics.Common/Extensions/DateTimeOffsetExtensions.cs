@@ -50,13 +50,12 @@ public static class DateTimeOffsetExtensions
     /// <summary>
     /// <para>
     /// Adjusts the provided <paramref name="dateTimeOffset"/> to the UK time zone and returns a
-    /// <see cref="DateTimeOffset"/> representing the end of that UK day (23:59:59.000),
-    /// accounting for daylight saving time.
+    /// <see cref="DateTimeOffset"/> in UTC representing the end of that UK day, accounting for daylight saving time.
     /// </para>
     /// </summary>
     /// <param name="dateTimeOffset">The input <see cref="DateTimeOffset"/> to convert.</param>
-    /// <param name="includeFractionalSeconds">Sets the milliseconds component to .999 if true and .0 if false.</param>
-    /// <returns>A <see cref="DateTimeOffset"/> in UTC corresponding to the start of the UK day for the provided input.</returns>
+    /// <param name="includeFractionalSeconds">Sets the milliseconds component to .9999999 if true and .0 if false.</param>
+    /// <returns>A <see cref="DateTimeOffset"/> in UTC corresponding to the end of the UK day for the provided input.</returns>
     public static DateTimeOffset GetUkEndOfDayUtc(
         this DateTimeOffset dateTimeOffset,
         bool includeFractionalSeconds = true

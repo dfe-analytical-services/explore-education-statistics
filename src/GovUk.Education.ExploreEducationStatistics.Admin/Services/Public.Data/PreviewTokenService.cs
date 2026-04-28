@@ -39,9 +39,7 @@ public class PreviewTokenService(
             .OnSuccess(async () =>
             {
                 var activatesUtc = activates?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
-                var expiresUtc =
-                    expires?.ToUniversalTime()
-                    ?? activatesUtc.AddDays(7).GetUkEndOfDayUtc(includeFractionalSeconds: false);
+                var expiresUtc = expires?.ToUniversalTime() ?? activatesUtc.AddDays(7).GetUkEndOfDayUtc();
 
                 var previewToken = publicDataDbContext.PreviewTokens.Add(
                     new PreviewToken
