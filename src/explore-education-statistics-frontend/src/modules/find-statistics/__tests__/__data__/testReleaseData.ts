@@ -40,6 +40,11 @@ export const testReleaseVersionSummary: ReleaseVersionSummary = {
   yearTitle: '2024',
   coverageTitle: 'Calendar year',
   label: 'Final',
+  publication: {
+    id: 'publication-summary-1',
+    title: 'Pupil attendance in schools',
+    slug: 'publication-slug',
+  },
   published: '2025-08-10T09:30:00+01:00',
   lastUpdated: '2025-08-11T14:30:00+01:00',
   isLatestRelease: true,

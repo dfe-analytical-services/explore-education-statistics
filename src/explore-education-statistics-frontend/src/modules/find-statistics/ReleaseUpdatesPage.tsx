@@ -1,8 +1,5 @@
 import FormattedDate from '@common/components/FormattedDate';
-import {
-  PublicationSummary,
-  ReleaseVersionSummary,
-} from '@common/services/publicationService';
+import { ReleaseVersionSummary } from '@common/services/publicationService';
 import { ReleaseUpdate } from '@common/services/releaseUpdatesService';
 import { PaginatedList } from '@common/services/types/pagination';
 import Link from '@frontend/components/Link';
@@ -18,34 +15,33 @@ import { GetServerSideProps } from 'next';
 import React from 'react';
 
 interface Props {
-  publicationSummary: PublicationSummary;
   releaseUpdates: PaginatedList<ReleaseUpdate>;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
 const ReleaseUpdatesPage = ({
-  publicationSummary,
   releaseUpdates,
   releaseVersionSummary,
 }: Props) => {
+  const { publication } = releaseVersionSummary;
   const { paging, results } = releaseUpdates ?? {};
   const { page, totalPages } = paging ?? {};
 
   return (
     <Page
-      title={publicationSummary.title}
-      metaTitle={`Updates - ${publicationSummary.title} - ${
+      title={publication.title}
+      metaTitle={`Updates - ${publication.title} - ${
         releaseVersionSummary.title
       } - ${page ? `- page ${page}` : ''}`}
-      description={`Updates to ${publicationSummary.title.toLocaleLowerCase()} ${releaseVersionSummary.title.toLocaleLowerCase()}.`}
+      description={`Updates to ${publication.title.toLocaleLowerCase()} ${releaseVersionSummary.title.toLocaleLowerCase()}.`}
       caption={`Updates to ${releaseVersionSummary.title}`}
       captionInsideTitle
       width="wide"
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },
         {
-          name: publicationSummary.title,
-          link: `/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`,
+          name: publication.title,
+          link: `/find-statistics/${publication.slug}/${releaseVersionSummary.slug}`,
         },
       ]}
       breadcrumbLabel="Updates"
@@ -53,7 +49,7 @@ const ReleaseUpdatesPage = ({
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <Link
-            to={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
+            to={`/find-statistics/${publication.slug}/${releaseVersionSummary.slug}`}
             className="govuk-!-margin-bottom-6 govuk-!-display-inline-block"
           >
             Release home
@@ -119,32 +115,23 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   const queryClient = new QueryClient();
 
   try {
-    const [publicationSummary, releaseVersionSummary, releaseUpdates] =
-      await Promise.all([
-        queryClient.fetchQuery(
-          publicationQueries.getPublicationSummary(publicationSlug),
+    const [releaseVersionSummary, releaseUpdates] = await Promise.all([
+      queryClient.fetchQuery(
+        publicationQueries.getReleaseVersionSummary(
+          publicationSlug,
+          releaseSlug,
         ),
-        queryClient.fetchQuery(
-          publicationQueries.getReleaseVersionSummary(
-            publicationSlug,
-            releaseSlug,
-          ),
-        ),
-        queryClient.fetchQuery(
-          releaseUpdatesQueries.getReleaseUpdates(
-            publicationSlug,
-            releaseSlug,
-            {
-              page: page ? Number(page) : undefined,
-              pageSize: pageSize ? Number(pageSize) : undefined,
-            },
-          ),
-        ),
-      ]);
+      ),
+      queryClient.fetchQuery(
+        releaseUpdatesQueries.getReleaseUpdates(publicationSlug, releaseSlug, {
+          page: page ? Number(page) : undefined,
+          pageSize: pageSize ? Number(pageSize) : undefined,
+        }),
+      ),
+    ]);
 
     return {
       props: {
-        publicationSummary,
         releaseVersionSummary,
         releaseUpdates,
       },
