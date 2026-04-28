@@ -16,7 +16,7 @@ Test Setup          fail test fast if required
 *** Variables ***
 ${PUBLICATION_NAME}=        Public API - preview token %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=            Academic year Q1 3000/01
-${SUBJECT_NAME_1}=          ${PUBLICATION_NAME} - Subject 1
+${SUBJECT_NAME}=            ${PUBLICATION_NAME} - Subject 1
 ${PREVIEW_TOKEN_NAME}=      Test token
 
 
@@ -34,25 +34,15 @@ Verify release summary
     user verifies release summary    Academic year Q1    3000/01    Accredited official statistics
 
 Upload data files
-    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
     ...    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_NAME_1}
-
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME_1}
-    ...    ${SUBJECT_NAME_1} guidance content
-
-Save data guidance
-    user clicks button    Save guidance
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
+    ...    ${SUBJECT_NAME} Main guidance content
 
 Create API data set
     user scrolls to the top of the page
@@ -61,7 +51,7 @@ Create API data set
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
+    user chooses select option    name:releaseFileId    ${SUBJECT_NAME}
     user clicks button    Confirm new API data set
 
     user waits until page contains    Creating API data set
@@ -95,7 +85,7 @@ User verifies the 'Draft API data set' summary list
     user checks summary list contains    Version    v1.0
     user checks summary list contains    Status    Ready
     user checks summary list contains    Release    ${RELEASE_NAME}
-    user checks summary list contains    Data set file    ${SUBJECT_NAME_1}
+    user checks summary list contains    Data set file    ${SUBJECT_NAME}
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time periods    2012/13
     user checks list contains exact items in order    id:draft-version-summary-indicators
@@ -147,7 +137,7 @@ User creates preview token through 'Generate preview token' modal window
     user waits until page finishes loading
     user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
 
 User revokes preview token
     user clicks button    Revoke preview token
@@ -173,7 +163,7 @@ User creates preview token through 'Generate preview token' modal window selecti
     user waits until page finishes loading
     user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
 
 User verifies created preview token details expires in 7 days
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
@@ -228,7 +218,7 @@ User creates another preview token through 'Generate preview token' modal window
     user waits until page finishes loading
     user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
 
 User verifies created preview token details for custom dates
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
@@ -264,7 +254,7 @@ User creates another preview token through 'Generate preview token' modal window
     user waits until page finishes loading
     user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
 
 User cancels revoking preview token
     user clicks button    Revoke preview token
@@ -273,7 +263,7 @@ User cancels revoking preview token
     user waits until page finishes loading
     user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
 
 User cancels creating preview token
     user clicks link    Back to API data set details
@@ -288,13 +278,13 @@ User cancels creating preview token
     user waits until page finishes loading
     user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    Generate API data set preview token
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
 
 Verify the 'Active tokens' and 'Expired tokens' on preview token log page
     user clicks link    Back to API data set details
     user clicks link    View preview token log
     user waits until page contains    API data set preview token log
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
 
     user checks table column heading contains    1    1    Reference
     user checks table column heading contains    1    2    User
@@ -325,7 +315,7 @@ User verifies the relevant fields on the active preview token page
     user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
 
-    user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user waits until h2 is visible    ${SUBJECT_NAME}
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
     user checks page contains
@@ -362,14 +352,14 @@ Search for API data set
 
     user waits until page finishes loading
     user clicks radio    Newest
-    user checks page contains link    ${SUBJECT_NAME_1}
-    user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_1}
+    user checks page contains link    ${SUBJECT_NAME}
+    user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME}
 
 User clicks on API data set link
-    user clicks link containing text    ${SUBJECT_NAME_1}
+    user clicks link containing text    ${SUBJECT_NAME}
     user waits until page finishes loading
 
-    user waits until h1 is visible    ${SUBJECT_NAME_1}
+    user waits until h1 is visible    ${SUBJECT_NAME}
 
 User checks relevant headings exist on API data set details page
     user waits until h2 is visible    Data set details

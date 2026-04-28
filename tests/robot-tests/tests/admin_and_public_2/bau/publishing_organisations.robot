@@ -100,6 +100,7 @@ Verify "Published by" shows default organisation
     user checks published by in admin    ${DEFAULT_ORGANISATION_TEXT}
 
 Publish amendment
+    user clicks link    Content
     user clicks button    Add note
     user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
@@ -148,8 +149,6 @@ user checks published by in admin
     ...    Accredited official statistics
     ...
     ...    ${published_by}
-    user clicks link    Content
-    user checks testid element contains    Produced by-value    ${published_by}
 
 user checks published by on public release page
     [Arguments]    ${published_by}

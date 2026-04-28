@@ -5,18 +5,18 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CheckSearchableDocuments;
 
-public class ReleaseSummaryRetrieverTests
+public class ReleaseVersionSummaryRetrieverTests
 {
     private readonly ContentApiClientMockBuilder _contentApiClient = new();
 
-    private ReleaseSummaryRetriever GetSut() =>
-        new(() => _contentApiClient.Build(), new NullLogger<ReleaseSummaryRetriever>());
+    private ReleaseVersionSummaryRetriever GetSut() =>
+        new(() => _contentApiClient.Build(), new NullLogger<ReleaseVersionSummaryRetriever>());
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task GivenSomePublications_WhenGetAllPublishedReleaseSummaries_ThenReturnsPublicationsAndReleaseInformation()
+    public async Task GivenSomePublications_WhenGetAllPublishedReleaseVersionSummaries_ThenReturnsPublicationsAndReleaseInformation()
     {
         // Arrange
         var publications = Enumerable
@@ -33,14 +33,14 @@ public class ReleaseSummaryRetrieverTests
         var sut = GetSut();
 
         // Act
-        var actual = await sut.GetAllPublishedReleaseSummaries();
+        var actual = await sut.GetAllPublishedReleaseVersionSummaries();
 
         // Assert
         Assert.Equal(publications.Select(p => p.PublicationSlug), actual.Select(r => r.PublicationSlug));
         Assert.All(
             publications,
             publication =>
-                _contentApiClient.Assert.ReleaseSummaryRequestedForPublication(
+                _contentApiClient.Assert.ReleaseVersionSummaryRequestedForPublication(
                     publication.PublicationSlug,
                     publication.LatestReleaseSlug
                 )
@@ -48,7 +48,7 @@ public class ReleaseSummaryRetrieverTests
     }
 
     [Fact]
-    public async Task GivenSomePublicationsIncludingABrokenOne_WhenGetAllPublishedReleaseSummaries_ThenReturnsPublicationsAndReleaseInformation()
+    public async Task GivenSomePublicationsIncludingABrokenOne_WhenGetAllPublishedReleaseVersionSummaries_ThenReturnsPublicationsAndReleaseInformation()
     {
         // Arrange
         var publications = Enumerable
@@ -63,7 +63,7 @@ public class ReleaseSummaryRetrieverTests
         _contentApiClient.WhereHasPublications(publications);
 
         // Given duff data, this call can fail
-        _contentApiClient.WhereGetReleaseSummaryThrows(
+        _contentApiClient.WhereGetReleaseVersionSummaryThrows(
             publications[1].PublicationSlug,
             publications[1].LatestReleaseSlug
         );
@@ -71,7 +71,7 @@ public class ReleaseSummaryRetrieverTests
         var sut = GetSut();
 
         // Act
-        var actual = await sut.GetAllPublishedReleaseSummaries();
+        var actual = await sut.GetAllPublishedReleaseVersionSummaries();
 
         // Assert
         var validPublications = publications.Except([publications[1]]).ToArray();
@@ -80,7 +80,7 @@ public class ReleaseSummaryRetrieverTests
         Assert.All(
             publications,
             publication =>
-                _contentApiClient.Assert.ReleaseSummaryRequestedForPublication(
+                _contentApiClient.Assert.ReleaseVersionSummaryRequestedForPublication(
                     publication.PublicationSlug,
                     publication.LatestReleaseSlug
                 )

@@ -162,14 +162,16 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
         }
 
-        [Fact(Skip = "Call Content API to get release summary for publication and release slug")]
-        public async Task GetReleaseSummary()
+        [Fact(
+            Skip = "Call Content API to get the latest published release version summary for the specified publication slug and release slug"
+        )]
+        public async Task GetReleaseVersionSummary()
         {
             var sut = GetSut();
-            var publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
-            var releaseSlug = "2016-17";
-            var releaseSummary = await sut.GetReleaseSummary(publicationSlug, releaseSlug);
-            PrintAsJson(releaseSummary);
+            const string publicationSlug = "seed-publication-pupil-absence-in-schools-in-england";
+            const string releaseSlug = "2016-17";
+            var releaseVersionSummary = await sut.GetReleaseVersionSummary(publicationSlug, releaseSlug);
+            PrintAsJson(releaseVersionSummary);
         }
 
         [Fact(Skip = "Ping Content API")]

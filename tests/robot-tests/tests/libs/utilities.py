@@ -355,3 +355,8 @@ def do_with_retries(action, action_description: str, allowed_exception_types, re
         f"Failed to perform action {action_description} after {retries} retries."
         f"Got the following exception:\r\n\r\n{last_exception}"
     )
+
+
+def prompt_to_continue():
+    logger.warn("Press Enter to continue...")
+    input()

@@ -37,10 +37,12 @@ internal class ContentApiClientMockBuilder
             .ReturnsAsync(() => _publications ?? []);
 
         _mock
-            .Setup(m => m.GetReleaseSummary(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Setup(m =>
+                m.GetReleaseVersionSummary(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(
                 (string publicationSlug, string releaseSlug, CancellationToken _) =>
-                    new ReleaseSummary
+                    new ReleaseVersionSummary
                     {
                         Id = Guid.NewGuid().ToString(),
                         ReleaseId = Guid.NewGuid().ToString(),
@@ -90,32 +92,32 @@ internal class ContentApiClientMockBuilder
         return this;
     }
 
-    public ContentApiClientMockBuilder WhereGetReleaseSummaryReturns(
+    public ContentApiClientMockBuilder WhereGetReleaseVersionSummaryReturns(
         string publicationSlug,
         string releaseSlug,
-        ReleaseSummary releaseSummary
+        ReleaseVersionSummary releaseVersionSummary
     )
     {
         _mock
-            .Setup(m => m.GetReleaseSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(releaseSummary);
+            .Setup(m => m.GetReleaseVersionSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(releaseVersionSummary);
         return this;
     }
 
-    public ContentApiClientMockBuilder WhereGetReleaseSummaryThrows(
+    public ContentApiClientMockBuilder WhereGetReleaseVersionSummaryThrows(
         string publicationSlug,
         string releaseSlug,
         Exception? exception = null
     )
     {
         _mock
-            .Setup(m => m.GetReleaseSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
+            .Setup(m => m.GetReleaseVersionSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
             .Throws(
                 (string ps, string rs, CancellationToken _) =>
-                    new UnableToGetReleaseSummaryForPublicationException(
+                    new UnableToGetReleaseVersionSummaryException(
                         ps,
                         rs,
-                        "This is a test exception. GetReleaseSummary error."
+                        "This is a test exception. GetReleaseVersionSummary error."
                     )
             );
 
@@ -144,10 +146,10 @@ internal class ContentApiClientMockBuilder
             mock.Verify(m => m.GetPublicationReleaseIds(publicationSlug, It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        public void ReleaseSummaryRequestedForPublication(string publicationSlug, string releaseSlug)
+        public void ReleaseVersionSummaryRequestedForPublication(string publicationSlug, string releaseSlug)
         {
             mock.Verify(
-                m => m.GetReleaseSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()),
+                m => m.GetReleaseVersionSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }

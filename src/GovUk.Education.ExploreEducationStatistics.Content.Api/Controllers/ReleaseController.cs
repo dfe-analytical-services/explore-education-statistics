@@ -24,12 +24,19 @@ public class ReleaseController(
     TimeProvider timeProvider
 ) : ControllerBase
 {
+    /// <summary>
+    /// Returns a list of releases for a given publication, used by the Public site frontend Data Catalogue page
+    /// when a publication is selected.
+    /// </summary>
     [HttpGet("publications/{publicationSlug}/releases")]
     public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListReleases(string publicationSlug)
     {
         return await releaseService.List(publicationSlug).HandleFailuresOrOk();
     }
 
+    /// <summary>
+    /// TODO This is pending removal by EES-7022 (PR #6939) but depends on EES-7102 removing usages of it first
+    /// </summary>
     [HttpGet("publications/{publicationSlug}/releases/latest")]
     public Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
     {
@@ -43,12 +50,18 @@ public class ReleaseController(
         );
     }
 
+    /// <summary>
+    /// TODO This is unused after EES-7028 (PR #6947) and pending removal by EES-7022 (PR #6939)
+    /// </summary>
     [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
     public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(string publicationSlug)
     {
         return await GetReleaseSummaryViewModel(publicationSlug).HandleFailuresOrOk();
     }
 
+    /// <summary>
+    /// TODO This is unused after EES-7028 (PR #6940) and pending removal by EES-7022 (PR #6939)
+    /// </summary>
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
     public Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
     {
@@ -62,6 +75,9 @@ public class ReleaseController(
         );
     }
 
+    /// <summary>
+    /// TODO This is unused after EES-7028 (PR #6947) and pending removal by EES-7022 (PR #6939)
+    /// </summary>
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/summary")]
     public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummary(
         string publicationSlug,

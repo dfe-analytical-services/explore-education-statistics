@@ -209,7 +209,7 @@ export interface ReleaseVersion<
 export interface ReleaseVersionSummary {
   coverageTitle: string;
   id: string;
-  isLatestRelease?: boolean;
+  isLatestRelease: boolean;
   label?: string;
   lastUpdated: string;
   published: string;
@@ -367,10 +367,6 @@ export interface ReleaseSummary {
   latestRelease: boolean;
 }
 
-export interface PublicationReleaseSummary extends ReleaseSummary {
-  publication: PublicationSummaryPreview;
-}
-
 export interface PublicationTreeSummary {
   id: string;
   title: string;
@@ -424,36 +420,10 @@ const publicationService = {
     return contentApi.get(`/publications/${publicationSlug}/releases`);
   },
   // Currently used within table tool
-  getPublicationRelease(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<ReleaseVersion> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}`,
-    );
-  },
-  // Currently used within table tool
   getLatestPublicationRelease(
     publicationSlug: string,
   ): Promise<ReleaseVersion> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
-  },
-  // Currently used within table tool
-  getPublicationReleaseSummary(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
-    );
-  },
-  // Currently used within table tool
-  getLatestPublicationReleaseSummary(
-    publicationSlug: string,
-  ): Promise<PublicationReleaseSummary> {
-    return contentApi.get(
-      `/publications/${publicationSlug}/releases/latest/summary`,
-    );
   },
   getReleaseVersionSummary(
     publicationSlug: string,

@@ -56,6 +56,7 @@ Add data guidance to subjects
 
 Save data guidance
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -90,6 +91,7 @@ Add data guidance to subjects (second release)
 
 Save data guidance (second release)
     user clicks button    Save guidance
+    user waits until page contains button    Edit guidance
 
 Add headline text block to Content page (second release)
     user navigates to content page    ${PUBLICATION_NAME}

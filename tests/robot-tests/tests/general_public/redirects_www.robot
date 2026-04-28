@@ -10,7 +10,6 @@ Force Tags          GeneralPublic    Local    Dev
 
 *** Test Cases ***
 Verify that routes with www are redirected without them
-    Skip    EES-7024 - skipping whilst testing on Azure Front Door temporary URL
     user navigates to www    %{PUBLIC_URL}/
     user waits until page contains    Explore education statistics
     user checks url equals    %{PUBLIC_URL}/

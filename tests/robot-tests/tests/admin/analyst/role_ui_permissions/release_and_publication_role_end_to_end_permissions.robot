@@ -55,13 +55,8 @@ Check publication owner can upload subject file
     user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add data guidance to ${SUBJECT_NAME}
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
-    user adds main data guidance content
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
     ...    data guidance content
-    user clicks button    Save guidance
 
 Navigate to 'Footnotes' page
     user waits until page finishes loading
@@ -141,13 +136,8 @@ Check publication owner can upload subject file on new release
     user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add data guidance to ${SUBJECT_NAME} on new release
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
-    user adds main data guidance content
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
     ...    data guidance content
-    user clicks button    Save guidance
 
 Swap the publication owner role for release approver to test approving the methodology
     user changes to bau1

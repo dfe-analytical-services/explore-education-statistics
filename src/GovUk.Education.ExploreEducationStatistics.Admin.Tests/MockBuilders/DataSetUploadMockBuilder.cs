@@ -1,15 +1,16 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 
-public class DataSetUploadMockBuilder
+public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
 {
     private Guid? _releaseVersionId;
     private string? _screenerResult;
     private List<DataScreenerTestResult>? _testResults;
+    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
     public DataSetUpload BuildInitialEntity()
     {
@@ -25,7 +26,7 @@ public class DataSetUploadMockBuilder
             MetaFileSizeInBytes = 157,
             Status = DataSetUploadStatus.SCREENING,
             UploadedBy = "test@test.com",
-            Created = DateTime.UtcNow,
+            Created = _timeProvider.GetUtcNow().AddDays(-1).Date,
             ReplacingFileId = null,
         };
     }
@@ -48,6 +49,7 @@ public class DataSetUploadMockBuilder
             Created = DateTime.UtcNow,
             ScreenerResult = new DataSetScreenerResponse
             {
+                Passed = _screenerResult == "Passed",
                 OverallResult = _screenerResult ?? "Passed",
                 TestResults =
                     _testResults
@@ -71,6 +73,14 @@ public class DataSetUploadMockBuilder
                         },
                     ],
             },
+            ScreenerProgress = new DataSetScreenerProgress
+            {
+                PercentageComplete = 100,
+                Stage = "Stage 1",
+                Completed = true,
+                Passed = _screenerResult == "Passed",
+                LastUpdated = _timeProvider.GetUtcNow(),
+            },
             ReplacingFileId = null,
         };
     }
@@ -83,7 +93,7 @@ public class DataSetUploadMockBuilder
             DataSetTitle = "Data set title",
             DataFileSize = "123 Kb",
             DataFileName = "data.csv",
-            Status = DataSetUploadStatus.PENDING_IMPORT.ToString(),
+            Status = nameof(DataSetUploadStatus.PENDING_IMPORT),
             UploadedBy = "test.user",
             MetaFileName = "data.meta.csv",
             MetaFileSize = "123 B",
@@ -91,7 +101,6 @@ public class DataSetUploadMockBuilder
             Created = DateTime.UtcNow,
             ScreenerResult = new()
             {
-                Message = "Screener result message",
                 OverallResult = "Passed",
                 TestResults =
                 [
@@ -100,14 +109,14 @@ public class DataSetUploadMockBuilder
                         TestFunctionName = "TestFunction1",
                         Notes = "Test 1 passed",
                         Stage = "1",
-                        Result = TestResult.PASS.ToString(),
+                        Result = nameof(TestResult.PASS),
                     },
                     new()
                     {
                         TestFunctionName = "TestFunction2",
                         Notes = "Test 2 passed",
                         Stage = "2",
-                        Result = TestResult.PASS.ToString(),
+                        Result = nameof(TestResult.PASS),
                     },
                 ],
             },

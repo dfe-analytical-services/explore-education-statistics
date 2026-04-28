@@ -336,29 +336,26 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const latestRelease =
-    await publicationService.getLatestPublicationReleaseSummary(
+  const publicationSummary = await publicationService.getPublicationSummary(
+    publicationSlug,
+  );
+  const { latestRelease } = publicationSummary;
+  const selectedReleaseVersion =
+    await publicationService.getReleaseVersionSummary(
       publicationSlug,
+      releaseSlug || latestRelease.slug,
     );
 
-  const selectedRelease =
-    !releaseSlug || latestRelease.slug === releaseSlug
-      ? latestRelease
-      : await publicationService.getPublicationReleaseSummary(
-          publicationSlug,
-          releaseSlug,
-        );
-
   const [subjects, featuredTables, fullPublication] = await Promise.all([
-    tableBuilderService.listReleaseSubjects(selectedRelease.id),
-    tableBuilderService.listReleaseFeaturedTables(selectedRelease.id),
+    tableBuilderService.listReleaseSubjects(selectedReleaseVersion.id),
+    tableBuilderService.listReleaseFeaturedTables(selectedReleaseVersion.id),
     publicationService.getLatestPublicationRelease(publicationSlug),
   ]);
 
   if (subjectId && subjects.some(subject => subject.id === subjectId)) {
     const subjectMeta = await tableBuilderService.getSubjectMeta(
       subjectId,
-      selectedRelease.id,
+      selectedReleaseVersion.id,
     );
 
     return {
@@ -368,11 +365,11 @@ export const getServerSideProps: GetServerSideProps<
         selectedPublication: {
           ...selectedPublication,
           selectedRelease: {
-            id: selectedRelease.id,
-            latestData: selectedRelease.latestRelease,
-            slug: selectedRelease.slug,
-            title: selectedRelease.title,
-            type: selectedRelease.type,
+            id: selectedReleaseVersion.id,
+            latestData: selectedReleaseVersion.isLatestRelease,
+            slug: selectedReleaseVersion.slug,
+            title: selectedReleaseVersion.title,
+            type: selectedReleaseVersion.type,
           },
           latestRelease: {
             title: latestRelease.title,
@@ -394,11 +391,11 @@ export const getServerSideProps: GetServerSideProps<
       selectedPublication: {
         ...selectedPublication,
         selectedRelease: {
-          id: selectedRelease.id,
-          latestData: selectedRelease.latestRelease,
-          slug: selectedRelease.slug,
-          title: selectedRelease.title,
-          type: selectedRelease.type,
+          id: selectedReleaseVersion.id,
+          latestData: selectedReleaseVersion.isLatestRelease,
+          slug: selectedReleaseVersion.slug,
+          title: selectedReleaseVersion.title,
+          type: selectedReleaseVersion.type,
         },
         latestRelease: {
           title: latestRelease.title,

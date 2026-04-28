@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 *** Variables ***
 ${PUBLICATION_NAME}=        Manage users %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=            Calendar year 2000
-${PUBLICATION_2_NAME}=      Manage users second %{RUN_IDENTIFIER}
+${PUBLICATION_2_NAME}=      Manage users %{RUN_IDENTIFIER} second
 ${RELEASE_2_NAME}=          Academic year 2000/01
 
 

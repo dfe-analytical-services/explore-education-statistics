@@ -7,5 +7,5 @@ public record CheckSearchableDocumentsReport
     public required int TotalPublicationCount { get; init; }
     public required string[] MissingBlobs { get; init; }
     public required string[] ExtraneousBlobs { get; init; }
-    public required ReleaseSummaryViewModel[] MissingBlobSummaries { get; init; }
+    public required ReleaseVersionSummaryViewModel[] MissingBlobSummaries { get; init; }
 }
