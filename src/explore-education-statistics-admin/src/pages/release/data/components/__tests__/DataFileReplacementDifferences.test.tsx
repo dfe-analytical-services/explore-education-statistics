@@ -84,6 +84,7 @@ describe('DataFileReplacementDifferences', () => {
     );
 
   const tableId = 'replacements-differences-table';
+
   test('renders differences/mappings table with options and available actions', async () => {
     const { user } = sharedRender();
     // check table is there

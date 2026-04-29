@@ -77,16 +77,16 @@ const DataFileReplacementPlan = ({
 
   const [debouncedRefetchPlan] = useDebouncedCallback(async () => {
     // Debounce avoids spamming for new plan.
-    // Fresh plan has updated datablocks/footnotes.
+    // Every mapping update will request a new plan, this will be batched in this debounce
+    // The new plan contains updated datablocks/footnotes.
 
     await refetchPlan();
     isFetchingSoonToggle.off();
   }, 7500);
 
   const onMappingUpdate = useCallback(() => {
-    // plan will update soon
-    isFetchingSoonToggle.on();
     debouncedRefetchPlan();
+    isFetchingSoonToggle.on();
   }, [debouncedRefetchPlan]);
 
   if (error) {
@@ -225,7 +225,6 @@ function Plan({
     isNotReadyToPublish,
     isPatch,
   } = useMemo(() => {
-    // a bunch of falsie statements about the plan
     return {
       hasInvalidDataBlocks:
         plan?.dataBlocks.some(block => !block.valid) ?? false,
