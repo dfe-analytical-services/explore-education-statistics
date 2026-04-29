@@ -1,7 +1,7 @@
 import _userService, {
   RemoveUser,
-  UserStatus,
-} from '@admin/services/user-management/userService';
+} from '@admin/services/user-management/usersService';
+import { User } from '@admin/services/types/userWithRoles';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
@@ -14,7 +14,7 @@ jest.mock('@admin/services/userService');
 
 const userService = _userService as jest.Mocked<typeof _userService>;
 
-const user: UserStatus[] = [
+const user: User[] = [
   {
     id: '1',
     name: 'TestUser1',
@@ -29,7 +29,7 @@ const removedUser: RemoveUser = {
 
 describe('BauUsersPage', () => {
   test('renders delete action when user a user is present', async () => {
-    userService.getUsers.mockResolvedValue(user);
+    userService.getAllUsers.mockResolvedValue(user);
 
     renderPage();
 
@@ -39,7 +39,7 @@ describe('BauUsersPage', () => {
   });
 
   test('calls user service when delete user button is clicked', async () => {
-    userService.getUsers.mockResolvedValue(user);
+    userService.getAllUsers.mockResolvedValue(user);
     userService.deleteUser.mockResolvedValue(Promise.resolve(removedUser));
     renderPage();
 
