@@ -263,6 +263,12 @@ public class DateTimeOffsetExtensionsTestsTheoryData
             // csharpier-ignore-end
         };
 
+        public static readonly TheoryData<DateTimeOffset, DateTimeOffset, string> tg = new()
+        {
+            // csharpier-ignore-start
+            { Dt("2025-03-23T00:00:00 +00:00"), Dt("2025-03-30T22:59:59.9999999 +00:00"), "seven days before BST starts" }
+        };
+
         /// <summary>
         /// Test data of UK time zone <see cref="DateTimeOffset"/> values used to verify date-only calculation.
         /// </summary>

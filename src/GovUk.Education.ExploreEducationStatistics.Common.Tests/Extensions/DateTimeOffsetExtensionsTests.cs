@@ -58,6 +58,24 @@ public abstract class DateTimeOffsetExtensionsTests
                 $"Expected: {expectedDateTimeOffset:o}\nActual:   {actual:o}\nDescription: {description}"
             );
         }
+
+        [Theory]
+        [MemberData(
+            nameof(DateTimeOffsetExtensionsTestsTheoryData.ToUkDateOnlyTheoryData.tg),
+            MemberType = typeof(DateTimeOffsetExtensionsTestsTheoryData.ToUkDateOnlyTheoryData)
+        )]
+        public void TJDemoTest(DateTimeOffset date, DateTimeOffset expected, string desc)
+        {
+            var currentLogic = date.AddDays(7).GetUkEndOfDayUtc(); // This represents the logic used in `TJDEMOMARKERFORCURRENTLOGICINPRREVIEW` in \Services\Public.Data\PreviewTokenService.cs line 42
+
+            DateTimeOffset starts = date; // includes the creating user's timezone offset, e.g. +01
+            var tjSuggestedLogic = starts.AddDays(8).AddMilliseconds(-1).ConvertToUkTimeZone().ToUniversalTime(); // UK Time?
+
+            Assert.Equal(expected, currentLogic); // returns true
+            Assert.Equal(expected, tjSuggestedLogic); // returns false as prone to DST bug introduced by '.AddDays(8)' (this Add(8) needs taken into account DST)
+        }
+
+        private static DateTimeOffset Dt(string input) => DateTimeOffset.Parse(input);
     }
 
     public class ToUkDateOnlyTests : DateTimeOffsetExtensionsTests

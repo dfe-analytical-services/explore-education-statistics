@@ -39,7 +39,7 @@ public class PreviewTokenService(
             .OnSuccess(async () =>
             {
                 var activatesUtc = activates?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
-                var expiresUtc = expires?.ToUniversalTime() ?? activatesUtc.AddDays(7).GetUkEndOfDayUtc();
+                var expiresUtc = expires?.ToUniversalTime() ?? TJDEMOMARKERFORCURRENTLOGICINPRREVIEW(activatesUtc);
 
                 var previewToken = publicDataDbContext.PreviewTokens.Add(
                     new PreviewToken
@@ -55,6 +55,11 @@ public class PreviewTokenService(
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
                 return await MapPreviewToken(previewToken.Entity);
             });
+    }
+
+    public static DateTimeOffset TJDEMOMARKERFORCURRENTLOGICINPRREVIEW(DateTimeOffset activatesUtc)
+    {
+        return activatesUtc.AddDays(7).GetUkEndOfDayUtc();
     }
 
     public async Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(
