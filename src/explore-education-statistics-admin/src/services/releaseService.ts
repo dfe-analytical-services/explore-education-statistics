@@ -1,6 +1,7 @@
 import client from '@admin/services/utils/service';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { ReleaseVersion } from './releaseVersionService';
+import { IdTitlePair } from './types/common';
 
 export interface CreateReleaseRequest {
   publicationId: string;
@@ -29,6 +30,10 @@ export interface Release {
 }
 
 const releaseService = {
+  getReleases(): Promise<IdTitlePair[]> {
+    return client.get<IdTitlePair[]>('/releases');
+  },
+
   createRelease(createRequest: CreateReleaseRequest): Promise<ReleaseVersion> {
     return client.post(`/releases`, createRequest);
   },

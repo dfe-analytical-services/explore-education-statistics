@@ -7,7 +7,7 @@ import {
   ReleaseSeriesItem,
 } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
-import { UserPublicationRole } from '@admin/services/user-management/userService';
+import { UserPublicationRole } from '@admin/services/user-management/usersService';
 import { isAxiosError } from 'axios';
 
 export interface Contact {

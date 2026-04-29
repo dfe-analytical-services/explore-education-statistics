@@ -5,6 +5,13 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
+public record UserWithRolesViewModel : UserViewModel
+{
+    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
+
+    public List<UserPreReleaseRoleViewModel> UserPreReleaseRoles { get; init; } = [];
+}
+
 public record UserViewModel
 {
     public required Guid Id { get; init; }
@@ -14,10 +21,6 @@ public record UserViewModel
     public required string Email { get; init; } = string.Empty;
 
     public string? Role { get; init; }
-
-    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
-
-    public List<UserPreReleaseRoleViewModel> UserPreReleaseRoles { get; init; } = [];
 }
 
 public record UserPublicationRoleViewModel
