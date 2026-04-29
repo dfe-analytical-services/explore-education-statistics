@@ -46,17 +46,19 @@ var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}
 //
 // Note that this only applies to Prod and Pre-Prod now, as Dev and Test can now use their proper public site
 // URLs to reach AFD.
-var publicSiteHostName = replaceMultiple(publicSiteUrl, {
+var publicSiteHostName = subscription == 's101p01'
   
   // Handle the case for Prod to allow access via "https://afd.explore-education-statistics.service.gov.uk" during
   // testing.
-  'https://explore-education': 'afd.explore-education'
+  ? 'afd.explore-education-statistics.service.gov.uk'
+  
+  : replaceMultiple(publicSiteUrl, {
   
   // Handle the case for Pre-Production to allow access via
   // "https://pre-productionafd.explore-education-statistics.service.gov.uk" during testing.
   'pre-production.explore-education': 'pre-productionafd.explore-education'
   
-  // Finally, remove the "https://" from the URL to leave just the domain name.
+  // Remove the "https://" from the URL to leave just the domain name.
   'https://': ''
 })
 
