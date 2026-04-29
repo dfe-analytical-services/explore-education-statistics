@@ -53,12 +53,12 @@ public class DataSetScreenerService(
     )
     {
         var utcNow = timeProvider.GetUtcNow();
-        var lastUpdatedInterval = utcNow.AddSeconds(-options.Value.ScreenerProgressUpdateIntervalSeconds);
+        var lastCheckedWindow = utcNow.AddSeconds(-options.Value.ScreenerProgressUpdateIntervalSeconds);
 
         var dataSetsUndergoingScreening = await contentDbContext
             .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
             .Where(upload =>
-                upload.ScreenerProgress == null || upload.ScreenerProgress.LastUpdated <= lastUpdatedInterval
+                upload.ScreenerProgressLastChecked == null || upload.ScreenerProgressLastChecked <= lastCheckedWindow
             )
             .ToListAsync(cancellationToken: cancellationToken);
 
@@ -97,9 +97,15 @@ public class DataSetScreenerService(
                 dataSetToUpdate.ScreenerProgress.Stage = progressUpdateForDataSet.Stage;
                 dataSetToUpdate.ScreenerProgress.Completed = progressUpdateForDataSet.Completed;
                 dataSetToUpdate.ScreenerProgress.Passed = progressUpdateForDataSet.Passed;
+
+                // Update the "last updated" date to mark the last time that a progress update was
+                // successfully applied for this data set.
+                dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
             }
 
-            dataSetToUpdate.ScreenerProgress.LastUpdated = utcNow;
+            // Update the "last checked" date to mark the last time that progress was checked
+            // for this data set.
+            dataSetToUpdate.ScreenerProgressLastChecked = utcNow;
         });
 
         contentDbContext.DataSetUploads.UpdateRange(dataSetsUndergoingScreening);

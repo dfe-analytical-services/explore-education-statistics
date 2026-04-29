@@ -83,6 +83,16 @@ public static class DataSetUploadGeneratorExtensions
         DataSetScreenerProgress? screenerProgress
     ) => generator.ForInstance(s => s.SetScreenerProgress(screenerProgress));
 
+    public static Generator<DataSetUpload> WithScreenerProgressLastChecked(
+        this Generator<DataSetUpload> generator,
+        DateTimeOffset? lastChecked
+    ) => generator.ForInstance(s => s.SetScreenerProgressLastChecked(lastChecked));
+
+    public static Generator<DataSetUpload> WithScreenerProgressLastUpdated(
+        this Generator<DataSetUpload> generator,
+        DateTimeOffset? lastUpdated
+    ) => generator.ForInstance(s => s.SetScreenerProgressLastUpdated(lastUpdated));
+
     public static Generator<DataSetUpload> WithCreated(this Generator<DataSetUpload> generator, DateTime created) =>
         generator.ForInstance(s => s.SetCreated(created));
 
@@ -151,6 +161,16 @@ public static class DataSetUploadGeneratorExtensions
         this InstanceSetters<DataSetUpload> setters,
         DataSetScreenerProgress? screenerProgress
     ) => setters.Set(d => d.ScreenerProgress, screenerProgress);
+
+    public static InstanceSetters<DataSetUpload> SetScreenerProgressLastChecked(
+        this InstanceSetters<DataSetUpload> setters,
+        DateTimeOffset? lastChecked
+    ) => setters.Set(d => d.ScreenerProgressLastChecked, lastChecked);
+
+    public static InstanceSetters<DataSetUpload> SetScreenerProgressLastUpdated(
+        this InstanceSetters<DataSetUpload> setters,
+        DateTimeOffset? lastUpdated
+    ) => setters.Set(d => d.ScreenerProgressLastUpdated, lastUpdated);
 
     public static InstanceSetters<DataSetUpload> SetCreated(
         this InstanceSetters<DataSetUpload> setters,

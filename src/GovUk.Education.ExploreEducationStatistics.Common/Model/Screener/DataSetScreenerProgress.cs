@@ -13,6 +13,4 @@ public record DataSetScreenerProgress
     public bool Completed { get; set; }
 
     public bool Passed { get; set; }
-
-    public DateTimeOffset LastUpdated { get; set; }
 }

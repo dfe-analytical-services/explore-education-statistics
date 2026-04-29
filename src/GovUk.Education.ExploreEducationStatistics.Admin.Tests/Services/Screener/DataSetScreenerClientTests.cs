@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using Moq;
 using RichardSzalay.MockHttp;
@@ -57,7 +56,7 @@ public class DataSetScreenerClientTests
                     MetaFilePath = "",
                     StorageContainerName = "",
                 },
-                default
+                CancellationToken.None
             );
 
             authenticationManager.Verify(
@@ -109,7 +108,7 @@ public class DataSetScreenerClientTests
 
             var dataSetScreenerClient = BuildService();
 
-            var response = await dataSetScreenerClient.ScreenDataSet(request, default);
+            var response = await dataSetScreenerClient.ScreenDataSet(request, CancellationToken.None);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
