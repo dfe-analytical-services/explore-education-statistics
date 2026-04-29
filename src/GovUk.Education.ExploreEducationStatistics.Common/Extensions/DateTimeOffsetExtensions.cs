@@ -54,12 +54,9 @@ public static class DateTimeOffsetExtensions
     /// </para>
     /// </summary>
     /// <param name="dateTimeOffset">The input <see cref="DateTimeOffset"/> to convert.</param>
-    /// <param name="includeFractionalSeconds">Sets the milliseconds component to .9999999 if true and .0 if false.</param>
     /// <returns>A <see cref="DateTimeOffset"/> in UTC corresponding to the end of the UK day for the provided input.</returns>
-    public static DateTimeOffset GetUkEndOfDayUtc(
-        this DateTimeOffset dateTimeOffset,
-        bool includeFractionalSeconds = true
-    ) => dateTimeOffset.ToUkDateOnly().GetUkEndOfDayUtc(includeFractionalSeconds);
+    public static DateTimeOffset GetUkEndOfDayUtc(this DateTimeOffset dateTimeOffset) =>
+        dateTimeOffset.ToUkDateOnly().GetUkEndOfDayUtc();
 
     /// <summary>
     /// <para>

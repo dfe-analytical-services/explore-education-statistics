@@ -344,7 +344,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         private static DateTimeOffset GetUkEndOfDayUtcAfterDays(DateTimeOffset date, int daysToAdd) =>
             // The request validation expects the expiry value to be at the end of the day,
             // without fractional seconds.
-            date.ToUkDateOnly().AddDays(daysToAdd).GetUkEndOfDayUtc(includeFractionalSeconds: false);
+            date.ToUkDateOnly().AddDays(daysToAdd).GetUkEndOfDayUtc();
 
         private async Task<HttpResponseMessage> CreatePreviewToken(
             Guid dataSetVersionId,
