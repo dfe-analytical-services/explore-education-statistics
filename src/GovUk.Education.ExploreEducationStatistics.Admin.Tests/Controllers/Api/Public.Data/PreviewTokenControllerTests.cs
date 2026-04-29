@@ -71,7 +71,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task Success()
         {
-            var expectedExpires = DateTimeOffset.UtcNow.AddDays(7).GetUkEndOfDayUtc(includeFractionalSeconds: false);
+            var expectedExpires = DateTimeOffset.UtcNow.AddDays(7).GetUkEndOfDayUtc();
             var dataSetVersion = await SetUpDataSetVersionTestData();
 
             var label = new string('A', count: 100);
@@ -154,8 +154,8 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
             var expectedExpires =
                 suppliedExpires // The supplied expires value
-                ?? suppliedActivates?.AddDays(7).GetUkEndOfDayUtc(includeFractionalSeconds: false) // otherwise 7 days after activates if that has a supplied value
-                ?? DateTimeOffset.UtcNow.AddDays(7).GetUkEndOfDayUtc(includeFractionalSeconds: false); // otherwise 7 days from now
+                ?? suppliedActivates?.AddDays(7).GetUkEndOfDayUtc() // otherwise 7 days after activates if that has a supplied value
+                ?? DateTimeOffset.UtcNow.AddDays(7).GetUkEndOfDayUtc(); // otherwise 7 days from now
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, viewModel.Id),
