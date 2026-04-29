@@ -838,9 +838,7 @@ public abstract class DataSetScreenerServiceTests
                                 }
                             )
                             .SetScreenerProgressLastChecked(dataSet2LastChecked)
-                            .SetScreenerProgressLastUpdated(
-                                dataSet2LastChecked.AddMinutes(-ScreenerProgressUpdateFailureIntervalMinutes - 1)
-                            )
+                            .SetScreenerProgressLastUpdated(dataSet2LastChecked.AddDays(-1))
                 )
                 .GenerateList();
 

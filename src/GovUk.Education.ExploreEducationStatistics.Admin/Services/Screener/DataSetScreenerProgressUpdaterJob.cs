@@ -1,6 +1,8 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +12,7 @@ public class DataSetScreenerProgressUpdaterJob(
     IServiceProvider serviceProvider,
     IOptions<DataScreenerOptions> options,
     IDatabaseHelper databaseHelper,
-    Func<TimeSpan, PeriodicTimer> timerFactory,
+    Func<TimeSpan, IPeriodicTimer> timerFactory,
     ILogger<DataSetScreenerProgressUpdaterJob> logger
 ) : BackgroundService
 {
@@ -54,7 +56,7 @@ public class DataSetScreenerProgressUpdaterJob(
                 logger.LogInformation(
                     "{Count} data sets had screener progress updates at {Time} (UTC)",
                     updates.Count,
-                    DateTimeOffset.UtcNow
+                    DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
                 );
             }
 
@@ -69,7 +71,7 @@ public class DataSetScreenerProgressUpdaterJob(
                         + "as failed screening at {Time} (UTC)",
                     failures.Count,
                     options.Value.ScreenerProgressUpdateFailureIntervalMinutes,
-                    DateTimeOffset.UtcNow
+                    DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
                 );
             }
         }

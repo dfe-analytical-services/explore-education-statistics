@@ -1,3 +1,4 @@
+#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -135,15 +136,14 @@ public class DataSetScreenerService(
     {
         var progressUpdatesFailureIntervalMins = options.Value.ScreenerProgressUpdateFailureIntervalMinutes;
 
-        var screeningDataSetsWithoutRecentProgressUpdates = (
-            await contentDbContext
-                .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
-                .ToListAsync(cancellationToken: cancellationToken)
-        )
+        var screeningDataSets = await contentDbContext
+            .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var screeningDataSetsWithoutRecentProgressUpdates = screeningDataSets
             .Where(upload =>
-                upload.ScreenerProgressLastChecked != null
-                && upload.ScreenerProgressLastUpdated != null
-                && (upload.ScreenerProgressLastChecked.Value - upload.ScreenerProgressLastUpdated.Value).Minutes
+                upload is { ScreenerProgressLastChecked: not null, ScreenerProgressLastUpdated: not null }
+                && (upload.ScreenerProgressLastChecked.Value - upload.ScreenerProgressLastUpdated.Value).TotalMinutes
                     >= progressUpdatesFailureIntervalMins
             )
             .ToList();

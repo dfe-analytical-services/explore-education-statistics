@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
