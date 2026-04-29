@@ -1,7 +1,7 @@
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { IdTitlePair } from '@admin/services/types/common';
-import { UserPublicationRole } from '@admin/services/user-management/userService';
+import { UserPublicationRole } from '@admin/services/user-management/usersService';
 import client from '@admin/services/utils/service';
 import {
   Contact,

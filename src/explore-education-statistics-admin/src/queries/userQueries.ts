@@ -1,5 +1,5 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
-import userService from '@admin/services/user-management/userService';
+import userService from '@admin/services/user-management/usersService';
 
 const userQueries = createQueryKeys('user', {
   get(userId: string) {
@@ -7,14 +7,6 @@ const userQueries = createQueryKeys('user', {
       queryKey: [userId],
       queryFn: () => userService.getUser(userId),
     };
-  },
-  getRoles: {
-    queryKey: null,
-    queryFn: () => userService.getRoles(),
-  },
-  getResourceRoles: {
-    queryKey: null,
-    queryFn: () => userService.getResourceRoles(),
   },
   getReleases: {
     queryKey: null,
