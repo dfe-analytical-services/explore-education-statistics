@@ -21,7 +21,7 @@ public class UsersController(IUserManagementService userManagementService) : Con
     }
 
     [HttpGet("users/{userId:guid}")]
-    public async Task<ActionResult<UserViewModel>> GetUser(Guid userId)
+    public async Task<ActionResult<UserWithRolesViewModel>> GetUser(Guid userId)
     {
         return await userManagementService.GetUser(userId).HandleFailuresOrOk();
     }

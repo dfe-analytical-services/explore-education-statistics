@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserManagementService
 {
-    Task<Either<ActionResult, UserViewModel>> GetUser(Guid id);
+    Task<Either<ActionResult, UserWithRolesViewModel>> GetUser(Guid id);
 
     Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers();
 
