@@ -66,7 +66,7 @@ public class UserManagementService(
                     .ToListAsync();
 
                 return usersAndRoles
-                    .Select(userAndRole => new UserViewModel
+                    .Select(userAndRole => new UserWithRolesViewModel
                     {
                         Id = userAndRole.Id,
                         Name = userAndRole.Name,
@@ -97,7 +97,7 @@ public class UserManagementService(
             });
     }
 
-    public async Task<Either<ActionResult, UserViewModel>> GetUser(Guid id)
+    public async Task<Either<ActionResult, UserWithRolesViewModel>> GetUser(Guid id)
     {
         return await userService
             .CheckCanManageAllUsers()
@@ -120,7 +120,7 @@ public class UserManagementService(
                                 // have been removed.
                                 var globalRole = globalRoles.FirstOrDefault();
 
-                                return new UserViewModel
+                                return new UserWithRolesViewModel
                                 {
                                     Id = id,
                                     Name = user.FirstName + " " + user.LastName,
