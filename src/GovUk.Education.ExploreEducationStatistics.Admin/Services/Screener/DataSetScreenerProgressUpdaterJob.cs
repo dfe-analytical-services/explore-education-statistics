@@ -10,12 +10,13 @@ public class DataSetScreenerProgressUpdaterJob(
     IServiceProvider serviceProvider,
     IOptions<DataScreenerOptions> options,
     IDatabaseHelper databaseHelper,
+    Func<TimeSpan, PeriodicTimer> timerFactory,
     ILogger<DataSetScreenerProgressUpdaterJob> logger
 ) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(options.Value.ScreenerProgressUpdateIntervalSeconds));
+        using var timer = timerFactory(TimeSpan.FromSeconds(options.Value.ScreenerProgressUpdateIntervalSeconds));
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -53,6 +54,21 @@ public class DataSetScreenerProgressUpdaterJob(
                 logger.LogInformation(
                     "{Count} data sets had screener progress updates at {Time} (UTC)",
                     updates.Count,
+                    DateTimeOffset.UtcNow
+                );
+            }
+
+            var failures = await dataSetScreenerService.MarkDataSetsWithoutProgressAsFailed(
+                cancellationToken: cancellationToken
+            );
+
+            if (failures.Count > 0)
+            {
+                logger.LogInformation(
+                    "{Count} data sets failed to retrieve progress updates in {TimeoutMins} minutes and were marked "
+                        + "as failed screening at {Time} (UTC)",
+                    failures.Count,
+                    options.Value.ScreenerProgressUpdateFailureIntervalMinutes,
                     DateTimeOffset.UtcNow
                 );
             }

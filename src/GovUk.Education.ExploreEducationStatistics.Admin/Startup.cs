@@ -439,6 +439,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         if (enhancedScreenerJourney)
         {
+            services.AddSingleton<Func<TimeSpan, PeriodicTimer>>(period => new PeriodicTimer(period));
             services.AddHostedService<DataSetScreenerProgressUpdaterJob>();
         }
 

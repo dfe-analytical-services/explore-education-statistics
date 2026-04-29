@@ -1,8 +1,10 @@
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -23,6 +25,7 @@ public class DataSetScreenerService(
     IUserService userService,
     ContentDbContext contentDbContext,
     TimeProvider timeProvider,
+    IMapper mapper,
     IOptions<DataScreenerOptions> options
 ) : IDataSetScreenerService
 {
@@ -99,7 +102,19 @@ public class DataSetScreenerService(
                 dataSetToUpdate.ScreenerProgress.Passed = progressUpdateForDataSet.Passed;
 
                 // Update the "last updated" date to mark the last time that a progress update was
-                // successfully applied for this data set.
+                // successfully received and applied to this data set.
+                dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
+            }
+            else if (dataSetToUpdate.ScreenerProgressLastChecked == null)
+            {
+                // If no progress response has been received for this data set, and
+                // it is the first time we have checked this data set for progress,
+                // provide an initial "ScreenerProgressLastUpdated" value.
+                //
+                // This allows us to check the difference between
+                // "ScreenerProgressLastUpdated" and "ScreenerProgressLastChecked"
+                // to see if it is successfully receiving progress updates in a timely
+                // manner and, if not, will allow us to mark it as failed.
                 dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
             }
 
@@ -112,6 +127,42 @@ public class DataSetScreenerService(
         await contentDbContext.SaveChangesAsync(cancellationToken: cancellationToken);
 
         return progressResults;
+    }
+
+    public async Task<List<DataSetUploadViewModel>> MarkDataSetsWithoutProgressAsFailed(
+        CancellationToken cancellationToken
+    )
+    {
+        var progressUpdatesFailureIntervalMins = options.Value.ScreenerProgressUpdateFailureIntervalMinutes;
+
+        var screeningDataSetsWithoutRecentProgressUpdates = (
+            await contentDbContext
+                .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
+                .ToListAsync(cancellationToken: cancellationToken)
+        )
+            .Where(upload =>
+                upload.ScreenerProgressLastChecked != null
+                && upload.ScreenerProgressLastUpdated != null
+                && (upload.ScreenerProgressLastChecked.Value - upload.ScreenerProgressLastUpdated.Value).Minutes
+                    >= progressUpdatesFailureIntervalMins
+            )
+            .ToList();
+
+        screeningDataSetsWithoutRecentProgressUpdates.ForEach(upload =>
+        {
+            upload.ScreenerResult = new DataSetScreenerResponse
+            {
+                Passed = false,
+                OverallResult = "Failed to retrieve progress updates",
+                TestResults = [],
+            };
+            upload.Status = DataSetUploadStatus.SCREENER_ERROR;
+        });
+
+        contentDbContext.DataSetUploads.UpdateRange(screeningDataSetsWithoutRecentProgressUpdates);
+        await contentDbContext.SaveChangesAsync(cancellationToken: cancellationToken);
+
+        return [.. screeningDataSetsWithoutRecentProgressUpdates.Select(mapper.Map<DataSetUploadViewModel>)];
     }
 
     public Task<Either<ActionResult, List<ScreenerProgressWithDataSetUploadIdViewModel>>> GetScreenerProgress(

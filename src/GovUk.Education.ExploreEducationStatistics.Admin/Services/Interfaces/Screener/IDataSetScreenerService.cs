@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
@@ -21,13 +22,20 @@ public interface IDataSetScreenerService
 
     Task StartScreening(DataSetStartScreeningRequest dataSetScreenRequest, CancellationToken cancellationToken);
 
-    // ReSharper disable once UnusedMemberInSuper.Global
     /// <summary>
     /// This method will find data sets that are currently undergoing screening, and will request
     /// progress updates for them from the Screener API.  To prevent excessive numbers of checks,
     /// this method will also exclude any data sets that had their progress updated very recently.
     /// </summary>
     Task<List<DataSetScreenerProgressResponse>> UpdateScreeningProgress(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// This method will find data sets that are currently undergoing screening but have failed to
+    /// get screener progress updates for a certain duration, and will mark them as having failed
+    /// screening. This prevents any build up of data sets that have become stuck in "Screening" status
+    /// but without being able to make any progress updates.
+    /// </summary>
+    Task<List<DataSetUploadViewModel>> MarkDataSetsWithoutProgressAsFailed(CancellationToken cancellationToken);
 
     /// <summary>
     /// Get the progress of all data sets undergoing screening for a given ReleaseVersion.
