@@ -127,6 +127,7 @@ describe('ReleaseDataUploadsSection', () => {
       valid: false,
       readyToPublish: false,
     },
+    mapping: { indicators: { mappings: {}, candidates: {} } },
   };
 
   beforeEach(() => {

@@ -138,6 +138,8 @@ interface IndicatorSource {
 
 export type IndicatorCandidate = IndicatorSource;
 
+export type SourceItem = IndicatorSource;
+
 export type IndicatorMapping = Mapping<IndicatorSource>;
 export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;
 
@@ -145,8 +147,6 @@ export type IndicatorsMappingsPlan = MappingsPlan<IndicatorSource>;
 
 export type PlanMappings = {
   indicators: IndicatorsMappingsPlan;
-  // filters: FiltersMappingsPlan;
-  // locations: LocationsMappingsPlan;
 };
 
 export interface IndicatorsMapping {
@@ -207,6 +207,7 @@ const dataReplacementService = {
         },
       );
 
+    // restructure from PlanMappingIndicatorsUpdateResponse to PlanMappings['indicators']['mappings']
     const planIndicatorMappings: PlanMappings['indicators']['mappings'] =
       Object.fromEntries(
         indicatorsMappings.map(
