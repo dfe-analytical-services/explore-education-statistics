@@ -1,10 +1,10 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService from '@admin/services/user-management/userService';
+import usersService from '@admin/services/user-management/usersService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import userQueries from '@admin/queries/userQueries';
+import usersQueries from '@admin/queries/user-management/usersQueries';
 import logger from '@common/services/logger';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
@@ -15,10 +15,10 @@ const BauUsersPage = () => {
     data: users = [],
     isLoading,
     refetch: refetchUsers,
-  } = useQuery(userQueries.getUsers);
+  } = useQuery(usersQueries.getAllUsers);
 
   const handleDeleteUser = async (userEmail: string) => {
-    await userService
+    await usersService
       .deleteUser(userEmail)
       .then(() => {
         refetchUsers();
