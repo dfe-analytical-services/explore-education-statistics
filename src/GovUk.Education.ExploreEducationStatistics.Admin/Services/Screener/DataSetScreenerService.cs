@@ -59,6 +59,8 @@ public class DataSetScreenerService(
         var utcNow = timeProvider.GetUtcNow();
         var lastCheckedWindow = utcNow.AddSeconds(-options.Value.ScreenerProgressUpdateIntervalSeconds);
 
+        // Find any data sets currently undergoing screening that haven't had a progress check made for
+        // them in the last <ScreenerProgressUpdateIntervalSeconds> seconds.
         var dataSetsUndergoingScreening = await contentDbContext
             .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
             .Where(upload =>
@@ -73,13 +75,14 @@ public class DataSetScreenerService(
 
         var dataSetIdsUndergoingScreening = dataSetsUndergoingScreening.Select(upload => upload.Id).ToList();
 
+        // Request progress updates for all data sets requiring one.
         var progressResults = await dataSetScreenerClient.GetScreenerProgress(
             dataSetIdsUndergoingScreening,
             cancellationToken
         );
 
-        // For each progress update received, update the screener progress details on the
-        // associated DataSetUpload entry.
+        // For each data set that required a progress update, attempt to update its progress
+        // based on the responses received from the Screener API.
         dataSetsUndergoingScreening.ForEach(dataSetToUpdate =>
         {
             dataSetToUpdate.ScreenerProgress ??= new DataSetScreenerProgress
@@ -94,6 +97,8 @@ public class DataSetScreenerService(
                 result.DataSetId == dataSetToUpdate.Id
             );
 
+            // If a progress response was returned from the Screener API for this
+            // data set, apply it.
             if (progressUpdateForDataSet != null)
             {
                 dataSetToUpdate.ScreenerProgress.PercentageComplete = (int)
@@ -136,9 +141,14 @@ public class DataSetScreenerService(
     {
         var progressUpdatesFailureIntervalMins = options.Value.ScreenerProgressUpdateFailureIntervalMinutes;
 
+        // Find all data sets currently undergoing screening.
         var screeningDataSets = await contentDbContext
             .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
             .ToListAsync(cancellationToken: cancellationToken);
+
+        // Find any data sets where the gap between their last successful progress update
+        // (or the very first attempt to get a progress update), and the last time that Admin checked
+        // for a progress update, has become too large.
 
         var screeningDataSetsWithoutRecentProgressUpdates = screeningDataSets
             .Where(upload =>
@@ -148,6 +158,8 @@ public class DataSetScreenerService(
             )
             .ToList();
 
+        // For each affected data set, mark it as having failed screening due to not receiving
+        // a successful progress update for too long.
         screeningDataSetsWithoutRecentProgressUpdates.ForEach(upload =>
         {
             upload.ScreenerResult = new DataSetScreenerResponse

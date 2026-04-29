@@ -25,6 +25,8 @@ public class DataSetScreenerProgressUpdaterJobTests
 
         var periodicTimer = new Mock<IPeriodicTimer>(MockBehavior.Strict);
 
+        // When WaitForNextTickAsync is called, cancel the CancellationToken so that we drop out of the
+        // hosted service's execution loop after a single iteration.
         periodicTimer
             .Setup(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()))
             .Callback(() => cancellationTokenSource.Cancel())
@@ -60,7 +62,7 @@ public class DataSetScreenerProgressUpdaterJobTests
 
         var periodicTimer = new Mock<IPeriodicTimer>(MockBehavior.Strict);
 
-        // Allow "WaitForNextTickAsync" to be called twice before cancelling the job execution.
+        // Allow "WaitForNextTickAsync" to be called three times before cancelling the job execution.
         // This way we can test that the looping in the job is working correctly.
         var iterations = 0;
 
@@ -68,7 +70,7 @@ public class DataSetScreenerProgressUpdaterJobTests
             .Setup(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()))
             .Callback(() =>
             {
-                if (++iterations == 2)
+                if (++iterations == 3)
                 {
                     cancellationTokenSource.Cancel();
                 }
@@ -94,14 +96,14 @@ public class DataSetScreenerProgressUpdaterJobTests
 
         await job.ExecuteTask!;
 
-        periodicTimer.Verify(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));
+        periodicTimer.Verify(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()), Times.Exactly(3));
 
         dataSetScreenerService.Verify(
             s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()),
-            Times.Exactly(2)
+            Times.Exactly(3)
         );
 
-        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(2));
+        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(3));
     }
 
     private DataSetScreenerProgressUpdaterJob BuildService(

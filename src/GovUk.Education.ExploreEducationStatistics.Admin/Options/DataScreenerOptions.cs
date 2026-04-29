@@ -10,8 +10,25 @@ public class DataScreenerOptions : IAzureAuthenticationOptions
 
     public string ScreenerStorage { get; init; }
 
+    /// <summary>
+    /// A temporary feature flag to control the Screener behaviour
+    /// requested by Admin.
+    ///
+    /// If set to false, the classic synchronous HTTP
+    /// request / response screening request is used.
+    ///
+    /// If set to true, screening is started as a background
+    /// process by a queue trigger, and its progress tracked
+    /// by Admin periodically requesting screening updates
+    /// from the Screener API.
+    ///
+    /// </summary>
     public bool EnhancedScreenerJourney { get; init; }
 
+    /// <summary>
+    /// Controls the length of time between Admin requesting
+    /// Screener progress updates from the Screener API.
+    /// </summary>
     public int ScreenerProgressUpdateIntervalSeconds { get; init; }
 
     /// <summary>

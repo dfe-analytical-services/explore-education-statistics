@@ -77,7 +77,11 @@ public class DataSetScreenerProgressUpdaterJob(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to update screener progress at {Time} (UTC)", DateTimeOffset.UtcNow);
+            logger.LogError(
+                ex,
+                "Failed to update screener progress at {Time} (UTC)",
+                DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+            );
         }
     }
 }
