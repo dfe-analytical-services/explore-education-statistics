@@ -66,7 +66,7 @@ public class UserManagementService(
                     .ToListAsync();
 
                 return usersAndRoles
-                    .Select(userAndRole => new UserWithRolesViewModel
+                    .Select(userAndRole => new UserViewModel
                     {
                         Id = userAndRole.Id,
                         Name = userAndRole.Name,
