@@ -24,7 +24,7 @@ describe('PublicationDraftReleases', () => {
     releaseId: 'release-id',
     live: false,
     permissions: {
-      canAddPrereleaseUsers: false,
+      canAddPreReleaseUsers: false,
       canUpdateRelease: true,
       canUpdateReleaseVersion: true,
       canDeleteReleaseVersion: false,
@@ -56,7 +56,7 @@ describe('PublicationDraftReleases', () => {
     amendment: true,
     id: 'release-3',
     permissions: {
-      canAddPrereleaseUsers: false,
+      canAddPreReleaseUsers: false,
       canUpdateRelease: true,
       canUpdateReleaseVersion: true,
       canDeleteReleaseVersion: true,
