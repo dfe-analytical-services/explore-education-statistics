@@ -4,7 +4,7 @@ import { parseISO } from 'date-fns';
 
 export interface GlobalPermissions {
   canAccessSystem: boolean;
-  canAccessPrereleasePages: boolean;
+  canAccessPreReleasePages: boolean;
   canAccessAnalystPages: boolean;
   canAccessAllImports: boolean;
   canManageAllTaxonomy: boolean;
