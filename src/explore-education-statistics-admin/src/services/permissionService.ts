@@ -41,7 +41,7 @@ const permissionService = {
     return client.get(`/permissions/access`);
   },
   canAccessPrereleasePages(user?: User): Promise<boolean> {
-    return Promise.resolve(!!user?.permissions.canAccessPrereleasePages);
+    return Promise.resolve(!!user?.permissions.canAccessPreReleasePages);
   },
   canUpdateRelease(releaseId: string): Promise<boolean> {
     return client.get(`/permissions/release/${releaseId}/update`);

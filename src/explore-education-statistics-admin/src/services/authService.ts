@@ -2,7 +2,7 @@ import client from '@admin/services/utils/service';
 
 export interface GlobalPermissions {
   canAccessSystem: boolean;
-  canAccessPrereleasePages: boolean;
+  canAccessPreReleasePages: boolean;
   canAccessAnalystPages: boolean;
   canAccessAllImports: boolean;
   canManageAllTaxonomy: boolean;
