@@ -44,7 +44,7 @@ describe('PublicationPublishedReleases', () => {
     releaseId: 'release-1',
     live: true,
     permissions: {
-      canAddPrereleaseUsers: false,
+      canAddPreReleaseUsers: false,
       canUpdateRelease: true,
       canUpdateReleaseVersion: false,
       canDeleteReleaseVersion: false,

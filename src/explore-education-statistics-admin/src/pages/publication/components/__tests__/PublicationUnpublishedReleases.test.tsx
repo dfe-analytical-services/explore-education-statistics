@@ -25,7 +25,7 @@ describe('PublicationUnpublishedReleases', () => {
   const testPublicationId = 'publication-1';
 
   const testPermissions: ReleaseVersionPermissions = {
-    canAddPrereleaseUsers: false,
+    canAddPreReleaseUsers: false,
     canUpdateRelease: true,
     canUpdateReleaseVersion: true,
     canDeleteReleaseVersion: true,
