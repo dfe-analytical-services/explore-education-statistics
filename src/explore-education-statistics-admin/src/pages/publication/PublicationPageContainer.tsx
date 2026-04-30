@@ -5,18 +5,17 @@ import PageTitle from '@admin/components/PageTitle';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
   publicationContactRoute,
-  publicationManageReleaseContributorsPageRoute,
   publicationDetailsRoute,
   publicationAdoptMethodologyRoute,
   publicationExternalMethodologyRoute,
   publicationMethodologiesRoute,
-  publicationInviteUsersPageRoute,
   publicationTeamAccessRoute,
   publicationReleasesRoute,
   publicationReleaseSeriesRoute,
   publicationCreateReleaseSeriesLegacyLinkRoute,
   publicationEditReleaseSeriesLegacyLinkRoute,
   PublicationRouteParams,
+  publicationInviteDraftersPageRoute,
 } from '@admin/routes/publicationRoutes';
 import publicationService, {
   PublicationWithPermissions,
@@ -45,8 +44,7 @@ const routes = [
   publicationExternalMethodologyRoute,
   publicationCreateReleaseSeriesLegacyLinkRoute,
   publicationEditReleaseSeriesLegacyLinkRoute,
-  publicationManageReleaseContributorsPageRoute,
-  publicationInviteUsersPageRoute,
+  publicationInviteDraftersPageRoute,
 ];
 
 const PublicationPageContainer = ({

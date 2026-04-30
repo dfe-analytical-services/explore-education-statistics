@@ -1,7 +1,6 @@
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { IdTitlePair } from '@admin/services/types/common';
-import { UserPublicationRole } from '@admin/services/user-management/usersService';
 import client from '@admin/services/utils/service';
 import {
   Contact,
@@ -50,7 +49,7 @@ export interface PublicationPermissions {
   canManageExternalMethodology: boolean;
   canManageReleaseSeries: boolean;
   canUpdateContact: boolean;
-  canUpdateContributorReleaseRole: boolean;
+  canUpdateDrafters: boolean;
   canViewReleaseTeamAccess: boolean;
 }
 
@@ -315,10 +314,6 @@ const publicationService = {
       `/publications/${publicationId}/release-series`,
       updatedReleaseSeries,
     );
-  },
-
-  listRoles(publicationId: string): Promise<UserPublicationRole[]> {
-    return client.get(`/publications/${publicationId}/roles`);
   },
 };
 
