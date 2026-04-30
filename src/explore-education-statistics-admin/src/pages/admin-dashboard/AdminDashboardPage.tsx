@@ -6,7 +6,7 @@ import ApprovalsTab from '@admin/pages/admin-dashboard/components/ApprovalsTab';
 import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftReleasesTab';
 import PublicationsTab from '@admin/pages/admin-dashboard/components/PublicationsTab';
 import ScheduledReleasesTab from '@admin/pages/admin-dashboard/components/ScheduledReleasesTab';
-import releaseQueries from '@admin/queries/releaseQueries';
+import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -49,16 +49,16 @@ const AdminDashboardPage = () => {
     data: draftReleases = [],
     isLoading: isLoadingDraftReleases,
     refetch: reloadDraftReleases,
-  } = useQuery(releaseQueries.listDraftReleaseVersions);
+  } = useQuery(releaseVersionQueries.listDraftReleaseVersions);
 
   const {
     data: scheduledReleases = [],
     isLoading: isLoadingScheduledReleases,
-  } = useQuery(releaseQueries.listScheduledReleaseVersions);
+  } = useQuery(releaseVersionQueries.listScheduledReleaseVersions);
 
   const { data: releaseApprovals = [], isLoading: isLoadingReleaseApprovals } =
     useQuery({
-      ...releaseQueries.listReleaseVersionsForApproval,
+      ...releaseVersionQueries.listReleaseVersionsForApproval,
       enabled: isApprover,
     });
 
