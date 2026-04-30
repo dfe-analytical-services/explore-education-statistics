@@ -6,7 +6,7 @@ import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import releaseQueries from '@admin/queries/releaseQueries';
+import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import {
   releaseContentRoute,
   releaseDataBlockCreateRoute,
@@ -101,7 +101,7 @@ const ReleasePageContainer = ({
     data: releaseVersion,
     isLoading: loadingRelease,
     refetch,
-  } = useQuery(releaseQueries.get(releaseVersionId));
+  } = useQuery(releaseVersionQueries.get(releaseVersionId));
 
   const navRoutes = useMemo(() => {
     return allNavRoutes.filter(route => {

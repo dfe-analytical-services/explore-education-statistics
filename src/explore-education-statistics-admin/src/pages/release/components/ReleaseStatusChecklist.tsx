@@ -20,7 +20,7 @@ import {
   ReleaseVersionChecklistError,
   ReleaseVersionChecklistWarning,
 } from '@admin/services/releaseVersionService';
-import releaseQueries from '@admin/queries/releaseQueries';
+import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import InsetText from '@common/components/InsetText';
@@ -42,7 +42,7 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
   const { user } = useAuthContext();
 
   const { data: checklist, isLoading } = useQuery(
-    releaseQueries.getChecklist(releaseVersion.id),
+    releaseVersionQueries.getChecklist(releaseVersion.id),
   );
 
   const { errors = [], warnings = [] } = checklist ?? {};

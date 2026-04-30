@@ -20,7 +20,7 @@ import tableBuilderService from '@common/services/tableBuilderService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath } from 'react-router-dom';
-import releaseQueries from '@admin/queries/releaseQueries';
+import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import publicationQueries from '@admin/queries/publicationQueries';
 import { useQuery } from '@tanstack/react-query';
 
@@ -34,7 +34,7 @@ const PreReleaseTableToolPage = ({
   );
 
   const { data: release, isLoading: isReleaseLoading } = useQuery(
-    releaseQueries.get(releaseVersionId),
+    releaseVersionQueries.get(releaseVersionId),
   );
 
   const { value: tableToolState, isLoading: isTableToolStateLoading } =

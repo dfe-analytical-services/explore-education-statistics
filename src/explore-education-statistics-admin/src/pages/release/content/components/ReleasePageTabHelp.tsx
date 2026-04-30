@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import ReleasePageTabPanel from '@admin/pages/release/content/components/ReleasePageTabPanel';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
-import releaseQueries from '@admin/queries/releaseQueries';
+import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import ContentHtml from '@common/components/ContentHtml';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContactUsSection, {
@@ -29,7 +29,7 @@ const ReleasePageTabHelp = () => {
     data: releaseVersion,
     isLoading,
     isError,
-  } = useQuery(releaseQueries.get(release.id));
+  } = useQuery(releaseVersionQueries.get(release.id));
 
   const hasRelatedInformation = relatedInformation.length > 0;
 

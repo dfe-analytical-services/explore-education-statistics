@@ -1,4 +1,4 @@
-import releaseQueries from '@admin/queries/releaseQueries';
+import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import {
   ReleaseRouteParams,
   releaseChecklistRoute,
@@ -25,7 +25,7 @@ export default function ReleaseStatusChecklistSummary({
   simple = false,
 }: Props) {
   const { data: checklist, isFetching } = useQuery(
-    releaseQueries.getChecklist(releaseVersionId),
+    releaseVersionQueries.getChecklist(releaseVersionId),
   );
 
   const { errors = [], warnings = [] } = checklist ?? {};
