@@ -7,7 +7,6 @@ import {
   ReleaseSeriesItem,
 } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
-import { UserPublicationRole } from '@admin/services/user-management/usersService';
 import { isAxiosError } from 'axios';
 
 export interface Contact {
@@ -43,7 +42,7 @@ export interface PublicationPermissions {
   canManageExternalMethodology: boolean;
   canManageReleaseSeries: boolean;
   canUpdateContact: boolean;
-  canUpdateContributorReleaseRole: boolean;
+  canUpdateDrafters: boolean;
   canViewReleaseTeamAccess: boolean;
 }
 
@@ -246,10 +245,6 @@ const publicationService = {
       `/publications/${publicationId}/release-series`,
       updatedReleaseSeries,
     );
-  },
-
-  listRoles(publicationId: string): Promise<UserPublicationRole[]> {
-    return client.get(`/publications/${publicationId}/roles`);
   },
 };
 

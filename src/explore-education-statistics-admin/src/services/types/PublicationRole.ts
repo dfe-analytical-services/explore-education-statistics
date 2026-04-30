@@ -1,2 +1,7 @@
-export const publicationRoles = ['Owner', 'Allower'] as const;
-export type PublicationRole = (typeof publicationRoles)[number];
+export const PublicationRole = {
+  Drafter: 'Drafter',
+  Approver: 'Approver',
+} as const;
+
+export type PublicationRole =
+  (typeof PublicationRole)[keyof typeof PublicationRole];

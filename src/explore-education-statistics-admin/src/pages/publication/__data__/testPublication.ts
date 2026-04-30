@@ -25,7 +25,7 @@ export const testPublication: PublicationWithPermissions = {
     canManageExternalMethodology: true,
     canManageReleaseSeries: true,
     canUpdateContact: true,
-    canUpdateContributorReleaseRole: true,
+    canUpdateDrafters: true,
     canViewReleaseTeamAccess: true,
   },
 };

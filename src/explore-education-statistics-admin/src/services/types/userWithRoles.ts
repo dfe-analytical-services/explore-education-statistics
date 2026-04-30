@@ -25,6 +25,7 @@ export interface UserPublicationRole {
 }
 
 export interface UserPublicationRoleWithUser extends UserPublicationRole {
+  userId: string;
   userName: string;
   email: string;
 }
