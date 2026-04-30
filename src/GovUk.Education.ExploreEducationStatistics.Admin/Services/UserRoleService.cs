@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -118,7 +119,7 @@ public class UserRoleService(
 
     public async Task<
         Either<ActionResult, List<UserPublicationRoleWithUserViewModel>>
-    > GetPublicationRolesForPublication(Guid publicationId) =>
+    > GetPublicationRolesForPublication(Guid publicationId, CancellationToken cancellationToken = default) =>
         await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId)
             .OnSuccess(userService.CheckCanViewPublication)
@@ -133,10 +134,11 @@ public class UserRoleService(
                             Id = upr.Id,
                             Publication = upr.Publication.Title,
                             Role = upr.Role,
+                            UserId = upr.UserId,
                             UserName = upr.User.DisplayName,
                             Email = upr.User.Email,
                         })
-                        .ToListAsync()
+                        .ToListAsync(cancellationToken)
                 ).OrderBy(upr => upr.UserName).ToList());
 
     public async Task<Either<ActionResult, Unit>> AddPublicationRole(
@@ -183,16 +185,54 @@ public class UserRoleService(
             .Publications.SingleOrNotFoundAsync(p => p.Id == publicationId, cancellationToken)
             .OnSuccess(userService.CheckCanUpdateDrafters)
             .OnSuccessDo(_ => ValidateDrafterRoleCanBeAdded(email, publicationId))
-            .OnSuccessVoid(
-                (Func<Publication, Task>)(
-                    async _ =>
-                        await AddDrafterRole(
-                            email: email,
-                            publicationId: publicationId,
-                            cancellationToken: cancellationToken
-                        )
-                )
+            .OnSuccessVoid(async _ =>
+                await AddDrafterRole(email: email, publicationId: publicationId, cancellationToken: cancellationToken)
             );
+
+    public async Task<Either<ActionResult, Unit>> UpdatePublicationDrafters(
+        Guid publicationId,
+        HashSet<Guid> userIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await contentDbContext
+            .Publications.SingleOrNotFoundAsync(p => p.Id == publicationId, cancellationToken)
+            .OnSuccessDo(userService.CheckCanUpdateDrafters)
+            .OnSuccessVoid(async publication =>
+            {
+                var publicationDrafterRolesByUserId = await userPublicationRoleRepository
+                    .Query()
+                    .WhereForPublication(publication.Id)
+                    .WhereRolesIn(PublicationRole.Drafter)
+                    .ToDictionaryAsync(urr => urr.UserId, cancellationToken);
+
+                var publicationDrafterRolesToBeRemoved = publicationDrafterRolesByUserId
+                    .Where(kv => !userIds.Contains(kv.Key))
+                    .Select(kv => kv.Value)
+                    .ToHashSet();
+
+                var usersToBeAdded = userIds
+                    .Where(userId => !publicationDrafterRolesByUserId.ContainsKey(userId))
+                    .ToList();
+
+                await userPublicationRoleRepository.RemoveMany(publicationDrafterRolesToBeRemoved, cancellationToken);
+
+                var newUserPublicationDrafterRoles = usersToBeAdded
+                    .Select(userId => new UserPublicationRoleCreateDto(
+                        UserId: userId,
+                        PublicationId: publicationId,
+                        Role: PublicationRole.Drafter,
+                        CreatedById: userService.GetUserId(),
+                        CreatedDate: DateTime.UtcNow
+                    ))
+                    .ToList();
+
+                await userPublicationRoleRepository.CreateManyIfNotExists(
+                    newUserPublicationDrafterRoles,
+                    cancellationToken
+                );
+            });
+    }
 
     public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId) =>
         await userService

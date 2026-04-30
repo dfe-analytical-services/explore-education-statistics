@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -1376,6 +1377,120 @@ public abstract class UserRoleServiceTests
             var service = SetupService();
 
             var result = await service.InviteDrafter("test@test.com", Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+    }
+
+    public class UpdatePublicationDraftersTests : UserRoleServiceTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            var userPublicationRoles = _dataFixture
+                .DefaultUserPublicationRole()
+                // This one should be removed as we are not supplying the userId for it
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetPublication(publication)
+                            .SetRole(PublicationRole.Drafter)
+                )
+                // This one should remain as we are supplying the userId for it
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetPublication(publication)
+                            .SetRole(PublicationRole.Drafter)
+                )
+                // This one should remain as it's an existing Approver role, and another Drafter role should be created for this user
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetPublication(publication)
+                            .SetRole(PublicationRole.Approver)
+                )
+                // This one should remain as it's for a different publication, and another Drafter role should be created for this user
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetPublication(_dataFixture.DefaultPublication())
+                            .SetRole(PublicationRole.Drafter)
+                )
+                .GenerateList(4);
+
+            var newUserId = Guid.NewGuid();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
+            // The first role should be removed
+            userPublicationRoleRepository
+                .Setup(m => m.RemoveMany(ListOf(userPublicationRoles[0]), default))
+                .Returns(Task.CompletedTask);
+            // Three roles should be created
+            userPublicationRoleRepository
+                .Setup(m =>
+                    m.CreateManyIfNotExists(
+                        It.Is<List<UserPublicationRoleCreateDto>>(l =>
+                            l.Count == 3
+                            && l.All(upr =>
+                                upr.PublicationId == publication.Id
+                                && upr.Role == PublicationRole.Drafter
+                                && Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
+                                    <= AssertExtensions.TimeWithinMillis
+                                && upr.CreatedById == _user.Id
+                            )
+                            && l[0].UserId == newUserId
+                            && l[1].UserId == userPublicationRoles[2].UserId
+                            && l[2].UserId == userPublicationRoles[3].UserId
+                        ),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(
+                    contentDbContext: contentDbContext,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
+
+                var result = await service.UpdatePublicationDrafters(
+                    publicationId: publication.Id,
+                    userIds:
+                    [
+                        newUserId,
+                        userPublicationRoles[1].UserId,
+                        userPublicationRoles[2].UserId,
+                        userPublicationRoles[3].UserId,
+                    ]
+                );
+                result.AssertRight();
+            }
+
+            VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task PublicationDoesNotExist_ReturnsNotFound()
+        {
+            var service = SetupService();
+
+            var result = await service.UpdatePublicationDrafters(publicationId: Guid.NewGuid(), userIds: []);
 
             result.AssertNotFound();
         }

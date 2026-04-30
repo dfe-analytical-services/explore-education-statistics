@@ -35,6 +35,8 @@ public record UserPublicationRoleViewModel
 
 public record UserPublicationRoleWithUserViewModel : UserPublicationRoleViewModel
 {
+    public required Guid UserId { get; init; }
+
     public required string UserName { get; init; }
 
     public required string Email { get; init; }

@@ -18,8 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 
 [Authorize]
 [ApiController]
-public class PublicationController(IPublicationService publicationService, IUserRoleService roleService)
-    : ControllerBase
+public class PublicationController(IPublicationService publicationService) : ControllerBase
 {
     [HttpGet("api/publications")]
     public async Task<ActionResult<List<PublicationViewModel>>> ListPublications([FromQuery] Guid? themeId)
@@ -137,11 +136,5 @@ public class PublicationController(IPublicationService publicationService, IUser
     )
     {
         return await publicationService.UpdateReleaseSeries(publicationId, releaseSeries).HandleFailuresOrOk();
-    }
-
-    [HttpGet("api/publications/{publicationId:guid}/roles")]
-    public async Task<ActionResult<List<UserPublicationRoleWithUserViewModel>>> GetRoles(Guid publicationId)
-    {
-        return await roleService.GetPublicationRolesForPublication(publicationId).HandleFailuresOrOk();
     }
 }

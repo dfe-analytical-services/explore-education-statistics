@@ -17,7 +17,8 @@ public interface IUserRoleService
     Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId);
 
     Task<Either<ActionResult, List<UserPublicationRoleWithUserViewModel>>> GetPublicationRolesForPublication(
-        Guid publicationId
+        Guid publicationId,
+        CancellationToken cancellationToken = default
     );
 
     Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
@@ -25,6 +26,12 @@ public interface IUserRoleService
     Task<Either<ActionResult, Unit>> InviteDrafter(
         string email,
         Guid publicationId,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Either<ActionResult, Unit>> UpdatePublicationDrafters(
+        Guid publicationId,
+        HashSet<Guid> userIds,
         CancellationToken cancellationToken = default
     );
 

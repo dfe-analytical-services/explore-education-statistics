@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +15,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 [Authorize]
 public class PublicationRolesController(IUserRoleService userRoleService) : ControllerBase
 {
+    [HttpGet("publications/{publicationId:guid}/publication-roles")]
+    public async Task<ActionResult<List<UserPublicationRoleWithUserViewModel>>> ListPublicationRoles(
+        Guid publicationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await userRoleService
+            .GetPublicationRolesForPublication(publicationId, cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPost("users/{userId:guid}/publication-roles")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, UserPublicationRoleCreateRequest request)
@@ -36,6 +49,22 @@ public class PublicationRolesController(IUserRoleService userRoleService) : Cont
                 cancellationToken: cancellationToken
             )
             .HandleFailuresOrOk();
+    }
+
+    [HttpPatch("publications/{publicationId:guid}/update-drafters")]
+    public async Task<ActionResult> UpdatePublicationDrafters(
+        Guid publicationId,
+        UpdatePublicationDraftersRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await userRoleService
+            .UpdatePublicationDrafters(
+                publicationId: publicationId,
+                userIds: request.UserIds,
+                cancellationToken: cancellationToken
+            )
+            .HandleFailuresOr(_ => new AcceptedResult());
     }
 
     [HttpDelete("users/publication-roles/{id:guid}")]
