@@ -20,7 +20,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.18.0" />
+    <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.26" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.26" PrivateAssets="all" />
     <PackageReference Include="GovukNotify" Version="7.2.0" />
@@ -37,7 +37,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageReference Include="System.Text.Json" Version="10.0.6" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="4.9.0" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
