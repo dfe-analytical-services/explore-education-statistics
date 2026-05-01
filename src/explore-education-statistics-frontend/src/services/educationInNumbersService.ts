@@ -11,11 +11,9 @@ export interface EinPage {
 }
 
 export interface EinNavItem {
-  id: string;
   title: string;
   order: number;
   slug?: string;
-  published: string;
 }
 
 export interface EinPageSitemapItem {

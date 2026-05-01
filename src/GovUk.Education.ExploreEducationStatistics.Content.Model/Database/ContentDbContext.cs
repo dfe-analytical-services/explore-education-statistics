@@ -88,7 +88,8 @@ public class ContentDbContext : DbContext
     public virtual DbSet<Comment> Comment { get; set; }
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
     public virtual DbSet<ReleasePublishingFeedback> ReleasePublishingFeedback { get; set; }
-    public virtual DbSet<EducationInNumbersPage> EducationInNumbersPages { get; set; }
+    public virtual DbSet<EinPage> EinPages { get; set; }
+    public virtual DbSet<EinPageVersion> EinPageVersions { get; set; }
     public virtual DbSet<EinContentSection> EinContentSections { get; set; }
     public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
     public virtual DbSet<EinTile> EinTiles { get; set; }

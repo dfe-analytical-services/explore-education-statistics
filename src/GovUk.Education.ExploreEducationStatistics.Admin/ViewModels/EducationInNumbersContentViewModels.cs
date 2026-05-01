@@ -19,15 +19,15 @@ public record EinContentViewModel
 
     public List<EinContentSectionViewModel> Content { get; set; } = [];
 
-    public static EinContentViewModel FromModel(EducationInNumbersPage page)
+    public static EinContentViewModel FromModel(EinPageVersion pageVersion)
     {
         return new EinContentViewModel
         {
-            Id = page.Id,
-            Title = page.Title,
-            Slug = page.Slug,
-            Published = page.Published,
-            Content = page
+            Id = pageVersion.Id,
+            Title = pageVersion.EinPage.Title,
+            Slug = pageVersion.EinPage.Slug,
+            Published = pageVersion.Published,
+            Content = pageVersion
                 .Content.Select(EinContentSectionViewModel.FromModel)
                 .OrderBy(section => section.Order)
                 .ToList(),
