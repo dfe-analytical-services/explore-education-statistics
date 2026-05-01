@@ -1,9 +1,8 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService, {
+import userInvitesService, {
   PendingInvite,
-} from '@admin/services/user-management/userService';
-import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
+} from '@admin/services/user-management/userInvitesService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -19,7 +18,7 @@ const InvitedUsersPage = () => {
 
   const getPendingInvites = useCallback(() => {
     setIsLoading(true);
-    userService
+    userInvitesService
       .getPendingInvites()
       .then(updatedInvites => {
         setModel({
@@ -66,7 +65,7 @@ const InvitedUsersPage = () => {
                 <tr>
                   <th scope="col">Email</th>
                   <th scope="col">Role</th>
-                  <th scope="col">Release Roles</th>
+                  <th scope="col">Pre-release Roles</th>
                   <th scope="col">Publication Roles</th>
                   <th scope="col">Actions</th>
                 </tr>
@@ -78,21 +77,22 @@ const InvitedUsersPage = () => {
                       <td>{pendingInvite.email}</td>
                       <td>{pendingInvite.role}</td>
                       <td>
-                        {pendingInvite.userReleaseRoles.length === 0 ? (
-                          'No user release roles'
+                        {pendingInvite.userPreReleaseRoles.length === 0 ? (
+                          'No user pre-release roles'
                         ) : (
                           <ul className="govuk-!-margin-0">
-                            {pendingInvite.userReleaseRoles.map(releaseRole => {
-                              return (
-                                <li key={releaseRole.id}>
-                                  {releaseRole.publication}
-                                  <ul>
-                                    <li>{releaseRole.release}</li>
-                                    <li>{releaseRole.role}</li>
-                                  </ul>
-                                </li>
-                              );
-                            })}
+                            {pendingInvite.userPreReleaseRoles.map(
+                              preReleaseRole => {
+                                return (
+                                  <li key={preReleaseRole.id}>
+                                    {preReleaseRole.publication}
+                                    <ul>
+                                      <li>{preReleaseRole.release}</li>
+                                    </ul>
+                                  </li>
+                                );
+                              },
+                            )}
                           </ul>
                         )}
                       </td>
@@ -105,16 +105,7 @@ const InvitedUsersPage = () => {
                               publicationRole => {
                                 return (
                                   <li key={publicationRole.id}>
-                                    {
-                                      // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
-                                      // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
-                                      // rework, this can be reverted to display the role without transformation.
-                                      `${
-                                        publicationRole.publication
-                                      } - ${publicationRoleDisplayName(
-                                        publicationRole.role,
-                                      )}`
-                                    }
+                                    {`${publicationRole.publication} - ${publicationRole.role}`}
                                   </li>
                                 );
                               },
@@ -125,7 +116,7 @@ const InvitedUsersPage = () => {
                       <td>
                         <ButtonText
                           onClick={() => {
-                            userService
+                            userInvitesService
                               .cancelInvite(pendingInvite.email)
                               .then(() => getPendingInvites());
                           }}
