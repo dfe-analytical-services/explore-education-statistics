@@ -88,6 +88,8 @@ tags
 *.tmp
 lerna-debug.log
 
+linkcheckerreport.html
+
 admin-start.sh
 remote-profile
 
