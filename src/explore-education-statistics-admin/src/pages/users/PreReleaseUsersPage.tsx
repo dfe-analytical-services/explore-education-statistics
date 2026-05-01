@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService from '@admin/services/user-management/userService';
+import usersService from '@admin/services/user-management/usersService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 import ButtonText from '@common/components/ButtonText';
@@ -8,17 +8,17 @@ import styles from '@admin/pages/bau/BauUsersPage.module.scss';
 import ModalConfirm from '@common/components/ModalConfirm';
 import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
-import userQueries from '@admin/queries/userQueries';
+import preReleaseUsersQueries from '@admin/queries/user-management/preReleaseUsersQueries';
 
 const PreReleaseUsersPage = () => {
   const {
-    data: users = [],
+    data: allPreReleaseUsers = [],
     isLoading,
     refetch: refetchUsers,
-  } = useQuery(userQueries.getPreReleaseUsers);
+  } = useQuery(preReleaseUsersQueries.getAllPreReleaseUsers);
 
   const handleDeleteUser = async (userEmail: string) => {
-    await userService
+    await usersService
       .deleteUser(userEmail)
       .then(() => {
         refetchUsers();
@@ -53,16 +53,16 @@ const PreReleaseUsersPage = () => {
           </tr>
         </thead>
         <LoadingSpinner loading={isLoading} text="Loading pre-release users">
-          {users && (
+          {allPreReleaseUsers && (
             <tbody>
-              {users.map(user => (
-                <tr key={user.id}>
-                  <th scope="row">{user.name}</th>
-                  <td>{user.email}</td>
+              {allPreReleaseUsers.map(preReleaseUser => (
+                <tr key={preReleaseUser.userId}>
+                  <th scope="row">{preReleaseUser.name}</th>
+                  <td>{preReleaseUser.email}</td>
                   <td>
                     <Link
                       className={styles.manageUserLink}
-                      to={`/administration/users/${user.id}`}
+                      to={`/administration/users/${preReleaseUser.userId}`}
                     >
                       Manage
                     </Link>
@@ -73,7 +73,7 @@ const PreReleaseUsersPage = () => {
                           Delete
                         </ButtonText>
                       }
-                      onConfirm={() => handleDeleteUser(user.email)}
+                      onConfirm={() => handleDeleteUser(preReleaseUser.email)}
                     >
                       <p>
                         By deleting this User you will remove all access and
