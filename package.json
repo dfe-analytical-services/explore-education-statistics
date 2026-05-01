@@ -67,6 +67,7 @@
     "format:robot:check": "pnpm format:robot -- --check --diff",
     "format:python": "python3 -m pipenv run black tests && python3 -m pipenv run isort tests",
     "format:python:check": "python3 -m pipenv run black tests --diff && python3 -m pipenv run isort tests --diff",
+    "linkchecker": "python3 -m pipenv run linkchecker --config .linkcheckerrc https://explore-education-statistics.service.gov.uk/",
     "lint": "pnpm lint:js && pnpm lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",
     "lint:python": "python3 -m pipenv run flake8 tests",
