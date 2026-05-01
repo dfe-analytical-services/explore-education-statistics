@@ -12,7 +12,6 @@ import { PublicationSummaryPreview } from '@common/services/publicationService';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { useFormContext } from 'react-hook-form';
 import { publicationRoles } from '@admin/services/types/PublicationRole';
-import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
 
 interface Props {
   publications?: PublicationSummaryPreview[];
@@ -143,11 +142,7 @@ export default function InviteUserPublicationRoleForm({ publications }: Props) {
                       .title
                   }
                 </td>
-                <td>
-                  {publicationRoleDisplayName(
-                    userPublicationRole.publicationRole,
-                  )}
-                </td>
+                <td>{userPublicationRole.publicationRole}</td>
                 <td>
                   <ButtonText
                     onClick={() => {
