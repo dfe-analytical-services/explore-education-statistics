@@ -409,4 +409,208 @@ describe('FilterHierarchy', () => {
       '7 selected',
     );
   });
+
+  test('tier selection buttons (de)select all options in that tier and update button text', async () => {
+    const { user } = render(
+      <FormProvider>
+        <FilterHierarchy
+          filterHierarchy={testFilterHierarchy}
+          name="test-filter"
+          optionLabelsMap={testOptionsLabelsMap}
+        />
+      </FormProvider>,
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Name of course being studied (3 tiers) - show options',
+      }),
+    );
+
+    const tier2Button = screen.getByRole('button', {
+      name: 'Select all Sector subject area (tier 2)',
+    });
+    await user.click(tier2Button);
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Unselect all Sector subject area (tier 2)',
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Show sub categories for entry level',
+      }),
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Show sub categories for higher',
+      }),
+    );
+
+    expect(screen.getByRole('checkbox', { name: 'Engineering' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Science' })).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Construction' }),
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Horticulture' }),
+    ).toBeChecked();
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Unselect all Sector subject area (tier 2)',
+      }),
+    );
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Select all Sector subject area (tier 2)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: 'Engineering' }),
+    ).not.toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Science' })).not.toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Construction' }),
+    ).not.toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Horticulture' }),
+    ).not.toBeChecked();
+  });
+
+  test('tier button text updates only after all visible tier options are selected', async () => {
+    const { user } = render(
+      <FormProvider>
+        <FilterHierarchy
+          filterHierarchy={testFilterHierarchy}
+          name="test-filter"
+          optionLabelsMap={testOptionsLabelsMap}
+        />
+      </FormProvider>,
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Name of course being studied (3 tiers) - show options',
+      }),
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Show sub categories for entry level',
+      }),
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Show sub categories for higher',
+      }),
+    );
+
+    const tier2Button = screen.getByRole('button', {
+      name: 'Select all Sector subject area (tier 2)',
+    });
+
+    await user.click(screen.getByRole('checkbox', { name: 'Engineering' }));
+    expect(tier2Button).toHaveTextContent(
+      'Select all Sector subject area (tier 2)',
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: 'Science' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Construction' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Horticulture' }));
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Unselect all Sector subject area (tier 2)',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('tier selection with active search only affects visible tier options', async () => {
+    const { user } = render(
+      <FormProvider>
+        <FilterHierarchy
+          filterHierarchy={testFilterHierarchy}
+          name="test-filter"
+          optionLabelsMap={testOptionsLabelsMap}
+        />
+      </FormProvider>,
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Name of course being studied (3 tiers) - show options',
+      }),
+    );
+
+    await user.type(
+      screen.getByLabelText(
+        'Search all tiers and name of course being studied',
+      ),
+      'engineering',
+    );
+    await user.click(screen.getByRole('button', { name: 'Search' }));
+
+    const tier2Button = screen.getByRole('button', {
+      name: 'Select Sector subject area (tier 2)',
+    });
+    await user.click(tier2Button);
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Unselect Sector subject area (tier 2)',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: 'Engineering' })).toBeChecked();
+    expect(screen.getByTestId('test-filter-count')).toHaveTextContent(
+      '1 selected',
+    );
+
+    const clearSearchButton = screen.getByRole('button', {
+      name: 'Clear search',
+    });
+    await user.click(clearSearchButton);
+
+    expect(screen.getByRole('checkbox', { name: 'Science' })).not.toBeChecked();
+  });
+
+  test('tier selection button is disabled when no options are available in that tier after search', async () => {
+    const { user } = render(
+      <FormProvider>
+        <FilterHierarchy
+          filterHierarchy={testFilterHierarchy}
+          name="test-filter"
+          optionLabelsMap={testOptionsLabelsMap}
+        />
+      </FormProvider>,
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Name of course being studied (3 tiers) - show options',
+      }),
+    );
+
+    await user.type(
+      screen.getByLabelText(
+        'Search all tiers and name of course being studied',
+      ),
+      'entry level',
+    );
+    await user.click(screen.getByRole('button', { name: 'Search' }));
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Select Sector subject area (tier 2)',
+      }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', {
+        name: 'Select Name of course being studied (tier 3)',
+      }),
+    ).toBeDisabled();
+  });
 });

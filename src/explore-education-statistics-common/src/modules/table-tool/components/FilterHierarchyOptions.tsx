@@ -12,6 +12,8 @@ import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export type FilterHierarchyOption = {
+  /** Zero-based */
+  tier: number;
   value: string;
   label: string;
   filterLabel: string;
@@ -27,7 +29,9 @@ export type SelectedChildren = {
 interface FilterHierarchyOptionsProps {
   disabled?: boolean;
   expandedOptionsList?: string[];
+  toggleSelectionStateForTier: (tier: number) => void;
   hierarchySearchTerm?: string;
+  /** Tier number, zero-based */
   level: number;
   name: string;
   optionTree: FilterHierarchyOption;
@@ -43,6 +47,7 @@ function FilterHierarchyOptions({
   level,
   selectedValues = [],
   expandedOptionsList = [],
+  toggleSelectionStateForTier,
   hierarchySearchTerm = '',
   selectedChildren,
   onToggleOptions,
@@ -162,6 +167,7 @@ function FilterHierarchyOptions({
   return (
     <div
       data-testid={`filter-hierarchy-options-${optionTree.value}`}
+      data-tier={level}
       className={classNames(
         'govuk-checkboxes',
         'govuk-checkboxes--small',
@@ -183,6 +189,10 @@ function FilterHierarchyOptions({
           hint={optionTree.filterLabel}
           disabled={disabled}
           checked={selectedValues.includes(optionTree.value)}
+          onChange={e => {
+            field.onChange(e);
+            toggleSelectionStateForTier(optionTree.tier);
+          }}
         />
       </div>
       {!!optionTree.options?.length && (
@@ -256,6 +266,7 @@ function FilterHierarchyOptions({
                 disabled={disabled}
                 selectedValues={selectedValues}
                 level={level + 1}
+                toggleSelectionStateForTier={toggleSelectionStateForTier}
                 hierarchySearchTerm={hierarchySearchTerm}
                 selectedChildren={selectedChildren}
                 onToggleOptions={onToggleOptions}
