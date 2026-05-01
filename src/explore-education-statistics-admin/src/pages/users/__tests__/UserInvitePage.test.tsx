@@ -2,17 +2,19 @@ import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import {
   testPublicationSummaries,
   testRoles,
-  testResourceRoles,
   testReleases,
 } from '@admin/pages/users/__data__/testUserData';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService from '@admin/services/publicationService';
-import _userService from '@admin/services/user-management/userService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { administrationUserInviteRoute } from '@admin/routes/administrationRoutes';
+import _globalRolesService from '@admin/services/user-management/globalRolesService';
+import _releaseService from '@admin/services/releaseService';
+import { PublicationRole } from '@admin/services/types/PublicationRole';
+import _userInvitesService from '@admin/services/user-management/userInvitesService';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/userService');
@@ -20,7 +22,13 @@ jest.mock('@admin/services/userService');
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
-const userService = _userService as jest.Mocked<typeof _userService>;
+const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+const globalRolesService = _globalRolesService as jest.Mocked<
+  typeof _globalRolesService
+>;
+const userInvitesService = _userInvitesService as jest.Mocked<
+  typeof _userInvitesService
+>;
 
 describe('UserInvitePage', () => {
   test('renders correctly', async () => {
@@ -34,10 +42,8 @@ describe('UserInvitePage', () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText('User email')).toBeInTheDocument();
     expect(screen.getByLabelText('Role')).toBeInTheDocument();
-    expect(screen.getByLabelText('Role')).toBeInTheDocument();
-    expect(screen.getByLabelText('Release role')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Add release role' }),
+      screen.getByRole('button', { name: 'Add pre-release role' }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText('Publication')).toBeInTheDocument();
     expect(screen.getByLabelText('Publication role')).toBeInTheDocument();
@@ -93,7 +99,7 @@ describe('UserInvitePage', () => {
     );
   });
 
-  describe('adding release roles', () => {
+  describe('adding pre-release roles', () => {
     test('shows validation error if release is empty', async () => {
       const { user } = renderPage();
       expect(
@@ -109,118 +115,86 @@ describe('UserInvitePage', () => {
       ).toHaveTextContent('Choose release to give the user access to');
     });
 
-    test('shows validation error if release role is empty', async () => {
-      const { user } = renderPage();
-      expect(
-        await screen.findByText('Manage access to this service'),
-      ).toBeInTheDocument();
-
-      await user.click(
-        screen.getByRole('button', { name: 'Add release role' }),
-      );
-
-      expect(
-        screen.getByTestId('inviteUserForm-releaseRole-error'),
-      ).toHaveTextContent('Choose release role for the user');
-    });
-
-    test('shows validation error if try to add another role for a release', async () => {
+    test('shows validation error if try to add another pre-release role for the same release', async () => {
       const { user } = renderPage();
       expect(
         await screen.findByText('Manage access to this service'),
       ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
-      await user.selectOptions(
-        screen.getByLabelText('Release role'),
-        'Approver',
-      );
 
       await user.click(
-        screen.getByRole('button', { name: 'Add release role' }),
+        screen.getByRole('button', { name: 'Add pre-release role' }),
       );
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
-      await user.selectOptions(
-        screen.getByLabelText('Release role'),
-        'Contributor',
-      );
 
       await user.click(
-        screen.getByRole('button', { name: 'Add release role' }),
+        screen.getByRole('button', { name: 'Add pre-release role' }),
       );
 
       expect(
         screen.getByTestId('inviteUserForm-releaseId-error'),
-      ).toHaveTextContent('You can only add one role for each release');
+      ).toHaveTextContent(
+        'You can only add one pre-release role for each release',
+      );
     });
 
-    test('successfully adds release roles', async () => {
+    test('successfully adds pre-release roles', async () => {
       const { user } = renderPage();
       expect(
         await screen.findByText('Manage access to this service'),
       ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
-      await user.selectOptions(
-        screen.getByLabelText('Release role'),
-        'Approver',
-      );
 
       await user.click(
-        screen.getByRole('button', { name: 'Add release role' }),
+        screen.getByRole('button', { name: 'Add pre-release role' }),
       );
 
-      const releaseRoleTable = within(screen.getByTestId('release-role-table'));
-      const rows = releaseRoleTable.getAllByRole('row');
+      const preReleaseRoleTable = within(
+        screen.getByTestId('pre-release-role-table'),
+      );
+      const rows = preReleaseRoleTable.getAllByRole('row');
       expect(rows).toHaveLength(2);
       expect(within(rows[1]).getByText('Release 1'));
-      expect(within(rows[1]).getByText('Approver'));
       expect(
         within(rows[1]).getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 2');
-      await user.selectOptions(
-        screen.getByLabelText('Release role'),
-        'Contributor',
-      );
 
       await user.click(
-        screen.getByRole('button', { name: 'Add release role' }),
+        screen.getByRole('button', { name: 'Add pre-release role' }),
       );
 
-      const updatedRows = releaseRoleTable.getAllByRole('row');
+      const updatedRows = preReleaseRoleTable.getAllByRole('row');
       expect(updatedRows).toHaveLength(3);
 
       expect(within(updatedRows[2]).getByText('Release 2'));
-      expect(within(updatedRows[2]).getByText('Contributor'));
       expect(
         within(updatedRows[2]).getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
     });
 
-    test('successfully removes release roles', async () => {
+    test('successfully removes pre-release roles', async () => {
       const { user } = renderPage();
       expect(
         await screen.findByText('Manage access to this service'),
       ).toBeInTheDocument();
 
       await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
-      await user.selectOptions(
-        screen.getByLabelText('Release role'),
-        'Approver',
-      );
 
       await user.click(
-        screen.getByRole('button', { name: 'Add release role' }),
+        screen.getByRole('button', { name: 'Add pre-release role' }),
       );
 
-      const releaseRoleTable = within(screen.getByTestId('release-role-table'));
-      const rows = releaseRoleTable.getAllByRole('row');
+      const preReleaseRoleTable = within(
+        screen.getByTestId('pre-release-role-table'),
+      );
+      const rows = preReleaseRoleTable.getAllByRole('row');
       expect(rows).toHaveLength(2);
       expect(within(rows[1]).getByText('Release 1'));
-      expect(within(rows[1]).getByText('Approver'));
       expect(
         within(rows[1]).getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
@@ -229,7 +203,7 @@ describe('UserInvitePage', () => {
 
       await waitFor(() =>
         expect(
-          screen.queryByTestId('release-role-table'),
+          screen.queryByTestId('pre-release-role-table'),
         ).not.toBeInTheDocument(),
       );
     });
@@ -278,7 +252,7 @@ describe('UserInvitePage', () => {
       );
       await user.selectOptions(
         screen.getByLabelText('Publication role'),
-        'Approver',
+        PublicationRole.Approver,
       );
 
       await user.click(
@@ -291,7 +265,7 @@ describe('UserInvitePage', () => {
       );
       await user.selectOptions(
         screen.getByLabelText('Publication role'),
-        'Owner',
+        PublicationRole.Drafter,
       );
 
       await user.click(
@@ -315,7 +289,7 @@ describe('UserInvitePage', () => {
       );
       await user.selectOptions(
         screen.getByLabelText('Publication role'),
-        'Approver',
+        PublicationRole.Approver,
       );
 
       await user.click(
@@ -328,7 +302,7 @@ describe('UserInvitePage', () => {
       const rows = publicationRoleTable.getAllByRole('row');
       expect(rows).toHaveLength(2);
       expect(within(rows[1]).getByText('Publication 1'));
-      expect(within(rows[1]).getByText('Approver'));
+      expect(within(rows[1]).getByText(PublicationRole.Approver));
       expect(
         within(rows[1]).getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
@@ -339,7 +313,7 @@ describe('UserInvitePage', () => {
       );
       await user.selectOptions(
         screen.getByLabelText('Publication role'),
-        'Owner',
+        PublicationRole.Drafter,
       );
 
       await user.click(
@@ -350,7 +324,7 @@ describe('UserInvitePage', () => {
       expect(updatedRows).toHaveLength(3);
 
       expect(within(updatedRows[2]).getByText('Publication 2'));
-      expect(within(updatedRows[2]).getByText('Owner'));
+      expect(within(updatedRows[2]).getByText(PublicationRole.Drafter));
       expect(
         within(updatedRows[2]).getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
@@ -368,7 +342,7 @@ describe('UserInvitePage', () => {
       );
       await user.selectOptions(
         screen.getByLabelText('Publication role'),
-        'Approver',
+        PublicationRole.Approver,
       );
 
       await user.click(
@@ -381,7 +355,7 @@ describe('UserInvitePage', () => {
       const rows = publicationRoleTable.getAllByRole('row');
       expect(rows).toHaveLength(2);
       expect(within(rows[1]).getByText('Publication 1'));
-      expect(within(rows[1]).getByText('Approver'));
+      expect(within(rows[1]).getByText(PublicationRole.Approver));
       expect(
         within(rows[1]).getByRole('button', { name: 'Remove' }),
       ).toBeInTheDocument();
@@ -396,7 +370,7 @@ describe('UserInvitePage', () => {
     });
   });
 
-  test('submits successfully without release or publication roles', async () => {
+  test('submits successfully without pre-release or publication roles', async () => {
     const { user } = renderPage();
     expect(
       await screen.findByText('Manage access to this service'),
@@ -404,22 +378,22 @@ describe('UserInvitePage', () => {
 
     await user.type(screen.getByLabelText('User email'), 'test@test.com');
 
-    expect(userService.inviteUser).not.toHaveBeenCalled();
+    expect(userInvitesService.inviteUser).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Send invite' }));
 
     await waitFor(() => {
-      expect(userService.inviteUser).toHaveBeenCalledTimes(1);
+      expect(userInvitesService.inviteUser).toHaveBeenCalledTimes(1);
     });
-    expect(userService.inviteUser).toHaveBeenCalledWith({
+    expect(userInvitesService.inviteUser).toHaveBeenCalledWith({
       email: 'test@test.com',
       roleId: 'role-1-id',
-      userReleaseRoles: [],
+      userPreReleaseRoles: [],
       userPublicationRoles: [],
     });
   });
 
-  test('submits successfully with release and publication roles', async () => {
+  test('submits successfully with pre-release and publication roles', async () => {
     const { user } = renderPage();
     expect(
       await screen.findByText('Manage access to this service'),
@@ -428,9 +402,10 @@ describe('UserInvitePage', () => {
     await user.type(screen.getByLabelText('User email'), 'test@test.com');
 
     await user.selectOptions(screen.getByLabelText('Release'), 'Release 1');
-    await user.selectOptions(screen.getByLabelText('Release role'), 'Approver');
 
-    await user.click(screen.getByRole('button', { name: 'Add release role' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Add pre-release role' }),
+    );
 
     await user.selectOptions(
       screen.getByLabelText('Publication'),
@@ -438,28 +413,29 @@ describe('UserInvitePage', () => {
     );
     await user.selectOptions(
       screen.getByLabelText('Publication role'),
-      'Approver',
+      PublicationRole.Approver,
     );
 
     await user.click(
       screen.getByRole('button', { name: 'Add publication role' }),
     );
 
-    expect(userService.inviteUser).not.toHaveBeenCalled();
+    expect(userInvitesService.inviteUser).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Send invite' }));
 
     await waitFor(() => {
-      expect(userService.inviteUser).toHaveBeenCalledTimes(1);
+      expect(userInvitesService.inviteUser).toHaveBeenCalledTimes(1);
     });
-    expect(userService.inviteUser).toHaveBeenCalledWith({
+    expect(userInvitesService.inviteUser).toHaveBeenCalledWith({
       email: 'test@test.com',
       roleId: 'role-1-id',
-      userReleaseRoles: [
-        { releaseId: 'release-1-id', releaseRole: 'Approver' },
-      ],
+      userPreReleaseRoles: [{ releaseId: 'release-1-id' }],
       userPublicationRoles: [
-        { publicationId: 'publication-1-id', publicationRole: 'Allower' },
+        {
+          publicationId: 'publication-1-id',
+          publicationRole: PublicationRole.Approver,
+        },
       ],
     });
   });
@@ -468,9 +444,8 @@ describe('UserInvitePage', () => {
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,
     );
-    userService.getRoles.mockResolvedValue(testRoles);
-    userService.getResourceRoles.mockResolvedValue(testResourceRoles);
-    userService.getReleases.mockResolvedValue(testReleases);
+    globalRolesService.getRoles.mockResolvedValue(testRoles);
+    releaseService.getReleases.mockResolvedValue(testReleases);
 
     return render(
       <MemoryRouter initialEntries={[administrationUserInviteRoute.path]}>

@@ -1,7 +1,4 @@
 import Page from '@admin/components/Page';
-import userService, {
-  UserInvite,
-} from '@admin/services/user-management/userService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import FormProvider from '@common/components/form/FormProvider';
@@ -10,10 +7,9 @@ import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import publicationQueries from '@admin/queries/publicationQueries';
-import userQueries from '@admin/queries/userQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ButtonGroup from '@common/components/ButtonGroup';
-import InviteUserReleaseRoleForm from '@admin/pages/users/components/InviteUserReleaseRoleForm';
+import InviteUserPreReleaseRoleForm from '@admin/pages/users/components/InviteUserPreReleaseRoleForm';
 import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
@@ -26,28 +22,29 @@ import {
   PublicationRole,
   publicationRoles,
 } from '@admin/services/types/PublicationRole';
+import releaseQueries from '@admin/queries/releaseQueries';
+import globalRolesQueries from '@admin/queries/user-management/globalRolesQueries';
+import userInvitesService, {
+  UserInvite,
+} from '@admin/services/user-management/userInvitesService';
 
-export interface InviteUserReleaseRole {
+export interface InviteUserPreReleaseRole {
   releaseId: string;
-  releaseTitle?: string;
-  releaseRole: string;
 }
 
 export interface InviteUserPublicationRole {
   publicationId: string;
-  publicationTitle?: string;
   publicationRole: PublicationRole;
 }
 
 export interface UserInviteFormValues {
   userEmail: string;
   roleId: string;
-  userReleaseRoles?: InviteUserReleaseRole[];
+  userPreReleaseRoles?: InviteUserPreReleaseRole[];
   userPublicationRoles?: InviteUserPublicationRole[];
   publicationId?: string;
   publicationRole?: PublicationRole;
   releaseId?: string;
-  releaseRole?: string;
 }
 
 const errorMappings = [
@@ -64,35 +61,31 @@ export default function UserInvitePage({
 }: RouteComponentProps & ErrorControlState) {
   const formId = 'inviteUserForm';
 
-  const { data: roles, isLoading: isLoadingRoles } = useQuery(
-    userQueries.getRoles,
+  const { data: globalRoles, isLoading: isLoadingGlobalRoles } = useQuery(
+    globalRolesQueries.getRoles,
   );
-  const { data: resourceRoles, isLoading: isLoadingResourceRoles } = useQuery(
-    userQueries.getResourceRoles,
-  );
+
   const { data: releases, isLoading: isLoadingReleases } = useQuery(
-    userQueries.getReleases,
+    releaseQueries.getReleases,
   );
+
   const { data: publications, isLoading: isLoadingPublications } = useQuery(
     publicationQueries.getPublicationSummaries,
   );
 
   const isLoading =
-    isLoadingRoles ||
-    isLoadingResourceRoles ||
-    isLoadingReleases ||
-    isLoadingPublications;
+    isLoadingGlobalRoles || isLoadingReleases || isLoadingPublications;
 
   const cancelHandler = () => history.push('/administration/users/invites');
 
   const handleSubmit = async (values: UserInviteFormValues) => {
-    const userReleaseRoles =
-      values.userReleaseRoles?.map(userReleaseRole => {
+    const userPreReleaseRoles =
+      values.userPreReleaseRoles?.map(userPreReleaseRole => {
         return {
-          releaseId: userReleaseRole.releaseId,
-          releaseRole: userReleaseRole.releaseRole,
+          releaseId: userPreReleaseRole.releaseId,
         };
       }) ?? [];
+
     const userPublicationRoles =
       values.userPublicationRoles?.map(userPublicationRole => {
         return {
@@ -100,14 +93,15 @@ export default function UserInvitePage({
           publicationRole: userPublicationRole.publicationRole,
         };
       }) ?? [];
+
     const submission: UserInvite = {
       email: values.userEmail,
       roleId: values.roleId,
-      userReleaseRoles,
+      userPreReleaseRoles,
       userPublicationRoles,
     };
 
-    await userService.inviteUser(submission);
+    await userInvitesService.inviteUser(submission);
 
     history.push(`/administration/users/invites`);
   };
@@ -118,21 +112,16 @@ export default function UserInvitePage({
         .required('Provide the users email')
         .email('Provide a valid email address'),
       roleId: Yup.string().required('Choose role for the user'),
-      userReleaseRoles: Yup.array().of(
+      userPreReleaseRoles: Yup.array().of(
         Yup.object({
           releaseId: Yup.string().required(
             'Choose release to give the user access to',
-          ),
-          releaseTitle: Yup.string(),
-          releaseRole: Yup.string().required(
-            'Choose release role for the user',
           ),
         }),
       ),
       userPublicationRoles: Yup.array(
         Yup.object({
           publicationId: Yup.string().required(),
-          publicationTitle: Yup.string(),
           publicationRole: Yup.mixed<PublicationRole>()
             .oneOf(publicationRoles)
             .required(),
@@ -141,7 +130,6 @@ export default function UserInvitePage({
       publicationId: Yup.string(),
       publicationRole: Yup.mixed<PublicationRole>(),
       releaseId: Yup.string(),
-      releaseRole: Yup.string(),
     });
   }, []);
 
@@ -161,8 +149,9 @@ export default function UserInvitePage({
           errorMappings={errorMappings}
           initialValues={{
             userEmail: '',
-            roleId: orderBy(roles, role => role.name)?.[0]?.id ?? '',
-            userReleaseRoles: [],
+            roleId:
+              orderBy(globalRoles, globalRole => globalRole.name)?.[0]?.id ??
+              '',
             userPublicationRoles: [],
           }}
           validationSchema={validationSchema}
@@ -180,21 +169,15 @@ export default function UserInvitePage({
               name="roleId"
               hint="The user's role within the service."
               placeholder="Choose role"
-              options={roles?.map(role => ({
-                label: role.name,
-                value: role.id,
+              options={globalRoles?.map(globalRole => ({
+                label: globalRole.name,
+                value: globalRole.id,
               }))}
             />
 
-            <InviteUserReleaseRoleForm
-              releases={releases}
-              releaseRoles={resourceRoles?.Release}
-            />
+            <InviteUserPreReleaseRoleForm releases={releases} />
 
-            <InviteUserPublicationRoleForm
-              publications={publications}
-              publicationRoles={resourceRoles?.Publication}
-            />
+            <InviteUserPublicationRoleForm publications={publications} />
 
             <ButtonGroup className="govuk-!-margin-top-6">
               <Button type="submit">Send invite</Button>
