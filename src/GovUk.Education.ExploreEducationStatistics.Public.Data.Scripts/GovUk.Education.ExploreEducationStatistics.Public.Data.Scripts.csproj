@@ -11,7 +11,7 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CliFx" Version="2.3.6" />
+    <PackageReference Include="CliFx" Version="3.0.0" />
     <PackageReference Include="CliWrap" Version="3.10.1" />
     <PackageReference Include="Dapper" Version="2.1.66" />
   </ItemGroup>
