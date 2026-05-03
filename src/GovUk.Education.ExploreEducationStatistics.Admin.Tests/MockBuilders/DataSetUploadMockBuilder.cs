@@ -79,8 +79,8 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
                 Stage = "Stage 1",
                 Completed = true,
                 Passed = _screenerResult == "Passed",
-                LastUpdated = _timeProvider.GetUtcNow(),
             },
+            ScreenerProgressLastChecked = _timeProvider.GetUtcNow(),
             ReplacingFileId = null,
         };
     }

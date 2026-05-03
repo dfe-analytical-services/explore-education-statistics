@@ -1,3 +1,4 @@
+#nullable enable
 using System.Text;
 using System.Text.Json;
 using System.Web;
@@ -8,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
@@ -37,7 +37,7 @@ public class DataSetScreenerClient(
         var response = await httpClient.PostAsync($"{httpClient.BaseAddress}/screen", content, CancellationToken.None);
 
         return response.IsSuccessStatusCode
-            ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)
+            ? (await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken))!
             : throw new DataScreenerException(
                 $"External data screening process failed with status code {response.StatusCode}."
             );
@@ -57,7 +57,7 @@ public class DataSetScreenerClient(
         var response = await httpClient.GetAsync(url, cancellationToken);
 
         return response.IsSuccessStatusCode
-            ? await response.Content.ReadFromJsonAsync<List<DataSetScreenerProgressResponse>>(cancellationToken)
+            ? (await response.Content.ReadFromJsonAsync<List<DataSetScreenerProgressResponse>>(cancellationToken))!
             : throw new DataScreenerException(
                 $"Failed to get screener progress for data set ids {dataSetIds.JoinToString(",")} - status code {response.StatusCode}."
             );
