@@ -111,6 +111,49 @@ export interface ApiDataSetVersionPlan {
   valid: boolean;
 }
 
+type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet';
+
+interface Mapping<TSource> {
+  type: MappingType;
+  source: TSource;
+  candidateKey?: string;
+}
+
+export type UpdateMappingPayload = {
+  sourceKey: string;
+  candidateKey?: string;
+};
+export type UpdateMappingPayloadMultiple = UpdateMappingPayload[];
+
+interface MappingsPlan<TSource> {
+  candidates: Dictionary<TSource>;
+  mappings: Dictionary<Mapping<TSource>>;
+}
+
+export type MappingWithKey<TSource> = { sourceKey: string } & Mapping<TSource>;
+
+interface IndicatorSource {
+  label: string;
+}
+
+export type IndicatorCandidate = IndicatorSource;
+
+export type SourceItem = IndicatorSource;
+
+export type IndicatorMapping = Mapping<IndicatorSource>;
+export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;
+
+export type IndicatorsMappingsPlan = MappingsPlan<IndicatorSource>;
+
+export type PlanMappings = {
+  indicators: IndicatorsMappingsPlan;
+};
+
+export interface IndicatorsMapping {
+  candidates: Dictionary<IndicatorCandidate>;
+  mappings: Dictionary<IndicatorMapping>;
+}
+
 export interface DataReplacementPlan {
   originalSubjectId: string;
   replacementSubjectId: string;
@@ -118,16 +161,73 @@ export interface DataReplacementPlan {
   footnotes: FootnoteReplacementPlan[];
   apiDataSetVersionPlan: ApiDataSetVersionPlan;
   valid: boolean;
+  mapping: PlanMappings;
 }
 
+type PlanMappingIndicatorsUpdateResponse = {
+  originalId: string;
+  originalLabel: string;
+  originalColumnName: string;
+  originalGroupId: string;
+  originalGroupLabel: string;
+  status: MappingType;
+  replacementId?: string;
+  replacementLabel?: string;
+  replacementColumnName?: string;
+  replacementGroupId?: string;
+  replacementGroupLabel?: string;
+}[];
+
 const dataReplacementService = {
-  getReplacementPlan(
+  async getReplacementPlan(
     releaseVersionId: string,
     originalFileId: string,
   ): Promise<DataReplacementPlan> {
-    return client.get(
+    const plan: DataReplacementPlan = await client.get(
       `releases/${releaseVersionId}/data/${originalFileId}/replacement-plan`,
     );
+    return plan;
+  },
+  async updatePlanIndicatorMappings(
+    releaseVersionId: string,
+    originalDataSetId: string,
+    replacementDataSetId: string,
+    updates: {
+      originalColumnName: string;
+      newReplacementColumnName?: string;
+    }[],
+  ): Promise<DataReplacementPlan['mapping']['indicators']['mappings']> {
+    const indicatorsMappings: PlanMappingIndicatorsUpdateResponse =
+      await client.patch(
+        `releases/${releaseVersionId}/data/replacements/mapping/indicators`,
+        {
+          originalDataSetId,
+          replacementDataSetId,
+          updates,
+        },
+      );
+
+    // restructure from PlanMappingIndicatorsUpdateResponse to PlanMappings['indicators']['mappings']
+    const planIndicatorMappings: PlanMappings['indicators']['mappings'] =
+      Object.fromEntries(
+        indicatorsMappings.map(
+          ({
+            originalLabel,
+            originalColumnName,
+            status,
+            replacementColumnName,
+          }) => [
+            originalColumnName,
+            {
+              source: { label: originalLabel },
+              type: status,
+              candidateKey: replacementColumnName,
+            },
+          ],
+        ),
+      );
+
+    return planIndicatorMappings;
   },
   replaceData(
     releaseVersionId: string,
