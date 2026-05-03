@@ -9,7 +9,7 @@ import {
   SearchRequestQueryTypeOptions,
 } from '@azure/search-documents';
 import { NextApiRequest, NextApiResponse } from 'next';
-import initialiseAzureSearchClient from '@frontend/modules/api/search/initialiseAzureSearchClient';
+import { initialiseAzurePublicationsSearchClient } from '@frontend/modules/api/search/initialiseAzureSearchClient';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import {
   AzurePublicationListRequest,
@@ -39,7 +39,7 @@ export default withMethods({
       body: { searchOptions },
     } = req;
 
-    const azureSearchClient = initialiseAzureSearchClient();
+    const azureSearchClient = initialiseAzurePublicationsSearchClient();
 
     try {
       const {

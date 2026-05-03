@@ -9,8 +9,8 @@ import {
   publicationSortOptions,
 } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import {
+  AzureOrderByParam,
   AzurePublicationListRequest,
-  AzurePublicationOrderByParam,
 } from '@frontend/services/azurePublicationService';
 import omitBy from 'lodash/omitBy';
 
@@ -78,9 +78,7 @@ export function createPublicationSuggestRequest(
   );
 }
 
-function getSortParam(
-  sortBy: PublicationSortOption,
-): AzurePublicationOrderByParam {
+function getSortParam(sortBy: PublicationSortOption): AzureOrderByParam {
   switch (sortBy) {
     case 'relevance':
       return undefined;
