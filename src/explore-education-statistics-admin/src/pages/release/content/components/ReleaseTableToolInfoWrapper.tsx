@@ -1,11 +1,13 @@
 import Link from '@admin/components/Link';
-import { Publication } from '@admin/services/publicationService';
+import {
+  ContentPublication,
+  Publication,
+} from '@admin/services/publicationService';
 import methodologyQueries from '@admin/queries/methodologyQueries';
 import publicationQueries from '@admin/queries/publicationQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { ReleaseType } from '@common/services/types/releaseType';
-import { Publication as ContentPublication } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 

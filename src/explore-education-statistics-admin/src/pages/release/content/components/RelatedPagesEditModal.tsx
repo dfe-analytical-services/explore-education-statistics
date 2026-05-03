@@ -2,13 +2,13 @@ import Link from '@admin/components/Link';
 import RelatedPageForm, {
   RelatedPageFormValues,
 } from '@admin/pages/release/content/components/RelatedPageForm';
+import { BasicLink } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Modal from '@common/components/Modal';
 import ReorderableList from '@common/components/ReorderableList';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
-import { BasicLink } from '@common/services/publicationService';
 import reorder from '@common/utils/reorder';
 import React, { useEffect, useState } from 'react';
 

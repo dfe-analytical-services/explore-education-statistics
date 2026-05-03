@@ -3,10 +3,7 @@ import { PaginatedList } from '@common/services/types/pagination';
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import ReleaseUpdatesPage from '../ReleaseUpdatesPage';
-import {
-  testPublicationSummary,
-  testReleaseVersionSummary,
-} from './__data__/testReleaseData';
+import { testReleaseVersionSummary } from './__data__/testReleaseData';
 
 describe('Release updates page', () => {
   const testReleaseUpdates: PaginatedList<ReleaseUpdate> = {
@@ -35,7 +32,6 @@ describe('Release updates page', () => {
     render(
       <ReleaseUpdatesPage
         releaseVersionSummary={testReleaseVersionSummary}
-        publicationSummary={testPublicationSummary}
         releaseUpdates={testReleaseUpdates}
       />,
     );
@@ -51,7 +47,6 @@ describe('Release updates page', () => {
     render(
       <ReleaseUpdatesPage
         releaseVersionSummary={testReleaseVersionSummary}
-        publicationSummary={testPublicationSummary}
         releaseUpdates={testReleaseUpdates}
       />,
     );
@@ -88,7 +83,6 @@ describe('Release updates page', () => {
     render(
       <ReleaseUpdatesPage
         releaseVersionSummary={testReleaseVersionSummary}
-        publicationSummary={testPublicationSummary}
         releaseUpdates={testReleaseUpdatesMultiPage}
       />,
     );

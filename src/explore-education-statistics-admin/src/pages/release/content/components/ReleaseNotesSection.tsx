@@ -3,12 +3,12 @@ import ReleaseNoteForm, {
   ReleaseNoteFormValues,
 } from '@admin/pages/release/content/components/ReleaseNoteForm';
 import ReleaseNote from '@admin/pages/release/content/components/ReleaseNote';
+import { ReleaseNote as ReleaseNoteData } from '@admin/services/publicationService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import releaseNoteService from '@admin/services/releaseNoteService';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import useToggle from '@common/hooks/useToggle';
-import { ReleaseNote as ReleaseNoteData } from '@common/services/publicationService';
 import React, { useState } from 'react';
 
 interface Props {

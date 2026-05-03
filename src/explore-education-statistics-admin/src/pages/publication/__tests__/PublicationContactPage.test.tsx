@@ -488,7 +488,7 @@ describe('PublicationContactPage', () => {
       testContact.contactName,
     );
     expect(screen.getByTestId('Contact telephone')).toHaveTextContent(
-      testContact.contactTelNo,
+      testContact.contactTelNo!,
     );
   });
 });

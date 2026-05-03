@@ -3,10 +3,10 @@ import RelatedPagesEditModal from '@admin/pages/release/content/components/Relat
 import RelatedPagesAddModal from '@admin/pages/release/content/components/RelatedPagesAddModal';
 import { RelatedPageFormValues } from '@admin/pages/release/content/components/RelatedPageForm';
 import { useEditingContext } from '@admin/contexts/EditingContext';
+import { BasicLink } from '@admin/services/publicationService';
 import releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { BasicLink } from '@common/services/publicationService';
 import React, { useState } from 'react';
 
 interface Props {

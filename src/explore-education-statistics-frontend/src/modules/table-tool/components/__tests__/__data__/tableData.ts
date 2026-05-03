@@ -8,7 +8,6 @@ import { SelectedPublication } from '@common/modules/table-tool/types/selectedPu
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableDataQuery } from '@common/services/tableBuilderService';
-import { ReleaseVersion } from '@common/services/publicationService';
 
 export const testQuery: TableDataQuery = {
   publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
@@ -221,6 +220,12 @@ export const testSelectedPublicationWithLatestRelease: SelectedPublication = {
     title: 'Latest Release Title',
     slug: 'latest-release-slug',
   },
+  contact: {
+    teamName: 'The team name',
+    teamEmail: 'team@name.com',
+    contactName: 'A person',
+    contactTelNo: '012345',
+  },
 };
 
 export const testSelectedPublicationWithNonLatestRelease: SelectedPublication =
@@ -240,75 +245,20 @@ export const testSelectedPublicationWithNonLatestRelease: SelectedPublication =
       title: 'Latest Release Title',
       slug: 'latest-release-slug',
     },
-  };
-
-export const testPublicationRelease: ReleaseVersion = {
-  id: '',
-  title: '',
-  yearTitle: '',
-  coverageTitle: '',
-  published: '',
-  slug: '',
-  summarySection: {
-    id: '',
-    order: 0,
-    heading: '',
-    content: [],
-  },
-  keyStatistics: [],
-  keyStatisticsSecondarySection: {
-    id: '',
-    order: 0,
-    heading: '',
-    content: [],
-  },
-  headlinesSection: {
-    id: '',
-    order: 0,
-    heading: '',
-    content: [],
-  },
-  relatedDashboardsSection: {
-    id: '',
-    order: 0,
-    heading: '',
-    content: [],
-  },
-  warningSection: {
-    id: '',
-    order: 0,
-    heading: '',
-    content: [],
-  },
-  publication: {
-    id: '',
-    slug: '',
-    title: '',
-    releaseSeries: [],
-    theme: {
-      title: '',
-      id: '',
-    },
     contact: {
       teamName: 'The team name',
       teamEmail: 'team@name.com',
       contactName: 'A person',
       contactTelNo: '012345',
     },
-    methodologies: [
-      {
-        id: 'm1',
-        title: 'methodology title',
-        slug: 'm1',
-      },
-    ],
-  },
-  latestRelease: true,
-  relatedInformation: [],
-  type: 'AccreditedOfficialStatistics',
-  updates: [],
-  content: [],
-  downloadFiles: [],
-  hasPreReleaseAccessList: true,
-  hasDataGuidance: true,
+  };
+
+export const testPublicationMethodologyList = {
+  methodologies: [
+    {
+      methodologyId: 'm1',
+      title: 'methodology title',
+      slug: 'm1',
+    },
+  ],
 };

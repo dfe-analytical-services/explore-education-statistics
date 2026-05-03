@@ -2,7 +2,7 @@ import RelatedPagesSection from '@admin/pages/release/content/components/Related
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import _releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
 import { generateEditableRelease } from '@admin-test/generators/releaseContentGenerators';
-import { BasicLink } from '@common/services/publicationService';
+import { BasicLink } from '@admin/services/publicationService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import render from '@common-test/render';

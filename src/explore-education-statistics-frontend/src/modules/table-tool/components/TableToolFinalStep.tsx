@@ -1,6 +1,5 @@
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
@@ -9,7 +8,6 @@ import { SelectedPublication } from '@common/modules/table-tool/types/selectedPu
 import TableToolShare from '@frontend/modules/table-tool/components/TableToolShare';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import publicationService from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
 import tableBuilderService, {
   ReleaseTableDataQuery,
@@ -35,14 +33,6 @@ const TableToolFinalStep = ({
   const dataTableRef = useRef<HTMLElement>(null);
   const [hasTableError, toggleHasTableError] = useToggle(false);
 
-  const { value: fullPublication } = useAsyncRetry(
-    async () =>
-      publicationService.getLatestPublicationRelease(selectedPublication.slug),
-    [selectedPublication],
-  );
-
-  const publication = fullPublication?.publication;
-
   return (
     <div
       className="govuk-!-margin-bottom-4"
@@ -51,14 +41,14 @@ const TableToolFinalStep = ({
       {table && tableHeaders && (
         <>
           <div className="govuk-!-margin-bottom-3 dfe-flex dfe-flex-wrap dfe-align-items-start dfe-justify-content--space-between dfe-gap-3">
-            {publication?.isSuperseded ? (
+            {selectedPublication.isSuperseded ? (
               <WarningMessage testId="superseded-warning">
                 This publication has been superseded by{' '}
                 <Link
                   testId="superseded-by-link"
-                  to={`/find-statistics/${publication.supersededBy?.slug}`}
+                  to={`/find-statistics/${selectedPublication.supersededBy?.slug}`}
                 >
-                  {publication.supersededBy?.title}
+                  {selectedPublication.supersededBy?.title}
                 </Link>
               </WarningMessage>
             ) : (
