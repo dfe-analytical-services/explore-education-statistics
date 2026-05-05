@@ -1,24 +1,24 @@
-import ReleaseAccessForm from '@admin/pages/users/components/ReleaseAccessForm';
+import PreReleaseAccessForm from '@admin/pages/users/components/PreReleaseAccessForm';
 import {
   testUser,
-  testResourceRoles,
   testReleases,
 } from '@admin/pages/users/__data__/testUserData';
-import _userService from '@admin/services/user-management/userService';
+import _preReleaseUsersService from '@admin/services/user-management/preReleaseUsersService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/userService');
-const userService = _userService as jest.Mocked<typeof _userService>;
+const preReleaseUsersService = _preReleaseUsersService as jest.Mocked<
+  typeof _preReleaseUsersService
+>;
 
-describe('ReleaseAccessForm', () => {
+describe('PreReleaseAccessForm', () => {
   test('renders the form', () => {
     render(
-      <ReleaseAccessForm
+      <PreReleaseAccessForm
         releases={testReleases}
-        releaseRoles={testResourceRoles.Release}
         user={testUser}
         onUpdate={noop}
       />,
@@ -31,15 +31,8 @@ describe('ReleaseAccessForm', () => {
     expect(releases[1]).toHaveTextContent('Release 2');
     expect(releases[2]).toHaveTextContent('Release 3');
 
-    const roleSelect = screen.getByLabelText('Release role');
-    const roles = within(roleSelect).getAllByRole('option');
-    expect(roles).toHaveLength(3);
-    expect(roles[0]).toHaveTextContent('Approver');
-    expect(roles[1]).toHaveTextContent('Contributor');
-    expect(roles[2]).toHaveTextContent('PrereleaseViewer');
-
     expect(
-      screen.getByRole('button', { name: 'Add release access' }),
+      screen.getByRole('button', { name: 'Add pre-release access' }),
     ).toBeInTheDocument();
   });
 
@@ -47,9 +40,8 @@ describe('ReleaseAccessForm', () => {
     const user = userEvent.setup();
     const handleUpdate = jest.fn();
     render(
-      <ReleaseAccessForm
+      <PreReleaseAccessForm
         releases={testReleases}
-        releaseRoles={testResourceRoles.Release}
         user={testUser}
         onUpdate={handleUpdate}
       />,
@@ -60,7 +52,7 @@ describe('ReleaseAccessForm', () => {
       'Contributor',
     ]);
 
-    expect(userService.addUserReleaseRole).not.toHaveBeenCalled();
+    expect(preReleaseUsersService.grantPreReleaseAccess).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
     await user.click(
@@ -68,13 +60,15 @@ describe('ReleaseAccessForm', () => {
     );
 
     await waitFor(() => {
-      expect(userService.addUserReleaseRole).toHaveBeenCalledTimes(1);
+      expect(
+        preReleaseUsersService.grantPreReleaseAccess,
+      ).toHaveBeenCalledTimes(1);
     });
 
-    expect(userService.addUserReleaseRole).toHaveBeenCalledWith('user-1-id', {
-      releaseId: 'release-1-id',
-      releaseRole: 'Contributor',
-    });
+    expect(preReleaseUsersService.grantPreReleaseAccess).toHaveBeenCalledWith(
+      'user-1-id',
+      'release-1-id',
+    );
     expect(handleUpdate).toHaveBeenCalledTimes(1);
   });
 
@@ -82,9 +76,8 @@ describe('ReleaseAccessForm', () => {
     const user = userEvent.setup();
     const handleUpdate = jest.fn();
     render(
-      <ReleaseAccessForm
+      <PreReleaseAccessForm
         releases={testReleases}
-        releaseRoles={testResourceRoles.Release}
         user={testUser}
         onUpdate={handleUpdate}
       />,
@@ -92,24 +85,29 @@ describe('ReleaseAccessForm', () => {
 
     const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
 
-    expect(userService.removeUserReleaseRole).not.toHaveBeenCalled();
+    expect(
+      preReleaseUsersService.removePreReleaseRoleById,
+    ).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
     await user.click(removeButtons[0]);
 
     await waitFor(() => {
-      expect(userService.removeUserReleaseRole).toHaveBeenCalledTimes(1);
+      expect(
+        preReleaseUsersService.removePreReleaseRoleById,
+      ).toHaveBeenCalledTimes(1);
     });
 
-    expect(userService.removeUserReleaseRole).toHaveBeenCalledWith('rr-id-1');
+    expect(
+      preReleaseUsersService.removePreReleaseRoleById,
+    ).toHaveBeenCalledWith('rr-id-1');
     expect(handleUpdate).toHaveBeenCalledTimes(1);
   });
 
   test('displays a table of releases', () => {
     render(
-      <ReleaseAccessForm
+      <PreReleaseAccessForm
         releases={testReleases}
-        releaseRoles={testResourceRoles.Release}
         user={testUser}
         onUpdate={noop}
       />,
@@ -119,6 +117,5 @@ describe('ReleaseAccessForm', () => {
     expect(rows.length).toBe(3);
     expect(within(rows[1]).getByText('Publication 1')).toBeInTheDocument();
     expect(within(rows[1]).getByText('Release 2')).toBeInTheDocument();
-    expect(within(rows[1]).getByText('Contributor')).toBeInTheDocument();
   });
 });

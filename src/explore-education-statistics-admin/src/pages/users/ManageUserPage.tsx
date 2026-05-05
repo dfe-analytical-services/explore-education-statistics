@@ -1,16 +1,18 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userQueries from '@admin/queries/userQueries';
+import usersQueries from '@admin/queries/user-management/usersQueries';
 import publicationQueries from '@admin/queries/publicationQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RoleForm from '@admin/pages/users/components/RoleForm';
-import ReleaseAccessForm from '@admin/pages/users/components/ReleaseAccessForm';
+import PreReleaseAccessForm from '@admin/pages/users/components/PreReleaseAccessForm';
 import PublicationAccessForm from '@admin/pages/users/components/PublicationAccessForm';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import releaseQueries from '@admin/queries/releaseQueries';
+import globalRolesQueries from '@admin/queries/user-management/globalRolesQueries';
 
 export default function ManageUserPage({
   match,
@@ -21,16 +23,13 @@ export default function ManageUserPage({
     data: user,
     isLoading: isLoadingUser,
     refetch,
-  } = useQuery(userQueries.get(userId));
+  } = useQuery(usersQueries.getUser(userId));
 
   const { data: roles, isLoading: isLoadingRoles } = useQuery(
-    userQueries.getRoles,
-  );
-  const { data: resourceRoles, isLoading: isLoadingResourceRoles } = useQuery(
-    userQueries.getResourceRoles,
+    globalRolesQueries.getRoles,
   );
   const { data: releases, isLoading: isLoadingReleases } = useQuery(
-    userQueries.getReleases,
+    releaseQueries.getReleases,
   );
   const { data: publications, isLoading: isLoadingPublications } = useQuery(
     publicationQueries.getPublicationSummaries,
@@ -62,23 +61,17 @@ export default function ManageUserPage({
               <RoleForm roles={roles} user={user} onUpdate={refetch} />
             </LoadingSpinner>
 
-            <LoadingSpinner
-              loading={isLoadingReleases || isLoadingResourceRoles}
-            >
-              <ReleaseAccessForm
+            <LoadingSpinner loading={isLoadingReleases}>
+              <PreReleaseAccessForm
                 releases={releases}
-                releaseRoles={resourceRoles?.Release}
                 user={user}
                 onUpdate={refetch}
               />
             </LoadingSpinner>
 
-            <LoadingSpinner
-              loading={isLoadingPublications || isLoadingResourceRoles}
-            >
+            <LoadingSpinner loading={isLoadingPublications}>
               <PublicationAccessForm
                 publications={publications}
-                publicationRoles={resourceRoles?.Publication}
                 user={user}
                 onUpdate={refetch}
               />
