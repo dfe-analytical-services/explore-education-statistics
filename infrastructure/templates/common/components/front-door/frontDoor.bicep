@@ -1,5 +1,5 @@
 import { abbreviations } from '../../abbreviations.bicep'
-import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../../../public-api/components/alerts/staticAlertConfig.bicep'
+import { staticAverageLessThan95, staticAverageGreaterThanZero } from '../../../public-api/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan, dynamicAverageLessThan } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
 import { FrontDoorCertificateType } from 'types.bicep'
 
@@ -317,7 +317,7 @@ module originHealthPercentageAlert '../../../public-api/components/alerts/static
       metric: 'OriginHealthPercentage'
     }
     config: {
-      ...staticAverageLessThanHundred
+      ...staticAverageLessThan95
       nameSuffix: 'origin-health-percentage'
     }
     alertsGroupName: alerts!.alertsGroupName
