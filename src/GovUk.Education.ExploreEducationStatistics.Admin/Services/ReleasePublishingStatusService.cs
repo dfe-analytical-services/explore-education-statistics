@@ -20,7 +20,9 @@ public class ReleasePublishingStatusService(
     IUserService userService
 ) : IReleasePublishingStatusService
 {
-    public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatus(Guid releaseVersionId) =>
+    public async Task<Either<ActionResult, ReleasePublishingStatusViewModel?>> GetReleaseStatus(
+        Guid releaseVersionId
+    ) =>
         await contentDbContext
             .ReleaseVersions.AsNoTracking()
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
@@ -34,6 +36,8 @@ public class ReleasePublishingStatusService(
                 var statusList = await asyncPageable.ToListAsync();
                 var latestStatus = statusList.MaxBy(status => status.Created);
 
-                return ReleasePublishingStatusViewModel.FromReleasePublishingStatus(latestStatus);
+                return latestStatus != null
+                    ? ReleasePublishingStatusViewModel.FromReleasePublishingStatus(latestStatus)
+                    : null;
             });
 }

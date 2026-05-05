@@ -315,8 +315,12 @@ public class ReleaseVersionsController(
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/stage-status")]
-    public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatuses(Guid releaseVersionId)
+    public async Task<ActionResult<ReleasePublishingStatusViewModel?>> GetReleaseStatuses(Guid releaseVersionId)
     {
+        // Publishing status entries are created asynchronously by the Publisher via a queue-triggered function when a
+        // release is approved, so there may be a brief delay before the status exists.
+        // A 404 Not Found would be more appropriate when the status does not exist yet, but for now
+        // a 204 No Content is returned when GetReleaseStatus returns null.
         return await releasePublishingStatusService.GetReleaseStatus(releaseVersionId).HandleFailuresOrOk();
     }
 
