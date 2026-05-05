@@ -24,32 +24,37 @@ public class EducationInNumbersServiceTests
         var createdByUserId = Guid.NewGuid();
         var updatedByUserId = Guid.NewGuid();
 
-        var latestPageVersion = new EducationInNumbersPage
+        var page = new EinPage
         {
             Id = Guid.NewGuid(),
             Title = "Test page",
             Slug = "test-page",
             Description = "Test page description",
-            Version = 1,
             Order = 0,
+        };
+        var latestPageVersion = new EinPageVersion
+        {
+            Id = Guid.NewGuid(),
+            Version = 1,
             Published = new DateTime(2005, 12, 25, 12, 00, 00),
             Created = new DateTime(2005, 12, 23, 12, 00, 00),
             CreatedById = createdByUserId,
             Updated = new DateTime(2005, 12, 24, 12, 00, 00),
             UpdatedById = updatedByUserId,
+            EinPageId = page.Id,
         };
-
-        var previousPageVersion = new EducationInNumbersPage
+        var previousPageVersion = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Slug = "test-page",
             Version = 0,
+            EinPageId = page.Id,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(latestPageVersion, previousPageVersion);
+            contentDbContext.EinPages.Add(page);
+            contentDbContext.EinPageVersions.AddRange(latestPageVersion, previousPageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -57,17 +62,17 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext);
 
-            var result = await service.GetPage(latestPageVersion.Id);
-            var fetchedPage = result.AssertRight();
+            var result = await service.GetPageVersion(latestPageVersion.Id);
+            var fetchedPageVersion = result.AssertRight();
 
             Assert.Multiple(
-                () => Assert.Equal(latestPageVersion.Id, fetchedPage.Id),
-                () => Assert.Equal(latestPageVersion.Title, fetchedPage.Title),
-                () => Assert.Equal(latestPageVersion.Slug, fetchedPage.Slug),
-                () => Assert.Equal(latestPageVersion.Description, fetchedPage.Description),
-                () => Assert.Equal(latestPageVersion.Version, fetchedPage.Version),
-                () => Assert.Equal(latestPageVersion.Published, fetchedPage.Published),
-                () => Assert.Equal(latestPageVersion.Order, fetchedPage.Order)
+                () => Assert.Equal(latestPageVersion.Id, fetchedPageVersion.Id),
+                () => Assert.Equal(page.Title, fetchedPageVersion.Title),
+                () => Assert.Equal(page.Slug, fetchedPageVersion.Slug),
+                () => Assert.Equal(page.Description, fetchedPageVersion.Description),
+                () => Assert.Equal(latestPageVersion.Version, fetchedPageVersion.Version),
+                () => Assert.Equal(latestPageVersion.Published, fetchedPageVersion.Published),
+                () => Assert.Equal(page.Order, fetchedPageVersion.Order)
             );
         }
     }
@@ -79,7 +84,7 @@ public class EducationInNumbersServiceTests
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
         var service = CreateService(contentDbContext);
 
-        var result = await service.GetPage(Guid.NewGuid());
+        var result = await service.GetPageVersion(Guid.NewGuid());
         result.AssertNotFound();
     }
 
@@ -89,29 +94,49 @@ public class EducationInNumbersServiceTests
         var createdByUserId = Guid.NewGuid();
         var updatedByUserId = Guid.NewGuid();
 
-        var educationInNumbersPage = new EducationInNumbersPage
+        var einPageId = Guid.NewGuid();
+        var einPageLatestVersionId = Guid.NewGuid();
+        var einPage = new EinPage
         {
-            Id = Guid.NewGuid(),
+            Id = einPageId,
             Title = "Education in numbers",
             Slug = null,
             Description = "Education in numbers description",
-            Version = 0,
             Order = 3,
-            Published = new DateTime(2002, 12, 25, 12, 00, 00),
-            Created = new DateTime(2002, 12, 23, 12, 00, 00),
-            CreatedById = createdByUserId,
-            Updated = new DateTime(2002, 12, 24, 12, 00, 00),
-            UpdatedById = updatedByUserId,
+            LatestVersionId = einPageLatestVersionId,
+            LatestPublishedVersionId = einPageLatestVersionId,
+            PageVersions =
+            [
+                new EinPageVersion
+                {
+                    Id = einPageLatestVersionId,
+                    EinPageId = einPageId,
+                    Version = 0,
+                    Published = new DateTime(2002, 12, 25, 12, 00, 00),
+                    Created = new DateTime(2002, 12, 23, 12, 00, 00),
+                    CreatedById = createdByUserId,
+                    Updated = new DateTime(2002, 12, 24, 12, 00, 00),
+                    UpdatedById = updatedByUserId,
+                },
+            ],
         };
 
-        var page1Latest = new EducationInNumbersPage
+        var page1LatestVersionId = Guid.NewGuid();
+        var page1 = new EinPage
         {
             Id = Guid.NewGuid(),
             Title = "Page 1",
             Slug = "page-1",
             Description = "Test 1 description",
-            Version = 1,
             Order = 1,
+            LatestVersionId = page1LatestVersionId,
+            LatestPublishedVersionId = page1LatestVersionId,
+        };
+        var page1LatestVersion = new EinPageVersion
+        {
+            Id = page1LatestVersionId,
+            EinPageId = page1.Id,
+            Version = 1,
             Published = new DateTime(2005, 12, 25, 12, 00, 00),
             Created = new DateTime(2005, 12, 23, 12, 00, 00),
             CreatedById = createdByUserId,
@@ -119,54 +144,72 @@ public class EducationInNumbersServiceTests
             UpdatedById = updatedByUserId,
         };
 
-        var page1Previous = new EducationInNumbersPage
+        var page1Previous = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Slug = "page-1",
+            EinPageId = page1.Id,
             Version = 0,
-            Order = 1,
         };
 
-        var page2 = new EducationInNumbersPage
+        var page2Id = Guid.NewGuid();
+        var page2LatestVersionId = Guid.NewGuid();
+        var page2 = new EinPage
         {
-            Id = Guid.NewGuid(),
+            Id = page2Id,
             Title = "Page 2",
             Slug = "page-2",
             Description = "Test 2 description",
-            Version = 0,
             Order = 0,
-            Published = null,
-            Created = new DateTime(2004, 12, 23, 12, 00, 00),
-            CreatedById = createdByUserId,
-            Updated = new DateTime(2004, 12, 24, 12, 00, 00),
-            UpdatedById = updatedByUserId,
+            LatestVersionId = page2LatestVersionId,
+            LatestPublishedVersionId = page2LatestVersionId,
+            PageVersions =
+            [
+                new EinPageVersion
+                {
+                    Id = page2LatestVersionId,
+                    EinPageId = page2Id,
+                    Version = 0,
+                    Published = null,
+                    Created = new DateTime(2004, 12, 23, 12, 00, 00),
+                    CreatedById = createdByUserId,
+                    Updated = new DateTime(2004, 12, 24, 12, 00, 00),
+                    UpdatedById = updatedByUserId,
+                },
+            ],
         };
 
-        var page3 = new EducationInNumbersPage
+        var page3Id = Guid.NewGuid();
+        var page3LatestVersionId = Guid.NewGuid();
+        var page3 = new EinPage
         {
-            Id = Guid.NewGuid(),
+            Id = page3Id,
             Title = "Page 3",
             Slug = "page-3",
             Description = "Test 3 description",
-            Version = 0,
             Order = 2,
-            Published = new DateTime(2003, 12, 25, 12, 00, 00),
-            Created = new DateTime(2003, 12, 23, 12, 00, 00),
-            CreatedById = createdByUserId,
-            Updated = new DateTime(2003, 12, 24, 12, 00, 00),
-            UpdatedById = updatedByUserId,
+            LatestVersionId = page3LatestVersionId,
+            LatestPublishedVersionId = page3LatestVersionId,
+            PageVersions =
+            [
+                new EinPageVersion
+                {
+                    Id = page3LatestVersionId,
+                    EinPageId = page3Id,
+                    Version = 0,
+                    Published = new DateTime(2003, 12, 25, 12, 00, 00),
+                    Created = new DateTime(2003, 12, 23, 12, 00, 00),
+                    CreatedById = createdByUserId,
+                    Updated = new DateTime(2003, 12, 24, 12, 00, 00),
+                    UpdatedById = updatedByUserId,
+                },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(
-                educationInNumbersPage,
-                page1Latest,
-                page1Previous,
-                page2,
-                page3
-            );
+            contentDbContext.EinPages.AddRange(einPage, page1, page2, page3);
+            contentDbContext.EinPageVersions.AddRange(page1LatestVersion, page1Previous);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -179,46 +222,46 @@ public class EducationInNumbersServiceTests
 
             // returned in order
             Assert.Multiple(
-                () => Assert.Equal(page2.Id, pageSummaryList[0].Id),
+                () => Assert.Equal(page2.PageVersions[0].Id, pageSummaryList[0].Id),
                 () => Assert.Equal(page2.Title, pageSummaryList[0].Title),
                 () => Assert.Equal(page2.Slug, pageSummaryList[0].Slug),
                 () => Assert.Equal(page2.Description, pageSummaryList[0].Description),
-                () => Assert.Equal(page2.Version, pageSummaryList[0].Version),
-                () => Assert.Equal(page2.Published, pageSummaryList[0].Published),
+                () => Assert.Equal(page2.PageVersions[0].Version, pageSummaryList[0].Version),
+                () => Assert.Equal(page2.PageVersions[0].Published, pageSummaryList[0].Published),
                 () => Assert.Equal(page2.Order, pageSummaryList[0].Order),
                 () => Assert.Null(pageSummaryList[0].PreviousVersionId)
             );
 
             Assert.Multiple(
-                () => Assert.Equal(page1Latest.Id, pageSummaryList[1].Id),
-                () => Assert.Equal(page1Latest.Title, pageSummaryList[1].Title),
-                () => Assert.Equal(page1Latest.Slug, pageSummaryList[1].Slug),
-                () => Assert.Equal(page1Latest.Description, pageSummaryList[1].Description),
-                () => Assert.Equal(page1Latest.Version, pageSummaryList[1].Version),
-                () => Assert.Equal(page1Latest.Published, pageSummaryList[1].Published),
-                () => Assert.Equal(page1Latest.Order, pageSummaryList[1].Order),
+                () => Assert.Equal(page1LatestVersion.Id, pageSummaryList[1].Id),
+                () => Assert.Equal(page1LatestVersion.EinPage.Title, pageSummaryList[1].Title),
+                () => Assert.Equal(page1LatestVersion.EinPage.Slug, pageSummaryList[1].Slug),
+                () => Assert.Equal(page1LatestVersion.EinPage.Description, pageSummaryList[1].Description),
+                () => Assert.Equal(page1LatestVersion.Version, pageSummaryList[1].Version),
+                () => Assert.Equal(page1LatestVersion.Published, pageSummaryList[1].Published),
+                () => Assert.Equal(page1LatestVersion.EinPage.Order, pageSummaryList[1].Order),
                 () => Assert.Equal(page1Previous.Id, pageSummaryList[1].PreviousVersionId)
             );
 
             Assert.Multiple(
-                () => Assert.Equal(page3.Id, pageSummaryList[2].Id),
+                () => Assert.Equal(page3.PageVersions[0].Id, pageSummaryList[2].Id),
                 () => Assert.Equal(page3.Title, pageSummaryList[2].Title),
                 () => Assert.Equal(page3.Slug, pageSummaryList[2].Slug),
                 () => Assert.Equal(page3.Description, pageSummaryList[2].Description),
-                () => Assert.Equal(page3.Version, pageSummaryList[2].Version),
-                () => Assert.Equal(page3.Published, pageSummaryList[2].Published),
+                () => Assert.Equal(page3.PageVersions[0].Version, pageSummaryList[2].Version),
+                () => Assert.Equal(page3.PageVersions[0].Published, pageSummaryList[2].Published),
                 () => Assert.Equal(page3.Order, pageSummaryList[2].Order),
                 () => Assert.Null(pageSummaryList[2].PreviousVersionId)
             );
 
             Assert.Multiple(
-                () => Assert.Equal(educationInNumbersPage.Id, pageSummaryList[3].Id),
-                () => Assert.Equal(educationInNumbersPage.Title, pageSummaryList[3].Title),
-                () => Assert.Equal(educationInNumbersPage.Slug, pageSummaryList[3].Slug),
-                () => Assert.Equal(educationInNumbersPage.Description, pageSummaryList[3].Description),
-                () => Assert.Equal(educationInNumbersPage.Version, pageSummaryList[3].Version),
-                () => Assert.Equal(educationInNumbersPage.Published, pageSummaryList[3].Published),
-                () => Assert.Equal(educationInNumbersPage.Order, pageSummaryList[3].Order),
+                () => Assert.Equal(einPage.PageVersions[0].Id, pageSummaryList[3].Id),
+                () => Assert.Equal(einPage.Title, pageSummaryList[3].Title),
+                () => Assert.Equal(einPage.Slug, pageSummaryList[3].Slug),
+                () => Assert.Equal(einPage.Description, pageSummaryList[3].Description),
+                () => Assert.Equal(einPage.PageVersions[0].Version, pageSummaryList[3].Version),
+                () => Assert.Equal(einPage.PageVersions[0].Published, pageSummaryList[3].Published),
+                () => Assert.Equal(einPage.Order, pageSummaryList[3].Order),
                 () => Assert.Null(pageSummaryList[3].PreviousVersionId)
             );
         }
@@ -227,25 +270,37 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task CreatePage_Success()
     {
-        var testPage = new EducationInNumbersPage
+        var testPageId = Guid.NewGuid();
+        var testPageVersionId = Guid.NewGuid();
+        var testPage = new EinPage
         {
-            Id = Guid.NewGuid(),
+            Id = testPageId,
             Title = "Test page",
             Slug = "test-page",
             Description = "Test page description",
-            Version = 0,
             Order = 0,
-            Published = new DateTime(2005, 12, 25, 12, 00, 00),
-            Created = new DateTime(2005, 12, 23, 12, 00, 00),
-            CreatedById = Guid.NewGuid(),
-            Updated = new DateTime(2005, 12, 24, 12, 00, 00),
-            UpdatedById = Guid.NewGuid(),
+            LatestVersionId = testPageVersionId,
+            LatestPublishedVersionId = testPageVersionId,
+            PageVersions =
+            [
+                new EinPageVersion
+                {
+                    Id = testPageVersionId,
+                    Version = 0,
+                    Published = new DateTime(2005, 12, 25, 12, 00, 00),
+                    Created = new DateTime(2005, 12, 23, 12, 00, 00),
+                    CreatedById = Guid.NewGuid(),
+                    Updated = new DateTime(2005, 12, 24, 12, 00, 00),
+                    UpdatedById = Guid.NewGuid(),
+                    EinPageId = testPageId,
+                },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(testPage);
+            contentDbContext.EinPages.Add(testPage);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -270,23 +325,29 @@ public class EducationInNumbersServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var pages = contentDbContext.EducationInNumbersPages.OrderBy(p => p.Order).ToList();
-
+            var pages = contentDbContext.EinPages.OrderBy(p => p.Order).ToList();
             Assert.Equal(2, pages.Count);
-
             Assert.Equal(testPage.Id, pages[0].Id);
-
             Assert.Multiple(
                 () => Assert.Equal("New page", pages[1].Title),
                 () => Assert.Equal("new-page", pages[1].Slug),
                 () => Assert.Equal("New page description", pages[1].Description),
-                () => Assert.Equal(0, pages[1].Version),
-                () => Assert.Equal(1, pages[1].Order),
-                () => Assert.Null(pages[1].Published),
-                () => pages[1].Created.AssertUtcNow(),
-                () => Assert.Equal(_userId, pages[1].CreatedById),
-                () => Assert.Null(pages[1].Updated),
-                () => Assert.Null(pages[1].UpdatedById)
+                () => Assert.Equal(1, pages[1].Order)
+            );
+
+            Assert.Equal(2, contentDbContext.EinPageVersions.ToList().Count);
+
+            var newPageVersion = contentDbContext.EinPageVersions.Single(pageVersion =>
+                pageVersion.Id != testPageVersionId
+            );
+            Assert.Multiple(
+                () => Assert.Equal(0, newPageVersion.Version),
+                () => Assert.Null(newPageVersion.Published),
+                () => newPageVersion.Created.AssertUtcNow(),
+                () => Assert.Equal(_userId, newPageVersion.CreatedById),
+                () => Assert.Null(newPageVersion.Updated),
+                () => Assert.Null(newPageVersion.UpdatedById),
+                () => Assert.Equal(pages[1].Id, newPageVersion.EinPageId)
             );
         }
     }
@@ -294,14 +355,17 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task CreatePage_TitleNotUnique_ValidationError()
     {
-        var testPage = new EducationInNumbersPage
+        var testPage = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Test page",
-            Slug = "test-page",
-            Description = "Test page description",
+            EinPage = new EinPage
+            {
+                Title = "Test page",
+                Slug = "test-page",
+                Description = "Test page description",
+                Order = 0,
+            },
             Version = 0,
-            Order = 0,
             Published = new DateTime(2005, 12, 25, 12, 00, 00),
             Created = new DateTime(2005, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -312,7 +376,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(testPage);
+            contentDbContext.EinPageVersions.Add(testPage);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -333,14 +397,17 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task CreatePage_SlugNotUnique_ValidationError()
     {
-        var testPage = new EducationInNumbersPage
+        var testPage = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Test page",
-            Slug = "test-page",
-            Description = "Test page description",
+            EinPage = new EinPage
+            {
+                Title = "Test page",
+                Slug = "test-page",
+                Description = "Test page description",
+                Order = 0,
+            },
             Version = 0,
-            Order = 0,
             Published = new DateTime(2005, 12, 25, 12, 00, 00),
             Created = new DateTime(2005, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -351,7 +418,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(testPage);
+            contentDbContext.EinPageVersions.Add(testPage);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -376,14 +443,20 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task CreateAmendment_Success()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPageVersionId = Guid.NewGuid();
+        var originalPageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            Id = originalPageVersionId,
+            EinPage = new EinPage
+            {
+                Title = "Page title",
+                Slug = "page-title",
+                Description = "Page description",
+                Order = 0,
+                LatestVersionId = originalPageVersionId,
+                LatestPublishedVersionId = originalPageVersionId,
+            },
             Version = 0,
-            Order = 0,
             Published = new DateTime(2005, 12, 25, 12, 00, 00),
             Created = new DateTime(2005, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -394,7 +467,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(originalPage);
+            contentDbContext.EinPageVersions.Add(originalPageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -402,14 +475,14 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext);
 
-            var result = await service.CreateAmendment(originalPage.Id);
+            var result = await service.CreateAmendment(originalPageVersion.Id);
             var amendment = result.AssertRight();
 
             Assert.Multiple(
                 () => Assert.Equal("Page title", amendment.Title),
                 () => Assert.Equal("page-title", amendment.Slug),
                 () => Assert.Equal("Page description", amendment.Description),
-                () => Assert.Equal(originalPage.Version + 1, amendment.Version),
+                () => Assert.Equal(originalPageVersion.Version + 1, amendment.Version),
                 () => Assert.Null(amendment.Published),
                 () => Assert.Equal(0, amendment.Order)
             );
@@ -417,38 +490,44 @@ public class EducationInNumbersServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var pages = contentDbContext.EducationInNumbersPages.OrderBy(p => p.Version).ToList();
+            var pageVersions = contentDbContext.EinPageVersions.OrderBy(p => p.Version).ToList();
 
-            Assert.Equal(2, pages.Count);
+            Assert.Equal(2, pageVersions.Count);
 
-            Assert.Equal(originalPage.Id, pages[0].Id);
+            Assert.Equal(originalPageVersion.Id, pageVersions[0].Id);
 
             Assert.Multiple(
-                () => Assert.Equal("Page title", pages[1].Title),
-                () => Assert.Equal("page-title", pages[1].Slug),
-                () => Assert.Equal("Page description", pages[1].Description),
-                () => Assert.Equal(1, pages[1].Version),
-                () => Assert.Equal(0, pages[1].Order),
-                () => Assert.Null(pages[1].Published),
-                () => pages[1].Created.AssertUtcNow(),
-                () => Assert.Equal(_userId, pages[1].CreatedById),
-                () => Assert.Null(pages[1].Updated),
-                () => Assert.Null(pages[1].UpdatedById)
+                () => Assert.Equal(1, pageVersions[1].Version),
+                () => Assert.Null(pageVersions[1].Published),
+                () => pageVersions[1].Created.AssertUtcNow(),
+                () => Assert.Equal(_userId, pageVersions[1].CreatedById),
+                () => Assert.Null(pageVersions[1].Updated),
+                () => Assert.Null(pageVersions[1].UpdatedById),
+                () => Assert.Equal(originalPageVersion.EinPageId, pageVersions[1].EinPageId)
             );
+
+            var page = Assert.Single(contentDbContext.EinPages.ToList());
+            Assert.Equal(pageVersions[1].Id, page.LatestVersionId);
         }
     }
 
     [Fact]
     public async Task CreateAmendment_ClonesContent_Success()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPageVersionId = Guid.NewGuid();
+        var originalPageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            Id = originalPageVersionId,
+            EinPage = new EinPage
+            {
+                Title = "Page title",
+                Slug = "page-title",
+                Description = "Page description",
+                Order = 0,
+                LatestVersionId = originalPageVersionId,
+                LatestPublishedVersionId = originalPageVersionId,
+            },
             Version = 0,
-            Order = 0,
             Published = DateTime.UtcNow,
             Content =
             [
@@ -494,7 +573,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(originalPage);
+            contentDbContext.EinPageVersions.Add(originalPageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -503,7 +582,7 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext);
 
-            var result = await service.CreateAmendment(originalPage.Id);
+            var result = await service.CreateAmendment(originalPageVersion.Id);
             var amendment = result.AssertRight();
             amendmentId = amendment.Id;
         }
@@ -511,17 +590,17 @@ public class EducationInNumbersServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var amendment = await contentDbContext
-                .EducationInNumbersPages.Include(p => p.Content)
+                .EinPageVersions.Include(p => p.Content)
                     .ThenInclude(s => s.Content)
                 .SingleAsync(p => p.Id == amendmentId);
 
-            Assert.NotEqual(originalPage.Id, amendment.Id);
-            Assert.Equal(originalPage.Content.Count, amendment.Content.Count);
+            Assert.NotEqual(originalPageVersion.Id, amendment.Id);
+            Assert.Equal(originalPageVersion.Content.Count, amendment.Content.Count);
 
-            var originalSection1 = originalPage.Content[0];
+            var originalSection1 = originalPageVersion.Content[0];
             var amendmentSection1 = amendment.Content[0];
             Assert.NotEqual(originalSection1.Id, amendmentSection1.Id);
-            Assert.Equal(amendment.Id, amendmentSection1.EducationInNumbersPageId);
+            Assert.Equal(amendment.Id, amendmentSection1.EinPageVersionId);
             Assert.Equal(originalSection1.Order, amendmentSection1.Order);
             Assert.Equal(originalSection1.Heading, amendmentSection1.Heading);
             Assert.Equal(originalSection1.Content.Count, amendmentSection1.Content.Count);
@@ -540,10 +619,10 @@ public class EducationInNumbersServiceTests
             Assert.Equal(originalSection1Block2.Order, amendmentSection1Block2.Order);
             Assert.Equal(originalSection1Block2.Body, amendmentSection1Block2.Body);
 
-            var originalSection2 = originalPage.Content[1];
+            var originalSection2 = originalPageVersion.Content[1];
             var amendmentSection2 = amendment.Content[1];
             Assert.NotEqual(originalSection2.Id, amendmentSection2.Id);
-            Assert.Equal(amendment.Id, amendmentSection2.EducationInNumbersPageId);
+            Assert.Equal(amendment.Id, amendmentSection2.EinPageVersionId);
             Assert.Equal(originalSection2.Order, amendmentSection2.Order);
             Assert.Equal(originalSection2.Heading, amendmentSection2.Heading);
             Assert.Equal(originalSection2.Content.Count, amendmentSection2.Content.Count);
@@ -571,14 +650,19 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task CreateAmendment_OriginalNotPublished_ThrowsException()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPageVersionId = Guid.NewGuid();
+        var originalPageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            Id = originalPageVersionId,
+            EinPage = new EinPage
+            {
+                Title = "Page title",
+                Slug = "page-title",
+                Description = "Page description",
+                Order = 0,
+                LatestVersionId = originalPageVersionId,
+            },
             Version = 0,
-            Order = 0,
             Published = null,
             Created = new DateTime(2005, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -589,7 +673,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(originalPage);
+            contentDbContext.EinPageVersions.Add(originalPageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -597,47 +681,59 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext);
 
-            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.CreateAmendment(originalPage.Id));
-            Assert.Equal("Can only create amendment of a published page", exception.Message);
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.CreateAmendment(originalPageVersion.Id)
+            );
+            Assert.Equal("Can only create amendment of latest published page version", exception.Message);
         }
     }
 
     [Fact]
     public async Task CreateAmendment_AmendmentAlreadyExists_ThrowsException()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPageId = Guid.NewGuid();
+        var originalPageVersionId = Guid.NewGuid();
+        var amendmentVersionId = Guid.NewGuid();
+        var originalPage = new EinPage
         {
-            Id = Guid.NewGuid(),
+            Id = originalPageId,
             Title = "Page title",
             Slug = "page-title",
             Description = "Page description",
-            Version = 0,
             Order = 0,
+            LatestVersionId = amendmentVersionId,
+            LatestPublishedVersionId = originalPageVersionId,
+        };
+        var originalPageVersion = new EinPageVersion
+        {
+            Id = originalPageVersionId,
+            EinPage = originalPage,
+            EinPageId = originalPageId,
+            Version = 0,
             Published = new DateTime(2005, 12, 25, 12, 00, 00),
             Created = new DateTime(2005, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
             Updated = new DateTime(2005, 12, 24, 12, 00, 00),
             UpdatedById = Guid.NewGuid(),
         };
-
-        var amendment = new EducationInNumbersPage
+        var amendmentPageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            Id = amendmentVersionId,
+            EinPage = originalPage,
+            EinPageId = originalPageId,
             Version = 1,
-            Order = 0,
             Published = null,
             Created = new DateTime(2006, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
             Updated = new DateTime(2006, 12, 24, 12, 00, 00),
             UpdatedById = Guid.NewGuid(),
         };
+
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(originalPage, amendment);
+            contentDbContext.EinPages.Add(originalPage);
+            contentDbContext.EinPageVersions.AddRange(originalPageVersion, amendmentPageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -645,22 +741,27 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext);
 
-            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.CreateAmendment(originalPage.Id));
-            Assert.Equal($"Amendment already exists for page {originalPage.Id}", exception.Message);
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+                await service.CreateAmendment(originalPageVersion.Id)
+            );
+            Assert.Equal($"Amendment already exists for page version {originalPageVersion.Id}", exception.Message);
         }
     }
 
     [Fact]
     public async Task UpdatePage_Success()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPage = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            EinPage = new EinPage
+            {
+                Title = "Page title",
+                Slug = "page-title",
+                Description = "Page description",
+                Order = 0,
+            },
             Version = 0,
-            Order = 0,
             Published = null,
             Created = new DateTime(2006, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -671,7 +772,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(originalPage);
+            contentDbContext.EinPageVersions.AddRange(originalPage);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -687,36 +788,43 @@ public class EducationInNumbersServiceTests
                     Description = "New page description",
                 }
             );
-            var updatedPage = result.AssertRight();
+            var updatedPageVersion = result.AssertRight();
 
             Assert.Multiple(
-                () => Assert.Equal("New page title", updatedPage.Title),
-                () => Assert.Equal("new-page-title", updatedPage.Slug),
-                () => Assert.Equal("New page description", updatedPage.Description),
-                () => Assert.Equal(originalPage.Version, updatedPage.Version), // we're updating this version of the page, not creating a new page version
-                () => Assert.Null(updatedPage.Published),
-                () => Assert.Equal(0, updatedPage.Order)
+                () => Assert.Equal("New page title", updatedPageVersion.Title),
+                () => Assert.Equal("new-page-title", updatedPageVersion.Slug),
+                () => Assert.Equal("New page description", updatedPageVersion.Description),
+                () => Assert.Equal(originalPage.Version, updatedPageVersion.Version), // we're updating this version of the page, not creating a new page version
+                () => Assert.Null(updatedPageVersion.Published),
+                () => Assert.Equal(0, updatedPageVersion.Order)
             );
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var pages = contentDbContext.EducationInNumbersPages.OrderBy(p => p.Version).ToList();
+            var pageVersions = contentDbContext
+                .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+                .OrderBy(p => p.Version)
+                .ToList();
 
-            var updatedPage = Assert.Single(pages);
+            var updatedPageVersion = Assert.Single(pageVersions);
 
             Assert.Multiple(
-                () => Assert.Equal(originalPage.Id, updatedPage.Id),
+                () => Assert.Equal(originalPage.Id, updatedPageVersion.Id),
+                () => Assert.Equal(0, updatedPageVersion.Version),
+                () => Assert.Null(updatedPageVersion.Published),
+                () => Assert.Equal(originalPage.Created, updatedPageVersion.Created),
+                () => Assert.Equal(originalPage.CreatedById, updatedPageVersion.CreatedById),
+                () => Assert.Equal(originalPage.Updated, updatedPageVersion.Updated),
+                () => Assert.Equal(originalPage.UpdatedById, updatedPageVersion.UpdatedById)
+            );
+
+            var updatedPage = updatedPageVersion.EinPage;
+            Assert.Multiple(
                 () => Assert.Equal("New page title", updatedPage.Title),
                 () => Assert.Equal("new-page-title", updatedPage.Slug),
                 () => Assert.Equal("New page description", updatedPage.Description),
-                () => Assert.Equal(0, updatedPage.Version),
-                () => Assert.Equal(0, updatedPage.Order),
-                () => Assert.Null(updatedPage.Published),
-                () => Assert.Equal(originalPage.Created, updatedPage.Created),
-                () => Assert.Equal(originalPage.CreatedById, updatedPage.CreatedById),
-                () => updatedPage.Updated.AssertUtcNow(),
-                () => Assert.Equal(_userId, updatedPage.UpdatedById)
+                () => Assert.Equal(0, updatedPage.Order)
             );
         }
     }
@@ -744,14 +852,20 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task UpdatePage_CannotUpdatePublishedPage_ThrowsException()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPageVersionId = Guid.NewGuid();
+        var originalPageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            Id = originalPageVersionId,
+            EinPage = new EinPage
+            {
+                Title = "Page title",
+                Slug = "page-title",
+                Description = "Page description",
+                Order = 0,
+                LatestVersionId = originalPageVersionId,
+                LatestPublishedVersionId = originalPageVersionId,
+            },
             Version = 0,
-            Order = 0,
             Published = new DateTime(2006, 12, 25, 12, 00, 00),
             Created = new DateTime(2006, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -762,7 +876,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(originalPage);
+            contentDbContext.EinPageVersions.Add(originalPageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -772,7 +886,7 @@ public class EducationInNumbersServiceTests
 
             var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
                 service.UpdatePage(
-                    originalPage.Id,
+                    originalPageVersion.Id,
                     new UpdateEducationInNumbersPageRequest
                     {
                         Title = "New page title",
@@ -785,74 +899,19 @@ public class EducationInNumbersServiceTests
     }
 
     [Fact]
-    public async Task UpdatePage_CannotUpdateAmendment_ThrowsException()
-    {
-        var latestPageVersion = new EducationInNumbersPage
-        {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
-            Version = 1,
-            Order = 0,
-            Published = null,
-            Created = new DateTime(2006, 12, 23, 12, 00, 00),
-            CreatedById = Guid.NewGuid(),
-            Updated = new DateTime(2006, 12, 24, 12, 00, 00),
-            UpdatedById = Guid.NewGuid(),
-        };
-
-        var previousPageVersion = new EducationInNumbersPage
-        {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
-            Version = 0,
-            Order = 0,
-            Published = new DateTime(2005, 12, 25, 12, 00, 00),
-            Created = new DateTime(2005, 12, 23, 12, 00, 00),
-            CreatedById = Guid.NewGuid(),
-            Updated = new DateTime(2005, 12, 24, 12, 00, 00),
-            UpdatedById = Guid.NewGuid(),
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.EducationInNumbersPages.AddRange(latestPageVersion, previousPageVersion);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var service = CreateService(contentDbContext);
-
-            var exception = await Assert.ThrowsAsync<Exception>(() =>
-                service.UpdatePage(
-                    latestPageVersion.Id,
-                    new UpdateEducationInNumbersPageRequest
-                    {
-                        Title = "Something something",
-                        Description = "Random description",
-                    }
-                )
-            );
-            Assert.Equal("Cannot update details for a page amendment", exception.Message);
-        }
-    }
-
-    [Fact]
     public async Task UpdatePage_TitleNotUnique_ValidationError()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPage = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            EinPage = new EinPage
+            {
+                Title = "Page title",
+                Slug = "page-title",
+                Description = "Page description",
+                Order = 0,
+            },
             Version = 0,
-            Order = 0,
             Published = null,
             Created = new DateTime(2006, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -860,14 +919,17 @@ public class EducationInNumbersServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        var otherPage = new EducationInNumbersPage
+        var otherPage = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Other page",
-            Slug = "other-page",
-            Description = "Other page description",
+            EinPage = new EinPage
+            {
+                Title = "Other page",
+                Slug = "other-page",
+                Description = "Other page description",
+                Order = 0,
+            },
             Version = 0,
-            Order = 0,
             Published = null,
             Created = new DateTime(2006, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -877,7 +939,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(originalPage, otherPage);
+            contentDbContext.EinPageVersions.AddRange(originalPage, otherPage);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -899,14 +961,17 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task UpdatePage_SlugNotUnique_ValidationError()
     {
-        var originalPage = new EducationInNumbersPage
+        var originalPage = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
-            Description = "Page description",
+            EinPage = new EinPage
+            {
+                Title = "Page title",
+                Slug = "page-title",
+                Description = "Page description",
+                Order = 0,
+            },
             Version = 0,
-            Order = 0,
             Published = null,
             Created = new DateTime(2006, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -914,14 +979,17 @@ public class EducationInNumbersServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        var otherPage = new EducationInNumbersPage
+        var otherPage = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Other page",
-            Slug = "other-page",
-            Description = "Other page description",
+            EinPage = new EinPage
+            {
+                Title = "Other page",
+                Slug = "other-page",
+                Description = "Other page description",
+                Order = 0,
+            },
             Version = 0,
-            Order = 0,
             Published = null,
             Created = new DateTime(2006, 12, 23, 12, 00, 00),
             CreatedById = Guid.NewGuid(),
@@ -931,7 +999,7 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(originalPage, otherPage);
+            contentDbContext.EinPageVersions.AddRange(originalPage, otherPage);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -957,34 +1025,43 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task PublishPage_Success()
     {
-        var page = new EducationInNumbersPage
+        var pageId = Guid.NewGuid();
+        var pageVersionId = Guid.NewGuid();
+        var pageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
+            Id = pageVersionId,
+            EinPageId = pageId,
+            EinPage = new EinPage
+            {
+                Id = pageId,
+                Title = "Page title",
+                Slug = "page-title",
+                LatestVersionId = pageVersionId,
+                LatestPublishedVersion = null,
+            },
             Published = null,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(page);
+            contentDbContext.EinPageVersions.Add(pageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var result = await service.PublishPage(page.Id);
+            var result = await service.PublishPage(pageVersion.Id);
             var publishedPage = result.AssertRight();
 
-            Assert.Equal(page.Id, publishedPage.Id);
+            Assert.Equal(pageVersion.Id, publishedPage.Id);
             publishedPage.Published.AssertUtcNow();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var savedPage = await contentDbContext.EducationInNumbersPages.FindAsync(page.Id);
+            var savedPage = await contentDbContext.EinPageVersions.FindAsync(pageVersion.Id);
             Assert.NotNull(savedPage);
             savedPage.Published.AssertUtcNow();
             savedPage.Updated.AssertUtcNow();
@@ -1006,210 +1083,174 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task PublishPage_AlreadyPublished_ThrowsException()
     {
-        var page = new EducationInNumbersPage
+        var pageId = Guid.NewGuid();
+        var pageVersion = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Title = "Page title",
-            Slug = "page-title",
+            EinPageId = pageId,
+            EinPage = new EinPage
+            {
+                Id = pageId,
+                Title = "Page title",
+                Slug = "page-title",
+            },
             Published = DateTime.UtcNow,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(page);
+            contentDbContext.EinPageVersions.Add(pageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.PublishPage(page.Id));
-            Assert.Equal("Cannot publish already published page", exception.Message);
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.PublishPage(pageVersion.Id));
+            Assert.Equal("Cannot publish already published page version", exception.Message);
         }
     }
 
     [Fact]
     public async Task Reorder_Success()
     {
-        var rootPage = new EducationInNumbersPage
+        var rootPageVersionId = Guid.NewGuid();
+        var rootPageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = null,
-            Order = 0,
+            Id = rootPageVersionId,
+            EinPage = new EinPage
+            {
+                Slug = null,
+                Order = 0,
+                LatestVersionId = rootPageVersionId,
+            },
         };
-        var page1 = new EducationInNumbersPage
+        var page1VersionId = Guid.NewGuid();
+        var page1Version = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = "page-1",
-            Order = 1,
+            Id = page1VersionId,
+            EinPage = new EinPage
+            {
+                Slug = "page-1",
+                Order = 1,
+                LatestVersionId = page1VersionId,
+            },
         };
-        var page2 = new EducationInNumbersPage
+        var page2VersionId = Guid.NewGuid();
+        var page2Version = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = "page-2",
-            Order = 2,
+            Id = page2VersionId,
+            EinPage = new EinPage
+            {
+                Slug = "page-2",
+                Order = 2,
+                LatestVersionId = page2VersionId,
+            },
         };
-        var page3 = new EducationInNumbersPage
+        var page3VersionId = Guid.NewGuid();
+        var page3Version = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = "page-3",
-            Order = 3,
+            Id = page3VersionId,
+            EinPage = new EinPage
+            {
+                Slug = "page-3",
+                Order = 3,
+                LatestVersionId = page3VersionId,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(rootPage, page1, page2, page3);
+            contentDbContext.EinPageVersions.AddRange(rootPageVersion, page1Version, page2Version, page3Version);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var newOrder = new List<Guid> { rootPage.Id, page3.Id, page1.Id, page2.Id };
+            var newOrder = new List<Guid> { rootPageVersion.Id, page3Version.Id, page1Version.Id, page2Version.Id };
             var result = await service.Reorder(newOrder);
             result.AssertRight();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var dbRootPage = await contentDbContext.EducationInNumbersPages.FindAsync(rootPage.Id);
-            Assert.NotNull(dbRootPage);
-            Assert.Equal(0, dbRootPage.Order);
-            dbRootPage.Updated.AssertUtcNow();
-            Assert.Equal(_userId, dbRootPage.UpdatedById);
+            var dbRootPageVersion = await contentDbContext
+                .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+                .SingleAsync(pageVersion => pageVersion.Id == rootPageVersion.Id);
+            Assert.NotNull(dbRootPageVersion);
+            Assert.Equal(0, dbRootPageVersion.EinPage.Order);
 
-            var savedPage1 = await contentDbContext.EducationInNumbersPages.FindAsync(page1.Id);
-            Assert.NotNull(savedPage1);
-            Assert.Equal(2, savedPage1.Order);
-            savedPage1.Updated.AssertUtcNow();
-            Assert.Equal(_userId, savedPage1.UpdatedById);
+            var savedPage1Version = await contentDbContext
+                .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+                .SingleAsync(pageVersion => pageVersion.Id == page1Version.Id);
+            Assert.NotNull(savedPage1Version);
+            Assert.Equal(2, savedPage1Version.EinPage.Order);
 
-            var savedPage2 = await contentDbContext.EducationInNumbersPages.FindAsync(page2.Id);
+            var savedPage2 = await contentDbContext
+                .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+                .SingleAsync(pageVersion => pageVersion.Id == page2Version.Id);
             Assert.NotNull(savedPage2);
-            Assert.Equal(3, savedPage2.Order);
-            savedPage2.Updated.AssertUtcNow();
-            Assert.Equal(_userId, savedPage2.UpdatedById);
+            Assert.Equal(3, savedPage2.EinPage.Order);
 
-            var savedPage3 = await contentDbContext.EducationInNumbersPages.FindAsync(page3.Id);
+            var savedPage3 = await contentDbContext
+                .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+                .SingleAsync(pageVersion => pageVersion.Id == page3Version.Id);
             Assert.NotNull(savedPage3);
-            Assert.Equal(1, savedPage3.Order);
-            savedPage3.Updated.AssertUtcNow();
-            Assert.Equal(_userId, savedPage3.UpdatedById);
-        }
-    }
-
-    [Fact]
-    public async Task Reorder_WithAmendment_Success()
-    {
-        var rootPage = new EducationInNumbersPage
-        {
-            Id = Guid.NewGuid(),
-            Slug = null,
-            Order = 0,
-        };
-        var page1V0 = new EducationInNumbersPage
-        {
-            Id = Guid.NewGuid(),
-            Slug = "page-1",
-            Version = 0,
-            Order = 1,
-            Published = DateTime.UtcNow,
-        };
-        var page1V1 = new EducationInNumbersPage
-        {
-            Id = Guid.NewGuid(),
-            Slug = "page-1",
-            Version = 1,
-            Order = 1,
-            Published = null,
-        };
-        var page2 = new EducationInNumbersPage
-        {
-            Id = Guid.NewGuid(),
-            Slug = "page-2",
-            Version = 0,
-            Order = 2,
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.EducationInNumbersPages.AddRange(rootPage, page1V0, page1V1, page2);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var service = CreateService(contentDbContext);
-            var newOrder = new List<Guid> { rootPage.Id, page2.Id, page1V1.Id };
-            var result = await service.Reorder(newOrder);
-            result.AssertRight();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var dbRootPage = await contentDbContext.EducationInNumbersPages.FindAsync(rootPage.Id);
-            Assert.NotNull(dbRootPage);
-            Assert.Equal(0, dbRootPage.Order);
-            dbRootPage.Updated.AssertUtcNow();
-            Assert.Equal(_userId, dbRootPage.UpdatedById);
-
-            // if there is an amendment, we update the original and the amendment, as the amendment could be cancelled
-            var savedPage1V0 = await contentDbContext.EducationInNumbersPages.FindAsync(page1V0.Id);
-            Assert.NotNull(savedPage1V0);
-            Assert.Equal(2, savedPage1V0.Order);
-            savedPage1V0.Updated.AssertUtcNow();
-            Assert.Equal(_userId, savedPage1V0.UpdatedById);
-
-            var savedPage1V1 = await contentDbContext.EducationInNumbersPages.FindAsync(page1V1.Id);
-            Assert.NotNull(savedPage1V1);
-            Assert.Equal(2, savedPage1V1.Order);
-            savedPage1V1.Updated.AssertUtcNow();
-            Assert.Equal(_userId, savedPage1V1.UpdatedById);
-
-            var savedPage2 = await contentDbContext.EducationInNumbersPages.FindAsync(page2.Id);
-            Assert.NotNull(savedPage2);
-            Assert.Equal(1, savedPage2.Order);
-            savedPage2.Updated.AssertUtcNow();
-            Assert.Equal(_userId, savedPage2.UpdatedById);
+            Assert.Equal(1, savedPage3.EinPage.Order);
         }
     }
 
     [Fact]
     public async Task Reorder_PageIdsDiffer_ValidationError()
     {
-        var rootPage = new EducationInNumbersPage
+        var rootPageVersionId = Guid.NewGuid();
+        var rootPageVersion = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = null,
-            Order = 0,
+            Id = rootPageVersionId,
+            EinPage = new EinPage
+            {
+                Slug = null,
+                Order = 0,
+                LatestVersionId = rootPageVersionId,
+            },
         };
-        var page1 = new EducationInNumbersPage
+        var page1VersionId = Guid.NewGuid();
+        var page1Version = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = "page-1",
-            Order = 1,
+            Id = page1VersionId,
+            EinPage = new EinPage
+            {
+                Slug = "page-1",
+                Order = 1,
+                LatestVersionId = page1VersionId,
+            },
         };
-        var page2 = new EducationInNumbersPage
+        var page2VersionId = Guid.NewGuid();
+        var page2Version = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = "page-2",
-            Order = 2,
+            Id = page2VersionId,
+            EinPage = new EinPage
+            {
+                Slug = "page-2",
+                Order = 2,
+                LatestVersionId = page2VersionId,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(rootPage, page1, page2);
+            contentDbContext.EinPageVersions.AddRange(rootPageVersion, page1Version, page2Version);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var newOrder = new List<Guid> { rootPage.Id, page1.Id, Guid.NewGuid() };
+            var newOrder = new List<Guid> { rootPageVersion.Id, page1Version.Id, Guid.NewGuid() };
             var result = await service.Reorder(newOrder);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
@@ -1220,25 +1261,35 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task Delete_UnpublishedAmendment_Success()
     {
-        var rootPage = new EducationInNumbersPage
+        var rootPageVersion = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Slug = null,
-            Order = 0,
+            EinPage = new EinPage { Slug = null, Order = 0 },
         };
-        var pageV0 = new EducationInNumbersPage
+        var pageId = Guid.NewGuid();
+        var pageV0Id = Guid.NewGuid();
+        var pageV1Id = Guid.NewGuid();
+        var page = new EinPage
         {
-            Id = Guid.NewGuid(),
+            Id = pageId,
             Slug = "page-1",
             Order = 1,
+            LatestVersionId = pageV1Id,
+            LatestPublishedVersionId = pageV0Id,
+        };
+        var pageV0 = new EinPageVersion
+        {
+            Id = pageV0Id,
+            EinPageId = pageId,
+            EinPage = page,
             Version = 0,
             Published = DateTime.UtcNow,
         };
-        var pageV1 = new EducationInNumbersPage
+        var pageV1 = new EinPageVersion
         {
-            Id = Guid.NewGuid(),
-            Slug = "page-1",
-            Order = 1,
+            Id = pageV1Id,
+            EinPageId = pageId,
+            EinPage = page,
             Version = 1,
             Published = null,
         };
@@ -1246,7 +1297,8 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(rootPage, pageV0, pageV1);
+            contentDbContext.EinPages.AddRange(page);
+            contentDbContext.EinPageVersions.AddRange(rootPageVersion, pageV0, pageV1);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1259,11 +1311,15 @@ public class EducationInNumbersServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var pages = contentDbContext.EducationInNumbersPages.ToList();
+            var dbPageVersions = contentDbContext.EinPageVersions.ToList();
 
-            Assert.Equal(2, pages.Count);
-            Assert.NotNull(pages.Find(page => page.Id == rootPage.Id));
-            Assert.NotNull(pages.Find(page => page.Id == pageV0.Id));
+            Assert.Equal(2, dbPageVersions.Count);
+            Assert.NotNull(dbPageVersions.Find(pageVersion => pageVersion.Id == rootPageVersion.Id));
+            Assert.NotNull(dbPageVersions.Find(pageVersion => pageVersion.Id == pageV0.Id));
+
+            var dbPage = contentDbContext.EinPages.Single(p => p.Id == pageId);
+            Assert.Equal(pageV0Id, dbPage.LatestVersionId);
+            Assert.Equal(pageV0Id, dbPage.LatestPublishedVersionId);
 
             // NOTE: Associated content is cascade deleted by the DB - cannot test that with the InMemory db
         }
@@ -1272,10 +1328,18 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task Delete_UnpublishedOriginalPage_Success()
     {
-        var page = new EducationInNumbersPage
+        var pageVersionId = Guid.NewGuid();
+        var page = new EinPage
         {
             Id = Guid.NewGuid(),
             Slug = "page-1",
+            LatestVersionId = pageVersionId,
+        };
+        var pageVersion = new EinPageVersion
+        {
+            Id = pageVersionId,
+            EinPage = page,
+            EinPageId = page.Id,
             Version = 0,
             Published = null,
         };
@@ -1283,20 +1347,22 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(page);
+            contentDbContext.EinPageVersions.Add(pageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var result = await service.Delete(page.Id);
+            var result = await service.Delete(pageVersion.Id);
             result.AssertRight();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            Assert.Empty(contentDbContext.EducationInNumbersPages);
+            Assert.Empty(contentDbContext.EinPageVersions);
+
+            Assert.Empty(contentDbContext.EinPages); // since we've deleted the only page version, the page is also removed
 
             // NOTE: Associated content is cascade deleted by the DB - cannot test that with the InMemory db
         }
@@ -1316,58 +1382,48 @@ public class EducationInNumbersServiceTests
     [Fact]
     public async Task Delete_PublishedPage_ThrowsException()
     {
-        var page = new EducationInNumbersPage
+        var pageVersion = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Slug = "page-1",
+            EinPage = new EinPage { Slug = "page-1" },
             Published = DateTime.UtcNow,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(page);
+            contentDbContext.EinPageVersions.Add(pageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = CreateService(contentDbContext);
-            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.Delete(page.Id));
-            Assert.Equal("Can only delete unpublished amendments", exception.Message);
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.Delete(pageVersion.Id));
+            Assert.Equal("Can only delete unpublished page versions", exception.Message);
         }
     }
 
     [Fact]
     public async Task FullDelete_Success()
     {
-        var rootPage = new EducationInNumbersPage
+        var rootPage = new EinPage // shouldn't be removed
         {
             Id = Guid.NewGuid(),
             Slug = null,
             Order = 0,
         };
-        var pageV0 = new EducationInNumbersPage
+        var page = new EinPage
         {
             Id = Guid.NewGuid(),
             Slug = "page-1",
             Order = 1,
-            Version = 0,
-            Published = DateTime.UtcNow,
-        };
-        var pageV1 = new EducationInNumbersPage
-        {
-            Id = Guid.NewGuid(),
-            Slug = "page-1",
-            Order = 1,
-            Version = 1,
-            Published = null,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(rootPage, pageV0, pageV1);
+            contentDbContext.EinPages.AddRange(rootPage, page);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1375,35 +1431,34 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext, enableEinPublishedPageDeletion: true);
 
-            var result = await service.FullDelete(pageV1.Slug);
+            var result = await service.FullDelete(page.Slug);
             result.AssertRight();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var pages = contentDbContext.EducationInNumbersPages.ToList();
-
+            var pages = contentDbContext.EinPages.ToList();
             var dbRootPage = Assert.Single(pages);
             Assert.Equal(rootPage.Id, dbRootPage.Id);
 
-            // NOTE: Associated content is cascade deleted by the DB - cannot test that with the InMemory db
+            // NOTE: Associated page versions, content is cascade deleted by the DB - cannot test that with the InMemory db
         }
     }
 
     [Fact]
     public async Task FullDelete_DisabledByEnvVar_ThrowsException()
     {
-        var page = new EducationInNumbersPage
+        var pageVersion = new EinPageVersion
         {
             Id = Guid.NewGuid(),
-            Slug = "page-1",
+            EinPage = new EinPage { Slug = "page-1" },
             Published = DateTime.UtcNow,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.Add(page);
+            contentDbContext.EinPageVersions.Add(pageVersion);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1411,7 +1466,7 @@ public class EducationInNumbersServiceTests
         {
             var service = CreateService(contentDbContext, enableEinPublishedPageDeletion: false);
 
-            var exception = await Assert.ThrowsAsync<Exception>(() => service.FullDelete(page.Slug));
+            var exception = await Assert.ThrowsAsync<Exception>(() => service.FullDelete(pageVersion.EinPage.Slug));
             Assert.Equal("Full delete not enabled", exception.Message);
         }
     }
