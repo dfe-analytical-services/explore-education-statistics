@@ -1,46 +1,36 @@
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
-import { ReleaseVersion } from '@common/services/publicationService';
+import { PublicationMethodologiesList } from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
-import publicationQueries from '@frontend/queries/publicationQueries';
-import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
 
 interface Props {
-  fullPublication?: ReleaseVersion;
+  publicationMethodologies: PublicationMethodologiesList;
   selectedPublication: SelectedPublication;
 }
 
 export default function TableToolInfoWrapper({
-  fullPublication,
+  publicationMethodologies,
   selectedPublication,
 }: Props) {
-  const { data, isLoading } = useQuery({
-    ...publicationQueries.getLatestPublicationRelease(selectedPublication.slug),
-    enabled: !fullPublication,
-    staleTime: Infinity,
-  });
-
-  if (!data && !fullPublication) return null;
-
-  const { publication } = fullPublication ?? data ?? {};
-
   const getMethodologyLinks = () => {
     const links: ReactNode[] =
-      publication?.methodologies?.map(methodology => (
-        <Link key={methodology.id} to={`/methodology/${methodology.slug}`}>
+      publicationMethodologies.methodologies.map(methodology => (
+        <Link
+          key={methodology.methodologyId}
+          to={`/methodology/${methodology.slug}`}
+        >
           {methodology.title}
         </Link>
       )) ?? [];
 
-    if (publication?.externalMethodology) {
+    if (publicationMethodologies.externalMethodology) {
       links.push(
         <Link
-          key={publication.externalMethodology.url}
-          to={publication.externalMethodology.url}
+          key={publicationMethodologies.externalMethodology.url}
+          to={publicationMethodologies.externalMethodology.url}
         >
-          {publication.externalMethodology.title}
+          {publicationMethodologies.externalMethodology.title}
         </Link>,
       );
     }
@@ -48,20 +38,20 @@ export default function TableToolInfoWrapper({
   };
 
   return (
-    <LoadingSpinner loading={!fullPublication && isLoading}>
-      <TableToolInfo
-        contactDetails={publication?.contact}
-        methodologyLinks={getMethodologyLinks()}
-        publishingOrganisations={fullPublication?.publishingOrganisations}
-        releaseLink={
-          <Link
-            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
-          >
-            {`${selectedPublication.title}, ${selectedPublication.latestRelease.title}`}
-          </Link>
-        }
-        releaseType={selectedPublication.selectedRelease.type}
-      />
-    </LoadingSpinner>
+    <TableToolInfo
+      contactDetails={selectedPublication.contact}
+      methodologyLinks={getMethodologyLinks()}
+      publishingOrganisations={
+        selectedPublication.selectedRelease.publishingOrganisations
+      }
+      releaseLink={
+        <Link
+          to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}
+        >
+          {`${selectedPublication.title}, ${selectedPublication.latestRelease.title}`}
+        </Link>
+      }
+      releaseType={selectedPublication.selectedRelease.type}
+    />
   );
 }

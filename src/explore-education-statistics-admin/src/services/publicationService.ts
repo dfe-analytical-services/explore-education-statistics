@@ -1,21 +1,28 @@
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { IdTitlePair } from '@admin/services/types/common';
+import { UserPublicationRole } from '@admin/services/userService';
 import client from '@admin/services/utils/service';
 import {
+  Contact,
+  ContentSection,
+  KeyStatistic,
   PublicationSummaryPreview,
+  PublicationSupersededBy,
   ReleaseSeriesItem,
 } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
-import { UserPublicationRole } from '@admin/services/userService';
+import { PartialDate } from '@common/utils/date/partialDate';
+import { Organisation } from '@common/services/types/organisation';
+import {
+  ContentBlock,
+  DataBlock,
+  EmbedBlock,
+} from '@common/services/types/blocks';
+import { FileInfo } from '@common/services/types/file';
+import { MethodologySummary } from '@common/services/types/methodology';
+import { ReleaseType } from '@common/services/types/releaseType';
 import { isAxiosError } from 'axios';
-
-export interface Contact {
-  contactName: string;
-  contactTelNo: string;
-  teamEmail: string;
-  teamName: string;
-}
 
 export interface ContactSave {
   contactName: string;
@@ -105,6 +112,68 @@ export interface ReleaseSeriesTableEntry extends ReleaseSeriesItem {
   id: string;
   isLatest?: boolean;
   isPublished?: boolean;
+}
+
+export interface BasicLink {
+  id: string;
+  description: string;
+  url: string;
+}
+
+export interface ReleaseNote {
+  id: string;
+  on: Date;
+  reason: string;
+}
+
+export interface ContentPublication {
+  id: string;
+  slug: string;
+  title: string;
+  summary?: string;
+  releaseSeries: ReleaseSeriesItem[];
+  theme: {
+    id: string;
+    title: string;
+  };
+  contact: Contact;
+  methodologies: MethodologySummary[];
+  externalMethodology?: ExternalMethodology;
+  supersededById?: string;
+  isSuperseded?: boolean;
+  supersededBy?: PublicationSupersededBy;
+}
+
+export interface ReleaseVersion<
+  ContentBlockType extends ContentBlock = ContentBlock,
+  DataBlockType extends DataBlock = DataBlock,
+  EmbedBlockType extends EmbedBlock = EmbedBlock,
+> {
+  content: ContentSection<ContentBlockType | DataBlockType | EmbedBlockType>[];
+  coverageTitle: string;
+  downloadFiles: FileInfo[];
+  hasDataGuidance: boolean;
+  hasPreReleaseAccessList: boolean;
+  headlinesSection: ContentSection<ContentBlockType>;
+  id: string;
+  keyStatistics: KeyStatistic[];
+  keyStatisticsSecondarySection: ContentSection<DataBlockType>;
+  lastUpdated?: string;
+  latestRelease: boolean;
+  nextReleaseDate?: PartialDate;
+  publication: ContentPublication;
+  published: string;
+  publishedDisplayDate?: string;
+  publishingOrganisations?: Organisation[];
+  relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
+  relatedInformation: BasicLink[];
+  slug: string;
+  summarySection: ContentSection<ContentBlockType>;
+  title: string;
+  type: ReleaseType;
+  updates: ReleaseNote[];
+  warningSection: ContentSection<ContentBlockType>;
+  yearTitle: string;
 }
 
 const publicationService = {

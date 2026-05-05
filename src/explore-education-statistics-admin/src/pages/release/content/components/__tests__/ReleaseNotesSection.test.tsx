@@ -2,7 +2,7 @@ import ReleaseNotesSection from '@admin/pages/release/content/components/Release
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import _releaseNoteService from '@admin/services/releaseNoteService';
 import { generateEditableRelease } from '@admin-test/generators/releaseContentGenerators';
-import { ReleaseNote as ReleaseNoteData } from '@common/services/publicationService';
+import { ReleaseNote as ReleaseNoteData } from '@admin/services/publicationService';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
