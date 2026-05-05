@@ -51,7 +51,14 @@ public class DataSetScreenerProgressUpdaterJobTests
 
         await job.ExecuteTask!;
 
-        VerifyAllMocks(periodicTimer, dataSetScreenerService);
+        periodicTimer.Verify(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+        dataSetScreenerService.Verify(
+            s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()),
+            Times.Exactly(1)
+        );
+
+        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(1));
     }
 
     [Fact]

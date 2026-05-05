@@ -61,19 +61,19 @@ public class DataSetScreenerService(
 
         // Find any data sets currently undergoing screening that haven't had a progress check made for
         // them in the last <ScreenerProgressUpdateIntervalSeconds> seconds.
-        var dataSetsUndergoingScreening = await contentDbContext
+        var dataSetsNeedingScreenerProgressUpdates = await contentDbContext
             .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
             .Where(upload =>
                 upload.ScreenerProgressLastChecked == null || upload.ScreenerProgressLastChecked <= lastCheckedWindow
             )
             .ToListAsync(cancellationToken: cancellationToken);
 
-        if (dataSetsUndergoingScreening.Count == 0)
+        if (dataSetsNeedingScreenerProgressUpdates.Count == 0)
         {
             return [];
         }
 
-        var dataSetIdsUndergoingScreening = dataSetsUndergoingScreening.Select(upload => upload.Id).ToList();
+        var dataSetIdsUndergoingScreening = dataSetsNeedingScreenerProgressUpdates.Select(upload => upload.Id).ToList();
 
         // Request progress updates for all data sets requiring one.
         var progressResults = await dataSetScreenerClient.GetScreenerProgress(
@@ -83,16 +83,8 @@ public class DataSetScreenerService(
 
         // For each data set that required a progress update, attempt to update its progress
         // based on the responses received from the Screener API.
-        dataSetsUndergoingScreening.ForEach(dataSetToUpdate =>
+        dataSetsNeedingScreenerProgressUpdates.ForEach(dataSetToUpdate =>
         {
-            dataSetToUpdate.ScreenerProgress ??= new DataSetScreenerProgress
-            {
-                PercentageComplete = 0,
-                Completed = false,
-                Passed = false,
-                Stage = "",
-            };
-
             var progressUpdateForDataSet = progressResults.SingleOrDefault(result =>
                 result.DataSetId == dataSetToUpdate.Id
             );
@@ -101,26 +93,13 @@ public class DataSetScreenerService(
             // data set, apply it.
             if (progressUpdateForDataSet != null)
             {
-                dataSetToUpdate.ScreenerProgress.PercentageComplete = (int)
+                dataSetToUpdate.ScreenerProgress!.PercentageComplete = (int)
                     Math.Round(progressUpdateForDataSet.PercentageComplete, MidpointRounding.ToZero);
                 dataSetToUpdate.ScreenerProgress.Stage = progressUpdateForDataSet.Stage;
                 dataSetToUpdate.ScreenerProgress.Completed = progressUpdateForDataSet.Completed;
                 dataSetToUpdate.ScreenerProgress.Passed = progressUpdateForDataSet.Passed;
 
-                // Update the "last updated" date to mark the last time that a progress update was
-                // successfully received and applied to this data set.
-                dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
-            }
-            else if (dataSetToUpdate.ScreenerProgressLastChecked == null)
-            {
-                // If no progress response has been received for this data set, and
-                // it is the first time we have checked this data set for progress,
-                // provide an initial "ScreenerProgressLastUpdated" value.
-                //
-                // This allows us to check the difference between
-                // "ScreenerProgressLastUpdated" and "ScreenerProgressLastChecked"
-                // to see if it is successfully receiving progress updates in a timely
-                // manner and, if not, will allow us to mark it as failed.
+                // Mark the data set as having received a successful progress update.
                 dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
             }
 
@@ -129,7 +108,7 @@ public class DataSetScreenerService(
             dataSetToUpdate.ScreenerProgressLastChecked = utcNow;
         });
 
-        contentDbContext.DataSetUploads.UpdateRange(dataSetsUndergoingScreening);
+        contentDbContext.DataSetUploads.UpdateRange(dataSetsNeedingScreenerProgressUpdates);
         await contentDbContext.SaveChangesAsync(cancellationToken: cancellationToken);
 
         return progressResults;
@@ -167,6 +146,7 @@ public class DataSetScreenerService(
                 Passed = false,
                 OverallResult = "Failed to retrieve progress updates",
                 TestResults = [],
+                PublicApiCompatible = false,
             };
             upload.Status = DataSetUploadStatus.SCREENER_ERROR;
         });
