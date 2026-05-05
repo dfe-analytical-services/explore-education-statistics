@@ -1,13 +1,13 @@
 import RoleForm from '@admin/pages/users/components/RoleForm';
 import { testUser, testRoles } from '@admin/pages/users/__data__/testUserData';
-import _userService from '@admin/services/user-management/userService';
+import _usersService from '@admin/services/user-management/usersService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/userService');
-const userService = _userService as jest.Mocked<typeof _userService>;
+const userService = _usersService as jest.Mocked<typeof _usersService>;
 
 describe('RoleForm', () => {
   test('renders the form', () => {
