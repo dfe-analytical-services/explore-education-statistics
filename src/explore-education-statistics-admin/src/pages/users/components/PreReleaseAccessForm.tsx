@@ -1,7 +1,3 @@
-import userService, {
-  User,
-  UserReleaseRole,
-} from '@admin/services/user-management/userService';
 import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -12,63 +8,71 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
+import {
+  UserPreReleaseRole,
+  UserWithRoles,
+} from '@admin/services/types/userWithRoles';
+import preReleaseUsersService from '@admin/services/user-management/preReleaseUsersService';
 
-const addReleaseFormErrorMappings = [
+const addPreReleaseFormErrorMappings = [
   mapFieldErrors<FormValues>({
     target: 'releaseRole',
     messages: {
-      UserAlreadyHasResourceRole: 'The user already has this release role',
+      UserAlreadyHasResourceRole: 'The user already has this pre-release role',
     },
   }),
 ];
 
 interface FormValues {
   releaseId: string;
-  releaseRole: string;
 }
 
 interface Props {
   releases?: IdTitlePair[];
-  releaseRoles?: string[];
-  user: User;
+  user: UserWithRoles;
   onUpdate: () => void;
 }
 
-export default function ReleaseAccessForm({
+export default function PreReleaseAccessForm({
   releases,
-  releaseRoles,
   user,
   onUpdate,
 }: Props) {
-  const handleAddReleaseRole = async (values: FormValues) => {
-    await userService.addUserReleaseRole(user.id, values);
+  const handleAddPreReleaseRole = async (values: FormValues) => {
+    await preReleaseUsersService.grantPreReleaseAccess(
+      user.id,
+      values.releaseId,
+    );
     onUpdate();
   };
 
-  const handleRemoveReleaseAccess = async (
-    userReleaseRole: UserReleaseRole,
+  const handleRemovePreReleaseAccess = async (
+    userPreReleaseRole: UserPreReleaseRole,
   ) => {
-    await userService.removeUserReleaseRole(userReleaseRole.id);
+    await preReleaseUsersService.removePreReleaseRoleById(
+      userPreReleaseRole.id,
+    );
     onUpdate();
   };
 
   return (
     <FormProvider
-      errorMappings={addReleaseFormErrorMappings}
+      errorMappings={addPreReleaseFormErrorMappings}
       initialValues={{
         releaseId: orderBy(releases, release => release)?.[0]?.id ?? '',
-        releaseRole:
-          orderBy(releaseRoles, releaseRole => releaseRole)?.[0] ?? '',
       }}
     >
       {({ formState }) => {
         return (
-          <Form id={`${user.id}-releaseRole`} onSubmit={handleAddReleaseRole}>
+          <Form
+            id={`${user.id}-releaseRole`}
+            onSubmit={handleAddPreReleaseRole}
+          >
             <FormFieldset
               id="role"
-              legend="Release access"
+              legend="Pre-release access"
               legendSize="m"
-              hint="The releases a user can access within the service."
+              hint="The releases a user has pre-release access to within the service."
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half">
@@ -81,17 +85,6 @@ export default function ReleaseAccessForm({
                     }))}
                   />
                 </div>
-
-                <div className="govuk-grid-column-one-quarter">
-                  <FormFieldSelect<FormValues>
-                    label="Release role"
-                    name="releaseRole"
-                    options={releaseRoles?.map(role => ({
-                      label: role,
-                      value: role,
-                    }))}
-                  />
-                </div>
                 <div className="govuk-grid-column-one-quarter">
                   {user && (
                     <Button
@@ -99,13 +92,13 @@ export default function ReleaseAccessForm({
                       disabled={formState.isSubmitting}
                       className="govuk-!-margin-top-6"
                     >
-                      Add release access
+                      Add pre-release access
                     </Button>
                   )}
                 </div>
               </div>
             </FormFieldset>
-            <table className="govuk-table" data-testid="releaseAccessTable">
+            <table className="govuk-table" data-testid="preReleaseAccessTable">
               <thead className="govuk-table__head">
                 <tr className="govuk-table__row">
                   <th scope="col" className="govuk-table__header">
@@ -115,30 +108,24 @@ export default function ReleaseAccessForm({
                     Release
                   </th>
                   <th scope="col" className="govuk-table__header">
-                    Role
-                  </th>
-                  <th scope="col" className="govuk-table__header">
                     Actions
                   </th>
                 </tr>
               </thead>
 
               <tbody className="govuk-table__body">
-                {user.userReleaseRoles.map(userReleaseRole => (
-                  <tr className="govuk-table__row" key={userReleaseRole.id}>
+                {user.userPreReleaseRoles.map(userPreReleaseRole => (
+                  <tr className="govuk-table__row" key={userPreReleaseRole.id}>
                     <td className="govuk-table__cell">
-                      {userReleaseRole.publication}
+                      {userPreReleaseRole.publication}
                     </td>
                     <td className="govuk-table__cell">
-                      {userReleaseRole.release}
-                    </td>
-                    <td className="govuk-table__cell">
-                      {userReleaseRole.role}
+                      {userPreReleaseRole.release}
                     </td>
                     <td className="govuk-table__cell">
                       <ButtonText
                         onClick={() =>
-                          handleRemoveReleaseAccess(userReleaseRole)
+                          handleRemovePreReleaseAccess(userPreReleaseRole)
                         }
                       >
                         Remove
