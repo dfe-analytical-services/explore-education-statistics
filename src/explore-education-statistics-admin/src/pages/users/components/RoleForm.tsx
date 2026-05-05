@@ -1,7 +1,4 @@
-import userService, {
-  Role,
-  User,
-} from '@admin/services/user-management/userService';
+import usersService from '@admin/services/user-management/usersService';
 import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
 import FormProvider from '@common/components/form/FormProvider';
@@ -11,6 +8,8 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
+import { Role } from '@admin/services/user-management/globalRolesService';
+import { UserWithRoles } from '@admin/services/types/userWithRoles';
 
 const updateRoleFormErrorMappings = [
   mapFieldErrors<FormValues>({
@@ -27,7 +26,7 @@ interface FormValues {
 
 interface Props {
   roles?: Role[];
-  user: User;
+  user: UserWithRoles;
   onUpdate: () => void;
 }
 
@@ -39,7 +38,7 @@ const RoleForm = ({ roles, user, onUpdate }: Props) => {
   }, []);
 
   const handleSubmit = async (values: FormValues) => {
-    await userService.updateUser(user.id, values);
+    await usersService.updateUser(user.id, values);
     onUpdate();
   };
 
