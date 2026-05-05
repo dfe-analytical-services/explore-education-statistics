@@ -18,4 +18,6 @@ public interface IDataSetMappingService
     Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(
         IndicatorMappingUpdatesRequest request
     );
+
+    Task<Either<ActionResult, List<LocationMappingDto>>> UpdateLocationMappings(LocationMappingUpdatesRequest request);
 }

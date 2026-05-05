@@ -22,4 +22,14 @@ public class DataSetMappingController(IDataSetMappingService dataSetMappingServi
     {
         return await dataSetMappingService.UpdateIndicatorMappings(request).HandleFailuresOrOk();
     }
+
+    [HttpPatch("releases/{releaseVersionId:guid}/data/replacements/mapping/locations")]
+    public async Task<ActionResult<List<LocationMappingDto>>> UpdateLocationMappings(
+        [FromRoute] Guid releaseVersionId,
+        [FromBody] LocationMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await dataSetMappingService.UpdateLocationMappings(request).HandleFailuresOrOk();
+    }
 }

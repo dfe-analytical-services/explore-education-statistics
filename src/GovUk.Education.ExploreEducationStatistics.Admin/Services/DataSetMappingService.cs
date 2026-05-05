@@ -22,10 +22,27 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
         CancellationToken cancellationToken = default
     )
     {
-        return await contentDbContext.DataSetMappings.SingleOrDefaultAsync(
+        var mapping =
+            await contentDbContext.DataSetMappings.SingleOrDefaultAsync(
                 map => map.OriginalDataSetId == originalSubjectId && map.ReplacementDataSetId == replacementSubjectId,
                 cancellationToken
             ) ?? await GenerateAndSaveInitialDataSetMapping(originalSubjectId, replacementSubjectId, cancellationToken);
+
+        // TODO EES-7126 Remove this code - it was only needed when first introducing LocationMappings to ensure they were set
+        if (mapping.LocationMappings.IsNullOrEmpty() && mapping.UnmappedReplacementLocations.IsNullOrEmpty())
+        {
+            var (initialLocationMappingDictionary, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
+                mapping.OriginalDataSetId,
+                mapping.ReplacementDataSetId,
+                cancellationToken
+            );
+
+            mapping.LocationMappings = initialLocationMappingDictionary;
+            mapping.UnmappedReplacementLocations = unmappedReplacementLocations;
+            await contentDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return mapping;
     }
 
     private async Task<DataSetMapping> GenerateAndSaveInitialDataSetMapping(
@@ -34,15 +51,26 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
         CancellationToken cancellationToken
     )
     {
-        var (initialIndicatorMappingDictionary, unmappedReplacementIndicatorIds) =
-            await GenerateInitialIndicatorMapping(originalDataSetId, replacementDataSetId, cancellationToken);
+        var (initialIndicatorMappingDictionary, unmappedReplacementIndicators) = await GenerateInitialIndicatorMapping(
+            originalDataSetId,
+            replacementDataSetId,
+            cancellationToken
+        );
+
+        var (initialLocationMappingDictionary, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
+            originalDataSetId,
+            replacementDataSetId,
+            cancellationToken
+        );
 
         var newMapping = new DataSetMapping
         {
             OriginalDataSetId = originalDataSetId,
             ReplacementDataSetId = replacementDataSetId,
             IndicatorMappings = initialIndicatorMappingDictionary,
-            UnmappedReplacementIndicators = unmappedReplacementIndicatorIds,
+            UnmappedReplacementIndicators = unmappedReplacementIndicators,
+            LocationMappings = initialLocationMappingDictionary,
+            UnmappedReplacementLocations = unmappedReplacementLocations,
         };
 
         contentDbContext.DataSetMappings.Add(newMapping);
@@ -107,7 +135,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
             .Values.Where(m => m.ReplacementId.HasValue)
             .Select(m => m.ReplacementId!.Value);
 
-        var unmappedReplacementIds = replacementIndicatorNameToIndicatorMap
+        var unmappedReplacements = replacementIndicatorNameToIndicatorMap
             .Values.ExceptBy(mappedReplacementIds, indicator => indicator.Id)
             .Select(i => new UnmappedIndicator
             {
@@ -119,7 +147,83 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
             })
             .ToList();
 
-        return (initialMappingDictionary, unmappedReplacementIds);
+        return (initialMappingDictionary, unmappedReplacements);
+    }
+
+    private async Task<(Dictionary<Guid, LocationMapping>, List<UnmappedLocation>)> GenerateInitialLocationMapping(
+        Guid originalDataSetId,
+        Guid replacementDataSetId,
+        CancellationToken cancellationToken
+    )
+    {
+        var originalLocations = await statisticsDbContext
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == originalDataSetId)
+            .Select(observation => observation.Location)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        var replacementLocationMap = await statisticsDbContext
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == replacementDataSetId)
+            .Select(observation => observation.Location)
+            .Distinct()
+            .ToDictionaryAsync(location => location.Id, location => location, cancellationToken);
+
+        var initialMappingDictionary = originalLocations.ToDictionary(
+            originalLocation => originalLocation.Id,
+            originalLocation =>
+            {
+                replacementLocationMap.TryGetValue(originalLocation.Id, out var replacementLocation);
+                if (replacementLocation == null)
+                {
+                    // If none matching by Id, check if any matching by GeogLvl + Code. We don't check by Name to
+                    // preserve behaviour from before location mapping was introduced (which allowed analysts to
+                    // change/fix location names with replacements).
+                    var candidateReplacements = replacementLocationMap
+                        .Values.Where(location =>
+                            location.GeographicLevel == originalLocation.GeographicLevel
+                            && location.ToLocationAttribute().GetCodeOrFallback()
+                                == originalLocation.ToLocationAttribute().GetCodeOrFallback()
+                        )
+                        .ToList();
+                    if (candidateReplacements.Count == 1)
+                    {
+                        replacementLocation = candidateReplacements[0];
+                    }
+                }
+
+                return new LocationMapping
+                {
+                    OriginalId = originalLocation.Id,
+                    OriginalCode = originalLocation.ToLocationAttribute().GetCodeOrFallback(),
+                    OriginalName = originalLocation.ToLocationAttribute().Name ?? "",
+                    OriginalGeographicLevel = originalLocation.GeographicLevel,
+                    ReplacementId = replacementLocation?.Id,
+                    ReplacementCode = replacementLocation?.ToLocationAttribute().GetCodeOrFallback(),
+                    ReplacementName = replacementLocation?.ToLocationAttribute().Name ?? "",
+                    ReplacementGeographicLevel = replacementLocation?.GeographicLevel,
+                    Status = replacementLocation == null ? MapStatus.Unset : MapStatus.AutoSet,
+                };
+            }
+        );
+
+        var mappedReplacementIds = initialMappingDictionary
+            .Values.Where(map => map.ReplacementId.HasValue)
+            .Select(map => map.ReplacementId!.Value);
+
+        var unmappedReplacements = replacementLocationMap
+            .Values.ExceptBy(mappedReplacementIds, location => location.Id)
+            .Select(location => new UnmappedLocation
+            {
+                Id = location.Id,
+                Code = location.ToLocationAttribute().GetCodeOrFallback(),
+                Name = location.ToLocationAttribute().Name ?? "",
+                GeographicLevel = location.GeographicLevel,
+            })
+            .ToList();
+
+        return (initialMappingDictionary, unmappedReplacements);
     }
 
     public async Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(
@@ -234,5 +338,130 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
         contentDbContext.Entry(dataSetMapping).Property(x => x.IndicatorMappings).IsModified = true;
 
         return indicatorMapping;
+    }
+
+    public async Task<Either<ActionResult, List<LocationMappingDto>>> UpdateLocationMappings(
+        LocationMappingUpdatesRequest request
+    )
+    {
+        return await contentDbContext
+            .DataSetMappings.Where(map =>
+                map.OriginalDataSetId == request.OriginalDataSetId
+                && map.ReplacementDataSetId == request.ReplacementDataSetId
+            )
+            .SingleOrNotFoundAsync()
+            .OnSuccess(async mapping =>
+            {
+                var updatedMappings = request
+                    .Updates.Select(update =>
+                        UpdateLocationMapping(mapping, update.OriginalLocationId, update.NewReplacementLocationId)
+                    )
+                    .ToList(); // cannot be async!
+
+                // we still save changes from the Updates that succeeded, even if some failed
+                await contentDbContext.SaveChangesAsync();
+
+                return updatedMappings
+                    .OnSuccessAll()
+                    .OnSuccess(_ => mapping.LocationMappings.Values.Select(LocationMappingDto.FromModel).ToList());
+            });
+    }
+
+    private Either<ActionResult, LocationMapping> UpdateLocationMapping(
+        DataSetMapping dataSetMapping,
+        Guid originalLocationId,
+        Guid? newReplacementLocationId = null
+    )
+    {
+        var locationMapping = dataSetMapping.LocationMappings.Values.SingleOrDefault(map =>
+            map.OriginalId == originalLocationId
+        );
+        if (locationMapping == null)
+        {
+            return Common.Validators.ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.OriginalLocationId)}",
+                    Code = "LocationMatchingOriginalIdNameNotFound",
+                    Message = $"Could not find location mapping matching original location id \"{originalLocationId}\"",
+                }
+            );
+        }
+
+        if (
+            locationMapping.ReplacementId == newReplacementLocationId
+            && locationMapping.Status == MapStatus.ManuallySet
+        )
+        {
+            return locationMapping; // it is already mapped, so can skip
+        }
+
+        var availableUnmappedLocation = dataSetMapping.UnmappedReplacementLocations.SingleOrDefault(unmappedLocation =>
+            unmappedLocation.Id == newReplacementLocationId
+        );
+
+        if (newReplacementLocationId != null && availableUnmappedLocation == null)
+        {
+            return Common.Validators.ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                    Code = "UnmappedLocationMatchingReplacementLocationIdNotFound",
+                    Message = $"No available unmapped location matching replacement id \"{newReplacementLocationId}\"",
+                }
+            );
+        }
+
+        if (
+            newReplacementLocationId != null
+            && availableUnmappedLocation != null
+            && availableUnmappedLocation!.GeographicLevel != locationMapping.OriginalGeographicLevel
+        )
+        {
+            return Common.Validators.ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                    Code = "UnmappedLocationHasDifferentGeographicLevelAsOriginalLocation",
+                    Message =
+                        $"The replacement location has a different geographic level than the original location. Replacement id: \"{newReplacementLocationId}\"",
+                }
+            );
+        }
+
+        if (availableUnmappedLocation != null)
+        {
+            // remove availableUnmappedLocation from UnmappedReplacementLocations as it's about to become mapped
+            dataSetMapping.UnmappedReplacementLocations.Remove(availableUnmappedLocation);
+            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementLocations).IsModified = true;
+        }
+
+        if (locationMapping.ReplacementId != null && locationMapping.ReplacementId != newReplacementLocationId)
+        {
+            // We need to move the preexisting mapped location into UnmappedReplacementLocations, as it will be overwritten
+            var newlyUnmappedLocation = new UnmappedLocation
+            {
+                Id = locationMapping.ReplacementId.Value,
+                GeographicLevel = locationMapping.ReplacementGeographicLevel!.Value,
+                Code = locationMapping.ReplacementCode!,
+                Name = locationMapping.ReplacementName!,
+            };
+            dataSetMapping.UnmappedReplacementLocations.Add(newlyUnmappedLocation);
+            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementLocations).IsModified = true;
+        }
+
+        // locationMapping.Original* properties should never change
+        locationMapping.ReplacementId = availableUnmappedLocation?.Id;
+        locationMapping.ReplacementGeographicLevel = availableUnmappedLocation?.GeographicLevel;
+        locationMapping.ReplacementCode = availableUnmappedLocation?.Code;
+        locationMapping.ReplacementName = availableUnmappedLocation?.Name;
+        locationMapping.Status = MapStatus.ManuallySet;
+
+        contentDbContext.Entry(dataSetMapping).Property(x => x.LocationMappings).IsModified = true;
+
+        return locationMapping;
     }
 }
