@@ -1,7 +1,7 @@
 import PreReleaseInvitePlanModal from '@admin/pages/release/pre-release/components/PreReleaseInvitePlanModal';
-import preReleaseUserService, {
+import preReleaseUsersService, {
   PreReleaseInvitePlan,
-} from '@admin/services/user-management/preReleaseUserService';
+} from '@admin/services/user-management/preReleaseUsersService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -63,7 +63,7 @@ export default function PreReleaseUserAccessForm({
     error,
     setState: setUsers,
   } = useAsyncRetry(
-    () => preReleaseUserService.getUsers(releaseVersionId),
+    () => preReleaseUsersService.getPreReleaseUsers(releaseVersionId),
     [releaseVersionId],
   );
 
@@ -84,7 +84,7 @@ export default function PreReleaseUserAccessForm({
 
   const handleSubmit = async (values: FormValues) => {
     setInvitePlan(
-      await preReleaseUserService.getInvitePlan(
+      await preReleaseUsersService.getPreReleaseUsersInvitePlan(
         releaseVersionId,
         splitAndTrimLines(values.emails),
       ),
@@ -92,7 +92,7 @@ export default function PreReleaseUserAccessForm({
   };
 
   const handleModalSubmit = async (emails: string) => {
-    const newUsers = await preReleaseUserService.inviteUsers(
+    const newUsers = await preReleaseUsersService.grantPreReleaseAccessForMany(
       releaseVersionId,
       splitAndTrimLines(emails),
     );
@@ -242,7 +242,7 @@ export default function PreReleaseUserAccessForm({
                         onClick={async () => {
                           toggleRemoving.on();
 
-                          await preReleaseUserService.removeUser(
+                          await preReleaseUsersService.removePreReleaseRoleByEmail(
                             releaseVersionId,
                             user.email,
                           );
