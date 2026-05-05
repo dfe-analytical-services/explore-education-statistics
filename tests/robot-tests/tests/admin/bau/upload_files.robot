@@ -36,7 +36,7 @@ Upload a ZIP file
     user clicks button    Upload data files
     user waits until page contains data uploads table
     user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
-    user checks table cell contains    1    2    141 Kb    testid:Data files table
+    user checks table cell contains    1    2    140 Kb    testid:Data files table
 
     user waits until table cell contains    1    3    Pending review    testid:Data files table
 
@@ -59,7 +59,7 @@ Check the file details in the modal
     user checks summary list contains    Title    Absence in PRUs    testid:Data file details
     user checks summary list contains    Data file    absence_in_prus.csv    testid:Data file details
     user checks summary list contains    Meta file    absence_in_prus.meta.csv    testid:Data file details
-    user checks summary list contains    Size    141 Kb    testid:Data file details
+    user checks summary list contains    Size    140 Kb    testid:Data file details
 
     user checks summary list contains    Status    Pending review    testid:Data file details
 
@@ -74,7 +74,7 @@ Continue the import
 
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
     user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
-    user checks table cell contains    1    2    141 Kb    testid:Data files table
+    user checks table cell contains    1    2    140 Kb    testid:Data files table
     user waits until table cell contains    1    3    Complete    testid:Data files table
     user checks table cell contains    1    4    View details    testid:Data files table
     user checks table cell contains    1    4    Edit title    testid:Data files table
