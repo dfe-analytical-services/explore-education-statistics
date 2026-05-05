@@ -1,8 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -646,6 +646,271 @@ public class DataSetMappingServiceTests
                 expectedPath: "Updates.NewReplacementColumnName",
                 expectedCode: "UnmappedIndicatorMatchingReplacementColumnNameNotFound",
                 expectedMessage: $"No available unmapped indicator matching replacement column name \"replacement_indicator_already_mapped\""
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_Success()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var loc1Id = Guid.NewGuid();
+        var loc2Id = Guid.NewGuid();
+        var loc3Id = Guid.NewGuid();
+        var replacementLocId = Guid.NewGuid();
+        var newlyUnmappedLocId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    loc1Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc1Id,
+                        OriginalGeographicLevel = GeographicLevel.LocalAuthority,
+                        Status = MapStatus.Unset,
+                    }
+                },
+                {
+                    loc2Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc2Id,
+                        OriginalGeographicLevel = GeographicLevel.Country,
+                        ReplacementId = newlyUnmappedLocId,
+                        ReplacementName = "Old Country Name",
+                        ReplacementCode = "E9200002",
+                        ReplacementGeographicLevel = GeographicLevel.Country,
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    loc3Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc3Id,
+                        OriginalGeographicLevel = GeographicLevel.Region,
+                        ReplacementId = Guid.NewGuid(),
+                        Status = MapStatus.ManuallySet,
+                    }
+                },
+            },
+            UnmappedReplacementLocations = new List<UnmappedLocation>
+            {
+                new()
+                {
+                    Id = replacementLocId,
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Name = "New LA",
+                    Code = "301",
+                },
+            },
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateLocationMappings(
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates =
+                    [
+                        new() { OriginalLocationId = loc1Id, NewReplacementLocationId = replacementLocId },
+                        new() { OriginalLocationId = loc2Id, NewReplacementLocationId = null },
+                    ],
+                }
+            );
+
+            var locationMappingList = result.AssertRight();
+            Assert.Equal(3, locationMappingList.Count);
+
+            var map1 = locationMappingList.Single(m => m.OriginalId == loc1Id);
+            Assert.Equal(replacementLocId, map1.ReplacementId);
+            Assert.Equal(nameof(MapStatus.ManuallySet), map1.Status);
+
+            var map2 = locationMappingList.Single(m => m.OriginalId == loc2Id);
+            Assert.Null(map2.ReplacementId);
+            Assert.Equal(nameof(MapStatus.ManuallySet), map2.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+
+            // Check that the old replacement from loc2 was moved back to unmapped
+            Assert.Contains(dbMapping.UnmappedReplacementLocations, l => l.Id == newlyUnmappedLocId);
+            // Check that the new replacement was removed from unmapped
+            Assert.DoesNotContain(dbMapping.UnmappedReplacementLocations, l => l.Id == replacementLocId);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_NoDataSetMapping_NotFound()
+    {
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+        var service = SetupDataSetMappingService(contentDbContext);
+
+        var result = await service.UpdateLocationMappings(
+            new LocationMappingUpdatesRequest
+            {
+                OriginalDataSetId = Guid.NewGuid(),
+                ReplacementDataSetId = Guid.NewGuid(),
+                Updates = [],
+            }
+        );
+
+        result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_OriginalLocationNotFound_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new(),
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var badId = Guid.NewGuid();
+            var result = await service.UpdateLocationMappings(
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates = [new() { OriginalLocationId = badId }],
+                }
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError("Updates.OriginalLocationId", "LocationMatchingOriginalIdNameNotFound");
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_UnmappedLocationNotFound_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+        var locId = Guid.NewGuid();
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    locId,
+                    new LocationMapping { OriginalId = locId }
+                },
+            },
+            UnmappedReplacementLocations = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateLocationMappings(
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = Guid.NewGuid() }],
+                }
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                "Updates.NewReplacementLocationId",
+                "UnmappedLocationMatchingReplacementLocationIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_DifferentGeographicLevel_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+        var locId = Guid.NewGuid();
+        var replacementId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    locId,
+                    new LocationMapping { OriginalId = locId, OriginalGeographicLevel = GeographicLevel.Region }
+                },
+            },
+            UnmappedReplacementLocations =
+            [
+                new UnmappedLocation { Id = replacementId, GeographicLevel = GeographicLevel.LocalAuthority },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateLocationMappings(
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = replacementId }],
+                }
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                "Updates.NewReplacementLocationId",
+                "UnmappedLocationHasDifferentGeographicLevelAsOriginalLocation"
             );
         }
     }
