@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 /// <summary>
 /// Component for supplying services with DbContexts when testing with InMemory DbContexts.

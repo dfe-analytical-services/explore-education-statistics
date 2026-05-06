@@ -39,6 +39,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -129,6 +131,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     {
         // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
         var publicDataDbExists = configuration.GetValue<bool>("PublicDataDbExists");
+
+        var enhancedScreenerJourney = configuration
+            .GetRequiredSection(DataScreenerOptions.Section)
+            .GetValue<bool>(nameof(DataScreenerOptions.EnhancedScreenerJourney));
 
         services.AddHealthChecks();
 
@@ -419,6 +425,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
         services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
+
         services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
         services.AddScoped<IDataSetScreenerService, DataSetScreenerService>();
         services.AddKeyedSingleton<IQueueServiceClient>(
@@ -431,6 +438,13 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                     : new NoOpQueueServiceClient();
             }
         );
+
+        if (enhancedScreenerJourney)
+        {
+            services.AddSingleton<Func<TimeSpan, IPeriodicTimer>>(period => new PeriodicTimerDelegate(period));
+            services.AddHostedService<DataSetScreenerProgressUpdaterJob>();
+        }
+
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseImageService, ReleaseImageService>();
@@ -600,6 +614,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
         services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
         services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
+
+        services.AddSingleton<IDbContextSupplier, DbContextSupplier>();
+        services.AddSingleton<IDatabaseHelper, DatabaseHelper>();
 
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
