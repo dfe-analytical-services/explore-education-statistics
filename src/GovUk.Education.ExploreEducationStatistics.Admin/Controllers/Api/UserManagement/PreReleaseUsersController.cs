@@ -18,7 +18,7 @@ public class PreReleaseUsersController(IPreReleaseUserService preReleaseUserServ
     [HttpGet("pre-release/users")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
-    [Authorize(Roles = nameof(SecurityPolicies.CanManageUsersOnSystem))]
+    [Authorize(Policy = nameof(SecurityPolicies.CanManageUsersOnSystem))]
     public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetAllPreReleaseUsers()
     {
         return await preReleaseUserService.GetAllPreReleaseUsers();
