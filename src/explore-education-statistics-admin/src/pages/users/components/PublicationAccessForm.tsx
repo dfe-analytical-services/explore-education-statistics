@@ -23,6 +23,8 @@ const addPublicationFormErrorMappings = [
     target: 'publicationRole',
     messages: {
       UserAlreadyHasResourceRole: 'The user already has this publication role',
+      UserAlreadyHasMorePowerfulRole:
+        'The user already has a more powerful publication role',
     },
   }),
 ];
