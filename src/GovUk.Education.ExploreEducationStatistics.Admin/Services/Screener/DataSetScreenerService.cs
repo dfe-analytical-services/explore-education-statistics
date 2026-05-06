@@ -93,14 +93,19 @@ public class DataSetScreenerService(
             // data set, apply it.
             if (progressUpdateForDataSet != null)
             {
-                dataSetToUpdate.ScreenerProgress!.PercentageComplete = (int)
-                    Math.Round(progressUpdateForDataSet.PercentageComplete, MidpointRounding.ToZero);
-                dataSetToUpdate.ScreenerProgress.Stage = progressUpdateForDataSet.Stage;
-                dataSetToUpdate.ScreenerProgress.Completed = progressUpdateForDataSet.Completed;
-                dataSetToUpdate.ScreenerProgress.Passed = progressUpdateForDataSet.Passed;
+                // Only update Screener progress details if some actual progress has been made since the
+                // last time the progress was updated. This helps to identify and clean up any stalled
+                // screening attempts.
+                if (ScreenerProgressHasChanged(dataSetToUpdate.ScreenerProgress, progressUpdateForDataSet))
+                {
+                    dataSetToUpdate.ScreenerProgress!.PercentageComplete = progressUpdateForDataSet.PercentageComplete;
+                    dataSetToUpdate.ScreenerProgress.Stage = progressUpdateForDataSet.Stage;
+                    dataSetToUpdate.ScreenerProgress.Completed = progressUpdateForDataSet.Completed;
+                    dataSetToUpdate.ScreenerProgress.Passed = progressUpdateForDataSet.Passed;
 
-                // Mark the data set as having received a successful progress update.
-                dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
+                    // Mark the data set as having received a successful progress update.
+                    dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
+                }
             }
 
             // Update the "last checked" date to mark the last time that progress was checked
@@ -177,10 +182,27 @@ public class DataSetScreenerService(
                     .Select(upload => new ScreenerProgressWithDataSetUploadIdViewModel
                     {
                         DataSetUploadId = upload.Id,
-                        PercentageComplete = upload.ScreenerProgress?.PercentageComplete ?? 0,
+                        PercentageComplete = (int)
+                            Math.Round(upload.ScreenerProgress?.PercentageComplete ?? 0, MidpointRounding.ToZero),
                         Stage = upload.ScreenerProgress?.Stage,
                     })
                     .ToList();
             });
+    }
+
+    private bool ScreenerProgressHasChanged(
+        DataSetScreenerProgress? currentScreenerProgress,
+        DataSetScreenerProgressResponse progressUpdate
+    )
+    {
+        if (currentScreenerProgress == null)
+        {
+            return true;
+        }
+
+        return Math.Abs(currentScreenerProgress.PercentageComplete - progressUpdate.PercentageComplete) > 0.001
+            || currentScreenerProgress.Stage != progressUpdate.Stage
+            || currentScreenerProgress.Passed != progressUpdate.Passed
+            || currentScreenerProgress.Completed != progressUpdate.Completed;
     }
 }

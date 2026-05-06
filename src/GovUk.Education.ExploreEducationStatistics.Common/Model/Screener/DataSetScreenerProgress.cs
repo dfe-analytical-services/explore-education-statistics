@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 /// </summary>
 public record DataSetScreenerProgress
 {
-    public int PercentageComplete { get; set; }
+    public double PercentageComplete { get; set; }
 
     public string Stage { get; set; } = null!;
 
