@@ -384,7 +384,18 @@ public class UserRoleService(
         PublicationRole role
     )
     {
-        if (await userPublicationRoleRepository.UserHasRoleOnPublication(userId, publicationId, role))
+        if (role is PublicationRole.Drafter)
+        {
+            return await ValidateDrafterRoleCanBeAdded(userId: userId, publicationId: publicationId);
+        }
+
+        if (
+            await userPublicationRoleRepository.UserHasRoleOnPublication(
+                userId: userId,
+                publicationId: publicationId,
+                role: role
+            )
+        )
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
         }
@@ -401,16 +412,28 @@ public class UserRoleService(
             return Unit.Instance;
         }
 
-        if (
-            await userPublicationRoleRepository.UserHasAnyRoleOnPublication(
-                userId: user.Id,
-                publicationId: publicationId,
-                resourceRoleFilter: ResourceRoleFilter.All,
-                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
-            )
-        )
+        return await ValidateDrafterRoleCanBeAdded(userId: user.Id, publicationId: publicationId);
+    }
+
+    private async Task<Either<ActionResult, Unit>> ValidateDrafterRoleCanBeAdded(Guid userId, Guid publicationId)
+    {
+        var userPublicationRoles = (
+            await userPublicationRoleRepository
+                .Query(ResourceRoleFilter.All)
+                .WhereForUser(userId)
+                .WhereForPublication(publicationId)
+                .Select(upr => upr.Role)
+                .ToListAsync()
+        ).ToHashSet();
+
+        if (userPublicationRoles.Contains(PublicationRole.Approver))
         {
-            return ValidationActionResult(UserAlreadyHasResourceRoleOrMorePowerfulRole);
+            return ValidationActionResult(UserAlreadyHasMorePowerfulRole);
+        }
+
+        if (userPublicationRoles.Contains(PublicationRole.Drafter))
+        {
+            return ValidationActionResult(UserAlreadyHasResourceRole);
         }
 
         return Unit.Instance;

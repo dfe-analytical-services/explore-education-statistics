@@ -34,8 +34,10 @@ export const errorMappings = [
   mapFieldErrors<InviteDrafterFormValues>({
     target: 'releaseIds',
     messages: {
-      UserAlreadyHasResourceRoleOrMorePowerfulRole:
+      UserAlreadyHasResourceRole:
         'The user has already been invited with these permissions',
+      UserAlreadyHasMorePowerfulRole:
+        'The user has already been invited with more powerful permissions than a publication drafter',
     },
   }),
 ];

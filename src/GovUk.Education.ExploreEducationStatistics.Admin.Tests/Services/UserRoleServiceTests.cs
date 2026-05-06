@@ -613,7 +613,7 @@ public abstract class UserRoleServiceTests
         }
 
         [Fact]
-        public async Task AddPublicationRole_UserAlreadyHasRole()
+        public async Task AddPublicationRole_Approver_UserAlreadyHasApproverRole_BadRequest()
         {
             var user = new ApplicationUser { Id = _user.Id.ToString(), Email = _user.Email };
 
@@ -640,12 +640,142 @@ public abstract class UserRoleServiceTests
                     mock.UserHasRoleOnPublication(
                         _user.Id,
                         publication.Id,
-                        PublicationRole.Drafter,
+                        PublicationRole.Approver,
                         ResourceRoleFilter.ActiveOnly,
                         It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(true);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
+
+                var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Approver);
+
+                result.AssertBadRequest(UserAlreadyHasResourceRole);
+            }
+
+            VerifyAllMocks(userPublicationRoleRepository);
+
+            userPublicationRoleRepository.Verify(
+                s =>
+                    s.Create(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<PublicationRole>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<DateTime?>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+        }
+
+        [Fact]
+        public async Task AddPublicationRole_Drafter_UserAlreadyHasApproverRole_BadRequest()
+        {
+            var applicationUser = new ApplicationUser { Id = _user.Id.ToString(), Email = _user.Email };
+
+            var user = _dataFixture
+                .DefaultUser()
+                .WithId(Guid.Parse(applicationUser.Id))
+                .WithEmail(applicationUser.Email);
+            var publication = new Publication();
+
+            UserPublicationRole existingUserPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Approver);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                userAndRolesDbContext.Users.Add(applicationUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, existingUserPublicationRole);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
+
+                var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Drafter);
+
+                result.AssertBadRequest(UserAlreadyHasMorePowerfulRole);
+            }
+
+            VerifyAllMocks(userPublicationRoleRepository);
+
+            userPublicationRoleRepository.Verify(
+                s =>
+                    s.Create(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<PublicationRole>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<DateTime?>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+        }
+
+        [Fact]
+        public async Task AddPublicationRole_Drafter_UserAlreadyHasDrafterRole_BadRequest()
+        {
+            var applicationUser = new ApplicationUser { Id = _user.Id.ToString(), Email = _user.Email };
+
+            var user = _dataFixture
+                .DefaultUser()
+                .WithId(Guid.Parse(applicationUser.Id))
+                .WithEmail(applicationUser.Email);
+            var publication = new Publication();
+
+            UserPublicationRole existingUserPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Drafter);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                userAndRolesDbContext.Users.Add(applicationUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, existingUserPublicationRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -1163,10 +1293,16 @@ public abstract class UserRoleServiceTests
 
         [Theory]
         [MemberData(nameof(AllTypesOfUser))]
-        public async Task UserAlreadyHasRole(Func<DataFixture, User> userFactory)
+        public async Task UserAlreadyHasDrafterRole_BadRequest(Func<DataFixture, User> userFactory)
         {
             User existingUser = userFactory(_dataFixture);
             Publication publication = _dataFixture.DefaultPublication();
+
+            UserPublicationRole existingUserPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(existingUser)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Drafter);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1176,29 +1312,13 @@ public abstract class UserRoleServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            UserPublicationRole createdUserDrafterRole = _dataFixture
-                .DefaultUserPublicationRole()
-                .WithUser(existingUser)
-                .WithPublication(publication)
-                .WithRole(PublicationRole.Drafter);
-
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
                 .Setup(mock => mock.FindUserByEmail(existingUser.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingUser);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        existingUser.Id,
-                        publication.Id,
-                        ResourceRoleFilter.All,
-                        It.IsAny<CancellationToken>(),
-                        new PublicationRole[] { PublicationRole.Drafter, PublicationRole.Approver }
-                    )
-                )
-                .ReturnsAsync(true);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, existingUserPublicationRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1210,7 +1330,52 @@ public abstract class UserRoleServiceTests
 
                 var result = await service.InviteDrafter(_user.Email, publication.Id);
 
-                result.AssertBadRequest(UserAlreadyHasResourceRoleOrMorePowerfulRole);
+                result.AssertBadRequest(UserAlreadyHasResourceRole);
+            }
+
+            VerifyAllMocks(userPublicationRoleRepository, userRepository);
+        }
+
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task UserAlreadyHasApproverRole_BadRequest(Func<DataFixture, User> userFactory)
+        {
+            User existingUser = userFactory(_dataFixture);
+            Publication publication = _dataFixture.DefaultPublication();
+
+            UserPublicationRole existingUserPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(existingUser)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Approver);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindUserByEmail(existingUser.Email, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(existingUser);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, existingUserPublicationRole);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(
+                    contentDbContext: contentDbContext,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userRepository: userRepository.Object
+                );
+
+                var result = await service.InviteDrafter(_user.Email, publication.Id);
+
+                result.AssertBadRequest(UserAlreadyHasMorePowerfulRole);
             }
 
             VerifyAllMocks(userPublicationRoleRepository, userRepository);
