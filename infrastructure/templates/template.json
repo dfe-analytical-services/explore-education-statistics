@@ -348,11 +348,18 @@
         "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
       }
     },
-    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "Enables the Functions in the Publisher App which allow scheduled release versions to be published immediately"
+        "description": "Whether the PublishScheduledReleaseVersionsNow HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
+      }
+    },
+    "publisherFunctionStageScheduledReleaseVersionsImmediatelyEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether the StageScheduledReleaseVersionsImmediately HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
       }
     },
     "teamEmailAddresses": {
@@ -3581,8 +3588,8 @@
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
-        "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
+        "AzureWebJobs.PublishScheduledReleaseVersionsNow.Disabled": "[not(parameters('publisherFunctionPublishScheduledReleaseVersionsNowEnabled'))]",
+        "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('publisherFunctionStageScheduledReleaseVersionsImmediatelyEnabled'))]",
         "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_TIME_ZONE": "[parameters('publisherFunctionAppTimeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",

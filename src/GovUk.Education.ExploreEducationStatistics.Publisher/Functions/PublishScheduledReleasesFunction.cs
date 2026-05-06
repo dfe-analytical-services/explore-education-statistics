@@ -15,11 +15,15 @@ public class PublishScheduledReleasesFunction(
 )
 {
     /// <summary>
-    /// Azure function which calls the <see cref="IPublishingCompletionService"/> in order to complete the publishing
-    /// process for release versions that are scheduled to be published.
+    /// Azure Function that publishes scheduled release versions.
+    /// It uses <see cref="IPublishingCompletionService"/> to mark releases as publicly accessible and to
+    /// execute tasks required to complete the publishing process.
     /// </summary>
-    [Function(nameof(PublishScheduledReleases))]
-    public async Task PublishScheduledReleases(
+    /// <remarks>
+    /// Triggered by a cron schedule that executes daily at 09:30:00 in the Production environment.
+    /// </remarks>
+    [Function(nameof(PublishScheduledReleaseVersions))]
+    public async Task PublishScheduledReleaseVersions(
         [TimerTrigger("%App:PublishScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
         FunctionContext context
     )
@@ -39,11 +43,15 @@ public class PublishScheduledReleasesFunction(
     }
 
     /// <summary>
-    /// Azure function which calls the <see cref="IPublishingCompletionService"/> in order to complete the publishing
-    /// process for release versions that are scheduled to be published.
+    /// HTTP-triggered function to immediately publish scheduled release versions.
+    /// Intended for use by manual and automated testing to avoid waiting for the scheduled trigger.
+    /// It uses <see cref="IPublishingCompletionService"/> to mark releases as publicly accessible and to
+    /// execute tasks required to complete the publishing process.
     /// </summary>
     /// <remarks>
-    /// This function is manually triggered by an HTTP POST, and is disabled by default in production environments.
+    /// This function is manually triggered by an HTTP POST and is disabled by default in production.
+    /// It mirrors the behaviour of <see cref="PublishScheduledReleaseVersions"/>.
+    /// For more info see the Publisher's README.
     /// </remarks>
     /// <param name="request">
     /// An optional JSON request body with a "ReleaseVersionIds" array can be included in the POST request to limit
@@ -51,11 +59,8 @@ public class PublishScheduledReleasesFunction(
     /// </param>
     /// <param name="context"></param>
     /// <returns></returns>
-    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
-    // given that the 'staging' content task no longer exists. Be careful to make sure it remains disabled in the Prod
-    // environment after renaming.
-    [Function(nameof(PublishStagedReleaseVersionContentImmediately))]
-    public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
+    [Function(nameof(PublishScheduledReleaseVersionsNow))]
+    public async Task<ActionResult<ManualTriggerResponse>> PublishScheduledReleaseVersionsNow(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
         FunctionContext context
     )

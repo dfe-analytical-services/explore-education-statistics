@@ -119,7 +119,10 @@
     "dataFactoryConcurrency": {
       "value": 10
     },
-    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
+      "value": true
+    },
+    "publisherFunctionStageScheduledReleaseVersionsImmediatelyEnabled": {
       "value": true
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {

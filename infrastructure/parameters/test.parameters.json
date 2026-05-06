@@ -92,7 +92,10 @@
     "maxStatsDbSizeBytes": {
       "value": 375809638400
     },
-    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
+      "value": true
+    },
+    "publisherFunctionStageScheduledReleaseVersionsImmediatelyEnabled": {
       "value": true
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
