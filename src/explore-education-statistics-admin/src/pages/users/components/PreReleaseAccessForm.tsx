@@ -16,7 +16,7 @@ import preReleaseUsersService from '@admin/services/user-management/preReleaseUs
 
 const addPreReleaseFormErrorMappings = [
   mapFieldErrors<FormValues>({
-    target: 'releaseRole',
+    target: 'releaseId',
     messages: {
       UserAlreadyHasResourceRole: 'The user already has this pre-release role',
     },
@@ -65,7 +65,7 @@ export default function PreReleaseAccessForm({
       {({ formState }) => {
         return (
           <Form
-            id={`${user.id}-releaseRole`}
+            id={`${user.id}-preReleaseRole`}
             onSubmit={handleAddPreReleaseRole}
           >
             <FormFieldset
