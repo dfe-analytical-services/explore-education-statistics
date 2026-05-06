@@ -32,7 +32,7 @@
     "stageScheduledReleasesFunctionCronSchedule": {
       "value": "0 0 * * * *"
     },
-    "publishScheduledReleasesFunctionCronSchedule": {
+    "publishScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 30 * * * *"
     },
     "preReleaseMinutesBeforeStart": {

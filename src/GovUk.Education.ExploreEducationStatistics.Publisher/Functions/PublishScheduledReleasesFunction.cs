@@ -24,7 +24,7 @@ public class PublishScheduledReleasesFunction(
     /// </remarks>
     [Function(nameof(PublishScheduledReleaseVersions))]
     public async Task PublishScheduledReleaseVersions(
-        [TimerTrigger("%App:PublishScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
+        [TimerTrigger("%App:PublishScheduledReleaseVersionsFunctionCronSchedule%")] TimerInfo timer,
         FunctionContext context
     )
     {

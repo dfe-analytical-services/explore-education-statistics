@@ -485,14 +485,14 @@
       "type": "string",
       "defaultValue": "0 5 0 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the StageScheduledReleases function in the Publisher Function App"
+        "description": "Cron expression that defines when the StageScheduledReleases function runs in the Publisher Function App"
       }
     },
-    "publishScheduledReleasesFunctionCronSchedule": {
+    "publishScheduledReleaseVersionsFunctionCronSchedule": {
       "type": "string",
       "defaultValue": "0 30 9 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the PublishScheduledReleases function in the Publisher Function App"
+        "description": "Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App"
       }
     },
     "preReleaseMinutesBeforeStart": {
@@ -1987,7 +1987,7 @@
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
         "PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
         "ReleaseApproval__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
-        "ReleaseApproval__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
+        "ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
         "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicApp__Url": "[variables('publicAppUrl')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
@@ -3597,7 +3597,7 @@
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
         "App__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
-        "App__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
+        "App__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
         "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",

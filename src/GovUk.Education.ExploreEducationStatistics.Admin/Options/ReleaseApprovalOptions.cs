@@ -7,5 +7,5 @@ public record ReleaseApprovalOptions
 
     public string StageScheduledReleasesFunctionCronSchedule { get; init; } = string.Empty;
 
-    public string PublishScheduledReleasesFunctionCronSchedule { get; init; } = string.Empty;
+    public string PublishScheduledReleaseVersionsFunctionCronSchedule { get; init; } = string.Empty;
 }

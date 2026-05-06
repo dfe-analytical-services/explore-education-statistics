@@ -220,7 +220,7 @@ public class ReleaseApprovalServiceTests
         var options = new ReleaseApprovalOptions
         {
             StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-01T00:00:00Z
-            PublishScheduledReleasesFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-01-01T09:30:00Z
+            PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-01-01T09:30:00Z
         };
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -270,7 +270,7 @@ public class ReleaseApprovalServiceTests
         var options = new ReleaseApprovalOptions
         {
             StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-06T23:00:00Z
-            PublishScheduledReleasesFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-06-07T08:30:00Z
+            PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-06-07T08:30:00Z
         };
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -318,7 +318,7 @@ public class ReleaseApprovalServiceTests
         var options = new ReleaseApprovalOptions
         {
             StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-02T00:00:00Z
-            PublishScheduledReleasesFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-01-01T09:30:00Z
+            PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-01-01T09:30:00Z
         };
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -368,7 +368,7 @@ public class ReleaseApprovalServiceTests
         var options = new ReleaseApprovalOptions
         {
             StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-07T23:00:00Z
-            PublishScheduledReleasesFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-06-07T08:30:00Z
+            PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-06-07T08:30:00Z
         };
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -416,7 +416,7 @@ public class ReleaseApprovalServiceTests
         var options = new ReleaseApprovalOptions
         {
             StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * 1-5", // Only occurs on weekdays Monday - Friday
-            PublishScheduledReleasesFunctionCronSchedule = "0 30 9 * * 1-5", // Only occurs on weekdays Monday - Friday
+            PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * 1-5", // Only occurs on weekdays Monday - Friday
         };
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -465,7 +465,7 @@ public class ReleaseApprovalServiceTests
         var options = new ReleaseApprovalOptions
         {
             StageScheduledReleasesFunctionCronSchedule = "0 30 * * * *", // Occurs hourly at minute 30
-            PublishScheduledReleasesFunctionCronSchedule = "0 15 * * * *", // Occurs hourly at minute 15
+            PublishScheduledReleaseVersionsFunctionCronSchedule = "0 15 * * * *", // Occurs hourly at minute 15
         };
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1878,7 +1878,7 @@ public class ReleaseApprovalServiceTests
         return new ReleaseApprovalOptions
         {
             StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *",
-            PublishScheduledReleasesFunctionCronSchedule = "0 30 9 * * *",
+            PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *",
         }.ToOptionsWrapper();
     }
 

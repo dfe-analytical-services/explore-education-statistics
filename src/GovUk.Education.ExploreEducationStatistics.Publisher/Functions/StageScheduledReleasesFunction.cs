@@ -41,20 +41,20 @@ public class StageScheduledReleasesFunction(
         var now = timeProvider.GetUtcNow();
         var timeZone = timeProvider.LocalTimeZone; // UTC or the time zone in WEBSITE_TIME_ZONE if specified
 
-        // Get the next scheduled publishing time using the cron expression of the PublishScheduledReleases function
+        // Get the next scheduled publishing time using the cron expression of the PublishScheduledReleaseVersions function
         var nextScheduledPublishingTime =
             CronExpressionUtil.GetNextOccurrence(
-                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                cronExpression: _appOptions.PublishScheduledReleaseVersionsFunctionCronSchedule,
                 from: now,
                 timeZone
             )
             ?? throw new CronNoFutureOccurrenceException(
-                cronExpression: _appOptions.PublishScheduledReleasesFunctionCronSchedule,
+                cronExpression: _appOptions.PublishScheduledReleaseVersionsFunctionCronSchedule,
                 from: now,
                 timeZone
             );
 
-        // Fetch releases scheduled for publishing before or on the next run time
+        // Fetch release versions scheduled for publishing before or on the next run time
         var scheduledReleases = await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
             DateComparison.BeforeOrOn,
             nextScheduledPublishingTime

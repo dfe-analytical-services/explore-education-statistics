@@ -394,7 +394,7 @@ public class PublishingServiceTests
             PublicStorageConnectionString = PublicStorageConnectionString,
             NotifierStorageConnectionString = string.Empty,
             PublisherStorageConnectionString = string.Empty,
-            PublishScheduledReleasesFunctionCronSchedule = string.Empty,
+            PublishScheduledReleaseVersionsFunctionCronSchedule = string.Empty,
             StageScheduledReleasesFunctionCronSchedule = string.Empty,
             AdminAppUrl = string.Empty,
             PublicAppUrl = string.Empty,
