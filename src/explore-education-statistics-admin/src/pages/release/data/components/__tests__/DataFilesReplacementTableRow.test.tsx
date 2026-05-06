@@ -64,7 +64,7 @@ describe('DataFilesReplacementTableRow', () => {
   const defaultPermissions = {
     isBauUser: true,
     canAccessSystem: true,
-    canAccessPrereleasePages: true,
+    canAccessPreReleasePages: true,
     canAccessAnalystPages: true,
     canAccessAllImports: true,
     canManageAllTaxonomy: true,
