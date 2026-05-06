@@ -12,7 +12,7 @@ export interface GlobalRolesService {
 
 const globalRolesService: GlobalRolesService = {
   getRoles(): Promise<Role[]> {
-    return client.get<Role[]>('/user-management/roles');
+    return client.get<Role[]>('/global-roles');
   },
 };
 
