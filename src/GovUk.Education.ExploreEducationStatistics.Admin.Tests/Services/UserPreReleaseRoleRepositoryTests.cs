@@ -199,7 +199,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                     CreatedById: uprr.CreatedById!.Value,
                     CreatedDate: uprr.Created
                 ))
-                .ToList();
+                .ToHashSet();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 

@@ -1,7 +1,7 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -364,7 +364,7 @@ public abstract class UserManagementServiceTests
         [MemberData(nameof(InviteUserOptionalCreatedDates))]
         public async Task Success(DateTime? createdDate)
         {
-            var email = "TEST@test.com";
+            var email = "test@test.com";
 
             var role = new IdentityRole
             {

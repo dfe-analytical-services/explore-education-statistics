@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
