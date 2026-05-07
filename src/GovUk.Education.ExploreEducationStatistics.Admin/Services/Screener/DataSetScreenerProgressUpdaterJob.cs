@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Options;
 
@@ -71,6 +72,36 @@ public class DataSetScreenerProgressUpdaterJob(
                         + "as failed screening at {Time} (UTC)",
                     failures.Count,
                     options.Value.ScreenerProgressUpdateFailureIntervalMinutes,
+                    DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+                );
+            }
+
+            var completions = await dataSetScreenerService.CompleteDataSetScreeningForFinishedDataSets(
+                cancellationToken: cancellationToken
+            );
+
+            var successfulCompletions = completions
+                .Where(c => c.Status == nameof(DataSetUploadStatus.PENDING_REVIEW))
+                .ToList();
+
+            var failedCompletions = completions
+                .Where(c => c.Status == nameof(DataSetUploadStatus.FAILED_SCREENING))
+                .ToList();
+
+            if (successfulCompletions.Count > 0)
+            {
+                logger.LogInformation(
+                    "{Count} data sets completed screening successfully at {Time} (UTC)",
+                    successfulCompletions.Count,
+                    DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+                );
+            }
+
+            if (failedCompletions.Count > 0)
+            {
+                logger.LogInformation(
+                    "{Count} data sets completed screening with failures at {Time} (UTC)",
+                    successfulCompletions.Count,
                     DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
                 );
             }

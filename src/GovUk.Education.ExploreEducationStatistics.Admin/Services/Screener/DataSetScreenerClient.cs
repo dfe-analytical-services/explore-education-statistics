@@ -62,4 +62,49 @@ public class DataSetScreenerClient(
                 $"Failed to get screener progress for data set ids {dataSetIds.JoinToString(",")} - status code {response.StatusCode}."
             );
     }
+
+    public async Task<List<DataSetScreenerCompletionReportResponse>> GetScreenerCompletionReports(
+        IList<Guid> dataSetIds,
+        CancellationToken cancellationToken
+    )
+    {
+        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
+
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        dataSetIds.ForEach(dataSetId => query.Add("data_set_id", dataSetId.ToString()));
+
+        var url = $"{httpClient.BaseAddress}/completion-reports?{query}";
+        var response = await httpClient.GetAsync(url, cancellationToken);
+
+        return response.IsSuccessStatusCode
+            ? (
+                await response.Content.ReadFromJsonAsync<List<DataSetScreenerCompletionReportResponse>>(
+                    cancellationToken
+                )
+            )!
+            : throw new DataScreenerException(
+                $"Failed to get screener completion reports for data set ids {dataSetIds.JoinToString(",")} - status code {response.StatusCode}."
+            );
+    }
+
+    public async Task DeleteScreenerProgressAndCompletionFiles(
+        IList<Guid> dataSetIds,
+        CancellationToken cancellationToken
+    )
+    {
+        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
+
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        dataSetIds.ForEach(dataSetId => query.Add("data_set_id", dataSetId.ToString()));
+
+        var url = $"{httpClient.BaseAddress}/progress?{query}";
+        var response = await httpClient.DeleteAsync(url, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new DataScreenerException(
+                $"Failed to delete screener progress and completion files for data set ids {dataSetIds.JoinToString(",")} - status code {response.StatusCode}."
+            );
+        }
+    }
 }

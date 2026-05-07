@@ -101,6 +101,7 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
             Created = DateTime.UtcNow,
             ScreenerResult = new()
             {
+                Passed = true,
                 OverallResult = "Passed",
                 TestResults =
                 [

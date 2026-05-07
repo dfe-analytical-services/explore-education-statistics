@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Screener;
 
@@ -42,6 +41,10 @@ public class DataSetScreenerProgressUpdaterJobTests
             .Setup(s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
+        dataSetScreenerService
+            .Setup(s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
         var job = BuildService(
             dataSetScreenerService: dataSetScreenerService.Object,
             periodicTimer: periodicTimer.Object
@@ -53,12 +56,17 @@ public class DataSetScreenerProgressUpdaterJobTests
 
         periodicTimer.Verify(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()), Times.Exactly(1));
 
+        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(1));
+
         dataSetScreenerService.Verify(
             s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()),
             Times.Exactly(1)
         );
 
-        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(1));
+        dataSetScreenerService.Verify(
+            s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()),
+            Times.Exactly(1)
+        );
     }
 
     [Fact]
@@ -94,6 +102,10 @@ public class DataSetScreenerProgressUpdaterJobTests
             .Setup(s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
+        dataSetScreenerService
+            .Setup(s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
         var job = BuildService(
             dataSetScreenerService: dataSetScreenerService.Object,
             periodicTimer: periodicTimer.Object
@@ -105,12 +117,17 @@ public class DataSetScreenerProgressUpdaterJobTests
 
         periodicTimer.Verify(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()), Times.Exactly(3));
 
+        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(3));
+
         dataSetScreenerService.Verify(
             s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()),
             Times.Exactly(3)
         );
 
-        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(3));
+        dataSetScreenerService.Verify(
+            s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()),
+            Times.Exactly(3)
+        );
     }
 
     private DataSetScreenerProgressUpdaterJob BuildService(

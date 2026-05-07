@@ -163,18 +163,24 @@ public abstract class DataSetScreenerServiceTests
                 new()
                 {
                     DataSetId = dataSetIds[1],
-                    PercentageComplete = 100.00,
-                    Completed = true,
-                    Passed = true,
-                    Stage = "complete",
+                    ProgressReport = new DataSetScreenerProgressReport
+                    {
+                        PercentageComplete = 100.00,
+                        Completed = true,
+                        Passed = true,
+                        Stage = "complete",
+                    },
                 },
                 new()
                 {
                     DataSetId = dataSetIds[0],
-                    PercentageComplete = 80.99,
-                    Completed = false,
-                    Passed = false,
-                    Stage = "screening",
+                    ProgressReport = new DataSetScreenerProgressReport
+                    {
+                        PercentageComplete = 80.99,
+                        Completed = false,
+                        Passed = false,
+                        Stage = "screening",
+                    },
                 },
             ];
 
@@ -389,10 +395,13 @@ public abstract class DataSetScreenerServiceTests
                 new()
                 {
                     DataSetId = dataSetIds[1],
-                    PercentageComplete = 100.00,
-                    Completed = true,
-                    Passed = true,
-                    Stage = "Complete",
+                    ProgressReport = new DataSetScreenerProgressReport
+                    {
+                        PercentageComplete = 100.00,
+                        Completed = true,
+                        Passed = true,
+                        Stage = "Complete",
+                    },
                 },
             ];
 
@@ -505,10 +514,13 @@ public abstract class DataSetScreenerServiceTests
                 new()
                 {
                     DataSetId = dataSetUndergoingScreening.Id,
-                    PercentageComplete = dataSetUndergoingScreening.ScreenerProgress!.PercentageComplete,
-                    Completed = dataSetUndergoingScreening.ScreenerProgress!.Completed,
-                    Passed = dataSetUndergoingScreening.ScreenerProgress!.Passed,
-                    Stage = dataSetUndergoingScreening.ScreenerProgress!.Stage,
+                    ProgressReport = new DataSetScreenerProgressReport
+                    {
+                        PercentageComplete = dataSetUndergoingScreening.ScreenerProgress!.PercentageComplete,
+                        Completed = dataSetUndergoingScreening.ScreenerProgress!.Completed,
+                        Passed = dataSetUndergoingScreening.ScreenerProgress!.Passed,
+                        Stage = dataSetUndergoingScreening.ScreenerProgress!.Stage,
+                    },
                 },
             ];
 
@@ -832,12 +844,22 @@ public abstract class DataSetScreenerServiceTests
                 await context.SaveChangesAsync();
             }
 
+            var dataSetIds = dataSetsUndergoingScreening.Select(upload => upload.Id).ToList();
+
+            var screenerClient = new Mock<IDataSetScreenerClient>(MockBehavior.Strict);
+
+            screenerClient
+                .Setup(s => s.DeleteScreenerProgressAndCompletionFiles(dataSetIds, CancellationToken.None))
+                .Returns(Task.CompletedTask);
+
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var service = BuildService(contentDbContext: context);
+                var service = BuildService(contentDbContext: context, screenerClient: screenerClient.Object);
 
                 // Act
                 var results = await service.MarkDataSetsWithoutProgressAsFailed(CancellationToken.None);
+
+                screenerClient.VerifyAll();
 
                 Assert.Equal(2, results.Count);
 
@@ -973,6 +995,300 @@ public abstract class DataSetScreenerServiceTests
 
                 // Expect it to be in its original state.
                 Assert.Equal(DataSetUploadStatus.PENDING_REVIEW, upload.Status);
+
+                // Expect it not to have had any ScreenerResult applied.
+                Assert.Null(upload.ScreenerResult);
+            }
+        }
+    }
+
+    public class CompleteDataSetScreeningForFinishedDataSetsTests : DataSetScreenerServiceTests
+    {
+        [Fact]
+        public async Task DataSetsWithCompletedScreeningProgress_MarkedAsComplete()
+        {
+            // Arrange
+            var dataSetsUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithStatus(DataSetUploadStatus.SCREENING)
+                // The first data set has had a progress update that shows it has completed successfully.
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetScreenerProgress(
+                            new DataSetScreenerProgress
+                            {
+                                Completed = true,
+                                Passed = false,
+                                PercentageComplete = 100,
+                                Stage = "Completed",
+                            }
+                        )
+                )
+                // The second data set has had a progress update that shows it has not yet completed.
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetScreenerProgress(
+                            new DataSetScreenerProgress
+                            {
+                                Completed = false,
+                                Passed = false,
+                                PercentageComplete = 70,
+                                Stage = "screening",
+                            }
+                        )
+                )
+                // The third data set has had a progress update that shows it has not completed, but not successfully.
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetScreenerProgress(
+                            new DataSetScreenerProgress
+                            {
+                                Completed = true,
+                                Passed = false,
+                                PercentageComplete = 70,
+                                Stage = "failed",
+                            }
+                        )
+                )
+                .GenerateList();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetsUndergoingScreening);
+                await context.SaveChangesAsync();
+            }
+
+            // Return the completion reports out of order, to ensure they're matched up correctly with the
+            // correct data sets by id.
+            List<DataSetScreenerCompletionReportResponse> completionReportsResponse =
+            [
+                new()
+                {
+                    DataSetId = dataSetsUndergoingScreening[2].Id,
+                    CompletionReport = new DataSetScreenerResponse
+                    {
+                        OverallResult = "Failed screening at stage 2",
+                        Passed = false,
+                        PublicApiCompatible = false,
+                        TestResults =
+                        [
+                            new DataScreenerTestResult
+                            {
+                                Stage = "stage 2",
+                                TestFunctionName = "a test",
+                                Notes = "Some notes",
+                                GuidanceUrl = "https://example.com",
+                                Result = TestResult.FAIL,
+                            },
+                        ],
+                    },
+                },
+                new()
+                {
+                    DataSetId = dataSetsUndergoingScreening[0].Id,
+                    CompletionReport = new DataSetScreenerResponse
+                    {
+                        OverallResult = "Passed all tests",
+                        Passed = true,
+                        PublicApiCompatible = true,
+                        TestResults =
+                        [
+                            new DataScreenerTestResult
+                            {
+                                Stage = "stage 2",
+                                TestFunctionName = "a test",
+                                Notes = "Some notes",
+                                GuidanceUrl = "https://example.com",
+                                Result = TestResult.PASS,
+                            },
+                            new DataScreenerTestResult
+                            {
+                                Stage = "stage 3",
+                                TestFunctionName = "another test",
+                                Notes = "Some notes",
+                                GuidanceUrl = "https://example.com",
+                                Result = TestResult.PASS,
+                            },
+                        ],
+                    },
+                },
+            ];
+
+            var screenerClient = new Mock<IDataSetScreenerClient>(MockBehavior.Strict);
+
+            screenerClient
+                .Setup(s =>
+                    s.GetScreenerCompletionReports(
+                        new[] { dataSetsUndergoingScreening[0].Id, dataSetsUndergoingScreening[2].Id },
+                        CancellationToken.None
+                    )
+                )
+                .ReturnsAsync(completionReportsResponse);
+
+            screenerClient
+                .Setup(s =>
+                    s.DeleteScreenerProgressAndCompletionFiles(
+                        new[] { dataSetsUndergoingScreening[2].Id, dataSetsUndergoingScreening[0].Id },
+                        CancellationToken.None
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(screenerClient: screenerClient.Object, contentDbContext: context);
+
+                // Act
+                var results = await service.CompleteDataSetScreeningForFinishedDataSets(CancellationToken.None);
+
+                // Assert
+                screenerClient.VerifyAll();
+
+                Assert.Equal(2, results.Count);
+
+                Assert.Equal(dataSetsUndergoingScreening[0].Id, results[0].Id);
+                var expectedDataSet1CompletionReport = completionReportsResponse[1].CompletionReport;
+                Assert.Equal(expectedDataSet1CompletionReport.OverallResult, results[0].ScreenerResult!.OverallResult);
+                Assert.Equal(
+                    expectedDataSet1CompletionReport.TestResults.Count,
+                    results[0].ScreenerResult!.TestResults.Count
+                );
+
+                Assert.Equal(dataSetsUndergoingScreening[2].Id, results[1].Id);
+                var expectedDataSet3CompletionReport = completionReportsResponse[0].CompletionReport;
+                Assert.Equal(expectedDataSet3CompletionReport.OverallResult, results[1].ScreenerResult!.OverallResult);
+                Assert.Equal(
+                    expectedDataSet3CompletionReport.TestResults.Count,
+                    results[1].ScreenerResult!.TestResults.Count
+                );
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var updatedDataSetUploads = context.DataSetUploads.ToList();
+
+                // Expect that data set 1 had its completion report applied and status updated to
+                // show that it passed screening successfully.
+                var dataSetUpload1 = updatedDataSetUploads[0];
+                var expectedDataSet1CompletionReport = completionReportsResponse[1].CompletionReport;
+                expectedDataSet1CompletionReport.AssertDeepEqualTo(dataSetUpload1.ScreenerResult);
+                Assert.Equal(DataSetUploadStatus.PENDING_REVIEW, dataSetUpload1.Status);
+
+                // Expect that data set 2 has no updates as it has not yet completed.
+                var dataSetUpload2 = updatedDataSetUploads[1];
+                Assert.Null(dataSetUpload2.ScreenerResult);
+                Assert.Equal(DataSetUploadStatus.SCREENING, dataSetUpload2.Status);
+
+                // Expect that data set 3 had its completion report applied and status updated to
+                // show that it failed screening.
+                var dataSetUpload3 = updatedDataSetUploads[2];
+                var expectedDataSet3CompletionReport = completionReportsResponse[0].CompletionReport;
+                expectedDataSet3CompletionReport.AssertDeepEqualTo(dataSetUpload3.ScreenerResult);
+                Assert.Equal(DataSetUploadStatus.FAILED_SCREENING, dataSetUpload3.Status);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetWithoutCompletionReport_Ignored_NotUpdated()
+        {
+            // Arrange
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = true,
+                        Passed = false,
+                        PercentageComplete = 100,
+                        Stage = "Completed",
+                    }
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.SaveChangesAsync();
+            }
+
+            var screenerClient = new Mock<IDataSetScreenerClient>(MockBehavior.Strict);
+
+            // Return no completion reports, to simulate an issue getting it successfully
+            // from the Screener API.
+            screenerClient
+                .Setup(s =>
+                    s.GetScreenerCompletionReports(new[] { dataSetUndergoingScreening.Id }, CancellationToken.None)
+                )
+                .ReturnsAsync([]);
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(screenerClient: screenerClient.Object, contentDbContext: context);
+
+                // Act
+                var results = await service.CompleteDataSetScreeningForFinishedDataSets(CancellationToken.None);
+
+                // Assert
+                screenerClient.VerifyAll();
+
+                Assert.Empty(results);
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var dataSetUpload = context.DataSetUploads.Single();
+
+                // Expect that the data set has been ignored.
+                dataSetUpload.AssertDeepEqualTo(dataSetUndergoingScreening);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetNotUndergoingScreening_Ignored_NotMarkedAsComplete()
+        {
+            // Arrange
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithStatus(DataSetUploadStatus.PENDING_IMPORT)
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = true,
+                        Passed = true,
+                        PercentageComplete = 100,
+                        Stage = "complete",
+                    }
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var results = await service.CompleteDataSetScreeningForFinishedDataSets(CancellationToken.None);
+
+                Assert.Empty(results);
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataQuery
+                var upload = context.DataSetUploads.Single();
+
+                // Expect it to be in its original state.
+                Assert.Equal(DataSetUploadStatus.PENDING_IMPORT, upload.Status);
 
                 // Expect it not to have had any ScreenerResult applied.
                 Assert.Null(upload.ScreenerResult);

@@ -93,15 +93,17 @@ public class DataSetScreenerService(
             // data set, apply it.
             if (progressUpdateForDataSet != null)
             {
+                var progressReport = progressUpdateForDataSet.ProgressReport;
+
                 // Only update Screener progress details if some actual progress has been made since the
                 // last time the progress was updated. This helps to identify and clean up any stalled
                 // screening attempts.
-                if (ScreenerProgressHasChanged(dataSetToUpdate.ScreenerProgress, progressUpdateForDataSet))
+                if (ScreenerProgressHasChanged(dataSetToUpdate.ScreenerProgress, progressReport))
                 {
-                    dataSetToUpdate.ScreenerProgress!.PercentageComplete = progressUpdateForDataSet.PercentageComplete;
-                    dataSetToUpdate.ScreenerProgress.Stage = progressUpdateForDataSet.Stage;
-                    dataSetToUpdate.ScreenerProgress.Completed = progressUpdateForDataSet.Completed;
-                    dataSetToUpdate.ScreenerProgress.Passed = progressUpdateForDataSet.Passed;
+                    dataSetToUpdate.ScreenerProgress!.PercentageComplete = progressReport.PercentageComplete;
+                    dataSetToUpdate.ScreenerProgress.Stage = progressReport.Stage;
+                    dataSetToUpdate.ScreenerProgress.Completed = progressReport.Completed;
+                    dataSetToUpdate.ScreenerProgress.Passed = progressReport.Passed;
 
                     // Mark the data set as having received a successful progress update.
                     dataSetToUpdate.ScreenerProgressLastUpdated = utcNow;
@@ -133,7 +135,6 @@ public class DataSetScreenerService(
         // Find any data sets where the gap between their last successful progress update
         // (or the very first attempt to get a progress update), and the last time that Admin checked
         // for a progress update, has become too large.
-
         var screeningDataSetsWithoutRecentProgressUpdates = screeningDataSets
             .Where(upload =>
                 upload is { ScreenerProgressLastChecked: not null, ScreenerProgressLastUpdated: not null }
@@ -141,6 +142,11 @@ public class DataSetScreenerService(
                     >= progressUpdatesFailureIntervalMins
             )
             .ToList();
+
+        if (screeningDataSetsWithoutRecentProgressUpdates.Count == 0)
+        {
+            return [];
+        }
 
         // For each affected data set, mark it as having failed screening due to not receiving
         // a successful progress update for too long.
@@ -154,10 +160,21 @@ public class DataSetScreenerService(
                 PublicApiCompatible = false,
             };
             upload.Status = DataSetUploadStatus.SCREENER_ERROR;
+            contentDbContext.DataSetUploads.Update(upload);
         });
 
-        contentDbContext.DataSetUploads.UpdateRange(screeningDataSetsWithoutRecentProgressUpdates);
         await contentDbContext.SaveChangesAsync(cancellationToken: cancellationToken);
+
+        // Ask the Screener API to delete any progress files that it may have for any of the data sets
+        // that we marked as failed, if any exist for them.
+        var dataSetIdsMarkedAsFailed = screeningDataSetsWithoutRecentProgressUpdates
+            .Select(upload => upload.Id)
+            .ToList();
+
+        await dataSetScreenerClient.DeleteScreenerProgressAndCompletionFiles(
+            dataSetIds: dataSetIdsMarkedAsFailed,
+            cancellationToken: cancellationToken
+        );
 
         return [.. screeningDataSetsWithoutRecentProgressUpdates.Select(mapper.Map<DataSetUploadViewModel>)];
     }
@@ -190,9 +207,74 @@ public class DataSetScreenerService(
             });
     }
 
+    public async Task<List<DataSetUploadViewModel>> CompleteDataSetScreeningForFinishedDataSets(
+        CancellationToken cancellationToken
+    )
+    {
+        // Find all data sets currently undergoing screening.
+        var screeningDataSets = await contentDbContext
+            .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        // Find only those whose latest progress reports show as having been completed.
+        var dataSetsFinishedScreening = screeningDataSets
+            .Where(upload => upload.ScreenerProgress is { Completed: true })
+            .ToList();
+
+        if (dataSetsFinishedScreening.Count == 0)
+        {
+            return [];
+        }
+
+        var dataSetIds = dataSetsFinishedScreening.Select(upload => upload.Id).ToList();
+
+        // Get the full report on their completion statuses.
+        var completionReports = await dataSetScreenerClient.GetScreenerCompletionReports(
+            dataSetIds: dataSetIds,
+            cancellationToken: cancellationToken
+        );
+
+        // For every completion report in the response, attach it to the appropriate upload, and update its status
+        // to be a post-screening status. This way, successful ones will no longer be polled for progress updates,
+        // and stalled ones will eventually be cleaned up by MarkDataSetsWithoutProgressAsFailed() if we cannot get
+        // a completion report successfully for them within a time limit.
+        var dataSetsToComplete = dataSetsFinishedScreening
+            .Where(upload => completionReports.Any(report => report.DataSetId == upload.Id))
+            .ToList();
+
+        dataSetsToComplete.ForEach(uploadToComplete =>
+        {
+            var report = completionReports.Single(u => u.DataSetId == uploadToComplete.Id);
+
+            uploadToComplete.ScreenerResult = report.CompletionReport;
+            uploadToComplete.Status = report.CompletionReport.Passed
+                ? DataSetUploadStatus.PENDING_REVIEW
+                : DataSetUploadStatus.FAILED_SCREENING;
+            contentDbContext.DataSetUploads.Update(uploadToComplete);
+        });
+
+        await contentDbContext.SaveChangesAsync(cancellationToken: cancellationToken);
+
+        if (completionReports.Count > 0)
+        {
+            // For all uploads that were successfully marked as having completed screening, call the Screener API to clean
+            // up its progress and completion report files.
+            var dataSetIdsWithSuccessfulCompletionReports = completionReports
+                .Select(report => report.DataSetId)
+                .ToList();
+
+            await dataSetScreenerClient.DeleteScreenerProgressAndCompletionFiles(
+                dataSetIds: dataSetIdsWithSuccessfulCompletionReports,
+                cancellationToken: cancellationToken
+            );
+        }
+
+        return [.. dataSetsToComplete.Select(mapper.Map<DataSetUploadViewModel>)];
+    }
+
     private bool ScreenerProgressHasChanged(
         DataSetScreenerProgress? currentScreenerProgress,
-        DataSetScreenerProgressResponse progressUpdate
+        DataSetScreenerProgressReport progressReport
     )
     {
         if (currentScreenerProgress == null)
@@ -200,9 +282,9 @@ public class DataSetScreenerService(
             return true;
         }
 
-        return Math.Abs(currentScreenerProgress.PercentageComplete - progressUpdate.PercentageComplete) > 0.001
-            || currentScreenerProgress.Stage != progressUpdate.Stage
-            || currentScreenerProgress.Passed != progressUpdate.Passed
-            || currentScreenerProgress.Completed != progressUpdate.Completed;
+        return Math.Abs(currentScreenerProgress.PercentageComplete - progressReport.PercentageComplete) > 0.001
+            || currentScreenerProgress.Stage != progressReport.Stage
+            || currentScreenerProgress.Passed != progressReport.Passed
+            || currentScreenerProgress.Completed != progressReport.Completed;
     }
 }
