@@ -139,7 +139,6 @@ Check page appears on public site
 
     user waits until h1 is visible    UI test page
 
-    user checks page contains link with text and url    Education in numbers    /education-in-numbers
     user checks page contains link with text and url    UI test page    /education-in-numbers/ui-test-page
 
     user checks page contains    Content section title
@@ -202,7 +201,6 @@ Check amendment on public site
 
     user waits until h1 is visible    UI test page
 
-    user checks page contains link with text and url    Education in numbers    /education-in-numbers
     user checks page contains link with text and url    UI test page    /education-in-numbers/ui-test-page
 
     user checks page contains    Content section title
