@@ -31,7 +31,7 @@ public class MethodologyCacheServiceTests
                 },
             ],
         },
-        new AllMethodologiesThemeViewModel
+        new()
         {
             Title = "Theme 2",
             Publications =
@@ -96,41 +96,6 @@ public class MethodologyCacheServiceTests
     }
 
     [Fact]
-    public async Task GetSummariesByPublication_NoCachedTreeExists()
-    {
-        var publicationId = _methodologyTree[1].Publications[0].Id;
-
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
-            .ReturnsAsync((object?)null);
-
-        var methodologyService = new Mock<IMethodologyService>(Strict);
-
-        methodologyService
-            .Setup(s => s.GetSummariesTree())
-            .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(_methodologyTree));
-
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(new AllMethodologiesCacheKey(), _methodologyTree))
-            .Returns(Task.CompletedTask);
-
-        var service = SetupService(
-            methodologyService: methodologyService.Object,
-            publicBlobCacheService: publicBlobCacheService.Object
-        );
-
-        var result = await service.GetSummariesByPublication(publicationId);
-
-        VerifyAllMocks(methodologyService, publicBlobCacheService);
-
-        var expectedMethodologiesByPublication = _methodologyTree[1].Publications[0].Methodologies;
-
-        result.AssertRight(expectedMethodologiesByPublication);
-    }
-
-    [Fact]
     public async Task UpdateSummariesTree()
     {
         var methodologyService = new Mock<IMethodologyService>(Strict);
@@ -157,49 +122,6 @@ public class MethodologyCacheServiceTests
         VerifyAllMocks(methodologyService, publicBlobCacheService);
 
         result.AssertRight(_methodologyTree);
-    }
-
-    [Fact]
-    public async Task GetSummariesByPublication_CachedTreeExists()
-    {
-        var publicationId = _methodologyTree[1].Publications[0].Id;
-
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
-            .ReturnsAsync(_methodologyTree);
-
-        var service = SetupService(publicBlobCacheService: publicBlobCacheService.Object);
-
-        var result = await service.GetSummariesByPublication(publicationId);
-
-        VerifyAllMocks(publicBlobCacheService);
-
-        var expectedMethodologiesByPublication = _methodologyTree[1].Publications[0].Methodologies;
-
-        result.AssertRight(expectedMethodologiesByPublication);
-    }
-
-    [Fact]
-    public async Task GetSummariesByPublication_PublicationNotFound()
-    {
-        var publicationId = Guid.NewGuid();
-
-        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
-            .ReturnsAsync(_methodologyTree);
-
-        var service = SetupService(publicBlobCacheService: publicBlobCacheService.Object);
-
-        var result = await service.GetSummariesByPublication(publicationId);
-
-        VerifyAllMocks(publicBlobCacheService);
-
-        var viewModels = result.AssertRight();
-        Assert.Empty(viewModels);
     }
 
     [Fact]
