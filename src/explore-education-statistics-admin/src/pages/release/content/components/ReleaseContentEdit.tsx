@@ -217,75 +217,64 @@ const ReleaseContentEdit = ({
           </div>
 
           <div id="releaseSummary" data-testid="release-summary">
-            <WarningMessage testId="release-summary-deprecated-warning">
-              <p className="govuk-!-font-weight-bold">
-                Warning: As part of the redesign of the EES release pages, the
-                summary text block functionality will be removed.
-              </p>
-              <p>
-                Existing pages released with a summary text block will retain
-                the information as legacy support, but new releases will cease
-                to offer this as an option.
-              </p>
-              <p>
-                We recommend any draft publications avoid using the summary text
-                block and instead add any summary content in a standard text
-                block below headlines and key stats.
-              </p>
-              <p>
-                Note that important warnings and messages will be accommodated
-                via a dedicated warnings text block in future. As always, we
-                welcome feedback on this change via the feedback form linked
-                above.
-              </p>
-            </WarningMessage>
-            {release.summarySection && (
-              <>
-                <EditableSectionBlocks
-                  blocks={release.summarySection.content}
-                  renderBlock={block => (
-                    <ReleaseBlock
-                      block={block}
-                      releaseVersionId={release.id}
-                      transformFeaturedTableLinks={transformFeaturedTableLinks}
-                    />
+            {release.summarySection &&
+              release.summarySection.content?.length > 0 && (
+                <>
+                  <WarningMessage testId="release-summary-deprecated-warning">
+                    <p className="govuk-!-font-weight-bold">
+                      Warning: Summary text blocks are now only retained for
+                      legacy purposes in existing releases and are no longer
+                      offered on new statistics releases.
+                    </p>
+                  </WarningMessage>
+                  <EditableSectionBlocks
+                    blocks={release.summarySection.content}
+                    renderBlock={block => (
+                      <ReleaseBlock
+                        block={block}
+                        releaseVersionId={release.id}
+                        transformFeaturedTableLinks={
+                          transformFeaturedTableLinks
+                        }
+                      />
+                    )}
+                    renderEditableBlock={block => (
+                      <ReleaseEditableBlock
+                        allowComments
+                        block={block}
+                        editButtonLabel={
+                          <>
+                            Edit<VisuallyHidden> summary</VisuallyHidden> block
+                          </>
+                        }
+                        publicationId={release.publication.id}
+                        releaseVersionId={release.id}
+                        removeButtonLabel={
+                          <>
+                            Remove<VisuallyHidden> summary</VisuallyHidden>{' '}
+                            block
+                          </>
+                        }
+                        sectionId={release.summarySection.id}
+                        sectionKey="summarySection"
+                        label="Summary block"
+                        onAfterDeleteBlock={onAfterDeleteSummaryBlock}
+                      />
+                    )}
+                  />
+                  {release.summarySection.content?.length === 0 && (
+                    <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
+                      <Button
+                        variant="secondary"
+                        onClick={addSummaryBlock}
+                        ref={addSummaryBlockButton}
+                      >
+                        Add a summary text block
+                      </Button>
+                    </div>
                   )}
-                  renderEditableBlock={block => (
-                    <ReleaseEditableBlock
-                      allowComments
-                      block={block}
-                      editButtonLabel={
-                        <>
-                          Edit<VisuallyHidden> summary</VisuallyHidden> block
-                        </>
-                      }
-                      publicationId={release.publication.id}
-                      releaseVersionId={release.id}
-                      removeButtonLabel={
-                        <>
-                          Remove<VisuallyHidden> summary</VisuallyHidden> block
-                        </>
-                      }
-                      sectionId={release.summarySection.id}
-                      sectionKey="summarySection"
-                      label="Summary block"
-                      onAfterDeleteBlock={onAfterDeleteSummaryBlock}
-                    />
-                  )}
-                />
-                {release.summarySection.content?.length === 0 && (
-                  <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-                    <Button
-                      variant="secondary"
-                      onClick={addSummaryBlock}
-                      ref={addSummaryBlockButton}
-                    >
-                      Add a summary text block
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
+                </>
+              )}
           </div>
         </div>
 

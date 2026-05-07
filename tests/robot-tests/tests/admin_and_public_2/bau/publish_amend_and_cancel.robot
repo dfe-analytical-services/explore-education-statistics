@@ -91,7 +91,7 @@ Create chart for data block
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
 
     user waits until page finishes loading
     user waits until page finishes loading
@@ -328,7 +328,7 @@ Save data block for amendment
 Navigate to 'Content' page for amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block
+    user waits until page contains button    Add a warning text block
 
 Verify amended Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
