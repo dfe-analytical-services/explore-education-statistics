@@ -132,6 +132,13 @@ const defaultRelatedInformation: BasicLink[] = [
   },
 ];
 
+const defaultRelatedDashoardsSection: ContentSection<EditableContentBlock> = {
+  id: 'related-dashboards-section-id',
+  content: [],
+  heading: 'Related dashboards heading',
+  order: 0,
+};
+
 const defaultSummarySection: ContentSection<EditableContentBlock> = {
   id: 'summary-section-id',
   content: [
@@ -184,7 +191,7 @@ export function generateEditableRelease({
   published,
   publishedDisplayDate,
   publishScheduled,
-  relatedDashboardsSection,
+  relatedDashboardsSection = defaultRelatedDashoardsSection,
   relatedInformation = defaultRelatedInformation,
   title = 'Release title',
   slug,
