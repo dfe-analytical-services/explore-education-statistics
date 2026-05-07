@@ -48,6 +48,9 @@ param screenerDockerImageTag string
 @description('Whether or not to include Data Dictionary checks in the Screener.')
 param includeDataDictionaryChecks bool = false
 
+@description('Whether or not to log screening results in the Screener API logs.')
+param logScreeningResults = false
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
 
@@ -115,6 +118,10 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
       {
         name: 'DD_CHECKS'
         value: includeDataDictionaryChecks ? 'TRUE' : 'FALSE'
+      }
+      {
+        name: 'LOG_SCREENING_RESULTS'
+        value: logScreeningResults ? 'TRUE' : 'FALSE'
       }
       {
         name: 'AzureWebJobs_StartScreening__queueServiceUri'

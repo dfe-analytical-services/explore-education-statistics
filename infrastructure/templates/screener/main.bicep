@@ -34,6 +34,9 @@ param devopsServicePrincipalId string = ''
 @description('Whether or not to include Data Dictionary checks in the Screener.')
 param includeDataDictionaryChecks bool = false
 
+@description('Whether or not to log screening results in the Screener API logs.')
+param logScreeningResults = false
+
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
@@ -94,6 +97,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
     includeDataDictionaryChecks: includeDataDictionaryChecks
+    logScreeningResults: logScreeningResults
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists
