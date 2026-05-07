@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
@@ -75,24 +76,28 @@ public class PreReleaseUserServicePermissionTests
     [Fact]
     public async Task GetPreReleaseUsersInvitePlan()
     {
+        var request = new PreReleaseUserInviteRequest { Emails = ["test@test.com"] };
+
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
             .AssertForbidden(userService =>
             {
                 var service = SetupService(userService: userService.Object);
-                return service.GetPreReleaseUsersInvitePlan(_releaseVersion.Id, ListOf("test@test.com"));
+                return service.GetPreReleaseUsersInvitePlan(_releaseVersion.Id, request);
             });
     }
 
     [Fact]
     public async Task GrantPreReleaseAccessForMultipleUsers()
     {
+        var request = new PreReleaseUserInviteRequest { Emails = ["test@test.com"] };
+
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
             .AssertForbidden(userService =>
             {
                 var service = SetupService(userService: userService.Object);
-                return service.GrantPreReleaseAccessForMultipleUsers(_releaseVersion.Id, ListOf("test@test.com"));
+                return service.GrantPreReleaseAccessForMultipleUsers(_releaseVersion.Id, request);
             });
     }
 
@@ -151,6 +156,8 @@ public class PreReleaseUserServicePermissionTests
             .WithReleaseVersion(_releaseVersion)
             .WithUser(user);
 
+        var request = new PreReleaseUserRemoveRequest { Email = user.Email };
+
         var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
         userRepository
             .Setup(mock => mock.FindUserByEmail(user.Email, It.IsAny<CancellationToken>()))
@@ -169,7 +176,7 @@ public class PreReleaseUserServicePermissionTests
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
-                var result = service.RemovePreReleaseRoleByCompositeKey(_releaseVersion.Id, user.Email);
+                var result = service.RemovePreReleaseRoleByCompositeKey(_releaseVersion.Id, request);
 
                 MockUtils.VerifyAllMocks(userService, userRepository, userPreReleaseRoleRepository);
 

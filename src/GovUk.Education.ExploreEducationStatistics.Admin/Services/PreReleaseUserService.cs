@@ -1,10 +1,9 @@
 #nullable enable
-using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -96,20 +95,19 @@ public class PreReleaseUserService(
 
     public async Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
         Guid releaseVersionId,
-        List<string> emails
+        PreReleaseUserInviteRequest request
     )
     {
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
-            .OnSuccess(_ => EmailValidator.ValidateEmailAddresses(emails))
-            .OnSuccess<ActionResult, List<string>, PreReleaseUserInvitePlan>(async validEmails =>
+            .OnSuccessDo(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
+            .OnSuccess<ActionResult, ReleaseVersion, PreReleaseUserInvitePlan>(async _ =>
             {
                 var invitable = new List<string>();
                 var alreadyAccepted = new List<string>();
                 var alreadyInvited = new List<string>();
 
-                foreach (var email in validEmails)
+                foreach (var email in request.Emails)
                 {
                     var existingUser = await userRepository.FindUserByEmail(email);
 
@@ -196,13 +194,13 @@ public class PreReleaseUserService(
 
     public async Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GrantPreReleaseAccessForMultipleUsers(
         Guid releaseVersionId,
-        List<string> emails
+        PreReleaseUserInviteRequest request
     )
     {
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
-            .OnSuccessCombineWith(_ => GetPreReleaseUsersInvitePlan(releaseVersionId, emails))
+            .OnSuccessCombineWith(_ => GetPreReleaseUsersInvitePlan(releaseVersionId, request))
             .OnSuccess(async releaseVersionAndPlan =>
             {
                 var (releaseVersion, plan) = releaseVersionAndPlan;
@@ -232,15 +230,10 @@ public class PreReleaseUserService(
 
     public async Task<Either<ActionResult, Unit>> RemovePreReleaseRoleByCompositeKey(
         Guid releaseVersionId,
-        string email
+        PreReleaseUserRemoveRequest request
     )
     {
-        if (!new EmailAddressAttribute().IsValid(email))
-        {
-            return ValidationActionResult(InvalidEmailAddress);
-        }
-
-        return await CheckUserPreReleaseRoleExists(email: email, releaseVersionId: releaseVersionId)
+        return await CheckUserPreReleaseRoleExists(email: request.Email, releaseVersionId: releaseVersionId)
             .OnSuccess(RemovePreReleaseRole);
     }
 

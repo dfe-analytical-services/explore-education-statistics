@@ -143,14 +143,14 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
                 {
                     Id = -16,
                     RoleId = preReleaseRoleId,
-                    ClaimType = SecurityClaimTypes.PreReleasePagesAccessGranted.ToString(),
+                    ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>
                 {
                     Id = -17,
                     RoleId = analystRoleId,
-                    ClaimType = SecurityClaimTypes.PreReleasePagesAccessGranted.ToString(),
+                    ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>
@@ -164,21 +164,21 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
                 {
                     Id = -19,
                     RoleId = bauRoleId,
-                    ClaimType = SecurityClaimTypes.PreReleasePagesAccessGranted.ToString(),
+                    ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>
                 {
                     Id = -20,
                     RoleId = bauRoleId,
-                    ClaimType = SecurityClaimTypes.CanViewPreReleaseContacts.ToString(),
+                    ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>
                 {
                     Id = -21,
                     RoleId = analystRoleId,
-                    ClaimType = SecurityClaimTypes.CanViewPreReleaseContacts.ToString(),
+                    ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>

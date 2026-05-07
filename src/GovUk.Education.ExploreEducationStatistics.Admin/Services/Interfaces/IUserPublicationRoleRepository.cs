@@ -17,7 +17,7 @@ public interface IUserPublicationRoleRepository
     );
 
     Task<List<UserPublicationRole>> CreateManyIfNotExists(
-        IEnumerable<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
+        HashSet<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
         CancellationToken cancellationToken = default
     );
 

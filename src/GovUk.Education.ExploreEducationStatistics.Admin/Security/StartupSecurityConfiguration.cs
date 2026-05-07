@@ -55,7 +55,7 @@ public static class StartupSecurityConfiguration
 
             options.AddPolicy(
                 nameof(SecurityPolicies.CanAccessPreReleasePages),
-                policy => policy.RequireClaim(nameof(SecurityClaimTypes.PreReleasePagesAccessGranted))
+                policy => policy.RequireClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
             );
 
             options.AddPolicy(

@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -107,38 +108,13 @@ public abstract class PreReleaseUserServiceTests
     public class GetPreReleaseUsersInvitePlanTests : PreReleaseUserServiceTests
     {
         [Fact]
-        public async Task InvalidEmail_ReturnsBadRequest()
-        {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var service = SetupService(context);
-                var result = await service.GetPreReleaseUsersInvitePlan(
-                    releaseVersion.Id,
-                    ListOf("test1@test.com", "not an email", "test2@test.com")
-                );
-
-                result.AssertBadRequest(InvalidEmailAddress);
-            }
-        }
-
-        [Fact]
         public async Task NoRelease_ReturnsNotFound()
         {
+            var request = new PreReleaseUserInviteRequest { Emails = ListOf("test@test.com") };
+
             await using var context = InMemoryApplicationDbContext();
             var service = SetupService(context);
-            var result = await service.GetPreReleaseUsersInvitePlan(Guid.NewGuid(), ListOf("test@test.com"));
+            var result = await service.GetPreReleaseUsersInvitePlan(Guid.NewGuid(), request);
 
             result.AssertNotFound();
         }
@@ -152,6 +128,8 @@ public abstract class PreReleaseUserServiceTests
 
             User activeUser = _dataFixture.DefaultUser();
             User userWithPendingInvite = _dataFixture.DefaultUserWithPendingInvite();
+
+            var request = new PreReleaseUserInviteRequest { Emails = [activeUser.Email, userWithPendingInvite.Email] };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -199,10 +177,7 @@ public abstract class PreReleaseUserServiceTests
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
-                var result = await service.GetPreReleaseUsersInvitePlan(
-                    releaseVersion.Id,
-                    [activeUser.Email, userWithPendingInvite.Email]
-                );
+                var result = await service.GetPreReleaseUsersInvitePlan(releaseVersion.Id, request);
 
                 result.AssertBadRequest(NoInvitableEmails);
             }
@@ -238,6 +213,8 @@ public abstract class PreReleaseUserServiceTests
             var allEmails = ListOf("new.user.1@test.com", "new.user.2@test.com")
                 .Concat(allExistingUsersByEmail.Keys)
                 .ToList();
+
+            var request = new PreReleaseUserInviteRequest { Emails = allEmails };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -318,7 +295,7 @@ public abstract class PreReleaseUserServiceTests
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
-                var result = await service.GetPreReleaseUsersInvitePlan(releaseVersion.Id, allEmails);
+                var result = await service.GetPreReleaseUsersInvitePlan(releaseVersion.Id, request);
 
                 var plan = result.AssertRight();
 
@@ -346,38 +323,13 @@ public abstract class PreReleaseUserServiceTests
     public class GrantPreReleaseAccessForMultipleUsersTests : PreReleaseUserServiceTests
     {
         [Fact]
-        public async Task InvalidEmail_ReturnsBadRequest()
-        {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var service = SetupService(context);
-                var result = await service.GrantPreReleaseAccessForMultipleUsers(
-                    releaseVersion.Id,
-                    ["test1@test.com", "not an email", "test2@test.com"]
-                );
-
-                result.AssertBadRequest(InvalidEmailAddress);
-            }
-        }
-
-        [Fact]
         public async Task NoRelease_ReturnsNotFound()
         {
+            var request = new PreReleaseUserInviteRequest { Emails = ["test@test.com"] };
+
             await using var context = InMemoryApplicationDbContext();
             var service = SetupService(context);
-            var result = await service.GrantPreReleaseAccessForMultipleUsers(Guid.NewGuid(), ["test@test.com"]);
+            var result = await service.GrantPreReleaseAccessForMultipleUsers(Guid.NewGuid(), request);
 
             result.AssertNotFound();
         }
@@ -391,6 +343,8 @@ public abstract class PreReleaseUserServiceTests
 
             User activeUser = _dataFixture.DefaultUser();
             User userWithPendingInvite = _dataFixture.DefaultUserWithPendingInvite();
+
+            var request = new PreReleaseUserInviteRequest { Emails = [activeUser.Email, userWithPendingInvite.Email] };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -437,10 +391,7 @@ public abstract class PreReleaseUserServiceTests
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
-                var result = await service.GrantPreReleaseAccessForMultipleUsers(
-                    releaseVersion.Id,
-                    [activeUser.Email, userWithPendingInvite.Email]
-                );
+                var result = await service.GrantPreReleaseAccessForMultipleUsers(releaseVersion.Id, request);
 
                 result.AssertBadRequest(NoInvitableEmails);
             }
@@ -501,6 +452,8 @@ public abstract class PreReleaseUserServiceTests
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             var allEmails = existingUsersByEmail.Values.Select(u => u.Email).Concat(newUserIdsByEmail.Keys).ToList();
+
+            var request = new PreReleaseUserInviteRequest { Emails = allEmails };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -659,7 +612,7 @@ public abstract class PreReleaseUserServiceTests
                     userRepository: userRepository.Object
                 );
 
-                var result = await service.GrantPreReleaseAccessForMultipleUsers(releaseVersion.Id, allEmails);
+                var result = await service.GrantPreReleaseAccessForMultipleUsers(releaseVersion.Id, request);
 
                 var preReleaseUsers = result.AssertRight();
 
@@ -739,6 +692,8 @@ public abstract class PreReleaseUserServiceTests
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             var allEmails = existingUsersByEmail.Values.Select(u => u.Email).Concat(newUserIdsByEmail.Keys).ToList();
+
+            var request = new PreReleaseUserInviteRequest { Emails = allEmails };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -872,7 +827,7 @@ public abstract class PreReleaseUserServiceTests
                     userRepository: userRepository.Object
                 );
 
-                var result = await service.GrantPreReleaseAccessForMultipleUsers(releaseVersion.Id, allEmails);
+                var result = await service.GrantPreReleaseAccessForMultipleUsers(releaseVersion.Id, request);
 
                 var preReleaseUsers = result.AssertRight();
 
@@ -1244,6 +1199,8 @@ public abstract class PreReleaseUserServiceTests
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
 
+            var request = new PreReleaseUserRemoveRequest { Email = userPreReleaseRole.User.Email };
+
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository
                 .Setup(m => m.FindUserByEmail(userPreReleaseRole.User.Email, It.IsAny<CancellationToken>()))
@@ -1260,10 +1217,7 @@ public abstract class PreReleaseUserServiceTests
                 userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
-            var result = await service.RemovePreReleaseRoleByCompositeKey(
-                userPreReleaseRole.ReleaseVersionId,
-                userPreReleaseRole.User.Email
-            );
+            var result = await service.RemovePreReleaseRoleByCompositeKey(userPreReleaseRole.ReleaseVersionId, request);
 
             result.AssertRight();
 
@@ -1274,6 +1228,8 @@ public abstract class PreReleaseUserServiceTests
         public async Task RoleDoesNotExist_ReturnsNotFound()
         {
             User user = _dataFixture.DefaultUser();
+
+            var request = new PreReleaseUserRemoveRequest { Email = user.Email };
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository.Setup(m => m.FindUserByEmail(user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
@@ -1286,7 +1242,7 @@ public abstract class PreReleaseUserServiceTests
                 userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
-            var result = await service.RemovePreReleaseRoleByCompositeKey(Guid.NewGuid(), user.Email);
+            var result = await service.RemovePreReleaseRoleByCompositeKey(Guid.NewGuid(), request);
 
             result.AssertNotFound();
 
@@ -1300,6 +1256,8 @@ public abstract class PreReleaseUserServiceTests
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
+
+            var request = new PreReleaseUserRemoveRequest { Email = userPreReleaseRole.User.Email };
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             userRepository
@@ -1318,22 +1276,10 @@ public abstract class PreReleaseUserServiceTests
             );
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await service.RemovePreReleaseRoleByCompositeKey(
-                    userPreReleaseRole.ReleaseVersionId,
-                    userPreReleaseRole.User.Email
-                )
+                await service.RemovePreReleaseRoleByCompositeKey(userPreReleaseRole.ReleaseVersionId, request)
             );
 
             MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
-        }
-
-        [Fact]
-        public async Task InvalidEmail_ReturnsBadRequest()
-        {
-            var service = SetupService();
-            var result = await service.RemovePreReleaseRoleByCompositeKey(Guid.NewGuid(), "not an email");
-
-            result.AssertBadRequest(InvalidEmailAddress);
         }
     }
 
