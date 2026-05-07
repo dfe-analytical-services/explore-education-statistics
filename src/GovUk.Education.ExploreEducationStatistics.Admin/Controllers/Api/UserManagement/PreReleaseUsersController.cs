@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -11,11 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserManagement;
 
 [ApiController]
-[Route("api/pre-release")]
+[Route("api")]
 [Authorize]
 public class PreReleaseUsersController(IPreReleaseUserService preReleaseUserService) : ControllerBase
 {
-    [HttpGet("users")]
+    [HttpGet("pre-release/users")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     [Authorize(Roles = nameof(SecurityPolicies.CanManageUsersOnSystem))]
@@ -24,53 +24,51 @@ public class PreReleaseUsersController(IPreReleaseUserService preReleaseUserServ
         return await preReleaseUserService.GetAllPreReleaseUsers();
     }
 
-    [HttpDelete("roles/{id:guid}")]
+    [HttpDelete("pre-release/roles/{id:guid}")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> RemovePreReleaseRoleById(Guid id)
     {
         return await preReleaseUserService.RemovePreReleaseRole(id).HandleFailuresOrOk();
     }
 
-    [HttpGet("release-versions/{releaseVersionId:guid}/users")]
+    [HttpGet("pre-release/release-versions/{releaseVersionId:guid}/users")]
     public async Task<ActionResult<List<PreReleaseUserSummaryViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
     {
         return await preReleaseUserService.GetPreReleaseUsers(releaseVersionId).HandleFailuresOrOk();
     }
 
-    [HttpPost("release-versions/{releaseVersionId:guid}/users/invite-plan")]
+    [HttpPost("pre-release/release-versions/{releaseVersionId:guid}/users/invite-plan")]
     public async Task<ActionResult<PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
         Guid releaseVersionId,
         [FromBody] PreReleaseUserInviteRequest request
     )
     {
-        return await preReleaseUserService
-            .GetPreReleaseUsersInvitePlan(releaseVersionId, request.Emails)
-            .HandleFailuresOrOk();
+        return await preReleaseUserService.GetPreReleaseUsersInvitePlan(releaseVersionId, request).HandleFailuresOrOk();
     }
 
-    [HttpPost("release-versions/{releaseVersionId:guid}/users")]
+    [HttpPost("pre-release/release-versions/{releaseVersionId:guid}/users")]
     public async Task<ActionResult<List<PreReleaseUserSummaryViewModel>>> GrantPreReleaseAccess(
         Guid releaseVersionId,
         [FromBody] PreReleaseUserInviteRequest request
     )
     {
         return await preReleaseUserService
-            .GrantPreReleaseAccessForMultipleUsers(releaseVersionId, request.Emails)
+            .GrantPreReleaseAccessForMultipleUsers(releaseVersionId, request)
             .HandleFailuresOrOk();
     }
 
-    [HttpDelete("release-versions/{releaseVersionId:guid}/users/by-email")]
+    [HttpDelete("pre-release/release-versions/{releaseVersionId:guid}/users/by-email")]
     public async Task<ActionResult> RemovePreReleaseRoleByEmail(
         Guid releaseVersionId,
         [FromBody] PreReleaseUserRemoveRequest request
     )
     {
         return await preReleaseUserService
-            .RemovePreReleaseRoleByCompositeKey(releaseVersionId, request.Email)
+            .RemovePreReleaseRoleByCompositeKey(releaseVersionId, request)
             .HandleFailuresOrNoContent();
     }
 
-    [HttpPost("releases/{releaseId:guid}/users/{userId:guid}")]
+    [HttpPost("pre-release/releases/{releaseId:guid}/users/{userId:guid}")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> GrantPreReleaseAccess(Guid releaseId, Guid userId)
     {

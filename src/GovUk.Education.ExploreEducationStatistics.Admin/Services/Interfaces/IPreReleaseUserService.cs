@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -13,19 +14,22 @@ public interface IPreReleaseUserService
 
     Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
         Guid releaseVersionId,
-        List<string> emails
+        PreReleaseUserInviteRequest emails
     );
 
     Task<Either<ActionResult, List<UserPreReleaseRoleViewModel>>> GetPreReleaseRolesForUser(Guid userId);
 
     Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GrantPreReleaseAccessForMultipleUsers(
         Guid releaseVersionId,
-        List<string> emails
+        PreReleaseUserInviteRequest request
     );
 
     Task<Either<ActionResult, Unit>> GrantPreReleaseAccess(Guid userId, Guid releaseId);
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseRoleByCompositeKey(Guid releaseVersionId, string email);
+    Task<Either<ActionResult, Unit>> RemovePreReleaseRoleByCompositeKey(
+        Guid releaseVersionId,
+        PreReleaseUserRemoveRequest request
+    );
 
     Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPreReleaseRoleId);
 }
