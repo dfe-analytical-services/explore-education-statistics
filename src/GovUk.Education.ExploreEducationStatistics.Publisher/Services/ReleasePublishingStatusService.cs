@@ -110,9 +110,6 @@ public class ReleasePublishingStatusService(
 
         // Match the internal stages with the values we expect for a release after tasks have been performed by
         // the StageScheduledReleases function.
-        var contentStageFilter = CreateQueryFilter(status =>
-            status.ContentStage == nameof(ReleasePublishingStatusContentStage.Scheduled)
-        );
         var filesStageFilter = CreateQueryFilter(status =>
             status.FilesStage == nameof(ReleasePublishingStatusFilesStage.Complete)
         );
@@ -120,7 +117,7 @@ public class ReleasePublishingStatusService(
             status.PublishingStage == nameof(ReleasePublishingStatusPublishingStage.Scheduled)
         );
 
-        var filter = string.Join(" and ", overallStageFilter, contentStageFilter, filesStageFilter, publishingFilter);
+        var filter = string.Join(" and ", overallStageFilter, filesStageFilter, publishingFilter);
 
         var result = await QueryEntitiesAsTableRowKeys(filter);
 
@@ -176,23 +173,6 @@ public class ReleasePublishingStatusService(
             row =>
             {
                 row.State = state;
-                return row;
-            }
-        );
-    }
-
-    public async Task UpdateContentStage(
-        ReleasePublishingKey releasePublishingKey,
-        ReleasePublishingStatusContentStage stage,
-        ReleasePublishingStatusLogMessage? logMessage = null
-    )
-    {
-        await UpdateWithRetries(
-            releasePublishingKey,
-            row =>
-            {
-                row.State.Content = stage;
-                row.AppendLogMessage(logMessage);
                 return row;
             }
         );

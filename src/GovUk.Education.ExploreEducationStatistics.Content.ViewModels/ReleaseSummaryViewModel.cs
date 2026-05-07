@@ -7,6 +7,10 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
+/// <summary>
+/// Used as the return type for the Content API's <c>ReleaseController.ListReleases</c> endpoint,
+/// and as the type of the <see cref="ReleaseFileViewModel.Release"/> property.
+/// </summary>
 public record ReleaseSummaryViewModel
 {
     /// <summary>
@@ -39,22 +43,6 @@ public record ReleaseSummaryViewModel
     // ReSharper disable once UnusedMember.Global
     // Used by JSON serialisation.
     public ReleaseSummaryViewModel() { }
-
-    [SetsRequiredMembers]
-    public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
-    {
-        Id = release.Id;
-        ReleaseId = release.ReleaseId;
-        Title = release.Title;
-        Slug = release.Slug;
-        YearTitle = release.YearTitle;
-        CoverageTitle = release.CoverageTitle;
-        Published = release.Published;
-        NextReleaseDate = release.NextReleaseDate;
-        Type = release.Type;
-        LatestRelease = Id == publication.LatestReleaseId;
-        Publication = new PublicationSummaryViewModel(publication);
-    }
 
     [SetsRequiredMembers]
     public ReleaseSummaryViewModel(ReleaseVersion releaseVersion, bool latestPublishedRelease)

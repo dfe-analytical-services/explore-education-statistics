@@ -17,7 +17,9 @@ public class MapperUtils
     public static IMapper ContentMapper(ContentDbContext? contentDbContext = null)
     {
         var services = new ServiceCollection();
-        services.AddTransient(_ => new DataBlockViewModelPostMappingAction(contentDbContext));
+
+        // Note, the Content.Services AutoMapper profile currently has no AfterMap MappingAction classes
+        // that depend on a DbContext or any other services requiring Dependency Injection.
 
         services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfiles>(), Array.Empty<Assembly>());
 

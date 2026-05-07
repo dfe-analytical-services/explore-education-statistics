@@ -149,10 +149,11 @@ public class BauCacheController : ControllerBase
     /// Useful for when the PublicationCacheViewModel has been changed to invalidate all publication JSON files.
     /// </summary>
     /// <returns></returns>
+    // TODO EES-7089 Once EES-7022 has been deployed, run this endpoint one final time to clear all cached files, then remove it.
     [HttpDelete("public-cache/publications/publication-json")]
     public async Task<ActionResult> ClearPublicCachePublicationJson()
     {
-        var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(".", "\\.");
+        var publicationJsonFilenameRegex = "publication.json".Replace(".", "\\.");
 
         await _publicBlobStorageService.DeleteBlobs(
             BlobContainers.PublicContent,
@@ -174,10 +175,11 @@ public class BauCacheController : ControllerBase
     /// will target both the latest-release.json and individual [release-year-and-time-identifier].json files in
     /// the same call.
     /// </summary>
+    // TODO EES-7089 Once EES-7022 has been deployed, run this endpoint one final time to clear all cached files, then remove it.
     [HttpDelete("public-cache/publications/release-json")]
     public async Task<ActionResult> ClearPublicCacheReleaseJson()
     {
-        var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(".", "\\.");
+        var latestReleaseJsonFilenameRegex = "latest-release.json".Replace(".", "\\.");
 
         await _publicBlobStorageService.DeleteBlobs(
             BlobContainers.PublicContent,

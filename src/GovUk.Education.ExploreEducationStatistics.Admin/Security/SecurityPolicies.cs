@@ -41,7 +41,6 @@ public enum SecurityPolicies
     CanSubmitSpecificReleaseToHigherReview,
     CanApproveSpecificRelease,
     CanMakeAmendmentOfSpecificReleaseVersion,
-    CanPublishSpecificRelease,
     CanDeleteSpecificReleaseVersion,
     CanDeleteTestRelease,
     CanViewSpecificPreReleaseSummary,

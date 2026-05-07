@@ -3,48 +3,22 @@ using System.Runtime.CompilerServices;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
-public class ReleasePublishingStatusState : INotifyPropertyChanged
+public class ReleasePublishingStatusState(
+    ReleasePublishingStatusFilesStage files,
+    ReleasePublishingStatusPublishingStage publishing,
+    ReleasePublishingStatusOverallStage overall
+) : INotifyPropertyChanged
 {
-    private ReleasePublishingStatusContentStage _content;
-    private ReleasePublishingStatusFilesStage _files;
-    private ReleasePublishingStatusPublishingStage _publishing;
-    private ReleasePublishingStatusOverallStage _overall;
+    private ReleasePublishingStatusFilesStage _files = files;
+    private ReleasePublishingStatusPublishingStage _publishing = publishing;
+    private ReleasePublishingStatusOverallStage _overall = overall;
 
-    public ReleasePublishingStatusState(
-        ReleasePublishingStatusContentStage content,
-        ReleasePublishingStatusFilesStage files,
-        ReleasePublishingStatusPublishingStage publishing,
-        ReleasePublishingStatusOverallStage overall
-    )
-    {
-        _content = content;
-        _files = files;
-        _publishing = publishing;
-        _overall = overall;
-    }
-
-    public ReleasePublishingStatusState(string content, string files, string publishing, string overall)
+    public ReleasePublishingStatusState(string files, string publishing, string overall)
         : this(
-            Enum.Parse<ReleasePublishingStatusContentStage>(content),
             Enum.Parse<ReleasePublishingStatusFilesStage>(files),
             Enum.Parse<ReleasePublishingStatusPublishingStage>(publishing),
             Enum.Parse<ReleasePublishingStatusOverallStage>(overall)
         ) { }
-
-    public ReleasePublishingStatusContentStage Content
-    {
-        get => _content;
-        set
-        {
-            if (value == _content)
-            {
-                return;
-            }
-
-            _content = value;
-            NotifyPropertyChanged();
-        }
-    }
 
     public ReleasePublishingStatusFilesStage Files
     {
@@ -94,8 +68,7 @@ public class ReleasePublishingStatusState : INotifyPropertyChanged
     private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
         if (
-            Content == ReleasePublishingStatusContentStage.Complete
-            && Files == ReleasePublishingStatusFilesStage.Complete
+            Files == ReleasePublishingStatusFilesStage.Complete
             && Publishing == ReleasePublishingStatusPublishingStage.Complete
         )
         {
@@ -103,15 +76,11 @@ public class ReleasePublishingStatusState : INotifyPropertyChanged
         }
 
         if (
-            Content == ReleasePublishingStatusContentStage.Failed
-            || Files == ReleasePublishingStatusFilesStage.Failed
+            Files == ReleasePublishingStatusFilesStage.Failed
             || Publishing == ReleasePublishingStatusPublishingStage.Failed
         )
         {
-            if (
-                Content == ReleasePublishingStatusContentStage.Failed
-                || Files == ReleasePublishingStatusFilesStage.Failed
-            )
+            if (Files == ReleasePublishingStatusFilesStage.Failed)
             {
                 Publishing = ReleasePublishingStatusPublishingStage.Cancelled;
             }
@@ -122,17 +91,6 @@ public class ReleasePublishingStatusState : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
-}
-
-public enum ReleasePublishingStatusContentStage
-{
-    Cancelled,
-    Complete,
-    Failed,
-    Queued,
-    NotStarted,
-    Started,
-    Scheduled,
 }
 
 public enum ReleasePublishingStatusFilesStage
