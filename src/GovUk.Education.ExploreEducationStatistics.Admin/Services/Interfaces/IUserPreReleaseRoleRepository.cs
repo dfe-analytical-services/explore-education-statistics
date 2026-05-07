@@ -16,7 +16,7 @@ public interface IUserPreReleaseRoleRepository
     );
 
     Task<List<UserReleaseRole>> CreateManyIfNotExists(
-        IEnumerable<UserPreReleaseRoleCreateDto> userPreReleaseRolesToCreate,
+        HashSet<UserPreReleaseRoleCreateDto> userPreReleaseRolesToCreate,
         CancellationToken cancellationToken = default
     );
 

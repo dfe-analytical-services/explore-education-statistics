@@ -1,7 +1,7 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RequestModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -194,15 +194,14 @@ public class UserManagementService(
 
     public async Task<Either<ActionResult, User>> InviteUser(UserInviteCreateRequest request)
     {
-        var sanitisedEmail = request.Email.Trim().ToLower();
-        var roleId = request.RoleId;
-
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => ValidateActiveUserDoesNotExist(sanitisedEmail))
+            .OnSuccess(() => ValidateActiveUserDoesNotExist(request.Email))
             .OnSuccess<ActionResult, Unit, User>(async () =>
             {
-                var role = await usersAndRolesDbContext.Roles.AsNoTracking().SingleOrDefaultAsync(r => r.Id == roleId);
+                var role = await usersAndRolesDbContext
+                    .Roles.AsNoTracking()
+                    .SingleOrDefaultAsync(r => r.Id == request.RoleId);
 
                 if (role is null)
                 {
@@ -210,8 +209,8 @@ public class UserManagementService(
                 }
 
                 var user = await userRepository.CreateOrUpdate(
-                    email: sanitisedEmail,
-                    roleId: roleId,
+                    email: request.Email,
+                    roleId: request.RoleId,
                     createdById: userService.GetUserId(),
                     createdDate: request.CreatedDate
                 );

@@ -21,7 +21,7 @@ public enum SecurityClaimTypes
      */
     ApplicationAccessGranted,
     AnalystPagesAccessGranted,
-    PreReleasePagesAccessGranted,
+    PrereleasePagesAccessGranted,
     ManageAnyUser,
     AccessAllImports,
 
@@ -50,7 +50,7 @@ public enum SecurityClaimTypes
     /**
      * Pre Release management
      */
-    CanViewPreReleaseContacts,
+    CanViewPrereleaseContacts,
 
     /**
      * Taxonomy management

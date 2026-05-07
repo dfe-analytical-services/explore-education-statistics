@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserManagement;
 
 [ApiController]
-[Route("api/global-roles")]
+[Route("api")]
 [Authorize]
 public class GlobalRolesController(IUserRoleService userRoleService) : ControllerBase
 {
@@ -16,7 +16,7 @@ public class GlobalRolesController(IUserRoleService userRoleService) : Controlle
     /// Provides a list of global roles that are available within the service
     /// </summary>
     /// <returns>Name and value representation of role</returns>
-    [HttpGet]
+    [HttpGet("global-roles")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<List<RoleViewModel>>> GetGlobalRoles()
     {

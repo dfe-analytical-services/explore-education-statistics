@@ -36,7 +36,7 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
     }
 
     public async Task<List<UserReleaseRole>> CreateManyIfNotExists(
-        IEnumerable<UserPreReleaseRoleCreateDto> userPreReleaseRolesToCreate,
+        HashSet<UserPreReleaseRoleCreateDto> userPreReleaseRolesToCreate,
         CancellationToken cancellationToken = default
     )
     {

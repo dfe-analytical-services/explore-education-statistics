@@ -84,7 +84,7 @@ public class UserPublicationRoleRepository(
     }
 
     public async Task<List<UserPublicationRole>> CreateManyIfNotExists(
-        IEnumerable<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
+        HashSet<UserPublicationRoleCreateDto> userPublicationRolesToCreate,
         CancellationToken cancellationToken = default
     )
     {
