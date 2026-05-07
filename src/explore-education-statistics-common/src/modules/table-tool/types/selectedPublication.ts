@@ -14,7 +14,6 @@ export interface SelectedPublication extends PublicationTreeSummary {
   };
 }
 
-// TODO: EES-4312 Cleanup this type - use PublicationReleaseSummary
 export interface SelectedRelease {
   id: string;
   slug: string;

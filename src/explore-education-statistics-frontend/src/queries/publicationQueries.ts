@@ -21,7 +21,7 @@ const publicationQueries = {
     publicationSlug: string,
   ): UseQueryOptions<PublicationSummary> {
     return {
-      queryKey: ['publicationSummaryRedesign', publicationSlug],
+      queryKey: ['publicationSummary', publicationSlug],
       queryFn: () => publicationService.getPublicationSummary(publicationSlug),
     };
   },

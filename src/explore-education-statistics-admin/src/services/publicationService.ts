@@ -165,7 +165,7 @@ export interface ReleaseVersion<
   published: string;
   publishedDisplayDate?: string;
   publishingOrganisations?: Organisation[];
-  relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
+  relatedDashboardsSection: ContentSection<ContentBlockType>;
   relatedInformation: BasicLink[];
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
