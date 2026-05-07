@@ -1,5 +1,5 @@
+import { ReleaseNote } from '@admin/services/publicationService';
 import client from '@admin/services/utils/service';
-import { ReleaseNote } from '@common/services/publicationService';
 
 const releaseNoteService = {
   create: (

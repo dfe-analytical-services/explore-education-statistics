@@ -1,5 +1,5 @@
 import RelatedPagesEditModal from '@admin/pages/release/content/components/RelatedPagesEditModal';
-import { BasicLink } from '@common/services/publicationService';
+import { BasicLink } from '@admin/services/publicationService';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';

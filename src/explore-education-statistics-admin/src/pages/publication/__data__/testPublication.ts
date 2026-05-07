@@ -1,7 +1,5 @@
-import {
-  Contact,
-  PublicationWithPermissions,
-} from '@admin/services/publicationService';
+import { PublicationWithPermissions } from '@admin/services/publicationService';
+import { Contact } from '@common/services/publicationService';
 
 export const testContact: Contact = {
   contactName: 'John Smith',

@@ -115,6 +115,12 @@ describe('PreReleaseContentPage', () => {
     lastUpdated: '2020-03-03T00:00:00+00:00',
     publishedDisplayDate: '2020-02-20T09:55:33.5735725+00:00',
     publishScheduled: '2020-03-03',
+    relatedDashboardsSection: {
+      id: 'related-dashoards-id',
+      order: 0,
+      content: [],
+      heading: '',
+    },
     relatedInformation: [],
     slug: '2020-21',
     summarySection: {
