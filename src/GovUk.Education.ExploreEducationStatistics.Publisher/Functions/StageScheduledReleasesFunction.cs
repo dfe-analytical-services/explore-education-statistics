@@ -25,11 +25,9 @@ public class StageScheduledReleasesFunction(
     private readonly AppOptions _appOptions = appOptions.Value;
 
     /// <summary>
-    /// Azure function which triggers copying files for all release versions that are scheduled to be published
-    /// later during the day. This operates on a schedule which by default occurs at midnight every night.
+    /// Azure function that triggers copying files for all release versions scheduled to be published later in the day.
+    /// By default, this runs daily at 00:05:00.
     /// </summary>
-    /// <param name="timer"></param>
-    /// <param name="context"></param>
     // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
     // given that the 'staging' content task no longer exists.
     [Function(nameof(StageScheduledReleases))]

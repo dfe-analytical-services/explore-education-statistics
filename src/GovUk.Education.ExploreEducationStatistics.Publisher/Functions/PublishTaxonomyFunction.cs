@@ -6,13 +6,20 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 
+#pragma warning disable IDE0060 // Suppress removing unused parameter `ignored` - must have a valid binding name for Azure function
+
 public class PublishTaxonomyFunction(ILogger<PublishTaxonomyFunction> logger, IContentService contentService)
 {
-    [Function("PublishTaxonomy")]
+    /// <summary>
+    /// Azure function that updates the cached methodologies and publications 'tree' models
+    /// used by the public site Methodologies, Data Catalogue, and Table Tool pages.
+    /// </summary>
+    /// <remarks>
+    /// Triggered via a message queued by the Admin application when a theme is created/updated/deleted.
+    /// </remarks>
+    [Function(nameof(PublishTaxonomy))]
     public async Task PublishTaxonomy(
-#pragma warning disable IDE0060
-        [QueueTrigger(PublishTaxonomyQueue)] PublishTaxonomyMessage message,
-#pragma warning restore IDE0060
+        [QueueTrigger(PublishTaxonomyQueue)] PublishTaxonomyMessage ignored, // The binding name _ is invalid
         FunctionContext context
     )
     {

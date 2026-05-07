@@ -18,9 +18,6 @@ public class PublishScheduledReleasesFunction(
     /// Azure function which calls the <see cref="IPublishingCompletionService"/> in order to complete the publishing
     /// process for release versions that are scheduled to be published.
     /// </summary>
-    /// <param name="timer"></param>
-    /// <param name="context"></param>
-    /// <returns></returns>
     [Function(nameof(PublishScheduledReleases))]
     public async Task PublishScheduledReleases(
         [TimerTrigger("%App:PublishScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
