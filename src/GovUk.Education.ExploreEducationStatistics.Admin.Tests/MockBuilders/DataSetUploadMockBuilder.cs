@@ -85,6 +85,25 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
         };
     }
 
+    public DataSetUpload BuildScreenerErrorEntity()
+    {
+        return new DataSetUpload
+        {
+            ReleaseVersionId = _releaseVersionId ?? Guid.NewGuid(),
+            DataSetTitle = "Test Data Set",
+            DataFileId = Guid.NewGuid(),
+            DataFileName = "data.csv",
+            DataFileSizeInBytes = 434,
+            MetaFileId = Guid.NewGuid(),
+            MetaFileName = "meta.data.csv",
+            MetaFileSizeInBytes = 157,
+            Status = DataSetUploadStatus.SCREENER_ERROR,
+            UploadedBy = "test@test.com",
+            Created = _timeProvider.GetUtcNow().AddDays(-1).Date,
+            ReplacingFileId = null,
+        };
+    }
+
     public static DataSetUploadViewModel BuildViewModel()
     {
         return new DataSetUploadViewModel

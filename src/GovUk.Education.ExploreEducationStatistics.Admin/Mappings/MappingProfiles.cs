@@ -126,7 +126,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Type, m => m.MapFrom(dataSetVersion => dataSetVersion.VersionType));
 
         CreateMap<DataSetUpload, DataSetUploadViewModel>()
-            .ForMember(dest => dest.Status, m => m.MapFrom(upload => GetDataSetUploadStatus(upload.ScreenerResult)))
+            .ForMember(dest => dest.Status, m => m.MapFrom(upload => GetDataSetUploadStatus(upload)))
             .ForMember(
                 dest => dest.PublicApiCompatible,
                 m => m.MapFrom(upload => upload.ScreenerResult != null && upload.ScreenerResult.PublicApiCompatible)
@@ -155,8 +155,15 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(d => d.DataSetId, m => m.MapFrom(upload => upload.Id));
     }
 
-    private static string GetDataSetUploadStatus(DataSetScreenerResponse? screenerResult)
+    private static string GetDataSetUploadStatus(DataSetUpload dataSetUpload)
     {
+        if (dataSetUpload.Status == DataSetUploadStatus.SCREENING)
+        {
+            return nameof(DataSetUploadStatus.SCREENING);
+        }
+
+        var screenerResult = dataSetUpload.ScreenerResult;
+
         if (screenerResult is null)
         {
             return nameof(DataSetUploadStatus.SCREENER_ERROR);
