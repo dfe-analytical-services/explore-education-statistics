@@ -23,6 +23,6 @@ export default function withMethods(config: MethodsConfig): NextApiHandler {
       return;
     }
 
-    handler(req, res);
+    await handler(req, res);
   };
 }
