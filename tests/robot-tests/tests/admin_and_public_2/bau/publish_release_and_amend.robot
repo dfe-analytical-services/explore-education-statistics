@@ -16,19 +16,21 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=            Publish release and amend %{RUN_IDENTIFIER}
-${RELEASE_LABEL}=               provisional
-${RELEASE_NAME}=                Financial year 3000-01 ${RELEASE_LABEL}
-${DATABLOCK_NAME}=              Dates data block name
-${SUBJECT_NAME}=                Dates test subject
-${ANCILLARY_FILE_NAME}=         Test ancillary file 1
-${ANCILLARY_FILE_NAME_2}=       Test ancillary file 2
+${PUBLICATION_NAME}=                Publish release and amend %{RUN_IDENTIFIER}
+${RELEASE_LABEL}=                   provisional
+${RELEASE_NAME}=                    Financial year 3000-01 ${RELEASE_LABEL}
+${DATABLOCK_NAME}=                  Dates data block name
+${SUBJECT_NAME}=                    Dates test subject
+${ANCILLARY_FILE_NAME}=             Test ancillary file 1
+${ANCILLARY_FILE_NAME_2}=           Test ancillary file 2
+${legacy_summary_text_box_body}=    Test summary text for ${PUBLICATION_NAME}
 
 
 *** Test Cases ***
 Create new publication for "UI tests theme" theme
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user creates test release via api    ${PUBLICATION_ID}    FY    3000    label=${RELEASE_LABEL}
+    user creates test release with legacy summary text block via api    ${PUBLICATION_ID}    FY    3000
+    ...    label=${RELEASE_LABEL}    summary_text_block=${legacy_summary_text_box_body}
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -129,6 +131,9 @@ Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
+
+Verify legacy summary text block content is correct
+    user waits until element contains    id:releaseSummary    ${legacy_summary_text_box_body}    %{WAIT_SMALL}
 
 Add free text key stat
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
@@ -289,6 +294,10 @@ Verify release page meta
     user checks meta title should be    Release home - ${PUBLICATION_NAME}
     user checks meta description should be
     ...    ${PUBLICATION_NAME} summary
+
+Verify release page background information
+    user waits until element contains    id:background-information    ${legacy_summary_text_box_body}
+    ...    %{WAIT_SMALL}
 
 Verify release URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/publish-release-and-amend-%{RUN_IDENTIFIER}
@@ -625,6 +634,12 @@ Navigate to 'Content' page for amendment
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a warning text block
 
+Verify legacy summary text block content is correct for amendment
+    user waits until element contains    id:releaseSummary    ${legacy_summary_text_box_body}    %{WAIT_SMALL}
+
+Update legacy summary text block for amendment
+    user adds content to autosaving text block    id:releaseSummary    Amended ${legacy_summary_text_box_body}
+
 Update free text key stat
     user updates free text key stat    1    Updated title    New stat    Updated trend
     ...    Updated guidance title    Updated guidance text
@@ -733,6 +748,10 @@ Navigate to amendment release page
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
+
+Verify amended background information
+    user waits until element contains    id:background-information    Amended ${legacy_summary_text_box_body}
+    ...    %{WAIT_SMALL}
 
 Verify amendment is displayed as the latest release and the 'All releases in this series' page only displays the latest release
     user checks page contains    Latest release
