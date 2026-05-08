@@ -1,12 +1,12 @@
 import ReleaseNoteForm, {
   ReleaseNoteFormValues,
 } from '@admin/pages/release/content/components/ReleaseNoteForm';
+import { ReleaseNote as ReleaseNoteData } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import { ReleaseNote as ReleaseNoteData } from '@common/services/publicationService';
 import React from 'react';
 
 interface Props {

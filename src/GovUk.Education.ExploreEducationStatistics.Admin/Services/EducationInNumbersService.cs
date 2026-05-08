@@ -26,167 +26,171 @@ public class EducationInNumbersService(
 {
     private readonly bool _publishedPageDeletionAllowed = appOptions.Value.EnableEinPublishedPageDeletion;
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> GetPage(Guid id)
+    public async Task<Either<ActionResult, EinPageVersionSummaryViewModel>> GetPageVersion(Guid pageVersionId)
     {
         return await contentDbContext
-            .EducationInNumbersPages.Where(page => page.Id == id)
-            .OrderByDescending(page => page.Version)
-            .FirstOrNotFoundAsync()
-            .OnSuccess(page => page.ToSummaryViewModel());
+            .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+            .SingleOrNotFoundAsync(pageVersion => pageVersion.Id == pageVersionId)
+            .OnSuccess(EinPageVersionSummaryViewModel.FromModel);
     }
 
-    public async Task<Either<ActionResult, List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages()
+    public async Task<Either<ActionResult, List<EinPageVersionSummaryWithPrevVersionViewModel>>> ListLatestPages()
     {
-        var uniqueSlugs = await contentDbContext.EducationInNumbersPages.Select(p => p.Slug).Distinct().ToListAsync();
+        var latestPageVersions = await contentDbContext
+            .EinPageVersions.Include(pv => pv.EinPage)
+            .Where(pv => pv.Id == pv.EinPage.LatestVersionId)
+            .ToListAsync();
 
-        var viewModels = new List<EinSummaryWithPrevVersionViewModel>();
+        var previousVersionIdLookup = await contentDbContext
+            .EinPageVersions.Where(pv => pv.Version == pv.EinPage.LatestVersion!.Version - 1)
+            .ToDictionaryAsync(pv => pv.EinPageId, pv => (Guid?)pv.Id);
 
-        foreach (var slug in uniqueSlugs)
-        {
-            var latestTwoPages = await contentDbContext
-                .EducationInNumbersPages.AsNoTracking()
-                .Where(page => page.Slug == slug)
-                .OrderByDescending(page => page.Version)
-                .Take(2)
-                .ToListAsync();
-
-            var latestPage = latestTwoPages[0];
-            var previousVersionId = latestTwoPages.Count > 1 ? (Guid?)latestTwoPages[1].Id : null;
-
-            var viewModel = latestPage.ToViewModel(previousVersionId);
-            viewModels.Add(viewModel);
-        }
-
-        return viewModels.OrderBy(vm => vm.Order).ToList();
+        return latestPageVersions
+            .Select(latestPageVersion =>
+            {
+                previousVersionIdLookup.TryGetValue(latestPageVersion.EinPageId, out var prevVersionId);
+                return EinPageVersionSummaryWithPrevVersionViewModel.FromModel(latestPageVersion, prevVersionId);
+            })
+            .OrderBy(viewModel => viewModel.Order)
+            .ToList();
     }
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(CreateEducationInNumbersPageRequest request)
+    public async Task<Either<ActionResult, EinPageVersionSummaryViewModel>> CreatePage(
+        CreateEducationInNumbersPageRequest request
+    )
     {
-        var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages.Any(page =>
-            page.Title == request.Title
-        );
+        var pageWithTitleAlreadyExists = contentDbContext.EinPages.Any(page => page.Title == request.Title);
         if (pageWithTitleAlreadyExists)
         {
-            return new Either<ActionResult, EinSummaryViewModel>(
+            return new Either<ActionResult, EinPageVersionSummaryViewModel>(
                 ValidationResult(ValidationErrorMessages.TitleNotUnique)
             );
         }
 
         var slug = NamingUtils.SlugFromTitle(request.Title);
-        var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages.Any(page => page.Slug == slug);
+        var pageWithSlugAlreadyExists = contentDbContext.EinPages.Any(page => page.Slug == slug);
         if (pageWithSlugAlreadyExists)
         {
             return ValidationResult(ValidationErrorMessages.SlugNotUnique);
         }
 
-        var currentMaxOrder = contentDbContext.EducationInNumbersPages.Select(page => page.Order).Max();
+        var currentMaxOrder = contentDbContext.EinPages.Select(page => page.Order).Max();
 
-        var newPage = new EducationInNumbersPage
+        var createdPageVersion = await contentDbContext.RequireTransaction(async () =>
         {
-            Id = Guid.NewGuid(),
-            Title = request.Title,
-            Slug = slug,
-            Description = request.Description,
-            Version = 0,
-            Order = currentMaxOrder + 1,
-            Published = null,
-            Created = DateTime.UtcNow,
-            CreatedById = userService.GetUserId(),
-            Updated = null,
-            UpdatedById = null,
-        };
+            var newPage = new EinPage
+            {
+                Id = Guid.NewGuid(),
+                Title = request.Title,
+                Slug = slug,
+                Description = request.Description,
+                Order = currentMaxOrder + 1,
+                LatestVersionId = null, // cannot set yet otherwise get a circular dependency
+            };
 
-        contentDbContext.EducationInNumbersPages.Add(newPage);
-        await contentDbContext.SaveChangesAsync();
+            var newPageVersionId = Guid.NewGuid();
+            var newPageVersion = new EinPageVersion
+            {
+                Id = newPageVersionId,
+                EinPageId = newPage.Id,
+                EinPage = newPage,
+                Version = 0,
+                Published = null,
+                Created = DateTime.UtcNow,
+                CreatedById = userService.GetUserId(),
+                Updated = null,
+                UpdatedById = null,
+            };
 
-        return newPage.ToSummaryViewModel();
+            contentDbContext.EinPages.Add(newPage);
+            contentDbContext.EinPageVersions.Add(newPageVersion);
+            await contentDbContext.SaveChangesAsync();
+
+            newPage.LatestVersionId = newPageVersionId;
+            newPage.LatestVersion = newPageVersion;
+            await contentDbContext.SaveChangesAsync();
+
+            return newPageVersion;
+        });
+
+        return EinPageVersionSummaryViewModel.FromModel(createdPageVersion);
     }
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(Guid id)
+    public async Task<Either<ActionResult, EinPageVersionSummaryViewModel>> CreateAmendment(Guid pageVersionId)
     {
         return await contentDbContext
-            .EducationInNumbersPages.Include(p => p.Content)
+            .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+            .Include(pageVersion => pageVersion.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
-            .FirstOrNotFoundAsync(page => page.Id == id)
-            .OnSuccess(async page =>
+            .FirstOrNotFoundAsync(pageVersion => pageVersion.Id == pageVersionId)
+            .OnSuccess(async pageVersion =>
             {
-                if (page.Published == null)
+                if (pageVersion.Id != pageVersion.EinPage.LatestPublishedVersionId)
                 {
-                    throw new ArgumentException("Can only create amendment of a published page");
+                    throw new ArgumentException($"Can only create amendment of latest published page version");
                 }
 
-                var amendmentAlreadyExists = contentDbContext.EducationInNumbersPages.Any(amendment =>
-                    amendment.Slug == page.Slug && amendment.Version == page.Version + 1
-                );
-                if (amendmentAlreadyExists)
+                if (pageVersion.Id != pageVersion.EinPage.LatestVersionId)
                 {
-                    throw new ArgumentException($"Amendment already exists for page {page.Id}");
+                    throw new ArgumentException($"Amendment already exists for page version {pageVersion.Id}");
                 }
 
-                var amendment = new EducationInNumbersPage
+                var amendment = new EinPageVersion
                 {
                     Id = Guid.NewGuid(),
-                    Title = page.Title,
-                    Slug = page.Slug,
-                    Description = page.Description,
-                    Version = page.Version + 1,
-                    Order = page.Order,
+                    EinPageId = pageVersion.EinPageId,
+                    EinPage = pageVersion.EinPage,
+                    Version = pageVersion.Version + 1,
                     Published = null,
                     Created = DateTime.UtcNow,
                     CreatedById = userService.GetUserId(),
                     Updated = null,
                     UpdatedById = null,
                 };
+                pageVersion.EinPage.LatestVersionId = amendment.Id;
 
-                var amendmentContent = page.Content.Select(section => section.Clone(amendment.Id)).ToList();
+                var amendmentContent = pageVersion.Content.Select(section => section.Clone(amendment.Id)).ToList();
 
-                contentDbContext.EducationInNumbersPages.Add(amendment);
-                contentDbContext.EinContentSections.AddRange(amendmentContent); // includes cloned EinContentBlocks
+                contentDbContext.EinPageVersions.Add(amendment);
+                contentDbContext.EinContentSections.AddRange(amendmentContent); // includes cloned EinContentBlocks/Tiles
 
                 await contentDbContext.SaveChangesAsync();
 
-                return amendment.ToSummaryViewModel();
+                return EinPageVersionSummaryViewModel.FromModel(amendment);
             });
     }
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> UpdatePage(
-        Guid id,
+    public async Task<Either<ActionResult, EinPageVersionSummaryViewModel>> UpdatePage(
+        Guid pageVersionId,
         UpdateEducationInNumbersPageRequest request
     )
     {
         return await contentDbContext
-            .EducationInNumbersPages.FirstOrNotFoundAsync(page => page.Id == id)
-            .OnSuccess(async page =>
+            .EinPageVersions.Include(page => page.EinPage)
+            .FirstOrNotFoundAsync(pageVersion => pageVersion.Id == pageVersionId)
+            .OnSuccess(async pageVersion =>
             {
-                if (page.Published != null)
+                if (pageVersion.EinPage.LatestPublishedVersionId != null)
                 {
                     throw new ArgumentException("Cannot update details of already published page");
                 }
 
-                if (page.Version > 0)
-                {
-                    // To prevent slug from being changed by an amendment, as we have no redirects
-                    throw new Exception("Cannot update details for a page amendment");
-                }
-
                 // If the title is being updated, we also update the slug
                 string? newSlug = null;
-                if (request.Title != null && request.Title != page.Title)
+                if (request.Title != null && request.Title != pageVersion.EinPage.Title)
                 {
-                    var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages.Any(p =>
-                        p.Title == request.Title
-                    );
+                    var pageWithTitleAlreadyExists = contentDbContext.EinPages.Any(page => page.Title == request.Title);
                     if (pageWithTitleAlreadyExists)
                     {
-                        return new Either<ActionResult, EinSummaryViewModel>(
+                        return new Either<ActionResult, EinPageVersionSummaryViewModel>(
                             ValidationResult(ValidationErrorMessages.TitleNotUnique)
                         );
                     }
 
                     newSlug = NamingUtils.SlugFromTitle(request.Title);
-                    var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages.Any(p =>
-                        p.Slug == newSlug && p.Id != id
+                    var newSlugIsNotUnique = contentDbContext.EinPages.Any(p =>
+                        p.Slug == newSlug && p.Id != pageVersion.EinPageId
                     ); // if the slug is for the page we're updating, we don't care
                     if (newSlugIsNotUnique)
                     {
@@ -194,99 +198,106 @@ public class EducationInNumbersService(
                     }
                 }
 
-                page.Title = request.Title ?? page.Title;
-                page.Slug = newSlug ?? page.Slug;
-                page.Description = request.Description ?? page.Description;
-
-                page.Updated = DateTime.UtcNow;
-                page.UpdatedById = userService.GetUserId();
+                pageVersion.EinPage.Title = request.Title ?? pageVersion.EinPage.Title;
+                pageVersion.EinPage.Slug = newSlug ?? pageVersion.EinPage.Slug;
+                pageVersion.EinPage.Description = request.Description ?? pageVersion.EinPage.Description;
 
                 await contentDbContext.SaveChangesAsync();
 
-                return page.ToSummaryViewModel();
+                return EinPageVersionSummaryViewModel.FromModel(pageVersion);
             });
     }
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(Guid id)
+    public async Task<Either<ActionResult, EinPageVersionSummaryViewModel>> PublishPage(Guid pageVersionId)
     {
         return await contentDbContext
-            .EducationInNumbersPages.FirstOrNotFoundAsync(page => page.Id == id)
-            .OnSuccess(async page =>
+            .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+            .FirstOrNotFoundAsync(pageVersion => pageVersion.Id == pageVersionId)
+            .OnSuccess(async pageVersion =>
             {
-                if (page.Published != null)
+                if (pageVersion.Published != null)
                 {
-                    throw new ArgumentException("Cannot publish already published page");
+                    throw new ArgumentException("Cannot publish already published page version");
                 }
 
-                page.Published = DateTime.UtcNow;
+                if (pageVersion.Id != pageVersion.EinPage.LatestVersionId)
+                {
+                    throw new Exception("An unpublished page should always be the latest page version");
+                }
 
-                page.Updated = DateTime.UtcNow;
-                page.UpdatedById = userService.GetUserId();
+                pageVersion.EinPage.LatestPublishedVersionId = pageVersion.Id;
+
+                pageVersion.Published = DateTime.UtcNow;
+
+                pageVersion.Updated = DateTime.UtcNow;
+                pageVersion.UpdatedById = userService.GetUserId();
 
                 await contentDbContext.SaveChangesAsync();
 
-                return page.ToSummaryViewModel();
+                return EinPageVersionSummaryViewModel.FromModel(pageVersion);
             });
     }
 
-    public async Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(List<Guid> newOrder)
+    public async Task<Either<ActionResult, List<EinPageVersionSummaryViewModel>>> Reorder(List<Guid> newOrder)
     {
-        var pageList = await contentDbContext
-            .EducationInNumbersPages.GroupBy(page => page.Slug ?? "ROOT PAGE") // needed because GroupBy doesn't like null - doesn't affect the returned page
-            .Select(group => group.OrderByDescending(p => p.Version).First())
+        var latestPageVersions = await contentDbContext
+            .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+            .Where(pageVersion => pageVersion.Id == pageVersion.EinPage.LatestVersionId)
             .ToListAsync();
 
-        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(newOrder, pageList.Select(page => page.Id)))
+        if (
+            !ComparerUtils.SequencesAreEqualIgnoringOrder(
+                newOrder,
+                latestPageVersions.Select(pageVersion => pageVersion.Id)
+            )
+        )
         {
             return ValidationUtils.ValidationActionResult(
                 ValidationErrorMessages.EinProvidedPageIdsDifferFromActualPageIds
             );
         }
 
-        var updatingUserId = userService.GetUserId();
-
         newOrder.ForEach(
-            (pageId, order) =>
+            (pageVersionId, order) =>
             {
-                var matchingPage = pageList.Single(page => page.Id == pageId);
-                matchingPage.Order = order;
-                matchingPage.Updated = DateTime.UtcNow;
-                matchingPage.UpdatedById = updatingUserId;
-
-                if (matchingPage is { Version: > 0, Published: null })
-                {
-                    // It is an unpublished amendment, so we must also update the original in case the amendment is cancelled
-                    var previousPageVersion = contentDbContext.EducationInNumbersPages.Single(page =>
-                        page.Slug == matchingPage.Slug && page.Version + 1 == matchingPage.Version
-                    );
-                    previousPageVersion.Order = order;
-                    previousPageVersion.Updated = DateTime.UtcNow;
-                    previousPageVersion.UpdatedById = updatingUserId;
-                }
+                var matchingPageVersion = latestPageVersions.Single(pageVersion => pageVersion.Id == pageVersionId);
+                matchingPageVersion.EinPage.Order = order;
             }
         );
-
         await contentDbContext.SaveChangesAsync();
 
-        return pageList.Select(page => page.ToSummaryViewModel()).ToList();
+        return latestPageVersions.Select(EinPageVersionSummaryViewModel.FromModel).ToList();
     }
 
-    public async Task<Either<ActionResult, Unit>> Delete(Guid id)
+    public async Task<Either<ActionResult, Unit>> Delete(Guid pageVersionId)
     {
         return await contentDbContext
-            .EducationInNumbersPages.SingleOrNotFoundAsync(page => page.Id == id)
-            .OnSuccessVoid(async page =>
+            .EinPageVersions.Include(pv => pv.EinPage)
+            .SingleOrNotFoundAsync(pageVersion => pageVersion.Id == pageVersionId)
+            .OnSuccessVoid(async pageVersion =>
             {
-                if (page.Published != null)
+                if (pageVersion.Published != null)
                 {
-                    throw new ArgumentException("Can only delete unpublished amendments");
+                    throw new ArgumentException("Can only delete unpublished page versions");
                 }
 
-                contentDbContext.EducationInNumbersPages.Remove(page);
+                await contentDbContext.RequireTransaction(async () =>
+                {
+                    // the previous version will be the last published version
+                    pageVersion.EinPage.LatestVersionId = pageVersion.EinPage.LatestPublishedVersionId;
+                    await contentDbContext.SaveChangesAsync();
 
-                // NOTE: Sections and blocks are cascade deleted by the database, so no worries
+                    contentDbContext.EinPageVersions.Remove(pageVersion);
 
-                await contentDbContext.SaveChangesAsync();
+                    if (pageVersion.Version == 0)
+                    {
+                        contentDbContext.EinPages.Remove(pageVersion.EinPage);
+                    }
+
+                    // NOTE: Sections and blocks are cascade deleted by the database, so no worries
+
+                    await contentDbContext.SaveChangesAsync();
+                });
             });
     }
 
@@ -297,10 +308,13 @@ public class EducationInNumbersService(
             throw new Exception("Full delete not enabled");
         }
 
-        var pagesToRemove = contentDbContext.EducationInNumbersPages.Where(page => page.Slug == slug).ToList();
-        contentDbContext.EducationInNumbersPages.RemoveRange(pagesToRemove);
+        var pagesToRemove = contentDbContext
+            .EinPages.Include(page => page.PageVersions)
+            .Single(page => page.Slug == slug);
 
-        // NOTE: Sections and blocks are cascade deleted by the database, so no worries
+        contentDbContext.EinPages.Remove(pagesToRemove);
+
+        // NOTE: Page versions, content sections and blocks are cascade deleted by the database
 
         await contentDbContext.SaveChangesAsync();
 

@@ -1,0 +1,59 @@
+#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
+using Microsoft.EntityFrameworkCore;
+
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+/// <summary>
+/// Component for supplying services with DbContexts when testing with InMemory DbContexts.
+/// </summary>
+public class InMemoryDbContextSupplier(string? contentDbContextId = null, string? statisticsDbContextId = null)
+    : IDbContextSupplier
+{
+    private readonly string _contentDbContextId = contentDbContextId ?? Guid.NewGuid().ToString();
+    private readonly string _statisticsDbContextId = statisticsDbContextId ?? Guid.NewGuid().ToString();
+
+    public TDbContext CreateDbContext<TDbContext>()
+        where TDbContext : DbContext
+    {
+        return (
+            typeof(TDbContext).Name switch
+            {
+                nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
+                nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
+                _ => throw new ArgumentOutOfRangeException(
+                    "Unable to provide DbContext of type " + typeof(TDbContext).Name
+                ),
+            }
+        )!;
+    }
+
+    public TDbContext CreateDbContextDelegate<TDbContext>()
+        where TDbContext : DbContext
+    {
+        return (
+            typeof(TDbContext).Name switch
+            {
+                nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
+                nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
+                _ => throw new ArgumentOutOfRangeException(
+                    "Unable to provide DbContext delegate of type " + typeof(TDbContext).Name
+                ),
+            }
+        )!;
+    }
+
+    private StatisticsDbContext CreateStatisticsDbContext()
+    {
+        return StatisticsDbUtils.InMemoryStatisticsDbContext(_statisticsDbContextId);
+    }
+
+    private ContentDbContext CreateContentDbContext()
+    {
+        return ContentDbUtils.InMemoryContentDbContext(_contentDbContextId);
+    }
+}

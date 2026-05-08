@@ -54,15 +54,12 @@ public static class ReleaseVersionPredicates
     /// <param name="releaseVersions">The source <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> to filter.</param>
     /// <param name="releaseId">Unique identifier of a release to filter by.</param>
     /// <param name="publishedOnly">Flag to only include published release versions.</param>
-    /// <param name="includeUnpublishedVersionIds">Optional list of unpublished release version ids to also consider.
-    /// Applicable when <paramref name="publishedOnly"/> is true.</param>
     /// <returns>An <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> that contains elements from the input
     /// sequence filtered to only include the latest version of the release.</returns>
     public static IQueryable<ReleaseVersion?> LatestReleaseVersion(
         this IQueryable<ReleaseVersion> releaseVersions,
         Guid releaseId,
-        bool publishedOnly = false,
-        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null
+        bool publishedOnly = false
     )
     {
         return releaseVersions
@@ -71,14 +68,7 @@ public static class ReleaseVersionPredicates
                 releaseVersion.Version
                 == releaseVersions
                     .Where(latestVersion => latestVersion.ReleaseId == releaseId)
-                    .Where(latestVersion =>
-                        !publishedOnly
-                        || latestVersion.Published.HasValue
-                        || (
-                            includeUnpublishedVersionIds != null
-                            && includeUnpublishedVersionIds.Contains(latestVersion.Id)
-                        )
-                    )
+                    .Where(latestVersion => !publishedOnly || latestVersion.Published.HasValue)
                     .Select(latestVersion => (int?)latestVersion.Version)
                     .Max()
             );

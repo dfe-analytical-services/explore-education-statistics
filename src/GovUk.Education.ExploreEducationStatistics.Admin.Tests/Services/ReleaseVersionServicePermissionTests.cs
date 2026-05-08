@@ -18,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -390,7 +389,6 @@ public class ReleaseVersionServicePermissionTests
                     userReleaseRoleRepository: userReleaseRoleRepository,
                     userPublicationRoleRepository: userPublicationRoleRepository
                 ),
-            Mock.Of<IReleaseCacheService>(),
             Mock.Of<IReleaseFileRepository>(),
             Mock.Of<IReleaseDataFileService>(),
             Mock.Of<IReleaseFileService>(),

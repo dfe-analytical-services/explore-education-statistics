@@ -1,4 +1,9 @@
 import {
+  ContentPublication,
+  BasicLink,
+  ReleaseNote,
+} from '@admin/services/publicationService';
+import {
   EditableRelease,
   ReleaseContent,
 } from '@admin/services/releaseContentService';
@@ -13,11 +18,8 @@ import {
   generateEditableDataBlock,
 } from '@admin-test/generators/contentGenerators';
 import {
-  Publication,
   ContentSection,
   KeyStatistic,
-  BasicLink,
-  ReleaseNote,
 } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
 
@@ -78,7 +80,7 @@ const defaultHeadlinesSection: ContentSection<EditableContentBlock> = {
   ],
 };
 
-export const defaultPublication: Publication = {
+export const defaultPublication: ContentPublication = {
   contact: {
     contactName: 'Contact name',
     teamEmail: 'contact@test.com',
@@ -129,6 +131,13 @@ const defaultRelatedInformation: BasicLink[] = [
     url: 'https://test.com',
   },
 ];
+
+const defaultRelatedDashoardsSection: ContentSection<EditableContentBlock> = {
+  id: 'related-dashboards-section-id',
+  content: [],
+  heading: 'Related dashboards heading',
+  order: 0,
+};
 
 const defaultSummarySection: ContentSection<EditableContentBlock> = {
   id: 'summary-section-id',
@@ -182,7 +191,7 @@ export function generateEditableRelease({
   published,
   publishedDisplayDate,
   publishScheduled,
-  relatedDashboardsSection,
+  relatedDashboardsSection = defaultRelatedDashoardsSection,
   relatedInformation = defaultRelatedInformation,
   title = 'Release title',
   slug,

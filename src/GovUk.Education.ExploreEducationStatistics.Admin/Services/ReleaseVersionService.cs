@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -44,7 +43,6 @@ public class ReleaseVersionService(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserService userService,
     IReleaseVersionRepository releaseVersionRepository,
-    IReleaseCacheService releaseCacheService,
     IReleaseFileRepository releaseFileRepository,
     IReleaseDataFileService releaseDataFileService,
     IReleaseFileService releaseFileService,
@@ -424,12 +422,9 @@ public class ReleaseVersionService(
     public async Task<Either<ActionResult, Unit>> UpdatePublishedDisplayDate(
         Guid releaseVersionId,
         ReleaseVersionPublishedDisplayDateUpdateRequest request
-    )
-    {
-        return await context
-            .ReleaseVersions.Include(rv => rv.Release)
-                .ThenInclude(r => r.Publication)
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+    ) =>
+        await context
+            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccessDo(userService.CheckIsBauUser)
             .OnSuccess<ActionResult, ReleaseVersion, Unit>(async releaseVersion =>
             {
@@ -443,26 +438,8 @@ public class ReleaseVersionService(
                     request.PublishedDisplayDate?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
                 await context.SaveChangesAsync();
 
-                // Update the cached release version
-                await releaseCacheService.UpdateRelease(
-                    releaseVersionId,
-                    publicationSlug: releaseVersion.Release.Publication.Slug,
-                    releaseSlug: releaseVersion.Release.Slug
-                );
-
-                if (releaseVersion.Release.Publication.LatestPublishedReleaseVersionId == releaseVersionId)
-                {
-                    // This is the latest published release version so also update the latest cached release version
-                    // for the publication which is a separate cache entry
-                    await releaseCacheService.UpdateRelease(
-                        releaseVersionId,
-                        publicationSlug: releaseVersion.Release.Publication.Slug
-                    );
-                }
-
                 return Unit.Instance;
             });
-    }
 
     public async Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId)
     {

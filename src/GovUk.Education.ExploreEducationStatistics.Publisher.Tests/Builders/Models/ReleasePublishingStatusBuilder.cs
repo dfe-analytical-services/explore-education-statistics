@@ -4,7 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Mo
 
 public class ReleasePublishingStatusBuilder(ReleasePublishingKey releasePublishingKey)
 {
-    private ReleasePublishingStatusContentStage _contentStatus = ReleasePublishingStatusContentStage.Complete;
     private ReleasePublishingStatusFilesStage _filesStatus = ReleasePublishingStatusFilesStage.Complete;
 
     public ReleasePublishingStatus Build()
@@ -13,20 +12,13 @@ public class ReleasePublishingStatusBuilder(ReleasePublishingKey releasePublishi
         {
             PartitionKey = releasePublishingKey.ReleaseVersionId.ToString(),
             RowKey = releasePublishingKey.ReleaseStatusId.ToString(),
-            State = new(
-                _contentStatus,
+            State = new ReleasePublishingStatusState(
                 _filesStatus,
                 ReleasePublishingStatusPublishingStage.NotStarted,
                 ReleasePublishingStatusOverallStage.Started
             ),
         };
         return releasePublishingStatus;
-    }
-
-    public ReleasePublishingStatusBuilder WhereContentStatusIs(ReleasePublishingStatusContentStage status)
-    {
-        _contentStatus = status;
-        return this;
     }
 
     public ReleasePublishingStatusBuilder WhereFilesStatusIs(ReleasePublishingStatusFilesStage status)

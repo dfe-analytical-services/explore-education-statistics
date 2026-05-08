@@ -15,9 +15,12 @@ public class EducationInNumbersController(IEducationInNumbersService einService)
         return await einService.ListEinPages(cancellationToken).HandleFailuresOrOk();
     }
 
-    [HttpGet("education-in-numbers")]
+    [HttpGet("education-in-numbers/pages")]
     [HttpGet("education-in-numbers/pages/{slug}")]
-    public async Task<ActionResult<EinPageViewModel>> GetEinPage(string? slug, CancellationToken cancellationToken)
+    public async Task<ActionResult<EinPageVersionViewModel>> GetEinPage(
+        string? slug,
+        CancellationToken cancellationToken
+    )
     {
         return await einService.GetEinPage(slug, cancellationToken).HandleFailuresOrOk();
     }

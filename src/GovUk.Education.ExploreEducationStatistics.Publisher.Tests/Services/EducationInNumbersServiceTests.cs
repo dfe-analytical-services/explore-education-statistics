@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -43,6 +44,18 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
             .WithRelease(_dataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseDataFile.Id))
             .WithVersionNumber(1, 0, 1);
 
+        var einPageId = Guid.NewGuid();
+        var pageVersionId = Guid.NewGuid();
+        var previousPageVersionId = Guid.NewGuid();
+
+        var einPage = new EinPage
+        {
+            Id = einPageId,
+            Title = "Ein page title",
+            Slug = "ein-page",
+            LatestVersionId = pageVersionId,
+        };
+
         var einApiQueryStatTile = new EinApiQueryStatTile
         {
             Title = "ApiQueryStatTile title",
@@ -55,10 +68,11 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
                 EinContentSection = new EinContentSection
                 {
                     Heading = "Content section heading",
-                    EducationInNumbersPage = new EducationInNumbersPage
+                    EinPageVersionId = pageVersionId,
+                    EinPageVersion = new EinPageVersion
                     {
-                        Title = "Ein page title",
-                        Slug = "ein-page",
+                        Id = pageVersionId,
+                        EinPage = einPage,
                         Version = 2,
                     },
                 },
@@ -78,10 +92,11 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
                 EinContentSection = new EinContentSection
                 {
                     Heading = "Content section heading",
-                    EducationInNumbersPage = new EducationInNumbersPage
+                    EinPageVersionId = previousPageVersionId,
+                    EinPageVersion = new EinPageVersion
                     {
-                        Title = "Ein page title",
-                        Slug = "ein-page",
+                        Id = previousPageVersionId,
+                        EinPage = einPage,
                         Version = 1,
                     },
                 },
@@ -110,10 +125,11 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
 
         // tiles from previous pages aren't included in the bau email
         var expectedMessage = $"""
-            * [Ein page title]({appOptions.AdminAppUrl}/education-in-numbers/{einApiQueryStatTile.EinParentBlock.EinContentSection.EducationInNumbersPageId}/content)
+            * [Ein page title]({appOptions.AdminAppUrl}/education-in-numbers/{einApiQueryStatTile.EinParentBlock.EinContentSection.EinPageVersionId}/content)
               * Tile titled '{einApiQueryStatTile.Title}' in section '{einApiQueryStatTile.EinParentBlock.EinContentSection.Heading}', which uses [this data set]({appOptions.PublicAppUrl}/data-catalogue/data-set/{dataSet.LatestLiveVersion!.Release.DataSetFileId})
 
             """;
+
         _fixture.EmailService.Setup(mock =>
             mock.NotifyEinTilesRequireUpdate(
                 "bau@example.com",
@@ -123,6 +139,8 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
 
         var einService = GetRequiredService<Publisher.Services.Interfaces.IEducationInNumbersService>();
         await einService.UpdateEinTiles([releaseVersion.Id]);
+
+        MockUtils.VerifyAllMocks(_fixture.EmailService, _fixture.NotifierClient);
 
         var contentDbContext = GetDbContext<ContentDbContext>();
         var einTiles = contentDbContext.EinTiles.ToList();
@@ -182,7 +200,7 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
                 EinContentSection = new EinContentSection
                 {
                     Heading = "Content section heading",
-                    EducationInNumbersPage = new EducationInNumbersPage { Title = "Ein page title" },
+                    EinPageVersion = new EinPageVersion { EinPage = new EinPage { Title = "Ein page title" } },
                 },
             },
         };
@@ -207,6 +225,8 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
 
         var einService = GetRequiredService<Publisher.Services.Interfaces.IEducationInNumbersService>();
         await einService.UpdateEinTiles([releaseVersion.Id]);
+
+        MockUtils.VerifyAllMocks(_fixture.EmailService, _fixture.NotifierClient);
 
         var contentDbContext = GetDbContext<ContentDbContext>();
         var einTiles = contentDbContext.EinTiles.ToList();

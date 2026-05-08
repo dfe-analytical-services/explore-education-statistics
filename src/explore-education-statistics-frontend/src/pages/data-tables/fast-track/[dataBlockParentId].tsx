@@ -41,12 +41,25 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
       );
     }
 
-    const [subjects, featuredTables, subjectMeta] = await Promise.all([
+    const [
+      subjects,
+      featuredTables,
+      subjectMeta,
+      publicationMethodologies,
+      publicationSummary,
+      releaseVersionSummary,
+    ] = await Promise.all([
       tableBuilderService.listReleaseSubjects(fastTrack.releaseId),
       tableBuilderService.listReleaseFeaturedTables(fastTrack.releaseId),
       tableBuilderService.getSubjectMeta(
         fastTrack.query.subjectId,
         fastTrack.releaseId,
+      ),
+      publicationService.getPublicationMethodologies(selectedPublication.slug),
+      publicationService.getPublicationSummary(selectedPublication.slug),
+      publicationService.getReleaseVersionSummary(
+        selectedPublication.slug,
+        fastTrack.releaseSlug,
       ),
     ]);
 
@@ -54,12 +67,16 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
       props: {
         fastTrack,
         featuredTables,
+        publicationMethodologies,
         selectedPublication: {
           ...selectedPublication,
+          contact: publicationSummary.contact,
           selectedRelease: {
             id: fastTrack.releaseId,
-            slug: fastTrack.releaseSlug,
             latestData: fastTrack.latestData,
+            publishingOrganisations:
+              releaseVersionSummary.publishingOrganisations,
+            slug: fastTrack.releaseSlug,
             title: fastTrack.latestReleaseTitle,
             type: fastTrack.releaseType,
           },

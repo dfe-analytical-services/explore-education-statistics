@@ -1,158 +1,33 @@
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Utils.ContentFilterUtils;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 /// <summary>
-/// TODO EES-6432 EES-6433: This service is due to be removed by EES-6432/EES-6433 once the release page redesign is live.
+/// This service contains a <c>List</c> method retained after the Release page redesign, which is required by the
+/// Public site frontend Data Catalogue page. Newer release-related services can be found in the
+/// <see cref="GovUk.Education.ExploreEducationStatistics.Content.Services.Releases"/> namespace.
 /// </summary>
-public class ReleaseService : IReleaseService
+public class ReleaseService(
+    ContentDbContext contentDbContext,
+    IReleaseVersionRepository releaseVersionRepository,
+    IUserService userService
+) : IReleaseService
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IReleaseFileRepository _releaseFileRepository;
-    private readonly IReleaseVersionRepository _releaseVersionRepository;
-    private readonly IUserService _userService;
-    private readonly IMapper _mapper;
-
-    public ReleaseService(
-        ContentDbContext contentDbContext,
-        IReleaseFileRepository releaseFileRepository,
-        IReleaseVersionRepository releaseVersionRepository,
-        IUserService userService,
-        IMapper mapper
-    )
-    {
-        _contentDbContext = contentDbContext;
-        _releaseFileRepository = releaseFileRepository;
-        _releaseVersionRepository = releaseVersionRepository;
-        _userService = userService;
-        _mapper = mapper;
-    }
-
-    public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
-        string publicationSlug,
-        string? releaseSlug = null
-    )
-    {
-        return await _contentDbContext
+    public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug) =>
+        await contentDbContext
             .Publications.SingleOrNotFoundAsync(p => p.Slug == publicationSlug)
+            .OnSuccess(userService.CheckCanViewPublication)
             .OnSuccess(async publication =>
             {
-                // If no release is requested use the publication's latest published release version,
-                // otherwise use the latest published version of the requested release
-                var latestReleaseVersionId =
-                    releaseSlug == null
-                        ? publication.LatestPublishedReleaseVersionId
-                        : (
-                            await _releaseVersionRepository.GetLatestPublishedReleaseVersionByReleaseSlug(
-                                publication.Id,
-                                releaseSlug
-                            )
-                        )?.Id;
-
-                return latestReleaseVersionId.HasValue
-                    ? await GetRelease(latestReleaseVersionId.Value)
-                    : new NotFoundResult();
-            });
-    }
-
-    public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
-        Guid releaseVersionId,
-        DateTimeOffset? expectedPublishDate = null
-    )
-    {
-        // Note this method is allowed to return a view model for an unpublished release version so that Publisher
-        // can use it to cache a release version in advance of it going live.
-
-        var releaseVersion = await _contentDbContext
-            .ReleaseVersions.Include(rv => rv.Release)
-            .Include(rv => rv.PublishingOrganisations)
-            .Include(rv => rv.Content)
-                .ThenInclude(cs => cs.Content)
-                    .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
-            .Include(rv => rv.Updates)
-            .Include(rv => rv.KeyStatistics)
-            .SingleAsync(rv => rv.Id == releaseVersionId);
-
-        var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(releaseVersion);
-
-        // Filter content blocks to remove any non-public or unnecessary information
-        releaseViewModel.HeadlinesSection?.Content.ForEach(FilterContentBlock);
-        releaseViewModel.SummarySection?.Content.ForEach(FilterContentBlock);
-        releaseViewModel.KeyStatisticsSecondarySection?.Content.ForEach(FilterContentBlock);
-        releaseViewModel.RelatedDashboardsSection?.Content.ForEach(FilterContentBlock);
-        // Note: ReleaseCacheViewModel has no WarningSection as it is only used by the old Release page design,
-        // which is pending removal.
-        releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));
-
-        releaseViewModel.DownloadFiles = await GetDownloadFiles(releaseVersion);
-
-        // If the view model has no Published value (mapped from PublishedDisplayDate) because the release version is
-        // unpublished, set a date based on what we expect it to be when publishing completes.
-        if (releaseViewModel.Published == null)
-        {
-            if (expectedPublishDate == null)
-            {
-                throw new ArgumentException(
-                    $"Expected publish date must be provided for unpublished release version '{releaseVersionId}'.",
-                    nameof(expectedPublishDate)
-                );
-            }
-
-            releaseViewModel.Published = await CalculatePublishedDisplayDate(releaseVersion, expectedPublishDate.Value);
-        }
-
-        return releaseViewModel;
-    }
-
-    // This is a duplicate of Publisher.Services.ReleaseService.CalculatePublishedDisplayDate
-    private async Task<DateTimeOffset> CalculatePublishedDisplayDate(
-        ReleaseVersion releaseVersion,
-        DateTimeOffset actualPublishedDate
-    )
-    {
-        // For the first version of a release or if an update to the published display date has been requested
-        // return the actual published date
-        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDisplayDate)
-        {
-            return actualPublishedDate;
-        }
-
-        // Otherwise, return the published display date of the previous version
-        await _contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync();
-        var previousVersion = releaseVersion.PreviousVersion!;
-
-        if (!previousVersion.PublishedDisplayDate.HasValue)
-        {
-            throw new ArgumentException(
-                $"Expected previous release version '{releaseVersion.PreviousVersionId}' to be published."
-            );
-        }
-
-        return previousVersion.PublishedDisplayDate.Value;
-    }
-
-    public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug)
-    {
-        return await _contentDbContext
-            .Publications.SingleOrNotFoundAsync(p => p.Slug == publicationSlug)
-            .OnSuccess(_userService.CheckCanViewPublication)
-            .OnSuccess(async publication =>
-            {
-                var publishedReleaseVersions = await _releaseVersionRepository.ListLatestReleaseVersions(
+                var publishedReleaseVersions = await releaseVersionRepository.ListLatestReleaseVersions(
                     publication.Id,
                     publishedOnly: true
                 );
@@ -161,7 +36,7 @@ public class ReleaseService : IReleaseService
                     .ToAsyncEnumerable()
                     .SelectAwait(async releaseVersion =>
                     {
-                        await _contentDbContext
+                        await contentDbContext
                             .ReleaseVersions.Entry(releaseVersion)
                             .Reference(rv => rv.Release)
                             .LoadAsync();
@@ -173,27 +48,4 @@ public class ReleaseService : IReleaseService
                     })
                     .ToListAsync();
             });
-    }
-
-    private static void FilterContentBlock(IContentBlockViewModel block)
-    {
-        switch (block)
-        {
-            case HtmlBlockViewModel htmlBlock:
-                htmlBlock.Body = string.IsNullOrEmpty(htmlBlock.Body)
-                    ? htmlBlock.Body
-                    : CommentsRegex().Replace(htmlBlock.Body, string.Empty);
-                break;
-        }
-    }
-
-    private async Task<List<FileInfo>> GetDownloadFiles(ReleaseVersion releaseVersion)
-    {
-        var files = await _releaseFileRepository.GetByFileType(
-            releaseVersion.Id,
-            types: [FileType.Ancillary, FileType.Data]
-        );
-
-        return files.Select(rf => rf.ToPublicFileInfo()).OrderBy(file => file.Name).ToList();
-    }
 }

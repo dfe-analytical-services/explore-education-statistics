@@ -18,11 +18,10 @@ public static class DateOnlyExtensions
         return new DateTimeOffset(ukMidnightDateTimeInUtc, TimeSpan.Zero);
     }
 
-    public static DateTimeOffset GetUkEndOfDayUtc(this DateOnly date, bool includeFractionalSeconds = true)
+    public static DateTimeOffset GetUkEndOfDayUtc(this DateOnly date)
     {
         // Get a TimeOnly value set to the end of the day.
-        // This is either 23:59:59.9999999 or 23:59:59 depending on whether fractional seconds should be included.
-        var timeAtEndOfDay = includeFractionalSeconds ? TimeOnly.MaxValue : new TimeOnly(23, 59, 59);
+        var timeAtEndOfDay = TimeOnly.MaxValue;
 
         // Get a DateTime set to the date of this DateOnly instance and the time at the end of the day
         var endOfDayDateTime = date.ToDateTime(timeAtEndOfDay, DateTimeKind.Unspecified);

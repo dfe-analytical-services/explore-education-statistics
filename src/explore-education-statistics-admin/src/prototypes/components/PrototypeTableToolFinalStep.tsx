@@ -1,6 +1,5 @@
 import Button from '@admin/prototypes/components/PrototypeButton';
 import Tag from '@common/components/Tag';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableHeadersForm from '@admin/prototypes/components/PrototypeTableHeadersForm';
@@ -9,12 +8,11 @@ import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import publicationService from '@common/services/publicationService';
 import Link from '@admin/components/Link';
 import tableBuilderService, {
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
-import React, { memo, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 
 interface TableToolFinalStepProps {
   query: ReleaseTableDataQuery;
@@ -40,34 +38,6 @@ const TableToolFinalStep = ({
   useEffect(() => {
     setCurrentTableHeaders(tableHeaders);
   }, [tableHeaders]);
-
-  const { value: fullPublication } = useAsyncRetry(
-    async () =>
-      publicationService.getLatestPublicationRelease(selectedPublication.slug),
-    [selectedPublication],
-  );
-  const publication = fullPublication?.publication;
-
-  const getMethodologyLinks = () => {
-    const links: ReactNode[] =
-      publication?.methodologies?.map(methodology => (
-        <Link key={methodology.id} to={`/methodology/${methodology.slug}`}>
-          {methodology.title}
-        </Link>
-      )) ?? [];
-
-    if (publication?.externalMethodology) {
-      links.push(
-        <Link
-          key={publication.externalMethodology.url}
-          to={publication.externalMethodology.url}
-        >
-          {publication.externalMethodology.title}
-        </Link>,
-      );
-    }
-    return links;
-  };
 
   return (
     <div
@@ -157,8 +127,8 @@ const TableToolFinalStep = ({
       )}
 
       <TableToolInfo
-        contactDetails={publication?.contact}
-        methodologyLinks={getMethodologyLinks()}
+        contactDetails={selectedPublication?.contact}
+        methodologyLinks={[]}
         releaseLink={
           <>
             {selectedPublication.selectedRelease.latestData ? (

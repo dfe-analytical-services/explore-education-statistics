@@ -600,9 +600,7 @@ public class PublicationServicePermissionTests
         IPublicationRepository? publicationRepository = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IMethodologyService? methodologyService = null,
-        IPublicationCacheService? publicationCacheService = null,
         IPublicationsTreeService? publicationsTreeService = null,
-        IReleaseCacheService? releaseCacheService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null,
         IAdminEventRaiser? adminEventRaiser = null
@@ -618,9 +616,7 @@ public class PublicationServicePermissionTests
             publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
             publicationsTreeService ?? Mock.Of<IPublicationsTreeService>(Strict),
-            releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build()

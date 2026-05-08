@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class EducationInNumbersContentExtensions
 {
-    public static EinContentSection Clone(this EinContentSection section, Guid newPageId)
+    public static EinContentSection Clone(this EinContentSection section, Guid newPageVersionId)
     {
         var newSectionId = Guid.NewGuid();
 
@@ -13,7 +13,7 @@ public static class EducationInNumbersContentExtensions
             Id = newSectionId,
             Order = section.Order,
             Heading = section.Heading,
-            EducationInNumbersPageId = newPageId,
+            EinPageVersionId = newPageVersionId,
             Content = section.Content.Select(block => block.Clone(newSectionId)).OrderBy(block => block.Order).ToList(),
         };
     }

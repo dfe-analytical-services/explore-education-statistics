@@ -11,16 +11,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 /// <summary>
 /// Component for supplying services with DbContexts when testing with InMemory DbContexts.
 /// </summary>
-public class InMemoryDbContextSupplier : IDbContextSupplier
+public class InMemoryDbContextSupplier(string? contentDbContextId = null, string? statisticsDbContextId = null)
+    : IDbContextSupplier
 {
-    private readonly string _contentDbContextId;
-    private readonly string _statisticsDbContextId;
-
-    public InMemoryDbContextSupplier(string? contentDbContextId = null, string? statisticsDbContextId = null)
-    {
-        _contentDbContextId = contentDbContextId ?? Guid.NewGuid().ToString();
-        _statisticsDbContextId = statisticsDbContextId ?? Guid.NewGuid().ToString();
-    }
+    private readonly string _contentDbContextId = contentDbContextId ?? Guid.NewGuid().ToString();
+    private readonly string _statisticsDbContextId = statisticsDbContextId ?? Guid.NewGuid().ToString();
 
     public TDbContext CreateDbContext<TDbContext>()
         where TDbContext : DbContext

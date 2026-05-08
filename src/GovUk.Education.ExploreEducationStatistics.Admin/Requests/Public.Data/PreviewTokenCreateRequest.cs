@@ -90,13 +90,17 @@ public record PreviewTokenCreateRequest
                                 .WithMessage("Expires date must be no more than 7 days from today.");
                         });
                     RuleFor(r => r.Expires)
-                        .Must(expires => expires!.Value.ConvertToUkTimeZone().TimeOfDay == _timeAtEndOfDay)
+                        .Must(expires =>
+                            TruncateMilliSeconds(expires!.Value.ConvertToUkTimeZone().TimeOfDay) == _timeAtEndOfDay
+                        )
                         .WithMessage("Expires time must always be at 23:59:59 UK local time.");
                 }
             );
 
             RuleFor(r => r.DataSetVersionId).NotEmpty();
             RuleFor(r => r.Label).NotEmpty().MaximumLength(100);
+            TimeSpan TruncateMilliSeconds(TimeSpan timeSpan) =>
+                new(timeSpan.Days, timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
     }
 }

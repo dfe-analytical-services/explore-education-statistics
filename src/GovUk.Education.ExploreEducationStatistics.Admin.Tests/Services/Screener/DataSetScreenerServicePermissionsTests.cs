@@ -1,5 +1,5 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -46,7 +46,8 @@ public class DataSetScreenerServicePermissionsTests
             userService: userService,
             contentDbContext: contentDbContext,
             timeProvider: TimeProvider.System,
-            new DataScreenerOptions().ToOptionsWrapper()
+            mapper: MapperUtils.AdminMapper(),
+            options: new DataScreenerOptions().ToOptionsWrapper()
         );
     }
 }

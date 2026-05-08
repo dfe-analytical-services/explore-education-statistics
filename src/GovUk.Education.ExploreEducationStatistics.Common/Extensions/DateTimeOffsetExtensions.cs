@@ -34,7 +34,7 @@ public static class DateTimeOffsetExtensions
         // Convert the date and time to the UK time zone
         var inUkZone = dateTimeOffset.ConvertToUkTimeZone();
 
-        // Get the date component of that date in the UK time zone (DateTime at midnight)
+        // Get the date component in the UK time zone, which sets the time to midnight (00:00)
         var ukMidnightDateTime = inUkZone.Date;
 
         // Get the correct UTC offset for midnight on that date in the UK time zone
@@ -46,6 +46,17 @@ public static class DateTimeOffsetExtensions
         // Convert the DateTimeOffset to UTC
         return ukMidnightDateTimeOffset.ToUniversalTime();
     }
+
+    /// <summary>
+    /// <para>
+    /// Adjusts the provided <paramref name="dateTimeOffset"/> to the UK time zone and returns a
+    /// <see cref="DateTimeOffset"/> in UTC representing the end of that UK day, accounting for daylight saving time.
+    /// </para>
+    /// </summary>
+    /// <param name="dateTimeOffset">The input <see cref="DateTimeOffset"/> to convert.</param>
+    /// <returns>A <see cref="DateTimeOffset"/> in UTC corresponding to the end of the UK day for the provided input.</returns>
+    public static DateTimeOffset GetUkEndOfDayUtc(this DateTimeOffset dateTimeOffset) =>
+        dateTimeOffset.ToUkDateOnly().GetUkEndOfDayUtc();
 
     /// <summary>
     /// <para>

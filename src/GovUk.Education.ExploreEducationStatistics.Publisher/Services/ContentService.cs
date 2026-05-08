@@ -20,7 +20,6 @@ public class ContentService : IContentService
     private readonly IBlobStorageService _publicBlobStorageService;
     private readonly IReleaseService _releaseService;
     private readonly IMethodologyCacheService _methodologyCacheService;
-    private readonly IReleaseCacheService _releaseCacheService;
     private readonly IPublicationsTreeService _publicationsTreeService;
 
     public ContentService(
@@ -30,7 +29,6 @@ public class ContentService : IContentService
         IBlobStorageService publicBlobStorageService,
         IReleaseService releaseService,
         IMethodologyCacheService methodologyCacheService,
-        IReleaseCacheService releaseCacheService,
         IPublicationsTreeService publicationsTreeService
     )
     {
@@ -40,7 +38,6 @@ public class ContentService : IContentService
         _publicBlobStorageService = publicBlobStorageService;
         _releaseService = releaseService;
         _methodologyCacheService = methodologyCacheService;
-        _releaseCacheService = releaseCacheService;
         _publicationsTreeService = publicationsTreeService;
     }
 
@@ -101,71 +98,6 @@ public class ContentService : IContentService
                     directoryPath: $"{releaseVersion.PreviousVersion.Id}/"
                 );
             }
-        }
-    }
-
-    public async Task UpdateContent(Guid releaseVersionId, DateTimeOffset expectedPublishDate)
-    {
-        var releaseVersion = await _contentDbContext
-            .ReleaseVersions.Include(rv => rv.Release)
-                .ThenInclude(r => r.Publication)
-            .SingleAsync(rv => rv.Id == releaseVersionId);
-
-        await _releaseCacheService.UpdateRelease(
-            releaseVersionId: releaseVersion.Id,
-            publicationSlug: releaseVersion.Release.Publication.Slug,
-            releaseSlug: releaseVersion.Release.Slug,
-            expectedPublishDate: expectedPublishDate
-        );
-
-        var publication = releaseVersion.Release.Publication;
-
-        // Cache the latest release version for the publication as a separate cache entry
-        var latestReleaseVersion = await _releaseService.GetLatestPublishedReleaseVersion(
-            publicationId: publication.Id,
-            includeUnpublishedVersionIds: [releaseVersion.Id]
-        );
-
-        await _releaseCacheService.UpdateRelease(
-            releaseVersionId: latestReleaseVersion.Id,
-            publicationSlug: publication.Slug,
-            expectedPublishDate: expectedPublishDate
-        );
-    }
-
-    public async Task UpdateContentStaged(DateTimeOffset expectedPublishDate, params Guid[] releaseVersionIds)
-    {
-        var releaseVersions = await _contentDbContext
-            .ReleaseVersions.Where(rv => releaseVersionIds.Contains(rv.Id))
-            .Include(rv => rv.Release)
-                .ThenInclude(r => r.Publication)
-            .ToListAsync();
-
-        foreach (var releaseVersion in releaseVersions)
-        {
-            await _releaseCacheService.UpdateReleaseStaged(
-                releaseVersion.Id,
-                expectedPublishDate,
-                publicationSlug: releaseVersion.Release.Publication.Slug,
-                releaseSlug: releaseVersion.Release.Slug
-            );
-        }
-
-        var publications = releaseVersions.Select(rv => rv.Release.Publication).DistinctBy(p => p.Id).ToList();
-
-        foreach (var publication in publications)
-        {
-            // Cache the latest release version for the publication as a separate cache entry
-            var latestReleaseVersion = await _releaseService.GetLatestPublishedReleaseVersion(
-                publicationId: publication.Id,
-                includeUnpublishedVersionIds: releaseVersionIds
-            );
-
-            await _releaseCacheService.UpdateReleaseStaged(
-                latestReleaseVersion.Id,
-                expectedPublishDate,
-                publicationSlug: publication.Slug
-            );
         }
     }
 
