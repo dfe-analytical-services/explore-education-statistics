@@ -83,11 +83,9 @@ Create data block table
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
 
-Add summary text block and key free text key statistic
-    user adds summary text block
-    user adds content to summary text block    Test intro text for ${PUBLICATION_NAME}
+Add key free text key statistic
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
 
     user checks element count is x    testid:keyStat    1

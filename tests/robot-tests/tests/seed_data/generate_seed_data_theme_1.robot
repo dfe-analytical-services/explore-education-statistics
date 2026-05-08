@@ -239,9 +239,10 @@ Add release content to ${RELEASE_1_NAME}
     user waits until page finishes loading
 
 Add release summary to ${RELEASE_1_NAME}
-    user adds summary text block
-    user adds content to summary text block
-    ...    Read national statistical summaries, view charts and tables and download data files.
+    # TODO: WIP for EES-7124 - this needs to be done via an API as we no longer should add 'background/summary' text blocks to publications
+    # user adds summary text block
+    # user adds content to summary text block
+    # ...    Read national statistical summaries, view charts and tables and download data files.
 
 Add key statistics to ${RELEASE_1_NAME}
     user adds key statistic from data block
@@ -693,9 +694,10 @@ Add release content to ${RELEASE_2_NAME}
     user waits until page finishes loading
 
 Add release summary to ${RELEASE_2_NAME}
-    user adds summary text block
-    user adds content to summary text block
-    ...    Read national statistical summaries, view charts and tables and download data files.
+    # TODO: WIP for EES-7124 - this needs to be done via an API as we no longer should add 'background/summary' text blocks to publications
+    # user adds summary text block
+    # user adds content to summary text block
+    # ...    Read national statistical summaries, view charts and tables and download data files.
 
 Add key statistics to ${RELEASE_2_NAME}
     user adds key statistic from data block

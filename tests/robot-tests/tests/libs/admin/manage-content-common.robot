@@ -28,9 +28,6 @@ user navigates to content page
 
 user adds basic release content
     [Arguments]    ${publication}    ${add_headlines_block}=${True}
-    user adds summary text block
-    user adds content to summary text block    Test summary text for ${publication}
-
     IF    ${add_headlines_block}
         user adds headlines text block
         user adds content to headlines text block    Test headlines summary text for ${publication}
@@ -234,10 +231,6 @@ user checks accordion section contains x blocks
     ${blocks}=    get child elements    ${section}    css:[data-testid="editableSectionBlock"]
     length should be    ${blocks}    ${num_blocks}
 
-user adds summary text block
-    user clicks button    Add a summary text block    id:releaseSummary
-    user waits until element contains    id:releaseSummary    This section is empty    %{WAIT_SMALL}
-
 user adds headlines text block
     user clicks button    Add a headlines text block    id:releaseHeadlines
     user waits until element contains    id:releaseHeadlines    This section is empty    %{WAIT_SMALL}
@@ -332,10 +325,6 @@ user adds content to autosaving text block
         user saves autosaving text block    ${parent}
     END
     user waits until element contains    ${parent}    ${content}    %{WAIT_SMALL}
-
-user adds content to summary text block
-    [Arguments]    ${content}
-    user adds content to autosaving text block    id:releaseSummary    ${content}
 
 user adds content to headlines text block
     [Arguments]    ${content}

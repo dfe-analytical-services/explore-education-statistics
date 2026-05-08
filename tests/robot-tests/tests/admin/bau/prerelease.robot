@@ -285,8 +285,6 @@ Validate prerelease has started
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
-    user waits until element contains    id:background-information    Test summary text for ${PUBLICATION_NAME}
-    ...    %{WAIT_SMALL}
     user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
     ...    %{WAIT_SMALL}
 
@@ -422,7 +420,6 @@ Validate prerelease has started for Analyst user
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
-    user waits until element contains    id:background-information    Test summary text for ${PUBLICATION_NAME}
     user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate public metdata guidance for Analyst user

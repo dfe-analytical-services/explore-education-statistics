@@ -128,7 +128,7 @@ Create chart for data block
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
 
 Add free text key stat
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
@@ -231,7 +231,7 @@ Edit data block
 Navigate to the 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
 
 Verify data block is updated correctly
     # checking if data block cache has been invalidated by verifying the updates on the block
@@ -623,7 +623,7 @@ Update data block chart for amendment
 Navigate to 'Content' page for amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block
+    user waits until page contains button    Add a warning text block
 
 Update free text key stat
     user updates free text key stat    1    Updated title    New stat    Updated trend
