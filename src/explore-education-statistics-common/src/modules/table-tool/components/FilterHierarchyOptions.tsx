@@ -12,6 +12,8 @@ import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export type FilterHierarchyOption = {
+  /** Zero-based */
+  tier: number;
   value: string;
   label: string;
   filterLabel: string;
@@ -162,6 +164,7 @@ function FilterHierarchyOptions({
   return (
     <div
       data-testid={`filter-hierarchy-options-${optionTree.value}`}
+      data-tier={level}
       className={classNames(
         'govuk-checkboxes',
         'govuk-checkboxes--small',
