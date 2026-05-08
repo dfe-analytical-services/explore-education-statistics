@@ -154,6 +154,12 @@ describe('ReleaseContentPage', () => {
         logoFileName: 'logo.png',
       },
     ],
+    relatedDashboardsSection: {
+      id: 'related-dashoards-id',
+      order: 0,
+      content: [],
+      heading: '',
+    },
     relatedInformation: [],
     slug: '2020-21',
     summarySection: {

@@ -165,6 +165,11 @@ const PrototypeTableToolWizard = ({
         id: publication.id,
         slug: publication.slug,
         title: publication.title,
+        contact: {
+          teamEmail: '',
+          contactName: '',
+          teamName: '',
+        },
         selectedRelease: {
           id: selectedReleaseVersion.id,
           latestData: selectedReleaseVersion.isLatestRelease,

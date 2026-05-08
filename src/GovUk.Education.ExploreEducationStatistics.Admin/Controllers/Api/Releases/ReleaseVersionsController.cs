@@ -314,11 +314,14 @@ public class ReleaseVersionsController(
             .HandleFailuresOr(_ => new AcceptedResult());
     }
 
-    // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-    [HttpGet("releases/{releaseVersionId:guid}/stage-status")]
-    public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseVersionId)
+    [HttpGet("releaseVersions/{releaseVersionId:guid}/stage-status")]
+    public async Task<ActionResult<ReleasePublishingStatusViewModel?>> GetReleaseStatuses(Guid releaseVersionId)
     {
-        return await releasePublishingStatusService.GetReleaseStatusAsync(releaseVersionId).HandleFailuresOrOk();
+        // Publishing status entries are created asynchronously by the Publisher via a queue-triggered function when a
+        // release is approved, so there may be a brief delay before the status exists.
+        // A 404 Not Found would be more appropriate when the status does not exist yet, but for now
+        // a 204 No Content is returned when GetReleaseStatus returns null.
+        return await releasePublishingStatusService.GetReleaseStatus(releaseVersionId).HandleFailuresOrOk();
     }
 
     [HttpGet("releaseVersions/{releaseVersionId:guid}/checklist")]

@@ -331,6 +331,12 @@ describe('TableToolPage', () => {
       title: 'Latest Release Title',
       type: 'OfficialStatistics',
     },
+    contact: {
+      teamName: 'The team name',
+      teamEmail: 'team@name.com',
+      contactName: 'A person',
+      contactTelNo: '012345',
+    },
     latestRelease: {
       title: 'Latest Release Title',
       slug: 'latest-release-slug',
@@ -348,6 +354,12 @@ describe('TableToolPage', () => {
       slug: 'selected-release-slug',
       title: 'Selected Release Title',
       type: 'OfficialStatistics',
+    },
+    contact: {
+      teamName: 'The team name',
+      teamEmail: 'team@name.com',
+      contactName: 'A person',
+      contactTelNo: '012345',
     },
     latestRelease: {
       title: 'Latest Release Title',

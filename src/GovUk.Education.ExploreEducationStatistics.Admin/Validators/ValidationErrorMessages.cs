@@ -71,7 +71,6 @@ public enum ValidationErrorMessages
     PublishingOrganisationsLimitExceeded,
 
     // Release approval
-    ReleaseNotApproved,
     PublishedReleaseCannotBeUnapproved,
     PublishDateCannotBeEmpty,
     PublishDateCannotBeScheduled,

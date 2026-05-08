@@ -13,61 +13,39 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
 {
     public async Task<Either<ActionResult, List<EinNavItemViewModel>>> ListEinPages(CancellationToken cancellationToken)
     {
-        var uniqueSlugs = await contentDbContext
-            .EducationInNumbersPages.Where(page => page.Published != null)
-            .Select(page => page.Slug)
-            .Distinct()
-            .ToListAsync(cancellationToken: cancellationToken);
-
-        return await uniqueSlugs
-            .ToAsyncEnumerable()
-            .Select(
-                async (slug, ct) =>
-                    await contentDbContext
-                        .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
-                        .OrderByDescending(page => page.Version)
-                        .Select(page => EinNavItemViewModel.FromModel(page))
-                        .FirstAsync(cancellationToken: ct)
-            )
-            .OrderBy(navItem => navItem.Order)
-            .ToListAsync(cancellationToken: cancellationToken);
+        return await contentDbContext
+            .EinPages.Include(page => page.LatestPublishedVersion!.EinPage)
+            .Where(page => page.LatestPublishedVersionId != null)
+            .OrderBy(page => page.Order)
+            .Select(page => EinNavItemViewModel.FromModel(page.LatestPublishedVersion!))
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<Either<ActionResult, EinPageViewModel>> GetEinPage(
+    public async Task<Either<ActionResult, EinPageVersionViewModel>> GetEinPage(
         string? slug,
         CancellationToken cancellationToken
     )
     {
         return await contentDbContext
-            .EducationInNumbersPages.Include(page => page.Content)
+            .EinPages.Include(page => page.LatestPublishedVersion!.EinPage)
+            .Include(page => page.LatestPublishedVersion!.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
                         .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
-            .Where(page => page.Slug == slug && page.Published != null)
-            .OrderByDescending(page => page.Version)
-            .Select(page => EinPageViewModel.FromModel(page))
-            .FirstOrNotFoundAsync(cancellationToken: cancellationToken);
+            .Where(page => page.Slug == slug && page.LatestPublishedVersionId != null)
+            .Select(page => EinPageVersionViewModel.FromModel(page.LatestPublishedVersion!))
+            .SingleOrNotFoundAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<Either<ActionResult, List<EinPageSitemapItemViewModel>>> ListSitemapItems(
         CancellationToken cancellationToken
     )
     {
-        var uniqueSlugs = await contentDbContext
-            .EducationInNumbersPages.Where(page => page.Published != null)
-            .Select(page => page.Slug)
-            .Distinct()
-            .ToListAsync(cancellationToken: cancellationToken);
-
-        return await uniqueSlugs
-            .ToAsyncEnumerable()
-            .SelectAwait(async slug =>
-                await contentDbContext
-                    .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
-                    .OrderByDescending(page => page.Version)
-                    .Select(page => EinPageSitemapItemViewModel.FromModel(page))
-                    .FirstAsync(cancellationToken: cancellationToken)
-            )
-            .ToListAsync(cancellationToken: cancellationToken);
+        return await contentDbContext
+            .EinPages.Include(page => page.LatestPublishedVersion!.EinPage)
+            .Where(page => page.LatestPublishedVersionId != null)
+            .OrderBy(page => page.Order)
+            .Select(page => EinPageSitemapItemViewModel.FromModel(page.LatestPublishedVersion!))
+            .ToListAsync(cancellationToken);
     }
 }

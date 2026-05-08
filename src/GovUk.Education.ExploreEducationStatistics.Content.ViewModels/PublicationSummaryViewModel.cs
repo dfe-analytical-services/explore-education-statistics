@@ -21,14 +21,6 @@ public record PublicationSummaryViewModel
     public PublicationSummaryViewModel() { }
 
     [SetsRequiredMembers]
-    public PublicationSummaryViewModel(PublicationCacheViewModel publicationCache)
-    {
-        Id = publicationCache.Id;
-        Title = publicationCache.Title;
-        Slug = publicationCache.Slug;
-    }
-
-    [SetsRequiredMembers]
     public PublicationSummaryViewModel(Publication publication)
         : this(publication, hasContact: false) { }
 

@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
@@ -23,6 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Screen
 
 public abstract class DataSetScreenerServiceTests
 {
+    private const int ScreenerProgressUpdateIntervalSeconds = 5;
+    private const int ScreenerProgressUpdateFailureIntervalMinutes = 10;
+
     private readonly DataFixture _dataFixture = new();
 
     public class ScreenDataSetTests : DataSetScreenerServiceTests
@@ -113,29 +115,35 @@ public abstract class DataSetScreenerServiceTests
                     0,
                     s =>
                         s.SetScreenerProgress(
-                            new DataSetScreenerProgress
-                            {
-                                Completed = false,
-                                Passed = false,
-                                PercentageComplete = 50,
-                                Stage = "validation",
-                                LastUpdated = utcNow.AddSeconds(-5),
-                            }
-                        )
+                                new DataSetScreenerProgress
+                                {
+                                    Completed = false,
+                                    Passed = false,
+                                    PercentageComplete = 50,
+                                    Stage = "validation",
+                                }
+                            )
+                            .SetScreenerProgressLastChecked(utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds))
+                            .SetScreenerProgressLastUpdated(utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds))
                 )
                 .ForIndex(
                     1,
                     s =>
                         s.SetScreenerProgress(
-                            new DataSetScreenerProgress
-                            {
-                                Completed = false,
-                                Passed = false,
-                                PercentageComplete = 70,
-                                Stage = "screening",
-                                LastUpdated = utcNow.AddSeconds(-6),
-                            }
-                        )
+                                new DataSetScreenerProgress
+                                {
+                                    Completed = false,
+                                    Passed = false,
+                                    PercentageComplete = 70,
+                                    Stage = "screening",
+                                }
+                            )
+                            .SetScreenerProgressLastChecked(
+                                utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds - 1)
+                            )
+                            .SetScreenerProgressLastUpdated(
+                                utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds - 1)
+                            )
                 )
                 .GenerateList();
 
@@ -203,10 +211,17 @@ public abstract class DataSetScreenerServiceTests
                 {
                     PercentageComplete = 80,
                     Stage = "screening",
-                    LastUpdated = utcNow,
                 };
 
                 Assert.Equal(expectedDataSet1ScreenerProgress, dataSetUpload1.ScreenerProgress);
+
+                // Expect the "last checked" date to be updated to show that Admin requested
+                // a progress update for this data set.
+                Assert.Equal(utcNow, dataSetUpload1.ScreenerProgressLastChecked);
+
+                // Expect the "last updated" date to be updated to show that Admin successfully
+                // received and applied a progress update for this data set.
+                Assert.Equal(utcNow, dataSetUpload1.ScreenerProgressLastUpdated);
 
                 var dataSetUpload2 = updatedDataSetUploads[1];
 
@@ -216,83 +231,17 @@ public abstract class DataSetScreenerServiceTests
                     Completed = true,
                     Passed = true,
                     Stage = "complete",
-                    LastUpdated = utcNow,
                 };
 
                 Assert.Equal(expectedDataSet2ScreenerProgress, dataSetUpload2.ScreenerProgress);
-            }
-        }
 
-        [Fact]
-        public async Task DataSetBeingScreened_NoExistingProgressUpdates_NeedProgressUpdate_Success()
-        {
-            var utcNow = DateTimeOffset.UtcNow;
+                // Expect the "last checked" date to be updated to show that Admin requested
+                // a progress update for this data set.
+                Assert.Equal(utcNow, dataSetUpload2.ScreenerProgressLastChecked);
 
-            // Arrange
-            DataSetUpload dataSetUndergoingScreening = _dataFixture
-                .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
-                // No existing progress updates yet.
-                .WithScreenerProgress(null);
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
-                await context.SaveChangesAsync();
-            }
-
-            // Return the progress responses out of order, to ensure they're matched up correctly with the
-            // correct data sets by id.
-            List<DataSetScreenerProgressResponse> progressResponse =
-            [
-                new()
-                {
-                    DataSetId = dataSetUndergoingScreening.Id,
-                    PercentageComplete = 10,
-                    Completed = false,
-                    Passed = false,
-                    Stage = "started",
-                },
-            ];
-
-            var screenerClient = new Mock<IDataSetScreenerClient>(MockBehavior.Strict);
-
-            screenerClient
-                .Setup(s => s.GetScreenerProgress(new[] { dataSetUndergoingScreening.Id }, CancellationToken.None))
-                .ReturnsAsync(progressResponse);
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildService(
-                    screenerClient: screenerClient.Object,
-                    contentDbContext: context,
-                    timeProvider: new FakeTimeProvider(utcNow)
-                );
-
-                // Act
-                var result = await service.UpdateScreeningProgress(CancellationToken.None);
-
-                // Assert
-                screenerClient.VerifyAll();
-
-                Assert.Equal(progressResponse, result);
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var updatedDataSetUpload = context.DataSetUploads.Single();
-
-                var expectedDataSetScreenerProgress = new DataSetScreenerProgress
-                {
-                    PercentageComplete = 10,
-                    Completed = false,
-                    Passed = false,
-                    Stage = "started",
-                    LastUpdated = utcNow,
-                };
-
-                Assert.Equal(expectedDataSetScreenerProgress, updatedDataSetUpload.ScreenerProgress);
+                // Expect the "last updated" date to be updated to show that Admin successfully
+                // received and applied a progress update for this data set.
+                Assert.Equal(utcNow, dataSetUpload2.ScreenerProgressLastUpdated);
             }
         }
 
@@ -312,10 +261,11 @@ public abstract class DataSetScreenerServiceTests
                         Passed = false,
                         PercentageComplete = 50,
                         Stage = "validation",
-                        // Recently updated, so no need for another progress update yet.
-                        LastUpdated = utcNow.AddSeconds(-4),
                     }
-                );
+                )
+                // Recently checked, so no need for another progress update yet.
+                .WithScreenerProgressLastChecked(utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds + 1))
+                .WithScreenerProgressLastUpdated(utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds - 5));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -347,8 +297,16 @@ public abstract class DataSetScreenerServiceTests
             {
                 var updatedDataSetUpload = context.DataSetUploads.Single();
 
-                // Expect no updates to progress.
+                // Expect no updates to progress or checked / updated dates.
                 Assert.Equal(dataSetUndergoingScreening.ScreenerProgress, updatedDataSetUpload.ScreenerProgress);
+                Assert.Equal(
+                    dataSetUndergoingScreening.ScreenerProgressLastChecked,
+                    updatedDataSetUpload.ScreenerProgressLastChecked
+                );
+                Assert.Equal(
+                    dataSetUndergoingScreening.ScreenerProgressLastUpdated,
+                    updatedDataSetUpload.ScreenerProgressLastUpdated
+                );
             }
         }
 
@@ -388,12 +346,14 @@ public abstract class DataSetScreenerServiceTests
                 var updatedDataSetUpload = context.DataSetUploads.Single();
 
                 // Expect no updates to progress.
-                Assert.Equal(dataSetUndergoingScreening.ScreenerProgress, updatedDataSetUpload.ScreenerProgress);
+                Assert.Null(updatedDataSetUpload.ScreenerProgress);
+                Assert.Null(updatedDataSetUpload.ScreenerProgressLastChecked);
+                Assert.Null(updatedDataSetUpload.ScreenerProgressLastUpdated);
             }
         }
 
         [Fact]
-        public async Task DataSetsBeingScreened_NeedProgressUpdate_OneProgressUpdateNotInResponse_NoUpdate()
+        public async Task DataSetsBeingScreened_NeedProgressUpdate_OnlyOneProgressUpdateInResponse_OnlyCheckedDateUpdatesForMissingOnes()
         {
             var utcNow = DateTimeOffset.UtcNow;
 
@@ -401,6 +361,17 @@ public abstract class DataSetScreenerServiceTests
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
                 .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = false,
+                        Passed = false,
+                        PercentageComplete = 0,
+                        Stage = "Not started",
+                    }
+                )
+                .WithScreenerProgressLastChecked(utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds))
+                .WithScreenerProgressLastUpdated(utcNow.AddSeconds(-ScreenerProgressUpdateIntervalSeconds))
                 .GenerateList(2);
 
             var contextId = Guid.NewGuid().ToString();
@@ -412,7 +383,7 @@ public abstract class DataSetScreenerServiceTests
 
             var dataSetIds = dataSetsUndergoingScreening.Select(u => u.Id).ToList();
 
-            // Only include a progress update for one of the requested data sets.
+            // Only include a progress update for one of the two requested data sets.
             List<DataSetScreenerProgressResponse> progressResponse =
             [
                 new()
@@ -421,7 +392,7 @@ public abstract class DataSetScreenerServiceTests
                     PercentageComplete = 100.00,
                     Completed = true,
                     Passed = true,
-                    Stage = "complete",
+                    Stage = "Complete",
                 },
             ];
 
@@ -454,18 +425,28 @@ public abstract class DataSetScreenerServiceTests
 
                 var dataSetUpload1 = updatedDataSetUploads[0];
 
-                // Assert that no progress update has been received for this data set yet, but it has received
-                // some default values and a LastUpdated date.
+                // Assert that no progress update has been received for this data set yet and so it still has its same
+                // progress as before.
                 var expectedDataSet1ScreenerProgress = new DataSetScreenerProgress
                 {
                     PercentageComplete = 0,
                     Completed = false,
                     Passed = false,
-                    Stage = "",
-                    LastUpdated = utcNow,
+                    Stage = "Not started",
                 };
 
                 Assert.Equal(expectedDataSet1ScreenerProgress, dataSetUpload1.ScreenerProgress);
+
+                // Expect the "last checked" date to be updated to show that Admin requested
+                // a progress update for this data set.
+                Assert.Equal(utcNow, dataSetUpload1.ScreenerProgressLastChecked);
+
+                // Expect the "last updated" date to be left alone as it didn't successfully receive
+                // a progress update this time.
+                Assert.Equal(
+                    dataSetsUndergoingScreening[0].ScreenerProgressLastUpdated,
+                    dataSetUpload1.ScreenerProgressLastUpdated
+                );
 
                 var dataSetUpload2 = updatedDataSetUploads[1];
 
@@ -474,12 +455,19 @@ public abstract class DataSetScreenerServiceTests
                     PercentageComplete = 100,
                     Completed = true,
                     Passed = true,
-                    Stage = "complete",
-                    LastUpdated = utcNow,
+                    Stage = "Complete",
                 };
 
                 // Assert that the data set that did receive a progress update has had its progress updated.
                 Assert.Equal(expectedDataSet2ScreenerProgress, dataSetUpload2.ScreenerProgress);
+
+                // Expect the "last checked" date to be updated to show that Admin requested
+                // a progress update for this data set.
+                Assert.Equal(utcNow, dataSetUpload2.ScreenerProgressLastChecked);
+
+                // Expect the "last updated" date to be updated to show that Admin successfully
+                // received and applied a progress update for this data set.
+                Assert.Equal(utcNow, dataSetUpload2.ScreenerProgressLastUpdated);
             }
         }
     }
@@ -705,6 +693,207 @@ public abstract class DataSetScreenerServiceTests
         }
     }
 
+    public class MarkDataSetsWithoutProgressAsFailedTests : DataSetScreenerServiceTests
+    {
+        [Fact]
+        public async Task DataSetsWithoutRecentProgressUpdates_MarkedAsScreenerErrors()
+        {
+            // Arrange
+            var dataSet1LastChecked = DateTimeOffset.UtcNow;
+            var dataSet2LastChecked = DateTimeOffset.UtcNow.AddDays(-1);
+
+            var dataSetsUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithStatus(DataSetUploadStatus.SCREENING)
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetScreenerProgress(
+                                new DataSetScreenerProgress
+                                {
+                                    Completed = false,
+                                    Passed = false,
+                                    PercentageComplete = 50,
+                                    Stage = "validation",
+                                }
+                            )
+                            .SetScreenerProgressLastChecked(dataSet1LastChecked)
+                            .SetScreenerProgressLastUpdated(
+                                dataSet1LastChecked.AddMinutes(-ScreenerProgressUpdateFailureIntervalMinutes)
+                            )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetScreenerProgress(
+                                new DataSetScreenerProgress
+                                {
+                                    Completed = false,
+                                    Passed = false,
+                                    PercentageComplete = 70,
+                                    Stage = "screening",
+                                }
+                            )
+                            .SetScreenerProgressLastChecked(dataSet2LastChecked)
+                            .SetScreenerProgressLastUpdated(dataSet2LastChecked.AddDays(-1))
+                )
+                .GenerateList();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetsUndergoingScreening);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var results = await service.MarkDataSetsWithoutProgressAsFailed(CancellationToken.None);
+
+                Assert.Equal(2, results.Count);
+
+                results.ForEach(result =>
+                {
+                    Assert.Equal(nameof(DataSetUploadStatus.FAILED_SCREENING), result.Status);
+                    Assert.NotNull(result.ScreenerResult);
+                    Assert.Equal("Failed to retrieve progress updates", result.ScreenerResult.OverallResult);
+                    Assert.Empty(result.ScreenerResult.TestResults);
+                });
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataQuery
+                var updatedUploads = context.DataSetUploads.ToList();
+
+                updatedUploads.ForEach(upload =>
+                {
+                    Assert.Equal(DataSetUploadStatus.SCREENER_ERROR, upload.Status);
+                    Assert.NotNull(upload.ScreenerResult);
+                    Assert.Equal("Failed to retrieve progress updates", upload.ScreenerResult.OverallResult);
+                    Assert.False(upload.ScreenerResult.Passed);
+                    Assert.False(upload.ScreenerResult.PublicApiCompatible);
+                    // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
+                    Assert.Empty(upload.ScreenerResult.TestResults);
+                });
+            }
+        }
+
+        [Fact]
+        public async Task DataSetWithRecentProgressUpdates_Ignored_NotMarkedAsScreenerErrors()
+        {
+            // Arrange
+            var dataSetLastChecked = DateTimeOffset.UtcNow;
+
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = false,
+                        Passed = false,
+                        PercentageComplete = 50,
+                        Stage = "validation",
+                    }
+                )
+                .WithScreenerProgressLastChecked(dataSetLastChecked)
+                .WithScreenerProgressLastUpdated(
+                    dataSetLastChecked
+                        .AddMinutes(-ScreenerProgressUpdateFailureIntervalMinutes)
+                        // Make the last updated date a little closer to the last
+                        // checked date so that the interval isn't as large as
+                        // ScreenerProgressUpdateFailureIntervalMinutes.
+                        .AddSeconds(1)
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var results = await service.MarkDataSetsWithoutProgressAsFailed(CancellationToken.None);
+
+                Assert.Empty(results);
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataQuery
+                var upload = context.DataSetUploads.Single();
+
+                // Expect it to be in its original state.
+                Assert.Equal(DataSetUploadStatus.SCREENING, upload.Status);
+
+                // Expect it not to have had any ScreenerResult applied.
+                Assert.Null(upload.ScreenerResult);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetNotUndergoingScreening_Ignored_NotMarkedAsScreenerErrors()
+        {
+            // Arrange
+            var dataSetLastChecked = DateTimeOffset.UtcNow;
+
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithStatus(DataSetUploadStatus.PENDING_REVIEW)
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = true,
+                        Passed = true,
+                        PercentageComplete = 100,
+                        Stage = "complete",
+                    }
+                )
+                .WithScreenerProgressLastChecked(dataSetLastChecked)
+                .WithScreenerProgressLastUpdated(
+                    dataSetLastChecked.AddMinutes(-ScreenerProgressUpdateFailureIntervalMinutes)
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var results = await service.MarkDataSetsWithoutProgressAsFailed(CancellationToken.None);
+
+                Assert.Empty(results);
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataQuery
+                var upload = context.DataSetUploads.Single();
+
+                // Expect it to be in its original state.
+                Assert.Equal(DataSetUploadStatus.PENDING_REVIEW, upload.Status);
+
+                // Expect it not to have had any ScreenerResult applied.
+                Assert.Null(upload.ScreenerResult);
+            }
+        }
+    }
+
     private DataSetScreenerService BuildService(
         IDataSetScreenerClient? screenerClient = null,
         IQueueServiceClient? queueServiceClient = null,
@@ -719,7 +908,12 @@ public abstract class DataSetScreenerServiceTests
             userService: userService ?? MockUtils.AlwaysTrueUserService().Object,
             contentDbContext: contentDbContext ?? Mock.Of<ContentDbContext>(),
             timeProvider: timeProvider ?? TimeProvider.System,
-            options: new DataScreenerOptions { ScreenerProgressUpdateIntervalSeconds = 5 }.ToOptionsWrapper()
+            mapper: MapperUtils.AdminMapper(),
+            options: new DataScreenerOptions
+            {
+                ScreenerProgressUpdateIntervalSeconds = ScreenerProgressUpdateIntervalSeconds,
+                ScreenerProgressUpdateFailureIntervalMinutes = ScreenerProgressUpdateFailureIntervalMinutes,
+            }.ToOptionsWrapper()
         );
     }
 }

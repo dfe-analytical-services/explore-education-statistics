@@ -25,34 +25,35 @@ public class EducationInNumbersContentService(
 ) : IEducationInNumbersContentService
 {
     public async Task<Either<ActionResult, EinContentViewModel>> GetPageContent(
-        Guid pageId,
+        Guid pageVersionId,
         CancellationToken cancellationToken
     )
     {
         return await contentDbContext
-            .EducationInNumbersPages.Include(page => page.Content)
+            .EinPageVersions.Include(pageVersion => pageVersion.EinPage)
+            .Include(pageVersion => pageVersion.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
                         .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
-            .Where(page => page.Id == pageId)
+            .Where(pageVersion => pageVersion.Id == pageVersionId)
             .FirstOrNotFoundAsync(cancellationToken)
             .OnSuccess(EinContentViewModel.FromModel);
     }
 
     public async Task<Either<ActionResult, EinContentSectionViewModel>> AddSection(
-        Guid pageId,
+        Guid pageVersionId,
         int order,
         CancellationToken cancellationToken
     )
     {
         var sectionList = await contentDbContext
-            .EinContentSections.Where(section => section.EducationInNumbersPageId == pageId)
+            .EinContentSections.Where(section => section.EinPageVersionId == pageVersionId)
             .ToListAsync(cancellationToken);
 
         var newSection = new EinContentSection
         {
             Id = Guid.NewGuid(),
-            EducationInNumbersPageId = pageId,
+            EinPageVersionId = pageVersionId,
             Order = order,
             Heading = "New section",
             Content = [],
@@ -68,7 +69,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, EinContentSectionViewModel>> UpdateSectionHeading(
-        Guid pageId,
+        Guid pageVersionId,
         Guid sectionId,
         string heading,
         CancellationToken cancellationToken
@@ -79,7 +80,7 @@ public class EducationInNumbersContentService(
                 .ThenInclude(b => (b as EinTileGroupBlock)!.Tiles)
                     .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
             .FirstOrNotFoundAsync(
-                section => section.EducationInNumbersPageId == pageId && section.Id == sectionId,
+                section => section.EinPageVersionId == pageVersionId && section.Id == sectionId,
                 cancellationToken
             )
             .OnSuccess(async section =>
@@ -93,20 +94,20 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> ReorderSections(
-        Guid pageId,
+        Guid pageVersionId,
         List<Guid> newSectionOrder,
         CancellationToken cancellationToken
     )
     {
         return await contentDbContext
-            .EducationInNumbersPages.Include(p => p.Content)
+            .EinPageVersions.Include(p => p.Content)
                 .ThenInclude(s => s.Content)
                     .ThenInclude(b => (b as EinTileGroupBlock)!.Tiles)
                         .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
-            .SingleOrNotFoundAsync(p => p.Id == pageId, cancellationToken)
-            .OnSuccess(async page =>
+            .SingleOrNotFoundAsync(p => p.Id == pageVersionId, cancellationToken)
+            .OnSuccess(async pageVersion =>
             {
-                var sectionList = page.Content;
+                var sectionList = pageVersion.Content;
 
                 if (
                     !ComparerUtils.SequencesAreEqualIgnoringOrder(
@@ -141,38 +142,38 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, List<EinContentSectionViewModel>>> DeleteSection(
-        Guid pageId,
+        Guid pageVersionId,
         Guid sectionId,
         CancellationToken cancellationToken
     )
     {
         return await contentDbContext
-            .EducationInNumbersPages.Include(p => p.Content)
+            .EinPageVersions.Include(p => p.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
                         .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
-            .SingleOrNotFoundAsync(p => p.Id == pageId, cancellationToken)
-            .OnSuccess(async page =>
+            .SingleOrNotFoundAsync(p => p.Id == pageVersionId, cancellationToken)
+            .OnSuccess(async pageVersion =>
             {
-                var pageSections = page.Content;
+                var pageVersionSections = pageVersion.Content;
 
-                var sectionToDelete = pageSections.SingleOrDefault(section => section.Id == sectionId);
+                var sectionToDelete = pageVersionSections.SingleOrDefault(section => section.Id == sectionId);
 
                 if (sectionToDelete == null)
                 {
                     return new Either<ActionResult, List<EinContentSectionViewModel>>(new NotFoundResult());
                 }
 
-                pageSections.Remove(sectionToDelete);
+                pageVersionSections.Remove(sectionToDelete);
 
-                pageSections // fix order of remaining sections
+                pageVersionSections // fix order of remaining sections
                     .Where(section => section.Order > sectionToDelete.Order)
                     .ForEach(section => section.Order--);
 
-                contentDbContext.EinContentSections.UpdateRange(pageSections);
+                contentDbContext.EinContentSections.UpdateRange(pageVersionSections);
                 await contentDbContext.SaveChangesAsync(cancellationToken);
 
-                return pageSections
+                return pageVersionSections
                     .Select(EinContentSectionViewModel.FromModel)
                     .OrderBy(section => section.Order)
                     .ToList();
@@ -180,7 +181,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, EinContentBlockViewModel>> AddBlock(
-        Guid pageId,
+        Guid pageVersionId,
         Guid sectionId,
         EinBlockType type,
         int? order,
@@ -223,7 +224,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, EinContentBlockViewModel>> UpdateHtmlBlock(
-        Guid pageId,
+        Guid pageVersionId,
         Guid sectionId,
         Guid htmlBlockId,
         EinHtmlBlockUpdateRequest request,
@@ -236,7 +237,7 @@ public class EducationInNumbersContentService(
                 htmlBlock =>
                     htmlBlock.Id == htmlBlockId
                     && htmlBlock.EinContentSectionId == sectionId
-                    && htmlBlock.EinContentSection.EducationInNumbersPageId == pageId,
+                    && htmlBlock.EinContentSection.EinPageVersionId == pageVersionId,
                 cancellationToken
             )
             .OnSuccess(async htmlBlockToUpdate =>
@@ -250,7 +251,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, EinContentBlockViewModel>> UpdateTileGroupBlock(
-        Guid pageId,
+        Guid pageVersionId,
         Guid sectionId,
         Guid tileGroupBlockId,
         EinTileGroupBlockUpdateRequest request,
@@ -265,7 +266,7 @@ public class EducationInNumbersContentService(
                 tileGroupBlock =>
                     tileGroupBlock.Id == tileGroupBlockId
                     && tileGroupBlock.EinContentSectionId == sectionId
-                    && tileGroupBlock.EinContentSection.EducationInNumbersPageId == pageId,
+                    && tileGroupBlock.EinContentSection.EinPageVersionId == pageVersionId,
                 cancellationToken
             )
             .OnSuccess(async tileGroupBlockToUpdate =>
@@ -279,7 +280,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, List<EinContentBlockViewModel>>> ReorderBlocks(
-        Guid pageId,
+        Guid pageVersionId,
         Guid sectionId,
         List<Guid> newBlockOrder,
         CancellationToken cancellationToken
@@ -289,7 +290,7 @@ public class EducationInNumbersContentService(
             .EinContentSections.Include(p => p.Content)
                 .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
                     .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
-            .SingleOrNotFoundAsync(s => s.Id == sectionId && s.EducationInNumbersPageId == pageId, cancellationToken)
+            .SingleOrNotFoundAsync(s => s.Id == sectionId && s.EinPageVersionId == pageVersionId, cancellationToken)
             .OnSuccess(async section =>
             {
                 var blockList = section.Content;
@@ -319,7 +320,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteBlock(
-        Guid pageId,
+        Guid pageVersionId,
         Guid sectionId,
         Guid blockId,
         CancellationToken cancellationToken
@@ -328,7 +329,7 @@ public class EducationInNumbersContentService(
         return await contentDbContext
             .EinContentSections.Include(section => section.Content)
                 .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
-            .SingleOrNotFoundAsync(s => s.Id == sectionId && s.EducationInNumbersPageId == pageId, cancellationToken)
+            .SingleOrNotFoundAsync(s => s.Id == sectionId && s.EinPageVersionId == pageVersionId, cancellationToken)
             .OnSuccess(async section =>
             {
                 var blockList = section.Content;
@@ -353,7 +354,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, EinTileViewModel>> AddTile(
-        Guid pageId,
+        Guid pageVersionId,
         Guid parentBlockId,
         EinTileType type,
         int? order,
@@ -363,7 +364,7 @@ public class EducationInNumbersContentService(
         var tileList = await contentDbContext
             .EinTiles.Where(tile =>
                 tile.EinParentBlockId == parentBlockId
-                && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
+                && tile.EinParentBlock.EinContentSection.EinPageVersionId == pageVersionId
             )
             .ToListAsync(cancellationToken);
 
@@ -394,7 +395,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, EinTileViewModel>> UpdateFreeTextStatTile(
-        Guid pageId,
+        Guid pageVersionId,
         Guid tileId,
         EinFreeTextStatTileUpdateRequest request,
         CancellationToken cancellationToken
@@ -403,7 +404,7 @@ public class EducationInNumbersContentService(
         return await contentDbContext
             .EinTiles.OfType<EinFreeTextStatTile>()
             .SingleOrNotFoundAsync(
-                tile => tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId,
+                tile => tile.Id == tileId && tile.EinParentBlock.EinContentSection.EinPageVersionId == pageVersionId,
                 cancellationToken
             )
             .OnSuccess(async tileToUpdate =>
@@ -422,7 +423,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, EinTileViewModel>> UpdateApiQueryStatTile(
-        Guid pageId,
+        Guid pageVersionId,
         Guid tileId,
         EinApiQueryStatTileUpdateRequest request,
         CancellationToken cancellationToken
@@ -432,7 +433,7 @@ public class EducationInNumbersContentService(
         return await contentDbContext
             .EinTiles.OfType<EinApiQueryStatTile>()
             .SingleOrNotFoundAsync(
-                tile => tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId,
+                tile => tile.Id == tileId && tile.EinParentBlock.EinContentSection.EinPageVersionId == pageVersionId,
                 cancellationToken
             )
             .OnSuccess(async tileToUpdate =>
@@ -553,7 +554,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, List<EinTileViewModel>>> ReorderTiles(
-        Guid pageId,
+        Guid pageVersionId,
         Guid parentBlockId,
         List<Guid> newTileOrder,
         CancellationToken cancellationToken
@@ -565,7 +566,7 @@ public class EducationInNumbersContentService(
                 .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
             .SingleOrNotFoundAsync(
                 parentBlock =>
-                    parentBlock.Id == parentBlockId && parentBlock.EinContentSection.EducationInNumbersPageId == pageId,
+                    parentBlock.Id == parentBlockId && parentBlock.EinContentSection.EinPageVersionId == pageVersionId,
                 cancellationToken
             )
             .OnSuccess(async parentBlock =>
@@ -597,7 +598,7 @@ public class EducationInNumbersContentService(
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteTile(
-        Guid pageId,
+        Guid pageVersionId,
         Guid blockId,
         Guid tileId,
         CancellationToken cancellationToken
@@ -608,7 +609,7 @@ public class EducationInNumbersContentService(
             .Include(block => block.Tiles)
                 .ThenInclude(tile => (tile as EinApiQueryStatTile)!.Release!.Publication)
             .SingleOrNotFoundAsync(
-                block => block.Id == blockId && block.EinContentSection.EducationInNumbersPageId == pageId,
+                block => block.Id == blockId && block.EinContentSection.EinPageVersionId == pageVersionId,
                 cancellationToken
             )
             .OnSuccess(async block =>

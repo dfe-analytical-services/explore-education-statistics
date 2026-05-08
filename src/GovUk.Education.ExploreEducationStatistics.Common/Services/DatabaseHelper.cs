@@ -4,20 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
-public class DatabaseHelper : IDatabaseHelper
+public class DatabaseHelper(IDbContextSupplier dbContextSupplier) : IDatabaseHelper
 {
-    private readonly IDbContextSupplier _dbContextSupplier;
-
-    public DatabaseHelper(IDbContextSupplier dbContextSupplier)
-    {
-        _dbContextSupplier = dbContextSupplier;
-    }
-
-    public IDbContextSupplier GetDbContextSupplier()
-    {
-        return _dbContextSupplier;
-    }
-
     public async Task DoInTransaction<TDbContext>(TDbContext context, Func<TDbContext, Task> transactionalUnit)
         where TDbContext : DbContext
     {
@@ -44,7 +32,7 @@ public class DatabaseHelper : IDatabaseHelper
             // We use a delegate context here to allow us to retry on failure successfully when defining our own
             // transaction boundaries manually. See
             // https://learn.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency#execution-strategies-and-transactions
-            var ctxDelegate = GetDbContextSupplier().CreateDbContextDelegate<TDbContext>();
+            var ctxDelegate = dbContextSupplier.CreateDbContextDelegate<TDbContext>();
             await using var transaction = await ctxDelegate.Database.BeginTransactionAsync();
 
             var result = await transactionalUnit.Invoke(ctxDelegate);

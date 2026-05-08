@@ -300,7 +300,7 @@ const ReleaseContentEdit = ({
               data-testid="quick-links"
             >
               <ul className="govuk-list">
-                {!!release.relatedDashboardsSection?.content.length && (
+                {!!release.relatedDashboardsSection.content.length && (
                   <li>
                     <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
@@ -377,7 +377,7 @@ const ReleaseContentEdit = ({
           Related dashboards will appear in the 'Explore and download data' tab
           of the release page.
         </p>
-        {release.relatedDashboardsSection?.content.length ? (
+        {release.relatedDashboardsSection.content.length ? (
           <Accordion
             id="data-accordion"
             showOpenAll={false}
@@ -398,8 +398,7 @@ const ReleaseContentEdit = ({
                     block={block}
                     publicationId={release.publication.id}
                     releaseVersionId={release.id}
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    sectionId={release.relatedDashboardsSection!.id}
+                    sectionId={release.relatedDashboardsSection.id}
                     sectionKey="relatedDashboardsSection"
                     label="Related Dashboards block"
                   />
@@ -409,7 +408,7 @@ const ReleaseContentEdit = ({
           </Accordion>
         ) : null}
 
-        {!release.relatedDashboardsSection?.content.length && (
+        {!release.relatedDashboardsSection.content.length && (
           <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
             <Button onClick={addRelatedDashboardsBlock}>
               Add dashboards section

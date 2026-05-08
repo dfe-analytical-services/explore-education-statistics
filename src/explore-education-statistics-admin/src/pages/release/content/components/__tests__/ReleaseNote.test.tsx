@@ -1,5 +1,5 @@
 import ReleaseNote from '@admin/pages/release/content/components/ReleaseNote';
-import { ReleaseNote as ReleaseNoteData } from '@common/services/publicationService';
+import { ReleaseNote as ReleaseNoteData } from '@admin/services/publicationService';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';

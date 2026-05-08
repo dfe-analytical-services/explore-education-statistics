@@ -112,7 +112,7 @@ Validate the summary contents inside the 'Latest live version details' table
     user checks summary list contains    Status    Published    id:live-version-summary
     user checks summary list contains    Release    ${RELEASE_1_NAME}    id:live-version-summary
     user checks summary list contains    Data set file    ${SUBJECT_1_NAME}    id:live-version-summary
-    user checks summary list contains    Geographic levels    Local authority, National, Regional, School
+    user checks summary list contains    Geographic levels    Local authority, National, Regional, School, Ward
     ...    id:live-version-summary
     user checks summary list contains    Time periods    2020/21 to 2022/23    id:live-version-summary
     user checks summary list contains    Indicators    Enrolments    id:live-version-summary
@@ -128,7 +128,7 @@ Validate the summary contents inside the 'draft version details' table
     ...    wait=%{WAIT_LONG}
     user checks summary list contains    Release    ${RELEASE_2_NAME}    id:draft-version-summary
     user checks summary list contains    Data set file    ${SUBJECT_2_NAME}    id:draft-version-summary
-    user checks summary list contains    Geographic levels    Local authority, National, Regional, School
+    user checks summary list contains    Geographic levels    Local authority, National, Regional, School, Ward
     ...    id:draft-version-summary
     user checks summary list contains    Time periods    2020/21 to 2022/23    id:draft-version-summary
     user checks summary list contains    Indicators    Number of enrolments    id:draft-version-summary
@@ -148,12 +148,12 @@ Validate the version task statuses inside the 'Draft version task' section
 User clicks on Map locations link
     user clicks link    Map locations
     user waits until h3 is visible    Locations not found in new data set
-    user waits until element contains    css:[data-testid="mappable-table-region"] caption
+    user waits until element contains    css:[data-testid="mappable-table-ward"] caption
     ...    1 unmapped location    %{WAIT_LONG}
 
 Validate the 'unmapped location' notification banner
     user waits until h2 is visible    Action required
-    user waits until page contains link    There is 1 unmapped region
+    user waits until page contains link    There is 1 unmapped ward
 
 Validate the row headings and its contents in the 'Regions' section
     user checks table column heading contains    1    1    Current data set
@@ -162,7 +162,7 @@ Validate the row headings and its contents in the 'Regions' section
     user checks table column heading contains    1    3    Type
     user checks table column heading contains    1    4    Actions
 
-    user checks table cell contains    1    1    Yorkshire and The Humber
+    user checks table cell contains    1    1    St. Agnes
     user checks table cell contains    1    2    Unmapped
     user checks table cell contains    1    3    N/A
 
@@ -170,12 +170,12 @@ User edits location mapping
     user clicks button in table cell    1    4    Map location
 
     ${modal}=    user waits until modal is visible    Map existing location
-    user clicks radio    Yorkshire
+    user clicks radio    St Agnes
     user clicks button    Update location mapping
     user waits until modal is not visible    Map existing location
 
 Verify location mapping changes
-    user waits until element contains    css:[data-testid="mappable-table-region"] caption
+    user waits until element contains    css:[data-testid="mappable-table-ward"] caption
     ...    1 mapped location    %{WAIT_LONG}
 
 Validate the row headings and its contents in the 'Regions' section after mapping
@@ -186,8 +186,8 @@ Validate the row headings and its contents in the 'Regions' section after mappin
     user checks table column heading contains    1    3    Type
     user checks table column heading contains    1    4    Actions
 
-    user checks table cell contains    1    1    Yorkshire and The Humber
-    user checks table cell contains    1    2    Yorkshire
+    user checks table cell contains    1    1    St. Agnes
+    user checks table cell contains    1    2    St Agnes
     user checks table cell contains    1    3    Minor
 
     user clicks link    Back
@@ -439,11 +439,11 @@ User verifies minor changes in the 'API data set changelog' section
     user checks element contains    ${updated_school_types_total}
     ...    label changed to: State-funded primary and secondary
 
-    ${updated_regional_options}=    user checks changelog section contains updated location level
-    ...    ${minor_changes_section}    Regional
-    ${updated_yorkshire_and_humber}=    user checks changed facet contains option    ${updated_regional_options}
-    ...    Yorkshire and The Humber
-    user checks element contains    ${updated_yorkshire_and_humber}    label changed to: Yorkshire
+    ${updated_ward_options}=    user checks changelog section contains updated location level
+    ...    ${minor_changes_section}    Ward
+    ${updated_st_agnes}=    user checks changed facet contains option    ${updated_ward_options}
+    ...    St. Agnes
+    user checks element contains    ${updated_st_agnes}    label changed to: St Agnes
 
 User verifies no major changes are present
     user checks page does not contain element    testid:major-changes

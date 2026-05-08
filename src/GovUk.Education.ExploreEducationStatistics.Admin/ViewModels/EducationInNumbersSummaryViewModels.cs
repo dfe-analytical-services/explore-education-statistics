@@ -1,9 +1,10 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class EinSummaryViewModel
+public class EinPageVersionSummaryViewModel
 {
     public Guid Id { get; set; }
 
@@ -19,9 +20,41 @@ public class EinSummaryViewModel
 
     [JsonIgnore]
     public int Order { get; set; }
+
+    public static EinPageVersionSummaryViewModel FromModel(EinPageVersion pageVersion)
+    {
+        return new EinPageVersionSummaryViewModel
+        {
+            Id = pageVersion.Id,
+            Title = pageVersion.EinPage.Title,
+            Slug = pageVersion.EinPage.Slug,
+            Description = pageVersion.EinPage.Description,
+            Version = pageVersion.Version,
+            Published = pageVersion.Published,
+            Order = pageVersion.EinPage.Order,
+        };
+    }
 }
 
-public class EinSummaryWithPrevVersionViewModel : EinSummaryViewModel
+public class EinPageVersionSummaryWithPrevVersionViewModel : EinPageVersionSummaryViewModel
 {
     public Guid? PreviousVersionId { get; set; }
+
+    public static EinPageVersionSummaryWithPrevVersionViewModel FromModel(
+        EinPageVersion pageVersion,
+        Guid? previousVersionId
+    )
+    {
+        return new EinPageVersionSummaryWithPrevVersionViewModel
+        {
+            Id = pageVersion.Id,
+            Title = pageVersion.EinPage.Title,
+            Slug = pageVersion.EinPage.Slug,
+            Description = pageVersion.EinPage.Description,
+            Version = pageVersion.Version,
+            Published = pageVersion.Published,
+            Order = pageVersion.EinPage.Order,
+            PreviousVersionId = previousVersionId,
+        };
+    }
 }

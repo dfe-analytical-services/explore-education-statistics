@@ -132,6 +132,12 @@ const prototypeReleaseContent: ReleaseContent = {
         title: 'Test theme',
       },
     },
+    relatedDashboardsSection: {
+      id: 'related-dashoards-id',
+      order: 0,
+      content: [],
+      heading: '',
+    },
     relatedInformation: [
       {
         id: 'related-information-id',

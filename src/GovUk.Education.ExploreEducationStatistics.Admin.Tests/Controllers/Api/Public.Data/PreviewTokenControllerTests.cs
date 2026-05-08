@@ -71,7 +71,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task Success()
         {
-            var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
+            var expectedExpires = DateTimeOffset.UtcNow.AddDays(7).GetUkEndOfDayUtc();
             var dataSetVersion = await SetUpDataSetVersionTestData();
 
             var label = new string('A', count: 100);
@@ -93,7 +93,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertUtcNow(),
-                () => viewModel.Expires.AssertEqual(sevenDaysFromNow),
+                () => viewModel.Expires.AssertEqual(expectedExpires),
                 () => Assert.Null(viewModel.Updated)
             );
 
@@ -111,7 +111,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(fixture.BauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => actualPreviewToken.Created.AssertUtcNow(),
                 () => actualPreviewToken.Activates.AssertUtcNow(),
-                () => actualPreviewToken.Expires.AssertEqual(sevenDaysFromNow),
+                () => actualPreviewToken.Expires.AssertEqual(expectedExpires),
                 () => Assert.Null(actualPreviewToken.Updated)
             );
         }
@@ -154,8 +154,8 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
             var expectedExpires =
                 suppliedExpires // The supplied expires value
-                ?? suppliedActivates?.AddDays(7) // otherwise 7 days after activates if that has a supplied value
-                ?? DateTimeOffset.UtcNow.AddDays(7); // otherwise 7 days from now
+                ?? suppliedActivates?.AddDays(7).GetUkEndOfDayUtc() // otherwise 7 days after activates if that has a supplied value
+                ?? DateTimeOffset.UtcNow.AddDays(7).GetUkEndOfDayUtc(); // otherwise 7 days from now
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, viewModel.Id),
@@ -344,7 +344,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         private static DateTimeOffset GetUkEndOfDayUtcAfterDays(DateTimeOffset date, int daysToAdd) =>
             // The request validation expects the expiry value to be at the end of the day,
             // without fractional seconds.
-            date.ToUkDateOnly().AddDays(daysToAdd).GetUkEndOfDayUtc(includeFractionalSeconds: false);
+            date.ToUkDateOnly().AddDays(daysToAdd).GetUkEndOfDayUtc();
 
         private async Task<HttpResponseMessage> CreatePreviewToken(
             Guid dataSetVersionId,

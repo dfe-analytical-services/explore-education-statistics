@@ -124,7 +124,7 @@ type OverallStage =
   | 'Started'
   | 'Superseded';
 
-type TaskStage =
+type FilesStage =
   | 'Validating'
   | 'Cancelled'
   | 'Complete'
@@ -136,8 +136,7 @@ type TaskStage =
 
 export interface ReleaseVersionStageStatus {
   id?: string;
-  contentStage?: TaskStage;
-  filesStage?: TaskStage;
+  filesStage?: FilesStage;
   publishingStage?: PublishingStage;
   overallStage: OverallStage;
   lastUpdated?: string;
@@ -275,7 +274,7 @@ const releaseVersionService = {
 
   getReleaseVersionStatus(id: string): Promise<ReleaseVersionStageStatus> {
     return client.get<ReleaseVersionStageStatus>(
-      `/releases/${id}/stage-status`,
+      `/releaseVersions/${id}/stage-status`,
     );
   },
 

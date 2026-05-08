@@ -9,18 +9,14 @@ import {
 describe('EducationInNumbersPage', () => {
   const testNavItemList: EinNavItem[] = [
     {
-      id: 'root-id',
       order: 0,
       title: 'Education in numbers',
       slug: undefined,
-      published: '2000-01-01',
     },
     {
-      id: 'attendance-id',
       order: 1,
       title: 'Attendance',
       slug: 'attendance',
-      published: '2001-02-02',
     },
   ];
 

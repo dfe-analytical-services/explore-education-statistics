@@ -1,5 +1,5 @@
 import client from '@admin/services/utils/service';
-import { BasicLink, ReleaseVersion } from '@common/services/publicationService';
+import { BasicLink, ReleaseVersion } from '@admin/services/publicationService';
 
 const releaseContentRelatedInformationService = {
   getAll: (

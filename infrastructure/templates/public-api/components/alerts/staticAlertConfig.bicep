@@ -55,6 +55,14 @@ var staticAverageLessThanHundred = {
 }
 
 @export()
+var staticAverageLessThan95 = {
+  ...defaultStaticAlertConfig
+  aggregation: 'Average'
+  operator: 'LessThan'
+  threshold: '95'
+}
+
+@export()
 var staticMaxGreaterThanZero = {
   ...defaultStaticAlertConfig
   aggregation: 'Maximum'

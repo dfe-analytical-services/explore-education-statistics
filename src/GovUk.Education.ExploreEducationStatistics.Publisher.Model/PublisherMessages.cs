@@ -7,12 +7,6 @@ public record NotifyChangeMessage(bool Immediate, ReleasePublishingKey ReleasePu
 
 public record PublishMethodologyFilesMessage(Guid MethodologyId);
 
-public record PublishReleaseContentMessage(ReleasePublishingKey ReleasePublishingKey);
-
 public record PublishReleaseFilesMessage(IReadOnlyList<ReleasePublishingKey> ReleasePublishingKeys);
 
 public record PublishTaxonomyMessage;
-
-public record RetryReleasePublishingMessage(Guid ReleaseVersionId);
-
-public record StageReleaseContentMessage(IReadOnlyList<ReleasePublishingKey> ReleasePublishingKeys);

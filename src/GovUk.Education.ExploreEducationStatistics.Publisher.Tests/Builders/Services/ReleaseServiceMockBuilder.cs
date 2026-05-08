@@ -31,7 +31,7 @@ public class ReleaseServiceMockBuilder
     )
     {
         _mock
-            .Setup(m => m.GetLatestPublishedReleaseVersion(publicationId, It.IsAny<IReadOnlyList<Guid>?>()))
+            .Setup(m => m.GetLatestPublishedReleaseVersion(publicationId))
             .ReturnsAsync(() => latestPublishedReleaseVersion);
 
         return this;

@@ -1,15 +1,8 @@
 import { Chart } from '@common/modules/charts/types/chart';
-import {
-  ContentBlock,
-  DataBlock,
-  EmbedBlock,
-  Table,
-} from '@common/services/types/blocks';
-import { FileInfo } from '@common/services/types/file';
+import { Table } from '@common/services/types/blocks';
 import {
   ExternalMethodology,
   InternalMethodologySummary,
-  MethodologySummary,
 } from '@common/services/types/methodology';
 import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType } from '@common/services/types/releaseType';
@@ -21,30 +14,19 @@ import { PaginatedList, PaginationRequestParams } from './types/pagination';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
-export interface Publication {
-  id: string;
-  slug: string;
-  title: string;
-  summary?: string;
-  releaseSeries: ReleaseSeriesItem[];
-  theme: {
-    id: string;
-    title: string;
-  };
-  contact: Contact;
-  methodologies: MethodologySummary[];
-  externalMethodology?: ExternalMethodology;
-  supersededById?: string;
-  isSuperseded?: boolean;
-  supersededBy?: PublicationSupersededBy;
-}
-
 export interface ReleaseSeriesItem {
   isLegacyLink: boolean;
   description: string;
   releaseId?: string;
   releaseSlug: string;
   legacyLinkUrl?: string;
+}
+
+export interface ContentSection<BlockType> {
+  id: string;
+  order: number;
+  heading: string;
+  content: BlockType[];
 }
 
 export interface PublicationSummaryPreview {
@@ -104,22 +86,10 @@ export interface PublicationTitle {
   title: string;
 }
 
-export interface BasicLink {
-  id: string;
-  description: string;
-  url: string;
-}
-
 export interface RelatedInformationItem {
   id: string;
   title: string;
   url: string;
-}
-
-export interface ReleaseNote {
-  id: string;
-  on: Date;
-  reason: string;
 }
 
 export interface KeyStatisticBase {
@@ -152,13 +122,6 @@ export interface KeyStatisticText extends KeyStatisticBase {
 
 export type KeyStatistic = KeyStatisticDataBlock | KeyStatisticText;
 
-export interface ContentSection<BlockType> {
-  id: string;
-  order: number;
-  heading: string;
-  content: BlockType[];
-}
-
 export type PublicationSortParam = 'published' | 'title' | 'relevance';
 
 export interface PublicationListRequest {
@@ -171,47 +134,17 @@ export interface PublicationListRequest {
   themeId?: string;
 }
 
-// This interface is no longer used for the FE release pages but is
-// still used elsewhere, e.g. table tool, and in admin.
-export interface ReleaseVersion<
-  ContentBlockType extends ContentBlock = ContentBlock,
-  DataBlockType extends DataBlock = DataBlock,
-  EmbedBlockType extends EmbedBlock = EmbedBlock,
-> {
-  content: ContentSection<ContentBlockType | DataBlockType | EmbedBlockType>[];
-  coverageTitle: string;
-  downloadFiles: FileInfo[];
-  hasDataGuidance: boolean;
-  hasPreReleaseAccessList: boolean;
-  headlinesSection: ContentSection<ContentBlockType>;
-  id: string;
-  keyStatistics: KeyStatistic[];
-  keyStatisticsSecondarySection: ContentSection<DataBlockType>;
-  lastUpdated?: string;
-  latestRelease: boolean;
-  nextReleaseDate?: PartialDate;
-  publication: Publication;
-  published: string;
-  publishedDisplayDate?: string;
-  publishingOrganisations?: Organisation[];
-  relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
-  relatedInformation: BasicLink[];
-  slug: string;
-  summarySection: ContentSection<ContentBlockType>;
-  title: string;
-  type: ReleaseType;
-  updates: ReleaseNote[];
-  warningSection: ContentSection<ContentBlockType>;
-  yearTitle: string;
-}
-
-// Used for the release pages
 export interface ReleaseVersionSummary {
   coverageTitle: string;
   id: string;
   isLatestRelease: boolean;
   label?: string;
   lastUpdated: string;
+  publication: {
+    id: string;
+    slug: string;
+    title: string;
+  };
   published: string;
   publishingOrganisations?: Organisation[];
   slug: string;
@@ -418,12 +351,6 @@ const publicationService = {
   },
   listReleases(publicationSlug: string): Promise<ReleaseSummary[]> {
     return contentApi.get(`/publications/${publicationSlug}/releases`);
-  },
-  // Currently used within table tool
-  getLatestPublicationRelease(
-    publicationSlug: string,
-  ): Promise<ReleaseVersion> {
-    return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
   },
   getReleaseVersionSummary(
     publicationSlug: string,

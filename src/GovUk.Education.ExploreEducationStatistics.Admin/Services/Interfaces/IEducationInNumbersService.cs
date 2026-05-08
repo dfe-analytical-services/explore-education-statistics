@@ -8,19 +8,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEducationInNumbersService
 {
-    Task<Either<ActionResult, EinSummaryViewModel>> GetPage(Guid id);
+    Task<Either<ActionResult, EinPageVersionSummaryViewModel>> GetPageVersion(Guid pageVersionId);
 
-    Task<Either<ActionResult, List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages();
+    Task<Either<ActionResult, List<EinPageVersionSummaryWithPrevVersionViewModel>>> ListLatestPages();
 
-    Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(CreateEducationInNumbersPageRequest request);
+    Task<Either<ActionResult, EinPageVersionSummaryViewModel>> CreatePage(CreateEducationInNumbersPageRequest request);
 
-    Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(Guid id);
+    Task<Either<ActionResult, EinPageVersionSummaryViewModel>> CreateAmendment(Guid pageVersionId);
 
-    Task<Either<ActionResult, EinSummaryViewModel>> UpdatePage(Guid id, UpdateEducationInNumbersPageRequest request);
+    Task<Either<ActionResult, EinPageVersionSummaryViewModel>> UpdatePage(
+        Guid pageVersionId,
+        UpdateEducationInNumbersPageRequest request
+    );
 
-    Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(Guid id);
+    Task<Either<ActionResult, EinPageVersionSummaryViewModel>> PublishPage(Guid pageVersionId);
 
-    Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(List<Guid> newOrder);
+    Task<Either<ActionResult, List<EinPageVersionSummaryViewModel>>> Reorder(List<Guid> newOrder);
 
     Task<Either<ActionResult, Unit>> Delete(Guid id);
 

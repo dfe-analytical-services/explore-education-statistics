@@ -75,7 +75,6 @@ public class ReleaseServicePermissionTests
         ContentDbContext? context = null,
         IReleaseVersionService? releaseVersionService = null,
         IReleaseCacheService? releaseCacheService = null,
-        IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
         IReleaseSlugValidator? releaseSlugValidator = null
@@ -86,7 +85,6 @@ public class ReleaseServicePermissionTests
             userService: userService,
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(),
             releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(),
-            publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
             releasePublishingStatusRepository: releasePublishingStatusRepository
                 ?? Mock.Of<IReleasePublishingStatusRepository>(),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),

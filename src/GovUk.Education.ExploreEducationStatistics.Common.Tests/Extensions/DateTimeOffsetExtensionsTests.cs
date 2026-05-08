@@ -33,6 +33,33 @@ public abstract class DateTimeOffsetExtensionsTests
         }
     }
 
+    public class GetUkEndOfDayUtcTests : DateTimeOffsetExtensionsTests
+    {
+        [Theory]
+        [MemberData(
+            nameof(DateTimeOffsetExtensionsTestsTheoryData.GetUkEndOfDayUtcUTheoryData.UtcZoneData),
+            MemberType = typeof(DateTimeOffsetExtensionsTestsTheoryData.GetUkEndOfDayUtcUTheoryData)
+        )]
+        [MemberData(
+            nameof(DateTimeOffsetExtensionsTestsTheoryData.GetUkEndOfDayUtcUTheoryData.UkZoneData),
+            MemberType = typeof(DateTimeOffsetExtensionsTestsTheoryData.GetUkEndOfDayUtcUTheoryData)
+        )]
+        public void GetUkEndOfDayUtc_ReturnsExpectedResult(
+            DateTimeOffset dateTimeOffset,
+            DateTimeOffset expectedDateTimeOffset,
+            string description
+        )
+        {
+            var actual = dateTimeOffset.GetUkEndOfDayUtc();
+
+            Assert.Equal(TimeSpan.Zero, actual.Offset);
+            Assert.True(
+                expectedDateTimeOffset.Equals(actual),
+                $"Expected: {expectedDateTimeOffset:o}\nActual:   {actual:o}\nDescription: {description}"
+            );
+        }
+    }
+
     public class ToUkDateOnlyTests : DateTimeOffsetExtensionsTests
     {
         [Theory]

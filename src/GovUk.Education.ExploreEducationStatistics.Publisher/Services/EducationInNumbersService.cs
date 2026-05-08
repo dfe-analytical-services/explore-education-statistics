@@ -39,7 +39,7 @@ public class EducationInNumbersService(
             .ToDictionaryAsync(ds => ds.Id, cancellationToken);
 
         var apiQueryTiles = await contentDbContext
-            .EinTiles.Include(t => t.EinParentBlock.EinContentSection.EducationInNumbersPage)
+            .EinTiles.Include(t => t.EinParentBlock.EinContentSection.EinPageVersion.EinPage)
             .OfType<EinApiQueryStatTile>()
             .Where(t => t.DataSetId != null && dataSets.Keys.Contains(t.DataSetId.Value))
             .ToListAsync(cancellationToken);
@@ -61,57 +61,44 @@ public class EducationInNumbersService(
         }
         await contentDbContext.SaveChangesAsync(cancellationToken);
 
-        await SendBauEmail(updatedTiles, [.. dataSets.Values], cancellationToken);
+        SendBauEmail(updatedTiles, [.. dataSets.Values]);
     }
 
-    private async Task SendBauEmail(
-        List<EinApiQueryStatTile> updatedTiles,
-        List<DataSet> dataSets,
-        CancellationToken cancellationToken
-    )
+    private void SendBauEmail(List<EinApiQueryStatTile> updatedTiles, List<DataSet> dataSets)
     {
         // For the email, we only want to inform BAU user about tiles that need updating on latest page versions -
-        // they cannot update tiles on older page versions even if they wanted to!
-        var uniqueEinPageSlugs = updatedTiles
-            .Select(tile => tile.EinParentBlock.EinContentSection.EducationInNumbersPage.Slug)
-            .Distinct()
-            .ToList();
-
-        var latestEinPageIds = await uniqueEinPageSlugs
-            .ToAsyncEnumerable()
-            .Select(
-                async (slug, ct) =>
-                    await contentDbContext
-                        // We don't care if the latest page is published or not - we're collecting these pages for BAU
-                        // users to update. If the latest is published, they'll have to create an amendment - if it
-                        // is a draft or draft amendment, then they'll want to edit that.
-                        .EducationInNumbersPages.Where(page => page.Slug == slug)
-                        .OrderByDescending(page => page.Version)
-                        .FirstAsync(cancellationToken: ct)
+        // they cannot update tiles on older/published page versions even if they wanted to!
+        var latestEinPageVersionIds = updatedTiles
+            .Where(tile =>
+                tile.EinParentBlock.EinContentSection.EinPageVersionId
+                == tile.EinParentBlock.EinContentSection.EinPageVersion.EinPage.LatestVersionId
             )
-            .Select(page => page.Id)
-            .ToListAsync(cancellationToken);
-
-        var pagesToBeInEmail = updatedTiles
-            .Select(t => t.EinParentBlock.EinContentSection.EducationInNumbersPage)
-            .Where(page => latestEinPageIds.Contains(page.Id))
+            .Select(tile => tile.EinParentBlock.EinContentSection.EinPageVersionId)
             .Distinct()
             .ToList();
 
-        if (pagesToBeInEmail.Count == 0)
+        var pageVersionsToBeInEmail = updatedTiles
+            .Select(t => t.EinParentBlock.EinContentSection.EinPageVersion)
+            .Where(pageVersion => latestEinPageVersionIds.Contains(pageVersion.Id))
+            .Distinct()
+            .ToList();
+
+        if (pageVersionsToBeInEmail.Count == 0)
         {
             return;
         }
 
         var bulletsStr = new StringBuilder();
-        foreach (var page in pagesToBeInEmail)
+        foreach (var pageVersion in pageVersionsToBeInEmail)
         {
-            bulletsStr.Append($"* [{page.Title}]({_appOptions.AdminAppUrl}/education-in-numbers/{page.Id}/content)\n");
+            bulletsStr.Append(
+                $"* [{pageVersion.EinPage.Title}]({_appOptions.AdminAppUrl}/education-in-numbers/{pageVersion.Id}/content)\n"
+            );
 
             foreach (var tile in updatedTiles)
             {
                 // sub-bullets for each tile associated with a particular page
-                if (page.Id != tile.EinParentBlock.EinContentSection.EducationInNumbersPageId)
+                if (pageVersion.Id != tile.EinParentBlock.EinContentSection.EinPageVersionId)
                 {
                     continue;
                 }

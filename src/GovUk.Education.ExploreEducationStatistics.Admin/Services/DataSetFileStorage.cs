@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -19,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using DataSet = GovUk.Education.ExploreEducationStatistics.Admin.Models.DataSet;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
@@ -36,6 +38,8 @@ public class DataSetFileStorage(
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
     IDataSetService dataSetService,
+    IOptions<DataScreenerOptions> screenerOptions,
+    TimeProvider timeProvider,
     ILogger<DataSetFileStorage> logger
 ) : IDataSetFileStorage
 {
@@ -100,6 +104,12 @@ public class DataSetFileStorage(
             Status = DataSetUploadStatus.SCREENING,
             UploadedBy = userService.GetProfileFromClaims().Email.ToLower(),
             ReplacingFileId = dataSet.ReplacingFile?.Id,
+            ScreenerProgress = screenerOptions.Value.EnhancedScreenerJourney
+                ? new DataSetScreenerProgress { Stage = "Started" }
+                : null,
+            ScreenerProgressLastUpdated = screenerOptions.Value.EnhancedScreenerJourney
+                ? timeProvider.GetUtcNow()
+                : null,
         };
     }
 
@@ -120,7 +130,7 @@ public class DataSetFileStorage(
             )
             .OnSuccess(upload =>
             {
-                var (FilePath, FileName) = GetTemporaryDataUploadFileDetails(
+                var (filePath, fileName) = GetTemporaryDataUploadFileDetails(
                     releaseVersionId: releaseVersionId,
                     fileType: fileType,
                     upload: upload
@@ -128,8 +138,8 @@ public class DataSetFileStorage(
 
                 return privateBlobStorageService.GetBlobDownloadToken(
                     container: PrivateReleaseTempFiles,
-                    filename: FileName,
-                    path: FilePath,
+                    filename: fileName,
+                    path: filePath,
                     cancellationToken: cancellationToken
                 );
             });
