@@ -4,6 +4,7 @@ import { useFormIdContext } from '@common/components/form/contexts/FormIdContext
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
 import FormSearchBar from '@common/components/form/FormSearchBar';
 import Modal from '@common/components/Modal';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import FilterAccordion from '@common/modules/table-tool/components/FilterAccordion';
 import getFilterOptionIdsRecursively from '@common/modules/table-tool/utils/getFilterOptionIdsRecursively';
 import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
@@ -41,6 +42,7 @@ export interface FilterHierarchyProps {
 export interface TierSelectionState {
   tier: number;
   selected: boolean;
+  disabled: boolean;
 }
 
 function FilterHierarchy({
@@ -67,7 +69,7 @@ function FilterHierarchy({
   const tiersInitialState = () => {
     const tierState: TierSelectionState[] = [];
     for (let i = 0; i < tiersTotal; i += 1) {
-      tierState.push({ tier: i, selected: false });
+      tierState.push({ tier: i, selected: false, disabled: false });
     }
 
     return tierState;
@@ -112,7 +114,7 @@ function FilterHierarchy({
       tierSelectedValues.includes(filterOptionId),
     );
 
-    setTierSelectionState(prev =>
+    updateTierSelectionState(prev =>
       prev.map((item, index) =>
         index === tier ? { ...item, selected: allTierOptionsSelected } : item,
       ),
@@ -120,6 +122,20 @@ function FilterHierarchy({
   };
 
   const [expandedOptionsList, setExpandedOptionsList] = useState<string[]>([]);
+  const [tierSelectionLoading, setTierSelectionLoading] = useState(false);
+
+  const updateTierSelectionState = (
+    updater: (prev: TierSelectionState[]) => TierSelectionState[],
+  ) => {
+    setTierSelectionLoading(true);
+    setTierSelectionState(updater);
+  };
+
+  useEffect(() => {
+    if (tierSelectionLoading) {
+      setTierSelectionLoading(false);
+    }
+  }, [tierSelectionState, tierSelectionLoading]);
 
   const filterLabels: string[] = [
     ...filterHierarchy.map(({ filterId }) => optionLabelsMap[filterId ?? '']),
@@ -196,6 +212,25 @@ function FilterHierarchy({
     expandAllOptions,
   ]);
 
+  const watchedValues: string[] = useWatch({ name });
+  const selectedValues = useMemo(() => watchedValues ?? [], [watchedValues]);
+
+  useEffect(() => {
+    updateTierSelectionState(prev =>
+      prev.map((item, index) => ({
+        ...item,
+        disabled:
+          hierarchySearchTerm !== '' &&
+          (!tierOptions[index] || tierOptions[index].length === 0),
+        selected:
+          tierOptions[index]?.length > 0 &&
+          tierOptions[index].every(filterOptionId =>
+            selectedValues.includes(filterOptionId),
+          ),
+      })),
+    );
+  }, [tierOptions, hierarchySearchTerm, selectedValues]);
+
   const getOptionUniqueValue = useCallback(
     (optionValue: string): string => {
       return hierarchyOptionsToString(
@@ -209,7 +244,6 @@ function FilterHierarchy({
     [filterHierarchy, name, optionLabelsMap],
   );
 
-  const selectedValues: string[] = useWatch({ name }) ?? [];
   const optionsWithSelectedChildren: SelectedChildren = useMemo(() => {
     if (!selectedValues?.length) {
       return {
@@ -375,7 +409,7 @@ function FilterHierarchy({
         error={errorMessage?.toString()}
       >
         <div data-testid="filter-hierarchy-options">
-          <div className="dfe-flex dfe-gap-4">
+          <div className="dfe-flex dfe-gap-4 dfe-align-items--baseline">
             {filterLabels.map((filterLabel, index) => {
               const isLast = index + 1 === filterLabels.length;
 
@@ -385,10 +419,13 @@ function FilterHierarchy({
                   className={
                     !isLast
                       ? 'dfe-border-right govuk-!-padding-right-5 govuk-!-margin-bottom-3'
-                      : undefined
+                      : 'govuk-!-margin-bottom-3'
                   }
                 >
-                  <ButtonText onClick={() => toggleTierSelection(index)}>
+                  <ButtonText
+                    onClick={() => toggleTierSelection(index)}
+                    disabled={tierSelectionState[index].disabled}
+                  >
                     {tierSelectionState[index].selected ? 'Unselect' : 'Select'}{' '}
                     {hierarchySearchTerm ? '' : 'all'} {filterLabel} (tier{' '}
                     {index + 1})
@@ -396,6 +433,7 @@ function FilterHierarchy({
                 </div>
               );
             })}
+            <LoadingSpinner loading={tierSelectionLoading} inline size="sm" />
           </div>
           {rootOptionTrees.map(optionTree => {
             return (
