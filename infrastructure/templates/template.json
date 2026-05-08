@@ -712,11 +712,18 @@
         "description": "The password to log in to the Container registry"
       }
     },
-    "searchIndexName" : {
+    "searchIndexName": {
       "type": "string",
       "defaultValue": "index-1",
       "metadata": {
         "description": "The name of the Azure AI Search index used by the public frontend application"
+      }
+    },
+    "datasetsSearchIndexName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The name of the Azure AI data set search index used by the public frontend application"
       }
     },
     "publicDataDbExists": {
@@ -2284,6 +2291,7 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
+        "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",

@@ -138,6 +138,9 @@
     },
     "publicAppCompressionDisable": {
       "value": true
+    },
+    "datasetsSearchIndexName": {
+      "value": "natural-language-prototype-dataset-level"
     }
   }
 }
