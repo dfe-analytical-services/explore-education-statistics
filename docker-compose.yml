@@ -67,5 +67,6 @@ services:
       - LOG_DIR=/tmp
       - DD_CHECKS=FALSE
       - LOG_SCREENING_RESULTS=TRUE
+      - CONCURRENT_R_WORKERS=4
 volumes:
   data-storage-data:

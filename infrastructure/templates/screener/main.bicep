@@ -35,7 +35,10 @@ param devopsServicePrincipalId string = ''
 param includeDataDictionaryChecks bool = false
 
 @description('Whether or not to log screening results in the Screener API logs.')
-param logScreeningResults = false
+param logScreeningResults bool = false
+
+@description('Number of concurrent threads that can be used by Plumber to process background jobs.')
+param concurrentRWorkers int = 4
 
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
@@ -98,6 +101,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     devopsServicePrincipalId: devopsServicePrincipalId
     includeDataDictionaryChecks: includeDataDictionaryChecks
     logScreeningResults: logScreeningResults
+    concurrentRWorkers: concurrentRWorkers
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists

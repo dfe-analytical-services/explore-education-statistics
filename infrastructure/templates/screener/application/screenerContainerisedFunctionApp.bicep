@@ -46,10 +46,13 @@ param functionAppImageName string
 param screenerDockerImageTag string
 
 @description('Whether or not to include Data Dictionary checks in the Screener.')
-param includeDataDictionaryChecks bool = false
+param includeDataDictionaryChecks bool
 
 @description('Whether or not to log screening results in the Screener API logs.')
-param logScreeningResults = false
+param logScreeningResults bool
+
+@description('Number of concurrent threads that can be used by Plumber to process background jobs.')
+param concurrentRWorkers int
 
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
@@ -122,6 +125,10 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
       {
         name: 'LOG_SCREENING_RESULTS'
         value: logScreeningResults ? 'TRUE' : 'FALSE'
+      }
+      {
+          name: 'CONCURRENT_R_WORKERS'
+          value: '${concurrentRWorkers}'
       }
       {
         name: 'AzureWebJobs_StartScreening__queueServiceUri'
