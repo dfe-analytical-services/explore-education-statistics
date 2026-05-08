@@ -119,11 +119,16 @@ const SearchDataPage: NextPage = () => {
     };
   });
 
+  const isFilteredByDataSetType =
+    !isPublicationsSearch && dataSetType === 'api';
+  const isFilteredAllReleases = !isPublicationsSearch && !latestDataOnly;
+
   const isFiltered =
     !!search ||
     !!releaseType ||
     !!themeId ||
-    (!isPublicationsSearch && dataSetType === 'api');
+    isFilteredByDataSetType ||
+    isFilteredAllReleases;
 
   const selectedTheme = themes.find(theme => theme.id === themeId);
   const selectedReleaseType = releaseTypes[releaseType as ReleaseType];
@@ -132,6 +137,8 @@ const SearchDataPage: NextPage = () => {
     search,
     selectedTheme?.title,
     selectedReleaseType,
+    isFilteredByDataSetType ? 'API data sets only' : undefined,
+    isFilteredAllReleases ? 'All releases' : undefined,
   ]).join(', ');
 
   const sortOptions: SortOption[] = [
@@ -441,12 +448,21 @@ const SearchDataPage: NextPage = () => {
                   }
                 />
               )}
-              {!isPublicationsSearch && dataSetType === 'api' && (
+              {isFilteredByDataSetType && (
                 <FilterResetButton
                   filterType="Data set type"
                   name="API"
                   onClick={() =>
                     handleResetFilter({ filterType: 'dataSetType' })
+                  }
+                />
+              )}
+              {isFilteredAllReleases && (
+                <FilterResetButton
+                  filterType="Releases"
+                  name="all"
+                  onClick={() =>
+                    handleResetFilter({ filterType: 'latestDataOnly' })
                   }
                 />
               )}
@@ -465,7 +481,10 @@ const SearchDataPage: NextPage = () => {
             ) : (
               <>
                 {totalResults === 0 ? (
-                  <div className="govuk-!-margin-top-5" id="searchResults">
+                  <div
+                    className="govuk-!-margin-top-5 dfe-border-top govuk-!-padding-top-4"
+                    id="searchResults"
+                  >
                     {isFiltered ? (
                       <>
                         <p className="govuk-!-font-weight-bold">
@@ -485,7 +504,7 @@ const SearchDataPage: NextPage = () => {
                   </div>
                 ) : (
                   <ul
-                    className="govuk-list"
+                    className="govuk-list govuk-!-margin-top-5 dfe-border-top"
                     id="searchResults"
                     data-testid={
                       isPublicationsSearch
