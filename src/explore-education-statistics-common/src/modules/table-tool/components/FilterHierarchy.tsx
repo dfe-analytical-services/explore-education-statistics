@@ -38,7 +38,7 @@ export interface FilterHierarchyProps {
   onToggle?: (isOpen: boolean) => void;
 }
 
-interface TierSelectionState {
+export interface TierSelectionState {
   tier: number;
   selected: boolean;
 }
@@ -357,6 +357,7 @@ function FilterHierarchy({
                 selectedValues={selectedValues}
                 level={0}
                 expandedOptionsList={expandedOptionsList}
+                tierSelectionState={tierSelectionState}
                 hierarchySearchTerm={hierarchySearchTerm}
                 selectedChildren={optionsWithSelectedChildren}
                 onToggleOptions={handleToggleOptions}
