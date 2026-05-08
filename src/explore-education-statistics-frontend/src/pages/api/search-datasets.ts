@@ -1,9 +1,9 @@
-/* eslint-disable no-restricted-syntax */
 import logger from '@common/services/logger';
 import { PaginatedList } from '@common/services/types/pagination';
 import withMethods from '@frontend/middleware/api/withMethods';
 import { initialiseAzureDataSetsSearchClient } from '@frontend/modules/api/search/initialiseAzureSearchClient';
 import { ErrorBody } from '@frontend/modules/api/types/error';
+import transformDataSetListResults from '@frontend/modules/search-data/utils/transformDataSetListResults';
 import {
   AzureDataSetListRequest,
   AzureDataSetIndexItem,
@@ -86,8 +86,11 @@ export default withMethods({
         ],
       });
 
-      // Now transform response into <PaginatedList<AzureDataSetListSummary>>
       const { count = 0, results } = searchResults;
+
+      const transformedResultsArray = await transformDataSetListResults(
+        results,
+      );
 
       const dataSetsResult = {
         paging: {
@@ -96,77 +99,9 @@ export default withMethods({
           page,
           pageSize,
         },
-        results: [] as DataSetFileSummary[],
+        results: transformedResultsArray,
       };
 
-      for await (const result of results) {
-        const { document } = result;
-        const {
-          fileId,
-          fileSize,
-          filename,
-          fileExtension,
-          title,
-          content,
-          themeId,
-          themeTitle,
-          publicationId,
-          publicationTitle,
-          publicationSlug,
-          releaseId,
-          releaseTitle,
-          releaseSlug,
-          latestData,
-          isSuperseded,
-          published,
-          lastUpdated,
-          api,
-          numDataFileRows,
-          geographicLevelsLabels: geographicLevels,
-          indicators,
-          filters,
-          timePeriodRange,
-        } = document;
-
-        dataSetsResult.results.push({
-          id: fileId,
-          fileId,
-          filename,
-          fileSize,
-          fileExtension,
-          title,
-          content,
-          theme: {
-            id: themeId,
-            title: themeTitle,
-          },
-          publication: {
-            id: publicationId,
-            title: publicationTitle,
-            slug: publicationSlug,
-          },
-          release: {
-            id: releaseId,
-            title: releaseTitle,
-            slug: releaseSlug,
-          },
-          latestData,
-          isSuperseded,
-          published: new Date(published),
-          lastUpdated,
-          api:
-            api.id.length > 0 // api will always be returned but we only want it on the FE if it has non-empty values
-              ? api
-              : undefined,
-          meta: {
-            numDataFileRows,
-            geographicLevels,
-            timePeriodRange,
-            filters,
-            indicators,
-          },
-        });
-      }
       return res.status(200).send(dataSetsResult);
     } catch (error) {
       logger.error(error);
