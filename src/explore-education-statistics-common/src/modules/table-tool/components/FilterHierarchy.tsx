@@ -57,7 +57,6 @@ function FilterHierarchy({
   const {
     formState: { errors },
     setValue,
-    getValues,
   } = useFormContext();
 
   const { fieldId } = useFormIdContext();
@@ -66,17 +65,16 @@ function FilterHierarchy({
 
   const tiersTotal = filterHierarchy.length + 1;
 
-  const tiersInitialState = () => {
+  const [tierSelectionState, setTierSelectionState] = useState<
+    TierSelectionState[]
+  >(() => {
     const tierState: TierSelectionState[] = [];
     for (let i = 0; i < tiersTotal; i += 1) {
       tierState.push({ tier: i, selected: false, disabled: false });
     }
 
     return tierState;
-  };
-
-  const [tierSelectionState, setTierSelectionState] =
-    useState<TierSelectionState[]>(tiersInitialState);
+  });
 
   const toggleTierSelection = (tier: number) => {
     toggleCheckboxSelectionsForTier(tier);
@@ -91,45 +89,16 @@ function FilterHierarchy({
     }
   };
 
-  const deselectAllFiltersForTier = (tier: number) => {
-    setValue(
-      name,
-      selectedValues.filter(sv => !tierOptions[tier].includes(sv)),
-    );
-  };
-
-  const selectAllFiltersForTier = (tier: number) => {
-    const combinedSelections = [...selectedValues, ...tierOptions[tier]];
-    const distinctSelections = combinedSelections.reduce(
-      (acc: string[], item) => (acc.includes(item) ? acc : [...acc, item]),
-      [],
-    );
-
-    setValue(name, distinctSelections);
-  };
-
-  const toggleSelectionStateForTier = (tier: number) => {
-    const tierSelectedValues: string[] = getValues(name);
-    const allTierOptionsSelected = tierOptions[tier].every(filterOptionId =>
-      tierSelectedValues.includes(filterOptionId),
-    );
-
-    updateTierSelectionState(prev =>
-      prev.map((item, index) =>
-        index === tier ? { ...item, selected: allTierOptionsSelected } : item,
-      ),
-    );
-  };
-
   const [expandedOptionsList, setExpandedOptionsList] = useState<string[]>([]);
   const [tierSelectionLoading, setTierSelectionLoading] = useState(false);
 
-  const updateTierSelectionState = (
-    updater: (prev: TierSelectionState[]) => TierSelectionState[],
-  ) => {
-    setTierSelectionLoading(true);
-    setTierSelectionState(updater);
-  };
+  const updateTierSelectionState = useCallback(
+    (updater: (prev: TierSelectionState[]) => TierSelectionState[]) => {
+      setTierSelectionLoading(true);
+      setTierSelectionState(updater);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (tierSelectionLoading) {
@@ -215,6 +184,49 @@ function FilterHierarchy({
   const watchedValues: string[] = useWatch({ name });
   const selectedValues = useMemo(() => watchedValues ?? [], [watchedValues]);
 
+  const toggleSelectionStateForTier = useCallback(
+    (tier: number) => {
+      const totalSelectionAboveMinimumForTier =
+        selectedValues.length < tierOptions[tier].length;
+
+      const allTierOptionsSelected =
+        totalSelectionAboveMinimumForTier &&
+        tierOptions[tier].every(filterOptionId =>
+          selectedValues.includes(filterOptionId),
+        );
+
+      updateTierSelectionState(prev =>
+        prev.map((item, index) =>
+          index === tier ? { ...item, selected: allTierOptionsSelected } : item,
+        ),
+      );
+    },
+    [tierOptions, selectedValues, updateTierSelectionState],
+  );
+
+  const deselectAllFiltersForTier = useCallback(
+    (tier: number) => {
+      setValue(
+        name,
+        selectedValues.filter(sv => !tierOptions[tier].includes(sv)),
+      );
+    },
+    [name, selectedValues, setValue, tierOptions],
+  );
+
+  const selectAllFiltersForTier = useCallback(
+    (tier: number) => {
+      const combinedSelections = [...selectedValues, ...tierOptions[tier]];
+      const distinctSelections = combinedSelections.reduce(
+        (acc: string[], item) => (acc.includes(item) ? acc : [...acc, item]),
+        [],
+      );
+
+      setValue(name, distinctSelections);
+    },
+    [name, selectedValues, setValue, tierOptions],
+  );
+
   useEffect(() => {
     updateTierSelectionState(prev =>
       prev.map((item, index) => ({
@@ -229,7 +241,12 @@ function FilterHierarchy({
           ),
       })),
     );
-  }, [tierOptions, hierarchySearchTerm, selectedValues]);
+  }, [
+    tierOptions,
+    hierarchySearchTerm,
+    selectedValues,
+    updateTierSelectionState,
+  ]);
 
   const getOptionUniqueValue = useCallback(
     (optionValue: string): string => {
