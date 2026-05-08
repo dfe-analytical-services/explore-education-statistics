@@ -144,64 +144,6 @@ public class BauCacheController : ControllerBase
     }
 
     /// <summary>
-    /// Clears all publication.json files
-    ///
-    /// Useful for when the PublicationCacheViewModel has been changed to invalidate all publication JSON files.
-    /// </summary>
-    /// <returns></returns>
-    // TODO EES-7089 Once EES-7022 has been deployed, run this endpoint one final time to clear all cached files, then remove it.
-    [HttpDelete("public-cache/publications/publication-json")]
-    public async Task<ActionResult> ClearPublicCachePublicationJson()
-    {
-        var publicationJsonFilenameRegex = "publication.json".Replace(".", "\\.");
-
-        await _publicBlobStorageService.DeleteBlobs(
-            BlobContainers.PublicContent,
-            options: new DeleteBlobsOptions
-            {
-                IncludeRegex = new Regex(
-                    $"^publications/{RegexPatterns.WildcardDirectoryName}/{publicationJsonFilenameRegex}$"
-                ),
-            }
-        );
-
-        return NoContent();
-    }
-
-    /// <summary>
-    /// Clears all latest-release.json and releases/[yyyy-*].json.
-    ///
-    /// Useful for when the ReleaseCacheViewModel has been changed to invalidate all release JSON files, as this
-    /// will target both the latest-release.json and individual [release-year-and-time-identifier].json files in
-    /// the same call.
-    /// </summary>
-    // TODO EES-7089 Once EES-7022 has been deployed, run this endpoint one final time to clear all cached files, then remove it.
-    [HttpDelete("public-cache/publications/release-json")]
-    public async Task<ActionResult> ClearPublicCacheReleaseJson()
-    {
-        var latestReleaseJsonFilenameRegex = "latest-release.json".Replace(".", "\\.");
-
-        await _publicBlobStorageService.DeleteBlobs(
-            BlobContainers.PublicContent,
-            options: new DeleteBlobsOptions
-            {
-                // Match against patterns:
-                //
-                // publications/***/latest-release.json
-                // publications/***/releases/1234.json
-                // publications/***/releases/1234-35.json
-                // publications/***/releases/1234-q1.json
-                // publications/***/releases/1234-35-q1.json
-                IncludeRegex = new Regex(
-                    $"^publications/{RegexPatterns.WildcardDirectoryName}/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$"
-                ),
-            }
-        );
-
-        return NoContent();
-    }
-
-    /// <summary>
     /// Clears all GeoJSON cached for Admin.
     ///
     /// Useful for when the GeoJSON cache needs to be refreshed, without impacting associated data blocks.
