@@ -37,7 +37,7 @@ export interface PaginatedListWithAzureFacets<T> extends PaginatedList<T> {
   };
 }
 
-export type AzurePublicationOrderByParam =
+export type AzureOrderByParam =
   | 'published asc'
   | 'published desc'
   | 'title asc'
@@ -45,7 +45,7 @@ export type AzurePublicationOrderByParam =
 
 export interface AzurePublicationListRequest {
   filter?: string;
-  orderBy?: AzurePublicationOrderByParam;
+  orderBy?: AzureOrderByParam;
   page?: number;
   pageSize?: number;
   releaseType?: string;
@@ -58,12 +58,12 @@ const azurePublicationService = {
   async listPublications(
     params: AzurePublicationListRequest,
   ): Promise<PaginatedListWithAzureFacets<PublicationListSummary>> {
-    return frontendApi.post(`/search`, { searchOptions: params });
+    return frontendApi.post(`/search-publications`, { searchOptions: params });
   },
   async suggestPublications(
     params: AzurePublicationListRequest,
   ): Promise<AzurePublicationSuggestResult[]> {
-    return frontendApi.post(`/suggest`, { searchOptions: params });
+    return frontendApi.post(`/suggest-publications`, { searchOptions: params });
   },
 };
 
