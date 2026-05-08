@@ -29,7 +29,7 @@ export type SelectedChildren = {
 interface FilterHierarchyOptionsProps {
   disabled?: boolean;
   expandedOptionsList?: string[];
-  toggleSelectionStateForTier: (tier: number) => void;
+  handleTierOptionChange: (tier: number) => void;
   hierarchySearchTerm?: string;
   /** Tier number, zero-based */
   level: number;
@@ -47,7 +47,7 @@ function FilterHierarchyOptions({
   level,
   selectedValues = [],
   expandedOptionsList = [],
-  toggleSelectionStateForTier,
+  handleTierOptionChange,
   hierarchySearchTerm = '',
   selectedChildren,
   onToggleOptions,
@@ -191,7 +191,7 @@ function FilterHierarchyOptions({
           checked={selectedValues.includes(optionTree.value)}
           onChange={e => {
             field.onChange(e);
-            toggleSelectionStateForTier(optionTree.tier);
+            handleTierOptionChange(optionTree.tier);
           }}
         />
       </div>
@@ -266,7 +266,7 @@ function FilterHierarchyOptions({
                 disabled={disabled}
                 selectedValues={selectedValues}
                 level={level + 1}
-                toggleSelectionStateForTier={toggleSelectionStateForTier}
+                handleTierOptionChange={handleTierOptionChange}
                 hierarchySearchTerm={hierarchySearchTerm}
                 selectedChildren={selectedChildren}
                 onToggleOptions={onToggleOptions}
