@@ -39,7 +39,6 @@ const ReleaseContentEdit = ({
   const { release } = useReleaseContentState();
   const { addContentSectionBlock } = useReleaseContentActions();
 
-  const addSummaryBlockButton = useRef<HTMLButtonElement>(null);
   const addWarningBlockButton = useRef<HTMLButtonElement>(null);
 
   const blockRouteChange = useMemo(() => {
@@ -72,21 +71,6 @@ const ReleaseContentEdit = ({
 
     focusAddedSectionBlockButton(newBlock.id);
   }, [addContentSectionBlock, release.id, release.warningSection]);
-
-  const addSummaryBlock = useCallback(async () => {
-    const newBlock = await addContentSectionBlock({
-      releaseVersionId: release.id,
-      sectionId: release.summarySection.id,
-      sectionKey: 'summarySection',
-      block: {
-        type: 'HtmlBlock',
-        order: 0,
-        body: '',
-      },
-    });
-
-    focusAddedSectionBlockButton(newBlock.id);
-  }, [addContentSectionBlock, release.id, release.summarySection.id]);
 
   const addRelatedDashboardsBlock = useCallback(async () => {
     if (release.relatedDashboardsSection) {
@@ -136,12 +120,6 @@ const ReleaseContentEdit = ({
       window.removeEventListener('scroll', handleScroll);
     };
   }, [handleScroll]);
-
-  const onAfterDeleteSummaryBlock = () => {
-    setTimeout(() => {
-      addSummaryBlockButton.current?.focus();
-    }, 100);
-  };
 
   const onAfterDeleteWarningBlock = () => {
     setTimeout(() => {
@@ -216,66 +194,49 @@ const ReleaseContentEdit = ({
             )}
           </div>
 
-          <div id="releaseSummary" data-testid="release-summary">
-            {release.summarySection &&
-              release.summarySection.content?.length > 0 && (
-                <>
-                  <WarningMessage testId="release-summary-deprecated-warning">
-                    <p className="govuk-!-font-weight-bold">
-                      Warning: Summary text blocks are now only retained for
-                      legacy purposes in existing releases and are no longer
-                      offered on new statistics releases.
-                    </p>
-                  </WarningMessage>
-                  <EditableSectionBlocks
-                    blocks={release.summarySection.content}
-                    renderBlock={block => (
-                      <ReleaseBlock
-                        block={block}
-                        releaseVersionId={release.id}
-                        transformFeaturedTableLinks={
-                          transformFeaturedTableLinks
-                        }
-                      />
-                    )}
-                    renderEditableBlock={block => (
-                      <ReleaseEditableBlock
-                        allowComments
-                        block={block}
-                        editButtonLabel={
-                          <>
-                            Edit<VisuallyHidden> summary</VisuallyHidden> block
-                          </>
-                        }
-                        publicationId={release.publication.id}
-                        releaseVersionId={release.id}
-                        removeButtonLabel={
-                          <>
-                            Remove<VisuallyHidden> summary</VisuallyHidden>{' '}
-                            block
-                          </>
-                        }
-                        sectionId={release.summarySection.id}
-                        sectionKey="summarySection"
-                        label="Summary block"
-                        onAfterDeleteBlock={onAfterDeleteSummaryBlock}
-                      />
-                    )}
-                  />
-                  {release.summarySection.content?.length === 0 && (
-                    <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
-                      <Button
-                        variant="secondary"
-                        onClick={addSummaryBlock}
-                        ref={addSummaryBlockButton}
-                      >
-                        Add a summary text block
-                      </Button>
-                    </div>
+          {release.summarySection &&
+            release.summarySection.content?.length > 0 && (
+              <div id="releaseSummary" data-testid="release-summary">
+                <WarningMessage testId="release-summary-deprecated-warning">
+                  <p className="govuk-!-font-weight-bold">
+                    Warning: Summary text blocks are now only retained for
+                    legacy purposes in existing releases and are no longer
+                    offered on new statistics releases.
+                  </p>
+                </WarningMessage>
+                <EditableSectionBlocks
+                  blocks={release.summarySection.content}
+                  renderBlock={block => (
+                    <ReleaseBlock
+                      block={block}
+                      releaseVersionId={release.id}
+                      transformFeaturedTableLinks={transformFeaturedTableLinks}
+                    />
                   )}
-                </>
-              )}
-          </div>
+                  renderEditableBlock={block => (
+                    <ReleaseEditableBlock
+                      allowComments
+                      block={block}
+                      editButtonLabel={
+                        <>
+                          Edit<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
+                      publicationId={release.publication.id}
+                      releaseVersionId={release.id}
+                      removeButtonLabel={
+                        <>
+                          Remove<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
+                      sectionId={release.summarySection.id}
+                      sectionKey="summarySection"
+                      label="Summary block"
+                    />
+                  )}
+                />
+              </div>
+            )}
         </div>
 
         <div className="govuk-grid-column-one-third">
