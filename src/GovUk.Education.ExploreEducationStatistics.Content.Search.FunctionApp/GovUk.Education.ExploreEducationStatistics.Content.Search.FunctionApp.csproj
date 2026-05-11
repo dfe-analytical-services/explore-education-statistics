@@ -35,7 +35,7 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageReference Include="System.Linq.Async" Version="7.0.0" />
+    <PackageReference Include="System.Linq.Async" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
