@@ -62,11 +62,7 @@ export default function Filters({
   return (
     <form className={styles.form} id={formId}>
       <h2 className="govuk-heading-m">Filter and sort</h2>
-      <ExpandableFilterGroup
-        id={`${formId}-theme-group`}
-        label="Theme"
-        open={!!themeIds}
-      >
+      <ExpandableFilterGroup id={`${formId}-theme-group`} label="Theme">
         <FormCheckboxGroup
           id={`${formId}-theme`}
           legend="Filter by Theme"
@@ -88,7 +84,6 @@ export default function Filters({
         <ExpandableFilterGroup
           id={`${formId}-geographicLevel-group`}
           label="Geographic level"
-          open={!!geographicLevels}
         >
           <FormCheckboxGroup
             id={`${formId}-geographicLevel`}
@@ -112,7 +107,6 @@ export default function Filters({
         <ExpandableFilterGroup
           id={`${formId}-showLatest-group`}
           label="Show latest or all releases"
-          open={latestDataOnly !== undefined}
         >
           <FormRadioGroup<'true' | 'false'>
             formGroupClass="govuk-!-margin-top-0"
@@ -143,7 +137,6 @@ export default function Filters({
       <ExpandableFilterGroup
         id={`${formId}-release-type-group`}
         label="Release types"
-        open={!!releaseTypes}
       >
         <FormCheckboxGroup
           id={`${formId}-release-type`}
@@ -166,7 +159,6 @@ export default function Filters({
         <ExpandableFilterGroup
           id={`${formId}-dataSetType-group`}
           label="API data sets"
-          open={dataSetType !== undefined}
         >
           <FormRadioGroup<DataSetType>
             formGroupClass="govuk-!-margin-top-0"
@@ -193,11 +185,7 @@ export default function Filters({
         </ExpandableFilterGroup>
       )}
 
-      <ExpandableFilterGroup
-        id={`${formId}-sortBy-group`}
-        label="Sort by"
-        open={sortBy !== undefined}
-      >
+      <ExpandableFilterGroup id={`${formId}-sortBy-group`} label="Sort by">
         <FormRadioGroup<SortOptionType>
           formGroupClass="govuk-!-margin-top-0"
           id={`${formId}-sortBy`}
