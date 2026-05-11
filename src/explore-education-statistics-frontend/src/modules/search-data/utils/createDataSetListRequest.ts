@@ -32,7 +32,7 @@ export default function createDataSetListRequest(
   const filter = buildODataFilter({
     dataSetType,
     latestDataOnly,
-    releaseType: releaseType ? [releaseType] : undefined,
+    releaseType,
     themeId,
   });
 
@@ -112,15 +112,17 @@ function getSortParam(sortBy: PublicationSortOption): AzureOrderByParam {
 }
 
 export function getParamsFromQuery(query: SearchDataPageQuery) {
+  const releaseTypesArray = getAsArray(query.releaseType) ?? [];
+
+  const validReleaseTypes = releaseTypesArray.filter(type =>
+    isOneOf(type, Object.keys(releaseTypes)),
+  ) as ReleaseType[];
+
   return {
     dataSetType: query.dataSetType === 'api' ? 'api' : 'all',
     latestDataOnly: !query.latestDataOnly || query.latestDataOnly !== 'false',
     page: getFirst(query.page),
-    releaseType:
-      query.releaseType &&
-      isOneOf(query.releaseType, Object.keys(releaseTypes) as ReleaseType[])
-        ? query.releaseType
-        : undefined,
+    releaseType: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,
     search: getFirst(query.search),
     sortBy:
       query.sortBy && isOneOf(query.sortBy, publicationSortOptions)

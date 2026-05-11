@@ -1,14 +1,9 @@
-import { SelectOption } from '@common/components/form/FormSelect';
-import VisuallyHidden from '@common/components/VisuallyHidden';
-import {
-  FormCheckboxGroup,
-  FormRadioGroup,
-  FormSelect,
-} from '@common/components/form';
+import Button from '@common/components/Button';
+import { FormCheckboxGroup, FormRadioGroup } from '@common/components/form';
+import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
+import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import { ThemeSummary } from '@common/services/themeService';
 import { ReleaseType } from '@common/services/types/releaseType';
-import Button from '@common/components/Button';
-import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import { SortOption } from '@frontend/components/SortControls';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
@@ -17,7 +12,6 @@ import styles from '@frontend/modules/search-data/components/SearchDataFilters.m
 import { SearchDataFilter } from '@frontend/modules/search-data/utils/searchDataFilters';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import React from 'react';
-import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
 
 const formId = 'filters-form';
 
@@ -35,8 +29,8 @@ interface Props {
   dataSetType?: DataSetType;
   includeDataFilters: boolean;
   latestDataOnly?: boolean;
-  releaseType?: ReleaseType;
-  releaseTypeOptions: SelectOption[];
+  releaseTypes?: ReleaseType[];
+  releaseTypeOptions: CheckboxOption[];
   sortBy: SortOptionType;
   sortOptions: SortOption[];
   themeIds?: string[];
@@ -50,7 +44,7 @@ export default function Filters({
   dataSetType,
   includeDataFilters,
   latestDataOnly,
-  releaseType,
+  releaseTypes,
   releaseTypeOptions,
   sortBy,
   sortOptions,
@@ -116,26 +110,16 @@ export default function Filters({
         id={`${formId}-release-type-group`}
         label="Release types"
       >
-        <FormSelect
-          className="govuk-!-width-full govuk-!-margin-bottom-1"
+        <FormCheckboxGroup
           id={`${formId}-release-type`}
-          label={
-            <>
-              <VisuallyHidden>Filter by </VisuallyHidden>Release type
-            </>
-          }
+          legend="Filter by Release Type"
+          legendHidden
           name="releaseType"
-          options={[
-            { label: 'All release types', value: 'all' },
-            ...releaseTypeOptions,
-          ]}
-          value={releaseType ?? 'all'}
-          order={[]}
+          options={releaseTypeOptions}
+          small
+          value={releaseTypes || []}
           onChange={e => {
-            onChange({
-              filterType: 'releaseType',
-              nextValue: e.target.value,
-            });
+            onChange({ filterType: 'releaseType', nextValue: e.target.value });
           }}
         />
         <div className={styles.modalButtonContainer}>

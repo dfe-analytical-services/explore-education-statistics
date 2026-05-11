@@ -48,7 +48,7 @@ export interface SearchDataPageQuery {
   dataSetType?: DataSetType;
   latestDataOnly?: string;
   page?: number;
-  releaseType?: ReleaseType;
+  releaseType?: ReleaseType | ReleaseType[];
   search?: string;
   sortBy?: PublicationSortOption;
   themeId?: string | string[];
@@ -125,20 +125,25 @@ const SearchDataPage: NextPage = () => {
     !isPublicationsSearch && dataSetType === 'api';
   const isFilteredAllReleases = !isPublicationsSearch && !latestDataOnly;
 
+  const selectedThemes = themes.filter(theme => themeId?.includes(theme.id));
+  const selectedReleaseTypes = releaseType
+    ? getAsArray(releaseType)!.map(type => ({
+        id: type,
+        title: releaseTypes[type as ReleaseType],
+      }))
+    : [];
+
   const isFiltered =
     !!search ||
-    !!releaseType ||
-    !!themeId ||
+    selectedReleaseTypes.length > 0 ||
+    selectedThemes.length > 0 ||
     isFilteredByDataSetType ||
     isFilteredAllReleases;
-
-  const selectedThemes = themes.filter(theme => themeId?.includes(theme.id));
-  const selectedReleaseType = releaseTypes[releaseType as ReleaseType];
 
   const filteredByString = compact([
     search,
     ...selectedThemes.map(t => t.title),
-    selectedReleaseType,
+    ...selectedReleaseTypes.map(rt => rt.title),
     isFilteredByDataSetType ? 'API data sets only' : undefined,
     isFilteredAllReleases ? 'All releases' : undefined,
   ]).join(', ');
@@ -418,7 +423,7 @@ const SearchDataPage: NextPage = () => {
               dataSetType={dataSetType as DataSetType}
               includeDataFilters={!isPublicationsSearch}
               latestDataOnly={latestDataOnly}
-              releaseType={releaseType}
+              releaseTypes={releaseType}
               releaseTypeOptions={releaseTypeOptions}
               sortBy={sortBy}
               sortOptions={sortOptions}
@@ -438,7 +443,7 @@ const SearchDataPage: NextPage = () => {
                 includeDataFilters={!isPublicationsSearch}
                 latestDataOnly={latestDataOnly}
                 releaseTypeOptions={releaseTypeOptions}
-                releaseType={releaseType}
+                releaseTypes={releaseType}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
                 themeIds={themeId}
@@ -487,15 +492,21 @@ const SearchDataPage: NextPage = () => {
                   }
                 />
               ))}
-              {selectedReleaseType && (
+
+              {selectedReleaseTypes.map(rt => (
                 <FilterResetButton
+                  key={rt.id}
                   filterType="Release type"
-                  name={selectedReleaseType}
+                  name={rt.title}
                   onClick={() =>
-                    handleResetFilter({ filterType: 'releaseType' })
+                    handleChangeFilter({
+                      filterType: 'releaseType',
+                      nextValue: rt.id,
+                    })
                   }
                 />
-              )}
+              ))}
+
               {isFilteredByDataSetType && (
                 <FilterResetButton
                   filterType="Data set type"
