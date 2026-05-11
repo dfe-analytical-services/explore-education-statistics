@@ -4,6 +4,7 @@ import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
 import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import { ThemeSummary } from '@common/services/themeService';
 import { ReleaseType } from '@common/services/types/releaseType';
+import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
 import { SortOption } from '@frontend/components/SortControls';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
@@ -27,6 +28,8 @@ type SortOptionType = PublicationSortOption;
 
 interface Props {
   dataSetType?: DataSetType;
+  geographicLevels?: GeographicLevelCode[];
+  geographicLevelOptions: CheckboxOption[];
   includeDataFilters: boolean;
   latestDataOnly?: boolean;
   releaseTypes?: ReleaseType[];
@@ -42,6 +45,8 @@ interface Props {
 
 export default function Filters({
   dataSetType,
+  geographicLevels,
+  geographicLevelOptions,
   includeDataFilters,
   latestDataOnly,
   releaseTypes,
@@ -57,7 +62,11 @@ export default function Filters({
   return (
     <form className={styles.form} id={formId}>
       <h2 className="govuk-heading-m">Filter and sort</h2>
-      <ExpandableFilterGroup id={`${formId}-theme-group`} label="Theme">
+      <ExpandableFilterGroup
+        id={`${formId}-theme-group`}
+        label="Theme"
+        open={!!themeIds}
+      >
         <FormCheckboxGroup
           id={`${formId}-theme`}
           legend="Filter by Theme"
@@ -77,8 +86,33 @@ export default function Filters({
 
       {includeDataFilters && (
         <ExpandableFilterGroup
+          id={`${formId}-geographicLevel-group`}
+          label="Geographic level"
+          open={!!geographicLevels}
+        >
+          <FormCheckboxGroup
+            id={`${formId}-geographicLevel`}
+            legend="Filter by Geographic Level"
+            legendHidden
+            name="geographicLevel"
+            options={geographicLevelOptions}
+            small
+            value={geographicLevels || []}
+            onChange={e => {
+              onChange({
+                filterType: 'geographicLevel',
+                nextValue: e.target.value,
+              });
+            }}
+          />
+        </ExpandableFilterGroup>
+      )}
+
+      {includeDataFilters && (
+        <ExpandableFilterGroup
           id={`${formId}-showLatest-group`}
           label="Show latest or all releases"
+          open={latestDataOnly !== undefined}
         >
           <FormRadioGroup<'true' | 'false'>
             formGroupClass="govuk-!-margin-top-0"
@@ -109,6 +143,7 @@ export default function Filters({
       <ExpandableFilterGroup
         id={`${formId}-release-type-group`}
         label="Release types"
+        open={!!releaseTypes}
       >
         <FormCheckboxGroup
           id={`${formId}-release-type`}
@@ -131,6 +166,7 @@ export default function Filters({
         <ExpandableFilterGroup
           id={`${formId}-dataSetType-group`}
           label="API data sets"
+          open={dataSetType !== undefined}
         >
           <FormRadioGroup<DataSetType>
             formGroupClass="govuk-!-margin-top-0"
@@ -156,7 +192,12 @@ export default function Filters({
           />
         </ExpandableFilterGroup>
       )}
-      <ExpandableFilterGroup id={`${formId}-sortBy-group`} label="Sort by">
+
+      <ExpandableFilterGroup
+        id={`${formId}-sortBy-group`}
+        label="Sort by"
+        open={sortBy !== undefined}
+      >
         <FormRadioGroup<SortOptionType>
           formGroupClass="govuk-!-margin-top-0"
           id={`${formId}-sortBy`}

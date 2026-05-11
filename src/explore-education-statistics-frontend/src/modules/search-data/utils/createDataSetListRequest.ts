@@ -2,6 +2,9 @@ import { odata } from '@azure/search-documents';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
 import getAsArray from '@common/utils/getAsArray';
 import getFirst from '@common/utils/getFirst';
+import locationLevelsMap, {
+  GeographicLevelCode,
+} from '@common/utils/locationLevelsMap';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
 import { FindStatisticsPageQuery } from '@frontend/modules/find-statistics/FindStatisticsPage';
@@ -12,6 +15,7 @@ import {
 import { SearchDataPageQuery } from '@frontend/modules/search-data/SearchDataPage';
 import { AzureDataSetListRequest } from '@frontend/services/azureDataSetService';
 import { AzureOrderByParam } from '@frontend/services/azurePublicationService';
+import { DataSetType } from '@frontend/services/dataSetFileService';
 import omitBy from 'lodash/omitBy';
 
 export default function createDataSetListRequest(
@@ -19,6 +23,7 @@ export default function createDataSetListRequest(
 ): AzureDataSetListRequest {
   const {
     dataSetType,
+    geographicLevels,
     latestDataOnly,
     releaseType,
     search: searchParam,
@@ -28,9 +33,9 @@ export default function createDataSetListRequest(
 
   const orderBy = getSortParam(sortBy);
 
-  // TOOD-7072 finish converting filters into arrays
   const filter = buildODataFilter({
     dataSetType,
+    geographicLevels,
     latestDataOnly,
     releaseType,
     themeId,
@@ -76,7 +81,9 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
 
   if (filters.geographicLevels?.length) {
     const joined = filters.geographicLevels.join('|');
-    conditions.push(odata`search.in(geographicLevels, ${joined}, '|')`);
+    conditions.push(
+      odata`geographicLevels/any(g: search.in(g, ${joined}, '|'))`,
+    );
   }
 
   if (filters.releaseId?.length) {
@@ -118,8 +125,19 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
     isOneOf(type, Object.keys(releaseTypes)),
   ) as ReleaseType[];
 
+  const geographicLevelsArray = getAsArray(query.geographicLevel) ?? [];
+
+  const validGeographicLevels = geographicLevelsArray.filter(type =>
+    isOneOf(
+      type,
+      Object.values(locationLevelsMap).map(level => level.code),
+    ),
+  ) as GeographicLevelCode[];
+
   return {
-    dataSetType: query.dataSetType === 'api' ? 'api' : 'all',
+    dataSetType: query.dataSetType === 'api' ? 'api' : ('all' as DataSetType),
+    geographicLevels:
+      validGeographicLevels.length > 0 ? validGeographicLevels : undefined,
     latestDataOnly: !query.latestDataOnly || query.latestDataOnly !== 'false',
     page: getFirst(query.page),
     releaseType: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,

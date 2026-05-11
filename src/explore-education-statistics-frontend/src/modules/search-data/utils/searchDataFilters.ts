@@ -1,5 +1,6 @@
 export const searchDataFilters = [
   'dataSetType',
+  'geographicLevel',
   'latestDataOnly',
   'releaseType',
   'search',

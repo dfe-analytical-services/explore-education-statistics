@@ -10,6 +10,10 @@ import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import getAsArray from '@common/utils/getAsArray';
+import locationLevelsMap, {
+  GeographicLevelCode,
+  geographicLevelCodesMap,
+} from '@common/utils/locationLevelsMap';
 import FilterResetButton from '@frontend/components/FilterResetButton';
 import FiltersMobile from '@frontend/components/FiltersMobile';
 import Link from '@frontend/components/Link';
@@ -46,6 +50,7 @@ type RoutePath = 'search-releases' | 'search-data';
 
 export interface SearchDataPageQuery {
   dataSetType?: DataSetType;
+  geographicLevel?: GeographicLevelCode | GeographicLevelCode[];
   latestDataOnly?: string;
   page?: number;
   releaseType?: ReleaseType | ReleaseType[];
@@ -104,8 +109,15 @@ const SearchDataPage: NextPage = () => {
     totalResults = 0,
   } = (isPublicationsSearch ? publicationsPaging : dataSetsPaging) ?? {};
 
-  const { dataSetType, latestDataOnly, releaseType, search, sortBy, themeId } =
-    getParamsFromQuery(router.query);
+  const {
+    dataSetType,
+    geographicLevels,
+    latestDataOnly,
+    releaseType,
+    search,
+    sortBy,
+    themeId,
+  } = getParamsFromQuery(router.query);
 
   const themeOptions = themes.map(theme => {
     return {
@@ -121,9 +133,14 @@ const SearchDataPage: NextPage = () => {
     };
   });
 
-  const isFilteredByDataSetType =
-    !isPublicationsSearch && dataSetType === 'api';
-  const isFilteredAllReleases = !isPublicationsSearch && !latestDataOnly;
+  const geographicLevelOptions = Object.values(locationLevelsMap).map(
+    location => {
+      return {
+        label: location.filterLabel,
+        value: location.code,
+      };
+    },
+  );
 
   const selectedThemes = themes.filter(theme => themeId?.includes(theme.id));
   const selectedReleaseTypes = releaseType
@@ -133,20 +150,38 @@ const SearchDataPage: NextPage = () => {
       }))
     : [];
 
+  const selectedGeographicLevels = geographicLevels
+    ? getAsArray(geographicLevels)!
+        .map(code => geographicLevelCodesMap[code as GeographicLevelCode])
+        .filter(Boolean)
+    : [];
+
+  const isFilteredByDataSetType =
+    !isPublicationsSearch && dataSetType === 'api';
+  const isFilteredAllReleases = !isPublicationsSearch && !latestDataOnly;
+  const isFilteredByGeographicLevel =
+    !isPublicationsSearch && selectedGeographicLevels.length > 0;
+
   const isFiltered =
     !!search ||
     selectedReleaseTypes.length > 0 ||
     selectedThemes.length > 0 ||
     isFilteredByDataSetType ||
-    isFilteredAllReleases;
+    isFilteredAllReleases ||
+    isFilteredByGeographicLevel;
 
-  const filteredByString = compact([
-    search,
-    ...selectedThemes.map(t => t.title),
-    ...selectedReleaseTypes.map(rt => rt.title),
-    isFilteredByDataSetType ? 'API data sets only' : undefined,
-    isFilteredAllReleases ? 'All releases' : undefined,
-  ]).join(', ');
+  const filteredByString = compact(
+    [
+      search,
+      ...selectedThemes.map(t => t.title),
+      ...selectedReleaseTypes.map(rt => rt.title),
+      isFilteredByGeographicLevel
+        ? [...selectedGeographicLevels.map(gl => gl.filterLabel)]
+        : undefined,
+      isFilteredByDataSetType ? 'API data sets only' : undefined,
+      isFilteredAllReleases ? 'All releases' : undefined,
+    ].flat(),
+  ).join(', ');
 
   const sortOptions: SortOption[] = [
     { label: 'Newest', value: 'newest' },
@@ -197,7 +232,6 @@ const SearchDataPage: NextPage = () => {
     'themeId',
     'releaseType',
     'geographicLevel',
-    'publicationId',
   ];
 
   const handleChangeFilter = async ({
@@ -420,7 +454,9 @@ const SearchDataPage: NextPage = () => {
         >
           {!isMobileMedia && (
             <SearchDataFilters
-              dataSetType={dataSetType as DataSetType}
+              dataSetType={dataSetType}
+              geographicLevels={geographicLevels}
+              geographicLevelOptions={geographicLevelOptions}
               includeDataFilters={!isPublicationsSearch}
               latestDataOnly={latestDataOnly}
               releaseTypes={releaseType}
@@ -439,7 +475,9 @@ const SearchDataPage: NextPage = () => {
           {isMobileMedia && (
             <FiltersMobile title="Filter and sort" totalResults={totalResults}>
               <SearchDataFilters
-                dataSetType={dataSetType as DataSetType}
+                dataSetType={dataSetType}
+                geographicLevels={geographicLevels}
+                geographicLevelOptions={geographicLevelOptions}
                 includeDataFilters={!isPublicationsSearch}
                 latestDataOnly={latestDataOnly}
                 releaseTypeOptions={releaseTypeOptions}
@@ -493,6 +531,20 @@ const SearchDataPage: NextPage = () => {
                 />
               ))}
 
+              {isFilteredByGeographicLevel &&
+                selectedGeographicLevels.map(gl => (
+                  <FilterResetButton
+                    key={gl.code}
+                    filterType="Geographic level"
+                    name={gl.filterLabel}
+                    onClick={() =>
+                      handleChangeFilter({
+                        filterType: 'geographicLevel',
+                        nextValue: gl.code,
+                      })
+                    }
+                  />
+                ))}
               {selectedReleaseTypes.map(rt => (
                 <FilterResetButton
                   key={rt.id}
