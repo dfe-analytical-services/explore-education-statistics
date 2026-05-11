@@ -69,7 +69,14 @@ const FormFieldset = ({
             },
           )}
         >
-          {legend}
+          {/* Extra span to avoid browser rendering quirk with hidden legend */}
+          <span
+            className={classNames({
+              'govuk-visually-hidden': legendHidden,
+            })}
+          >
+            {legend}
+          </span>
         </legend>
 
         {hint && (
