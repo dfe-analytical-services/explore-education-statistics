@@ -10,6 +10,7 @@ interface Props {
   label: string;
   labelHiddenText?: string;
   labelAfter?: ReactNode;
+  labelSub?: string;
   id: string;
   open?: boolean;
   testId?: string;
@@ -21,6 +22,7 @@ export default function ExpandableFilterGroup({
   label,
   labelAfter,
   labelHiddenText,
+  labelSub,
   id,
   open: initialOpen = false,
   testId = 'expandable-filter-group',
@@ -46,7 +48,10 @@ export default function ExpandableFilterGroup({
         <button
           aria-controls={contentId}
           aria-expanded={open}
-          className="govuk-accordion__show-all govuk-!-margin-bottom-0"
+          className={classNames(
+            'govuk-accordion__show-all govuk-!-margin-bottom-0',
+            styles.toggleButton,
+          )}
           data-testid="expandable-filter-group-button"
           type="button"
           onClick={() => {
@@ -61,6 +66,11 @@ export default function ExpandableFilterGroup({
           />
           <span className="govuk-accordion__show-all-text">
             {label}
+            {labelSub && (
+              <span className="govuk-!-font-size-16 govuk-!-display-block">
+                {labelSub}
+              </span>
+            )}
             <VisuallyHidden>
               {labelHiddenText ??
                 ` - ${open ? 'hide options' : 'show options'}`}

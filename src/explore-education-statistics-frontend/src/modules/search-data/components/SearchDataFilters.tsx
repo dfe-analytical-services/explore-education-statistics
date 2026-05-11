@@ -84,6 +84,7 @@ export default function Filters({
         <ExpandableFilterGroup
           id={`${formId}-geographicLevel-group`}
           label="Geographic level"
+          labelSub="(includes schools and providers)"
         >
           <FormCheckboxGroup
             id={`${formId}-geographicLevel`}

@@ -22,6 +22,16 @@
   }
 }
 
+.toggleButton {
+  display: flex;
+  align-items: center;
+  text-align: left;
+
+  :global(.govuk-accordion-nav__chevron) {
+    flex-shrink: 0;
+  }
+}
+
 .expanded > .sectionContent {
   display: block;
 }
