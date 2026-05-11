@@ -1,6 +1,10 @@
 import { SelectOption } from '@common/components/form/FormSelect';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { FormRadioGroup, FormSelect } from '@common/components/form';
+import {
+  FormCheckboxGroup,
+  FormRadioGroup,
+  FormSelect,
+} from '@common/components/form';
 import { ThemeSummary } from '@common/services/themeService';
 import { ReleaseType } from '@common/services/types/releaseType';
 import Button from '@common/components/Button';
@@ -13,6 +17,7 @@ import styles from '@frontend/modules/search-data/components/SearchDataFilters.m
 import { SearchDataFilter } from '@frontend/modules/search-data/utils/searchDataFilters';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import React from 'react';
+import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
 
 const formId = 'filters-form';
 
@@ -34,9 +39,9 @@ interface Props {
   releaseTypeOptions: SelectOption[];
   sortBy: SortOptionType;
   sortOptions: SortOption[];
-  themeId?: string;
+  themeIds?: string[];
   themes: ThemeSummary[];
-  themeOptions: SelectOption[];
+  themeOptions: CheckboxOption[];
   onChange: FilterChangeHandler;
   onSortChange: (nextSortBy: SortOptionType) => void;
 }
@@ -49,7 +54,7 @@ export default function Filters({
   releaseTypeOptions,
   sortBy,
   sortOptions,
-  themeId,
+  themeIds,
   themes,
   themeOptions,
   onChange,
@@ -59,18 +64,14 @@ export default function Filters({
     <form className={styles.form} id={formId}>
       <h2 className="govuk-heading-m">Filter and sort</h2>
       <ExpandableFilterGroup id={`${formId}-theme-group`} label="Theme">
-        <FormSelect
-          className="govuk-!-width-full govuk-!-margin-bottom-1"
+        <FormCheckboxGroup
           id={`${formId}-theme`}
-          label={
-            <>
-              <VisuallyHidden>Filter by </VisuallyHidden>Theme
-            </>
-          }
+          legend="Filter by Theme"
+          legendHidden
           name="themeId"
-          options={[{ label: 'All themes', value: 'all' }, ...themeOptions]}
-          value={themeId ?? 'all'}
-          order={[]}
+          options={themeOptions}
+          small
+          value={themeIds || []}
           onChange={e => {
             onChange({ filterType: 'themeId', nextValue: e.target.value });
           }}

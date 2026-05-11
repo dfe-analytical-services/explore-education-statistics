@@ -1,5 +1,6 @@
 import { odata } from '@azure/search-documents';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
+import getAsArray from '@common/utils/getAsArray';
 import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
@@ -32,7 +33,7 @@ export default function createDataSetListRequest(
     dataSetType,
     latestDataOnly,
     releaseType: releaseType ? [releaseType] : undefined,
-    themeId: themeId ? [themeId] : undefined,
+    themeId,
   });
 
   const minSearchCharacters = 3;
@@ -125,6 +126,6 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
       query.sortBy && isOneOf(query.sortBy, publicationSortOptions)
         ? query.sortBy
         : 'newest',
-    themeId: getFirst(query.themeId),
+    themeId: getAsArray(query.themeId),
   };
 }

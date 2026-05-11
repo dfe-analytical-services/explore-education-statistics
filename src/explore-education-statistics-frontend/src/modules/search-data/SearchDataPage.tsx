@@ -9,6 +9,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import getAsArray from '@common/utils/getAsArray';
 import FilterResetButton from '@frontend/components/FilterResetButton';
 import FiltersMobile from '@frontend/components/FiltersMobile';
 import Link from '@frontend/components/Link';
@@ -50,7 +51,7 @@ export interface SearchDataPageQuery {
   releaseType?: ReleaseType;
   search?: string;
   sortBy?: PublicationSortOption;
-  themeId?: string;
+  themeId?: string | string[];
 }
 
 const SearchDataPage: NextPage = () => {
@@ -131,12 +132,12 @@ const SearchDataPage: NextPage = () => {
     isFilteredByDataSetType ||
     isFilteredAllReleases;
 
-  const selectedTheme = themes.find(theme => theme.id === themeId);
+  const selectedThemes = themes.filter(theme => themeId?.includes(theme.id));
   const selectedReleaseType = releaseTypes[releaseType as ReleaseType];
 
   const filteredByString = compact([
     search,
-    selectedTheme?.title,
+    ...selectedThemes.map(t => t.title),
     selectedReleaseType,
     isFilteredByDataSetType ? 'API data sets only' : undefined,
     isFilteredAllReleases ? 'All releases' : undefined,
@@ -187,6 +188,13 @@ const SearchDataPage: NextPage = () => {
     });
   };
 
+  const multiValueFilters: string[] = [
+    'themeId',
+    'releaseType',
+    'geographicLevel',
+    'publicationId',
+  ];
+
   const handleChangeFilter = async ({
     filterType,
     nextValue,
@@ -194,20 +202,50 @@ const SearchDataPage: NextPage = () => {
     filterType: SearchDataFilter;
     nextValue: string;
   }) => {
-    // If performing a search (by search term), reset sortBy to relevance
+    // 1. If performing a search (by search term), reset sortBy to relevance
     const nextSortBy =
       filterType === 'search' && nextValue.length > 0 ? 'relevance' : sortBy;
 
-    const newParams =
-      nextValue === 'all' && filterType !== 'dataSetType'
-        ? omit(router.query, 'page', filterType)
-        : {
-            ...omit(router.query, 'page'),
-            [filterType]: nextValue,
-            sortBy: nextSortBy,
-          };
+    // 2. Start building the new query.
+    // We use a Record here so TypeScript allows dynamic key assignments.
+    let newQuery: Record<string, string | string[] | undefined> = {
+      ...omit(router.query, 'page'),
+      sortBy: nextSortBy,
+    };
 
-    await updateQueryParams(newParams);
+    // 3. Determine if this filter should be handled as an array (checkboxes) or a single string (radios/selects)
+    if (multiValueFilters.includes(filterType)) {
+      // Safely grab the current query param and ensure it's an array.
+      const currentParam = router.query[filterType] as
+        | string
+        | string[]
+        | undefined;
+      const currentValues = getAsArray(currentParam) ?? [];
+
+      let updatedValues: string[];
+      if (currentValues.includes(nextValue)) {
+        // Remove it if already selected
+        updatedValues = currentValues.filter(v => v !== nextValue);
+      } else {
+        // Add it if not selected
+        updatedValues = [...currentValues, nextValue];
+      }
+
+      // If the array is empty, wipe it from the URL entirely. Otherwise, set it.
+      if (updatedValues.length === 0) {
+        newQuery = omit(newQuery, filterType);
+      } else {
+        newQuery[filterType] = updatedValues;
+      }
+    } else if (nextValue === 'all' && filterType !== 'dataSetType') {
+      // Wipe the parameter from the URL if 'all' is selected
+      newQuery = omit(newQuery, filterType);
+    } else {
+      // Set the specific single string value
+      newQuery[filterType] = nextValue;
+    }
+
+    await updateQueryParams(newQuery as SearchDataPageQuery);
 
     logEvent({
       category: 'Find statistics and data',
@@ -384,7 +422,7 @@ const SearchDataPage: NextPage = () => {
               releaseTypeOptions={releaseTypeOptions}
               sortBy={sortBy}
               sortOptions={sortOptions}
-              themeId={themeId}
+              themeIds={themeId}
               themes={themes}
               themeOptions={themeOptions}
               onChange={handleChangeFilter}
@@ -403,7 +441,7 @@ const SearchDataPage: NextPage = () => {
                 releaseType={releaseType}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
-                themeId={themeId}
+                themeIds={themeId}
                 themes={themes}
                 themeOptions={themeOptions}
                 onChange={handleChangeFilter}
@@ -436,13 +474,19 @@ const SearchDataPage: NextPage = () => {
                 />
               )}
 
-              {selectedTheme && (
+              {selectedThemes.map(theme => (
                 <FilterResetButton
+                  key={theme.id}
                   filterType="Theme"
-                  name={selectedTheme.title}
-                  onClick={() => handleResetFilter({ filterType: 'themeId' })}
+                  name={theme.title}
+                  onClick={() =>
+                    handleChangeFilter({
+                      filterType: 'themeId',
+                      nextValue: theme.id,
+                    })
+                  }
                 />
-              )}
+              ))}
               {selectedReleaseType && (
                 <FilterResetButton
                   filterType="Release type"
