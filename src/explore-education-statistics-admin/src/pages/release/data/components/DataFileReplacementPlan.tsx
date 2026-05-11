@@ -161,7 +161,6 @@ const DataFileReplacementPlan = ({
         linkToApiDetailsTab,
         user,
       )}
-      ,
       {getApiDataSetMappingProgressTag(
         'filters',
         hasIncompleteFilterMapping,

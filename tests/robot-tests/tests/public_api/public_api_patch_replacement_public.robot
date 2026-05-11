@@ -109,23 +109,23 @@ Validate error summary is displayed on Api Data Set Details page
 User clicks on Map locations link
     user clicks link    Map locations
     user waits until h3 is visible    Locations not found in new data set
-    user waits until element contains    css:[data-testid="mappable-table-region"] caption
+    user waits until element contains    css:[data-testid="mappable-table-ward"] caption
     ...    1 unmapped location    %{WAIT_LONG}
 
 Validate the 'unmapped location' notification banner
     user waits until h2 is visible    Action required
-    user waits until page contains link    There is 1 unmapped region
+    user waits until page contains link    There is 1 unmapped ward
 
 User edits location mapping
     user clicks button in table cell    1    4    Map location
 
     ${modal}=    user waits until modal is visible    Map existing location
-    user clicks radio    Yorkshire
+    user clicks radio    St Agnes
     user clicks button    Update location mapping
     user waits until modal is not visible    Map existing location
 
 Verify location mapping changes
-    user waits until element contains    css:[data-testid="mappable-table-region"] caption
+    user waits until element contains    css:[data-testid="mappable-table-ward"] caption
     ...    1 mapped location    %{WAIT_LONG}
     user waits until h3 is visible    Locations not found in new data set
     user clicks link    Back
@@ -377,7 +377,7 @@ Verify that the two patch versions are collated on a single page
     # This change log is from 1.0.1
     user waits until h3 is visible    Patch changes for version 1.0.1
     user waits until li is visible    label changed to: State-funded primary and secondary
-    user waits until li is visible    label changed to: Yorkshire
+    user waits until li is visible    label changed to: St Agnes
     user waits until li is visible    label changed to: Number of enrolments
     user waits until li is visible    column changed to: number_of_enrolments
 

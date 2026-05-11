@@ -155,7 +155,7 @@ Validate the 'unmapped location' notification banner
     user waits until h2 is visible    Action required
     user waits until page contains link    There is 1 unmapped ward
 
-Validate the row headings and its contents in the 'Regions' section
+Validate the row headings and its contents in the 'Wards' section
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
 
@@ -178,7 +178,7 @@ Verify location mapping changes
     user waits until element contains    css:[data-testid="mappable-table-ward"] caption
     ...    1 mapped location    %{WAIT_LONG}
 
-Validate the row headings and its contents in the 'Regions' section after mapping
+Validate the row headings and its contents in the 'Wards' section after mapping
     user waits until h3 is visible    Locations not found in new data set
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
