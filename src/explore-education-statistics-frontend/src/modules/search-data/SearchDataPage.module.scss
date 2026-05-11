@@ -33,3 +33,10 @@
     border-color: govuk-colour('blue');
   }
 }
+
+.stickyFilters {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow: auto;
+}

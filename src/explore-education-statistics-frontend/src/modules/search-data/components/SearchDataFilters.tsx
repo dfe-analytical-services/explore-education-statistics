@@ -1,18 +1,18 @@
 import { SelectOption } from '@common/components/form/FormSelect';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { FormGroup, FormRadioGroup, FormSelect } from '@common/components/form';
+import { FormRadioGroup, FormSelect } from '@common/components/form';
 import { ThemeSummary } from '@common/services/themeService';
 import { ReleaseType } from '@common/services/types/releaseType';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
-import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
-import styles from '@frontend/modules/data-catalogue/components/Filters.module.scss';
 import { SortOption } from '@frontend/components/SortControls';
-import React from 'react';
+import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import ExpandableFilterGroup from '@frontend/modules/search-data/components/ExpandableFilterGroup';
+import styles from '@frontend/modules/search-data/components/SearchDataFilters.module.scss';
 import { SearchDataFilter } from '@frontend/modules/search-data/utils/searchDataFilters';
 import { DataSetType } from '@frontend/services/dataSetFileService';
+import React from 'react';
 
 const formId = 'filters-form';
 
@@ -32,14 +32,12 @@ interface Props {
   latestDataOnly?: boolean;
   releaseType?: ReleaseType;
   releaseTypeOptions: SelectOption[];
-  showResetFiltersButton?: boolean;
   sortBy: SortOptionType;
   sortOptions: SortOption[];
   themeId?: string;
   themes: ThemeSummary[];
   themeOptions: SelectOption[];
   onChange: FilterChangeHandler;
-  onResetFilters?: () => void;
   onSortChange: (nextSortBy: SortOptionType) => void;
 }
 
@@ -49,20 +47,18 @@ export default function Filters({
   latestDataOnly,
   releaseType,
   releaseTypeOptions,
-  showResetFiltersButton,
   sortBy,
   sortOptions,
   themeId,
   themes,
   themeOptions,
   onChange,
-  onResetFilters,
   onSortChange,
 }: Props) {
   return (
     <form className={styles.form} id={formId}>
       <h2 className="govuk-heading-m">Filter and sort</h2>
-      <FormGroup>
+      <ExpandableFilterGroup id={`${formId}-theme-group`} label="Theme">
         <FormSelect
           className="govuk-!-width-full govuk-!-margin-bottom-1"
           id={`${formId}-theme`}
@@ -79,10 +75,46 @@ export default function Filters({
             onChange({ filterType: 'themeId', nextValue: e.target.value });
           }}
         />
-        <ThemesModal themes={themes} />
-      </FormGroup>
+        <div className={styles.modalButtonContainer}>
+          <ThemesModal themes={themes} />
+        </div>
+      </ExpandableFilterGroup>
 
-      <FormGroup>
+      {includeDataFilters && (
+        <ExpandableFilterGroup
+          id={`${formId}-showLatest-group`}
+          label="Show latest or all releases"
+        >
+          <FormRadioGroup<'true' | 'false'>
+            formGroupClass="govuk-!-margin-top-0"
+            id={`${formId}-showLatest`}
+            legend="Show latest or all releases"
+            legendHidden
+            name="latestDataOnly"
+            options={[
+              { label: 'Show latest releases only', value: 'true' },
+              {
+                label: 'Show all releases',
+                value: 'false',
+              },
+            ]}
+            small
+            order={[]}
+            value={latestDataOnly ? 'true' : 'false'}
+            onChange={e => {
+              onChange({
+                filterType: 'latestDataOnly',
+                nextValue: e.target.value,
+              });
+            }}
+          />
+        </ExpandableFilterGroup>
+      )}
+
+      <ExpandableFilterGroup
+        id={`${formId}-release-type-group`}
+        label="Release types"
+      >
         <FormSelect
           className="govuk-!-width-full govuk-!-margin-bottom-1"
           id={`${formId}-release-type`}
@@ -105,16 +137,21 @@ export default function Filters({
             });
           }}
         />
-        <ReleaseTypesModal />
-      </FormGroup>
+        <div className={styles.modalButtonContainer}>
+          <ReleaseTypesModal />
+        </div>
+      </ExpandableFilterGroup>
 
       {includeDataFilters && (
-        <>
+        <ExpandableFilterGroup
+          id={`${formId}-dataSetType-group`}
+          label="API data sets"
+        >
           <FormRadioGroup<DataSetType>
-            formGroupClass="dfe-border-top govuk-!-padding-top-4 govuk-!-margin-top-2"
+            formGroupClass="govuk-!-margin-top-0"
             id={`${formId}-dataSetType`}
             legend="Type of data"
-            legendSize="s"
+            legendHidden
             name="dataSetType"
             options={[
               { label: 'All data', value: 'all' },
@@ -132,50 +169,21 @@ export default function Filters({
               });
             }}
           />
-          <FormGroup>
-            <FormRadioGroup<'true' | 'false'>
-              formGroupClass="dfe-border-top govuk-!-padding-top-4 govuk-!-margin-top-2"
-              id={`${formId}-showLatest`}
-              legend="Show latest or all releases"
-              legendSize="s"
-              name="latestDataOnly"
-              options={[
-                { label: 'Show latest releases only', value: 'true' },
-                {
-                  label: 'Show all releases',
-                  value: 'false',
-                },
-              ]}
-              small
-              order={[]}
-              value={latestDataOnly ? 'true' : 'false'}
-              onChange={e => {
-                onChange({
-                  filterType: 'latestDataOnly',
-                  nextValue: e.target.value,
-                });
-              }}
-            />
-          </FormGroup>
-        </>
+        </ExpandableFilterGroup>
       )}
-
-      <FormGroup>
-        <FormSelect
-          className="govuk-!-width-full govuk-!-margin-bottom-1"
+      <ExpandableFilterGroup id={`${formId}-sortBy-group`} label="Sort by">
+        <FormRadioGroup<SortOptionType>
+          formGroupClass="govuk-!-margin-top-0"
           id={`${formId}-sortBy`}
-          label="Sort by"
+          legend="Sort by"
+          legendHidden
           name="sortBy"
           options={sortOptions}
+          small
           value={sortBy}
-          order={[]}
           onChange={event => onSortChange(event.target.value as SortOptionType)}
         />
-      </FormGroup>
-
-      {showResetFiltersButton && (
-        <ButtonText onClick={onResetFilters}>Reset filters</ButtonText>
-      )}
+      </ExpandableFilterGroup>
 
       <Button className="dfe-js-hidden" type="submit">
         Submit

@@ -1,14 +1,14 @@
-import FilterAccordion from '@common/modules/table-tool/components/FilterAccordion';
 import render from '@common-test/render';
+import ExpandableFilterGroup from '@frontend/modules/search-data/components/ExpandableFilterGroup';
 import { screen } from '@testing-library/react';
 import React from 'react';
 
-describe('FilterAccordion', () => {
+describe('ExpandableFilterGroup', () => {
   test('renders correctly', () => {
     render(
-      <FilterAccordion label="Test label" id="test-id">
+      <ExpandableFilterGroup label="Test label" id="test-id">
         content
-      </FilterAccordion>,
+      </ExpandableFilterGroup>,
     );
 
     expect(
@@ -20,9 +20,9 @@ describe('FilterAccordion', () => {
 
   test('is closed by default and expands when clicked', async () => {
     const { user } = render(
-      <FilterAccordion label="Test label" id="test-id">
+      <ExpandableFilterGroup label="Test label" id="test-id">
         <h2>content</h2>
-      </FilterAccordion>,
+      </ExpandableFilterGroup>,
     );
 
     const button = screen.getByRole('button', {
@@ -44,9 +44,9 @@ describe('FilterAccordion', () => {
 
   test('is expanded when open is set to true', async () => {
     const { user } = render(
-      <FilterAccordion label="Test label" id="test-id" open>
+      <ExpandableFilterGroup label="Test label" id="test-id" open>
         <h2>content</h2>
-      </FilterAccordion>,
+      </ExpandableFilterGroup>,
     );
 
     const button = screen.getByRole('button', {
@@ -58,23 +58,5 @@ describe('FilterAccordion', () => {
     await user.click(button);
 
     expect(button).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  test('cannot be opened or closed when preventToggle is set', async () => {
-    const { user } = render(
-      <FilterAccordion label="Test label" id="test-id" open preventToggle>
-        <h2>content</h2>
-      </FilterAccordion>,
-    );
-
-    const button = screen.getByRole('button', {
-      name: 'Test label - hide options',
-    });
-
-    expect(button).toHaveAttribute('aria-expanded', 'true');
-
-    await user.click(button);
-
-    expect(button).toHaveAttribute('aria-expanded', 'true');
   });
 });

@@ -32,6 +32,7 @@ import themeQueries from '@frontend/queries/themeQueries';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
@@ -368,7 +369,12 @@ const SearchDataPage: NextPage = () => {
         </div>
       </div>
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
+        <div
+          className={classNames([
+            'govuk-grid-column-one-third',
+            styles.stickyFilters,
+          ])}
+        >
           {!isMobileMedia && (
             <SearchDataFilters
               dataSetType={dataSetType as DataSetType}
@@ -376,7 +382,6 @@ const SearchDataPage: NextPage = () => {
               latestDataOnly={latestDataOnly}
               releaseType={releaseType}
               releaseTypeOptions={releaseTypeOptions}
-              showResetFiltersButton={!isMobileMedia && isFiltered}
               sortBy={sortBy}
               sortOptions={sortOptions}
               themeId={themeId}
@@ -384,7 +389,6 @@ const SearchDataPage: NextPage = () => {
               themeOptions={themeOptions}
               onChange={handleChangeFilter}
               onSortChange={handleSortBy}
-              onResetFilters={() => handleResetFilter({ filterType: 'all' })}
             />
           )}
         </div>
@@ -467,6 +471,16 @@ const SearchDataPage: NextPage = () => {
                 />
               )}
             </div>
+
+            {isFiltered && (
+              <div className="govuk-!-width-full">
+                <ButtonText
+                  onClick={() => handleResetFilter({ filterType: 'all' })}
+                >
+                  Clear all filters
+                </ButtonText>
+              </div>
+            )}
           </div>
 
           <LoadingSpinner
