@@ -4,6 +4,8 @@ import educationInNumbersContentService, {
 import {
   EinBlockType,
   EinFreeTextStatTile,
+  EinTile,
+  EinTileType,
 } from '@common/services/types/einBlocks';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 import { FreeTextStatTileFormValues } from '../components/EditableFreeTextStatTileForm';
@@ -77,10 +79,6 @@ export default function useEducationInNumbersPageContentActions() {
     });
   }
 
-  // NOTE: `order` could be removed from EinContentBlockAddRequest, as
-  // we only ever add new blocks to the end of all existing blocks. If
-  // someone ever did provide an order that clashed with an existing block,
-  // currently the frontend doesn't adjust the `order`s of existing blocks.
   async function addContentSectionBlock({
     educationInNumbersPageId,
     sectionId,
@@ -224,39 +222,92 @@ export default function useEducationInNumbersPageContentActions() {
     });
   }
 
-  async function addFreeTextStatTile({
+  async function addTile({
     educationInNumbersPageId,
-    blockId,
     sectionId,
+    blockId,
+    type,
   }: {
     educationInNumbersPageId: string;
-    blockId: string;
     sectionId: string;
+    blockId: string;
+    type: EinTileType;
   }) {
-    const newTile = await educationInNumbersContentService.addFreeTextStatTile({
+    const newTile = await educationInNumbersContentService.addTile({
       educationInNumbersPageId,
       blockId,
+      type,
     });
     dispatch({
-      type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK',
+      type: 'ADD_TILE_TO_GROUP_BLOCK',
       payload: {
-        meta: { blockId, sectionId },
+        meta: { sectionId, blockId },
         tile: newTile,
       },
     });
     return newTile;
   }
 
+  async function reorderTiles({
+    educationInNumbersPageId,
+    sectionId,
+    blockId,
+    tiles,
+  }: {
+    educationInNumbersPageId: string;
+    sectionId: string;
+    blockId: string;
+    tiles: EinTile[];
+  }) {
+    const newTiles =
+      await educationInNumbersContentService.reorderGroupBlockTiles({
+        educationInNumbersPageId,
+        blockId,
+        order: tiles.map(tile => tile.id),
+      });
+    dispatch({
+      type: 'REORDER_TILES_IN_GROUP_BLOCK',
+      payload: {
+        meta: { sectionId, blockId },
+        tiles: newTiles,
+      },
+    });
+  }
+
+  async function deleteTile({
+    educationInNumbersPageId,
+    sectionId,
+    blockId,
+    tileId,
+  }: {
+    educationInNumbersPageId: string;
+    sectionId: string;
+    blockId: string;
+    tileId: string;
+  }) {
+    await educationInNumbersContentService.deleteTile({
+      educationInNumbersPageId,
+      blockId,
+      tileId,
+    });
+    dispatch({
+      type: 'DELETE_TILE_FROM_GROUP_BLOCK',
+      payload: {
+        meta: { sectionId, blockId, tileId },
+      },
+    });
+  }
+
   async function updateFreeTextStatTile({
     educationInNumbersPageId,
-    blockId,
     sectionId,
+    blockId,
     tileId,
     values,
   }: {
     educationInNumbersPageId: string;
-    blockId: string;
     sectionId: string;
+    blockId: string;
     tileId: string;
     values: FreeTextStatTileFormValues;
   }) {
@@ -269,68 +320,18 @@ export default function useEducationInNumbersPageContentActions() {
     dispatch({
       type: 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK',
       payload: {
-        meta: { blockId, sectionId, tileId },
+        meta: { sectionId, blockId, tileId },
         tile: newTile,
       },
     });
     return newTile;
   }
 
-  async function reorderFreeTextStatTiles({
-    educationInNumbersPageId,
-    blockId,
-    sectionId,
-    tiles,
-  }: {
-    educationInNumbersPageId: string;
-    blockId: string;
-    sectionId: string;
-    tiles: EinFreeTextStatTile[];
-  }) {
-    const newTiles =
-      await educationInNumbersContentService.reorderFreeTextStatTiles({
-        educationInNumbersPageId,
-        blockId,
-        order: tiles.map(tile => tile.id),
-      });
-    dispatch({
-      type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK',
-      payload: {
-        meta: { blockId, sectionId },
-        tiles: newTiles,
-      },
-    });
-  }
-
-  async function deleteFreeTextStatTile({
-    educationInNumbersPageId,
-    blockId,
-    sectionId,
-    tileId,
-  }: {
-    educationInNumbersPageId: string;
-    blockId: string;
-    sectionId: string;
-    tileId: string;
-  }) {
-    await educationInNumbersContentService.deleteFreeTextStatTile({
-      educationInNumbersPageId,
-      blockId,
-      tileId,
-    });
-    dispatch({
-      type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK',
-      payload: {
-        meta: { blockId, sectionId, tileId },
-      },
-    });
-  }
-
   return {
-    addFreeTextStatTile,
+    addTile,
+    reorderTiles,
+    deleteTile,
     updateFreeTextStatTile,
-    deleteFreeTextStatTile,
-    reorderFreeTextStatTiles,
     deleteContentSectionBlock,
     updateContentSectionBlock,
     addContentSectionBlock,

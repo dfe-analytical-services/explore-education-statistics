@@ -55,9 +55,9 @@ export const testEinPageContent: EinContent = {
             testTile,
             {
               id: 'tile-2',
-              type: 'FreeTextStatTile',
-              order: 1,
               title: 'Tile 2 title',
+              order: 1,
+              type: 'FreeTextStatTile',
               statistic: '2000',
               trend: 'Tile 2 trend',
               linkText: 'Tile 2 link text',

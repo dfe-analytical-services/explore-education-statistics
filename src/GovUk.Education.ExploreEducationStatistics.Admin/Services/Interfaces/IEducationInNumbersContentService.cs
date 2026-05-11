@@ -43,7 +43,6 @@ public interface IEducationInNumbersContentService
         Guid pageId,
         Guid sectionId,
         EinBlockType type,
-        int? order,
         CancellationToken cancellationToken
     );
 

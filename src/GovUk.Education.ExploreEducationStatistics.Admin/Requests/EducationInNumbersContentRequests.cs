@@ -20,8 +20,6 @@ public record EinContentSectionUpdateHeadingRequest
 public record EinContentBlockAddRequest
 {
     public EinBlockType Type { get; set; }
-
-    public int? Order { get; set; }
 }
 
 public record EinHtmlBlockUpdateRequest

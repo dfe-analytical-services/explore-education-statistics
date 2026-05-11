@@ -17,11 +17,20 @@ const TileGroupBlock = ({ block }: TileGroupBlockProps) => {
           {title}
         </h3>
       )}
-      <FreeTextStatTileWrapper>
-        {tiles.map(tile => (
-          <FreeTextStatTile key={tile.id} tile={tile} />
-        ))}
-      </FreeTextStatTileWrapper>
+      {tiles.map(tile => {
+        switch (tile.type) {
+          case 'FreeTextStatTile':
+            return (
+              <FreeTextStatTileWrapper>
+                <FreeTextStatTile key={tile.id} tile={tile} />
+              </FreeTextStatTileWrapper>
+            );
+          case 'ApiQueryStatTile':
+            return <p>Api Query Stat tile!</p>;
+          default:
+            return null; // @MarkFix
+        }
+      })}
     </div>
   );
 };

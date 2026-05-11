@@ -8,41 +8,36 @@ import { EinFreeTextStatTile } from '@common/services/types/einBlocks';
 import Yup from '@common/validation/yup';
 import React from 'react';
 
-export type FreeTextStatTileFormValues = Omit<
-  EinFreeTextStatTile,
-  'id' | 'type' | 'order'
->;
+export type FreeTextStatTileFormValues = {
+  title: string;
+  statistic: string;
+  trend: string;
+  linkUrl?: string;
+  linkText?: string;
+};
 
 interface EditableFreeTextStatTileFormProps {
-  statTile?: EinFreeTextStatTile;
-  onSubmit: (values: FreeTextStatTileFormValues) => void;
+  freeTextStatTile?: EinFreeTextStatTile;
+  onSubmit: (values: FreeTextStatTileFormValues) => Promise<void> | void;
   onCancel: () => void;
   testId: string;
 }
 
 export default function EditableFreeTextStatTileForm({
-  statTile,
+  freeTextStatTile,
   onSubmit,
   onCancel,
   testId,
 }: EditableFreeTextStatTileFormProps) {
-  const handleSubmit = async (values: FreeTextStatTileFormValues) => {
-    await onSubmit({
-      ...values,
-      linkText: values.linkText,
-      linkUrl: values.linkUrl,
-    });
-  };
-
   return (
     <div data-testid={testId}>
       <FormProvider
         initialValues={{
-          title: statTile?.title,
-          statistic: statTile?.statistic,
-          trend: statTile?.trend,
-          linkText: statTile?.linkText,
-          linkUrl: statTile?.linkUrl,
+          title: freeTextStatTile?.title,
+          statistic: freeTextStatTile?.statistic,
+          trend: freeTextStatTile?.trend,
+          linkText: freeTextStatTile?.linkText,
+          linkUrl: freeTextStatTile?.linkUrl,
         }}
         validationSchema={Yup.object<FreeTextStatTileFormValues>({
           title: Yup.string().required('Enter a title').max(100),
@@ -51,6 +46,7 @@ export default function EditableFreeTextStatTileForm({
           linkText: Yup.string().when('linkUrl', {
             is: (val: string) => val !== '',
             then: s => s.required('Enter the link text'),
+            otherwise: s => s.notRequired(),
           }),
           linkUrl: Yup.string().url(),
         })}
@@ -59,11 +55,11 @@ export default function EditableFreeTextStatTileForm({
           return (
             <Form
               id={
-                statTile
-                  ? `editableFreeTextStatTileForm-${statTile.id}`
+                freeTextStatTile
+                  ? `editableFreeTextStatTileForm-${freeTextStatTile.id}`
                   : 'editableFreeTextStatTileForm-create'
               }
-              onSubmit={handleSubmit}
+              onSubmit={onSubmit}
             >
               <div className={styles.textTile}>
                 <FormFieldTextInput<FreeTextStatTileFormValues>

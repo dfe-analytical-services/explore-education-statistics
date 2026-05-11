@@ -184,7 +184,6 @@ public class EducationInNumbersContentService(
         Guid pageVersionId,
         Guid sectionId,
         EinBlockType type,
-        int? order,
         CancellationToken cancellationToken
     )
     {
@@ -198,7 +197,7 @@ public class EducationInNumbersContentService(
             {
                 Id = Guid.NewGuid(),
                 EinContentSectionId = sectionId,
-                Order = order ?? blockList.Count,
+                Order = blockList.Count,
                 Body = "",
             },
             EinBlockType.TileGroupBlock => new EinTileGroupBlock
@@ -206,7 +205,7 @@ public class EducationInNumbersContentService(
                 Id = Guid.NewGuid(),
                 Title = null,
                 EinContentSectionId = sectionId,
-                Order = order ?? blockList.Count,
+                Order = blockList.Count,
                 Tiles = [],
             },
             _ => throw new Exception($"{nameof(EinContentBlock)} type {type} not found"),
