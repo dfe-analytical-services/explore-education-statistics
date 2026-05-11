@@ -86,7 +86,7 @@ const SearchDataPage: NextPage = () => {
     isFetching: isPublicationsFetching,
     isLoading: isPublicationsLoading,
   } = useQuery({
-    ...azurePublicationQueries.list(router.query),
+    ...azurePublicationQueries.listStatisticalReleases(router.query),
     keepPreviousData: true,
     refetchOnWindowFocus: false,
     staleTime: 60000,
@@ -697,7 +697,9 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   await Promise.all([
     isPublicationsSearch
-      ? queryClient.prefetchQuery(azurePublicationQueries.list(query))
+      ? queryClient.prefetchQuery(
+          azurePublicationQueries.listStatisticalReleases(query),
+        )
       : queryClient.prefetchQuery(azureDataSetQueries.list(query)),
     queryClient.prefetchQuery(themeQueries.listProdThemes()),
   ]);

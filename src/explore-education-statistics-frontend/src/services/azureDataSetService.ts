@@ -54,10 +54,8 @@ export interface AzureDataSetListRequest {
   orderBy?: AzureOrderByParam;
   page?: number;
   pageSize?: number;
-  releaseType?: string;
   search?: string;
   sortDirection?: SortDirection;
-  themeId?: string;
 }
 
 const azureDataSetService = {

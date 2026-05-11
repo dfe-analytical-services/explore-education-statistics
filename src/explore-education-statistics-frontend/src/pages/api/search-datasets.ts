@@ -25,7 +25,7 @@ type SharedSearchOptionsBase = Partial<SearchOptions<AzureDataSetIndexItem>> &
   SearchRequestQueryTypeOptions;
 
 export default withMethods({
-  post: async function searchPublications(
+  post: async function searchDatasets(
     req: Request,
     res: NextApiResponse<PaginatedList<DataSetFileSummary> | ErrorBody>,
   ) {
