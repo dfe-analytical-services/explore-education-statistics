@@ -75,7 +75,7 @@ public class EducationInNumbersContentController(IEducationInNumbersContentServi
     )
     {
         return await einContentService
-            .AddBlock(pageId, sectionId, request.Type, request.Order, cancellationToken)
+            .AddBlock(pageId, sectionId, request.Type, cancellationToken)
             .HandleFailuresOrOk();
     }
 

@@ -6,7 +6,9 @@ import {
   EinContentBlock,
   EinFreeTextStatTile,
   EinHtmlBlock,
+  EinTile,
   EinTileGroupBlock,
+  EinTileType,
 } from '@common/services/types/einBlocks';
 
 // ContentSection is shared with release/methodology too
@@ -14,7 +16,6 @@ export type EinEditableContentSection = ContentSection<EinContentBlock>;
 
 export interface EinContentBlockAddRequest {
   type: EinBlockType;
-  order?: number;
 }
 
 export interface EinHtmlBlockUpdateRequest {
@@ -112,16 +113,47 @@ const educationInNumbersContentService = {
     );
   },
 
-  addFreeTextStatTile({
+  addTile({
     educationInNumbersPageId,
     blockId,
+    type,
   }: {
     educationInNumbersPageId: string;
     blockId: string;
-  }): Promise<EinFreeTextStatTile> {
+    type: EinTileType;
+  }): Promise<EinTile> {
     return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/add`,
-      { type: 'FreeTextStatTile' },
+      { type },
+    );
+  },
+
+  reorderGroupBlockTiles({
+    educationInNumbersPageId,
+    blockId,
+    order,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    order: string[];
+  }): Promise<EinTile[]> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/order`,
+      order,
+    );
+  },
+
+  deleteTile({
+    educationInNumbersPageId,
+    blockId,
+    tileId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    tileId: string;
+  }): Promise<EinTile> {
+    return client.delete(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tile/${tileId}`,
     );
   },
 
@@ -140,32 +172,18 @@ const educationInNumbersContentService = {
     );
   },
 
-  reorderFreeTextStatTiles({
+  updateApiQueryStatTile({
     educationInNumbersPageId,
-    blockId,
-    order,
-  }: {
-    educationInNumbersPageId: string;
-    blockId: string;
-    order: string[];
-  }): Promise<EinFreeTextStatTile[]> {
-    return client.put(
-      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/order`,
-      order,
-    );
-  },
-
-  deleteFreeTextStatTile({
-    educationInNumbersPageId,
-    blockId,
     tileId,
+    values,
   }: {
     educationInNumbersPageId: string;
-    blockId: string;
     tileId: string;
+    values: FreeTextStatTileFormValues;
   }): Promise<EinFreeTextStatTile> {
-    return client.delete(
-      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tile/${tileId}`,
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/tile/${tileId}/api-stat`,
+      values,
     );
   },
 

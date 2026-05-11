@@ -57,7 +57,6 @@ const EducationInNumbersAccordionSection = ({
         sectionId,
         block: {
           type: blockType,
-          order: sectionContent.length,
         },
       });
 

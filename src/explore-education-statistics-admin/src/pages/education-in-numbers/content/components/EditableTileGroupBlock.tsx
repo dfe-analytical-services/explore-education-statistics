@@ -13,7 +13,10 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
 import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
-import { EinTileGroupBlock } from '@common/services/types/einBlocks';
+import {
+  EinTileGroupBlock,
+  EinTileType,
+} from '@common/services/types/einBlocks';
 import reorder from '@common/utils/reorder';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
@@ -37,12 +40,8 @@ const EditableTileGroupBlock = ({
   onSave,
 }: Props) => {
   const { pageVersion } = useEducationInNumbersPageContentState();
-  const {
-    addFreeTextStatTile,
-    updateFreeTextStatTile,
-    deleteFreeTextStatTile,
-    reorderFreeTextStatTiles,
-  } = useEducationInNumbersPageContentActions();
+  const { addTile, reorderTiles, deleteTile, updateFreeTextStatTile } =
+    useEducationInNumbersPageContentActions();
 
   const [groupTiles, setGroupTiles] = useState(block.tiles);
 
@@ -69,11 +68,12 @@ const EditableTileGroupBlock = ({
     toggleEditingHeading.off();
   }, [title, isEditingHeading, newHeading, onSave, toggleEditingHeading]);
 
-  const handleAddStatTile = async () => {
-    const newTile = await addFreeTextStatTile({
+  const handleAddStatTile = async (type: EinTileType) => {
+    const newTile = await addTile({
       educationInNumbersPageId,
-      blockId: block.id,
       sectionId,
+      blockId: block.id,
+      type,
     });
     setIsEditingStatTile(newTile.id);
   };
@@ -140,7 +140,7 @@ const EditableTileGroupBlock = ({
               <Button
                 type="button"
                 variant="secondary"
-                onClick={handleAddStatTile}
+                onClick={() => handleAddStatTile('FreeTextStatTile')}
               >
                 Add new tile
                 <VisuallyHidden> in {groupButtonsLabel}</VisuallyHidden>
@@ -166,7 +166,7 @@ const EditableTileGroupBlock = ({
               list={groupTiles.map(tile => {
                 return {
                   id: tile.id,
-                  label: `${tile.title} ${tile.statistic} ${tile.trend}`,
+                  label: `${tile.title}`,
                 };
               })}
               onCancel={() => {
@@ -174,10 +174,10 @@ const EditableTileGroupBlock = ({
                 toggleIsReordering.off();
               }}
               onConfirm={async () => {
-                await reorderFreeTextStatTiles({
+                await reorderTiles({
                   educationInNumbersPageId,
-                  blockId: block.id,
                   sectionId,
+                  blockId: block.id,
                   tiles: groupTiles,
                 });
                 toggleIsReordering.off();
@@ -195,62 +195,77 @@ const EditableTileGroupBlock = ({
               }}
             />
           ) : (
-            <FreeTextStatTileWrapper>
-              {tiles.map(tile => (
-                <div key={tile.id}>
-                  {isEditingStatTile === tile.id ? (
-                    <EditableFreeTextStatTileForm
-                      statTile={tile}
-                      testId="freeTextStatTile-editForm"
-                      onSubmit={async values => {
-                        await updateFreeTextStatTile({
-                          educationInNumbersPageId,
-                          blockId: block.id,
-                          sectionId,
-                          tileId: tile.id,
-                          values,
-                        });
-                        setIsEditingStatTile(null);
-                      }}
-                      onCancel={() => setIsEditingStatTile(null)}
-                    />
-                  ) : (
-                    <>
-                      <FreeTextStatTile key={tile.id} tile={tile} />
-                      {!isEditingStatTile && (
-                        <ButtonGroup className="govuk-!-margin-top-2">
-                          <Button
-                            onClick={() => setIsEditingStatTile(tile.id)}
-                            variant="secondary"
-                          >
-                            Edit <VisuallyHidden> tile: {title}</VisuallyHidden>
-                          </Button>
-                          <ModalConfirm
-                            title="Remove tile"
-                            triggerButton={
-                              <ButtonText variant="warning">
-                                Delete tile
-                                <VisuallyHidden>- {title}</VisuallyHidden>
-                              </ButtonText>
-                            }
-                            onConfirm={async () => {
-                              await deleteFreeTextStatTile({
-                                educationInNumbersPageId,
-                                blockId: block.id,
-                                sectionId,
-                                tileId: tile.id,
-                              });
-                            }}
-                          >
-                            <p>Are you sure you want to remove this tile?</p>
-                          </ModalConfirm>
-                        </ButtonGroup>
+            tiles.map(tile => {
+              switch (tile.type) {
+                case 'FreeTextStatTile':
+                  return (
+                    <FreeTextStatTileWrapper key={tile.id}>
+                      {isEditingStatTile === tile.id ? (
+                        <EditableFreeTextStatTileForm
+                          freeTextStatTile={tile}
+                          testId="freeTextStatTile-editForm"
+                          onSubmit={async values => {
+                            await updateFreeTextStatTile({
+                              educationInNumbersPageId,
+                              blockId: block.id,
+                              sectionId,
+                              tileId: tile.id,
+                              values,
+                            });
+                            setIsEditingStatTile(null);
+                          }}
+                          onCancel={() => setIsEditingStatTile(null)}
+                        />
+                      ) : (
+                        <>
+                          <FreeTextStatTile key={tile.id} tile={tile} />
+                          {!isEditingStatTile && (
+                            <ButtonGroup className="govuk-!-margin-top-2">
+                              <Button
+                                onClick={() => setIsEditingStatTile(tile.id)}
+                                variant="secondary"
+                              >
+                                Edit{' '}
+                                <VisuallyHidden>
+                                  {' '}
+                                  tile: {tile.title}
+                                </VisuallyHidden>
+                              </Button>
+                              <ModalConfirm
+                                title="Remove tile"
+                                triggerButton={
+                                  <ButtonText variant="warning">
+                                    Delete tile
+                                    <VisuallyHidden>
+                                      - {tile.title}
+                                    </VisuallyHidden>
+                                  </ButtonText>
+                                }
+                                onConfirm={async () => {
+                                  await deleteTile({
+                                    educationInNumbersPageId,
+                                    sectionId,
+                                    blockId: block.id,
+                                    tileId: tile.id,
+                                  });
+                                }}
+                              >
+                                <p>
+                                  Are you sure you want to remove this tile?
+                                </p>
+                              </ModalConfirm>
+                            </ButtonGroup>
+                          )}
+                        </>
                       )}
-                    </>
-                  )}
-                </div>
-              ))}
-            </FreeTextStatTileWrapper>
+                    </FreeTextStatTileWrapper>
+                  );
+                case 'ApiQueryStatTile':
+                  return <p>Editable ApiQueryStatTile!</p>;
+                default:
+                  return null; // @MarkFix
+              }
+            })
           )}
         </>
       ) : (
