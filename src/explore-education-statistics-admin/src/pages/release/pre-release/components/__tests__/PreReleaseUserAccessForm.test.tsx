@@ -1,15 +1,15 @@
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
-import _preReleaseUserService, {
+import _preReleaseUsersService, {
   PreReleaseUserSummary,
 } from '@admin/services/user-management/preReleaseUsersService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 
-const preReleaseUserService = _preReleaseUserService as jest.Mocked<
-  typeof _preReleaseUserService
+const preReleaseUsersService = _preReleaseUsersService as jest.Mocked<
+  typeof _preReleaseUsersService
 >;
 
-jest.mock('@admin/services/preReleaseUserService');
+jest.mock('@admin/services/user-management/preReleaseUsersService');
 jest.setTimeout(20000);
 
 describe('PreReleaseUserAccessForm', () => {
@@ -23,7 +23,7 @@ describe('PreReleaseUserAccessForm', () => {
   ];
 
   test('renders correctly with list of users', async () => {
-    preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+    preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
     render(<PreReleaseUserAccessForm releaseVersionId="release-1" />);
 
@@ -53,7 +53,7 @@ describe('PreReleaseUserAccessForm', () => {
   });
 
   test('renders empty message when there are no users', async () => {
-    preReleaseUserService.getPreReleaseUsers.mockResolvedValue([]);
+    preReleaseUsersService.getPreReleaseUsers.mockResolvedValue([]);
 
     render(<PreReleaseUserAccessForm releaseVersionId="release-1" />);
 
@@ -67,7 +67,7 @@ describe('PreReleaseUserAccessForm', () => {
   });
 
   test('renders correctly when the release is live', async () => {
-    preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+    preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
     render(
       <PreReleaseUserAccessForm releaseVersionId="release-1" isReleaseLive />,
@@ -94,7 +94,7 @@ describe('PreReleaseUserAccessForm', () => {
   });
 
   test('renders error message if users could not be loaded', async () => {
-    preReleaseUserService.getPreReleaseUsers.mockRejectedValue(
+    preReleaseUsersService.getPreReleaseUsers.mockRejectedValue(
       new Error('Something went wrong'),
     );
 
@@ -111,7 +111,7 @@ describe('PreReleaseUserAccessForm', () => {
 
   describe('inviting new users', () => {
     test('shows validation message when there are no email values', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -137,7 +137,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when the number of email lines exceeds the upper limit', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -155,7 +155,7 @@ describe('PreReleaseUserAccessForm', () => {
       );
 
       expect(
-        preReleaseUserService.grantPreReleaseAccessForMany,
+        preReleaseUsersService.grantPreReleaseAccessForMany,
       ).toHaveBeenCalledTimes(0);
 
       expect(
@@ -169,7 +169,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when emails contains invalid values', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -207,7 +207,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when email has more than one @', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -240,7 +240,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when email has invalid domain', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -269,7 +269,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('submitting form with no values shows a validation error', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -295,7 +295,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('submitting form with invalid values shows a validation error', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -334,7 +334,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('whitespace is trimmed and blank lines are filtered without causing a validation error', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -357,7 +357,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          preReleaseUserService.getPreReleaseUsersInvitePlan,
+          preReleaseUsersService.getPreReleaseUsersInvitePlan,
         ).toHaveBeenCalledWith('release-1', [
           'test1@test.com',
           'test2@test.com',
@@ -367,7 +367,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('accepts a range of valid values without causing a validation error', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -395,7 +395,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          preReleaseUserService.getPreReleaseUsersInvitePlan,
+          preReleaseUsersService.getPreReleaseUsersInvitePlan,
         ).toHaveBeenCalledWith('release-1', [
           "special_'%+-.characters@test.com",
           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com',
@@ -408,7 +408,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('submitting the form opens confirmation modal with invite plan', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -425,7 +425,7 @@ describe('PreReleaseUserAccessForm', () => {
         'test1@test.com{enter}test2@test.com{enter}test3@test.com',
       );
 
-      preReleaseUserService.getPreReleaseUsersInvitePlan.mockResolvedValue({
+      preReleaseUsersService.getPreReleaseUsersInvitePlan.mockResolvedValue({
         alreadyAccepted: [
           'existing.prerelease.user.1@test.com',
           'existing.prerelease.user.2@test.com',
@@ -443,7 +443,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          preReleaseUserService.getPreReleaseUsersInvitePlan,
+          preReleaseUsersService.getPreReleaseUsersInvitePlan,
         ).toHaveBeenCalledWith('release-1', [
           'test1@test.com',
           'test2@test.com',
@@ -505,7 +505,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('cancelling the confirmation closes the modal', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -522,7 +522,7 @@ describe('PreReleaseUserAccessForm', () => {
         'test@test.com',
       );
 
-      preReleaseUserService.getPreReleaseUsersInvitePlan.mockResolvedValue({
+      preReleaseUsersService.getPreReleaseUsersInvitePlan.mockResolvedValue({
         invitable: ['test@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
@@ -549,7 +549,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
 
       expect(
-        preReleaseUserService.grantPreReleaseAccessForMany,
+        preReleaseUsersService.grantPreReleaseAccessForMany,
       ).not.toHaveBeenCalled();
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -574,7 +574,7 @@ describe('PreReleaseUserAccessForm', () => {
         'test@test.com',
       );
 
-      preReleaseUserService.getPreReleaseUsersInvitePlan.mockResolvedValue({
+      preReleaseUsersService.getPreReleaseUsersInvitePlan.mockResolvedValue({
         invitable: ['test@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
@@ -598,7 +598,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('accepting the confirmation modal adds newly invited users to list', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -615,7 +615,7 @@ describe('PreReleaseUserAccessForm', () => {
         'test3@test.com{enter}test4@test.com{enter}test5@test.com',
       );
 
-      preReleaseUserService.getPreReleaseUsersInvitePlan.mockResolvedValue({
+      preReleaseUsersService.getPreReleaseUsersInvitePlan.mockResolvedValue({
         invitable: ['test1@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
@@ -625,7 +625,7 @@ describe('PreReleaseUserAccessForm', () => {
         screen.getByRole('button', { name: 'Invite new users' }),
       );
 
-      preReleaseUserService.grantPreReleaseAccessForMany.mockResolvedValue([
+      preReleaseUsersService.grantPreReleaseAccessForMany.mockResolvedValue([
         { email: 'test3@test.com' },
         { email: 'test4@test.com' },
         { email: 'test5@test.com' },
@@ -643,7 +643,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          preReleaseUserService.grantPreReleaseAccessForMany,
+          preReleaseUsersService.grantPreReleaseAccessForMany,
         ).toHaveBeenCalledWith('release-1', [
           'test3@test.com',
           'test4@test.com',
@@ -680,7 +680,7 @@ describe('PreReleaseUserAccessForm', () => {
 
   describe('removing user', () => {
     test('clicking Remove button removes user from the list', async () => {
-      preReleaseUserService.getPreReleaseUsers.mockResolvedValue(testUsers);
+      preReleaseUsersService.getPreReleaseUsers.mockResolvedValue(testUsers);
 
       const { user } = render(
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
@@ -705,7 +705,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          preReleaseUserService.removePreReleaseRoleByEmail,
+          preReleaseUsersService.removePreReleaseRoleByEmail,
         ).toHaveBeenCalledWith('release-1', 'test2@test.com');
       });
 

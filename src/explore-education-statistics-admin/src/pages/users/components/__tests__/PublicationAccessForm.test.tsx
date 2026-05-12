@@ -10,7 +10,8 @@ import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 import { PublicationRole } from '@admin/services/types/PublicationRole';
 
-jest.mock('@admin/services/userService');
+jest.mock('@admin/services/user-management/publicationRolesService');
+
 const publicationRolesService = _publicationRolesService as jest.Mocked<
   typeof _publicationRolesService
 >;

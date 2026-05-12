@@ -7,7 +7,7 @@ import {
 } from '@admin/pages/users/__data__/testUserData';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService from '@admin/services/publicationService';
-import _userService from '@admin/services/user-management/usersService';
+import _usersService from '@admin/services/user-management/usersService';
 import _globalRolesService from '@admin/services/user-management/globalRolesService';
 import _releaseService from '@admin/services/releaseService';
 import render from '@common-test/render';
@@ -17,12 +17,14 @@ import { MemoryRouter, Route, generatePath } from 'react-router';
 import { administrationUserManageRoute } from '@admin/routes/administrationRoutes';
 
 jest.mock('@admin/services/publicationService');
-jest.mock('@admin/services/userService');
+jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/user-management/usersService');
+jest.mock('@admin/services/user-management/globalRolesService');
 
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
-const userService = _userService as jest.Mocked<typeof _userService>;
+const usersService = _usersService as jest.Mocked<typeof _usersService>;
 const globalRolesService = _globalRolesService as jest.Mocked<
   typeof _globalRolesService
 >;
@@ -75,7 +77,7 @@ describe('ManageUserPage', () => {
     );
     globalRolesService.getRoles.mockResolvedValue(testRoles);
     releaseService.getReleases.mockResolvedValue(testReleases);
-    userService.getUser.mockResolvedValue(testUser);
+    usersService.getUser.mockResolvedValue(testUser);
 
     render(
       <MemoryRouter

@@ -17,7 +17,9 @@ import { PublicationRole } from '@admin/services/types/PublicationRole';
 import _userInvitesService from '@admin/services/user-management/userInvitesService';
 
 jest.mock('@admin/services/publicationService');
-jest.mock('@admin/services/userService');
+jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/user-management/userInvitesService');
+jest.mock('@admin/services/user-management/globalRolesService');
 
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
@@ -107,7 +109,7 @@ describe('UserInvitePage', () => {
       ).toBeInTheDocument();
 
       await user.click(
-        screen.getByRole('button', { name: 'Add release role' }),
+        screen.getByRole('button', { name: 'Add pre-release role' }),
       );
 
       expect(
