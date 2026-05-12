@@ -20,7 +20,9 @@ public class DataSetMappingController(IDataSetMappingService dataSetMappingServi
         CancellationToken cancellationToken = default
     )
     {
-        return await dataSetMappingService.UpdateIndicatorMappings(request).HandleFailuresOrOk();
+        return await dataSetMappingService
+            .UpdateIndicatorMappings(releaseVersionId, request, cancellationToken)
+            .HandleFailuresOrOk();
     }
 
     [HttpPatch("releases/{releaseVersionId:guid}/data/replacements/mapping/locations")]
@@ -30,6 +32,8 @@ public class DataSetMappingController(IDataSetMappingService dataSetMappingServi
         CancellationToken cancellationToken = default
     )
     {
-        return await dataSetMappingService.UpdateLocationMappings(request).HandleFailuresOrOk();
+        return await dataSetMappingService
+            .UpdateLocationMappings(releaseVersionId, request, cancellationToken)
+            .HandleFailuresOrOk();
     }
 }

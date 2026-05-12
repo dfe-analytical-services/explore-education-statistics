@@ -3262,6 +3262,7 @@ public class ReplacementPlanServiceTests
         IReleaseFileRepository? releaseFileRepository = null
     )
     {
+        var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
             statisticsDbContext,
@@ -3269,8 +3270,8 @@ public class ReplacementPlanServiceTests
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
-            AlwaysTrueUserService().Object,
-            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext),
+            userService,
+            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext, userService),
             apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );

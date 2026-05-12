@@ -23,9 +23,11 @@ public class LocationMappingUpdatesRequest
 
             RuleFor(x => x.Updates)
                 .Must(HaveUniqueOriginalLocationId)
-                .WithMessage("Each OriginalLocationId must be unique.")
+                .WithMessage($"Each {nameof(LocationMappingUpdateRequest.OriginalLocationId)} must be unique.")
                 .Must(HaveUniqueReplacementIds)
-                .WithMessage("Each NewReplacementLocationId must be unique (if provided).");
+                .WithMessage(
+                    $"Each {nameof(LocationMappingUpdateRequest.NewReplacementLocationId)} must be unique (if provided)."
+                );
         }
 
         private bool HaveUniqueOriginalLocationId(List<LocationMappingUpdateRequest> updates)
@@ -64,7 +66,7 @@ public record LocationMappingUpdateRequest
     {
         public Validator()
         {
-            RuleFor(x => x.OriginalLocationId).NotEmpty().WithMessage("OriginalLocationId cannot be empty.");
+            RuleFor(x => x.OriginalLocationId).NotEmpty().WithMessage($"{nameof(OriginalLocationId)} cannot be empty.");
         }
     }
 }

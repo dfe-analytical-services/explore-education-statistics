@@ -1,20 +1,26 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class DataSetMappingService(ContentDbContext contentDbContext, StatisticsDbContext statisticsDbContext)
-    : IDataSetMappingService
+public class DataSetMappingService(
+    ContentDbContext contentDbContext,
+    StatisticsDbContext statisticsDbContext,
+    IUserService userService
+) : IDataSetMappingService
 {
     public async Task<DataSetMapping> GetOrCreateMapping(
         Guid originalSubjectId,
@@ -187,10 +193,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
                                 == originalLocation.ToLocationAttribute().GetCodeOrFallback()
                         )
                         .ToList();
-                    if (candidateReplacements.Count == 1)
-                    {
-                        replacementLocation = candidateReplacements[0];
-                    }
+                    replacementLocation = candidateReplacements.SingleOrDefault();
                 }
 
                 return new LocationMapping
@@ -227,15 +230,18 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
     }
 
     public async Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(
-        IndicatorMappingUpdatesRequest request
+        Guid releaseVersionId,
+        IndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
     )
     {
         return await contentDbContext
-            .DataSetMappings.Where(map =>
-                map.OriginalDataSetId == request.OriginalDataSetId
-                && map.ReplacementDataSetId == request.ReplacementDataSetId
+            .ReleaseVersions.Where(rv => rv.Id == releaseVersionId)
+            .SingleOrNotFound()
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(async releaseVersion =>
+                await ValidateMapping(releaseVersion, request.OriginalDataSetId, request.ReplacementDataSetId)
             )
-            .SingleOrNotFoundAsync()
             .OnSuccess(async mapping =>
             {
                 var updatedMappings = request
@@ -245,7 +251,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
                     .ToList(); // cannot be async!
 
                 // we still save changes from the Updates that succeeded, even if some failed
-                await contentDbContext.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync(cancellationToken);
 
                 return updatedMappings
                     .OnSuccessAll()
@@ -264,7 +270,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
         );
         if (indicatorMapping == null)
         {
-            return Common.Validators.ValidationUtils.ValidationResult(
+            return ValidationResult(
                 new ErrorViewModel
                 {
                     Path =
@@ -290,7 +296,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
 
         if (newReplacementColumnName != null && availableUnmappedIndicator == null)
         {
-            return Common.Validators.ValidationUtils.ValidationResult(
+            return ValidationResult(
                 new ErrorViewModel
                 {
                     Path =
@@ -341,15 +347,18 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
     }
 
     public async Task<Either<ActionResult, List<LocationMappingDto>>> UpdateLocationMappings(
-        LocationMappingUpdatesRequest request
+        Guid releaseVersionId,
+        LocationMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
     )
     {
         return await contentDbContext
-            .DataSetMappings.Where(map =>
-                map.OriginalDataSetId == request.OriginalDataSetId
-                && map.ReplacementDataSetId == request.ReplacementDataSetId
+            .ReleaseVersions.Where(rv => rv.Id == releaseVersionId)
+            .SingleOrNotFound()
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(async releaseVersion =>
+                await ValidateMapping(releaseVersion, request.OriginalDataSetId, request.ReplacementDataSetId)
             )
-            .SingleOrNotFoundAsync()
             .OnSuccess(async mapping =>
             {
                 var updatedMappings = request
@@ -359,7 +368,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
                     .ToList(); // cannot be async!
 
                 // we still save changes from the Updates that succeeded, even if some failed
-                await contentDbContext.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync(cancellationToken);
 
                 return updatedMappings
                     .OnSuccessAll()
@@ -378,7 +387,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
         );
         if (locationMapping == null)
         {
-            return Common.Validators.ValidationUtils.ValidationResult(
+            return ValidationResult(
                 new ErrorViewModel
                 {
                     Path =
@@ -403,7 +412,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
 
         if (newReplacementLocationId != null && availableUnmappedLocation == null)
         {
-            return Common.Validators.ValidationUtils.ValidationResult(
+            return ValidationResult(
                 new ErrorViewModel
                 {
                     Path =
@@ -420,7 +429,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
             && availableUnmappedLocation!.GeographicLevel != locationMapping.OriginalGeographicLevel
         )
         {
-            return Common.Validators.ValidationUtils.ValidationResult(
+            return ValidationResult(
                 new ErrorViewModel
                 {
                     Path =
@@ -463,5 +472,52 @@ public class DataSetMappingService(ContentDbContext contentDbContext, Statistics
         contentDbContext.Entry(dataSetMapping).Property(x => x.LocationMappings).IsModified = true;
 
         return locationMapping;
+    }
+
+    private async Task<Either<ActionResult, DataSetMapping>> ValidateMapping(
+        ReleaseVersion releaseVersion,
+        Guid originalDataSetId,
+        Guid replacementDataSetId
+    )
+    {
+        var mapping = await contentDbContext.DataSetMappings.SingleOrDefaultAsync(map =>
+            map.OriginalDataSetId == originalDataSetId && map.ReplacementDataSetId == replacementDataSetId
+        );
+
+        if (mapping == null)
+        {
+            return new Either<ActionResult, DataSetMapping>(new NotFoundResult());
+        }
+
+        var originalReleaseFileExists = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
+            rf.ReleaseVersionId == releaseVersion.Id && rf.File.SubjectId == mapping.OriginalDataSetId
+        );
+        if (!originalReleaseFileExists)
+        {
+            return ValidationResult(
+                new ErrorViewModel
+                {
+                    Path = $"{nameof(IndicatorMappingUpdatesRequest.OriginalDataSetId)}",
+                    Code = "OriginalDataSetIdNotLinkedToReleaseVersion",
+                    Message = $"The original data set is not linked to the release version",
+                }
+            );
+        }
+        var replacementReleaseFileExists = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
+            rf.ReleaseVersionId == releaseVersion.Id && rf.File.SubjectId == mapping.ReplacementDataSetId
+        );
+        if (!replacementReleaseFileExists)
+        {
+            return ValidationResult(
+                new ErrorViewModel
+                {
+                    Path = $"{nameof(IndicatorMappingUpdatesRequest.ReplacementDataSetId)}",
+                    Code = "ReplacementDataSetIdNotLinkedToReleaseVersion",
+                    Message = $"The replacement data set is not linked to the release version",
+                }
+            );
+        }
+
+        return mapping;
     }
 }
