@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20260508142629_Ees7021AddLocationMappingsToDataSetMappingsTable")]
+    [Migration("20260518131339_Ees7021AddLocationMappingsToDataSetMappingsTable")]
     partial class Ees7021AddLocationMappingsToDataSetMappingsTable
     {
         /// <inheritdoc />
@@ -370,6 +370,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OriginalDataSetId")
+                        .IsUnique();
+
+                    b.HasIndex("ReplacementDataSetId")
+                        .IsUnique();
+
                     b.ToTable("DataSetMappings");
                 });
 
@@ -422,6 +428,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ScreenerResult")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScreeningStatus")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
