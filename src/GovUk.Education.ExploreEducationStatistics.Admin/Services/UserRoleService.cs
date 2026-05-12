@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -141,6 +140,28 @@ public class UserRoleService(
                         .ToListAsync(cancellationToken)
                 ).OrderBy(upr => upr.UserName).ToList());
 
+    public async Task<
+        Either<ActionResult, List<UserPublicationRoleInviteViewModel>>
+    > GetPublicationRoleInvitesForPublication(Guid publicationId, CancellationToken cancellationToken = default) =>
+        await contentPersistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccess(userService.CheckCanViewPublication)
+            .OnSuccess(async () => (
+                    await userPublicationRoleRepository
+                        .Query(ResourceRoleFilter.PendingOnly)
+                        .WhereForPublication(publicationId)
+                        .Include(upr => upr.User)
+                        .Include(upr => upr.Publication)
+                        .Select(upr => new UserPublicationRoleInviteViewModel
+                        {
+                            RoleId = upr.Id,
+                            Role = upr.Role,
+                            UserId = upr.UserId,
+                            Email = upr.User.Email,
+                        })
+                        .ToListAsync(cancellationToken)
+                ).OrderBy(upr => upr.Email).ToList());
+
     public async Task<Either<ActionResult, Unit>> AddPublicationRole(
         Guid userId,
         Guid publicationId,
@@ -189,73 +210,18 @@ public class UserRoleService(
                 await AddDrafterRole(email: email, publicationId: publicationId, cancellationToken: cancellationToken)
             );
 
-    public async Task<Either<ActionResult, Unit>> UpdatePublicationDrafters(
-        Guid publicationId,
-        HashSet<Guid> userIds,
-        CancellationToken cancellationToken = default
-    )
-    {
-        return await contentDbContext
-            .Publications.SingleOrNotFoundAsync(p => p.Id == publicationId, cancellationToken)
-            .OnSuccessDo(userService.CheckCanUpdateDrafters)
-            .OnSuccessVoid(async publication =>
-            {
-                var publicationDrafterRolesByUserId = await userPublicationRoleRepository
-                    .Query()
-                    .WhereForPublication(publication.Id)
-                    .WhereRolesIn(PublicationRole.Drafter)
-                    .ToDictionaryAsync(urr => urr.UserId, cancellationToken);
-
-                var publicationDrafterRolesToBeRemoved = publicationDrafterRolesByUserId
-                    .Where(kv => !userIds.Contains(kv.Key))
-                    .Select(kv => kv.Value)
-                    .ToHashSet();
-
-                var usersToBeAdded = userIds
-                    .Where(userId => !publicationDrafterRolesByUserId.ContainsKey(userId))
-                    .ToList();
-
-                await userPublicationRoleRepository.RemoveMany(publicationDrafterRolesToBeRemoved, cancellationToken);
-
-                var newUserPublicationDrafterRoles = usersToBeAdded
-                    .Select(userId => new UserPublicationRoleCreateDto(
-                        UserId: userId,
-                        PublicationId: publicationId,
-                        Role: PublicationRole.Drafter,
-                        CreatedById: userService.GetUserId(),
-                        CreatedDate: DateTime.UtcNow
-                    ))
-                    .ToList();
-
-                await userPublicationRoleRepository.CreateManyIfNotExists(
-                    newUserPublicationDrafterRoles,
-                    cancellationToken
-                );
-            });
-    }
-
     public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId) =>
         await userService
             .CheckCanManageAllUsers()
             .OnSuccess(() => FindUserPublicationRole(userPublicationRoleId))
-            .OnSuccessDo(async userPublicationRole =>
-            {
-                var removed = await userPublicationRoleRepository.RemoveById(userPublicationRole.Id);
+            .OnSuccess(RemoveUserPublicationRole);
 
-                if (!removed)
-                {
-                    throw new InvalidOperationException(
-                        $"Failed to remove User Publication Role with ID {userPublicationRole.Id}"
-                    );
-                }
-            })
-            .OnSuccessVoid(async userPublicationRole =>
-                await usersAndRolesPersistenceHelper
-                    .CheckEntityExists<ApplicationUser, string>(userPublicationRole.UserId.ToString())
-                    .OnSuccessDo(user =>
-                        DowngradeFromGlobalRoleIfRequired(user, AssociatedGlobalRoleNameForPublicationRole)
-                    )
-            );
+    public async Task<Either<ActionResult, Unit>> RemoveDrafter(Guid userPublicationRoleId) =>
+        await FindUserDrafterRole(userPublicationRoleId)
+            .OnSuccessDo(async userPublicationRole =>
+                await userService.CheckCanUpdateDrafters(userPublicationRole.Publication)
+            )
+            .OnSuccess(RemoveUserPublicationRole);
 
     public async Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId) =>
         await userService
@@ -280,6 +246,33 @@ public class UserRoleService(
                         return Unit.Instance;
                     });
             });
+
+    private async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(UserPublicationRole userPublicationRole)
+    {
+        var removed = await userPublicationRoleRepository.RemoveById(userPublicationRole.Id);
+
+        if (!removed)
+        {
+            throw new InvalidOperationException(
+                $"Failed to remove User Publication Role with ID {userPublicationRole.Id}"
+            );
+        }
+
+        var checkAspNetUserExistsResult = await usersAndRolesPersistenceHelper.CheckEntityExists<
+            ApplicationUser,
+            string
+        >(userPublicationRole.UserId.ToString());
+
+        if (checkAspNetUserExistsResult.IsRight)
+        {
+            await DowngradeFromGlobalRoleIfRequired(
+                checkAspNetUserExistsResult.Right,
+                AssociatedGlobalRoleNameForPublicationRole
+            );
+        }
+
+        return Unit.Instance;
+    }
 
     private async Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(
         string globalRoleNameToSet,
@@ -482,9 +475,20 @@ public class UserRoleService(
     private async Task<Either<ActionResult, User>> FindActiveUser(Guid userId) =>
         await userRepository.FindActiveUserById(userId) ?? new Either<ActionResult, User>(new NotFoundResult());
 
-    private async Task<Either<ActionResult, UserPublicationRole>> FindUserPublicationRole(Guid userPublicationRoleId) =>
+    private async Task<Either<ActionResult, UserPublicationRole>> FindUserPublicationRole(
+        Guid userPublicationRoleId,
+        bool hydrateWithPublication = false
+    ) =>
         await userPublicationRoleRepository.GetById(userPublicationRoleId)
         ?? new Either<ActionResult, UserPublicationRole>(new NotFoundResult());
+
+    private async Task<Either<ActionResult, UserPublicationRole>> FindUserDrafterRole(Guid userPublicationRoleId) =>
+        await userPublicationRoleRepository
+            .Query(ResourceRoleFilter.All)
+            .Where(upr => upr.Id == userPublicationRoleId)
+            .WhereRolesIn(PublicationRole.Drafter)
+            .Include(upr => upr.Publication)
+            .SingleOrNotFoundAsync();
 
     private static string AssociatedGlobalRoleNameForPreReleaseRole => RoleNames.PrereleaseUser;
 

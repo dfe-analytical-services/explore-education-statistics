@@ -26,6 +26,17 @@ public class PublicationRolesController(IUserRoleService userRoleService) : Cont
             .HandleFailuresOrOk();
     }
 
+    [HttpGet("publications/{publicationId:guid}/publication-role-invites")]
+    public async Task<ActionResult<List<UserPublicationRoleInviteViewModel>>> ListPublicationRoleInvites(
+        Guid publicationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await userRoleService
+            .GetPublicationRoleInvitesForPublication(publicationId, cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPost("users/{userId:guid}/publication-roles")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, UserPublicationRoleCreateRequest request)
@@ -51,26 +62,17 @@ public class PublicationRolesController(IUserRoleService userRoleService) : Cont
             .HandleFailuresOrOk();
     }
 
-    [HttpPatch("publications/{publicationId:guid}/update-drafters")]
-    public async Task<ActionResult> UpdatePublicationDrafters(
-        Guid publicationId,
-        UpdatePublicationDraftersRequest request,
-        CancellationToken cancellationToken = default
-    )
-    {
-        return await userRoleService
-            .UpdatePublicationDrafters(
-                publicationId: publicationId,
-                userIds: request.UserIds,
-                cancellationToken: cancellationToken
-            )
-            .HandleFailuresOr(_ => new AcceptedResult());
-    }
-
     [HttpDelete("users/publication-roles/{id:guid}")]
     [ProducesResponseType(200)]
     public async Task<ActionResult<Unit>> DeleteUserPublicationRole(Guid id)
     {
         return await userRoleService.RemoveUserPublicationRole(id).HandleFailuresOrOk();
+    }
+
+    [HttpDelete("users/publication-roles/drafters/{id:guid}")]
+    [ProducesResponseType(200)]
+    public async Task<ActionResult<Unit>> RemoveDrafter(Guid id)
+    {
+        return await userRoleService.RemoveDrafter(id).HandleFailuresOrOk();
     }
 }

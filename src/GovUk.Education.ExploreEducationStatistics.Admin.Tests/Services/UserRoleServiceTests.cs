@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -293,7 +292,7 @@ public abstract class UserRoleServiceTests
                     mock.UserHasRoleOnPublication(
                         _user.Id,
                         publication.Id,
-                        PublicationRole.Drafter,
+                        PublicationRole.Approver,
                         ResourceRoleFilter.ActiveOnly,
                         It.IsAny<CancellationToken>()
                     )
@@ -304,7 +303,7 @@ public abstract class UserRoleServiceTests
                     s.Create(
                         _user.Id,
                         publication.Id,
-                        PublicationRole.Drafter,
+                        PublicationRole.Approver,
                         _user.Id,
                         null,
                         It.IsAny<CancellationToken>()
@@ -330,7 +329,7 @@ public abstract class UserRoleServiceTests
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
-                var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Drafter);
+                var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Approver);
 
                 result.AssertRight();
             }
@@ -366,6 +365,7 @@ public abstract class UserRoleServiceTests
                 .WithPublication(_dataFixture.DefaultPublication());
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.UserHasRoleOnPublication(
@@ -452,6 +452,7 @@ public abstract class UserRoleServiceTests
                 .WithPublication(_dataFixture.DefaultPublication());
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.UserHasRoleOnPublication(
@@ -546,6 +547,7 @@ public abstract class UserRoleServiceTests
                 .WithPublication(_dataFixture.DefaultPublication());
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.UserHasRoleOnPublication(
@@ -686,7 +688,7 @@ public abstract class UserRoleServiceTests
                 .DefaultUser()
                 .WithId(Guid.Parse(applicationUser.Id))
                 .WithEmail(applicationUser.Email);
-            var publication = new Publication();
+            Publication publication = _dataFixture.DefaultPublication();
 
             UserPublicationRole existingUserPublicationRole = _dataFixture
                 .DefaultUserPublicationRole()
@@ -710,7 +712,7 @@ public abstract class UserRoleServiceTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, existingUserPublicationRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, existingUserPublicationRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -751,7 +753,7 @@ public abstract class UserRoleServiceTests
                 .DefaultUser()
                 .WithId(Guid.Parse(applicationUser.Id))
                 .WithEmail(applicationUser.Email);
-            var publication = new Publication();
+            Publication publication = _dataFixture.DefaultPublication();
 
             UserPublicationRole existingUserPublicationRole = _dataFixture
                 .DefaultUserPublicationRole()
@@ -775,7 +777,7 @@ public abstract class UserRoleServiceTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, existingUserPublicationRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, existingUserPublicationRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -922,17 +924,7 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(_user);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        _user.Id,
-                        publication.Id,
-                        ResourceRoleFilter.All,
-                        It.IsAny<CancellationToken>(),
-                        new PublicationRole[] { PublicationRole.Drafter, PublicationRole.Approver }
-                    )
-                )
-                .ReturnsAsync(false);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(s =>
                     s.Create(
@@ -1021,17 +1013,7 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(_user);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        _user.Id,
-                        publication.Id,
-                        ResourceRoleFilter.All,
-                        It.IsAny<CancellationToken>(),
-                        new PublicationRole[] { PublicationRole.Drafter, PublicationRole.Approver }
-                    )
-                )
-                .ReturnsAsync(false);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(s =>
                     s.Create(
@@ -1119,17 +1101,7 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(_user);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        _user.Id,
-                        publication.Id,
-                        ResourceRoleFilter.All,
-                        It.IsAny<CancellationToken>(),
-                        new PublicationRole[] { PublicationRole.Drafter, PublicationRole.Approver }
-                    )
-                )
-                .ReturnsAsync(false);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(s =>
                     s.Create(
@@ -1235,17 +1207,7 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(_user);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        _user.Id,
-                        publication.Id,
-                        ResourceRoleFilter.All,
-                        It.IsAny<CancellationToken>(),
-                        new PublicationRole[] { PublicationRole.Drafter, PublicationRole.Approver }
-                    )
-                )
-                .ReturnsAsync(false);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(s =>
                     s.Create(
@@ -1488,17 +1450,7 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(existingUser);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock =>
-                    mock.UserHasAnyRoleOnPublication(
-                        existingUser.Id,
-                        publication.Id,
-                        ResourceRoleFilter.All,
-                        It.IsAny<CancellationToken>(),
-                        new PublicationRole[] { PublicationRole.Drafter, PublicationRole.Approver }
-                    )
-                )
-                .ReturnsAsync(false);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
                 .Setup(s =>
                     s.Create(
@@ -1542,120 +1494,6 @@ public abstract class UserRoleServiceTests
             var service = SetupService();
 
             var result = await service.InviteDrafter("test@test.com", Guid.NewGuid());
-
-            result.AssertNotFound();
-        }
-    }
-
-    public class UpdatePublicationDraftersTests : UserRoleServiceTests
-    {
-        [Fact]
-        public async Task Success()
-        {
-            Publication publication = _dataFixture.DefaultPublication();
-
-            var userPublicationRoles = _dataFixture
-                .DefaultUserPublicationRole()
-                // This one should be removed as we are not supplying the userId for it
-                .ForIndex(
-                    0,
-                    s =>
-                        s.SetUser(_dataFixture.DefaultUser())
-                            .SetPublication(publication)
-                            .SetRole(PublicationRole.Drafter)
-                )
-                // This one should remain as we are supplying the userId for it
-                .ForIndex(
-                    1,
-                    s =>
-                        s.SetUser(_dataFixture.DefaultUser())
-                            .SetPublication(publication)
-                            .SetRole(PublicationRole.Drafter)
-                )
-                // This one should remain as it's an existing Approver role, and another Drafter role should be created for this user
-                .ForIndex(
-                    2,
-                    s =>
-                        s.SetUser(_dataFixture.DefaultUser())
-                            .SetPublication(publication)
-                            .SetRole(PublicationRole.Approver)
-                )
-                // This one should remain as it's for a different publication, and another Drafter role should be created for this user
-                .ForIndex(
-                    3,
-                    s =>
-                        s.SetUser(_dataFixture.DefaultUser())
-                            .SetPublication(_dataFixture.DefaultPublication())
-                            .SetRole(PublicationRole.Drafter)
-                )
-                .GenerateList(4);
-
-            var newUserId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
-            // The first role should be removed
-            userPublicationRoleRepository
-                .Setup(m => m.RemoveMany(ListOf(userPublicationRoles[0]), default))
-                .Returns(Task.CompletedTask);
-            // Three roles should be created
-            userPublicationRoleRepository
-                .Setup(m =>
-                    m.CreateManyIfNotExists(
-                        It.Is<List<UserPublicationRoleCreateDto>>(l =>
-                            l.Count == 3
-                            && l.All(upr =>
-                                upr.PublicationId == publication.Id
-                                && upr.Role == PublicationRole.Drafter
-                                && Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
-                                    <= AssertExtensions.TimeWithinMillis
-                                && upr.CreatedById == _user.Id
-                            )
-                            && l[0].UserId == newUserId
-                            && l[1].UserId == userPublicationRoles[2].UserId
-                            && l[2].UserId == userPublicationRoles[3].UserId
-                        ),
-                        It.IsAny<CancellationToken>()
-                    )
-                )
-                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupService(
-                    contentDbContext: contentDbContext,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object
-                );
-
-                var result = await service.UpdatePublicationDrafters(
-                    publicationId: publication.Id,
-                    userIds:
-                    [
-                        newUserId,
-                        userPublicationRoles[1].UserId,
-                        userPublicationRoles[2].UserId,
-                        userPublicationRoles[3].UserId,
-                    ]
-                );
-                result.AssertRight();
-            }
-
-            VerifyAllMocks(userPublicationRoleRepository);
-        }
-
-        [Fact]
-        public async Task PublicationDoesNotExist_ReturnsNotFound()
-        {
-            var service = SetupService();
-
-            var result = await service.UpdatePublicationDrafters(publicationId: Guid.NewGuid(), userIds: []);
 
             result.AssertNotFound();
         }
@@ -2027,6 +1865,99 @@ public abstract class UserRoleServiceTests
         }
     }
 
+    public class GetPublicationRoleInvitesForPublicationTests : UserRoleServiceTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            // Give three predictable email so that we can check the ordering
+            User pendingUserInvite1 = _dataFixture.DefaultUserWithPendingInvite().WithEmail("a@example.com");
+            User pendingUserInvite2 = _dataFixture.DefaultUserWithPendingInvite().WithEmail("b@example.com");
+            User pendingUserInvite3 = _dataFixture.DefaultUserWithPendingInvite().WithEmail("c@example.com");
+            ;
+            Publication publication = _dataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole1 = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(pendingUserInvite1)
+                .WithPublication(publication);
+
+            UserPublicationRole userPublicationRole2 = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(pendingUserInvite2)
+                .WithPublication(publication);
+
+            UserPublicationRole userPublicationRole3 = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(pendingUserInvite3)
+                .WithPublication(publication);
+
+            // Role assignment for a different publication
+            UserPublicationRole userPublicationRole4 = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(pendingUserInvite1)
+                .WithPublication(_dataFixture.DefaultPublication());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(
+                ResourceRoleFilter.PendingOnly,
+                [userPublicationRole2, userPublicationRole3, userPublicationRole1, userPublicationRole4]
+            );
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(
+                    contentDbContext: contentDbContext,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
+
+                var result = await service.GetPublicationRoleInvitesForPublication(publication.Id);
+
+                result.AssertRight();
+
+                var userPublicationRoles = result.Right;
+                Assert.Equal(3, userPublicationRoles.Count);
+
+                // Should be ordered by email address ascending
+                Assert.Equal(userPublicationRole1.Id, userPublicationRoles[0].RoleId);
+                Assert.Equal(userPublicationRole1.Role, userPublicationRoles[0].Role);
+                Assert.Equal(pendingUserInvite1.Email, userPublicationRoles[0].Email);
+                Assert.Equal(pendingUserInvite1.Id, userPublicationRoles[0].UserId);
+
+                Assert.Equal(userPublicationRole2.Id, userPublicationRoles[1].RoleId);
+                Assert.Equal(userPublicationRole2.Role, userPublicationRoles[1].Role);
+                Assert.Equal(pendingUserInvite2.Email, userPublicationRoles[1].Email);
+                Assert.Equal(pendingUserInvite2.Id, userPublicationRoles[1].UserId);
+
+                Assert.Equal(userPublicationRole3.Id, userPublicationRoles[2].RoleId);
+                Assert.Equal(userPublicationRole3.Role, userPublicationRoles[2].Role);
+                Assert.Equal(pendingUserInvite3.Email, userPublicationRoles[2].Email);
+                Assert.Equal(pendingUserInvite3.Id, userPublicationRoles[2].UserId);
+
+                VerifyAllMocks(userPublicationRoleRepository);
+            }
+        }
+
+        [Fact]
+        public async Task NoPublication_ReturnsNotFound()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            var service = SetupService(contentDbContext: contentDbContext);
+
+            var result = await service.GetPublicationRoleInvitesForPublication(Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+    }
+
     public class RemoveUserPublicationRoleTests : UserRoleServiceTests
     {
         [Fact]
@@ -2309,6 +2240,305 @@ public abstract class UserRoleServiceTests
                 );
 
                 var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
+
+                result.AssertRight();
+            }
+
+            VerifyAllMocks(userManager, userPublicationRoleRepository, userPreReleaseRoleRepository);
+        }
+    }
+
+    public class RemoveDrafterTests : UserRoleServiceTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            User user = _dataFixture.DefaultUser();
+
+            var identityUser = new ApplicationUser { Id = user.Id.ToString() };
+
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Drafter);
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
+            userManager
+                .Setup(s =>
+                    s.RemoveFromRolesAsync(ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst)))
+                )
+                .ReturnsAsync(new IdentityResult());
+
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await service.RemoveDrafter(userPublicationRole.Id);
+
+                result.AssertRight();
+            }
+
+            VerifyAllMocks(userManager, userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task NoUserPublicationRole_ReturnsNotFound()
+        {
+            var userPublicationRoleGuid = Guid.NewGuid();
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+
+            var service = SetupService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+
+            var result = await service.RemoveDrafter(userPublicationRoleGuid);
+
+            result.AssertNotFound();
+
+            VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task PublicationRoleExistsButItIsNotADrafterRole_ReturnsNotFound()
+        {
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Approver);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
+
+            var service = SetupService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+
+            var result = await service.RemoveDrafter(userPublicationRole.Id);
+
+            result.AssertNotFound();
+
+            VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task RoleRemovalFails_Throws()
+        {
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Drafter);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(false);
+
+            var service = SetupService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await service.RemoveDrafter(userPublicationRole.Id)
+            );
+
+            VerifyAllMocks(userPublicationRoleRepository);
+        }
+
+        [Fact]
+        public async Task HasHigherGlobalRoleThanAnalyst()
+        {
+            User user = _dataFixture.DefaultUser();
+
+            var identityUser = new ApplicationUser { Id = user.Id.ToString() };
+
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Drafter);
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the BAU role, which is higher-powered than Analyst, so we will test that they remain
+            // a BAU user and do not have any roles removed.
+            userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.BauUser));
+
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await service.RemoveDrafter(userPublicationRole.Id);
+
+                result.AssertRight();
+            }
+
+            VerifyAllMocks(userManager, userPublicationRoleRepository, userPreReleaseRoleRepository);
+        }
+
+        [Fact]
+        public async Task AnalystRoleStillRequiredForOtherPublications()
+        {
+            User user = _dataFixture.DefaultUser();
+
+            var identityUser = new ApplicationUser { Id = user.Id.ToString() };
+
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Drafter);
+
+            UserPublicationRole anotherUserPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Drafter);
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they retain the Analyst role  because
+            // they still have need of it in other Publication roles.
+            userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, anotherUserPublicationRole);
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await service.RemoveDrafter(userPublicationRole.Id);
+
+                result.AssertRight();
+            }
+
+            VerifyAllMocks(userManager, userPublicationRoleRepository, userPreReleaseRoleRepository);
+        }
+
+        [Fact]
+        public async Task DowngradeToPreReleaseRole()
+        {
+            User user = _dataFixture.DefaultUser();
+
+            var identityUser = new ApplicationUser { Id = user.Id.ToString() };
+
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication())
+                .WithRole(PublicationRole.Drafter);
+
+            UserReleaseRole preReleaseRole = _dataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                );
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they lose the Analyst role but gain the
+            // PreReleaseUser role, as they have need of this role elsewhere.
+            userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            userManager
+                .Setup(s =>
+                    s.RemoveFromRolesAsync(ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst)))
+                )
+                .ReturnsAsync(new IdentityResult());
+
+            userManager
+                .Setup(s => s.AddToRoleAsync(ItIsUser(identityUser), RoleNames.PrereleaseUser))
+                .ReturnsAsync(new IdentityResult());
+
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, preReleaseRole);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
+            userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await service.RemoveDrafter(userPublicationRole.Id);
 
                 result.AssertRight();
             }

@@ -21,6 +21,11 @@ public interface IUserRoleService
         CancellationToken cancellationToken = default
     );
 
+    Task<Either<ActionResult, List<UserPublicationRoleInviteViewModel>>> GetPublicationRoleInvitesForPublication(
+        Guid publicationId,
+        CancellationToken cancellationToken = default
+    );
+
     Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
     Task<Either<ActionResult, Unit>> InviteDrafter(
@@ -29,13 +34,9 @@ public interface IUserRoleService
         CancellationToken cancellationToken = default
     );
 
-    Task<Either<ActionResult, Unit>> UpdatePublicationDrafters(
-        Guid publicationId,
-        HashSet<Guid> userIds,
-        CancellationToken cancellationToken = default
-    );
-
     Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
+
+    Task<Either<ActionResult, Unit>> RemoveDrafter(Guid userId);
 
     Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId);
 }

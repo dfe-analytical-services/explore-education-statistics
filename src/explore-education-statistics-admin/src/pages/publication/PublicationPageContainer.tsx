@@ -15,7 +15,6 @@ import {
   publicationCreateReleaseSeriesLegacyLinkRoute,
   publicationEditReleaseSeriesLegacyLinkRoute,
   PublicationRouteParams,
-  managePublicationDraftersPageRoute,
 } from '@admin/routes/publicationRoutes';
 import publicationService, {
   PublicationWithPermissions,
@@ -44,7 +43,6 @@ const routes = [
   publicationExternalMethodologyRoute,
   publicationCreateReleaseSeriesLegacyLinkRoute,
   publicationEditReleaseSeriesLegacyLinkRoute,
-  managePublicationDraftersPageRoute,
 ];
 
 const PublicationPageContainer = ({

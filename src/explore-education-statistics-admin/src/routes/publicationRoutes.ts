@@ -9,7 +9,6 @@ import PublicationCreateReleaseSeriesLegacyLinkPage from '@admin/pages/publicati
 import PublicationEditReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
 import PublicationTeamAccessPage from '@admin/pages/publication/PublicationTeamAccessPage';
 import { RouteProps } from 'react-router';
-import ManagePublicationDraftersPage from '@admin/pages/publication/ManagePublicationDraftersPage';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -21,10 +20,6 @@ export type PublicationEditReleaseSeriesLegacyLinkRouteParams = {
 };
 
 export type PublicationTeamRouteParams = {
-  publicationId: string;
-};
-
-export type ManagePublicationDraftersRouteParams = {
   publicationId: string;
 };
 
@@ -73,12 +68,6 @@ export const publicationTeamAccessRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/team',
   title: 'Team access',
   component: PublicationTeamAccessPage,
-};
-
-export const managePublicationDraftersPageRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/team/manage-drafters',
-  title: 'Manage drafters',
-  component: ManagePublicationDraftersPage,
 };
 
 export const publicationReleaseSeriesRoute: PublicationRouteProps = {

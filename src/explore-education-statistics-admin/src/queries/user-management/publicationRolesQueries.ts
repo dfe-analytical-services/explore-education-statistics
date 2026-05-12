@@ -9,6 +9,13 @@ const publicationRolesQueries = createQueryKeys('publicationRole', {
         publicationRolesService.listPublicationRoles(publicationId),
     };
   },
+  listPublicationRoleInvites(publicationId: string) {
+    return {
+      queryKey: ['Invites', publicationId],
+      queryFn: () =>
+        publicationRolesService.listPublicationRoleInvites(publicationId),
+    };
+  },
 });
 
 export default publicationRolesQueries;
