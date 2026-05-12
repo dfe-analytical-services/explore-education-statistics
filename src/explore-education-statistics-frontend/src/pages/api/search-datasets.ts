@@ -58,6 +58,7 @@ export default withMethods({
         ...searchOptionsBase,
         filter,
         select: [
+          'dataSetFileId',
           'fileId',
           'filename',
           'fileExtension',

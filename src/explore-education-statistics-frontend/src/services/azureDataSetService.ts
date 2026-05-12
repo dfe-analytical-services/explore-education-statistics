@@ -10,6 +10,7 @@ import { PaginatedList } from '@common/services/types/pagination';
 
 export interface AzureDataSetIndexItem {
   '@search.score': string;
+  dataSetFileId: string;
   fileId: string;
   filename: string;
   fileExtension: string;
@@ -41,14 +42,6 @@ export interface AzureDataSetIndexItem {
   };
 }
 
-// export interface AzureDataSetSuggestResult {
-//   highlightedMatch: string;
-//   releaseSlug: string;
-//   publicationSlug: string;
-//   summary: string;
-//   title: string;
-// }
-
 export interface AzureDataSetListRequest {
   filter?: string;
   orderBy?: AzureOrderByParam;
@@ -64,11 +57,6 @@ const azureDataSetService = {
   ): Promise<PaginatedList<DataSetFileSummary>> {
     return frontendApi.post(`/search-datasets`, { searchOptions: params });
   },
-  // async suggestPublications(
-  //   params: AzureDataSetListRequest,
-  // ): Promise<AzureDataSetSuggestResult[]> {
-  //   return frontendApi.post(`/suggest-datasets`, { searchOptions: params });
-  // },
 };
 
 export default azureDataSetService;
