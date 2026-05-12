@@ -36,7 +36,7 @@ export interface PreReleaseUserService {
   grantPreReleaseAccess(userId: string, releaseId: string): Promise<boolean>;
 }
 
-const preReleaseUserService: PreReleaseUserService = {
+const preReleaseUsersService: PreReleaseUserService = {
   getAllPreReleaseUsers(): Promise<PreReleaseUser[]> {
     return client.get('/pre-release/users');
   },
@@ -96,4 +96,4 @@ const preReleaseUserService: PreReleaseUserService = {
   },
 };
 
-export default preReleaseUserService;
+export default preReleaseUsersService;

@@ -1,22 +1,23 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
-import preReleaseUserService from '@admin/services/user-management/preReleaseUsersService';
+import preReleaseUsersService from '@admin/services/user-management/preReleaseUsersService';
 
 const preReleaseUsersQueries = createQueryKeys('preReleaseUser', {
   getAllPreReleaseUsers: {
     queryKey: null,
-    queryFn: () => preReleaseUserService.getAllPreReleaseUsers(),
+    queryFn: () => preReleaseUsersService.getAllPreReleaseUsers(),
   },
   getPreReleaseUsers(releaseVersionId: string) {
     return {
       queryKey: [releaseVersionId],
-      queryFn: () => preReleaseUserService.getPreReleaseUsers(releaseVersionId),
+      queryFn: () =>
+        preReleaseUsersService.getPreReleaseUsers(releaseVersionId),
     };
   },
   getPreReleaseUsersInvitePlan(releaseVersionId: string, emails: string[]) {
     return {
       queryKey: [releaseVersionId, emails],
       queryFn: () =>
-        preReleaseUserService.getPreReleaseUsersInvitePlan(
+        preReleaseUsersService.getPreReleaseUsersInvitePlan(
           releaseVersionId,
           emails,
         ),

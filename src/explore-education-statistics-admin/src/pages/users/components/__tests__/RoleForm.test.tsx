@@ -6,8 +6,9 @@ import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 
-jest.mock('@admin/services/userService');
-const userService = _usersService as jest.Mocked<typeof _usersService>;
+jest.mock('@admin/services/user-management/usersService');
+
+const usersService = _usersService as jest.Mocked<typeof _usersService>;
 
 describe('RoleForm', () => {
   test('renders the form', () => {
@@ -34,15 +35,15 @@ describe('RoleForm', () => {
 
     await user.selectOptions(screen.getByLabelText('Role'), ['Role 1']);
 
-    expect(userService.updateUser).not.toHaveBeenCalled();
+    expect(usersService.updateUser).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Update role' }));
 
     await waitFor(() => {
-      expect(userService.updateUser).toHaveBeenCalledTimes(1);
+      expect(usersService.updateUser).toHaveBeenCalledTimes(1);
     });
-    expect(userService.updateUser).toHaveBeenCalledWith('user-1-id', {
+    expect(usersService.updateUser).toHaveBeenCalledWith('user-1-id', {
       roleId: 'role-1-id',
     });
     expect(handleUpdate).toHaveBeenCalledTimes(1);

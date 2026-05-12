@@ -9,7 +9,7 @@ import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 
-jest.mock('@admin/services/userService');
+jest.mock('@admin/services/user-management/preReleaseUsersService');
 const preReleaseUsersService = _preReleaseUsersService as jest.Mocked<
   typeof _preReleaseUsersService
 >;
@@ -48,15 +48,12 @@ describe('PreReleaseAccessForm', () => {
     );
 
     await user.selectOptions(screen.getByLabelText('Release'), ['Release 1']);
-    await user.selectOptions(screen.getByLabelText('Release role'), [
-      'Contributor',
-    ]);
 
     expect(preReleaseUsersService.grantPreReleaseAccess).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
     await user.click(
-      screen.getByRole('button', { name: 'Add release access' }),
+      screen.getByRole('button', { name: 'Add pre-release access' }),
     );
 
     await waitFor(() => {
