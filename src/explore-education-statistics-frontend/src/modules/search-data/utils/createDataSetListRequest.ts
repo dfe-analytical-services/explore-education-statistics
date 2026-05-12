@@ -68,15 +68,32 @@ interface SearchFilters {
 
 function buildODataFilter(filters: SearchFilters): string | undefined {
   const conditions: string[] = [];
+  const themeAndPubConditions: string[] = [];
+
+  if (filters.themeId?.length) {
+    const joined = filters.themeId.join('|');
+    themeAndPubConditions.push(odata`search.in(themeId, ${joined}, '|')`);
+  }
+
+  if (filters.publicationId?.length) {
+    const joined = filters.publicationId.join('|');
+    themeAndPubConditions.push(odata`search.in(publicationId, ${joined}, '|')`);
+  }
+
+  if (themeAndPubConditions.length > 0) {
+    // If both theme and publication ids, we want to match either, so join them with 'or' and wrap in parentheses.
+    // If only one exists, just use it as is.
+    const combinedGroup =
+      themeAndPubConditions.length > 1
+        ? `(${themeAndPubConditions.join(' or ')})`
+        : themeAndPubConditions[0];
+
+    conditions.push(combinedGroup);
+  }
 
   if (filters.releaseType?.length) {
     const joined = filters.releaseType.join('|');
     conditions.push(odata`search.in(releaseType, ${joined}, '|')`);
-  }
-
-  if (filters.themeId?.length) {
-    const joined = filters.themeId.join('|');
-    conditions.push(odata`search.in(themeId, ${joined}, '|')`);
   }
 
   if (filters.geographicLevels?.length) {
@@ -84,11 +101,6 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
     conditions.push(
       odata`geographicLevels/any(g: search.in(g, ${joined}, '|'))`,
     );
-  }
-
-  if (filters.publicationId?.length) {
-    const joined = filters.publicationId.join('|');
-    conditions.push(odata`search.in(publicationId, ${joined}, '|')`);
   }
 
   if (filters.latestDataOnly) {
