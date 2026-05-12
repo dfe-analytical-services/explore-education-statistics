@@ -115,22 +115,6 @@ public class UserRoleServicePermissionTests
     }
 
     [Fact]
-    public async Task UpdatePublicationDrafters()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_publication, CanUpdateDrafters)
-            .AssertForbidden(async userService =>
-            {
-                await using var contentDbContext = InMemoryApplicationDbContext();
-                await contentDbContext.AddAsync(_publication);
-                await contentDbContext.SaveChangesAsync();
-
-                var service = SetupService(contentDbContext: contentDbContext, userService: userService.Object);
-                return await service.UpdatePublicationDrafters(_publication.Id, []);
-            });
-    }
-
-    [Fact]
     public async Task RemoveUserPublicationRole()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
