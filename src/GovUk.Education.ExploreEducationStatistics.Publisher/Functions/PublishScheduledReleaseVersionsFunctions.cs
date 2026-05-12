@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 
-public class PublishScheduledReleasesFunction(
-    ILogger<PublishScheduledReleasesFunction> logger,
+public class PublishScheduledReleaseVersionsFunctions(
+    ILogger<PublishScheduledReleaseVersionsFunctions> logger,
     IReleasePublishingStatusService releasePublishingStatusService,
     IPublishingCompletionService publishingCompletionService
 )
