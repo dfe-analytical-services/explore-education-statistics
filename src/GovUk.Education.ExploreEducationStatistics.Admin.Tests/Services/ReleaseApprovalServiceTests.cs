@@ -219,7 +219,7 @@ public class ReleaseApprovalServiceTests
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
         {
-            StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-01T00:00:00Z
+            PrepareScheduledReleaseVersionsFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-01T00:00:00Z
             PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-01-01T09:30:00Z
         };
 
@@ -269,7 +269,7 @@ public class ReleaseApprovalServiceTests
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
         {
-            StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-06T23:00:00Z
+            PrepareScheduledReleaseVersionsFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-06T23:00:00Z
             PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-06-07T08:30:00Z
         };
 
@@ -317,7 +317,7 @@ public class ReleaseApprovalServiceTests
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
         {
-            StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-02T00:00:00Z
+            PrepareScheduledReleaseVersionsFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-02T00:00:00Z
             PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-01-01T09:30:00Z
         };
 
@@ -367,7 +367,7 @@ public class ReleaseApprovalServiceTests
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
         {
-            StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-07T23:00:00Z
+            PrepareScheduledReleaseVersionsFunctionCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-07T23:00:00Z
             PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *", // Next occurrence 2023-06-07T08:30:00Z
         };
 
@@ -415,7 +415,7 @@ public class ReleaseApprovalServiceTests
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
         {
-            StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * 1-5", // Only occurs on weekdays Monday - Friday
+            PrepareScheduledReleaseVersionsFunctionCronSchedule = "0 0 0 * * 1-5", // Only occurs on weekdays Monday - Friday
             PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * 1-5", // Only occurs on weekdays Monday - Friday
         };
 
@@ -464,7 +464,7 @@ public class ReleaseApprovalServiceTests
         // will have an occurrence on the day, but not the second
         var options = new ReleaseApprovalOptions
         {
-            StageScheduledReleasesFunctionCronSchedule = "0 30 * * * *", // Occurs hourly at minute 30
+            PrepareScheduledReleaseVersionsFunctionCronSchedule = "0 30 * * * *", // Occurs hourly at minute 30
             PublishScheduledReleaseVersionsFunctionCronSchedule = "0 15 * * * *", // Occurs hourly at minute 15
         };
 
@@ -1877,7 +1877,7 @@ public class ReleaseApprovalServiceTests
     {
         return new ReleaseApprovalOptions
         {
-            StageScheduledReleasesFunctionCronSchedule = "0 0 0 * * *",
+            PrepareScheduledReleaseVersionsFunctionCronSchedule = "0 0 0 * * *",
             PublishScheduledReleaseVersionsFunctionCronSchedule = "0 30 9 * * *",
         }.ToOptionsWrapper();
     }

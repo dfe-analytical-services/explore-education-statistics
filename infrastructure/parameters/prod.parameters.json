@@ -32,7 +32,7 @@
     "publicAppBasicAuth": {
       "value": "false"
     },
-    "stageScheduledReleasesFunctionCronSchedule": {
+    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 5 0 * * *"
     },
     "publishScheduledReleaseVersionsFunctionCronSchedule": {

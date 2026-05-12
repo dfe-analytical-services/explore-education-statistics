@@ -25,14 +25,15 @@ public class PrepareScheduledReleaseVersionsFunctions(
     private readonly AppOptions _appOptions = appOptions.Value;
 
     /// <summary>
-    /// Azure function that triggers copying files for all release versions scheduled to be published later in the day.
-    /// By default, this runs daily at 00:05:00.
+    /// Azure function that prepares release versions for publishing by triggering file copying for all release versions
+    /// scheduled to be published later that day.
     /// </summary>
-    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
-    // given that the 'staging' content task no longer exists.
-    [Function(nameof(StageScheduledReleases))]
-    public async Task StageScheduledReleases(
-        [TimerTrigger("%App:StageScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
+    /// <remarks>
+    /// Triggered by a cron schedule that executes daily at 00:05:00 in the Production environment.
+    /// </remarks>
+    [Function(nameof(PrepareScheduledReleaseVersions))]
+    public async Task PrepareScheduledReleaseVersions(
+        [TimerTrigger("%App:PrepareScheduledReleaseVersionsFunctionCronSchedule%")] TimerInfo timer,
         FunctionContext context
     )
     {
@@ -70,21 +71,23 @@ public class PrepareScheduledReleaseVersionsFunctions(
     }
 
     /// <summary>
-    /// Azure function to manually trigger the publishing/staging of releaseVersion(s) files/content. This can be
-    /// done for either all releaseVersions that are scheduled to be published today, or an array of
-    /// releaseVersions that are due to be published today or in the future. This is triggered manually by an HTTP
-    /// post request, and is disabled in production environments. More info in the Publisher README.md.
+    /// HTTP-triggered function to immediately prepare release versions for publishing by triggering file copying for
+    /// all release versions scheduled to be published later that day.
+    /// Intended for use by manual and automated testing to avoid waiting for the scheduled trigger.
     /// </summary>
+    /// <remarks>
+    /// This function is manually triggered by an HTTP POST and is disabled by default in production.
+    /// It mirrors the behaviour of <see cref="PrepareScheduledReleaseVersions"/>.
+    /// For more info see the Publisher's README.
+    /// </remarks>
     /// <param name="request">
     /// An optional JSON request body with a "ReleaseVersionIds" array can be included in the POST request to limit
     /// the scope of the Function to only the provided release version id's.
     /// </param>
     /// <param name="context"></param>
-    // TODO EES-6432 Rename this function and its associated cron schedule app setting to reflect its current purpose,
-    // given that the 'staging' content task no longer exists. Be careful to make sure it remains disabled in the Prod
-    // environment after renaming.
-    [Function(nameof(StageScheduledReleaseVersionsImmediately))]
-    public async Task<ActionResult<ManualTriggerResponse>> StageScheduledReleaseVersionsImmediately(
+    /// <returns></returns>
+    [Function(nameof(PrepareScheduledReleaseVersionsNow))]
+    public async Task<ActionResult<ManualTriggerResponse>> PrepareScheduledReleaseVersionsNow(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
         FunctionContext context
     )

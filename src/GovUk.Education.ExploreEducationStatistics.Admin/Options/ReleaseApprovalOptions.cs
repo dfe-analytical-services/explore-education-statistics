@@ -5,7 +5,7 @@ public record ReleaseApprovalOptions
 {
     public const string Section = "ReleaseApproval";
 
-    public string StageScheduledReleasesFunctionCronSchedule { get; init; } = string.Empty;
+    public string PrepareScheduledReleaseVersionsFunctionCronSchedule { get; init; } = string.Empty;
 
     public string PublishScheduledReleaseVersionsFunctionCronSchedule { get; init; } = string.Empty;
 }

@@ -45,7 +45,7 @@ If `NotifyChange` is triggered by an approval set for scheduled publication, it 
 
 Publishing of scheduled release relies on two functions which are triggered by cron schedules.
 
-- **`StageScheduledReleases`** - Prepares release versions for publishing by triggering file copying.
+- **`PrepareScheduledReleases`** - Prepares release versions for publishing by triggering file copying.
 - **`PublishScheduledReleaseVersions`** - Completes publishing of scheduled release versions.
 
 ## Forcing immediate publishing of scheduled release versions for testing
@@ -60,19 +60,19 @@ Passing an array of specific release version IDs overrides this behaviour, causi
 All HTTP examples below target a local development environment.
 Replace `http://localhost:7072` with the target environment's Publisher Functions base URL.
 
-### StageScheduledReleaseVersionsImmediately
+### PrepareScheduledReleaseVersionsNow
 
 Prepare all release versions scheduled for publishing today:
 
 ```http request
-POST http://localhost:7072/api/StageScheduledReleaseVersionsImmediately
+POST http://localhost:7072/api/PrepareScheduledReleaseVersionsNow
 Accept: application/json
 ```
 
 Prepare specific release versions scheduled for publishing (ignores scheduled date):
 
 ```http request
-POST http://localhost:7072/api/StageScheduledReleaseVersionsImmediately
+POST http://localhost:7072/api/PrepareScheduledReleaseVersionsNow
 Content-Type: application/json
 
 {
@@ -92,7 +92,7 @@ Response (release version IDs that are now prepared for publishing):
 
 Once preparation is complete, call this endpoint to finalise publishing and make the release versions live.
 
-> **Note:** Allow sufficient time for the staging process to complete before calling this endpoint.
+> **Note:** Allow sufficient time for the PrepareScheduledReleaseVersionsNow function to complete before calling this endpoint.
 
 Publish all prepared release versions:
 
@@ -125,11 +125,11 @@ Response (release version IDs that have been published):
 Here are some examples of using cURL to make the requests:
 
 ```bash
-curl http://localhost:7072/api/StageScheduledReleaseVersionsImmediately -X POST -H 'Accept: application/json'
+curl http://localhost:7072/api/PrepareScheduledReleaseVersionsNow -X POST -H 'Accept: application/json'
 ```
 
 ```bash
-curl http://localhost:7072/api/StageScheduledReleaseVersionsImmediately -X POST -H 'Content-Type: application/json' -d '{"releaseVersionIds":["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]}'
+curl http://localhost:7072/api/PrepareScheduledReleaseVersionsNow -X POST -H 'Content-Type: application/json' -d '{"releaseVersionIds":["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]}'
 ```
 
 ```bash

@@ -273,7 +273,7 @@ public class ReleaseApprovalService(
     {
         // Publishing a scheduled release relies on two Azure Functions which are triggered by cron expressions.
         // These notes will refer to them as functions (1) and (2):
-        // StageScheduledReleases (1) - Runs tasks for the releases that are scheduled to be published.
+        // PrepareScheduledReleaseVersions (1) - Runs tasks for the releases that are scheduled to be published.
         // PublishScheduledReleaseVersions (2) - Runs after (1) and completes publishing of releases.
 
         // The cron expressions are configurable per environment to allow different schedules for testing.
@@ -307,7 +307,7 @@ public class ReleaseApprovalService(
 
         // Publishing won't occur unless there's an occurrence of (1) between the publishing range
         var nextOccurrenceUtc = GetNextOccurrenceForCronExpression(
-            cronExpression: options.Value.StageScheduledReleasesFunctionCronSchedule,
+            cronExpression: options.Value.PrepareScheduledReleaseVersionsFunctionCronSchedule,
             fromUtc: fromUtc,
             toUtc: toUtc,
             timeZone: ukTimeZone

@@ -12,9 +12,9 @@ public class AppOptions
 
     public required string PublisherStorageConnectionString { get; init; }
 
-    public required string PublishScheduledReleaseVersionsFunctionCronSchedule { get; init; }
+    public required string PrepareScheduledReleaseVersionsFunctionCronSchedule { get; init; }
 
-    public required string StageScheduledReleasesFunctionCronSchedule { get; init; }
+    public required string PublishScheduledReleaseVersionsFunctionCronSchedule { get; init; }
 
     public required string BauEmail { get; init; }
 

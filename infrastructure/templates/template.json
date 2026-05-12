@@ -348,18 +348,18 @@
         "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
       }
     },
+    "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether the PrepareScheduledReleaseVersionsNow HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
+      }
+    },
     "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
         "description": "Whether the PublishScheduledReleaseVersionsNow HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
-      }
-    },
-    "publisherFunctionStageScheduledReleaseVersionsImmediatelyEnabled": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Whether the StageScheduledReleaseVersionsImmediately HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
       }
     },
     "teamEmailAddresses": {
@@ -481,11 +481,11 @@
         "description": "Whether or not to register data sources with Backup Vault."
       }
     },
-    "stageScheduledReleasesFunctionCronSchedule": {
+    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "type": "string",
       "defaultValue": "0 5 0 * * *",
       "metadata": {
-        "description": "Cron expression that defines when the StageScheduledReleases function runs in the Publisher Function App"
+        "description": "Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App"
       }
     },
     "publishScheduledReleaseVersionsFunctionCronSchedule": {
@@ -1986,7 +1986,7 @@
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
         "PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
-        "ReleaseApproval__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
+        "ReleaseApproval__PrepareScheduledReleaseVersionsFunctionCronSchedule": "[parameters('prepareScheduledReleaseVersionsFunctionCronSchedule')]",
         "ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
         "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicApp__Url": "[variables('publicAppUrl')]",
@@ -3588,15 +3588,15 @@
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "AzureWebJobs.PrepareScheduledReleaseVersionsNow.Disabled": "[not(parameters('publisherFunctionPrepareScheduledReleaseVersionsNowEnabled'))]",
         "AzureWebJobs.PublishScheduledReleaseVersionsNow.Disabled": "[not(parameters('publisherFunctionPublishScheduledReleaseVersionsNowEnabled'))]",
-        "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('publisherFunctionStageScheduledReleaseVersionsImmediatelyEnabled'))]",
         "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_TIME_ZONE": "[parameters('publisherFunctionAppTimeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
+        "App__PrepareScheduledReleaseVersionsFunctionCronSchedule": "[parameters('prepareScheduledReleaseVersionsFunctionCronSchedule')]",
         "App__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
         "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
