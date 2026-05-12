@@ -159,9 +159,11 @@ public record ReleaseVersionSummaryViewModel
     [JsonConverter(typeof(StringEnumConverter))]
     public ReleaseApprovalStatus ApprovalStatus { get; init; }
 
-    public DateTimeOffset? Published { get; init; }
+    public DateTimeOffset? PublishedDisplayDate { get; init; }
 
-    public bool Live => Published != null;
+    public DateTimeOffset? LastPublished { get; init; }
+
+    public bool Live => PublishedDisplayDate != null;
 
     public DateOnly? PublishScheduled { get; init; }
 
@@ -194,7 +196,8 @@ public record ReleaseVersionSummaryViewModel
             YearTitle = releaseVersion.Release.YearTitle,
             TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage,
             ApprovalStatus = releaseVersion.ApprovalStatus,
-            Published = releaseVersion.PublishedDisplayDate,
+            PublishedDisplayDate = releaseVersion.PublishedDisplayDate,
+            LastPublished = releaseVersion.Published,
             PublishScheduled = releaseVersion.PublishScheduled?.ToUkDateOnly(),
             NextReleaseDate = releaseVersion.NextReleaseDate,
             Type = releaseVersion.Type,

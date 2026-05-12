@@ -64,6 +64,7 @@ export default function PublicationPublishedReleasesTable({
                 Status
               </th>
               <th>Published date</th>
+              <th>Last published</th>
               <th className="govuk-!-width-one-quarter">Actions</th>
             </tr>
           </thead>
@@ -83,8 +84,15 @@ export default function PublicationPublishedReleasesTable({
                     <Tag colour="green">Published</Tag>
                   </td>
                   <td>
-                    {release.published && (
-                      <FormattedDate>{release.published}</FormattedDate>
+                    {release.publishedDisplayDate && (
+                      <FormattedDate>
+                        {release.publishedDisplayDate}
+                      </FormattedDate>
+                    )}
+                  </td>
+                  <td>
+                    {release.lastPublished && (
+                      <FormattedDate>{release.lastPublished}</FormattedDate>
                     )}
                   </td>
                   <td>

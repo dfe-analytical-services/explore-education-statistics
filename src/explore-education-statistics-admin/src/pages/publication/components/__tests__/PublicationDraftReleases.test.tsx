@@ -46,7 +46,7 @@ describe('PublicationDraftReleases', () => {
     ...testRelease1,
     approvalStatus: 'HigherLevelReview',
     id: 'release-2',
-    published: '2022-01-02T00:00:00',
+    publishedDisplayDate: '2022-01-02T00:00:00+00:00',
     slug: 'release-2-slug',
     title: 'Release 2',
   };
@@ -64,7 +64,7 @@ describe('PublicationDraftReleases', () => {
       canViewReleaseVersion: false,
     },
     previousVersionId: 'release-previous-id',
-    published: '2022-01-03T00:00:00',
+    publishedDisplayDate: '2022-01-03T00:00:00+00:00',
     slug: 'release-3-slug',
     title: 'Release 3',
   };

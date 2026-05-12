@@ -2199,7 +2199,8 @@ public class PublicationServiceTests
             Assert.Equal(releaseVersion.Release.YearTitle, summaryViewModel.YearTitle);
             Assert.Equal(releaseVersion.Release.TimePeriodCoverage, summaryViewModel.TimePeriodCoverage);
             Assert.Equal(releaseVersion.Release.Label, summaryViewModel.Label);
-            Assert.Equal(releaseVersion.PublishedDisplayDate, summaryViewModel.Published);
+            Assert.Equal(releaseVersion.PublishedDisplayDate, summaryViewModel.PublishedDisplayDate);
+            Assert.Equal(releaseVersion.Published, summaryViewModel.LastPublished);
             Assert.Equal(releaseVersion.Live, summaryViewModel.Live);
             Assert.Equal(releaseVersion.PublishScheduled?.ToUkDateOnly(), summaryViewModel.PublishScheduled);
             Assert.Equal(releaseVersion.NextReleaseDate, summaryViewModel.NextReleaseDate);

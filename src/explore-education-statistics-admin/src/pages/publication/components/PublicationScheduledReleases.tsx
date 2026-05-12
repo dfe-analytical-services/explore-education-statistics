@@ -40,7 +40,7 @@ const PublicationScheduledReleases = ({
             <th className="govuk-!-width-one-quarter dfe-white-space--nowrap">
               Stages checklist
             </th>
-            <th>Publish date</th>
+            <th>Scheduled publication date</th>
             <th>Actions</th>
           </tr>
         </thead>

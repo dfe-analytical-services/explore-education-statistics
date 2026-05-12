@@ -51,7 +51,8 @@ describe('PublicationPublishedReleases', () => {
       canMakeAmendmentOfReleaseVersion: true,
       canViewReleaseVersion: true,
     },
-    published: '2022-01-01T00:00:00',
+    publishedDisplayDate: '2022-01-01T00:00:00+00:00',
+    lastPublished: '2022-07-01T00:00:00+00:00',
     slug: 'release-1-slug',
     title: 'Release 1',
     timePeriodCoverage: {
@@ -67,7 +68,8 @@ describe('PublicationPublishedReleases', () => {
     ...testRelease1,
     id: 'release-2-version-1',
     releaseId: 'release-2',
-    published: '2022-01-02T00:00:00',
+    publishedDisplayDate: '2022-01-02T00:00:00+00:00',
+    lastPublished: '2022-07-02T00:00:00+00:00',
     slug: 'release-2-slug',
     title: 'Release 2',
     year: 2020,
@@ -78,7 +80,8 @@ describe('PublicationPublishedReleases', () => {
     ...testRelease1,
     id: 'release-3-version-1',
     releaseId: 'release-3',
-    published: '2022-01-03T00:00:00',
+    publishedDisplayDate: '2022-01-03T00:00:00+00:00',
+    lastPublished: '2022-07-03T00:00:00+00:00',
     slug: 'release-3-slug',
     title: 'Release 3',
     year: 2019,
@@ -89,7 +92,8 @@ describe('PublicationPublishedReleases', () => {
     ...testRelease1,
     id: 'release-4-version-1',
     releaseId: 'release-4',
-    published: '2022-01-04T00:00:00',
+    publishedDisplayDate: '2022-01-04T00:00:00+00:00',
+    lastPublished: '2022-07-04T00:00:00+00:00',
     slug: 'release-4-slug',
     title: 'Release 4',
     year: 2018,
@@ -100,7 +104,8 @@ describe('PublicationPublishedReleases', () => {
     ...testRelease1,
     id: 'release-5-version-1',
     releaseId: 'release-5',
-    published: '2022-01-05T00:00:00',
+    publishedDisplayDate: '2022-01-05T00:00:00+00:00',
+    lastPublished: '2022-07-05T00:00:00+00:00',
     slug: 'release-5-slug',
     title: 'Release 5',
     year: 2017,
@@ -111,7 +116,8 @@ describe('PublicationPublishedReleases', () => {
     ...testRelease1,
     id: 'release-6-version-1',
     releaseId: 'release-6',
-    published: '2022-01-06T00:00:00',
+    publishedDisplayDate: '2022-01-06T00:00:00+00:00',
+    lastPublished: '2022-07-06T00:00:00+00:00',
     slug: 'release-6-slug',
     title: 'Release 6',
     year: 2016,
@@ -122,7 +128,8 @@ describe('PublicationPublishedReleases', () => {
     ...testRelease1,
     id: 'release-7-version-1',
     releaseId: 'release-7',
-    published: '2022-01-07T00:00:00',
+    publishedDisplayDate: '2022-01-07T00:00:00+00:00',
+    lastPublished: '2022-07-07T00:00:00+00:00',
     slug: 'release-7-slug',
     title: 'Release 7',
     year: 2015,
@@ -196,17 +203,18 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(row1Cells[2]).getByText('1 January 2022'),
     ).toBeInTheDocument();
+    expect(within(row1Cells[3]).getByText('1 July 2022')).toBeInTheDocument();
     expect(
-      within(row1Cells[3]).getByRole('button', { name: 'Amend Release 1' }),
+      within(row1Cells[4]).getByRole('button', { name: 'Amend Release 1' }),
     ).toBeInTheDocument();
     expect(
-      within(row1Cells[3]).getByRole('link', { name: 'View Release 1' }),
+      within(row1Cells[4]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1-version-1/summary',
     );
     expect(
-      within(row1Cells[3]).getByRole('button', {
+      within(row1Cells[4]).getByRole('button', {
         name: 'Edit release label for Release 1',
       }),
     ).toBeInTheDocument();
@@ -217,17 +225,18 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(row2Cells[2]).getByText('2 January 2022'),
     ).toBeInTheDocument();
+    expect(within(row2Cells[3]).getByText('2 July 2022')).toBeInTheDocument();
     expect(
-      within(row2Cells[3]).getByRole('button', { name: 'Amend Release 2' }),
+      within(row2Cells[4]).getByRole('button', { name: 'Amend Release 2' }),
     ).toBeInTheDocument();
     expect(
-      within(row2Cells[3]).getByRole('link', { name: 'View Release 2' }),
+      within(row2Cells[4]).getByRole('link', { name: 'View Release 2' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-2-version-1/summary',
     );
     expect(
-      within(row2Cells[3]).getByRole('button', {
+      within(row2Cells[4]).getByRole('button', {
         name: 'Edit release label for Release 2',
       }),
     ).toBeInTheDocument();
@@ -238,17 +247,18 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(row3Cells[2]).getByText('3 January 2022'),
     ).toBeInTheDocument();
+    expect(within(row3Cells[3]).getByText('3 July 2022')).toBeInTheDocument();
     expect(
-      within(row3Cells[3]).getByRole('button', { name: 'Amend Release 3' }),
+      within(row3Cells[4]).getByRole('button', { name: 'Amend Release 3' }),
     ).toBeInTheDocument();
     expect(
-      within(row3Cells[3]).getByRole('link', { name: 'View Release 3' }),
+      within(row3Cells[4]).getByRole('link', { name: 'View Release 3' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-3-version-1/summary',
     );
     expect(
-      within(row3Cells[3]).getByRole('button', {
+      within(row3Cells[4]).getByRole('button', {
         name: 'Edit release label for Release 3',
       }),
     ).toBeInTheDocument();
@@ -259,17 +269,18 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(row4Cells[2]).getByText('4 January 2022'),
     ).toBeInTheDocument();
+    expect(within(row4Cells[3]).getByText('4 July 2022')).toBeInTheDocument();
     expect(
-      within(row4Cells[3]).getByRole('button', { name: 'Amend Release 4' }),
+      within(row4Cells[4]).getByRole('button', { name: 'Amend Release 4' }),
     ).toBeInTheDocument();
     expect(
-      within(row4Cells[3]).getByRole('link', { name: 'View Release 4' }),
+      within(row4Cells[4]).getByRole('link', { name: 'View Release 4' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-4-version-1/summary',
     );
     expect(
-      within(row4Cells[3]).getByRole('button', {
+      within(row4Cells[4]).getByRole('button', {
         name: 'Edit release label for Release 4',
       }),
     ).toBeInTheDocument();
@@ -280,17 +291,18 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(row5Cells[2]).getByText('5 January 2022'),
     ).toBeInTheDocument();
+    expect(within(row5Cells[3]).getByText('5 July 2022')).toBeInTheDocument();
     expect(
-      within(row5Cells[3]).getByRole('button', { name: 'Amend Release 5' }),
+      within(row5Cells[4]).getByRole('button', { name: 'Amend Release 5' }),
     ).toBeInTheDocument();
     expect(
-      within(row5Cells[3]).getByRole('link', { name: 'View Release 5' }),
+      within(row5Cells[4]).getByRole('link', { name: 'View Release 5' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-5-version-1/summary',
     );
     expect(
-      within(row5Cells[3]).getByRole('button', {
+      within(row5Cells[4]).getByRole('button', {
         name: 'Edit release label for Release 5',
       }),
     ).toBeInTheDocument();
@@ -338,13 +350,13 @@ describe('PublicationPublishedReleases', () => {
 
       if (canUpdateRelease) {
         expect(
-          within(rowCells[3]).getByRole('button', {
+          within(rowCells[4]).getByRole('button', {
             name: 'Edit release label for Release 1',
           }),
         ).toBeInTheDocument();
       } else {
         expect(
-          within(rowCells[3]).queryByRole('button', {
+          within(rowCells[4]).queryByRole('button', {
             name: 'Edit release label for Release 1',
           }),
         ).not.toBeInTheDocument();
@@ -423,11 +435,12 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(row6Cells[2]).getByText('6 January 2022'),
     ).toBeInTheDocument();
+    expect(within(row6Cells[3]).getByText('6 July 2022')).toBeInTheDocument();
     expect(
-      within(row6Cells[3]).getByRole('button', { name: 'Amend Release 6' }),
+      within(row6Cells[4]).getByRole('button', { name: 'Amend Release 6' }),
     ).toBeInTheDocument();
     expect(
-      within(row6Cells[3]).getByRole('link', { name: 'View Release 6' }),
+      within(row6Cells[4]).getByRole('link', { name: 'View Release 6' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-6-version-1/summary',
@@ -439,11 +452,12 @@ describe('PublicationPublishedReleases', () => {
     expect(
       within(row7Cells[2]).getByText('7 January 2022'),
     ).toBeInTheDocument();
+    expect(within(row7Cells[3]).getByText('7 July 2022')).toBeInTheDocument();
     expect(
-      within(row7Cells[3]).getByRole('button', { name: 'Amend Release 7' }),
+      within(row7Cells[4]).getByRole('button', { name: 'Amend Release 7' }),
     ).toBeInTheDocument();
     expect(
-      within(row7Cells[3]).getByRole('link', { name: 'View Release 7' }),
+      within(row7Cells[4]).getByRole('link', { name: 'View Release 7' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-7-version-1/summary',
