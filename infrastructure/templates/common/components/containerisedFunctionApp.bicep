@@ -10,8 +10,8 @@ import {
 
 import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
 param userAssignedManagedIdentityParams {
@@ -195,7 +195,7 @@ module keyVaultRoleAssignmentModule 'key-vault/keyVaultRoleAssignment.bicep' = {
   }
 }
 
-module deploymentStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
+module deploymentStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: '${functionAppName}DeploymentStorageAccountModuleDeploy'
   params: {
     location: location
@@ -215,7 +215,7 @@ module deploymentStorageAccountModule '../../public-api/components/storageAccoun
   }
 }
 
-module fileShareModule '../../public-api/components/fileShare.bicep' = {
+module fileShareModule '../../common/components/storage/fileShare.bicep' = {
   name: '${functionAppName}FileShareDeploy'
   params: {
     storageAccountName: deploymentStorageAccountName
@@ -391,7 +391,7 @@ module azureAuthentication '../../public-api/components/siteAzureAuthentication.
   }
 }
 
-module healthAlert '../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionApp.name
@@ -410,7 +410,7 @@ module healthAlert '../../public-api/components/alerts/staticMetricAlert.bicep' 
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
 
-module unexpectedHttpStatusCodeAlerts '../../public-api/components/alerts/staticMetricAlert.bicep' = [
+module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
   for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
@@ -431,7 +431,7 @@ module unexpectedHttpStatusCodeAlerts '../../public-api/components/alerts/static
 
 var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
 
-module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicMetricAlert.bicep' = [
+module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
   for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {

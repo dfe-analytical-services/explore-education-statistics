@@ -42,7 +42,7 @@ var storageAccountConfig = {
 
 var fileShareName = '${resourcePrefix}-${abbreviations.fileShare}-anlyt'
 
-module analyticsStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
+module analyticsStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: 'analyticsStorageAccountDeploy'
   params: {
     location: location
@@ -64,7 +64,7 @@ module analyticsStorageAccountModule '../../public-api/components/storageAccount
   }
 }
 
-module analyticsFileShareModule '../../public-api/components/fileShare.bicep' = {
+module analyticsFileShareModule '../../common/components/storage/fileShare.bicep' = {
   name: 'analyticsFileShareDeploy'
   params: {
     fileShareName: fileShareName

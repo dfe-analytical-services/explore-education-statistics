@@ -1,7 +1,7 @@
 import { IpRange, FirewallRule, AzureFileShareMount } from '../types.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 
 @description('Specifies the location for all resources.')
@@ -173,7 +173,7 @@ module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
   }
 }
 
-module storageAccountModule '../../public-api/components/storageAccount.bicep' = {
+module storageAccountModule 'storage/storageAccount.bicep' = {
   name: 'storageAccountModuleDeploy'
   params: {
     location: location
@@ -194,7 +194,7 @@ module storageAccountModule '../../public-api/components/storageAccount.bicep' =
   }
 }
 
-module fileShareModule '../../public-api/components/fileShare.bicep' = {
+module fileShareModule '../../common/components/storage/fileShare.bicep' = {
   name: '${storageAccountName}FileShareModuleDeploy'
   params: {
     storageAccountName: storageAccountModule.outputs.storageAccountName
@@ -350,7 +350,7 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?fun
   }
 }
 
-module healthAlert '../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionApp.name
@@ -369,7 +369,7 @@ module healthAlert '../../public-api/components/alerts/staticMetricAlert.bicep' 
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
 
-module unexpectedHttpStatusCodeAlerts '../../public-api/components/alerts/staticMetricAlert.bicep' = [
+module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
   for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
@@ -390,7 +390,7 @@ module unexpectedHttpStatusCodeAlerts '../../public-api/components/alerts/static
 
 var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
 
-module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicMetricAlert.bicep' = [
+module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
   for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
