@@ -14,8 +14,8 @@ using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 
-public class StageScheduledReleasesFunction(
-    ILogger<StageScheduledReleasesFunction> logger,
+public class PrepareScheduledReleaseVersionsFunctions(
+    ILogger<PrepareScheduledReleaseVersionsFunctions> logger,
     IOptions<AppOptions> appOptions,
     TimeProvider timeProvider,
     IQueueService queueService,
