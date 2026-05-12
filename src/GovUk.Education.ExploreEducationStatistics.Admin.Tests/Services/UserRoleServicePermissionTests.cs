@@ -3,11 +3,15 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -19,7 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class UserRoleServicePermissionTests
 {
-    private readonly Publication _publication = new() { Id = Guid.NewGuid() };
+    private readonly DataFixture _dataFixture = new();
+
+    private readonly Publication _publication = new DataFixture().DefaultPublication();
 
     [Fact]
     public async Task SetGlobalRoleForUser()
@@ -99,6 +105,23 @@ public class UserRoleServicePermissionTests
     }
 
     [Fact]
+    public async Task GetPublicationRoleInvitesForPublication()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                await using var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.AddAsync(_publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = SetupService(contentDbContext: contentDbContext, userService: userService.Object);
+
+                return await service.GetPublicationRoleInvitesForPublication(_publication.Id);
+            });
+    }
+
+    [Fact]
     public async Task InviteDrafter()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
@@ -123,6 +146,29 @@ public class UserRoleServicePermissionTests
             {
                 var service = SetupService(userService: userService.Object);
                 return await service.RemoveUserPublicationRole(Guid.NewGuid());
+            });
+    }
+
+    [Fact]
+    public async Task RemoveDrafter()
+    {
+        UserPublicationRole userDrafterRole = _dataFixture
+            .DefaultUserPublicationRole()
+            .WithPublication(_publication)
+            .WithRole(PublicationRole.Drafter);
+
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_publication, CanUpdateDrafters)
+            .AssertForbidden(async userService =>
+            {
+                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+                userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userDrafterRole);
+
+                var service = SetupService(
+                    userService: userService.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
+                return await service.RemoveDrafter(userDrafterRole.Id);
             });
     }
 
