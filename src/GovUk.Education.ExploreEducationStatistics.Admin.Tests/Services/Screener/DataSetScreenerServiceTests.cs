@@ -574,7 +574,7 @@ public abstract class DataSetScreenerServiceTests
     public class GetScreenerProgressTests : DataSetScreenerServiceTests
     {
         [Fact]
-        public async Task DataSetsBeingScreened_ProgressUpdatesReturned()
+        public async Task DataSetWithScreenerProgress_ProgressUpdatesReturned()
         {
             // Arrange
             ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
@@ -582,7 +582,6 @@ public abstract class DataSetScreenerServiceTests
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
                 .WithReleaseVersionId(releaseVersion.Id)
-                .WithStatus(DataSetUploadStatus.SCREENING)
                 .ForIndex(
                     0,
                     s =>
@@ -596,6 +595,7 @@ public abstract class DataSetScreenerServiceTests
                             }
                         )
                 )
+                // Add an unrelated DataSetUpload.
                 .ForIndex(
                     1,
                     s =>
@@ -626,32 +626,61 @@ public abstract class DataSetScreenerServiceTests
                 // Act
                 var result = await service.GetScreenerProgress(
                     releaseVersionId: releaseVersion.Id,
+                    dataSetUploadId: dataSetsUndergoingScreening[0].Id,
                     cancellationToken: CancellationToken.None
                 );
 
                 // Assert
-                List<ScreenerProgressWithDataSetUploadIdViewModel> expectedProgressUpdates =
-                [
-                    new()
-                    {
-                        DataSetUploadId = dataSetsUndergoingScreening[0].Id,
-                        PercentageComplete = (int)dataSetsUndergoingScreening[0].ScreenerProgress!.PercentageComplete,
-                        Stage = dataSetsUndergoingScreening[0].ScreenerProgress!.Stage,
-                    },
-                    new()
-                    {
-                        DataSetUploadId = dataSetsUndergoingScreening[1].Id,
-                        PercentageComplete = (int)dataSetsUndergoingScreening[1].ScreenerProgress!.PercentageComplete,
-                        Stage = dataSetsUndergoingScreening[1].ScreenerProgress!.Stage,
-                    },
-                ];
+                var expectedProgressUpdate = new ScreenerProgressViewModel
+                {
+                    PercentageComplete = (int)dataSetsUndergoingScreening[0].ScreenerProgress!.PercentageComplete,
+                    Stage = dataSetsUndergoingScreening[0].ScreenerProgress!.Stage,
+                    Completed = dataSetsUndergoingScreening[0].ScreenerProgress!.Completed,
+                };
 
-                result.AssertRight(expectedProgressUpdates);
+                result.AssertRight(expectedProgressUpdate);
             }
         }
 
         [Fact]
-        public async Task DataSetBeingScreened_DifferentReleaseVersion_ProgressUpdatesNotReturned()
+        public async Task DataSetBeingScreened_NoProgressUpdatesYet_NullProgressUpdateReturned()
+        {
+            // Arrange
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithReleaseVersionId(releaseVersion.Id)
+                // No progress update has yet been fetched for this data set.
+                .WithScreenerProgress(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.ReleaseVersions.AddRangeAsync(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(contentDbContext: context);
+
+                // Act
+                var result = await service.GetScreenerProgress(
+                    releaseVersionId: releaseVersion.Id,
+                    dataSetUploadId: dataSetUndergoingScreening.Id,
+                    cancellationToken: CancellationToken.None
+                );
+
+                // Assert
+                var response = result.AssertRight();
+                Assert.Null(response);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetBeingScreened_ReleaseVersionAndDataSetUploadMismatch_NotFound()
         {
             // Arrange
             ReleaseVersion unrelatedReleaseVersion = _dataFixture.DefaultReleaseVersion();
@@ -660,7 +689,6 @@ public abstract class DataSetScreenerServiceTests
                 .DefaultDataSetUpload()
                 // Assign these DataSetUploads to a different ReleaseVersion.
                 .WithReleaseVersionId(Guid.NewGuid())
-                .WithStatus(DataSetUploadStatus.SCREENING)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -686,32 +714,37 @@ public abstract class DataSetScreenerServiceTests
                 // Act
                 var result = await service.GetScreenerProgress(
                     releaseVersionId: unrelatedReleaseVersion.Id,
+                    dataSetUploadId: dataSetUndergoingScreening.Id,
                     cancellationToken: CancellationToken.None
                 );
 
                 // Assert
-                result.AssertRight([]);
+                result.AssertNotFound();
             }
         }
 
         [Fact]
-        public async Task DataSetBeingScreened_NoProgressUpdatesYet_DefaultProgressUpdateReturned()
+        public async Task DataSetBeingScreened_ReleaseVersionNotFound_NotFound()
         {
             // Arrange
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
-
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithReleaseVersionId(releaseVersion.Id)
-                .WithStatus(DataSetUploadStatus.SCREENING)
-                // No progress update has yet been fetched for this data set.
-                .WithScreenerProgress(null);
+                // Assign these DataSetUploads to a different ReleaseVersion.
+                .WithReleaseVersionId(Guid.NewGuid())
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = false,
+                        Passed = false,
+                        PercentageComplete = 50,
+                        Stage = "validation",
+                    }
+                );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
-                await context.ReleaseVersions.AddRangeAsync(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -721,74 +754,14 @@ public abstract class DataSetScreenerServiceTests
 
                 // Act
                 var result = await service.GetScreenerProgress(
-                    releaseVersionId: releaseVersion.Id,
-                    cancellationToken: CancellationToken.None
-                );
-
-                List<ScreenerProgressWithDataSetUploadIdViewModel> expectedProgressUpdates =
-                [
-                    new()
-                    {
-                        DataSetUploadId = dataSetUndergoingScreening.Id,
-                        PercentageComplete = 0,
-                        Stage = null,
-                    },
-                ];
-
-                // Assert
-                result.AssertRight(expectedProgressUpdates);
-            }
-        }
-
-        [Fact]
-        public async Task DataSetNotCurrentlyUndergoingScreening_NoProgressUpdateReturned()
-        {
-            // Arrange
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
-
-            DataSetUpload dataSetNotUndergoingScreening = _dataFixture
-                .DefaultDataSetUpload()
-                .WithReleaseVersionId(releaseVersion.Id)
-                // Not currently undergoing screening.
-                .WithStatus(DataSetUploadStatus.PENDING_REVIEW);
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.DataSetUploads.AddRangeAsync(dataSetNotUndergoingScreening);
-                await context.ReleaseVersions.AddRangeAsync(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildService(contentDbContext: context);
-
-                // Act
-                var result = await service.GetScreenerProgress(
-                    releaseVersionId: releaseVersion.Id,
+                    releaseVersionId: Guid.NewGuid(), // Non-existent ReleaseVersion id.
+                    dataSetUploadId: dataSetUndergoingScreening.Id,
                     cancellationToken: CancellationToken.None
                 );
 
                 // Assert
-                result.AssertRight([]);
+                result.AssertNotFound();
             }
-        }
-
-        [Fact]
-        public async Task ReleaseVersionDoesNotExist_ReturnsNotFound()
-        {
-            await using var context = InMemoryContentDbContext();
-            var service = BuildService(contentDbContext: context);
-
-            // Act
-            var result = await service.GetScreenerProgress(
-                releaseVersionId: Guid.NewGuid(),
-                cancellationToken: CancellationToken.None
-            );
-
-            // Assert
-            result.AssertNotFound();
         }
     }
 
