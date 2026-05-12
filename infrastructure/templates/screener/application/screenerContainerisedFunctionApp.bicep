@@ -60,6 +60,8 @@ param deployAlerts bool
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+var eesyscreenerLogsFileShareMountPath = '/screener/logs'
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
@@ -85,6 +87,10 @@ resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
 resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
   scope: adminAppService
   name: 'default'
+}
+
+resource eesyscreenerLogsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: resourceNames.screener.screenerLogsStorageAccount
 }
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
@@ -116,7 +122,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
       }
       {
         name: 'LOG_DIR'
-        value: '/tmp'
+        value: eesyscreenerLogsFileShareMountPath
       }
       {
         name: 'DD_CHECKS'
@@ -162,6 +168,13 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     }
     subnetId: outboundVnetSubnet.id
     includeQueueServices: true
+    azureFileShares: [{
+      storageName: resourceNames.screener.screenerLogsStorageAccount
+      storageAccountKey: eesyscreenerLogsStorageAccount.listKeys().keys[0].value
+      storageAccountName: resourceNames.screener.screenerLogsStorageAccount
+      fileShareName: resourceNames.screener.screenerLogsFileShare
+      mountPath: eesyscreenerLogsFileShareMountPath
+    }]
     alerts: deployAlerts
       ? {
           cpuPercentage: true
@@ -179,7 +192,5 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     tagValues: tagValues
   }
 }
-
-
 
 output functionAppUrl string = containerisedFunctionAppModule.outputs.url

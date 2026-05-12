@@ -90,8 +90,19 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
+module screenerStorageModule 'application/screenerStorage.bicep' = {
+  name: 'screenerStorageModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    storageFirewallRules: maintenanceIpRanges
+    tagValues: tagValues
+    deployAlerts: deployAlerts
+  }
+}
+
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
-  name: 'screenerFunctionApp'
+  name: 'screenerFunctionModuleDeploy'
   params: {
     location: location
     functionAppImageName: 'ees-screener-api'
@@ -122,6 +133,9 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     tagValues: tagValues
     deployAlerts: deployAlerts
   }
+  dependsOn: [
+    screenerStorageModule
+  ]
 }
 
 var tagValues = union(resourceTags ?? {}, {
@@ -137,6 +151,8 @@ var resourcePrefix = '${subscription}-ees'
 
 // The resource prefix for anything specific to the Screener API.
 var screenerResourcePrefix = '${subscription}-ees-sapi'
+
+var screenerFunctionAppName = '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
 
 var resourceNames = {
   existingResources: {
@@ -155,8 +171,10 @@ var resourceNames = {
       : '${legacyResourcePrefix}saeescore'
   }
   screener: {
-    screenerFunction: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
+    screenerFunction: screenerFunctionAppName
     screenerFunctionStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}fn'
+    screenerLogsStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}logs'
+    screenerLogsFileShare: '${screenerFunctionAppName}-logs-${abbreviations.fileShare}'
   }
 }
 
