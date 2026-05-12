@@ -129,19 +129,25 @@ def user_checks_dashboard_theme_dropdown_exists():
     return True
 
 
-def trigger_immediate_staging_of_scheduled_release(release_version_id):
-    stage_release_version_response = publisher_functions_client.post(
-        "/api/StageScheduledReleaseVersionsImmediately", {"releaseVersionIds": [release_version_id]}
+def prepare_scheduled_release_versions_now_via_api(release_version_ids: list[str]):
+    response = publisher_functions_client.post(
+        "/api/PrepareScheduledReleaseVersionsNow", {"releaseVersionIds": release_version_ids}
     )
-    assert (
-        stage_release_version_response.status_code < 300
-    ), f"Immediate staging of scheduled release version API request failed with {stage_release_version_response.status_code} and {stage_release_version_response.text}"
+    assert response.status_code < 300, (
+        "Failed to prepare scheduled release versions. "
+        f"ReleaseVersionIds=[{', '.join(release_version_ids)}]. "
+        f"Status code: {response.status_code}. "
+        f"Response body: {response.text}"
+    )
 
 
-def trigger_immediate_publishing_of_scheduled_release(release_version_id):
-    stage_release_version_response = publisher_functions_client.post(
-        "/api/PublishStagedReleaseVersionContentImmediately", {"releaseVersionIds": [release_version_id]}
+def publish_scheduled_release_versions_now_via_api(release_version_ids: list[str]):
+    response = publisher_functions_client.post(
+        "/api/PublishScheduledReleaseVersionsNow", {"releaseVersionIds": release_version_ids}
     )
-    assert (
-        stage_release_version_response.status_code < 300
-    ), f"Immediate publishing of staged release version API request failed with {stage_release_version_response.status_code} and {stage_release_version_response.text}"
+    assert response.status_code < 300, (
+        "Failed to publish scheduled release versions. "
+        f"ReleaseVersionIds=[{', '.join(release_version_ids)}]. "
+        f"Status code: {response.status_code}. "
+        f"Response body: {response.text}"
+    )
