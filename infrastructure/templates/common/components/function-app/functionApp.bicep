@@ -1,8 +1,8 @@
-import { IpRange, FirewallRule, AzureFileShareMount } from '../types.bicep'
-import { abbreviations } from '../../common/abbreviations.bicep'
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
-import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
+import { IpRange, FirewallRule, AzureFileShareMount } from '../../types.bicep'
+import { abbreviations } from '../../abbreviations.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
+import { AppServicePlanSku } from '../../components/app-service-plan/types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -61,7 +61,7 @@ param deployQueueRoleAssignment bool = false
 param instanceMemoryMB int = 2048
 
 @description('The maximum number of instances for the function app.')
-param maximumInstanceCount int = 100
+param maximumInstanceCount int = 10
 
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
 param outboundSubnetId string?
@@ -156,7 +156,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
   name: '${appServicePlanName}ModuleDeploy'
   params: {
     planName: appServicePlanName
@@ -173,7 +173,7 @@ module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
   }
 }
 
-module storageAccountModule 'storage/storageAccount.bicep' = {
+module storageAccountModule '../storage/storageAccount.bicep' = {
   name: 'storageAccountModuleDeploy'
   params: {
     location: location
@@ -194,7 +194,7 @@ module storageAccountModule 'storage/storageAccount.bicep' = {
   }
 }
 
-module fileShareModule '../../common/components/storage/fileShare.bicep' = {
+module fileShareModule '../../components/storage/fileShare.bicep' = {
   name: '${storageAccountName}FileShareModuleDeploy'
   params: {
     storageAccountName: storageAccountModule.outputs.storageAccountName
@@ -311,7 +311,7 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = if
   )
 }
 
-module keyVaultRoleAssignmentModule 'key-vault/keyVaultRoleAssignment.bicep' = {
+module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
     principalIds: [functionApp.identity.principalId]
@@ -320,7 +320,7 @@ module keyVaultRoleAssignmentModule 'key-vault/keyVaultRoleAssignment.bicep' = {
   }
 }
 
-module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
+module storageAccountBlobRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = {
   name: '${storageAccountName}BlobRoleAssignmentModuleDeploy'
   params: {
     principalIds: [functionApp.identity.principalId]
@@ -329,7 +329,7 @@ module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bice
   }
 }
 
-module storageAccountQueueRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = if (deployQueueRoleAssignment) {
+module storageAccountQueueRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = if (deployQueueRoleAssignment) {
   name: '${storageAccountName}QueueRoleAssignmentModuleDeploy'
   params: {
     principalIds: [functionApp.identity.principalId]
@@ -338,7 +338,7 @@ module storageAccountQueueRoleAssignmentModule 'storageAccountRoleAssignment.bic
   }
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
+module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointModuleDeploy'
   params: {
     serviceId: functionApp.id
@@ -350,7 +350,7 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?fun
   }
 }
 
-module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+module healthAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionApp.name
@@ -369,7 +369,7 @@ module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && aler
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
 
-module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
+module unexpectedHttpStatusCodeAlerts '../alerts/staticMetricAlert.bicep' = [
   for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
@@ -390,7 +390,7 @@ module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
 
 var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
 
-module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
+module expectedHttpStatusCodeAlerts '../alerts/dynamicMetricAlert.bicep' = [
   for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
@@ -410,7 +410,7 @@ module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
   }
 ]
 
-module diagnosticSetting 'monitoring/functionAppDiagnosticSetting.bicep' = if (diagnosticSettingEnabled) {
+module diagnosticSetting '../monitoring/functionAppDiagnosticSetting.bicep' = if (diagnosticSettingEnabled) {
   name: '${functionAppName}DiagnosticSettingModuleDeploy'
   params: {
     functionAppName: functionApp.name

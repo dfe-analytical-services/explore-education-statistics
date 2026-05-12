@@ -1,17 +1,17 @@
 import {
   FirewallRule
   IpRange
-} from '../../common/types.bicep'
+} from '../../types.bicep'
 
 import {
   AzureFileShareMount
   EntraIdAuthentication
-} from '../../public-api/types.bicep'
+} from '../../../public-api/types.bicep'
 
-import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
-import { abbreviations } from '../../common/abbreviations.bicep'
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
+import { AppServicePlanSku } from '../../components/app-service-plan/types.bicep'
+import { abbreviations } from '../../abbreviations.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
 param userAssignedManagedIdentityParams {
@@ -165,7 +165,7 @@ var fileServiceAlerts = alerts != null
     }
   : null
 
-module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
     planName: appServicePlanName
@@ -184,7 +184,7 @@ module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
   }
 }
 
-module keyVaultRoleAssignmentModule 'key-vault/keyVaultRoleAssignment.bicep' = {
+module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
     principalIds: userAssignedManagedIdentityParams != null
@@ -195,7 +195,7 @@ module keyVaultRoleAssignmentModule 'key-vault/keyVaultRoleAssignment.bicep' = {
   }
 }
 
-module deploymentStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module deploymentStorageAccountModule '../../components/storage/storageAccount.bicep' = {
   name: '${functionAppName}DeploymentStorageAccountModuleDeploy'
   params: {
     location: location
@@ -215,7 +215,7 @@ module deploymentStorageAccountModule '../../common/components/storage/storageAc
   }
 }
 
-module fileShareModule '../../common/components/storage/fileShare.bicep' = {
+module fileShareModule '../../components/storage/fileShare.bicep' = {
   name: '${functionAppName}FileShareDeploy'
   params: {
     storageAccountName: deploymentStorageAccountName
@@ -228,7 +228,7 @@ module fileShareModule '../../common/components/storage/fileShare.bicep' = {
   ]
 }
 
-module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
+module storageAccountBlobRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = {
   name: '${deploymentStorageAccountName}BlobRoleAssignmentModuleDeploy'
   params: {
     principalIds: userAssignedManagedIdentityParams != null
@@ -239,7 +239,7 @@ module storageAccountBlobRoleAssignmentModule 'storageAccountRoleAssignment.bice
   }
 }
 
-module storageAccountQueueDataContributorRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = if (includeQueueServices) {
+module storageAccountQueueDataContributorRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = if (includeQueueServices) {
   name: '${deploymentStorageAccountName}QueueDataContributorRoleAssignmentModuleDeploy'
   params: {
     principalIds: userAssignedManagedIdentityParams != null
@@ -368,7 +368,7 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
   )
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
+module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id
@@ -380,7 +380,7 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?fun
   }
 }
 
-module azureAuthentication '../../public-api/components/siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
+module azureAuthentication '../../../public-api/components/siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
   name: '${functionAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
@@ -391,7 +391,7 @@ module azureAuthentication '../../public-api/components/siteAzureAuthentication.
   }
 }
 
-module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+module healthAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionApp.name
@@ -410,7 +410,7 @@ module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && aler
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
 
-module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
+module unexpectedHttpStatusCodeAlerts '../alerts/staticMetricAlert.bicep' = [
   for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
@@ -431,7 +431,7 @@ module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
 
 var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
 
-module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
+module expectedHttpStatusCodeAlerts '../alerts/dynamicMetricAlert.bicep' = [
   for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
