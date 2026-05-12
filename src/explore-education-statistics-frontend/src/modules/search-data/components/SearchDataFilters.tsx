@@ -2,6 +2,7 @@ import Button from '@common/components/Button';
 import { FormCheckboxGroup, FormRadioGroup } from '@common/components/form';
 import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
 import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
+import { Theme } from '@common/services/publicationService';
 import { ThemeSummary } from '@common/services/themeService';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
@@ -10,6 +11,7 @@ import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModa
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import ExpandableFilterGroup from '@frontend/modules/search-data/components/ExpandableFilterGroup';
 import styles from '@frontend/modules/search-data/components/SearchDataFilters.module.scss';
+import ThemesAndReleasesFilterGroup from '@frontend/modules/search-data/components/ThemesAndReleasesFilterGroup';
 import { SearchDataFilter } from '@frontend/modules/search-data/utils/searchDataFilters';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import React from 'react';
@@ -32,6 +34,8 @@ interface Props {
   geographicLevelOptions: CheckboxOption[];
   includeDataFilters: boolean;
   latestDataOnly?: boolean;
+  publicationIds?: string[];
+  publicationTree: Theme[];
   releaseTypes?: ReleaseType[];
   releaseTypeOptions: CheckboxOption[];
   sortBy: SortOptionType;
@@ -40,6 +44,7 @@ interface Props {
   themes: ThemeSummary[];
   themeOptions: CheckboxOption[];
   onChange: FilterChangeHandler;
+  onChangeBatch: (updates: Record<string, string[]>) => void;
   onSortChange: (nextSortBy: SortOptionType) => void;
 }
 
@@ -49,6 +54,8 @@ export default function Filters({
   geographicLevelOptions,
   includeDataFilters,
   latestDataOnly,
+  publicationIds,
+  publicationTree,
   releaseTypes,
   releaseTypeOptions,
   sortBy,
@@ -57,24 +64,39 @@ export default function Filters({
   themes,
   themeOptions,
   onChange,
+  onChangeBatch,
   onSortChange,
 }: Props) {
   return (
     <form className={styles.form} id={formId}>
       <h2 className="govuk-heading-m">Filter and sort</h2>
       <ExpandableFilterGroup id={`${formId}-theme-group`} label="Theme">
-        <FormCheckboxGroup
-          id={`${formId}-theme`}
-          legend="Filter by Theme"
-          legendHidden
-          name="themeId"
-          options={themeOptions}
-          small
-          value={themeIds || []}
-          onChange={e => {
-            onChange({ filterType: 'themeId', nextValue: e.target.value });
-          }}
-        />
+        {includeDataFilters ? (
+          <ThemesAndReleasesFilterGroup
+            publicationTree={publicationTree}
+            themeIds={themeIds}
+            publicationIds={publicationIds}
+            onChangeBatch={(nextThemes, nextPubs) => {
+              onChangeBatch({
+                themeId: nextThemes,
+                publicationId: nextPubs,
+              });
+            }}
+          />
+        ) : (
+          <FormCheckboxGroup
+            id={`${formId}-theme`}
+            legend="Filter by Theme"
+            legendHidden
+            name="themeId"
+            options={themeOptions}
+            small
+            value={themeIds || []}
+            onChange={e => {
+              onChange({ filterType: 'themeId', nextValue: e.target.value });
+            }}
+          />
+        )}
         <div className={styles.modalButtonContainer}>
           <ThemesModal themes={themes} />
         </div>

@@ -38,7 +38,7 @@ export default function ExpandableFilterGroup({
 
   return (
     <div
-      className={classNames('govuk-!-margin-bottom-2 dfe-border-bottom', {
+      className={classNames('govuk-!-margin-bottom-1 dfe-border-bottom', {
         [styles.expanded]: open,
       })}
       data-testid={testId}

@@ -24,6 +24,7 @@ export default function createDataSetListRequest(
     dataSetType,
     geographicLevels,
     latestDataOnly,
+    publicationId,
     releaseType,
     search: searchParam,
     sortBy,
@@ -36,6 +37,7 @@ export default function createDataSetListRequest(
     dataSetType,
     geographicLevels,
     latestDataOnly,
+    publicationId,
     releaseType,
     themeId,
   });
@@ -59,7 +61,7 @@ interface SearchFilters {
   geographicLevels?: string[];
   dataSetType: string;
   latestDataOnly?: boolean;
-  releaseId?: string[];
+  publicationId?: string[];
   releaseType?: string[];
   themeId?: string[];
 }
@@ -84,9 +86,9 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
     );
   }
 
-  if (filters.releaseId?.length) {
-    const joined = filters.releaseId.join('|');
-    conditions.push(odata`search.in(releaseId, ${joined}, '|')`);
+  if (filters.publicationId?.length) {
+    const joined = filters.publicationId.join('|');
+    conditions.push(odata`search.in(publicationId, ${joined}, '|')`);
   }
 
   if (filters.latestDataOnly) {
@@ -138,6 +140,7 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
       validGeographicLevels.length > 0 ? validGeographicLevels : undefined,
     latestDataOnly: !query.latestDataOnly || query.latestDataOnly !== 'false',
     page: getFirst(query.page),
+    publicationId: getAsArray(query.publicationId),
     releaseType: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,
     search: getFirst(query.search),
     sortBy:
