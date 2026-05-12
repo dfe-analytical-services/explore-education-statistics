@@ -2,6 +2,13 @@ import client from '@admin/services/utils/service';
 import { PublicationRole } from '../types/PublicationRole';
 import { UserPublicationRoleWithUser } from '../types/userWithRoles';
 
+export interface UserPublicationRoleInvite {
+  roleId: string;
+  role: PublicationRole;
+  userId: string;
+  email: string;
+}
+
 export interface UserPublicationRoleCreateRequest {
   publicationId: string;
   publicationRole: PublicationRole;
@@ -12,14 +19,13 @@ export interface UserDrafterRoleCreateRequest {
   publicationId: string;
 }
 
-export interface UpdatePublicationDraftersRequest {
-  userIds: string[];
-}
-
 export interface PublicationRolesService {
   listPublicationRoles(
     publicationId: string,
   ): Promise<UserPublicationRoleWithUser[]>;
+  listPublicationRoleInvites(
+    publicationId: string,
+  ): Promise<UserPublicationRoleInvite[]>;
   addPublicationRole(
     userId: string,
     userPublicationRole: UserPublicationRoleCreateRequest,
@@ -27,11 +33,8 @@ export interface PublicationRolesService {
   inviteDrafter(
     userDrafterRoleCreateRequest: UserDrafterRoleCreateRequest,
   ): Promise<boolean>;
-  updatePublicationDrafters(
-    publicationId: string,
-    updatePublicationDraftersRequest: UpdatePublicationDraftersRequest,
-  ): Promise<boolean>;
   removeUserPublicationRole(userPublicationRoleId: string): Promise<boolean>;
+  removePublicationDrafter(userPublicationRoleId: string): Promise<boolean>;
 }
 
 const publicationRolesService: PublicationRolesService = {
@@ -39,6 +42,14 @@ const publicationRolesService: PublicationRolesService = {
     publicationId: string,
   ): Promise<UserPublicationRoleWithUser[]> {
     return client.get(`/publications/${publicationId}/publication-roles`);
+  },
+
+  listPublicationRoleInvites(
+    publicationId: string,
+  ): Promise<UserPublicationRoleInvite[]> {
+    return client.get(
+      `/publications/${publicationId}/publication-role-invites`,
+    );
   },
 
   addPublicationRole(
@@ -60,18 +71,14 @@ const publicationRolesService: PublicationRolesService = {
     );
   },
 
-  updatePublicationDrafters(
-    publicationId: string,
-    updatePublicationDraftersRequest: UpdatePublicationDraftersRequest,
-  ): Promise<boolean> {
-    return client.patch(
-      `publications/${publicationId}/update-drafters`,
-      updatePublicationDraftersRequest,
-    );
-  },
-
   removeUserPublicationRole(userPublicationRoleId: string): Promise<boolean> {
     return client.delete(`/users/publication-roles/${userPublicationRoleId}`);
+  },
+
+  removePublicationDrafter(userPublicationRoleId: string): Promise<boolean> {
+    return client.delete(
+      `/users/publication-roles/drafters/${userPublicationRoleId}`,
+    );
   },
 };
 
