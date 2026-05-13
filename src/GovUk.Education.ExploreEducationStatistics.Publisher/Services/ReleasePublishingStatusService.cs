@@ -72,7 +72,7 @@ public class ReleasePublishingStatusService(
         DateTimeOffset referenceDate
     )
     {
-        var scheduledMethodFilter = CreateQueryFilter(status => !status.Immediate);
+        var scheduledMethodFilter = CreateQueryFilter(status => status.Immediate == false);
 
         var overallStageFilter = CreateQueryFilter(status =>
             status.OverallStage == nameof(ReleasePublishingStatusOverallStage.Scheduled)
@@ -104,7 +104,7 @@ public class ReleasePublishingStatusService(
 
     public async Task<IReadOnlyList<ReleasePublishingKey>> GetScheduledReleasesReadyForPublishing()
     {
-        var scheduledMethodFilter = CreateQueryFilter(status => !status.Immediate);
+        var scheduledMethodFilter = CreateQueryFilter(status => status.Immediate == false);
 
         // Release versions ready for scheduled publishing have completed the tasks
         // performed by the StageScheduledReleases function and are in the "Started" stage.
