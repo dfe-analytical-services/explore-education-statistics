@@ -3,6 +3,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
@@ -37,6 +38,7 @@ public class PublicationService(
     IUserService userService,
     IPublicationRepository publicationRepository,
     IReleaseVersionRepository releaseVersionRepository,
+    IPublicationCacheService publicationCacheService,
     IMethodologyService methodologyService,
     IPublicationsTreeService publicationsTreeService,
     IMethodologyCacheService methodologyCacheService,
@@ -244,6 +246,7 @@ public class PublicationService(
 
                     if (slugChanged)
                     {
+                        await publicationCacheService.RemovePublication(previousSlug);
                         await redirectsCacheService.UpdateRedirects();
                     }
 

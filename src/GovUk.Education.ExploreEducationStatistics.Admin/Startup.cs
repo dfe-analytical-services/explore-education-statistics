@@ -454,6 +454,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>();
         services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>();
         services.AddTransient<IThemeService, ThemeService>();
+        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IPublicationService, PublicationService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IMetaService, MetaService>();
