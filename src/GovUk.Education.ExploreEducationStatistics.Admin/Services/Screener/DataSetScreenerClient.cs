@@ -97,7 +97,7 @@ public class DataSetScreenerClient(
         var query = HttpUtility.ParseQueryString(string.Empty);
         dataSetIds.ForEach(dataSetId => query.Add("data_set_id", dataSetId.ToString()));
 
-        var url = $"{httpClient.BaseAddress}/progress?{query}";
+        var url = $"{httpClient.BaseAddress}/progress-and-completion-files?{query}";
         var response = await httpClient.DeleteAsync(url, cancellationToken);
 
         if (!response.IsSuccessStatusCode)

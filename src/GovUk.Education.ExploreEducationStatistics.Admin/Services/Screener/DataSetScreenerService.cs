@@ -89,12 +89,12 @@ public class DataSetScreenerService(
                 result.DataSetId == dataSetToUpdate.Id
             );
 
+            var progressReport = progressUpdateForDataSet?.ProgressReport;
+
             // If a progress response was returned from the Screener API for this
             // data set, apply it.
-            if (progressUpdateForDataSet != null)
+            if (progressReport != null && ScreenerProgressHasChanged(dataSetToUpdate.ScreenerProgress, progressReport))
             {
-                var progressReport = progressUpdateForDataSet.ProgressReport;
-
                 // Only update Screener progress details if some actual progress has been made since the
                 // last time the progress was updated. This helps to identify and clean up any stalled
                 // screening attempts.
@@ -211,22 +211,14 @@ public class DataSetScreenerService(
         CancellationToken cancellationToken
     )
     {
-        // Find all data sets currently undergoing screening.
-        var screeningDataSets = await contentDbContext
-            .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
-            .ToListAsync(cancellationToken: cancellationToken);
+        var dataSetsCompletedScreening = await GetDataSetsThatHaveCompletedScreening(cancellationToken);
 
-        // Find only those whose latest progress reports show as having been completed.
-        var dataSetsFinishedScreening = screeningDataSets
-            .Where(upload => upload.ScreenerProgress is { Completed: true })
-            .ToList();
-
-        if (dataSetsFinishedScreening.Count == 0)
+        if (dataSetsCompletedScreening.Count == 0)
         {
             return [];
         }
 
-        var dataSetIds = dataSetsFinishedScreening.Select(upload => upload.Id).ToList();
+        var dataSetIds = dataSetsCompletedScreening.Select(upload => upload.Id).ToList();
 
         // Get the full report on their completion statuses.
         var completionReports = await dataSetScreenerClient.GetScreenerCompletionReports(
@@ -238,9 +230,15 @@ public class DataSetScreenerService(
         // to be a post-screening status. This way, successful ones will no longer be polled for progress updates,
         // and stalled ones will eventually be cleaned up by MarkDataSetsWithoutProgressAsFailed() if we cannot get
         // a completion report successfully for them within a time limit.
-        var dataSetsToComplete = dataSetsFinishedScreening
+        var dataSetsToComplete = dataSetsCompletedScreening
             .Where(upload => completionReports.Any(report => report.DataSetId == upload.Id))
             .ToList();
+
+        // If we don't have any completion reports for our completed data sets yet, return early.
+        if (dataSetsToComplete.Count == 0)
+        {
+            return [];
+        }
 
         dataSetsToComplete.ForEach(uploadToComplete =>
         {
@@ -255,21 +253,27 @@ public class DataSetScreenerService(
 
         await contentDbContext.SaveChangesAsync(cancellationToken: cancellationToken);
 
-        if (completionReports.Count > 0)
-        {
-            // For all uploads that were successfully marked as having completed screening, call the Screener API to clean
-            // up its progress and completion report files.
-            var dataSetIdsWithSuccessfulCompletionReports = completionReports
-                .Select(report => report.DataSetId)
-                .ToList();
+        // For all uploads that were successfully marked as having completed screening, call the Screener API to clean
+        // up its progress and completion report files.
+        var dataSetIdsWithSuccessfulCompletionReports = dataSetsToComplete.Select(upload => upload.Id).ToList();
 
-            await dataSetScreenerClient.DeleteScreenerProgressAndCompletionFiles(
-                dataSetIds: dataSetIdsWithSuccessfulCompletionReports,
-                cancellationToken: cancellationToken
-            );
-        }
+        await dataSetScreenerClient.DeleteScreenerProgressAndCompletionFiles(
+            dataSetIds: dataSetIdsWithSuccessfulCompletionReports,
+            cancellationToken: cancellationToken
+        );
 
         return [.. dataSetsToComplete.Select(mapper.Map<DataSetUploadViewModel>)];
+    }
+
+    private async Task<List<DataSetUpload>> GetDataSetsThatHaveCompletedScreening(CancellationToken cancellationToken)
+    {
+        // Find all data sets currently undergoing screening.
+        var screeningDataSets = await contentDbContext
+            .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        // Find only those whose latest progress reports show as having been completed.
+        return [.. screeningDataSets.Where(upload => upload.ScreenerProgress is { Completed: true })];
     }
 
     private bool ScreenerProgressHasChanged(

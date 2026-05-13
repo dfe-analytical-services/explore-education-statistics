@@ -1039,7 +1039,7 @@ public abstract class DataSetScreenerServiceTests
                             }
                         )
                 )
-                // The third data set has had a progress update that shows it has not completed, but not successfully.
+                // The third data set has had a progress update that shows it has completed, but not successfully.
                 .ForIndex(
                     2,
                     s =>
@@ -1132,7 +1132,7 @@ public abstract class DataSetScreenerServiceTests
             screenerClient
                 .Setup(s =>
                     s.DeleteScreenerProgressAndCompletionFiles(
-                        new[] { dataSetsUndergoingScreening[2].Id, dataSetsUndergoingScreening[0].Id },
+                        new[] { dataSetsUndergoingScreening[0].Id, dataSetsUndergoingScreening[2].Id },
                         CancellationToken.None
                     )
                 )

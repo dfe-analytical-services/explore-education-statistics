@@ -226,7 +226,7 @@ public class DataSetScreenerClientTests
             Guid[] dataSetIds = [Guid.NewGuid(), Guid.NewGuid()];
 
             _mockHttp
-                .Expect(HttpMethod.Delete, $"{BaseUri.AbsoluteUri}/progress")
+                .Expect(HttpMethod.Delete, $"{BaseUri.AbsoluteUri}/progress-and-completion-files")
                 .WithQueryString($"data_set_id={dataSetIds[0]}&data_set_id={dataSetIds[1]}")
                 .Respond(HttpStatusCode.NoContent);
 
