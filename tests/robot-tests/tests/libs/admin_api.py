@@ -141,7 +141,7 @@ def user_adds_publication_role_to_user_via_api(user_email: str, publication_id: 
 
 
 def user_removes_all_release_and_publication_roles_from_user(user_id: str) -> None:
-    response = admin_client.delete(f"/api/user-management/user/{user_id}/resource-roles/all")
+    response = admin_client.delete(f"/api/users/{user_id}/resource-roles")
     assert (
         response.status_code < 300
     ), f"Removing release role from user API request failed with {response.status_code} and {response.text}"
