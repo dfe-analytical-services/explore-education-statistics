@@ -11,16 +11,43 @@ public class QueueService(
     ILogger<QueueService> logger
 ) : IQueueService
 {
-    public async Task QueuePublishReleaseFilesMessages(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
+    public async Task QueueReleaseFilesForImmediatePublishing(
+        ReleasePublishingKey releasePublishingKey,
+        CancellationToken cancellationToken = default
+    )
     {
         logger.LogInformation(
-            "Queuing files message for release versions: [{ReleaseVersionIds}]",
+            "Queuing files message for immediate publishing for release version: {ReleaseVersionId}",
+            releasePublishingKey.ReleaseVersionId
+        );
+
+        await publisherClient.PublishReleaseFiles(
+            PublishReleaseFilesMessage.ForImmediate(releasePublishingKey),
+            cancellationToken
+        );
+        await UpdateFilesStageAsQueued([releasePublishingKey]);
+    }
+
+    public async Task QueueReleaseFilesForScheduledPublishing(
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
+        CancellationToken cancellationToken = default
+    )
+    {
+        logger.LogInformation(
+            "Queuing files message for scheduled publishing for release versions: [{ReleaseVersionIds}]",
             releasePublishingKeys.ToReleaseVersionIdsString()
         );
 
-        await publisherClient.PublishReleaseFiles(releasePublishingKeys);
+        await publisherClient.PublishReleaseFiles(
+            PublishReleaseFilesMessage.ForScheduled(releasePublishingKeys),
+            cancellationToken
+        );
+        await UpdateFilesStageAsQueued(releasePublishingKeys);
+    }
 
-        foreach (var key in releasePublishingKeys)
+    private async Task UpdateFilesStageAsQueued(IReadOnlyList<ReleasePublishingKey> keys)
+    {
+        foreach (var key in keys)
         {
             await releasePublishingStatusService.UpdateFilesStage(key, ReleasePublishingStatusFilesStage.Queued);
         }

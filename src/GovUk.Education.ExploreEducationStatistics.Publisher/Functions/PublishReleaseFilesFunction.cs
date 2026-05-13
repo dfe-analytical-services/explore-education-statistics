@@ -60,7 +60,11 @@ public class PublishReleaseFilesFunction(
 
         try
         {
-            await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(successfulReleases);
+            if (message.Immediate)
+            {
+                // Continue the 'Immediate' flow by completing the publishing process for the successful release version
+                await publishingCompletionService.CompletePublishing(successfulReleases);
+            }
         }
         catch (Exception e)
         {

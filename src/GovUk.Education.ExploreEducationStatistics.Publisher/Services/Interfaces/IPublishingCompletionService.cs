@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
 public interface IPublishingCompletionService
 {
-    Task CompletePublishingIfAllPriorStagesComplete(
+    Task CompletePublishing(
         IReadOnlyList<ReleasePublishingKey> releaseVersionAndReleaseStatusIds,
         CancellationToken cancellationToken = default
     );
