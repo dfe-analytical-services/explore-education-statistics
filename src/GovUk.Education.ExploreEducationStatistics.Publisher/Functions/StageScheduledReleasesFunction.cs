@@ -140,7 +140,7 @@ public class StageScheduledReleasesFunction(
             );
         }
 
-        await queueService.QueuePublishReleaseFilesMessages(releasePublishingKeys);
+        await queueService.QueueReleaseFilesForScheduledPublishing(releasePublishingKeys);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
