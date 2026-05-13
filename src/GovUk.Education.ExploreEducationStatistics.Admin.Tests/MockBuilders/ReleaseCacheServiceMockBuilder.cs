@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
@@ -11,7 +10,7 @@ public class ReleaseCacheServiceMockBuilder
 
     public IReleaseCacheService Build()
     {
-        _mock.Setup(m => m.RemoveRelease(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(() => Unit.Instance);
+        _mock.Setup(m => m.RemoveRelease(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
         return _mock.Object;
     }
