@@ -409,7 +409,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
         services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
         services.AddTransient<IPublicationsTreeService, PublicationsTreeService>();
-        services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 
         // Content.Model repositories
         services.AddTransient<IFileRepository, FileRepository>();
@@ -445,6 +444,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         }
 
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
+        services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
         services.AddTransient<IReleaseImageService, ReleaseImageService>();
         services.AddTransient<IReleasePermissionService, ReleasePermissionService>();

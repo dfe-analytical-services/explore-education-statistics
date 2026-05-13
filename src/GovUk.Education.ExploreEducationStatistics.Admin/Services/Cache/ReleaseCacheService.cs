@@ -1,11 +1,12 @@
+#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache;
 
 public class ReleaseCacheService(IPublicBlobStorageService publicBlobStorageService) : IReleaseCacheService
 {

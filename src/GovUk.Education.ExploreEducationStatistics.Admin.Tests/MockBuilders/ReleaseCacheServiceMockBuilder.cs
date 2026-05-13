@@ -1,6 +1,6 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
