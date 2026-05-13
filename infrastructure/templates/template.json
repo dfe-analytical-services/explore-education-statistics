@@ -1347,7 +1347,8 @@
     "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
-    "screenerStorageAccountConnectionStringKey": "[concat(parameters('subscription'), parameters('environment'), 'papisa-connectionString",
+    "screenerStorageAccountConnectionStringSecretKey": "[concat(parameters('subscription'), parameters('environment'), 'sapisafn-connection-string')]",
+    "screenerStorageAccountConnectionStringSecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('screenerStorageAccountConnectionStringSecretKey'))]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
     "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
@@ -1993,7 +1994,7 @@
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api')]",
         "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
-        "DataScreener__ScreenerStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables(screenerStorageAccountConnectionStringKey), '2018-02-14').secretUriWithVersion, ')')]",
+        "DataScreener__ScreenerStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('screenerStorageAccountConnectionStringSecret'), '2018-02-14').secretUriWithVersion, ')')]",
         "DataScreener__EnhancedScreenerJourney": false,
         "DataScreener__ScreenerProgressUpdateIntervalSeconds": 5,
         "DataScreener__ScreenerProgressUpdateFailureIntervalMinutes": 1440
