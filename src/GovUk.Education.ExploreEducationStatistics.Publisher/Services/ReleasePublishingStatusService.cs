@@ -72,6 +72,8 @@ public class ReleasePublishingStatusService(
         DateTimeOffset referenceDate
     )
     {
+        var scheduledMethodFilter = CreateQueryFilter(status => !status.Immediate);
+
         var overallStageFilter = CreateQueryFilter(status =>
             status.OverallStage == nameof(ReleasePublishingStatusOverallStage.Scheduled)
         );
@@ -87,7 +89,7 @@ public class ReleasePublishingStatusService(
             _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null),
         };
 
-        var filter = $"{overallStageFilter} and {publishDateFilter}";
+        var filter = string.Join(" and ", scheduledMethodFilter, overallStageFilter, publishDateFilter);
 
         var result = await QueryEntitiesAsTableRowKeys(filter);
 
@@ -102,6 +104,8 @@ public class ReleasePublishingStatusService(
 
     public async Task<IReadOnlyList<ReleasePublishingKey>> GetScheduledReleasesReadyForPublishing()
     {
+        var scheduledMethodFilter = CreateQueryFilter(status => !status.Immediate);
+
         // Release versions ready for scheduled publishing have completed the tasks
         // performed by the StageScheduledReleases function and are in the "Started" stage.
         var overallStageFilter = CreateQueryFilter(status =>
@@ -117,7 +121,13 @@ public class ReleasePublishingStatusService(
             status.PublishingStage == nameof(ReleasePublishingStatusPublishingStage.Scheduled)
         );
 
-        var filter = string.Join(" and ", overallStageFilter, filesStageFilter, publishingFilter);
+        var filter = string.Join(
+            " and ",
+            scheduledMethodFilter,
+            overallStageFilter,
+            filesStageFilter,
+            publishingFilter
+        );
 
         var result = await QueryEntitiesAsTableRowKeys(filter);
 
