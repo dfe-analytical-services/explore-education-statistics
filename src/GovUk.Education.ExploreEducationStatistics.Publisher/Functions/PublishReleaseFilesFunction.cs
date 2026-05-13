@@ -60,7 +60,9 @@ public class PublishReleaseFilesFunction(
 
         try
         {
-            await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(successfulReleases);
+            // Continue the 'Immediate' publication flow by the completing the publishing process for the successful release versions
+            // TODO EES-7134 Add check here to filter those releases by those ready for Immediate publishing
+            await publishingCompletionService.CompletePublishing(successfulReleases);
         }
         catch (Exception e)
         {
