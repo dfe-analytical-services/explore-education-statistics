@@ -6,7 +6,7 @@ Azure Functions project responsible for a number of publishing-related tasks:
 with two publisher flows handling these scenarios respectively. Includes copying of release version files from private to public storage.
 - **Methodology version publishing** - publishes methodology versions alongside their associated release versions as
   part of the release publishing flows. Includes copying of methodology version files from private to public storage.
-- **Methodology file publishing** - Copies methodology version files from private to public storage when a methodology version is approved for immediate
+- **Methodology file publishing** - copies methodology version files from private to public storage when a methodology version is approved for immediate
   public access, independently of a release version being published.
 - **Taxonomy cache refresh** - refreshes the cached publication and methodology 'tree' data (content structure) used by the public site Methodologies, Data Catalogue, and Table Tool pages.
 
