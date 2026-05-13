@@ -208,7 +208,7 @@ Create data block 7 for ${RELEASE_1_NAME}
 
 Add line chart to ${RELEASE_1_NAME}
     # This test may fail intermittently due to StaleElementReferenceException exception.
-    # If it does, run this script from this point on after manually setting suite variable ${ThEME_ID}
+    # If it does, run this script from this point on after manually setting suite variable ${THEME_ID}
     # to the theme id of the newly created `Seed theme - Pupils and schools` theme.
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
