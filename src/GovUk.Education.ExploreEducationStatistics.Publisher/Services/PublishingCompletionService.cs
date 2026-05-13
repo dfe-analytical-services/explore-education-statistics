@@ -20,7 +20,13 @@ public class PublishingCompletionService(
     IEducationInNumbersService educationInNumbersService
 ) : IPublishingCompletionService
 {
-    public async Task CompletePublishingIfAllPriorStagesComplete(
+    /// <summary>
+    /// Sets release versions as publicly accessible and executes all tasks required to complete the publishing process,
+    /// including publishing any methodology versions being published alongside the release versions.
+    /// </summary>
+    /// <param name="releasePublishingKeys">A list containing the release version and release status IDs for the release versions to complete publishing for.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    public async Task CompletePublishing(
         IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
         CancellationToken cancellationToken = default
     )
@@ -37,16 +43,7 @@ public class PublishingCompletionService(
             )
             .ToListAsync(cancellationToken);
 
-        var prePublishingStagesComplete = releaseStatuses
-            .Where(status => status.AllStagesPriorToPublishingComplete())
-            .ToList();
-
-        if (!prePublishingStagesComplete.Any())
-        {
-            return;
-        }
-
-        foreach (var status in prePublishingStagesComplete)
+        foreach (var status in releaseStatuses)
         {
             await releasePublishingStatusService.UpdatePublishingStage(
                 status.AsTableRowKey(),
@@ -54,7 +51,7 @@ public class PublishingCompletionService(
             );
         }
 
-        var releaseVersionIdsToUpdate = prePublishingStagesComplete.Select(status => status.ReleaseVersionId).ToArray();
+        var releaseVersionIdsToUpdate = releaseStatuses.Select(status => status.ReleaseVersionId).ToArray();
         foreach (var releaseVersionId in releaseVersionIdsToUpdate)
         {
             await releaseService.CompletePublishing(releaseVersionId, DateTimeOffset.UtcNow);
@@ -98,7 +95,7 @@ public class PublishingCompletionService(
 
         await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
 
-        foreach (var status in prePublishingStagesComplete)
+        foreach (var status in releaseStatuses)
         {
             await releasePublishingStatusService.UpdatePublishingStage(
                 status.AsTableRowKey(),

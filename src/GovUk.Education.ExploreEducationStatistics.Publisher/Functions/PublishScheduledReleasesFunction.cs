@@ -32,7 +32,7 @@ public class PublishScheduledReleasesFunction(
         var releasesReadyForPublishing = await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
         // Complete publishing of these release versions
-        await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(releasesReadyForPublishing);
+        await publishingCompletionService.CompletePublishing(releasesReadyForPublishing);
 
         logger.LogInformation(
             "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
@@ -75,7 +75,7 @@ public class PublishScheduledReleasesFunction(
                 : releasesReadyForPublishing;
 
         // Complete publishing of these release versions
-        await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(selectedReleasesToPublish);
+        await publishingCompletionService.CompletePublishing(selectedReleasesToPublish);
 
         logger.LogInformation(
             "{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",

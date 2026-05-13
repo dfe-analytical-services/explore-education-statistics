@@ -40,7 +40,7 @@ public abstract class ReleasePublishingStatusServiceTests
                 _ => throw new ArgumentOutOfRangeException(nameof(dateComparison), dateComparison, null),
             };
             var expectedFilter =
-                $"OverallStage eq 'Scheduled' and Publish {expectedDateOperator} datetime'2025-01-01T12:00:00Z'";
+                $"Immediate eq false and OverallStage eq 'Scheduled' and Publish {expectedDateOperator} datetime'2025-01-01T12:00:00Z'";
 
             var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
 
@@ -113,7 +113,7 @@ public abstract class ReleasePublishingStatusServiceTests
         {
             // Arrange
             const string expectedFilter =
-                "OverallStage eq 'Started' and FilesStage eq 'Complete' and PublishingStage eq 'Scheduled'";
+                "Immediate eq false and OverallStage eq 'Started' and FilesStage eq 'Complete' and PublishingStage eq 'Scheduled'";
 
             var publisherTableStorageService = new Mock<IPublisherTableStorageService>(MockBehavior.Strict);
 
