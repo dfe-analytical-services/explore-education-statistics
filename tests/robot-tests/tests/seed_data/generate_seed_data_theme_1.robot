@@ -69,7 +69,7 @@ Create ${RELEASE_1_NAME} release
     ...    ${PUBLICATION_ID}
     ...    ${PUPIL_ABSENCE_RELEASE_TIME}
     ...    ${PUPIL_ABSENCE_RELEASE_YEAR}
-    ...    OfficialStatistics
+    ...    type=OfficialStatistics
     ...    summary_text_block=Read national statistical summaries, view charts and tables and download data files.
 
     user navigates to draft release page from dashboard
@@ -207,6 +207,9 @@ Create data block 7 for ${RELEASE_1_NAME}
     ...    ${EMPTY}
 
 Add line chart to ${RELEASE_1_NAME}
+    # This test may fail intermittently due to StaleElementReferenceException exception.
+    # If it does, run this script from this point on after manually setting suite variable ${ThEME_ID}
+    # to the theme id of the newly created `Seed theme - Pupils and schools` theme.
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -232,7 +235,7 @@ Add map chart to ${RELEASE_1_NAME}
     user selects all data sets for chart
     user clicks link    Boundary levels
     user waits until h3 is visible    Boundary levels
-    user chooses select option    name:boundaryLevel    Local Authority Districts (December 2021) UK BUC
+    user chooses select option    name:boundaryLevel    Local Authority Districts UK BUC 2023/12
     user saves chart configuration
 
 Add release content to ${RELEASE_1_NAME}
@@ -535,7 +538,7 @@ Create ${RELEASE_2_NAME} release
     ...    ${PUBLICATION_ID}
     ...    ${EXCLUSIONS_PUBLICATION_RELEASE_TIME}
     ...    ${EXCLUSIONS_PUBLICATION_RELEASE_YEAR}
-    ...    OfficialStatistics
+    ...    type=OfficialStatistics
     ...    summary_text_block=Read national statistical summaries, view charts and tables and download data files.
 
     user navigates to draft release page from dashboard
@@ -644,6 +647,8 @@ Create data block 6 for ${RELEASE_2_NAME}
     ...    ${EMPTY}
 
 Add line chart 1 to ${RELEASE_2_NAME}
+    # This test may fail intermittently due to StaleElementReferenceException exception.
+    # If it does, run this script from this point on and it should complete on the second try.
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible

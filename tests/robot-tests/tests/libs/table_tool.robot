@@ -113,7 +113,7 @@ user creates data block
     user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
 
     # Select locations.
-    @{location_details_sections}=    Get WebElements    //*[starts-with(@data-testid, 'Expand Details Section')]
+    @{location_details_sections}=    Get WebElements    //*[starts-with(@data-testid, 'filter-accordion-button')]
     FOR    ${location_details_section}    IN    @{location_details_sections}
         user clicks element    ${location_details_section}
     END
