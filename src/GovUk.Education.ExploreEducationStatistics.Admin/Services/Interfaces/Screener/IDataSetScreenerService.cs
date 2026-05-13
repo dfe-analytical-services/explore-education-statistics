@@ -45,4 +45,10 @@ public interface IDataSetScreenerService
         Guid releaseVersionId,
         CancellationToken cancellationToken
     );
+
+    /// <summary>
+    /// This method will find any data sets that have received a progress update that is flagged as "completed" and
+    /// complete the screening process from both the Admin and Screener API sides.
+    /// </summary>
+    Task<List<DataSetUploadViewModel>> CompleteDataSetScreeningForFinishedDataSets(CancellationToken cancellationToken);
 }

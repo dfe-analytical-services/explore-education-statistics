@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Screener;
@@ -47,7 +48,8 @@ public class DataSetScreenerServicePermissionsTests
             contentDbContext: contentDbContext,
             timeProvider: TimeProvider.System,
             mapper: MapperUtils.AdminMapper(),
-            options: new DataScreenerOptions().ToOptionsWrapper()
+            options: new DataScreenerOptions().ToOptionsWrapper(),
+            logger: Mock.Of<ILogger<DataSetScreenerService>>()
         );
     }
 }

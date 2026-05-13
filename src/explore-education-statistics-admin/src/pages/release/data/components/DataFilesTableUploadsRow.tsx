@@ -65,7 +65,7 @@ export default function DataFilesTableUploadRow({
     hasFailures;
 
   const importUnavailable = !Object.values(warningAcknowledgements).every(
-    acknowledgement => acknowledgement === true,
+    acknowledgement => acknowledgement,
   );
 
   useEffect(() => {

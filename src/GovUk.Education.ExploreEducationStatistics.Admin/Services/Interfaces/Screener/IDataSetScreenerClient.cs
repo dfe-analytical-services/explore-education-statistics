@@ -16,4 +16,11 @@ public interface IDataSetScreenerClient
         IList<Guid> dataSetIds,
         CancellationToken cancellationToken
     );
+
+    Task<List<DataSetScreenerCompletionReportResponse>> GetScreenerCompletionReports(
+        IList<Guid> dataSetIds,
+        CancellationToken cancellationToken
+    );
+
+    Task DeleteScreenerProgressAndCompletionFiles(IList<Guid> dataSetIds, CancellationToken cancellationToken);
 }
