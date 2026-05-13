@@ -60,8 +60,11 @@ param deployQueueRoleAssignment bool = false
 @description('Set the amount of memory allocated to each instance of the function app in MB.')
 param instanceMemoryMB int = 2048
 
-@description('The maximum number of instances for the function app.')
-param maximumInstanceCount int = 10
+@description('The minimum number of instances for the function app.')
+param minimumInstanceCount int = 1
+
+@description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
+param maximumInstanceCount int = 0
 
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
 param outboundSubnetId string?
@@ -268,6 +271,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         supportCredentials: false
       }
       ftpsState: 'FtpsOnly'
+      minimumElasticInstanceCount: minimumInstanceCount
       functionAppScaleLimit: maximumInstanceCount
       healthCheckPath: healthCheckPath
       minTlsVersion: '1.3'

@@ -26,7 +26,7 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
 }
 
 var storageAccountConfig = {
-  kind: 'FileStorage'
+  kind: 'StorageV2'
   sku: 'Standard_LRS'
   fileShare: {
     quotaGbs: 1
@@ -34,8 +34,8 @@ var storageAccountConfig = {
   }
 }
 
-module storageStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
-  name: 'storageStorageAccountDeploy'
+module screenerLogsStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+  name: 'screenerLogsStorageAccountDeploy'
   params: {
     location: location
     storageAccountName: resourceNames.screener.screenerLogsStorageAccount
@@ -56,13 +56,13 @@ module storageStorageAccountModule '../../common/components/storage/storageAccou
   }
 }
 
-module storageFileShareModule '../../common/components/storage/fileShare.bicep' = {
-  name: 'storageFileShareDeploy'
+module screenerLogsFileShareModule '../../common/components/storage/fileShare.bicep' = {
+  name: 'screenerLogsFileShareDeploy'
   params: {
     fileShareName: resourceNames.screener.screenerLogsFileShare
     fileShareQuotaGbs: storageAccountConfig.fileShare.quotaGbs
-    storageAccountName: storageStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: storageAccountConfig.fileShare.accessTier
+    storageAccountName: screenerLogsStorageAccountModule.outputs.storageAccountName
     alerts: deployAlerts ? {
       availability: true
       latency: true
@@ -73,5 +73,5 @@ module storageFileShareModule '../../common/components/storage/fileShare.bicep' 
   }
 }
 
-output storageAccountName string = storageStorageAccountModule.outputs.storageAccountName
+output storageAccountName string = screenerLogsStorageAccountModule.outputs.storageAccountName
 output fileShareName string = resourceNames.screener.screenerLogsFileShare

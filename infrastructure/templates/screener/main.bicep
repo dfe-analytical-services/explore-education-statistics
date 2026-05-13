@@ -40,6 +40,12 @@ param logScreeningResults bool = false
 @description('Number of concurrent threads that can be used by Plumber to process background jobs.')
 param concurrentRWorkers int = 4
 
+@description('The minimum number of instances for the function app.')
+param minimumInstanceCount int = 1
+
+@description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
+param maximumInstanceCount int = 0
+
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
@@ -113,6 +119,8 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     includeDataDictionaryChecks: includeDataDictionaryChecks
     logScreeningResults: logScreeningResults
     concurrentRWorkers: concurrentRWorkers
+    minimumInstanceCount: minimumInstanceCount
+    maximumInstanceCount: maximumInstanceCount
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists

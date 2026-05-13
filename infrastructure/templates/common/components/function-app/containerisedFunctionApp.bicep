@@ -72,6 +72,12 @@ param applicationInsightsConnectionString string
 @description('Specifies the SKU for the Function App hosting plan')
 param sku AppServicePlanSku
 
+@description('The minimum number of instances for the function app.')
+param minimumInstanceCount int = 1
+
+@description('The maximum number of instances for the function app.')
+param maximumInstanceCount int = 10
+
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
@@ -292,6 +298,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       http20Enabled: true
       minTlsVersion: '1.3'
       preWarmedInstanceCount: preWarmedInstanceCount
+      minimumElasticInstanceCount: minimumInstanceCount
+      functionAppScaleLimit: maximumInstanceCount
       appSettings: union(
         [
           {

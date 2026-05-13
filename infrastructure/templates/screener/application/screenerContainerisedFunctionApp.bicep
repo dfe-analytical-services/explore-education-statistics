@@ -54,6 +54,12 @@ param logScreeningResults bool
 @description('Number of concurrent threads that can be used by Plumber to process background jobs.')
 param concurrentRWorkers int
 
+@description('The minimum number of instances for the function app.')
+param minimumInstanceCount int
+
+@description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
+param maximumInstanceCount int
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
 
@@ -110,6 +116,8 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
     location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     healthCheckPath: '/api/healthcheck'
+    minimumInstanceCount: minimumInstanceCount
+    maximumInstanceCount: maximumInstanceCount
     appServicePlanName: resourceNames.screener.screenerFunction
     appSettings: [
       {
