@@ -15,7 +15,7 @@ ${PUPIL_ABSENCE_RELEASE_TIME}                   AY
 ${PUPIL_ABSENCE_RELEASE_YEAR}                   2016
 ${PUPIL_ABSENCE_RELEASE_NAME}                   Academic year 2016/17
 
-${EXCLUSIONS_PUBLICATION_TITLE}                 ${PUBLICATION_TITLE_PREFIX}Permanent and fixed-period exclusions in England
+${EXCLUSIONS_PUBLICATION_TITLE}                 ${PUBLICATION_TITLE_PREFIX}Permanent & fixed-period exclusions in England
 ${EXCLUSIONS_PUBLICATION_RELEASE_TIME}          AY
 ${EXCLUSIONS_PUBLICATION_RELEASE_YEAR}          2016
 ${EXCLUSIONS_PUBLICATION_RELEASE_NAME}          Academic year 2016/17

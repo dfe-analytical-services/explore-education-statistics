@@ -15,7 +15,7 @@ Go to Table Tool page
 Go to permalink
     user navigates to    %{PUBLIC_URL}/data-tables/permalink/30999037-fcd4-409f-9ff4-d3680da7402d
     user waits until h1 is visible
-    ...    'Total days missed due to fixed period exclusions' from 'Permanent and fixed-period exclusions in England'
+    ...    'Total days missed due to fixed period exclusions' from 'Permanent & fixed-period exclusions in England'
 
 Validate breadcrumbs
     user checks breadcrumb count should be    4
@@ -23,7 +23,7 @@ Validate breadcrumbs
     user checks nth breadcrumb contains    2    Data tables
     user checks nth breadcrumb contains    3    Permanent link
     user checks nth breadcrumb contains    4
-    ...    'Total days missed due to fixed period exclusions' from 'Permanent and fixed-period exclusions in England'
+    ...    'Total days missed due to fixed period exclusions' from 'Permanent & fixed-period exclusions in England'
 
 Validate miscellaneous
     user checks summary list contains    Created    7 April 2020

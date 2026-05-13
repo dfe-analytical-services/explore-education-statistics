@@ -65,11 +65,12 @@ Add legacy releases to ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015
 
 Create ${RELEASE_1_NAME} release
-    user creates test release via api
+    user creates test release with legacy summary text block via api
     ...    ${PUBLICATION_ID}
     ...    ${PUPIL_ABSENCE_RELEASE_TIME}
     ...    ${PUPIL_ABSENCE_RELEASE_YEAR}
-    ...    OfficialStatistics
+    ...    type=OfficialStatistics
+    ...    summary_text_block=Read national statistical summaries, view charts and tables and download data files.
 
     user navigates to draft release page from dashboard
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
@@ -206,6 +207,9 @@ Create data block 7 for ${RELEASE_1_NAME}
     ...    ${EMPTY}
 
 Add line chart to ${RELEASE_1_NAME}
+    # This test may fail intermittently due to StaleElementReferenceException exception.
+    # If it does, run this script from this point on after manually setting suite variable ${THEME_ID}
+    # to the theme id of the newly created `Seed theme - Pupils and schools` theme.
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -231,18 +235,12 @@ Add map chart to ${RELEASE_1_NAME}
     user selects all data sets for chart
     user clicks link    Boundary levels
     user waits until h3 is visible    Boundary levels
-    user chooses select option    name:boundaryLevel    Local Authority Districts (December 2021) UK BUC
+    user chooses select option    name:boundaryLevel    Local Authority Districts UK BUC 2023/12
     user saves chart configuration
 
 Add release content to ${RELEASE_1_NAME}
     user clicks link    Content
     user waits until page finishes loading
-
-Add release summary to ${RELEASE_1_NAME}
-    # TODO: WIP for EES-7124 - this needs to be done via an API as we no longer should add 'background/summary' text blocks to publications
-    # user adds summary text block
-    # user adds content to summary text block
-    # ...    Read national statistical summaries, view charts and tables and download data files.
 
 Add key statistics to ${RELEASE_1_NAME}
     user adds key statistic from data block
@@ -536,11 +534,12 @@ Add legacy releases to ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016
 
 Create ${RELEASE_2_NAME} release
-    user creates test release via api
+    user creates test release with legacy summary text block via api
     ...    ${PUBLICATION_ID}
     ...    ${EXCLUSIONS_PUBLICATION_RELEASE_TIME}
     ...    ${EXCLUSIONS_PUBLICATION_RELEASE_YEAR}
-    ...    OfficialStatistics
+    ...    type=OfficialStatistics
+    ...    summary_text_block=Read national statistical summaries, view charts and tables and download data files.
 
     user navigates to draft release page from dashboard
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
@@ -648,6 +647,8 @@ Create data block 6 for ${RELEASE_2_NAME}
     ...    ${EMPTY}
 
 Add line chart 1 to ${RELEASE_2_NAME}
+    # This test may fail intermittently due to StaleElementReferenceException exception.
+    # If it does, run this script from this point on and it should complete on the second try.
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -692,12 +693,6 @@ Add line chart 3 to ${RELEASE_2_NAME}
 Add release content to ${RELEASE_2_NAME}
     user clicks link    Content
     user waits until page finishes loading
-
-Add release summary to ${RELEASE_2_NAME}
-    # TODO: WIP for EES-7124 - this needs to be done via an API as we no longer should add 'background/summary' text blocks to publications
-    # user adds summary text block
-    # user adds content to summary text block
-    # ...    Read national statistical summaries, view charts and tables and download data files.
 
 Add key statistics to ${RELEASE_2_NAME}
     user adds key statistic from data block
