@@ -23,14 +23,14 @@ ${DATABLOCK_NAME}=                  Dates data block name
 ${SUBJECT_NAME}=                    Dates test subject
 ${ANCILLARY_FILE_NAME}=             Test ancillary file 1
 ${ANCILLARY_FILE_NAME_2}=           Test ancillary file 2
-${legacy_summary_text_box_body}=    Test summary text for ${PUBLICATION_NAME}
+${LEGACY_SUMMARY_TEXT_BLOCK}=       Test summary text for ${PUBLICATION_NAME}
 
 
 *** Test Cases ***
 Create new publication for "UI tests theme" theme
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release with legacy summary text block via api    ${PUBLICATION_ID}    FY    3000
-    ...    label=${RELEASE_LABEL}    summary_text_block=${legacy_summary_text_box_body}
+    ...    label=${RELEASE_LABEL}    summary_text_block=${LEGACY_SUMMARY_TEXT_BLOCK}
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -133,7 +133,7 @@ Navigate to 'Content' page
     user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
 
 Verify legacy summary text block content is correct
-    user waits until element contains    id:releaseSummary    ${legacy_summary_text_box_body}    %{WAIT_SMALL}
+    user waits until element contains    id:releaseSummary    ${LEGACY_SUMMARY_TEXT_BLOCK}    %{WAIT_SMALL}
 
 Add free text key stat
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
@@ -296,7 +296,7 @@ Verify release page meta
     ...    ${PUBLICATION_NAME} summary
 
 Verify release page background information
-    user waits until element contains    id:background-information    ${legacy_summary_text_box_body}
+    user waits until element contains    id:background-information    ${LEGACY_SUMMARY_TEXT_BLOCK}
     ...    %{WAIT_SMALL}
 
 Verify release URL
@@ -635,10 +635,10 @@ Navigate to 'Content' page for amendment
     user waits until page contains button    Add a warning text block
 
 Verify legacy summary text block content is correct for amendment
-    user waits until element contains    id:releaseSummary    ${legacy_summary_text_box_body}    %{WAIT_SMALL}
+    user waits until element contains    id:releaseSummary    ${LEGACY_SUMMARY_TEXT_BLOCK}    %{WAIT_SMALL}
 
 Update legacy summary text block for amendment
-    user adds content to autosaving text block    id:releaseSummary    Amended ${legacy_summary_text_box_body}
+    user adds content to autosaving text block    id:releaseSummary    Amended ${LEGACY_SUMMARY_TEXT_BLOCK}
 
 Update free text key stat
     user updates free text key stat    1    Updated title    New stat    Updated trend
@@ -750,7 +750,7 @@ Navigate to amendment release page
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
 
 Verify amended background information
-    user waits until element contains    id:background-information    Amended ${legacy_summary_text_box_body}
+    user waits until element contains    id:background-information    Amended ${LEGACY_SUMMARY_TEXT_BLOCK}
     ...    %{WAIT_SMALL}
 
 Verify amendment is displayed as the latest release and the 'All releases in this series' page only displays the latest release
