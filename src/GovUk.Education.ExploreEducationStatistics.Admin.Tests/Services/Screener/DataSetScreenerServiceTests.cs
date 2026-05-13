@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -1315,7 +1316,8 @@ public abstract class DataSetScreenerServiceTests
             {
                 ScreenerProgressUpdateIntervalSeconds = ScreenerProgressUpdateIntervalSeconds,
                 ScreenerProgressUpdateFailureIntervalMinutes = ScreenerProgressUpdateFailureIntervalMinutes,
-            }.ToOptionsWrapper()
+            }.ToOptionsWrapper(),
+            logger: Mock.Of<ILogger<DataSetScreenerService>>()
         );
     }
 }

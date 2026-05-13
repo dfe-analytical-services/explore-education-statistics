@@ -27,7 +27,8 @@ public class DataSetScreenerService(
     ContentDbContext contentDbContext,
     TimeProvider timeProvider,
     IMapper mapper,
-    IOptions<DataScreenerOptions> options
+    IOptions<DataScreenerOptions> options,
+    ILogger<DataSetScreenerService> logger
 ) : IDataSetScreenerService
 {
     public const string StartScreeningQueue = "start-screening";
@@ -80,6 +81,21 @@ public class DataSetScreenerService(
             dataSetIdsUndergoingScreening,
             cancellationToken
         );
+
+        var dataSetIdsWithoutProgressUpdates = dataSetIdsUndergoingScreening
+            .Except(progressResults.Select(result => result.DataSetId))
+            .ToList();
+
+        if (dataSetIdsWithoutProgressUpdates.Count > 0)
+        {
+            logger.LogWarning(
+                message: "Expected to receive {ExpectedUpdatesCount} progress updates but received "
+                    + "{ActualUpdatesCount}. Missing progress updates for data sets {DataSetIds}.",
+                dataSetIdsUndergoingScreening.Count,
+                progressResults.Count,
+                string.Join(", ", dataSetIdsWithoutProgressUpdates)
+            );
+        }
 
         // For each data set that required a progress update, attempt to update its progress
         // based on the responses received from the Screener API.
@@ -233,6 +249,19 @@ public class DataSetScreenerService(
         var dataSetsToComplete = dataSetsCompletedScreening
             .Where(upload => completionReports.Any(report => report.DataSetId == upload.Id))
             .ToList();
+
+        var dataSetsWithoutReports = dataSetsCompletedScreening.Except(dataSetsToComplete).ToList();
+
+        if (dataSetsWithoutReports.Count > 0)
+        {
+            logger.LogWarning(
+                message: "Expected to receive {ExpectedReportCount} completion reports but received "
+                    + "{ActualReportCount}. Missing reports for data sets {DataSetIds}.",
+                dataSetsCompletedScreening.Count,
+                completionReports.Count,
+                string.Join(", ", dataSetsWithoutReports.Select(upload => upload.Id))
+            );
+        }
 
         // If we don't have any completion reports for our completed data sets yet, return early.
         if (dataSetsToComplete.Count == 0)
