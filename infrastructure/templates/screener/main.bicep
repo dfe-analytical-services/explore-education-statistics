@@ -96,8 +96,8 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module screenerStorageModule 'application/screenerStorage.bicep' = {
-  name: 'screenerStorageModuleDeploy'
+module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
+  name: 'screenerLogsStorageModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -142,7 +142,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     deployAlerts: deployAlerts
   }
   dependsOn: [
-    screenerStorageModule
+    screenerLogsStorageModule
   ]
 }
 
