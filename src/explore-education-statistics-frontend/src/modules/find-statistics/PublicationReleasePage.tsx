@@ -143,6 +143,20 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
         };
       }
 
+      // We have some links which point that have no release slug and instead point to sub sections within the 'explore' tab.
+      // For example, `find-statistics/apprenticeships-and-traineeships/explore#supporting-files-section`
+      // as opposed to `find-statistics/apprenticeships-and-traineeships/2022-23/explore#supporting-files-section`
+      // this logic works around these instances so that links which don't contain a release slug continue to work when clicked on
+      const isLegacyPath = releaseSlug === 'explore';
+      if (isLegacyPath) {
+        return {
+          redirect: {
+            destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}/${releaseSlug}`, //
+            permanent: true,
+          },
+        };
+      }
+
       const releaseVersionSummary = await queryClient.fetchQuery(
         publicationQueries.getReleaseVersionSummary(
           publicationSlug,
