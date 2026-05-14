@@ -24,9 +24,11 @@ public class DataSetScreenerServicePermissionsTests
     public async Task GetScreenerProgress()
     {
         ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        DataSetUpload upload = _dataFixture.DefaultDataSetUpload().WithReleaseVersionId(releaseVersion.Id);
 
         await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
         contentDbContext.ReleaseVersions.Add(releaseVersion);
+        contentDbContext.DataSetUploads.Add(upload);
         await contentDbContext.SaveChangesAsync();
 
         await PermissionTestUtils
@@ -35,7 +37,7 @@ public class DataSetScreenerServicePermissionsTests
             .AssertForbidden(userService =>
             {
                 var service = BuildService(userService: userService.Object, contentDbContext: contentDbContext);
-                return service.GetScreenerProgress(releaseVersion.Id, CancellationToken.None);
+                return service.GetScreenerProgress(releaseVersion.Id, upload.Id, CancellationToken.None);
             });
     }
 

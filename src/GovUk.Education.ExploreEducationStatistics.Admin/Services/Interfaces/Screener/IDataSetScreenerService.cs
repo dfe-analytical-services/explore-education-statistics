@@ -39,10 +39,11 @@ public interface IDataSetScreenerService
     Task<List<DataSetUploadViewModel>> MarkDataSetsWithoutProgressAsFailed(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Get the progress of all data sets undergoing screening for a given ReleaseVersion.
+    /// Get the progress of a data set undergoing screening for a given ReleaseVersion and dataSetUploadId.
     /// </summary>
-    Task<Either<ActionResult, List<ScreenerProgressWithDataSetUploadIdViewModel>>> GetScreenerProgress(
+    Task<Either<ActionResult, ScreenerProgressViewModel?>> GetScreenerProgress(
         Guid releaseVersionId,
+        Guid dataSetUploadId,
         CancellationToken cancellationToken
     );
 

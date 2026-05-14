@@ -195,32 +195,32 @@ public class DataSetScreenerService(
         return [.. screeningDataSetsWithoutRecentProgressUpdates.Select(mapper.Map<DataSetUploadViewModel>)];
     }
 
-    public Task<Either<ActionResult, List<ScreenerProgressWithDataSetUploadIdViewModel>>> GetScreenerProgress(
+    public Task<Either<ActionResult, ScreenerProgressViewModel?>> GetScreenerProgress(
         Guid releaseVersionId,
+        Guid dataSetUploadId,
         CancellationToken cancellationToken
     )
     {
         return contentDbContext
             .ReleaseVersions.SingleOrNotFound(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
-            .OnSuccess(async () =>
-            {
-                var dataSetsUndergoingScreening = await contentDbContext
-                    .DataSetUploads.Where(upload =>
-                        upload.ReleaseVersionId == releaseVersionId && upload.Status == DataSetUploadStatus.SCREENING
-                    )
-                    .ToListAsync(cancellationToken: cancellationToken);
-
-                return dataSetsUndergoingScreening
-                    .Select(upload => new ScreenerProgressWithDataSetUploadIdViewModel
+            .OnSuccess(() =>
+                contentDbContext.DataSetUploads.SingleOrNotFoundAsync(
+                    upload => upload.Id == dataSetUploadId && upload.ReleaseVersionId == releaseVersionId,
+                    cancellationToken: cancellationToken
+                )
+            )
+            .OnSuccess(upload =>
+                upload.ScreenerProgress != null
+                    ? new ScreenerProgressViewModel
                     {
-                        DataSetUploadId = upload.Id,
                         PercentageComplete = (int)
                             Math.Round(upload.ScreenerProgress?.PercentageComplete ?? 0, MidpointRounding.ToZero),
                         Stage = upload.ScreenerProgress?.Stage,
-                    })
-                    .ToList();
-            });
+                        Completed = upload.ScreenerProgress?.Completed ?? false,
+                    }
+                    : null
+            );
     }
 
     public async Task<List<DataSetUploadViewModel>> CompleteDataSetScreeningForFinishedDataSets(

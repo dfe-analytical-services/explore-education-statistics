@@ -652,27 +652,29 @@ public class ReleaseVersionsControllerUnitTests
     {
         // Arrange
         var releaseVersionId = Guid.NewGuid();
+        var uploadId = Guid.NewGuid();
 
-        List<ScreenerProgressWithDataSetUploadIdViewModel> response =
-        [
-            new()
-            {
-                DataSetUploadId = Guid.NewGuid(),
-                PercentageComplete = 100,
-                Stage = "completed",
-            },
-        ];
+        var response = new ScreenerProgressViewModel
+        {
+            PercentageComplete = 100,
+            Stage = "completed",
+            Completed = true,
+        };
 
         var dataSetScreenerService = new Mock<IDataSetScreenerService>(Strict);
 
         dataSetScreenerService
-            .Setup(s => s.GetScreenerProgress(releaseVersionId, CancellationToken.None))
+            .Setup(s => s.GetScreenerProgress(releaseVersionId, uploadId, CancellationToken.None))
             .ReturnsAsync(response);
 
         var controller = BuildController(dataSetScreenerService: dataSetScreenerService.Object);
 
         // Act
-        var result = await controller.GetDataSetUploadScreenerProgress(releaseVersionId, CancellationToken.None);
+        var result = await controller.GetDataSetUploadScreenerProgress(
+            releaseVersionId,
+            uploadId,
+            CancellationToken.None
+        );
 
         // Assert
         VerifyAllMocks(dataSetScreenerService);
