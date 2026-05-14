@@ -147,8 +147,9 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
       // For example, `find-statistics/apprenticeships-and-traineeships/explore#supporting-files-section`
       // as opposed to `find-statistics/apprenticeships-and-traineeships/2022-23/explore#supporting-files-section`
       // this logic works around these instances so that links which don't contain a release slug continue to work when clicked on
-      const isLegacyPath = releaseSlug === 'explore';
-      if (isLegacyPath) {
+      const linkMissingReleaseSlugAndContainsTabName =
+        releaseSlug === 'explore';
+      if (linkMissingReleaseSlugAndContainsTabName) {
         return {
           redirect: {
             destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}/${releaseSlug}`, //
