@@ -12,10 +12,10 @@ public class ReleaseCacheService(IPublicBlobStorageService publicBlobStorageServ
     {
         await publicBlobStorageService.DeleteBlobs(
             containerName: BlobContainers.PublicContent,
-            directoryPath: FileStoragePathUtils.PublicContentReleaseParentPath(
+            directoryPath: $"{FileStoragePathUtils.PublicContentReleaseParentPath(
                 publicationSlug: publicationSlug,
                 releaseSlug: releaseSlug
-            )
+            )}/"
         );
     }
 }
