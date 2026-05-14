@@ -11,7 +11,16 @@ public class PublishMethodologyFilesFunction(
     IPublishingService publishingService
 )
 {
-    [Function("PublishMethodologyFiles")]
+    /// <summary>
+    /// Azure function that copies methodology version files from private to public storage accounts.
+    /// </summary>
+    /// <remarks>
+    /// Triggered via a message queued by the Admin application when a methodology version is approved for immediate
+    /// public access, independently of a release version being published.
+    /// This differs from the standard immediate and scheduled publication flows when a methodology version is published
+    /// alongside a release version, where methodology version files are copied as part of the release version's publishing process.
+    /// </remarks>
+    [Function(nameof(PublishMethodologyFiles))]
     public async Task PublishMethodologyFiles(
         [QueueTrigger(PublishMethodologyFilesQueue)] PublishMethodologyFilesMessage message,
         FunctionContext context

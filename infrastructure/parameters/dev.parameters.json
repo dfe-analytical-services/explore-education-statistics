@@ -29,10 +29,10 @@
     "slackAlertsChannel": {
       "value": "C067Z1K68UD"
     },
-    "stageScheduledReleasesFunctionCronSchedule": {
+    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 0 * * * *"
     },
-    "publishScheduledReleasesFunctionCronSchedule": {
+    "publishScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 30 * * * *"
     },
     "preReleaseMinutesBeforeStart": {
@@ -119,7 +119,10 @@
     "dataFactoryConcurrency": {
       "value": 10
     },
-    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+    "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
+      "value": true
+    },
+    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
       "value": true
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {

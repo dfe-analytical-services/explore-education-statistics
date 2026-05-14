@@ -154,9 +154,9 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             typeof(NotifyChangeFunction),
             typeof(PublishMethodologyFilesFunction),
             typeof(PublishReleaseFilesFunction),
-            typeof(PublishScheduledReleasesFunction),
+            typeof(PublishScheduledReleaseVersionsFunctions),
             typeof(PublishTaxonomyFunction),
-            typeof(StageScheduledReleasesFunction),
+            typeof(PrepareScheduledReleaseVersionsFunctions),
         ];
     }
 }

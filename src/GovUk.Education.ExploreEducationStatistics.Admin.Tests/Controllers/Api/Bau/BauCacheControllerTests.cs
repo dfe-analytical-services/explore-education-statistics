@@ -142,9 +142,6 @@ public class BauCacheControllerTests
         Assert.DoesNotMatch(regex, "publications/publication-2/something");
         Assert.DoesNotMatch(regex, "publications/publication-2/releases/something");
         Assert.DoesNotMatch(regex, "publications/publication-2/releases/release-1/something");
-        Assert.DoesNotMatch(regex, "staging/publications/publication-1/something");
-        Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/something");
-        Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/release-1/something");
     }
 
     [Fact]
@@ -171,9 +168,6 @@ public class BauCacheControllerTests
         Assert.Matches(regex, "publications/publication-1/something");
         Assert.Matches(regex, "publications/publication-1/releases/something");
         Assert.Matches(regex, "publications/publication-1/releases/release-1/something");
-        Assert.DoesNotMatch(regex, "staging/publications/publication-1/something");
-        Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/something");
-        Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/release-1/something");
     }
 
     [Fact]
