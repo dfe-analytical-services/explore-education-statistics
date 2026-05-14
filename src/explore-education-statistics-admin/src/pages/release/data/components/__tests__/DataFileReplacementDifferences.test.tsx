@@ -1,4 +1,6 @@
-import { IndicatorsMapping } from '@admin/services/dataReplacementService';
+import dataReplacementService, {
+  IndicatorsMapping,
+} from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import DataFileReplacementDifferences from '../DataFileReplacementDifferences';
@@ -79,7 +81,7 @@ describe('DataFileReplacementDifferences', () => {
         reloadPlan={jest.fn}
         fileId="fileId"
         releaseVersionId="releaseVersionId"
-        mapping={{ indicators: dummyIndicatorsMappings }}
+        plan={{ indicators: dummyIndicatorsMappings }}
       />,
     );
 
@@ -143,19 +145,13 @@ describe('DataFileReplacementDifferences', () => {
     );
     expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent('not present');
 
-    expect(
-      within(enrolmentsAgainRow).getByText('not present'),
-    ).toBeInTheDocument();
-
     await user.click(
       within(enrolmentsAgainRow).getByRole('button', {
         name: 'Map item Enrolments_Again',
       }),
     );
 
-    waitFor(() => {
-      expect(screen.getAllByRole('dialog')).toHaveLength(1);
-    });
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
 
     const modal = screen.getByRole('dialog');
     const radioOptions = within(modal).getAllByRole('radio');
@@ -204,9 +200,7 @@ describe('DataFileReplacementDifferences', () => {
     expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
       'Enrolments_Again',
     );
-    expect(
-      within(enrolmentsAgainRow).getByText('not present'),
-    ).toBeInTheDocument();
+    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent('not present');
 
     const noMappingButton = within(enrolmentsAgainRow).getByRole('button', {
       name: 'No mapping for Enrolments_Again',
@@ -217,9 +211,9 @@ describe('DataFileReplacementDifferences', () => {
 
     waitFor(async () => {
       expect(noMappingButton).not.toBeInTheDocument();
-      /*       expect(
-        releaseDataFileService.updateDataFileIndicatorsMapping,
-      ).toHaveBeenCalled(); */
+      expect(
+        dataReplacementService.updatePlanIndicatorMappings,
+      ).toHaveBeenCalled();
     });
 
     expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(

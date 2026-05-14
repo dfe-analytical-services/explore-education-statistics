@@ -123,7 +123,6 @@ export type UpdateMappingPayload = {
   sourceKey: string;
   candidateKey?: string;
 };
-export type UpdateMappingPayloadMultiple = UpdateMappingPayload[];
 
 interface MappingsPlan<TSource> {
   candidates: Dictionary<TSource>;
@@ -138,7 +137,7 @@ interface IndicatorSource {
 
 export type IndicatorCandidate = IndicatorSource;
 
-export type SourceItem = IndicatorSource;
+export type SourceItem = IndicatorSource /* | LocationSource | FilterSource */;
 
 export type IndicatorMapping = Mapping<IndicatorSource>;
 export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;

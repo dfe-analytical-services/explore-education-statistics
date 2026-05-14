@@ -87,7 +87,7 @@ const DataFileReplacementPlan = ({
   const onMappingUpdate = useCallback(() => {
     debouncedRefetchPlan();
     isFetchingSoonToggle.on();
-  }, [debouncedRefetchPlan]);
+  }, [debouncedRefetchPlan, isFetchingSoonToggle]);
 
   if (error) {
     return (
@@ -227,28 +227,28 @@ function Plan({
   } = useMemo(() => {
     return {
       hasInvalidDataBlocks:
-        plan?.dataBlocks.some(block => !block.valid) ?? false,
+        plan.dataBlocks.some(block => !block.valid) ?? false,
       hasInvalidFootnotes:
-        plan?.footnotes.some(footnote => !footnote.valid) ?? false,
-      hasDataSetVersionPlan: !!plan?.apiDataSetVersionPlan,
+        plan.footnotes.some(footnote => !footnote.valid) ?? false,
+      hasDataSetVersionPlan: !!plan.apiDataSetVersionPlan,
       hasIncompleteLocationMapping:
-        !plan?.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
+        !plan.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
       hasIncompleteFilterMapping:
-        !plan?.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
+        !plan.apiDataSetVersionPlan?.mappingStatus?.filtersComplete,
       hasIncompleteIndicatorMapping:
-        !plan?.apiDataSetVersionPlan?.mappingStatus?.indicatorsComplete,
+        !plan.apiDataSetVersionPlan?.mappingStatus?.indicatorsComplete,
       hasMajorLocationMapping:
-        !!plan?.apiDataSetVersionPlan?.mappingStatus?.locationsHaveMajorChange,
+        !!plan.apiDataSetVersionPlan?.mappingStatus?.locationsHaveMajorChange,
       hasMajorFilterMapping:
-        !!plan?.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
+        !!plan.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
       hasMajorIndicatorMapping:
-        !!plan?.apiDataSetVersionPlan?.mappingStatus?.indicatorsHaveMajorChange,
-      isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
-      isPatch: isPatchVersion(plan?.apiDataSetVersionPlan?.version),
+        !!plan.apiDataSetVersionPlan?.mappingStatus?.indicatorsHaveMajorChange,
+      isNotReadyToPublish: !plan.apiDataSetVersionPlan?.readyToPublish,
+      isPatch: isPatchVersion(plan.apiDataSetVersionPlan?.version),
     };
   }, [plan]);
 
-  const dataSetId = plan?.apiDataSetVersionPlan?.dataSetId;
+  const dataSetId = plan.apiDataSetVersionPlan?.dataSetId;
 
   const releaseRouteParams = useMemo<ReleaseDataSetRouteParams | undefined>(
     () =>
@@ -332,15 +332,14 @@ function Plan({
         </>
       )}
 
-      {!hasInvalidDataBlocks && !hasInvalidFootnotes ? null : (
-        <DataFileReplacementDifferences
-          releaseVersionId={releaseVersionId}
-          fileId={plan.originalSubjectId}
-          replacementFileId={plan.replacementSubjectId}
-          mapping={plan.mapping}
-          reloadPlan={onMappingUpdate}
-        />
-      )}
+      <DataFileReplacementDifferences
+        releaseVersionId={releaseVersionId}
+        fileId={plan.originalSubjectId}
+        replacementFileId={plan.replacementSubjectId}
+        plan={plan}
+        reloadPlan={onMappingUpdate}
+      />
+
       <div className="dfe-position--relative ">
         <LoadingSpinner loading={isFetchingPlan} overlay />
         <h3 className="govuk-heading-m">
@@ -444,12 +443,16 @@ function Plan({
                             term={indicatorGroup.label}
                           >
                             <ul className="govuk-list">
-                              {indicatorGroup.indicators.map(indicator => (
-                                <li key={indicator.id}>
-                                  {indicator.label}
-                                  {!indicator.valid && notPresentTag}
-                                </li>
-                              ))}
+                              {indicatorGroup.indicators.map(indicator => {
+                                return (
+                                  <li key={indicator.id}>
+                                    {indicator.label}
+                                    {!indicator.valid
+                                      ? notPresentTag
+                                      : ` (mapped)`}
+                                  </li>
+                                );
+                              })}
                             </ul>
                           </SummaryListItem>
                         ),
