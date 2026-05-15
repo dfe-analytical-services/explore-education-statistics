@@ -29,7 +29,7 @@ public class KeyStatisticService(
         KeyStatisticDataBlockCreateRequest request
     ) =>
         await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
                 persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
@@ -74,7 +74,7 @@ public class KeyStatisticService(
         KeyStatisticTextCreateRequest request
     ) =>
         await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -107,7 +107,7 @@ public class KeyStatisticService(
         KeyStatisticDataBlockUpdateRequest request
     ) =>
         await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
                 await persistenceHelper.CheckEntityExists<KeyStatisticDataBlock>(
@@ -135,7 +135,7 @@ public class KeyStatisticService(
         KeyStatisticTextUpdateRequest request
     ) =>
         await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
                 await persistenceHelper.CheckEntityExists<KeyStatisticText>(
@@ -161,7 +161,7 @@ public class KeyStatisticService(
 
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid keyStatisticId) =>
         await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
                 await persistenceHelper.CheckEntityExists<KeyStatistic>(query =>
@@ -181,7 +181,7 @@ public class KeyStatisticService(
         List<Guid> newOrder
     ) =>
         await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess<ActionResult, ReleaseVersion, List<KeyStatisticViewModel>>(async release =>
             {

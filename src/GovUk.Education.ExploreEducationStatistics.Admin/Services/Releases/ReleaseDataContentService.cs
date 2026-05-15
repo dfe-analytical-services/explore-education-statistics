@@ -38,6 +38,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
     ) =>
         contentDbContext
             .ReleaseVersions.AsNoTracking()
+            .Include(rv => rv.Release)
             .Include(rv => rv.Content.Where(cs => cs.Type == ContentSectionType.RelatedDashboards))
                 .ThenInclude(cs => cs.Content)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken);

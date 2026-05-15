@@ -21,7 +21,7 @@ Create publication and release and ensure that the invitee is not already regist
     user creates test release via api    ${publication_id}    AY    2000
     delete test user    %{PENDING_INVITE_USER_EMAIL}
 
-Invite the user as an Analyst with publication and release roles
+Invite the user as an Analyst with publication and pre-release roles
     user clicks link    Platform administration
     user waits until h1 is visible    Platform administration
     user clicks link    Invite new users
@@ -31,12 +31,10 @@ Invite the user as an Analyst with publication and release roles
     user enters text into element    name:userEmail    %{PENDING_INVITE_USER_EMAIL}
 
     user chooses select option    name:releaseId    ${RELEASE_NAME}
-    user chooses select option    name:releaseRole    Approver
-    user clicks button    Add release role
+    user clicks button    Add pre-release role
 
-    user checks table body has x rows    1    testid:release-role-table
-    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:release-role-table
-    user checks element contains    ${ROW}    Approver
+    user checks table body has x rows    1    testid:pre-release-role-table
+    user gets table row    ${RELEASE_NAME}    testid:pre-release-role-table
 
     user chooses select option    name:publicationId    ${PUBLICATION_NAME}
     user chooses select option    name:publicationRole    Approver

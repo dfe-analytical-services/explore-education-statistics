@@ -34,10 +34,9 @@ Create publication and releases
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
 
-    user gives analyst publication owner access
+    user gives analyst publication drafter access
     ...    ${PUBLICATION_NAME}
 
-    user gives release access to analyst
+    user gives pre-release access to analyst
     ...    ${PUBLICATION_NAME}
     ...    Academic year 2025/26
-    ...    Approver

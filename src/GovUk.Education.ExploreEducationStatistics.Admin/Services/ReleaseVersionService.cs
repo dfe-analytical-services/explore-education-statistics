@@ -354,7 +354,7 @@ public class ReleaseVersionService(
     )
     {
         return persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(mapper.Map<ReleasePublicationStatusViewModel>);
     }
@@ -404,10 +404,8 @@ public class ReleaseVersionService(
         CancellationToken cancellationToken = default
     ) =>
         await context
-            .ReleaseVersions.SingleOrNotFoundAsync(
-                rv => rv.Id == releaseVersionId,
-                cancellationToken: cancellationToken
-            )
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanUpdateReleaseVersion)
             .OnSuccessVoid(async rv =>
             {
@@ -581,7 +579,8 @@ public class ReleaseVersionService(
     )
     {
         return await context
-            .ReleaseVersions.FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccessCombineWith(releaseFile =>
@@ -662,7 +661,8 @@ public class ReleaseVersionService(
     public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
     {
         return await context
-            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
@@ -724,7 +724,7 @@ public class ReleaseVersionService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
             {
