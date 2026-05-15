@@ -27,13 +27,13 @@ Create Publication as bau1
     user waits until page contains link    Add external methodology
     user waits until page contains link    Adopt an existing methodology
 
-Assign publication owner permissions to analyst1
-    user gives analyst publication owner access    ${PUBLICATION_NAME}
+Assign publication drafter permissions to analyst1
+    user gives analyst publication drafter access    ${PUBLICATION_NAME}
 
 Switch to analyst1
     user changes to analyst1
 
-Create a methodology as publication owner
+Create a methodology as publication drafter
     user clicks link    ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 

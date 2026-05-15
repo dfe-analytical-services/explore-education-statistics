@@ -119,7 +119,8 @@ public class PermissionsController(
     public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseVersionId)
     {
         return await contentDbContext
-            .ReleaseVersions.SingleOrNotFound(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFound(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewPreReleaseSummary)
             .OnSuccess(releaseVersion =>
                 preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTimeOffset.UtcNow)

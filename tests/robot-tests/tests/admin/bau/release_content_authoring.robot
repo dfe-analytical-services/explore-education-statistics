@@ -41,8 +41,8 @@ Create a data block
     ...    ${DATABLOCK_NAME}
     ...    Data Block 1 title
 
-Give analyst1 publication owner permissions to work on release
-    user gives analyst publication owner access    ${PUBLICATION_NAME}
+Give analyst1 publication drafter permissions to work on release
+    user gives analyst publication drafter access    ${PUBLICATION_NAME}
 
 Switch to analyst1 to work on release content blocks
     user signs in as analyst1

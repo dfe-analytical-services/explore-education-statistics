@@ -21,10 +21,8 @@ public class ReleaseNoteService(ContentDbContext contentDbContext, IUserService 
         CancellationToken cancellationToken = default
     ) =>
         await contentDbContext
-            .ReleaseVersions.SingleOrNotFoundAsync(
-                rv => rv.Id == releaseVersionId,
-                cancellationToken: cancellationToken
-            )
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -50,7 +48,8 @@ public class ReleaseNoteService(ContentDbContext contentDbContext, IUserService 
         CancellationToken cancellationToken = default
     ) =>
         await contentDbContext
-            .ReleaseVersions.Include(rv => rv.Updates)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .Include(rv => rv.Updates)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
@@ -70,7 +69,8 @@ public class ReleaseNoteService(ContentDbContext contentDbContext, IUserService 
         CancellationToken cancellationToken = default
     ) =>
         await contentDbContext
-            .ReleaseVersions.Include(rv => rv.Updates)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .Include(rv => rv.Updates)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>

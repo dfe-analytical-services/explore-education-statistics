@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    Publication release approver %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Publication approver %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
@@ -26,26 +26,25 @@ Create new publication and release for "UI tests theme" theme
 Check that no publication roles are listed yet on the Team access page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
-    user waits until page contains    There are no publication owners or approvers.
+    user waits until page contains    There are no approvers, or pending approver invites, for this publication.
+    user waits until page contains    There are no drafters, or pending drafter invites, for this publication.
 
 Assign publication approver permissions to analyst1
     user adds publication role to user via api
     ...    EES-test.ANALYST1@education.gov.uk
     ...    ${PUBLICATION_ID}
-    ...    Allower
+    ...    Approver
 
 Sign in as analyst1 and check that the Team access page now contains the Publication Approver details
     user signs in as analyst1
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
-    user waits until page contains    There are no publication owners.
-    user checks table column heading contains    1    1    Name    testid:publicationRoles
-    user checks table column heading contains    1    2    Email    testid:publicationRoles
-    user checks table column heading contains    1    3    Publication role    testid:publicationRoles
-    user checks table body has x rows    1    testid:publicationRoles
-    user checks table cell contains    1    1    Analyst1 User1    testid:publicationRoles
-    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationRoles
-    user checks table cell contains    1    3    Approver    testid:publicationRoles
+    user waits until page contains    There are no drafters, or pending drafter invites, for this publication.
+    user checks table column heading contains    1    1    Name    testid:publicationApproverRoles
+    user checks table column heading contains    1    2    Email    testid:publicationApproverRoles
+    user checks table body has x rows    1    testid:publicationApproverRoles
+    user checks table cell contains    1    1    Analyst1 User1    testid:publicationApproverRoles
+    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationApproverRoles
 
 Navigate to the "Release summary" page for the new release
     user signs in as analyst1

@@ -59,7 +59,7 @@ public class EmbedBlockService : IEmbedBlockService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
                 _persistenceHelper.CheckEntityExists<ContentSection>(
@@ -111,7 +111,7 @@ public class EmbedBlockService : IEmbedBlockService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
                 _persistenceHelper.CheckEntityExists<EmbedBlockLink>(
@@ -143,7 +143,7 @@ public class EmbedBlockService : IEmbedBlockService
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid contentBlockId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccessDo(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccessVoid(async releaseVersion =>
             {

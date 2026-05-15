@@ -95,7 +95,7 @@ public class ReleaseFileService : IReleaseFileService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(async releaseVersion =>
                 await _userService.CheckCanUpdateReleaseVersion(releaseVersion, ignoreCheck: forceDelete)
             )
@@ -143,7 +143,7 @@ public class ReleaseFileService : IReleaseFileService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -160,7 +160,7 @@ public class ReleaseFileService : IReleaseFileService
     public async Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseVersionId, Guid fileId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(() => _releaseFileRepository.FindOrNotFound(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccess(releaseFile => releaseFile.ToFileInfo());
@@ -173,7 +173,7 @@ public class ReleaseFileService : IReleaseFileService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(_ => CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccess(file =>
@@ -277,7 +277,7 @@ public class ReleaseFileService : IReleaseFileService
     )
     {
         return _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
                 _persistenceHelper.CheckEntityExists<ReleaseFile>(q =>
@@ -306,7 +306,7 @@ public class ReleaseFileService : IReleaseFileService
     public async Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseVersionId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -326,7 +326,7 @@ public class ReleaseFileService : IReleaseFileService
     )
     {
         return _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(upload.File, Ancillary))
             .OnSuccess(async () =>
@@ -364,7 +364,7 @@ public class ReleaseFileService : IReleaseFileService
     )
     {
         return _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
                 _persistenceHelper.CheckEntityExists<ReleaseFile>(query =>
@@ -444,7 +444,7 @@ public class ReleaseFileService : IReleaseFileService
     )
     {
         return _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Chart))
             .OnSuccess(async () =>

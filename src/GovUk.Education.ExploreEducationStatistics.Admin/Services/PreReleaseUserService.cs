@@ -99,7 +99,7 @@ public class PreReleaseUserService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccessDo(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
             .OnSuccess<ActionResult, ReleaseVersion, PreReleaseUserInvitePlan>(async _ =>
             {
@@ -198,7 +198,7 @@ public class PreReleaseUserService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
             .OnSuccessCombineWith(_ => GetPreReleaseUsersInvitePlan(releaseVersionId, request))
             .OnSuccess(async releaseVersionAndPlan =>
@@ -341,6 +341,7 @@ public class PreReleaseUserService(
                     .WhereForUser(user.Id)
                     .WhereForReleaseVersion(releaseVersionId)
                     .Include(uprr => uprr.ReleaseVersion)
+                        .ThenInclude(rv => rv.Release)
                     .SingleOrNotFoundAsync()
             );
 
@@ -351,6 +352,7 @@ public class PreReleaseUserService(
             .Query(ResourceRoleFilter.All)
             .Where(uprr => uprr.Id == userPreReleaseRoleId)
             .Include(uprr => uprr.ReleaseVersion)
+                .ThenInclude(rv => rv.Release)
             .SingleOrNotFoundAsync();
 
     private async Task<Either<ActionResult, User>> FindUserByEmail(string email) =>
