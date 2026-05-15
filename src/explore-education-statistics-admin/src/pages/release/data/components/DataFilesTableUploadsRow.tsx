@@ -19,8 +19,8 @@ import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
 import styles from './DataFilesTable.module.scss';
 import {
-  getDataSetUploadStatusColour,
-  getDataSetUploadStatusLabel,
+  getDataSetUploadScreeningStatusColour,
+  getDataSetUploadScreeningStatusLabel,
 } from './ImporterStatus';
 
 interface Props {
@@ -151,8 +151,10 @@ export default function DataFilesTableUploadRow({
         {dataSetUpload.dataFileSize}
       </td>
       <td data-testid="Status">
-        <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
-          {getDataSetUploadStatusLabel(dataSetUpload.status)}
+        <Tag
+          colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}
+        >
+          {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
         </Tag>
       </td>
       <td data-testid="Actions">

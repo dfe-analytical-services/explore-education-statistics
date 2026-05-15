@@ -121,7 +121,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Type, m => m.MapFrom(dataSetVersion => dataSetVersion.VersionType));
 
         CreateMap<DataSetUpload, DataSetUploadViewModel>()
-            .ForMember(dest => dest.Status, m => m.MapFrom(upload => GetDataSetUploadStatus(upload)))
+            .ForMember(dest => dest.Status, m => m.MapFrom(upload => GetDataSetUploadScreeningStatus(upload)))
             .ForMember(
                 dest => dest.PublicApiCompatible,
                 m => m.MapFrom(upload => upload.ScreenerResult != null && upload.ScreenerResult.PublicApiCompatible)
@@ -150,28 +150,28 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(d => d.DataSetId, m => m.MapFrom(upload => upload.Id));
     }
 
-    private static string GetDataSetUploadStatus(DataSetUpload dataSetUpload)
+    private static string GetDataSetUploadScreeningStatus(DataSetUpload dataSetUpload)
     {
-        if (dataSetUpload.Status == DataSetUploadStatus.SCREENING)
+        if (dataSetUpload.ScreeningStatus == DataSetUploadScreeningStatus.Screening)
         {
-            return nameof(DataSetUploadStatus.SCREENING);
+            return nameof(DataSetUploadScreeningStatus.Screening);
         }
 
         var screenerResult = dataSetUpload.ScreenerResult;
 
         if (screenerResult is null)
         {
-            return nameof(DataSetUploadStatus.SCREENER_ERROR);
+            return nameof(DataSetUploadScreeningStatus.ScreenerError);
         }
 
         if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
-            return nameof(DataSetUploadStatus.PENDING_REVIEW);
+            return nameof(DataSetUploadScreeningStatus.PendingReview);
         }
 
         return !screenerResult.Passed
-            ? nameof(DataSetUploadStatus.FAILED_SCREENING)
-            : nameof(DataSetUploadStatus.PENDING_IMPORT);
+            ? nameof(DataSetUploadScreeningStatus.FailedScreening)
+            : nameof(DataSetUploadScreeningStatus.PendingImport);
     }
 
     private void CreateContentBlockMap()

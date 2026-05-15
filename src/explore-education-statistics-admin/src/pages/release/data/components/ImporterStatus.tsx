@@ -1,7 +1,7 @@
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
-  DataSetUploadStatus,
+  DataSetUploadScreeningStatus,
   ImportStatusCode,
   ScreenerTestResult,
 } from '@admin/services/releaseDataFileService';
@@ -14,41 +14,37 @@ import useInterval from '@common/hooks/useInterval';
 import useMounted from '@common/hooks/useMounted';
 import React, { useCallback, useEffect, useState } from 'react';
 
-export const getDataSetUploadStatusLabel = (
-  statusCode: DataSetUploadStatus,
+export const getDataSetUploadScreeningStatusLabel = (
+  statusCode: DataSetUploadScreeningStatus,
 ): string | undefined => {
   switch (statusCode) {
-    case 'UPLOADING':
-      return 'Uploading';
-    case 'SCREENING':
+    case 'Screening':
       return 'Screening';
-    case 'PENDING_REVIEW':
+    case 'PendingReview':
       return 'Pending review';
-    case 'PENDING_IMPORT':
+    case 'PendingImport':
       return 'Pending import';
-    case 'FAILED_SCREENING':
+    case 'FailedScreening':
       return 'Failed screening';
-    case 'SCREENER_ERROR':
+    case 'ScreenerError':
       return 'Screener error';
     default:
       return undefined;
   }
 };
 
-export const getDataSetUploadStatusColour = (
-  statusCode: DataSetUploadStatus,
+export const getDataSetUploadScreeningStatusColour = (
+  statusCode: DataSetUploadScreeningStatus,
 ): TagProps['colour'] => {
   switch (statusCode) {
-    case 'UPLOADING':
-      return 'turquoise';
-    case 'PENDING_REVIEW':
+    case 'PendingReview':
       return 'orange';
-    case 'SCREENING':
+    case 'Screening':
       return 'blue';
-    case 'PENDING_IMPORT':
+    case 'PendingImport':
       return 'light-blue';
-    case 'FAILED_SCREENING':
-    case 'SCREENER_ERROR':
+    case 'FailedScreening':
+    case 'ScreenerError':
       return 'red';
     default:
       return undefined;

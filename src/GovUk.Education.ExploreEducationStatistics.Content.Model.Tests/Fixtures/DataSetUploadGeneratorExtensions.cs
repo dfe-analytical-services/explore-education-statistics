@@ -22,7 +22,7 @@ public static class DataSetUploadGeneratorExtensions
             .SetDefault(d => d.MetaFileId)
             .SetDefault(d => d.MetaFileName)
             .SetDefault(d => d.MetaFileSizeInBytes)
-            .SetDefault(d => d.Status)
+            .SetDefault(d => d.ScreeningStatus)
             .SetDefault(d => d.Created)
             .SetDefault(d => d.UploadedBy);
 
@@ -70,7 +70,7 @@ public static class DataSetUploadGeneratorExtensions
 
     public static Generator<DataSetUpload> WithStatus(
         this Generator<DataSetUpload> generator,
-        DataSetUploadStatus status
+        DataSetUploadScreeningStatus status
     ) => generator.ForInstance(s => s.SetStatus(status));
 
     public static Generator<DataSetUpload> WithScreenerResult(
@@ -149,8 +149,8 @@ public static class DataSetUploadGeneratorExtensions
 
     public static InstanceSetters<DataSetUpload> SetStatus(
         this InstanceSetters<DataSetUpload> setters,
-        DataSetUploadStatus status
-    ) => setters.Set(d => d.Status, status);
+        DataSetUploadScreeningStatus status
+    ) => setters.Set(d => d.ScreeningStatus, status);
 
     public static InstanceSetters<DataSetUpload> SetScreenerResult(
         this InstanceSetters<DataSetUpload> setters,

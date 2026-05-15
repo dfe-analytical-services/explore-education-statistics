@@ -111,7 +111,7 @@ public abstract class DataSetScreenerServiceTests
             // Arrange
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 .ForIndex(
                     0,
                     s =>
@@ -260,7 +260,7 @@ public abstract class DataSetScreenerServiceTests
             // Arrange
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -324,7 +324,7 @@ public abstract class DataSetScreenerServiceTests
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
                 // Not currently being screened.
-                .WithStatus(DataSetUploadStatus.PENDING_REVIEW);
+                .WithStatus(DataSetUploadScreeningStatus.PendingReview);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -367,7 +367,7 @@ public abstract class DataSetScreenerServiceTests
             // Arrange
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -489,7 +489,7 @@ public abstract class DataSetScreenerServiceTests
             // Arrange
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -776,7 +776,7 @@ public abstract class DataSetScreenerServiceTests
 
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 .ForIndex(
                     0,
                     s =>
@@ -839,7 +839,7 @@ public abstract class DataSetScreenerServiceTests
 
                 results.ForEach(result =>
                 {
-                    Assert.Equal(nameof(DataSetUploadStatus.FAILED_SCREENING), result.Status);
+                    Assert.Equal(nameof(DataSetUploadScreeningStatus.FailedScreening), result.Status);
                     Assert.NotNull(result.ScreenerResult);
                     Assert.Equal("Failed to retrieve progress updates", result.ScreenerResult.OverallResult);
                     Assert.Empty(result.ScreenerResult.TestResults);
@@ -853,7 +853,7 @@ public abstract class DataSetScreenerServiceTests
 
                 updatedUploads.ForEach(upload =>
                 {
-                    Assert.Equal(DataSetUploadStatus.SCREENER_ERROR, upload.Status);
+                    Assert.Equal(DataSetUploadScreeningStatus.ScreenerError, upload.ScreeningStatus);
                     Assert.NotNull(upload.ScreenerResult);
                     Assert.Equal("Failed to retrieve progress updates", upload.ScreenerResult.OverallResult);
                     Assert.False(upload.ScreenerResult.Passed);
@@ -872,7 +872,7 @@ public abstract class DataSetScreenerServiceTests
 
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -915,7 +915,7 @@ public abstract class DataSetScreenerServiceTests
                 var upload = context.DataSetUploads.Single();
 
                 // Expect it to be in its original state.
-                Assert.Equal(DataSetUploadStatus.SCREENING, upload.Status);
+                Assert.Equal(DataSetUploadScreeningStatus.Screening, upload.ScreeningStatus);
 
                 // Expect it not to have had any ScreenerResult applied.
                 Assert.Null(upload.ScreenerResult);
@@ -930,7 +930,7 @@ public abstract class DataSetScreenerServiceTests
 
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.PENDING_REVIEW)
+                .WithStatus(DataSetUploadScreeningStatus.PendingReview)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -968,7 +968,7 @@ public abstract class DataSetScreenerServiceTests
                 var upload = context.DataSetUploads.Single();
 
                 // Expect it to be in its original state.
-                Assert.Equal(DataSetUploadStatus.PENDING_REVIEW, upload.Status);
+                Assert.Equal(DataSetUploadScreeningStatus.PendingReview, upload.ScreeningStatus);
 
                 // Expect it not to have had any ScreenerResult applied.
                 Assert.Null(upload.ScreenerResult);
@@ -984,7 +984,7 @@ public abstract class DataSetScreenerServiceTests
             // Arrange
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 // The first data set has had a progress update that shows it has completed successfully.
                 .ForIndex(
                     0,
@@ -1150,19 +1150,19 @@ public abstract class DataSetScreenerServiceTests
                 var dataSetUpload1 = updatedDataSetUploads[0];
                 var expectedDataSet1CompletionReport = completionReportsResponse[1].CompletionReport;
                 expectedDataSet1CompletionReport.AssertDeepEqualTo(dataSetUpload1.ScreenerResult);
-                Assert.Equal(DataSetUploadStatus.PENDING_REVIEW, dataSetUpload1.Status);
+                Assert.Equal(DataSetUploadScreeningStatus.PendingReview, dataSetUpload1.ScreeningStatus);
 
                 // Expect that data set 2 has no updates as it has not yet completed.
                 var dataSetUpload2 = updatedDataSetUploads[1];
                 Assert.Null(dataSetUpload2.ScreenerResult);
-                Assert.Equal(DataSetUploadStatus.SCREENING, dataSetUpload2.Status);
+                Assert.Equal(DataSetUploadScreeningStatus.Screening, dataSetUpload2.ScreeningStatus);
 
                 // Expect that data set 3 had its completion report applied and status updated to
                 // show that it failed screening.
                 var dataSetUpload3 = updatedDataSetUploads[2];
                 var expectedDataSet3CompletionReport = completionReportsResponse[0].CompletionReport;
                 expectedDataSet3CompletionReport.AssertDeepEqualTo(dataSetUpload3.ScreenerResult);
-                Assert.Equal(DataSetUploadStatus.FAILED_SCREENING, dataSetUpload3.Status);
+                Assert.Equal(DataSetUploadScreeningStatus.FailedScreening, dataSetUpload3.ScreeningStatus);
             }
         }
 
@@ -1172,7 +1172,7 @@ public abstract class DataSetScreenerServiceTests
             // Arrange
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.SCREENING)
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -1228,7 +1228,7 @@ public abstract class DataSetScreenerServiceTests
             // Arrange
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
-                .WithStatus(DataSetUploadStatus.PENDING_IMPORT)
+                .WithStatus(DataSetUploadScreeningStatus.PendingImport)
                 .WithScreenerProgress(
                     new DataSetScreenerProgress
                     {
@@ -1262,7 +1262,7 @@ public abstract class DataSetScreenerServiceTests
                 var upload = context.DataSetUploads.Single();
 
                 // Expect it to be in its original state.
-                Assert.Equal(DataSetUploadStatus.PENDING_IMPORT, upload.Status);
+                Assert.Equal(DataSetUploadScreeningStatus.PendingImport, upload.ScreeningStatus);
 
                 // Expect it not to have had any ScreenerResult applied.
                 Assert.Null(upload.ScreenerResult);
