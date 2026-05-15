@@ -1,5 +1,5 @@
-import { responseTimeConfig, dynamicTotalGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
-import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { responseTimeConfig, dynamicTotalGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'
+import { staticAverageGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
 import { removeMultiple } from '../../common/functions.bicep'
 
 import {
@@ -278,7 +278,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
   ]
 }
 
-module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
+module backendPoolsHealthAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
   name: '${appGatewayName}BackendHealthAlertModule'
   params: {
     resourceName: appGatewayName
@@ -299,7 +299,7 @@ module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != 
   ]
 }
 
-module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
   params: {
     resourceName: appGatewayName
@@ -316,7 +316,7 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
   ]
 }
 
-module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
+module failedRequestsAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
   name: '${appGatewayName}FailedRequestsDeploy'
   params: {
     resourceName: appGatewayName
@@ -341,7 +341,7 @@ module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
   ]
 }
 
-module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
+module responseStatusAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
   name: '${appGatewayName}ResponseStatusDeploy'
   params: {
     resourceName: appGatewayName

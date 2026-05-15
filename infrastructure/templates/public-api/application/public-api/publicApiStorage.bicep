@@ -27,7 +27,7 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
   parent: vNet
 }
 
-module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
+module publicApiStorageAccountModule '../../../common/components/storage/storageAccount.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
@@ -49,7 +49,7 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
   }
 }
 
-module dataFilesFileShareModule '../../components/fileShare.bicep' = {
+module dataFilesFileShareModule '../../../common/components/storage/fileShare.bicep' = {
   name: 'publicApiFileShareDeploy'
   params: {
     fileShareName: resourceNames.publicApi.publicApiFileShare

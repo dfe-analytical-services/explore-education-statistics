@@ -1,4 +1,4 @@
-import { cpuPercentageConfig, memoryPercentageConfig } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig } from '../alerts/dynamicAlertConfig.bicep'
 import { AppServicePlanSku } from 'types.bicep'
 
 @description('Specifies the App Service plan name')
@@ -39,7 +39,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   tags: tagValues
 }
 
-module cpuPercentageAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${planName}CpuPercentageDeploy'
   params: {
     resourceName: planName
@@ -56,7 +56,7 @@ module cpuPercentageAlert '../../../public-api/components/alerts/dynamicMetricAl
   ]
 }
 
-module memoryPercentageAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${planName}MemoryPercentageDeploy'
   params: {
     resourceName: planName

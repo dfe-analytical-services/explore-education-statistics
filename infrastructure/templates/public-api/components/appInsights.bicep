@@ -1,4 +1,4 @@
-import { dynamicCountGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
+import { dynamicCountGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -35,7 +35,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   tags: tagValues
 }
 
-module exceptionCountAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.exceptionCount) {
+module exceptionCountAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.exceptionCount) {
   name: '${appInsightsName}ExceptionCountDeploy'
   params: {
     resourceName: appInsightsName
@@ -56,7 +56,7 @@ module exceptionCountAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
   ]
 }
 
-module exceptionServerCountAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.exceptionServerCount) {
+module exceptionServerCountAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.exceptionServerCount) {
   name: '${appInsightsName}ExceptionServerCountDeploy'
   params: {
     resourceName: appInsightsName
@@ -77,7 +77,7 @@ module exceptionServerCountAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts 
   ]
 }
 
-module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
+module failedRequestsAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
   name: '${appInsightsName}FailedRequestsDeploy'
   params: {
     resourceName: appInsightsName

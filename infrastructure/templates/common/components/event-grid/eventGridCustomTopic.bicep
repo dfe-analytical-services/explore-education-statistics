@@ -1,5 +1,5 @@
 import { IpRange } from '../../types.bicep'
-import { staticTotalGreaterThanZero } from '../../../public-api/components/alerts/staticAlertConfig.bicep'
+import { staticTotalGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 
 @description('The resource name.')
 @minLength(3)
@@ -83,7 +83,7 @@ module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSub
   }
 }
 
-module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+module deadLetteredCountAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null) {
   name: '${name}DeadLttrDeploy'
   params: {
     enabled: alerts!.deadLetteredCount
@@ -102,7 +102,7 @@ module deadLetteredCountAlert '../../../public-api/components/alerts/staticMetri
   }
 }
 
-module droppedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+module droppedEventCountAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null) {
   name: '${name}DropEvntDeploy'
   params: {
     enabled: alerts!.droppedEventCount
@@ -121,7 +121,7 @@ module droppedEventCountAlert '../../../public-api/components/alerts/staticMetri
   }
 }
 
-module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+module deliveryAttemptFailCountAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null) {
   name: '${name}DlvAttFlDeploy'
   params: {
     enabled: alerts!.deliveryAttemptFailCount
@@ -140,7 +140,7 @@ module deliveryAttemptFailCountAlert '../../../public-api/components/alerts/stat
   }
 }
 
-module publishFailCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+module publishFailCountAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null) {
   name: '${name}PubFailDeploy'
   params: {
     enabled: alerts!.publishFailCount
@@ -159,7 +159,7 @@ module publishFailCountAlert '../../../public-api/components/alerts/staticMetric
   }
 }
 
-module unmatchedEventCountAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null) {
+module unmatchedEventCountAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null) {
   name: '${name}UnmtEvtDeploy'
   params: {
     enabled: alerts!.unmatchedEventCount
