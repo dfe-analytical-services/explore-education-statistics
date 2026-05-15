@@ -103,6 +103,11 @@
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
+    },
+    "additionalPublicAllowedOrigins": {
+      "value": [
+        "https://pre-productionafd.explore-education-statistics.service.gov.uk"
+      ]
     }
   }
 }
