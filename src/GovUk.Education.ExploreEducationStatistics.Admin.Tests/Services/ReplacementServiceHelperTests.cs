@@ -555,8 +555,8 @@ public class ReplacementServiceHelperTests
         };
 
         var mapping = GenerateMapping(
-            originalDataSetId: Guid.NewGuid(),
-            replacementDataSetId: Guid.NewGuid(),
+            originalDataFileId: Guid.NewGuid(),
+            replacementDataFileId: Guid.NewGuid(),
             originalIndicatorGroups: originalGroups,
             replacementIndicatorGroups: replacementGroups
         );
@@ -767,8 +767,8 @@ public class ReplacementServiceHelperTests
         };
 
         var mapping = GenerateMapping(
-            originalDataSetId: Guid.NewGuid(),
-            replacementDataSetId: Guid.NewGuid(),
+            originalDataFileId: Guid.NewGuid(),
+            replacementDataFileId: Guid.NewGuid(),
             originalIndicatorGroups: originalGroups,
             replacementIndicatorGroups: replacementGroups
         );
@@ -931,8 +931,8 @@ public class ReplacementServiceHelperTests
         };
 
         var mapping = GenerateMapping(
-            originalDataSetId: Guid.NewGuid(),
-            replacementDataSetId: Guid.NewGuid(),
+            originalDataFileId: Guid.NewGuid(),
+            replacementDataFileId: Guid.NewGuid(),
             originalIndicatorGroups: originalGroups,
             replacementIndicatorGroups: replacementGroups
         );
@@ -1037,8 +1037,8 @@ public class ReplacementServiceHelperTests
         };
 
         var mapping = GenerateMapping(
-            originalDataSetId: Guid.NewGuid(),
-            replacementDataSetId: Guid.NewGuid(),
+            originalDataFileId: Guid.NewGuid(),
+            replacementDataFileId: Guid.NewGuid(),
             originalIndicatorGroups: originalGroups,
             replacementIndicatorGroups: replacementGroups
         );
@@ -1060,8 +1060,8 @@ public class ReplacementServiceHelperTests
     }
 
     private static DataSetMapping GenerateMapping(
-        Guid originalDataSetId,
-        Guid replacementDataSetId,
+        Guid originalDataFileId,
+        Guid replacementDataFileId,
         List<IndicatorGroup> originalIndicatorGroups = null,
         List<IndicatorGroup> replacementIndicatorGroups = null
     )
@@ -1116,8 +1116,8 @@ public class ReplacementServiceHelperTests
 
         return new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = indicatorsMappings,
             UnmappedReplacementIndicators = unmappedReplacementIndicators,
         };
