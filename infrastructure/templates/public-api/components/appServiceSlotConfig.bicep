@@ -1,4 +1,4 @@
-import { AzureFileShareMount } from '../types.bicep'
+import { AzureFileShareMount } from '../../common/components/storage/types.bicep'
 
 @description('Specifies the Web / Function App name that these settings belong to')
 param appName string

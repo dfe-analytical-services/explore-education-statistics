@@ -1,10 +1,10 @@
 import {
   FirewallRule
   IpRange
-  AzureFileShareMount
   EntraIdAuthentication
 } from '../types.bicep'
 
+import { AzureFileShareMount } from '../../common/components/storage/types.bicep'
 import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'

@@ -1,4 +1,5 @@
-import { IpRange, FirewallRule, AzureFileShareMount } from '../../types.bicep'
+import { IpRange, FirewallRule } from '../../types.bicep'
+import { AzureFileShareMount } from '../storage/types.bicep'
 import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'

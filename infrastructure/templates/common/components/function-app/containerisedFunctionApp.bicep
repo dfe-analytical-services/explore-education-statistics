@@ -3,10 +3,9 @@ import {
   IpRange
 } from '../../types.bicep'
 
-import {
-  AzureFileShareMount
-  EntraIdAuthentication
-} from '../../../public-api/types.bicep'
+import { AzureFileShareMount } from '../storage/types.bicep'
+
+import { EntraIdAuthentication } from '../../../public-api/types.bicep'
 
 import { AppServicePlanSku } from '../../components/app-service-plan/types.bicep'
 import { abbreviations } from '../../abbreviations.bicep'
