@@ -158,7 +158,7 @@ export interface DataReplacementPlan {
   replacementSubjectId: string;
   dataBlocks: DataBlockReplacementPlan[];
   footnotes: FootnoteReplacementPlan[];
-  apiDataSetVersionPlan: ApiDataSetVersionPlan;
+  apiDataSetVersionPlan?: ApiDataSetVersionPlan;
   valid: boolean;
   mapping: PlanMappings;
 }
@@ -185,6 +185,7 @@ const dataReplacementService = {
     const plan: DataReplacementPlan = await client.get(
       `releases/${releaseVersionId}/data/${originalFileId}/replacement-plan`,
     );
+
     return plan;
   },
   async updatePlanIndicatorMappings(
