@@ -13,12 +13,12 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Import permissions test variables
-    Set suite variable    ${PUBLICATION_NAME}    ${ROLE_PERMISSIONS_PUBLICATION_OWNER_PUBLICATION}
+    Set suite variable    ${PUBLICATION_NAME}    ${ROLE_PERMISSIONS_PUBLICATION_DRAFTER_PUBLICATION}
     Set suite variable    ${THEME_NAME}    ${ROLE_PERMISSIONS_THEME_TITLE}
     Set suite variable    ${DRAFT_RELEASE_TYPE}    ${ROLE_PERMISSIONS_DRAFT_RELEASE_TYPE}
     Set suite variable    ${PUBLISHED_RELEASE_TYPE}    ${ROLE_PERMISSIONS_PUBLISHED_RELEASE_TYPE}
 
-Navigate to Publication where analyst has Publication Owner role
+Navigate to Publication where analyst has Publication Drafter role
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}
     user waits until page contains link    Releases
     user waits until page contains link    Methodologies
@@ -35,7 +35,7 @@ Check can reorder releases
 Check can create legacy releases
     user checks page contains button    Create legacy release
 
-Check can create a Methodology for the owned Publication
+Check can create a Methodology for the Publication
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
 
@@ -82,12 +82,9 @@ Check cannot approve a draft release
     ...    ${DRAFT_RELEASE_TYPE}    ${THEME_NAME}
     user cannot see the enabled approve release controls for release
 
-Check can see the editable "Update release access" section of the "Team access" page
+Check can see the editable "Publication drafters" section of the "Team access" page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
-    user waits until h3 is visible    Update release access
-    user waits until h3 is not visible    Release access
-    user waits until page contains link    Manage release contributors
-
-Check can see the "Invite new contributors" functionality of the "Team access" page
-    user waits until page contains link    Invite new contributors
+    user waits until h2 is visible    Manage team access
+    user waits until h3 is visible    Publication drafters
+    user waits until page contains button    Invite drafter

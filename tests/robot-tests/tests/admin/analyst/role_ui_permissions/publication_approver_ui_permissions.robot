@@ -19,42 +19,71 @@ Import permissions test variables
 
 Validates publication approver publication page is correct
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-
     user waits until page contains link    Releases
     user waits until page contains link    Methodologies
+    user waits until page contains link    Details
+    user waits until page contains link    Contact
     user waits until page contains link    Team access
     user waits until page contains link    Release order
 
-    user checks page does not contain link    Details
-    user checks page does not contain link    Contact
-
-Check cannot reorder releases
+Check can reorder releases
     user clicks link    Release order
     user waits until h2 is visible    Release order
-    user checks page does not contain button    Reorder releases
+    user checks page contains button    Reorder releases
 
-Check cannot create legacy releases
-    user checks page does not contain button    Create legacy release
+Check can create legacy releases
+    user checks page contains button    Create legacy release
 
-Check cannot create a Methodology for a Publication if they don't have Publication Owner role
-    user goes to methodologies and checks cannot create methodologies for publication    ${PUBLICATION_NAME}
-    ...    ${THEME_NAME}
+Check can create a Methodology for the Publication
+    user clicks link    Methodologies
+    user waits until h2 is visible    Manage methodologies
+
+    user checks page contains button    Create new methodology
+    user waits until page contains link    Add external methodology
+    user waits until page contains link    Adopt an existing methodology
 
 Check cannot edit content for published release
     user navigates to published release page from dashboard    ${PUBLICATION_NAME}
     ...    ${PUBLISHED_RELEASE_TYPE}    ${THEME_NAME}
     user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
-Check cannot create an amendment of a published release
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}
-    user cannot see the create amendment controls for release    ${PUBLISHED_RELEASE_TYPE}
+Check Edit publication details page inputs are correct
+    user navigates to details on publication page    ${PUBLICATION_NAME}
+    user clicks button    Edit publication details
 
-Check can see the readonly "Release access" section of the "Team access" page
+    user waits until page contains element    label:Publication summary
+    user checks page does not contain element    label:Publication title    # Only BAU users should see this
+    user checks page does not contain element    label:Select theme    # Only BAU users should see this
+    user checks page does not contain element    label:Superseding publication    # Only BAU users should see this
+
+    user clicks button    Cancel
+    user waits until page does not contain button    Cancel
+
+Check Edit publication contact page inputs are correct
+    user clicks link    Contact
+    user waits until h2 is visible    Contact for this publication
+    user clicks button    Edit contact details
+
+    user waits until page contains element    label:Team name
+    user waits until page contains element    label:Team email
+    user waits until page contains element    label:Contact name
+    user waits until page contains element    label:Contact telephone (optional)
+
+    user clicks button    Cancel
+    user waits until page does not contain button    Cancel
+
+Check can create an amendment of a published release
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}
+    user can see the create amendment controls for release    ${PUBLISHED_RELEASE_TYPE}
+
+Check can approve a draft release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${DRAFT_RELEASE_TYPE}    ${THEME_NAME}
+    user can see the enabled approve release controls for release
+
+Check can see the editable "Publication drafters" section of the "Team access" page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
-    user waits until h3 is visible    Release access
-    user waits until h3 is not visible    Update release access
-    user waits until page does not contain link    Manage release contributors
-
-Check cannot see the "Invite new contributors" functionality of the "Team access" page
-    user waits until page does not contain link    Invite new contributors
+    user waits until h2 is visible    Manage team access
+    user waits until h3 is visible    Publication drafters
+    user waits until page contains button    Invite drafter

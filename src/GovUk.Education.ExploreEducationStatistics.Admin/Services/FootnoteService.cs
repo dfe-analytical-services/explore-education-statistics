@@ -60,7 +60,7 @@ public class FootnoteService : IFootnoteService
     )
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccessDo(() =>
                 CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
@@ -104,7 +104,7 @@ public class FootnoteService : IFootnoteService
     public async Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseVersionId, Guid footnoteId)
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId))
             .OnSuccessVoid(async footnote =>
@@ -127,7 +127,7 @@ public class FootnoteService : IFootnoteService
     )
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
                 CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
@@ -191,7 +191,7 @@ public class FootnoteService : IFootnoteService
     public async Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseVersionId, FootnotesUpdateRequest request)
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() => ValidateFootnoteIdsForRelease(releaseVersionId, request.FootnoteIds))
             .OnSuccessVoid(async _ =>
@@ -215,7 +215,7 @@ public class FootnoteService : IFootnoteService
     public Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseVersionId, Guid footnoteId)
     {
         return _contentPersistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess<ActionResult, ReleaseVersion, Footnote>(async release =>
             {
@@ -233,7 +233,7 @@ public class FootnoteService : IFootnoteService
     public async Task<Either<ActionResult, List<Footnote>>> GetFootnotes(Guid releaseVersionId)
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ => await _footnoteRepository.GetFootnotes(releaseVersionId));
     }

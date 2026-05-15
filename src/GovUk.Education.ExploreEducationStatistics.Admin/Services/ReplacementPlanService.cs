@@ -44,7 +44,8 @@ public class ReplacementPlanService(
     )
     {
         return await contentDbContext
-            .ReleaseVersions.FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() =>
                 releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(

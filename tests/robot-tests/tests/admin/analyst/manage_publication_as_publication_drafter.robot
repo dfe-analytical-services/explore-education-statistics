@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    Manage publication as publication owner %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    Manage publication as publication drafter %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
@@ -23,26 +23,25 @@ Check that no publication roles are listed yet on the Team access page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until page contains link    Team access
     user clicks link    Team access
-    user waits until page contains    There are no publication owners or approvers.
+    user waits until page contains    There are no approvers, or pending approver invites, for this publication.
+    user waits until page contains    There are no drafters, or pending drafter invites, for this publication.
 
-Assign publication owner permissions to analyst1
+Assign publication drafter permissions to analyst1
     user adds publication role to user via api
     ...    EES-test.ANALYST1@education.gov.uk
     ...    ${PUBLICATION_ID}
-    ...    Owner
+    ...    Drafter
 
-Sign in as analyst1 and check that the Team access page now contains the Publication Owner details
+Sign in as analyst1 and check that the Team access page now contains the Publication Drafter details
     user signs in as analyst1
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
-    user waits until page contains    There are no publication approvers
-    user checks table column heading contains    1    1    Name    testid:publicationRoles
-    user checks table column heading contains    1    2    Email    testid:publicationRoles
-    user checks table column heading contains    1    3    Publication role    testid:publicationRoles
-    user checks table body has x rows    1    testid:publicationRoles
-    user checks table cell contains    1    1    Analyst1 User1    testid:publicationRoles
-    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationRoles
-    user checks table cell contains    1    3    Owner    testid:publicationRoles
+    user waits until page contains    There are no approvers, or pending approver invites, for this publication.
+    user checks table column heading contains    1    1    Name    testid:publicationDrafterRoles
+    user checks table column heading contains    1    2    Email    testid:publicationDrafterRoles
+    user checks table body has x rows    1    testid:publicationDrafterRoles
+    user checks table cell contains    1    1    Analyst1 User1    testid:publicationDrafterRoles
+    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationDrafterRoles
 
 Update publication contact
     user clicks link    Contact
