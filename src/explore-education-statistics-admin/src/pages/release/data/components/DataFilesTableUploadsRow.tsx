@@ -60,8 +60,8 @@ export default function DataFilesTableUploadRow({
   const importBlocked =
     !canUpdateRelease ||
     !dataSetUpload.screenerResult ||
-    dataSetUpload.status === 'SCREENER_ERROR' ||
-    dataSetUpload.status === 'FAILED_SCREENING' ||
+    dataSetUpload.status === 'ScreenerError' ||
+    dataSetUpload.status === 'FailedScreening' ||
     hasFailures;
 
   const importUnavailable = !Object.values(warningAcknowledgements).every(
@@ -138,7 +138,7 @@ export default function DataFilesTableUploadRow({
     confirmText = 'Continue import (override failures)';
   }
 
-  if (dataSetUpload.status === 'SCREENER_ERROR') {
+  if (dataSetUpload.status === 'ScreenerError') {
     confirmText = 'Continue import (bypass screening)';
   }
 
