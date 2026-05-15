@@ -24,7 +24,7 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
             MetaFileId = Guid.NewGuid(),
             MetaFileName = "meta.data.csv",
             MetaFileSizeInBytes = 157,
-            Status = DataSetUploadStatus.SCREENING,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
             UploadedBy = "test@test.com",
             Created = _timeProvider.GetUtcNow().AddDays(-1).Date,
             ReplacingFileId = null,
@@ -43,8 +43,10 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
             MetaFileId = Guid.NewGuid(),
             MetaFileName = "meta.data.csv",
             MetaFileSizeInBytes = 157,
-            Status =
-                _screenerResult == "Failed" ? DataSetUploadStatus.FAILED_SCREENING : DataSetUploadStatus.PENDING_IMPORT,
+            ScreeningStatus =
+                _screenerResult == "Failed"
+                    ? DataSetUploadScreeningStatus.FailedScreening
+                    : DataSetUploadScreeningStatus.PendingImport,
             UploadedBy = "test@test.com",
             Created = DateTime.UtcNow,
             ScreenerResult = new DataSetScreenerResponse
@@ -97,7 +99,7 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
             MetaFileId = Guid.NewGuid(),
             MetaFileName = "meta.data.csv",
             MetaFileSizeInBytes = 157,
-            Status = DataSetUploadStatus.SCREENER_ERROR,
+            ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError,
             UploadedBy = "test@test.com",
             Created = _timeProvider.GetUtcNow().AddDays(-1).Date,
             ReplacingFileId = null,
@@ -112,7 +114,7 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
             DataSetTitle = "Data set title",
             DataFileSize = "123 Kb",
             DataFileName = "data.csv",
-            Status = nameof(DataSetUploadStatus.PENDING_IMPORT),
+            Status = nameof(DataSetUploadScreeningStatus.PendingImport),
             UploadedBy = "test.user",
             MetaFileName = "data.meta.csv",
             MetaFileSize = "123 B",

@@ -81,11 +81,11 @@ public class DataSetScreenerProgressUpdaterJob(
             );
 
             var successfulCompletions = completions
-                .Where(c => c.Status == nameof(DataSetUploadStatus.PENDING_REVIEW))
+                .Where(c => c.Status == nameof(DataSetUploadScreeningStatus.PendingReview))
                 .ToList();
 
             var failedCompletions = completions
-                .Where(c => c.Status == nameof(DataSetUploadStatus.FAILED_SCREENING))
+                .Where(c => c.Status == nameof(DataSetUploadScreeningStatus.FailedScreening))
                 .ToList();
 
             if (successfulCompletions.Count > 0)

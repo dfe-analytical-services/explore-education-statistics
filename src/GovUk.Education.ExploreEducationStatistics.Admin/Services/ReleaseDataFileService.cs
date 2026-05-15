@@ -724,7 +724,9 @@ public class ReleaseDataFileService(
 
         return
             !isBauUser.IsRight
-            && dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
+            && dataSetUpload.ScreeningStatus
+                is not DataSetUploadScreeningStatus.PendingReview
+                    and not DataSetUploadScreeningStatus.PendingImport
             ? ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
             : dataSetUpload;
     }
