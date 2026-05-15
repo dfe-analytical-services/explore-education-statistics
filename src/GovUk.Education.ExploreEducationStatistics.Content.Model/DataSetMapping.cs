@@ -11,8 +11,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 public record DataSetMapping
 {
     public Guid Id { get; set; }
-    public Guid OriginalDataSetId { get; set; }
-    public Guid ReplacementDataSetId { get; set; }
+
+    public Guid OriginalDataFileId { get; set; }
+    public File OriginalDataFile { get; set; } = null!;
+    public Guid ReplacementDataFileId { get; set; }
+    public File ReplacementDataFile { get; set; } = null!;
 
     public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; set; } = null!;
     public List<UnmappedIndicator> UnmappedReplacementIndicators { get; set; } = [];
