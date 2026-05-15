@@ -100,7 +100,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
   name: searchServiceName
 }
 
-module functionAppModule '../../common/components/functionApp.bicep' = {
+module functionAppModule '../../common/components/function-app/functionApp.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'

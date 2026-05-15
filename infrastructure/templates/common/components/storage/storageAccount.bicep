@@ -15,7 +15,7 @@ param allowedSubnetIds string[] = []
 param firewallRules IpRange[] = []
 
 @description('Storage Account SKU')
-param sku 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
+param sku 'Standard_LRS' | 'StandardV2_LRS' | 'Standard_GRS' | 'StandardV2_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'StandardV2_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'StandardV2_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
 
 @description('Storage Account kind')
 param kind 'StorageV2' | 'FileStorage' = 'StorageV2'
