@@ -21,7 +21,7 @@ public class PublicationReleasesServiceMockBuilder
             Task<Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>>
         >
     > GetPublicationReleases = m =>
-        m.GetPublicationReleases(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>());
+        m.GetPublicationReleases(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<CancellationToken>());
 
     private static readonly Expression<
         Func<IPublicationReleasesService, Task<Either<ActionResult, Guid[]>>>
@@ -60,8 +60,8 @@ public class PublicationReleasesServiceMockBuilder
             .Setup(m =>
                 m.GetPublicationReleases(
                     It.IsAny<string>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
+                    It.IsAny<int?>(),
+                    It.IsAny<int?>(),
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -93,8 +93,8 @@ public class PublicationReleasesServiceMockBuilder
                 m =>
                     m.GetPublicationReleases(
                         It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                        It.Is<int>(actual => page == null || actual == page),
-                        It.Is<int>(actual => pageSize == null || actual == pageSize),
+                        It.Is<int?>(actual => page == null || actual == page),
+                        It.Is<int?>(actual => pageSize == null || actual == pageSize),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Once
