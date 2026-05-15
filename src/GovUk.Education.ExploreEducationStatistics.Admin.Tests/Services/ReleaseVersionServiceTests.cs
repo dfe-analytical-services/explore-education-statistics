@@ -399,14 +399,14 @@ public abstract class ReleaseVersionServiceTests
 
             DataSetMapping mapping = new DataSetMapping
             {
-                OriginalDataSetId = subject.Id,
-                ReplacementDataSetId = replacementSubject.Id,
+                OriginalDataFileId = file.Id,
+                ReplacementDataFileId = replacementFile.Id,
             };
 
             DataSetMapping unrelatedMapping = new DataSetMapping
             {
-                OriginalDataSetId = Guid.NewGuid(),
-                ReplacementDataSetId = Guid.NewGuid(),
+                OriginalDataFileId = Guid.NewGuid(),
+                ReplacementDataFileId = Guid.NewGuid(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -522,7 +522,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 // Check the related DataSetMapping has been removed - the unrelated mapping should remain
                 var dbUnrelatedMapping = Assert.Single(context.DataSetMappings.ToList());
-                Assert.Equal(unrelatedMapping.OriginalDataSetId, dbUnrelatedMapping.OriginalDataSetId);
+                Assert.Equal(unrelatedMapping.OriginalDataFileId, dbUnrelatedMapping.OriginalDataFileId);
             }
         }
 
