@@ -15,12 +15,14 @@ import React, { useMemo } from 'react';
 import DifferencesItemMappingModal from './DataFileReplacementDifferencesMappingModal';
 
 interface RowsProps {
+  mappingKeysToShow: Set<string>;
   itemType: 'indicator' | 'filter' | 'location';
   mappings: IndicatorsMappingsPlan;
   onUpdate: (payload: UpdateMappingPayload) => Promise<void>;
 }
 
 export default function DifferencesMappingTableRows({
+  mappingKeysToShow,
   itemType,
   mappings: { candidates, mappings },
   onUpdate,
@@ -61,55 +63,57 @@ export default function DifferencesMappingTableRows({
 
   return (
     <>
-      {mappingsToList.map(mapping => {
-        const { source, sourceKey, type } = mapping;
-        const isUnset = type === 'Unset';
-        const itemCurrentMapping =
-          (mapping.candidateKey &&
-            allCandidates[mapping.candidateKey]?.label) ??
-          'No mapping';
+      {mappingsToList
+        .filter(({ sourceKey }) => mappingKeysToShow.has(sourceKey))
+        .map(mapping => {
+          const { source, sourceKey, type } = mapping;
+          const isUnset = type === 'Unset';
+          const itemCurrentMapping =
+            (mapping.candidateKey &&
+              allCandidates[mapping.candidateKey]?.label) ??
+            'No mapping';
 
-        return (
-          <tr
-            key={`mapping-${sourceKey}`}
-            className={classNames({
-              'rowHighlight--alert': isUnset,
-            })}
-          >
-            <td>{source.label}</td>
-            <td>
-              {isUnset ? (
-                <Tag colour="red">not present</Tag>
-              ) : (
-                itemCurrentMapping
-              )}
-            </td>
-            <td className="govuk-!-text-align-right">
-              {mapping.type === 'Unset' && (
-                <ButtonText
-                  onClick={() =>
-                    onUpdate({
-                      sourceKey: mapping.sourceKey,
-                      candidateKey: undefined, // no mapping
-                    })
-                  }
-                >
-                  No mapping{' '}
-                  <VisuallyHidden>for {mapping.source.label}</VisuallyHidden>
-                </ButtonText>
-              )}
+          return (
+            <tr
+              key={`mapping-${sourceKey}`}
+              className={classNames({
+                'rowHighlight--alert': isUnset,
+              })}
+            >
+              <td>{source.label}</td>
+              <td>
+                {isUnset ? (
+                  <Tag colour="red">not present</Tag>
+                ) : (
+                  itemCurrentMapping
+                )}
+              </td>
+              <td className="govuk-!-text-align-right">
+                {mapping.type === 'Unset' && (
+                  <ButtonText
+                    onClick={() =>
+                      onUpdate({
+                        sourceKey: mapping.sourceKey,
+                        candidateKey: undefined, // no mapping
+                      })
+                    }
+                  >
+                    No mapping{' '}
+                    <VisuallyHidden>for {mapping.source.label}</VisuallyHidden>
+                  </ButtonText>
+                )}
 
-              <DifferencesItemMappingModal
-                itemType={itemType}
-                allCandidateOptions={allCandidates}
-                unmappedCandidateOptions={unmappedCandidates}
-                mapping={mapping}
-                onSubmit={onUpdate}
-              />
-            </td>
-          </tr>
-        );
-      })}
+                <DifferencesItemMappingModal
+                  itemType={itemType}
+                  allCandidateOptions={allCandidates}
+                  unmappedCandidateOptions={unmappedCandidates}
+                  mapping={mapping}
+                  onSubmit={onUpdate}
+                />
+              </td>
+            </tr>
+          );
+        })}
     </>
   );
 }

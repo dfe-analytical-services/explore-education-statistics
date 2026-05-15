@@ -48,27 +48,13 @@ export default function DataFileReplacementDifferences({
     return { indicators };
   }, [plan.dataBlocks, plan.footnotes]);
 
-  const filteredMappings: DataReplacementPlan['mapping'] = useMemo(() => {
-    // filtered mappings that aren't used in datablocks or footnotes
-
-    const filteredIndicatorMappings = {
-      candidates: plan.mapping.indicators.candidates,
-      mappings: Object.fromEntries(
-        Object.entries(plan.mapping.indicators.mappings).filter(([key]) =>
-          referencedFilters.indicators.has(key),
-        ),
-      ),
-    };
-
-    return { indicators: filteredIndicatorMappings };
-  }, [plan.mapping, referencedFilters]);
-
-  const [planMappings, updatePlanMappings] =
-    useImmer<PlanMappings>(filteredMappings);
+  const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(
+    plan.mapping,
+  );
 
   useEffect(() => {
-    updatePlanMappings(filteredMappings);
-  }, [filteredMappings, updatePlanMappings]);
+    updatePlanMappings(plan.mapping);
+  }, [plan.mapping, updatePlanMappings]);
 
   const handleIndicatorsMappingUpdate = useCallback(
     async ({ sourceKey, candidateKey }: UpdateMappingPayload) => {
@@ -105,18 +91,35 @@ export default function DataFileReplacementDifferences({
 
   const mappingCounts: { indicators: { mapped: number; unmapped: number } } =
     useMemo(() => {
-      return mapValues(planMappings, itemType => {
-        const nonAutoMappedMappings = Object.values(itemType.mappings).filter(
-          ({ type }) => type !== 'AutoSet',
+      return mapValues(planMappings, (itemType, itemTypeKey) => {
+        // convert dictionary to array, AND filter mapping list to only referenced mappings
+        const mappingsList = Object.entries(itemType.mappings).filter(
+          ([mappingKey]) => {
+            return referencedFilters[
+              itemTypeKey as keyof typeof referencedFilters
+            ].has(mappingKey);
+          },
         );
-        const manuallyMappedCount = nonAutoMappedMappings.filter(
-          ({ type }) => type === 'ManuallySet',
+
+        const totalMappingCount = mappingsList.length;
+
+        const autoMappedCount = mappingsList.filter(
+          ([_, { type }]) => type === 'AutoSet',
         ).length;
+
+        const manualMappedCount = mappingsList.filter(
+          ([_, { type }]) => type === 'ManuallySet',
+        ).length;
+
         const unmappedCount =
-          nonAutoMappedMappings.length - manuallyMappedCount;
-        return { mapped: manuallyMappedCount, unmapped: unmappedCount };
+          totalMappingCount - autoMappedCount - manualMappedCount;
+
+        return {
+          mapped: manualMappedCount,
+          unmapped: unmappedCount,
+        };
       });
-    }, [planMappings]);
+    }, [planMappings, referencedFilters]);
 
   return (
     <>
@@ -169,6 +172,7 @@ export default function DataFileReplacementDifferences({
           </thead>
           <tbody data-testid={`${tableId}-body`}>
             <DifferencesMappingTableRows
+              mappingKeysToShow={referencedFilters.indicators}
               itemType="indicator"
               mappings={planMappings.indicators}
               onUpdate={handleIndicatorsMappingUpdate}

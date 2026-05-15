@@ -1,5 +1,5 @@
 import dataReplacementService, {
-  IndicatorsMapping,
+  DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -7,70 +7,156 @@ import DataFileReplacementDifferences from '../DataFileReplacementDifferences';
 
 jest.mock('@admin/services/dataReplacementService');
 
-const dummyIndicatorsMappings: IndicatorsMapping = {
-  mappings: {
-    enrolments_again: {
-      source: {
-        label: 'Enrolments_Again',
+const testReplacementPlan: DataReplacementPlan = {
+  originalSubjectId: 'subId',
+  replacementSubjectId: 'repId',
+  valid: false,
+  footnotes: [],
+  mapping: {
+    indicators: {
+      mappings: {
+        enrolments_again: {
+          source: {
+            label: 'Enrolments_Again',
+          },
+          type: 'Unset',
+        },
+        enrolments: {
+          source: {
+            label: 'Enrolments',
+          },
+          type: 'Unset',
+        },
+        sess_possible: {
+          source: {
+            label: 'Number of possible sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_possible',
+        },
+        sess_authorised: {
+          source: {
+            label: 'Number of authorised sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_authorised',
+        },
+        sess_unauthorised: {
+          source: {
+            label: 'Number of unauthorised sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_unauthorised',
+        },
+        sess_unauthorised_percent: {
+          source: {
+            label: 'Percentage of unauthorised sessions',
+          },
+          type: 'AutoSet',
+          candidateKey: 'sess_unauthorised_percent',
+        },
       },
-      type: 'Unset',
-    },
-    enrolments: {
-      source: {
-        label: 'Enrolments',
+      candidates: {
+        // indicators from the replacement data
+        sess_possible: {
+          label: 'Number of possible sessions',
+        },
+        sess_authorised: {
+          label: 'Number of authorised sessions',
+        },
+        sess_unauthorised: {
+          label: 'Number of unauthorised sessions',
+        },
+        number_of_enrolments_again: {
+          label: 'Number of enrolments again',
+        },
+        number_of_enrolments: {
+          label: 'Number of enrolments',
+        },
+        sess_unauthorised_percent: {
+          label: 'Percentage of unauthorised sessions',
+        },
       },
-      type: 'Unset',
-    },
-    sess_possible: {
-      source: {
-        label: 'Number of possible sessions',
-      },
-      type: 'AutoSet',
-      candidateKey: 'sess_possible',
-    },
-    sess_authorised: {
-      source: {
-        label: 'Number of authorised sessions',
-      },
-      type: 'AutoSet',
-      candidateKey: 'sess_authorised',
-    },
-    sess_unauthorised: {
-      source: {
-        label: 'Number of unauthorised sessions',
-      },
-      type: 'AutoSet',
-      candidateKey: 'sess_unauthorised',
-    },
-    sess_unauthorised_percent: {
-      source: {
-        label: 'Percentage of unauthorised sessions',
-      },
-      type: 'AutoSet',
-      candidateKey: 'sess_unauthorised_percent',
     },
   },
-  candidates: {
-    // indicators from the replacement data
-    sess_possible: {
-      label: 'Number of possible sessions',
+  dataBlocks: [
+    {
+      id: '5ad1c42b-763c-4dfb-b8dd-ad88ebfb9ad4',
+      name: 'Dates',
+      filters: {
+        'fa36f29a-8184-4588-ac7b-08deb19a25e6': {
+          id: 'fa36f29a-8184-4588-ac7b-08deb19a25e6',
+          label: 'Date',
+          groups: {
+            '7f7dd166-b7bc-4d09-83b5-19756451278b': {
+              id: '7f7dd166-b7bc-4d09-83b5-19756451278b',
+              label: 'Default',
+              filters: [
+                {
+                  id: '6424fca3-f3b7-4d99-b5c4-9711556aaec3',
+                  label: 'Not specified',
+                  valid: false,
+                },
+              ],
+              valid: false,
+            },
+          },
+          valid: false,
+        },
+      },
+      indicatorGroups: {
+        '1': {
+          id: '1',
+          label: 'some Indicators',
+          indicators: [
+            {
+              name: 'enrolments_again',
+              id: '1',
+              label: 'Enrolments_Again',
+              valid: false,
+            },
+            {
+              name: 'enrolments',
+              id: '2',
+              label: 'Enrolments',
+              valid: false,
+            },
+          ],
+          valid: false,
+        },
+      },
+      locations: {
+        Country: {
+          label: 'Country',
+          locationAttributes: [
+            {
+              code: 'E92000001',
+              label: 'England',
+              target: 'f628134d-5235-4615-2438-08dc1c5c7fdf',
+              valid: true,
+            },
+          ],
+          valid: true,
+        },
+      },
+      timePeriods: {
+        start: {
+          code: 'W13',
+          year: 2020,
+          label: '2020 Week 13',
+          valid: true,
+        },
+        end: {
+          code: 'W24',
+          year: 2021,
+          label: '2021 Week 24',
+          valid: true,
+        },
+        valid: true,
+      },
+      valid: false,
     },
-    sess_authorised: {
-      label: 'Number of authorised sessions',
-    },
-    sess_unauthorised: {
-      label: 'Number of unauthorised sessions',
-    },
-    number_of_enrolments_again: {
-      label: 'Number of enrolments again',
-    },
-    number_of_enrolments: {
-      label: 'Number of enrolments',
-    },
-    sess_unauthorised_percent: {
-      label: 'Percentage of unauthorised sessions',
-    },
-  },
+  ],
 };
 
 describe('DataFileReplacementDifferences', () => {
@@ -81,7 +167,7 @@ describe('DataFileReplacementDifferences', () => {
         reloadPlan={jest.fn}
         fileId="fileId"
         releaseVersionId="releaseVersionId"
-        plan={{ indicators: dummyIndicatorsMappings }}
+        plan={testReplacementPlan}
       />,
     );
 
@@ -165,7 +251,7 @@ describe('DataFileReplacementDifferences', () => {
 
     await user.click(
       // submit
-      within(modal).getByRole('button', { name: 'Update indicator mapping' }),
+      within(modal).getByRole('button', { name: 'Save' }),
     );
 
     expect(modal).not.toBeInTheDocument();

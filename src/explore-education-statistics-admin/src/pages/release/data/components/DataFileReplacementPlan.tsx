@@ -82,7 +82,7 @@ const DataFileReplacementPlan = ({
 
     await refetchPlan();
     isFetchingSoonToggle.off();
-  }, 7500);
+  }, 2500);
 
   const onMappingUpdate = useCallback(() => {
     debouncedRefetchPlan();
