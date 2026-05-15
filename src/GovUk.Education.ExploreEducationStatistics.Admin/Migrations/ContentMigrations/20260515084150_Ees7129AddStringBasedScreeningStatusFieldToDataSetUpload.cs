@@ -17,11 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: true
             );
 
-            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'Screening' WHERE Status = '0'");
-            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'ScreenerError' WHERE Status = '1'");
-            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'FailedScreening' WHERE Status = '2'");
-            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'PendingReview' WHERE Status = '3'");
-            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'PendingImport' WHERE Status = '4'");
+            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'Screening' WHERE Status = 0");
+            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'ScreenerError' WHERE Status = 1");
+            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'FailedScreening' WHERE Status = 2");
+            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'PendingReview' WHERE Status = 3");
+            migrationBuilder.Sql("UPDATE DataSetUploads SET ScreeningStatus = 'PendingImport' WHERE Status = 4");
 
             migrationBuilder.AlterColumn<int>(
                 name: "ScreeningStatus",
