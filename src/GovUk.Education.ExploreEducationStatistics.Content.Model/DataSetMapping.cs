@@ -27,7 +27,8 @@ public record DataSetMapping
     {
         public void Configure(EntityTypeBuilder<DataSetMapping> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.HasIndex(x => x.OriginalDataSetId).IsUnique();
+            builder.HasIndex(x => x.ReplacementDataSetId).IsUnique();
 
             builder
                 .Property(x => x.IndicatorMappings)
