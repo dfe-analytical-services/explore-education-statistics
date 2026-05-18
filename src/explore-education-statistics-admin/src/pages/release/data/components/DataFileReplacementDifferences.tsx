@@ -52,10 +52,6 @@ export default function DataFileReplacementDifferences({
     plan.mapping,
   );
 
-  useEffect(() => {
-    updatePlanMappings(plan.mapping);
-  }, [plan.mapping, updatePlanMappings]);
-
   const handleIndicatorsMappingUpdate = useCallback(
     async ({ sourceKey, candidateKey }: UpdateMappingPayload) => {
       updatePlanMappings(draft => {
