@@ -936,9 +936,9 @@ public class PublicationServiceTests
             Assert.Empty(publicationRedirects);
         }
 
+        AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
-        AssertOnPublicationChangedEventsNotRaised();
     }
 
     [Fact]
@@ -1360,6 +1360,8 @@ public class PublicationServiceTests
         }
 
         AssertOnPublicationChangedEventsNotRaised();
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
     }
 
     [Fact]
@@ -1433,9 +1435,9 @@ public class PublicationServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var dbPublication = context.Publications.Single(p => p.Id == publication.Id);
-            Assert.Equal("New title", dbPublication.Title);
-            Assert.Equal("new-title", dbPublication.Slug);
+            var updatedPublication = context.Publications.Single(p => p.Id == publication.Id);
+            Assert.Equal("New title", updatedPublication.Title);
+            Assert.Equal("new-title", updatedPublication.Slug);
 
             var publicationRedirects = context.PublicationRedirects.ToList();
             Assert.Equal(2, publicationRedirects.Count);
@@ -1445,7 +1447,12 @@ public class PublicationServiceTests
 
             Assert.Equal(publication.Id, publicationRedirects[1].PublicationId);
             Assert.Equal("current-title", publicationRedirects[1].Slug);
+
+            AssertOnPublicationChangedEventRaised(updatedPublication);
         }
+
+        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
     }
 
     [Fact]
@@ -1487,14 +1494,6 @@ public class PublicationServiceTests
                     )
                 );
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService.Setup(mock => mock.RemovePublication("title")).Returns(Task.CompletedTask);
-
-            var publicationTreeService = new Mock<IPublicationsTreeService>(Strict);
-            publicationTreeService
-                .Setup(mock => mock.UpdateCachedPublicationsTree(It.IsAny<CancellationToken>()))
-                .ReturnsAsync([]);
-
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
                 .Setup(mock => mock.UpdateRedirects())
@@ -1510,8 +1509,6 @@ public class PublicationServiceTests
                 context,
                 methodologyService: methodologyService.Object,
                 methodologyCacheService: methodologyCacheService.Object,
-                publicationCacheService: publicationCacheService.Object,
-                publicationsTreeService: publicationTreeService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
 
@@ -1520,13 +1517,7 @@ public class PublicationServiceTests
                 new PublicationSaveRequest { Title = "Older title", ThemeId = theme.Id }
             );
 
-            VerifyAllMocks(
-                methodologyService,
-                methodologyCacheService,
-                publicationCacheService,
-                publicationTreeService,
-                redirectsCacheService
-            );
+            VerifyAllMocks(methodologyService, methodologyCacheService, redirectsCacheService);
 
             var viewModel = result.AssertRight();
             Assert.Equal("Older title", viewModel.Title);
@@ -1535,9 +1526,9 @@ public class PublicationServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var dbPublication = context.Publications.Single(p => p.Id == publication.Id);
-            Assert.Equal("Older title", dbPublication.Title);
-            Assert.Equal("older-title", dbPublication.Slug);
+            var updatedPublication = context.Publications.Single(p => p.Id == publication.Id);
+            Assert.Equal("Older title", updatedPublication.Title);
+            Assert.Equal("older-title", updatedPublication.Slug);
 
             var publicationRedirects = context.PublicationRedirects.ToList();
             var redirect = Assert.Single(publicationRedirects);
@@ -1547,7 +1538,12 @@ public class PublicationServiceTests
 
             Assert.Equal(publication.Id, redirect.PublicationId);
             Assert.Equal("title", redirect.Slug);
+
+            AssertOnPublicationChangedEventRaised(updatedPublication);
         }
+
+        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
     }
 
     [Fact]
@@ -1599,6 +1595,10 @@ public class PublicationServiceTests
             var publicationRedirects = context.PublicationRedirects.ToList();
             Assert.Empty(publicationRedirects);
         }
+
+        AssertOnPublicationChangedEventsNotRaised();
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
     }
 
     [Fact]
@@ -1650,6 +1650,10 @@ public class PublicationServiceTests
             Assert.Equal(publicationRedirect.PublicationId, redirect.PublicationId);
             Assert.Equal(publicationRedirect.Slug, redirect.Slug);
         }
+
+        AssertOnPublicationChangedEventsNotRaised();
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
     }
 
     [Fact]
@@ -1716,6 +1720,10 @@ public class PublicationServiceTests
             var dbMethodology = context.Methodologies.Include(m => m.Versions).Single(m => m.Id == methodology.Id);
             Assert.Equal("test-publication", dbMethodology.Versions[0].Slug);
         }
+
+        AssertOnPublicationChangedEventsNotRaised();
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
     }
 
     [Fact]
