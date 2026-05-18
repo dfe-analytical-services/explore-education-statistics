@@ -106,9 +106,9 @@ export default function DifferencesItemMappingModal({
 
       <FormFieldRadioSearchGroup<FormValues>
         alwaysShowOptions={[noMappingValue]}
-        hint={`Choose a ${prefixNoun(
+        hint={`Choose ${prefixNoun(
           itemType,
-        )} that will be mapped to the current data set ${itemType} (see above).`}
+        )} ${itemType} that will be mapped to the current data set ${itemType} (see above).`}
         legend={`Next data set ${itemType}`}
         name="selectedCandidate"
         options={options}
