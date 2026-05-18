@@ -1,4 +1,4 @@
-# nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -31,7 +31,7 @@ public class FileImportService : IFileImportService
         _importerService = importerService;
     }
 
-    public async Task ImportObservations(DataImport import, StatisticsDbContext context)
+    public async Task<DataImport?> ImportObservations(DataImport import, StatisticsDbContext context)
     {
         _logger.LogInformation("Importing Observations for {Filename}", import.File.Filename);
 
@@ -43,7 +43,7 @@ public class FileImportService : IFileImportService
                 import.Status
             );
 
-            return;
+            return null;
         }
 
         if (import.Status == CANCELLING)
@@ -55,7 +55,7 @@ public class FileImportService : IFileImportService
             );
 
             await _dataImportService.UpdateStatus(import.Id, CANCELLED, 100);
-            return;
+            return null;
         }
 
         var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
@@ -71,8 +71,7 @@ public class FileImportService : IFileImportService
             context
         );
 
-        var completedImport = await _dataImportService.GetImport(import.Id);
-        await CompleteImport(completedImport, context);
+        return await _dataImportService.GetImport(import.Id);
     }
 
     public async Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context)
@@ -97,7 +96,7 @@ public class FileImportService : IFileImportService
 
             if (import.Status == COMPLETE)
             {
-                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+                await FinalImportTasks(import);
             }
 
             return;
@@ -119,7 +118,6 @@ public class FileImportService : IFileImportService
         }
 
         var observationCount = await context.Observation.CountAsync(o => o.SubjectId.Equals(import.SubjectId));
-
         if (observationCount != import.ExpectedImportedRows)
         {
             await _dataImportService.FailImport(
@@ -127,18 +125,21 @@ public class FileImportService : IFileImportService
                 $"Number of observations inserted ({observationCount}) "
                     + $"does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry"
             );
+            return;
         }
-        else
+
+        if (import.Errors.Count > 0)
         {
-            if (import.Errors.Count == 0)
-            {
-                await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
-                await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
-            }
-            else
-            {
-                await _dataImportService.UpdateStatus(import.Id, FAILED, 100);
-            }
+            await _dataImportService.UpdateStatus(import.Id, FAILED, 100);
         }
+
+        await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
+        await FinalImportTasks(import);
+    }
+
+    private async Task FinalImportTasks(DataImport import)
+    {
+        await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+        // @MarkFix create DataSetMapping here
     }
 }

@@ -6,7 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
 public interface IFileImportService
 {
-    Task ImportObservations(DataImport import, StatisticsDbContext context);
+    Task<DataImport> ImportObservations(DataImport import, StatisticsDbContext context);
 
     Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context);
+
+    Task CompleteImport(DataImport import, StatisticsDbContext context);
 }

@@ -89,10 +89,9 @@ public class ProcessorService : IProcessorService
 
         try
         {
-            await _fileImportService.ImportObservations(
-                import,
-                _dbContextSupplier.CreateDbContext<StatisticsDbContext>()
-            );
+            var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
+            var completedImport = await _fileImportService.ImportObservations(import, statisticsDbContext);
+            await _fileImportService.CompleteImport(completedImport, statisticsDbContext);
         }
         catch (Exception e)
         {
