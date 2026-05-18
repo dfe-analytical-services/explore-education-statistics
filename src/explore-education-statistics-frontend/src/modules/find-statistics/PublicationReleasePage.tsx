@@ -148,7 +148,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
       // as opposed to `find-statistics/apprenticeships-and-traineeships/2022-23/explore#supporting-files-section`
       // For these links, a redirect is needed in order for them to work as expected.
       // This logic works around this issue, so that links which don't contain a release slug and do contain an anchor/quick jump ('#')
-      // continue to work as expected when clicked on
+      // continue to work as expected when clicked on.
       const linkMissingReleaseSlugAndContainsTabName =
         releaseSlug === 'explore' ||
         releaseSlug === 'help' ||
