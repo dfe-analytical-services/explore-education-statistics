@@ -2,11 +2,13 @@ import { AuthContext, AuthContextState } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { ReleaseDataFileReplaceRouteParams } from '@admin/routes/releaseRoutes';
 import { ImportStatusCode } from '@admin/services/releaseDataFileService';
-import { render, screen } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RouteComponentProps } from 'react-router';
 import PendingDataReplacementSection from '../PendingDataReplacementSection';
 
+jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService', () => ({
   __esModule: true,
   default: {
