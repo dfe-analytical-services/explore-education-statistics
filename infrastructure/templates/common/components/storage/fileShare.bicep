@@ -1,6 +1,6 @@
-import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-import { AllValuesForDimension } from 'alerts/types.bicep'
-import { percentage, gbsToBytes } from '../../common/functions.bicep'
+import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { AllValuesForDimension } from '../alerts/types.bicep'
+import { percentage, gbsToBytes } from '../../functions.bicep'
 
 @description('Size in GB of the file share')
 param fileShareQuotaGbs int = 6
@@ -46,7 +46,7 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-0
 
 var fileServiceId = resourceId('Microsoft.Storage/storageAccounts/fileServices', storageAccountName, 'default')
 
-module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+module availabilityAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
   name: '${storageAccountName}FsAvailabilityAlertModule'
   params: {
     resourceName: storageAccountName
@@ -67,7 +67,7 @@ module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null &
   ]
 }
 
-module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}FsLatencyDeploy'
   params: {
     resourceName: storageAccountName
@@ -105,7 +105,7 @@ var capacityAlertThresholds = [{
   description: 'File service is at 95% of its reserved capacity.  Raise its quote as soon as possible.'
 }]
 
-module fileCapacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold in capacityAlertThresholds: if (alerts != null && alerts!.capacity) {
+module fileCapacityAlerts '../alerts/staticMetricAlert.bicep' = [for capacityThreshold in capacityAlertThresholds: if (alerts != null && alerts!.capacity) {
   name: '${storageAccountName}FsCapacity${capacityThreshold.threshold}Deploy'
   params: {
     resourceName: storageAccountName

@@ -63,7 +63,7 @@ public class DataSetScreenerService(
         // Find any data sets currently undergoing screening that haven't had a progress check made for
         // them in the last <ScreenerProgressUpdateIntervalSeconds> seconds.
         var dataSetsNeedingScreenerProgressUpdates = await contentDbContext
-            .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
+            .DataSetUploads.Where(upload => upload.ScreeningStatus == DataSetUploadScreeningStatus.Screening)
             .Where(upload =>
                 upload.ScreenerProgressLastChecked == null || upload.ScreenerProgressLastChecked <= lastCheckedWindow
             )
@@ -145,7 +145,7 @@ public class DataSetScreenerService(
 
         // Find all data sets currently undergoing screening.
         var screeningDataSets = await contentDbContext
-            .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
+            .DataSetUploads.Where(upload => upload.ScreeningStatus == DataSetUploadScreeningStatus.Screening)
             .ToListAsync(cancellationToken: cancellationToken);
 
         // Find any data sets where the gap between their last successful progress update
@@ -175,7 +175,7 @@ public class DataSetScreenerService(
                 TestResults = [],
                 PublicApiCompatible = false,
             };
-            upload.Status = DataSetUploadStatus.SCREENER_ERROR;
+            upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
             contentDbContext.DataSetUploads.Update(upload);
         });
 
@@ -274,9 +274,9 @@ public class DataSetScreenerService(
             var report = completionReports.Single(u => u.DataSetId == uploadToComplete.Id);
 
             uploadToComplete.ScreenerResult = report.CompletionReport;
-            uploadToComplete.Status = report.CompletionReport.Passed
-                ? DataSetUploadStatus.PENDING_REVIEW
-                : DataSetUploadStatus.FAILED_SCREENING;
+            uploadToComplete.ScreeningStatus = report.CompletionReport.Passed
+                ? DataSetUploadScreeningStatus.PendingReview
+                : DataSetUploadScreeningStatus.FailedScreening;
             contentDbContext.DataSetUploads.Update(uploadToComplete);
         });
 
@@ -298,7 +298,7 @@ public class DataSetScreenerService(
     {
         // Find all data sets currently undergoing screening.
         var screeningDataSets = await contentDbContext
-            .DataSetUploads.Where(upload => upload.Status == DataSetUploadStatus.SCREENING)
+            .DataSetUploads.Where(upload => upload.ScreeningStatus == DataSetUploadScreeningStatus.Screening)
             .ToListAsync(cancellationToken: cancellationToken);
 
         // Find only those whose latest progress reports show as having been completed.

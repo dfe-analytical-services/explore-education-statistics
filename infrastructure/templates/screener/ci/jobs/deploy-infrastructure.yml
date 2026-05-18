@@ -21,7 +21,10 @@ jobs:
           steps:
             - checkout: self
 
-            - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
+            # Omitting this upgrade step for now in the Screener API pipeline, as it adds
+            # on a chuck of time and doesn't seem to be crucial for this pipeline at the moment.
+            
+            # - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

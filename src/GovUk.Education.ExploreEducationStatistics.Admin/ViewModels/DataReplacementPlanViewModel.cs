@@ -46,7 +46,7 @@ public class DataBlockReplacementPlanViewModel
     public Dictionary<Guid, FilterReplacementViewModel> Filters { get; }
     private List<FilterReplacementViewModel> NewlyIntroducedFilters { get; }
     public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; }
-    public Dictionary<string, LocationReplacementViewModel> Locations { get; }
+    public Dictionary<string, LocationReplacementViewModel> Locations { get; } // Key is GeographicLevel
     public TimePeriodRangeReplacementViewModel? TimePeriods { get; }
 
     public DataBlockReplacementPlanViewModel(

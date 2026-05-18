@@ -9,6 +9,8 @@ public class ReleaseSubject : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
 
     public Guid SubjectId { get; set; }
 
+    public Guid FileId;
+
     public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
     public Guid ReleaseVersionId { get; set; }

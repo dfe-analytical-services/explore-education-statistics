@@ -36,8 +36,12 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
     public Guid? ReplacingFileId { get; init; }
 
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataSetUploadStatus>))]
-    public required DataSetUploadStatus Status { get; set; }
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataSetUploadScreeningStatus>))]
+    [Obsolete("Use ScreeningStatus instead")]
+    public DataSetUploadScreeningStatus Status { get; set; }
+
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataSetUploadScreeningStatus>))]
+    public required DataSetUploadScreeningStatus ScreeningStatus { get; set; }
 
     public DataSetScreenerResponse? ScreenerResult { get; set; }
 
@@ -52,11 +56,11 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
     public required string UploadedBy { get; set; }
 }
 
-public enum DataSetUploadStatus
+public enum DataSetUploadScreeningStatus
 {
-    SCREENING,
-    SCREENER_ERROR,
-    FAILED_SCREENING,
-    PENDING_REVIEW,
-    PENDING_IMPORT,
+    Screening,
+    ScreenerError,
+    FailedScreening,
+    PendingReview,
+    PendingImport,
 }

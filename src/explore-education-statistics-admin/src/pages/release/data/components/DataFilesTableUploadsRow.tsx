@@ -19,8 +19,8 @@ import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
 import styles from './DataFilesTable.module.scss';
 import {
-  getDataSetUploadStatusColour,
-  getDataSetUploadStatusLabel,
+  getDataSetUploadScreeningStatusColour,
+  getDataSetUploadScreeningStatusLabel,
 } from './ImporterStatus';
 
 interface Props {
@@ -60,8 +60,8 @@ export default function DataFilesTableUploadRow({
   const importBlocked =
     !canUpdateRelease ||
     !dataSetUpload.screenerResult ||
-    dataSetUpload.status === 'SCREENER_ERROR' ||
-    dataSetUpload.status === 'FAILED_SCREENING' ||
+    dataSetUpload.status === 'ScreenerError' ||
+    dataSetUpload.status === 'FailedScreening' ||
     hasFailures;
 
   const importUnavailable = !Object.values(warningAcknowledgements).every(
@@ -138,7 +138,7 @@ export default function DataFilesTableUploadRow({
     confirmText = 'Continue import (override failures)';
   }
 
-  if (dataSetUpload.status === 'SCREENER_ERROR') {
+  if (dataSetUpload.status === 'ScreenerError') {
     confirmText = 'Continue import (bypass screening)';
   }
 
@@ -151,8 +151,10 @@ export default function DataFilesTableUploadRow({
         {dataSetUpload.dataFileSize}
       </td>
       <td data-testid="Status">
-        <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
-          {getDataSetUploadStatusLabel(dataSetUpload.status)}
+        <Tag
+          colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}
+        >
+          {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
         </Tag>
       </td>
       <td data-testid="Actions">

@@ -102,7 +102,7 @@ public class DataSetFileStorageTests
         Assert.NotEqual(Guid.Empty, uploadDetails.MetaFileId);
         Assert.Equal("test-data.meta.csv", uploadDetails.MetaFileName);
         Assert.Equal(157, uploadDetails.MetaFileSizeInBytes);
-        Assert.Equal(DataSetUploadStatus.SCREENING, uploadDetails.Status);
+        Assert.Equal(DataSetUploadScreeningStatus.Screening, uploadDetails.ScreeningStatus);
         Assert.Equal(_user.Email.ToLower(), uploadDetails.UploadedBy);
         Assert.Null(uploadDetails.ReplacingFileId);
 
@@ -178,7 +178,7 @@ public class DataSetFileStorageTests
         Assert.NotEqual(Guid.Empty, uploadDetails.MetaFileId);
         Assert.Equal("test-data.meta.csv", uploadDetails.MetaFileName);
         Assert.Equal(157, uploadDetails.MetaFileSizeInBytes);
-        Assert.Equal(DataSetUploadStatus.SCREENING, uploadDetails.Status);
+        Assert.Equal(DataSetUploadScreeningStatus.Screening, uploadDetails.ScreeningStatus);
         Assert.Equal(_user.Email.ToLower(), uploadDetails.UploadedBy);
         Assert.Null(uploadDetails.ReplacingFileId);
 
@@ -363,7 +363,7 @@ public class DataSetFileStorageTests
             var result = await contentDbContext.DataSetUploads.FindAsync(dataSetUpload.Id);
 
             Assert.NotNull(result);
-            Assert.Equal(DataSetUploadStatus.SCREENER_ERROR, result.Status);
+            Assert.Equal(DataSetUploadScreeningStatus.ScreenerError, result.ScreeningStatus);
             Assert.Null(result.ScreenerResult);
         }
     }
@@ -412,13 +412,13 @@ public class DataSetFileStorageTests
             switch (testResult)
             {
                 case TestResult.PASS:
-                    Assert.Equal(DataSetUploadStatus.PENDING_IMPORT, updatedDataSetUpload.Status);
+                    Assert.Equal(DataSetUploadScreeningStatus.PendingImport, updatedDataSetUpload.ScreeningStatus);
                     break;
                 case TestResult.WARNING:
-                    Assert.Equal(DataSetUploadStatus.PENDING_REVIEW, updatedDataSetUpload.Status);
+                    Assert.Equal(DataSetUploadScreeningStatus.PendingReview, updatedDataSetUpload.ScreeningStatus);
                     break;
                 case TestResult.FAIL:
-                    Assert.Equal(DataSetUploadStatus.FAILED_SCREENING, updatedDataSetUpload.Status);
+                    Assert.Equal(DataSetUploadScreeningStatus.FailedScreening, updatedDataSetUpload.ScreeningStatus);
                     break;
             }
 
@@ -536,7 +536,7 @@ public class DataSetFileStorageTests
             MetaFileId = Guid.NewGuid(),
             MetaFileName = metaFileName,
             MetaFileSizeInBytes = 157,
-            Status = DataSetUploadStatus.SCREENING,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
             UploadedBy = _user.Email,
             ReplacingFileId = originalDataFile.Id,
         };
@@ -589,7 +589,7 @@ public class DataSetFileStorageTests
             MetaFileSizeInBytes = 456,
             MetaFileId = Guid.NewGuid(),
             UploadedBy = _user.Email,
-            Status = DataSetUploadStatus.SCREENING,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
         };
 
         await using var contentDbContext = InMemoryApplicationDbContext();
@@ -676,7 +676,7 @@ public class DataSetFileStorageTests
             MetaFileSizeInBytes = 456,
             MetaFileId = Guid.NewGuid(),
             UploadedBy = _user.Email,
-            Status = DataSetUploadStatus.SCREENING,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
         };
 
         await using var contentDbContext = InMemoryApplicationDbContext();
@@ -777,7 +777,7 @@ public class DataSetFileStorageTests
             ReplacingFileId = testFixture.DataFile.Id,
             ReleaseVersionId = testFixture.ReleaseVersion.Id,
             DataSetTitle = dataSetName,
-            Status = DataSetUploadStatus.SCREENING,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
             UploadedBy = _user.Email,
         };
 
@@ -838,7 +838,7 @@ public class DataSetFileStorageTests
                 MetaFileSizeInBytes = 157,
                 ReleaseVersionId = testFixture.ReleaseVersion.Id,
                 DataSetTitle = releaseFilesAndDataSets[i].dataSetName,
-                Status = DataSetUploadStatus.SCREENING,
+                ScreeningStatus = DataSetUploadScreeningStatus.Screening,
                 DataFileId = Guid.NewGuid(),
                 DataFileName = dataFileNames[i],
                 MetaFileId = Guid.NewGuid(),

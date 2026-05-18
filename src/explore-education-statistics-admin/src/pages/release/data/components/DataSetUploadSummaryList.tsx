@@ -7,8 +7,8 @@ import React from 'react';
 import ButtonText from '@common/components/ButtonText';
 import downloadTemporaryReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadTemporaryReleaseFileSecurely';
 import {
-  getDataSetUploadStatusColour,
-  getDataSetUploadStatusLabel,
+  getDataSetUploadScreeningStatusColour,
+  getDataSetUploadScreeningStatusLabel,
 } from './ImporterStatus';
 import ApiCompatibilityTag from './ApiCompatibilityTag';
 
@@ -62,8 +62,10 @@ export default function DataSetUploadSummaryList({
         {dataSetUpload.dataFileSize}
       </SummaryListItem>
       <SummaryListItem term="Status">
-        <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
-          {getDataSetUploadStatusLabel(dataSetUpload.status)}
+        <Tag
+          colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}
+        >
+          {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
         </Tag>
       </SummaryListItem>{' '}
       <SummaryListItem term="Uploaded by">

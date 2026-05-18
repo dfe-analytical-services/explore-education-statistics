@@ -1,8 +1,10 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -278,6 +280,18 @@ public class DataSetMappingServiceTests
         var originalIndicator3Id = Guid.NewGuid();
         var originalIndicator4Id = Guid.NewGuid();
 
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
+
         var mapping = new DataSetMapping
         {
             OriginalDataSetId = originalDataSetId,
@@ -380,6 +394,8 @@ public class DataSetMappingServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -389,6 +405,7 @@ public class DataSetMappingServiceTests
             var service = SetupDataSetMappingService(contentDbContext);
 
             var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
                     OriginalDataSetId = originalDataSetId,
@@ -407,7 +424,8 @@ public class DataSetMappingServiceTests
                         },
                         new() { OriginalColumnName = "original_indicator_3", NewReplacementColumnName = null },
                     ],
-                }
+                },
+                CancellationToken.None
             );
 
             var indicatorMappingList = result.AssertRight();
@@ -488,10 +506,38 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
+    public async Task UpdateIndicatorMappings_NoReleaseVersion_NotFound()
+    {
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+        var service = SetupDataSetMappingService(contentDbContext);
+        var result = await service.UpdateIndicatorMappings(
+            Guid.NewGuid(),
+            new IndicatorMappingUpdatesRequest(),
+            CancellationToken.None
+        );
+
+        result.AssertNotFound();
+    }
+
+    [Fact]
     public async Task UpdateIndicatorMapping_NoDataSetMapping_NotFound()
     {
         var originalDataSetId = Guid.NewGuid();
         var replacementDataSetId = Guid.NewGuid();
+
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
 
         var mapping = new DataSetMapping
         {
@@ -504,6 +550,8 @@ public class DataSetMappingServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -513,15 +561,108 @@ public class DataSetMappingServiceTests
             var service = SetupDataSetMappingService(contentDbContext);
 
             var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
                     OriginalDataSetId = originalDataSetId,
                     ReplacementDataSetId = Guid.NewGuid(),
                     Updates = [],
-                }
+                },
+                CancellationToken.None
             );
 
             result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task UpdateIndicatorMappings_OriginalDataSet_NotFound()
+    {
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                $"{nameof(IndicatorMappingUpdatesRequest.OriginalDataSetId)}",
+                "OriginalDataSetIdNotLinkedToReleaseVersion"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateIndicatorMappings_ReplacementDataSet_NotFound()
+    {
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+        };
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataSetMappings.Add(mapping);
+            contentDbContext.ReleaseFiles.Add(originalReleaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                $"{nameof(IndicatorMappingUpdatesRequest.ReplacementDataSetId)}",
+                "ReplacementDataSetIdNotLinkedToReleaseVersion"
+            );
         }
     }
 
@@ -532,6 +673,18 @@ public class DataSetMappingServiceTests
         var replacementDataSetId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
+
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
 
         var mapping = new DataSetMapping
         {
@@ -555,6 +708,8 @@ public class DataSetMappingServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -564,12 +719,14 @@ public class DataSetMappingServiceTests
             var service = SetupDataSetMappingService(contentDbContext);
 
             var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
                     OriginalDataSetId = originalDataSetId,
                     ReplacementDataSetId = replacementDataSetId,
                     Updates = [new() { OriginalColumnName = "does_not_exist", NewReplacementColumnName = null }],
-                }
+                },
+                CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
@@ -592,6 +749,18 @@ public class DataSetMappingServiceTests
 
         var originalIndicator1Id = Guid.NewGuid();
 
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
+
         var mapping = new DataSetMapping
         {
             OriginalDataSetId = originalDataSetId,
@@ -614,6 +783,8 @@ public class DataSetMappingServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -623,6 +794,7 @@ public class DataSetMappingServiceTests
             var service = SetupDataSetMappingService(contentDbContext);
 
             var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
                     OriginalDataSetId = originalDataSetId,
@@ -635,7 +807,8 @@ public class DataSetMappingServiceTests
                             NewReplacementColumnName = "replacement_indicator_already_mapped",
                         },
                     ],
-                }
+                },
+                CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
@@ -650,14 +823,474 @@ public class DataSetMappingServiceTests
         }
     }
 
+    [Fact]
+    public async Task UpdateLocationMappings_Success()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var loc1Id = Guid.NewGuid();
+        var loc2Id = Guid.NewGuid();
+        var loc3Id = Guid.NewGuid();
+        var replacementLocId = Guid.NewGuid();
+        var newlyUnmappedLocId = Guid.NewGuid();
+        var loc3ReplacementId = Guid.NewGuid();
+
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    loc1Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc1Id,
+                        OriginalGeographicLevel = GeographicLevel.LocalAuthority,
+                        Status = MapStatus.Unset,
+                    }
+                },
+                {
+                    loc2Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc2Id,
+                        OriginalGeographicLevel = GeographicLevel.Country,
+                        ReplacementId = newlyUnmappedLocId,
+                        ReplacementName = "Old Country Name",
+                        ReplacementCode = "E9200002",
+                        ReplacementGeographicLevel = GeographicLevel.Country,
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    loc3Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc3Id,
+                        OriginalGeographicLevel = GeographicLevel.Region,
+                        ReplacementId = loc3ReplacementId,
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+            UnmappedReplacementLocations = new List<UnmappedLocation>
+            {
+                new()
+                {
+                    Id = replacementLocId,
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Name = "New LA",
+                    Code = "301",
+                },
+            },
+        };
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataSetMappings.Add(mapping);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates =
+                    [
+                        new() { OriginalLocationId = loc1Id, NewReplacementLocationId = replacementLocId },
+                        new() { OriginalLocationId = loc2Id, NewReplacementLocationId = null },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var locationMappingList = result.AssertRight();
+            Assert.Equal(3, locationMappingList.Count);
+
+            var map1 = locationMappingList.Single(m => m.OriginalId == loc1Id);
+            Assert.Equal(replacementLocId, map1.ReplacementId);
+            Assert.Equal(nameof(MapStatus.ManuallySet), map1.Status);
+
+            var map2 = locationMappingList.Single(m => m.OriginalId == loc2Id);
+            Assert.Null(map2.ReplacementId);
+            Assert.Equal(nameof(MapStatus.ManuallySet), map2.Status);
+
+            var map3 = locationMappingList.Single(m => m.OriginalId == loc3Id);
+            Assert.Equal(loc3ReplacementId, map3.ReplacementId);
+            Assert.Equal(nameof(MapStatus.Unset), map3.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+
+            Assert.Single(dbMapping.UnmappedReplacementLocations);
+
+            // Check that the old replacement from loc2 was moved back to unmapped
+            Assert.Contains(dbMapping.UnmappedReplacementLocations, l => l.Id == newlyUnmappedLocId);
+            // Check that the new replacement was removed from unmapped
+            Assert.DoesNotContain(dbMapping.UnmappedReplacementLocations, l => l.Id == replacementLocId);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_NoReleaseVersion_NotFound()
+    {
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+        var service = SetupDataSetMappingService(contentDbContext);
+        var result = await service.UpdateLocationMappings(
+            Guid.NewGuid(),
+            new LocationMappingUpdatesRequest(),
+            CancellationToken.None
+        );
+
+        result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_NoDataSetMapping_NotFound()
+    {
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest(),
+                CancellationToken.None
+            );
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_OriginalDataSet_NotFound()
+    {
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                $"{nameof(LocationMappingUpdatesRequest.OriginalDataSetId)}",
+                "OriginalDataSetIdNotLinkedToReleaseVersion"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_ReplacementDataSet_NotFound()
+    {
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+        };
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataSetMappings.Add(mapping);
+            contentDbContext.ReleaseFiles.Add(originalReleaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                $"{nameof(LocationMappingUpdatesRequest.ReplacementDataSetId)}",
+                "ReplacementDataSetIdNotLinkedToReleaseVersion"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_OriginalLocationNotFound_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new(),
+        };
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.DataSetMappings.Add(mapping);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var badId = Guid.NewGuid();
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates = [new() { OriginalLocationId = badId }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.OriginalLocationId)}",
+                "LocationMatchingOriginalIdNameNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_UnmappedLocationNotFound_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
+
+        var locId = Guid.NewGuid();
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    locId,
+                    new LocationMapping { OriginalId = locId }
+                },
+            },
+            UnmappedReplacementLocations = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = Guid.NewGuid() }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                "UnmappedLocationMatchingReplacementLocationIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_DifferentGeographicLevel_Fail()
+    {
+        var originalDataSetId = Guid.NewGuid();
+        var replacementDataSetId = Guid.NewGuid();
+
+        var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = originalDataSetId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { SubjectId = replacementDataSetId },
+        };
+
+        var locId = Guid.NewGuid();
+        var replacementLocId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataSetId = originalDataSetId,
+            ReplacementDataSetId = replacementDataSetId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    locId,
+                    new LocationMapping { OriginalId = locId, OriginalGeographicLevel = GeographicLevel.Region }
+                },
+            },
+            UnmappedReplacementLocations =
+            [
+                new UnmappedLocation { Id = replacementLocId, GeographicLevel = GeographicLevel.LocalAuthority },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataSetId = originalDataSetId,
+                    ReplacementDataSetId = replacementDataSetId,
+                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = replacementLocId }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            validationProblem.AssertHasError(
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                "UnmappedLocationHasDifferentGeographicLevelAsOriginalLocation"
+            );
+        }
+    }
+
     private static DataSetMappingService SetupDataSetMappingService(
         ContentDbContext contentDbContext,
-        StatisticsDbContext? statisticsDbContext = null
+        StatisticsDbContext? statisticsDbContext = null,
+        IUserService? userService = null
     )
     {
         return new DataSetMappingService(
             contentDbContext,
-            statisticsDbContext ?? Mock.Of<StatisticsDbContext>(MockBehavior.Strict)
+            statisticsDbContext ?? Mock.Of<StatisticsDbContext>(MockBehavior.Strict),
+            userService ?? MockUtils.AlwaysTrueUserService().Object // @MarkFix add permission tests
         );
     }
 }
