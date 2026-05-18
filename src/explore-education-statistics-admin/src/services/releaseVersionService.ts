@@ -62,7 +62,8 @@ export interface ReleaseVersionSummary {
   timePeriodCoverage: ValueLabelPair;
   approvalStatus: ReleaseApprovalStatus;
   publishScheduled?: string;
-  published?: string;
+  publishedDisplayDate?: string;
+  lastPublished?: string;
   live: boolean;
   nextReleaseDate?: PartialDate;
   type: ReleaseType;

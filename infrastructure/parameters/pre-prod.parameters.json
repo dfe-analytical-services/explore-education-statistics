@@ -29,10 +29,10 @@
     "slackAlertsChannel": {
       "value": "C0681S50SP5"
     },
-    "stageScheduledReleasesFunctionCronSchedule": {
+    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 5 0 * * *"
     },
-    "publishScheduledReleasesFunctionCronSchedule": {
+    "publishScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 30 9 * * *"
     },
     "useSubnets": {
@@ -95,11 +95,19 @@
     "maxStatsDbSizeBytes": {
       "value": 805306368000
     },
-    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+    "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
+      "value": true
+    },
+    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
       "value": true
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
+    },
+    "additionalPublicAllowedOrigins": {
+      "value": [
+        "https://pre-productionafd.explore-education-statistics.service.gov.uk"
+      ]
     }
   }
 }

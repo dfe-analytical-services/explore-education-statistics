@@ -108,13 +108,15 @@ public class ReleaseVersionsController(
             .HandleFailuresOrNoContent();
     }
 
-    [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads/screener/progress")]
-    public async Task<
-        ActionResult<List<ScreenerProgressWithDataSetUploadIdViewModel>>
-    > GetDataSetUploadScreenerProgress(Guid releaseVersionId, CancellationToken cancellationToken)
+    [HttpGet("releaseVersions/{releaseVersionId:guid}/uploads/{dataSetUploadId:guid}/screener/progress")]
+    public async Task<ActionResult<ScreenerProgressViewModel>> GetDataSetUploadScreenerProgress(
+        Guid releaseVersionId,
+        Guid dataSetUploadId,
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetScreenerService
-            .GetScreenerProgress(releaseVersionId, cancellationToken)
+            .GetScreenerProgress(releaseVersionId, dataSetUploadId, cancellationToken)
             .HandleFailuresOrOk();
     }
 

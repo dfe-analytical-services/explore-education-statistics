@@ -1,3 +1,7 @@
+# Note that previously, we were using the simpler "az upgrade --yes" script,
+# but that has been broken on the runners for some time now. The below script
+# provides the same upgrade in a way that works, but is quite time-consuming.
+
 steps:
 - task: Bash@3
   displayName: Upgrade Azure CLI and extensions

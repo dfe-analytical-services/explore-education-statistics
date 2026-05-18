@@ -1,5 +1,5 @@
-import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
-import { staticTotalGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from '../../common/components/alerts/dynamicAlertConfig.bicep'
+import { staticTotalGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
 
 import { EntraIdAuthentication } from '../types.bicep'
 
@@ -219,7 +219,7 @@ module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
   }
 }
 
-module containerAppRestartsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.restarts) {
+module containerAppRestartsAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.restarts) {
   name: '${containerAppName}RestartsAlertModule'
   params: {
     resourceName: containerAppName
@@ -239,7 +239,7 @@ module containerAppRestartsAlert 'alerts/staticMetricAlert.bicep' = if (alerts !
   ]
 }
 
-module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${containerAppName}ResponseTimeDeploy'
   params: {
     resourceName: containerAppName
@@ -256,7 +256,7 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
   ]
 }
 
-module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${containerAppName}CpuPercentageDeploy'
   params: {
     resourceName: containerAppName
@@ -273,7 +273,7 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
   ]
 }
 
-module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${containerAppName}MemoryPercentageDeploy'
   params: {
     resourceName: containerAppName
@@ -290,7 +290,7 @@ module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != n
   ]
 }
 
-module connectionTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.connectionTimeouts) {
+module connectionTimeoutsAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.connectionTimeouts) {
   name: '${containerAppName}ConnectionTimeoutsAlertModule'
   params: {
     resourceName: containerAppName
@@ -310,7 +310,7 @@ module connectionTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != 
   ]
 }
 
-module requestRetriesAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestRetries) {
+module requestRetriesAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestRetries) {
   name: '${containerAppName}RequestRetriesAlertModule'
   params: {
     resourceName: containerAppName
@@ -330,7 +330,7 @@ module requestRetriesAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null
   ]
 }
 
-module requestTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestTimeouts) {
+module requestTimeoutsAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestTimeouts) {
   name: '${containerAppName}RequestTimeoutsAlertModule'
   params: {
     resourceName: containerAppName

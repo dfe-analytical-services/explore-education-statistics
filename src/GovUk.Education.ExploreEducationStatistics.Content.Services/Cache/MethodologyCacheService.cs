@@ -34,18 +34,4 @@ public class MethodologyCacheService(
             logger: logger
         );
     }
-
-    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
-        Guid publicationId
-    )
-    {
-        return GetSummariesTree()
-            .OnSuccess(methodologiesByTheme =>
-            {
-                var matchingPublication = methodologiesByTheme
-                    .SelectMany(theme => theme.Publications)
-                    .SingleOrDefault(publication => publication.Id == publicationId);
-                return matchingPublication?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>();
-            });
-    }
 }

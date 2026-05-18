@@ -24,6 +24,7 @@ const maxContentLength = 300;
 
 interface Props {
   dataSetFile: DataSetFileSummaryData;
+  expandable?: boolean;
   expanded?: boolean;
   headingTag?: 'h3' | 'h4';
   showLatestDataTag?: boolean;
@@ -32,6 +33,7 @@ interface Props {
 
 export default function DataSetFileSummary({
   dataSetFile,
+  expandable = true,
   expanded = false,
   headingTag = 'h3',
   showLatestDataTag = true,
@@ -242,24 +244,26 @@ export default function DataSetFileSummary({
         </SummaryListItem>
       </SummaryList>
 
-      <AccordionToggleButton
-        ariaControls={`${id}-details`}
-        expanded={showDetails}
-        label={
-          <>
-            {`${showDetails ? 'Hide details' : 'Show more details'}`}
-            <VisuallyHidden>{` about ${title}`}</VisuallyHidden>
-          </>
-        }
-        onClick={() => {
-          toggleDetails();
-          logEvent({
-            category: 'Data catalogue',
-            action: 'Data set details toggled',
-            label: `Publication: ${publication.title}, Release: ${release.title}, Data set: ${title}`,
-          });
-        }}
-      />
+      {expandable && (
+        <AccordionToggleButton
+          ariaControls={`${id}-details`}
+          expanded={showDetails}
+          label={
+            <>
+              {`${showDetails ? 'Hide details' : 'Show more details'}`}
+              <VisuallyHidden>{` about ${title}`}</VisuallyHidden>
+            </>
+          }
+          onClick={() => {
+            toggleDetails();
+            logEvent({
+              category: 'Data catalogue',
+              action: 'Data set details toggled',
+              label: `Publication: ${publication.title}, Release: ${release.title}, Data set: ${title}`,
+            });
+          }}
+        />
+      )}
     </li>
   );
 }

@@ -16,19 +16,21 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=            Publish release and amend %{RUN_IDENTIFIER}
-${RELEASE_LABEL}=               provisional
-${RELEASE_NAME}=                Financial year 3000-01 ${RELEASE_LABEL}
-${DATABLOCK_NAME}=              Dates data block name
-${SUBJECT_NAME}=                Dates test subject
-${ANCILLARY_FILE_NAME}=         Test ancillary file 1
-${ANCILLARY_FILE_NAME_2}=       Test ancillary file 2
+${PUBLICATION_NAME}=                Publish release and amend %{RUN_IDENTIFIER}
+${RELEASE_LABEL}=                   provisional
+${RELEASE_NAME}=                    Financial year 3000-01 ${RELEASE_LABEL}
+${DATABLOCK_NAME}=                  Dates data block name
+${SUBJECT_NAME}=                    Dates test subject
+${ANCILLARY_FILE_NAME}=             Test ancillary file 1
+${ANCILLARY_FILE_NAME_2}=           Test ancillary file 2
+${LEGACY_SUMMARY_TEXT_BLOCK}=       Test summary text for ${PUBLICATION_NAME}
 
 
 *** Test Cases ***
 Create new publication for "UI tests theme" theme
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user creates test release via api    ${PUBLICATION_ID}    FY    3000    label=${RELEASE_LABEL}
+    user creates test release with legacy summary text block via api    ${PUBLICATION_ID}    FY    3000
+    ...    label=${RELEASE_LABEL}    summary_text_block=${LEGACY_SUMMARY_TEXT_BLOCK}
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -128,7 +130,10 @@ Create chart for data block
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
+
+Verify legacy summary text block content is correct
+    user waits until element contains    id:releaseSummary    ${LEGACY_SUMMARY_TEXT_BLOCK}    %{WAIT_SMALL}
 
 Add free text key stat
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
@@ -231,7 +236,7 @@ Edit data block
 Navigate to the 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
 
 Verify data block is updated correctly
     # checking if data block cache has been invalidated by verifying the updates on the block
@@ -289,6 +294,10 @@ Verify release page meta
     user checks meta title should be    Release home - ${PUBLICATION_NAME}
     user checks meta description should be
     ...    ${PUBLICATION_NAME} summary
+
+Verify release page background information
+    user waits until element contains    id:background-information    ${LEGACY_SUMMARY_TEXT_BLOCK}
+    ...    %{WAIT_SMALL}
 
 Verify release URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/publish-release-and-amend-%{RUN_IDENTIFIER}
@@ -623,7 +632,13 @@ Update data block chart for amendment
 Navigate to 'Content' page for amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block
+    user waits until page contains button    Add a warning text block
+
+Verify legacy summary text block content is correct for amendment
+    user waits until element contains    id:releaseSummary    ${LEGACY_SUMMARY_TEXT_BLOCK}    %{WAIT_SMALL}
+
+Update legacy summary text block for amendment
+    user adds content to autosaving text block    id:releaseSummary    Amended ${LEGACY_SUMMARY_TEXT_BLOCK}
 
 Update free text key stat
     user updates free text key stat    1    Updated title    New stat    Updated trend
@@ -733,6 +748,10 @@ Navigate to amendment release page
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
+
+Verify amended background information
+    user waits until element contains    id:background-information    Amended ${LEGACY_SUMMARY_TEXT_BLOCK}
+    ...    %{WAIT_SMALL}
 
 Verify amendment is displayed as the latest release and the 'All releases in this series' page only displays the latest release
     user checks page contains    Latest release

@@ -358,7 +358,7 @@ public class ContentService : IContentService
             return order.Value;
         }
 
-        if (!section.Content.Any())
+        if (section.Content.Any())
         {
             return section.Content.Max(contentBlock => contentBlock.Order) + 1;
         }

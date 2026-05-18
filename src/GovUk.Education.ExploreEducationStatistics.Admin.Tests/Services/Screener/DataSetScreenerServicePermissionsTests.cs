@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Screener;
@@ -23,9 +24,11 @@ public class DataSetScreenerServicePermissionsTests
     public async Task GetScreenerProgress()
     {
         ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        DataSetUpload upload = _dataFixture.DefaultDataSetUpload().WithReleaseVersionId(releaseVersion.Id);
 
         await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
         contentDbContext.ReleaseVersions.Add(releaseVersion);
+        contentDbContext.DataSetUploads.Add(upload);
         await contentDbContext.SaveChangesAsync();
 
         await PermissionTestUtils
@@ -34,7 +37,7 @@ public class DataSetScreenerServicePermissionsTests
             .AssertForbidden(userService =>
             {
                 var service = BuildService(userService: userService.Object, contentDbContext: contentDbContext);
-                return service.GetScreenerProgress(releaseVersion.Id, CancellationToken.None);
+                return service.GetScreenerProgress(releaseVersion.Id, upload.Id, CancellationToken.None);
             });
     }
 
@@ -47,7 +50,8 @@ public class DataSetScreenerServicePermissionsTests
             contentDbContext: contentDbContext,
             timeProvider: TimeProvider.System,
             mapper: MapperUtils.AdminMapper(),
-            options: new DataScreenerOptions().ToOptionsWrapper()
+            options: new DataScreenerOptions().ToOptionsWrapper(),
+            logger: Mock.Of<ILogger<DataSetScreenerService>>()
         );
     }
 }

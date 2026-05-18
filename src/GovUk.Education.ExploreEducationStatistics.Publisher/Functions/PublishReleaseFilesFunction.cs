@@ -15,15 +15,17 @@ public class PublishReleaseFilesFunction(
 )
 {
     /// <summary>
-    /// Azure function which publishes the files for a Release by copying them between storage accounts.
+    /// Azure function that copies release version and methodology version files from private to public storage
+    /// during publishing. This is the 'Files' step of the publishing process.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    [Function("PublishReleaseFiles")]
+    /// <remarks>
+    /// Triggered via a queue message.
+    /// </remarks>
+    [Function(nameof(PublishReleaseFiles))]
     public async Task PublishReleaseFiles(
         [QueueTrigger(PublishReleaseFilesQueue)] PublishReleaseFilesMessage message,
-        FunctionContext context
+        FunctionContext context,
+        CancellationToken cancellationToken
     )
     {
         logger.LogInformation("{FunctionName} triggered: {Message}", context.FunctionDefinition.Name, message);
@@ -32,26 +34,28 @@ public class PublishReleaseFilesFunction(
 
         var successfulReleases = await message
             .ReleasePublishingKeys.ToAsyncEnumerable()
-            .WhereAwait(async key =>
-            {
-                try
+            .Where(
+                async (key, _) =>
                 {
-                    await publishingService.PublishMethodologyFilesIfApplicableForRelease(key.ReleaseVersionId);
-                    await publishingService.PublishReleaseFiles(key.ReleaseVersionId);
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(
-                        e,
-                        "Exception occured while executing {FunctionName}",
-                        context.FunctionDefinition.Name
-                    );
+                    try
+                    {
+                        await publishingService.PublishMethodologyFilesIfApplicableForRelease(key.ReleaseVersionId);
+                        await publishingService.PublishReleaseFiles(key.ReleaseVersionId);
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(
+                            e,
+                            "Exception occured while executing {FunctionName}",
+                            context.FunctionDefinition.Name
+                        );
 
-                    return false;
+                        return false;
+                    }
                 }
-            })
-            .ToListAsync();
+            )
+            .ToListAsync(cancellationToken);
 
         var unsuccessfulReleases = message.ReleasePublishingKeys.Except(successfulReleases).ToList();
 
@@ -63,7 +67,7 @@ public class PublishReleaseFilesFunction(
             if (message.Immediate)
             {
                 // Continue the 'Immediate' flow by completing the publishing process for the successful release version
-                await publishingCompletionService.CompletePublishing(successfulReleases);
+                await publishingCompletionService.CompletePublishing(successfulReleases, cancellationToken);
             }
         }
         catch (Exception e)

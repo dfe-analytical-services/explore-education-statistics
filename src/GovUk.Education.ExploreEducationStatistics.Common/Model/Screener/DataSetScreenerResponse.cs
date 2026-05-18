@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 
+// TODO EES-7003 - rename to "DataSetScreenerCompletionReport" in a follow-up PR.
 public record DataSetScreenerResponse
 {
     [JsonPropertyName("overall_stage")]

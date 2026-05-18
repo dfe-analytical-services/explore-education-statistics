@@ -15,3 +15,10 @@ param screenerFunctionAppSku = {
 // In the future, this can be switched back to true to allow Prod to properly enforce this
 // quality check.
 param includeDataDictionaryChecks = false
+
+// Don't include any worker pool in Plumber yet for Prod.
+param concurrentRWorkers = 0
+
+// Run with at least 2 instances in Prod in case one becomes unhealthy.
+param minimumInstanceCount = 2
+param maximumInstanceCount = 4

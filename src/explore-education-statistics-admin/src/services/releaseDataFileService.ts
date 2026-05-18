@@ -28,7 +28,7 @@ export interface DataSetUpload {
   dataFileSize: string;
   metaFileName: string;
   metaFileSize: string;
-  status: DataSetUploadStatus;
+  status: DataSetUploadScreeningStatus;
   screenerResult?: ScreenerResult; // Nullable if screening fails
   created: Date;
   uploadedBy: string;
@@ -118,13 +118,12 @@ export type ImportStatusCode =
   | 'CANCELLING'
   | 'CANCELLED';
 
-export type DataSetUploadStatus =
-  | 'UPLOADING'
-  | 'SCREENING'
-  | 'FAILED_SCREENING'
-  | 'SCREENER_ERROR'
-  | 'PENDING_REVIEW'
-  | 'PENDING_IMPORT';
+export type DataSetUploadScreeningStatus =
+  | 'Screening'
+  | 'FailedScreening'
+  | 'ScreenerError'
+  | 'PendingReview'
+  | 'PendingImport';
 
 export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
 

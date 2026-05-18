@@ -1,7 +1,7 @@
 // Originally sourced from https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.search/azure-search-create/main.bicep.
 
 import { IpRange } from '../../common/types.bicep'
-import { dynamicAverageGreaterThan, dynamicTotalGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { dynamicAverageGreaterThan, dynamicTotalGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'
 
 @description('Service name must only contain lowercase letters, digits or dashes, cannot use dash as the first two or last one characters, cannot contain consecutive dashes, and is limited between 2 and 60 characters in length.')
 @minLength(2)
@@ -142,7 +142,7 @@ resource searchDiagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-
   }
 }
 
-module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
+module searchLatencyAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
   name: '${name}SrchLatDeploy'
   params: {
     enabled: alerts!.searchLatency
@@ -165,7 +165,7 @@ module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert
   }
 }
 
-module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
+module searchQueriesPerSecondAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
   name: '${name}SearchQPSDeploy'
   params: {
     enabled: alerts!.searchQueriesPerSecond
@@ -188,7 +188,7 @@ module searchQueriesPerSecondAlert '../../public-api/components/alerts/dynamicMe
   }
 }
 
-module throttledSearchQueriesPercentageAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
+module throttledSearchQueriesPercentageAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
   name: '${name}ThrSQPctDeploy'
   params: {
     enabled: alerts!.throttledSearchQueriesPercentage

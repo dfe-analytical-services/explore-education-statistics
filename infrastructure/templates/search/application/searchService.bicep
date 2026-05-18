@@ -70,7 +70,7 @@ module searchServiceModule '../components/searchService.bicep' = {
   }
 }
 
-module searchStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
+module searchStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: 'searchStorageAccountModuleDeploy'
   params: {
     location: location

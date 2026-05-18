@@ -56,10 +56,6 @@ Navigate to 'Content' page
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
-Add summary content to release
-    user adds summary text block
-    user adds content to summary text block    Test intro text for ${PUBLICATION_NAME}
-
 Add release note to release
     user adds a release note    Test release note one
     ${date}=    get london date

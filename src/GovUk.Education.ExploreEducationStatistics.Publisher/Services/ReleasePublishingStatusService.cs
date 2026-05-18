@@ -107,13 +107,13 @@ public class ReleasePublishingStatusService(
         var scheduledMethodFilter = CreateQueryFilter(status => status.Immediate == false);
 
         // Release versions ready for scheduled publishing have completed the tasks
-        // performed by the StageScheduledReleases function and are in the "Started" stage.
+        // performed by the PrepareScheduledReleaseVersions function and are in the "Started" stage.
         var overallStageFilter = CreateQueryFilter(status =>
             status.OverallStage == nameof(ReleasePublishingStatusOverallStage.Started)
         );
 
         // Match the internal stages with the values we expect for a release after tasks have been performed by
-        // the StageScheduledReleases function.
+        // the PrepareScheduledReleaseVersions function.
         var filesStageFilter = CreateQueryFilter(status =>
             status.FilesStage == nameof(ReleasePublishingStatusFilesStage.Complete)
         );
@@ -163,17 +163,6 @@ public class ReleasePublishingStatusService(
                 : $"{partitionKeyFilter} and ({stageFilter})";
 
         return await QueryEntitiesAsTableRowKeys(filter);
-    }
-
-    public async Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId)
-    {
-        var asyncPages = await publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
-            PublisherReleaseStatusTableName,
-            status => status.PartitionKey == releaseVersionId.ToString()
-        );
-        var statusList = await asyncPages.ToListAsync();
-
-        return statusList.OrderByDescending(status => status.Created).FirstOrDefault();
     }
 
     public async Task UpdateState(ReleasePublishingKey releasePublishingKey, ReleasePublishingStatusState state)

@@ -781,21 +781,22 @@ user approves release for scheduled publication
     user clicks button    Confirm
 
 user waits for scheduled release to be published immediately
-    # TODO EES-6432 Update this comment when the "stage scheduled releases" function is renamed.
-    # It's possible that the actual scheduled "stage scheduled releases" function might pick up the staging of this
-    # scheduled Release before we get a chance to manually trigger the "stage scheduled releases immediately" function
-    # ourselves - hence we need to account for it going into "Started" state while it stages before we've manually
-    # triggered the function, as well as the standard "Scheduled" state that we would normally expect a scheduled
-    # Release to fall into.
-    ${release_id}=    get release id from url
+    ${release_version_id}=    get release id from url
+    # It's possible that the scheduled "PrepareScheduledReleaseVersions" function may begin processing
+    # this scheduled release version before the test manually triggers the
+    # "PrepareScheduledReleaseVersionsNow" function via the API.
+    #
+    # Because of this potential overlap, the release version may already be in the overall
+    # "Started" state instead of the "Scheduled" state that would normally be expected.
+    # The test therefore needs to expect both states.
     user waits until page contains element
     ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_SMALL}
-    trigger immediate staging of scheduled release    ${release_id}
+    prepare scheduled release versions now via api    ['${release_version_id}']
     user reloads page
     user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
     user opens details dropdown    View stages
     user waits until page contains    Files - complete    %{WAIT_MEDIUM}
-    trigger immediate publishing of scheduled release    ${release_id}
+    publish scheduled release versions now via api    ['${release_version_id}']
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary

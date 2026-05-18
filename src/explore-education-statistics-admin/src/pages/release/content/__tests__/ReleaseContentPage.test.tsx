@@ -557,10 +557,6 @@ describe('ReleaseContentPage', () => {
           name: 'Add new section',
         }),
       ).toBeInTheDocument();
-
-      expect(
-        screen.getByTestId('release-summary-deprecated-warning'),
-      ).toBeInTheDocument();
     });
   });
 

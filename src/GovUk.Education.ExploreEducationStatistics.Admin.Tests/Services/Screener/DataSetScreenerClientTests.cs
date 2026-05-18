@@ -104,7 +104,7 @@ public class DataSetScreenerClientTests
             _mockHttp
                 .Expect(HttpMethod.Post, $"{BaseUri.AbsoluteUri}/screen")
                 .WithJsonContent(request, _requestSerializerOptions)
-                .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
+                .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(responseBody));
 
             var dataSetScreenerClient = BuildService();
 
@@ -128,25 +128,31 @@ public class DataSetScreenerClientTests
                 new()
                 {
                     DataSetId = dataSetIds[0],
-                    PercentageComplete = 50.12,
-                    Completed = false,
-                    Passed = false,
-                    Stage = "Validation",
+                    ProgressReport = new DataSetScreenerProgressReport
+                    {
+                        PercentageComplete = 50.12,
+                        Completed = false,
+                        Passed = false,
+                        Stage = "Validation",
+                    },
                 },
                 new()
                 {
                     DataSetId = dataSetIds[1],
-                    PercentageComplete = 100.00,
-                    Completed = true,
-                    Passed = true,
-                    Stage = "Screening",
+                    ProgressReport = new DataSetScreenerProgressReport
+                    {
+                        PercentageComplete = 100.00,
+                        Completed = true,
+                        Passed = true,
+                        Stage = "Screening",
+                    },
                 },
             ];
 
             _mockHttp
                 .Expect(HttpMethod.Get, $"{BaseUri.AbsoluteUri}/progress")
                 .WithQueryString($"data_set_id={dataSetIds[0]}&data_set_id={dataSetIds[1]}")
-                .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
+                .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(responseBody));
 
             var dataSetScreenerClient = BuildService();
 
@@ -158,6 +164,80 @@ public class DataSetScreenerClientTests
             _mockHttp.VerifyNoOutstandingExpectation();
 
             Assert.Equivalent(responseBody, response);
+        }
+    }
+
+    public class GetScreeningCompletionReportsTests : DataSetScreenerClientTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            Guid[] dataSetIds = [Guid.NewGuid(), Guid.NewGuid()];
+
+            DataSetScreenerCompletionReportResponse[] responseBody =
+            [
+                new()
+                {
+                    DataSetId = dataSetIds[0],
+                    CompletionReport = new DataSetScreenerResponse
+                    {
+                        OverallResult = "passed",
+                        Passed = true,
+                        PublicApiCompatible = true,
+                        TestResults = [],
+                    },
+                },
+                new()
+                {
+                    DataSetId = dataSetIds[1],
+                    CompletionReport = new DataSetScreenerResponse
+                    {
+                        OverallResult = "passed",
+                        Passed = true,
+                        PublicApiCompatible = true,
+                        TestResults = [new DataScreenerTestResult { Stage = "stage 1", TestFunctionName = "test 1" }],
+                    },
+                },
+            ];
+
+            _mockHttp
+                .Expect(HttpMethod.Get, $"{BaseUri.AbsoluteUri}/completion-reports")
+                .WithQueryString($"data_set_id={dataSetIds[0]}&data_set_id={dataSetIds[1]}")
+                .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(responseBody));
+
+            var dataSetScreenerClient = BuildService();
+
+            var response = await dataSetScreenerClient.GetScreenerCompletionReports(
+                dataSetIds: dataSetIds,
+                CancellationToken.None
+            );
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            Assert.Equivalent(responseBody, response);
+        }
+    }
+
+    public class DeleteScreenerProgressAndCompletionFiles : DataSetScreenerClientTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            Guid[] dataSetIds = [Guid.NewGuid(), Guid.NewGuid()];
+
+            _mockHttp
+                .Expect(HttpMethod.Delete, $"{BaseUri.AbsoluteUri}/progress-and-completion-files")
+                .WithQueryString($"data_set_id={dataSetIds[0]}&data_set_id={dataSetIds[1]}")
+                .Respond(HttpStatusCode.NoContent);
+
+            var dataSetScreenerClient = BuildService();
+
+            await dataSetScreenerClient.DeleteScreenerProgressAndCompletionFiles(
+                dataSetIds: dataSetIds,
+                CancellationToken.None
+            );
+
+            _mockHttp.VerifyNoOutstandingExpectation();
         }
     }
 

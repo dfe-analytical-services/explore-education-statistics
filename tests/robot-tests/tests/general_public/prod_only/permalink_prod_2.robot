@@ -15,7 +15,7 @@ Go to Table Tool page
 Go to permalink
     user navigates to    %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
     user waits until h1 is visible
-    ...    'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
+    ...    'Exclusions by characteristic' from 'Permanent & fixed-period exclusions in England'
 
 Validate breadcrumbs
     user checks breadcrumb count should be    4
@@ -23,7 +23,7 @@ Validate breadcrumbs
     user checks nth breadcrumb contains    2    Data tables
     user checks nth breadcrumb contains    3    Permanent link
     user checks nth breadcrumb contains    4
-    ...    'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
+    ...    'Exclusions by characteristic' from 'Permanent & fixed-period exclusions in England'
 
 Validate miscellaneous
     user checks summary list contains    Created    7 April 2020

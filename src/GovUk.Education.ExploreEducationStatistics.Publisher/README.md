@@ -1,40 +1,86 @@
 # Publisher Functions
 
-This project contains Azure Functions responsible for publishing of approved release versions, their content and their files.
+Azure Functions project responsible for a number of publishing-related tasks:
 
-Release versions can be scheduled to be published on a particular date or immediately on approval. There are two publisher flows covering these two scenarios.
+- **Release version publishing** - publishes approved release versions. A release version can either be scheduled for publication on a specific date or published immediately upon approval,
+with two publisher flows handling these scenarios respectively. Includes copying of release version files from private to public storage.
+- **Methodology version publishing** - publishes methodology versions alongside their associated release versions as
+  part of the release publishing flows. Includes copying of methodology version files from private to public storage.
+- **Methodology file publishing** - copies methodology version files from private to public storage when a methodology version is approved for immediate
+  public access, independently of a release version being published.
+- **Taxonomy cache refresh** - refreshes the cached publication and methodology 'tree' data (content structure) used by the public site Methodologies, Data Catalogue, and Table Tool pages.
 
-## Forcing immediate publishing of scheduled release versions in test environments
+## Release version approval in the Admin and the `NotifyChange` function
 
-All example HTTP requests below show examples of sending requests in a local development environment. Replace `http://localhost:7072` with the relevant environment's
-Publisher Functions URL.
+When a release version is approved in Admin, a message is placed on a queue, triggering the `NotifyChange` function.
 
-During manual or automated testing, it is handy to have a way to schedule release versions for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthy
-period before the scheduled Publisher Functions run. For this, we provide two Functions that can be triggered by HTTP requests; one stages scheduled release versions, whilst the other completes the 
-publishing process for any staged release versions and makes them live.
+`NotifyChange` is the entry point into release version publishing and is responsible for routing to either the immediate or scheduled publishing flows.
 
-By default, the two Functions for publishing scheduled release versions immediately will target only release versions scheduled for publication "today". However, passing an array of specific release version id's
-will affect only those specified release versions (and in addition will ignore their scheduled publishing date).
+At a high level, it:
 
-This first HTTP request will stage scheduled release versions with a scheduled publication date of "today":
+1. Acquires a per-release lease to prevent concurrent processing of the same release version approval events.
+2. Marks any previously scheduled publishing attempt for that release version as superseded.
+3. Validates that the release version is in a valid state to publish (i.e. that it hasn't already been scheduled or started publishing).
+4. Creates a new `ReleaseStatus` table entity in the Publisher's Azure Table storage to record details of the publishing attempt.
+5. Routes to the correct flow:
+    - **Immediate publication**: The status is created in an overall `Started` state, and it queues the 'Files' step to start immediately.
+    - **Scheduled publication**: The status is created in an overall `Scheduled` state which the cron-triggered scheduled flow will pick up later.
+
+## Immediate release version publishing flow
+
+If `NotifyChange` is triggered by an approval set for immediate publication, it creates a release status entity in an overall
+`Started` state and queues a message to trigger the 'Files' step function `PublishReleaseFiles` immediately.
+
+The `PublishReleaseFiles` function copies release version files from private to public storage.
+It also copies the methodology version files of any methodology versions being published alongside the release version.
+
+It then performs the 'Publishing' step, delegating to `PublishingCompletionService` to complete all remaining publishing tasks.
+One of the tasks involves updating the release version to make it publicly accessible.
+
+When complete, the release status entity is updated with an overall `Complete` state.
+
+## Scheduled release version publishing flow
+
+If `NotifyChange` is triggered by an approval set for scheduled publication, it creates a release status entity in an overall `Scheduled` state.
+
+Publishing of scheduled release relies on two functions which are triggered by cron schedules.
+
+- **`PrepareScheduledReleases`** - Prepares release versions for publishing by triggering file copying.
+- **`PublishScheduledReleaseVersions`** - Completes publishing of scheduled release versions.
+
+## Forcing immediate publishing of scheduled release versions for testing
+
+As scheduled publishing depends on two functions triggered by cron schedules, it can make testing frustrating if you have to wait for the next scheduled run.
+
+To assist manual and automated testing, two additional HTTP-triggered functions have been developed to allow **scheduled** release versions to be published immediately.
+
+By default, both functions target only release versions scheduled for publication on the current date.
+Passing an array of specific release version IDs overrides this behaviour, causing only the specified versions to be targeted regardless of their scheduled publishing date.
+
+All HTTP examples below target a local development environment.
+Replace `http://localhost:7072` with the target environment's Publisher Functions base URL.
+
+### PrepareScheduledReleaseVersionsNow
+
+Prepare all release versions scheduled for publishing today:
 
 ```http request
-POST http://localhost:7072/api/StageScheduledReleaseVersionsImmediately
-Accept: 'application/json'
+POST http://localhost:7072/api/PrepareScheduledReleaseVersionsNow
+Accept: application/json
 ```
 
-Alternatively to target specific release versions and ignore their scheduled dates:
+Prepare specific release versions scheduled for publishing (ignores scheduled date):
 
 ```http request
-POST http://localhost:7072/api/StageScheduledReleaseVersionsImmediately
-Content-Type: 'application/json'
+POST http://localhost:7072/api/PrepareScheduledReleaseVersionsNow
+Content-Type: application/json
 
 {
   "releaseVersionIds": ["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]
 }
 ```
 
-A JSON response of release version id's that are now being staged will be returned:
+Response (release version IDs that are now prepared for publishing):
 
 ```json
 {
@@ -42,26 +88,31 @@ A JSON response of release version id's that are now being staged will be return
 }
 ```
 
-After a delay to allow the staging process to complete (the above request queues messages to stage release versions but does not wait for them to complete), this second request will complete the
-publishing process of the staged release versions, returning an array of release version id's to be published:
+### PublishScheduledReleaseVersionsNow
 
-```http request
-POST http://localhost:7072/api/PublishStagedReleaseVersionContentImmediately
-Accept: 'application/json'
+Once preparation is complete, call this endpoint to finalise publishing and make the release versions live.
+
+> **Note:** Allow sufficient time for the PrepareScheduledReleaseVersionsNow function to complete before calling this endpoint.
+
+Publish all prepared release versions:
+
+```
+POST http://localhost:7072/api/PublishScheduledReleaseVersionsNow
+Accept: application/json
 ```
 
-Alternatively to target specific release versions:
+Publish specific prepared release versions:
 
-```http request
-POST http://localhost:7072/api/PublishStagedReleaseVersionContentImmediately
-Content-Type: 'application/json'
+```
+POST http://localhost:7072/api/PublishScheduledReleaseVersionsNow
+Content-Type: application/json
 
 {
   "releaseVersionIds": ["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]
 }
 ```
 
-A JSON response of release version id's that have now been published will be returned:
+Response (release version IDs that have been published):
 
 ```json
 {
@@ -69,16 +120,22 @@ A JSON response of release version id's that have now been published will be ret
 }
 ```
 
-After the HTTP request completes, the release versions will be published.
+### Triggering Functions via cURL
 
-### Triggering Functions from CLI
+Here are some examples of using cURL to make the requests:
 
-cURL can be used to easily trigger the Functions from the command-line. Some examples below:
+```bash
+curl http://localhost:7072/api/PrepareScheduledReleaseVersionsNow -X POST -H 'Accept: application/json'
+```
 
-`curl http://localhost:7072/api/StageScheduledReleaseVersionsImmediately -X POST -H 'Accept: application/json'`
+```bash
+curl http://localhost:7072/api/PrepareScheduledReleaseVersionsNow -X POST -H 'Content-Type: application/json' -d '{"releaseVersionIds":["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]}'
+```
 
-`curl http://localhost:7072/api/StageScheduledReleaseVersionsImmediately -X POST -H 'Content-Type: application/json' -d '{"releaseVersionIds":["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]}'`
+```bash
+curl http://localhost:7072/api/PublishScheduledReleaseVersionsNow -X POST -H 'Accept: application/json'
+```
 
-`curl http://localhost:7072/api/PublishStagedReleaseVersionContentImmediately -X POST -H 'Accept: application/json'`
-
-`curl http://localhost:7072/api/PublishStagedReleaseVersionContentImmediately -X POST -H 'Content-Type: application/json' -d '{"releaseVersionIds":["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]}'`
+```bash
+curl http://localhost:7072/api/PublishScheduledReleaseVersionsNow -X POST -H 'Content-Type: application/json' -d '{"releaseVersionIds":["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]}'
+```

@@ -308,15 +308,21 @@ public class EducationInNumbersService(
             throw new Exception("Full delete not enabled");
         }
 
-        var pagesToRemove = contentDbContext
-            .EinPages.Include(page => page.PageVersions)
-            .Single(page => page.Slug == slug);
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            var pageToRemove = contentDbContext.EinPages.Single(page => page.Slug == slug);
 
-        contentDbContext.EinPages.Remove(pagesToRemove);
+            pageToRemove.LatestPublishedVersionId = null;
+            pageToRemove.LatestVersionId = null;
 
-        // NOTE: Page versions, content sections and blocks are cascade deleted by the database
+            await contentDbContext.SaveChangesAsync();
 
-        await contentDbContext.SaveChangesAsync();
+            contentDbContext.EinPages.Remove(pageToRemove);
+
+            // NOTE: Page versions, content sections and blocks are cascade deleted by the database
+
+            await contentDbContext.SaveChangesAsync();
+        });
 
         return Unit.Instance;
     }

@@ -1,0 +1,35 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.helpColumn {
+  margin-top: govuk-spacing(3);
+
+  @include govuk-media-query($from: tablet) {
+    margin-top: 0;
+    margin-bottom: -30px; // shift tabs higher to match design
+  }
+}
+
+.nav {
+  margin: 0 0 govuk-spacing(4);
+  padding: 0;
+  display: flex;
+  gap: govuk-spacing(3);
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  list-style: none;
+
+  > li {
+    margin: 0;
+  }
+}
+
+.navItemLink {
+  border-bottom: 5px solid transparent;
+  padding: govuk-spacing(3) govuk-spacing(1);
+  text-decoration: none;
+  display: inline-flex;
+
+  &[aria-current='page']:not(:focus) {
+    color: govuk-colour('black');
+    border-color: govuk-colour('blue');
+  }
+}

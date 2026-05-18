@@ -1,7 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -101,7 +100,7 @@ public class DataSetFileStorage(
             MetaFileId = metaFileId,
             MetaFileName = dataSet.MetaFile.FileName,
             MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
-            Status = DataSetUploadStatus.SCREENING,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
             UploadedBy = userService.GetProfileFromClaims().Email.ToLower(),
             ReplacingFileId = dataSet.ReplacingFile?.Id,
             ScreenerProgress = screenerOptions.Value.EnhancedScreenerJourney
@@ -222,7 +221,7 @@ public class DataSetFileStorage(
 
         if (screenerResult is null)
         {
-            upload.Status = DataSetUploadStatus.SCREENER_ERROR;
+            upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
         }
         else
         {
@@ -233,15 +232,15 @@ public class DataSetFileStorage(
 
             if (hasWarnings)
             {
-                upload.Status = DataSetUploadStatus.PENDING_REVIEW;
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingReview;
             }
             else if (hasFailures)
             {
-                upload.Status = DataSetUploadStatus.FAILED_SCREENING;
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.FailedScreening;
             }
             else
             {
-                upload.Status = DataSetUploadStatus.PENDING_IMPORT;
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingImport;
             }
         }
 

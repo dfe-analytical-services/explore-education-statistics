@@ -419,6 +419,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("ScreenerResult")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ScreeningStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
