@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 
@@ -337,21 +338,23 @@ public abstract class ReplacementViewModel
 
 public record ReplacementPlanMappingViewModel
 {
-    public ReplacementPlanIndicatorsMappingViewModel Indicators { get; init; } = new();
+    public ReplacementPlanIndicatorsMappingViewModel Indicators { get; init; } = null!;
+
+    public ReplacementPlanLocationMappingsViewModel Locations { get; init; } = null!;
 }
 
 public record ReplacementPlanIndicatorsMappingViewModel
 {
     // Key is original indicator csv column name
-    public Dictionary<string, ReplacementPlanIndicatorMappingViewModel> Mappings { get; init; } = new();
+    public Dictionary<string, ReplacementPlanIndicatorMappingViewModel> Mappings { get; init; } = null!;
 
     // Key is replacement indicator csv column name
-    public Dictionary<string, ReplacementPlanIndicatorViewModel> Candidates { get; init; } = new();
+    public Dictionary<string, ReplacementPlanIndicatorViewModel> Candidates { get; init; } = null!;
 }
 
 public record ReplacementPlanIndicatorMappingViewModel
 {
-    public ReplacementPlanIndicatorViewModel Source { get; init; } = new();
+    public ReplacementPlanIndicatorViewModel Source { get; init; } = null!;
     public string Type { get; init; } = "";
     public string? CandidateKey { get; init; } // replacement indicator csv column name
 }
@@ -359,4 +362,26 @@ public record ReplacementPlanIndicatorMappingViewModel
 public record ReplacementPlanIndicatorViewModel
 {
     public string Label { get; init; } = "";
+}
+
+public record ReplacementPlanLocationMappingsViewModel
+{
+    // Key is original location id
+    public Dictionary<Guid, ReplacementPlanLocationMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement location id
+    public Dictionary<Guid, ReplacementPlanLocationViewModel> Candidates { get; init; } = new();
+}
+
+public record ReplacementPlanLocationMappingViewModel
+{
+    public ReplacementPlanLocationViewModel Source { get; init; } = null!;
+    public string Type { get; init; } = "";
+    public Guid? CandidateKey { get; init; } // replacement location id
+}
+
+public record ReplacementPlanLocationViewModel
+{
+    public string Code { get; init; } = "";
+    public string Name { get; init; } = "";
 }

@@ -166,6 +166,34 @@ public class ReplacementPlanService(
                             .Indicator.Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
                             .ToDictionary(i => i.Name, i => new ReplacementPlanIndicatorViewModel { Label = i.Label }),
                     },
+                    Locations = new ReplacementPlanLocationMappingsViewModel // @MarkFix write tests for this
+                    {
+                        Mappings = mapping.LocationMappings.Values.ToDictionary(
+                            map => map.OriginalId,
+                            map => new ReplacementPlanLocationMappingViewModel
+                            {
+                                Source = new ReplacementPlanLocationViewModel
+                                {
+                                    Code = map.OriginalCode,
+                                    Name = map.OriginalName,
+                                },
+                                Type = map.Status.ToString(),
+                                CandidateKey = map.ReplacementId,
+                            }
+                        ),
+                        Candidates = statisticsDbContext
+                            .Observation.Where(o => o.SubjectId == replacementSubjectId)
+                            .Select(o => o.Location)
+                            .Distinct()
+                            .ToDictionary(
+                                l => l.Id,
+                                l => new ReplacementPlanLocationViewModel
+                                {
+                                    Code = l.ToLocationAttribute().GetCodeOrFallback(),
+                                    Name = l.ToLocationAttribute().Name ?? "",
+                                }
+                            ),
+                    },
                 };
 
                 return new DataReplacementPlanViewModel
