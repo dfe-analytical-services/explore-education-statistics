@@ -8,7 +8,10 @@ import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import {
+  ReleaseType,
+  releaseTypes as statisticsReleaseTypes,
+} from '@common/services/types/releaseType';
 import getAsArray from '@common/utils/getAsArray';
 import locationLevelsMap, {
   GeographicLevelCode,
@@ -122,11 +125,11 @@ const SearchDataPage: NextPage = () => {
     dataSetType,
     geographicLevels,
     latestDataOnly,
-    publicationId,
-    releaseType,
+    publicationIds,
+    releaseTypes,
     search,
     sortBy,
-    themeId,
+    themeIds,
   } = getParamsFromQuery(router.query);
 
   const themeOptions = themes.map(theme => {
@@ -136,9 +139,9 @@ const SearchDataPage: NextPage = () => {
     };
   });
 
-  const releaseTypeOptions = Object.keys(releaseTypes).map(type => {
+  const releaseTypeOptions = Object.keys(statisticsReleaseTypes).map(type => {
     return {
-      label: releaseTypes[type as ReleaseType],
+      label: statisticsReleaseTypes[type as ReleaseType],
       value: type,
     };
   });
@@ -152,11 +155,11 @@ const SearchDataPage: NextPage = () => {
     },
   );
 
-  const selectedThemes = themes.filter(theme => themeId?.includes(theme.id));
-  const selectedReleaseTypes = releaseType
-    ? getAsArray(releaseType)!.map(type => ({
+  const selectedThemes = themes.filter(theme => themeIds?.includes(theme.id));
+  const selectedReleaseTypes = releaseTypes
+    ? getAsArray(releaseTypes)!.map(type => ({
         id: type,
-        title: releaseTypes[type as ReleaseType],
+        title: statisticsReleaseTypes[type as ReleaseType],
       }))
     : [];
 
@@ -168,7 +171,7 @@ const SearchDataPage: NextPage = () => {
 
   const allPublications = publicationTree.flatMap(theme => theme.publications);
   const selectedPublications = allPublications.filter(
-    publication => publicationId?.includes(publication.id),
+    publication => publicationIds?.includes(publication.id),
   );
 
   const isFilteredByDataSetType =
@@ -506,13 +509,13 @@ const SearchDataPage: NextPage = () => {
               geographicLevelOptions={geographicLevelOptions}
               includeDataFilters={!isPublicationsSearch}
               latestDataOnly={latestDataOnly}
-              publicationIds={publicationId}
+              publicationIds={publicationIds}
               publicationTree={publicationTree}
-              releaseTypes={releaseType}
+              releaseTypes={releaseTypes}
               releaseTypeOptions={releaseTypeOptions}
               sortBy={sortBy}
               sortOptions={sortOptions}
-              themeIds={themeId}
+              themeIds={themeIds}
               themes={themes}
               themeOptions={themeOptions}
               onChange={handleChangeFilter}
@@ -530,13 +533,13 @@ const SearchDataPage: NextPage = () => {
                 geographicLevelOptions={geographicLevelOptions}
                 includeDataFilters={!isPublicationsSearch}
                 latestDataOnly={latestDataOnly}
-                publicationIds={publicationId}
+                publicationIds={publicationIds}
                 publicationTree={publicationTree}
                 releaseTypeOptions={releaseTypeOptions}
-                releaseTypes={releaseType}
+                releaseTypes={releaseTypes}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
-                themeIds={themeId}
+                themeIds={themeIds}
                 themes={themes}
                 themeOptions={themeOptions}
                 onChange={handleChangeFilter}

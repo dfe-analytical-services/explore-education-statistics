@@ -163,7 +163,7 @@ export default function Filters({
       >
         <FormCheckboxGroup
           id={`${formId}-release-type`}
-          legend="Filter by Release Type"
+          legend="Filter by Release type"
           legendHidden
           name="releaseType"
           options={releaseTypeOptions}

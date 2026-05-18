@@ -1,5 +1,8 @@
 import { odata } from '@azure/search-documents';
-import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
+import {
+  releaseTypes as statisticsReleaseTypes,
+  ReleaseType,
+} from '@common/services/types/releaseType';
 import getAsArray from '@common/utils/getAsArray';
 import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -17,17 +20,17 @@ export default function createStatisticalReleasesListRequest(
   query: SearchDataPageQuery,
 ): AzureDataSetListRequest {
   const {
-    releaseType,
+    releaseTypes,
     search: searchParam,
     sortBy,
-    themeId,
+    themeIds,
   } = getParamsFromQuery(query);
 
   const orderBy = getSortParam(sortBy);
 
   const filter = buildODataFilter({
-    releaseType,
-    themeId,
+    releaseTypes,
+    themeIds,
   });
 
   const minSearchCharacters = 3;
@@ -46,20 +49,20 @@ export default function createStatisticalReleasesListRequest(
 }
 
 interface SearchFilters {
-  releaseType?: string[];
-  themeId?: string[];
+  releaseTypes?: string[];
+  themeIds?: string[];
 }
 
 function buildODataFilter(filters: SearchFilters): string | undefined {
   const conditions: string[] = [];
 
-  if (filters.releaseType?.length) {
-    const joined = filters.releaseType.join('|');
+  if (filters.releaseTypes?.length) {
+    const joined = filters.releaseTypes.join('|');
     conditions.push(odata`search.in(releaseType, ${joined}, '|')`);
   }
 
-  if (filters.themeId?.length) {
-    const joined = filters.themeId.join('|');
+  if (filters.themeIds?.length) {
+    const joined = filters.themeIds.join('|');
     conditions.push(odata`search.in(themeId, ${joined}, '|')`);
   }
 
@@ -84,17 +87,17 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
   const releaseTypesArray = getAsArray(query.releaseType) ?? [];
 
   const validReleaseTypes = releaseTypesArray.filter(type =>
-    isOneOf(type, Object.keys(releaseTypes)),
+    isOneOf(type, Object.keys(statisticsReleaseTypes)),
   ) as ReleaseType[];
 
   return {
     page: getFirst(query.page),
-    releaseType: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,
+    releaseTypes: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,
     search: getFirst(query.search),
     sortBy:
       query.sortBy && isOneOf(query.sortBy, publicationSortOptions)
         ? query.sortBy
         : 'newest',
-    themeId: getAsArray(query.themeId),
+    themeIds: getAsArray(query.themeId),
   };
 }

@@ -49,6 +49,7 @@ const ThemesAndReleasesFilterGroup = ({
   // Calculate total matching checkboxes (themes + publications)
   const matchCount = useMemo(() => {
     return filteredTree.reduce(
+      // add together total, 1 for the theme itself, and the number of publications
       (total, theme) => total + 1 + (theme.publications?.length || 0),
       0,
     );
@@ -61,12 +62,12 @@ const ThemesAndReleasesFilterGroup = ({
     if (isChecked) {
       nextThemeIds.push(themeId);
       // Uncheck all publications contained under this theme to avoid logical overlap
-      const themePubIds =
+      const themePublicationIds =
         publicationTree
           .find(t => t.id === themeId)
           ?.publications.map(p => p.id) || [];
       nextPublicationIds = nextPublicationIds.filter(
-        id => !themePubIds.includes(id),
+        id => !themePublicationIds.includes(id),
       );
     } else {
       nextThemeIds = nextThemeIds.filter(id => id !== themeId);
@@ -77,18 +78,20 @@ const ThemesAndReleasesFilterGroup = ({
 
   const handlePublicationChange = (
     themeId: string,
-    pubId: string,
+    publicationId: string,
     isChecked: boolean,
   ) => {
     let nextThemeIds = [...themeIds];
     let nextPublicationIds = [...publicationIds];
 
     if (isChecked) {
-      nextPublicationIds.push(pubId);
+      nextPublicationIds.push(publicationId);
       // Uncheck the parent theme if a nested publication is specifically selected
       nextThemeIds = nextThemeIds.filter(id => id !== themeId);
     } else {
-      nextPublicationIds = nextPublicationIds.filter(id => id !== pubId);
+      nextPublicationIds = nextPublicationIds.filter(
+        id => id !== publicationId,
+      );
     }
 
     onChangeBatch(nextThemeIds, nextPublicationIds);
