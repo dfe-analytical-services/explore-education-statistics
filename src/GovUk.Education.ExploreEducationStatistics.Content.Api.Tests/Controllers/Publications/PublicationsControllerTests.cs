@@ -96,27 +96,27 @@ public abstract class PublicationsControllerTests
 
     public class GetPublicationReleasesTests : PublicationsControllerTests
     {
-        private const int Page = 1;
-        private const int PageSize = 10;
-
         [Fact]
-        public async Task WhenServiceReturnsPublicationReleases_ReturnsOk()
+        public async Task WhenServiceReturnsReleases_ReturnsOk()
         {
             // Arrange
+            const int page = 2;
+            const int pageSize = 5;
+
             var publicationReleases = PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(
                 [
                     new LegacyPublicationReleaseEntryDtoBuilder().Build(),
                     new PublicationReleaseEntryDtoBuilder().Build(),
                 ],
-                page: Page,
-                pageSize: PageSize
+                page: page,
+                pageSize: pageSize
             );
 
             var request = new GetPublicationReleasesRequest
             {
                 PublicationSlug = PublicationSlug,
-                Page = Page,
-                PageSize = PageSize,
+                Page = page,
+                PageSize = pageSize,
             };
 
             _publicationReleasesService.WhereHasPublicationReleases(publicationReleases);
@@ -128,30 +128,33 @@ public abstract class PublicationsControllerTests
 
             // Assert
             _publicationReleasesService.Assert.GetPublicationReleasesWasCalled(
-                request.PublicationSlug,
-                page: request.Page,
-                pageSize: request.PageSize
+                PublicationSlug,
+                page: page,
+                pageSize: pageSize
             );
             result.AssertOkResult(publicationReleases);
         }
 
         [Fact]
-        public async Task WhenNoQueryParameters_UsesPaginationDefaults()
+        public async Task WhenPageAndPageSizeAreNull_PassesNullToService()
         {
             // Arrange
-            const int defaultPage = 1;
-            const int defaultPageSize = 10;
             var publicationReleases = PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(
                 [
                     new LegacyPublicationReleaseEntryDtoBuilder().Build(),
                     new PublicationReleaseEntryDtoBuilder().Build(),
                 ],
-                page: defaultPage,
-                pageSize: defaultPageSize
+                page: 1,
+                pageSize: 2
             );
 
-            // No page or pageSize query parameters set on request
-            var request = new GetPublicationReleasesRequest { PublicationSlug = PublicationSlug };
+            // Pagination parameters omitted from request (Page and PageSize are null)
+            var request = new GetPublicationReleasesRequest
+            {
+                PublicationSlug = PublicationSlug,
+                Page = null,
+                PageSize = null,
+            };
 
             _publicationReleasesService.WhereHasPublicationReleases(publicationReleases);
 
@@ -161,10 +164,11 @@ public abstract class PublicationsControllerTests
             var result = await sut.GetPublicationReleases(request);
 
             // Assert
+            // The service should be called with null Page and PageSize so that all results are returned
             _publicationReleasesService.Assert.GetPublicationReleasesWasCalled(
-                request.PublicationSlug,
-                page: defaultPage,
-                pageSize: defaultPageSize
+                PublicationSlug,
+                page: null,
+                pageSize: null
             );
             result.AssertOkResult(publicationReleases);
         }
@@ -183,7 +187,7 @@ public abstract class PublicationsControllerTests
             var result = await sut.GetPublicationReleases(request);
 
             // Assert
-            _publicationReleasesService.Assert.GetPublicationReleasesWasCalled(request.PublicationSlug);
+            _publicationReleasesService.Assert.GetPublicationReleasesWasCalled(PublicationSlug);
             result.AssertNotFoundResult();
         }
     }

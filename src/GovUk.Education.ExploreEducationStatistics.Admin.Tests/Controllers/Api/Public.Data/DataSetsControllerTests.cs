@@ -554,7 +554,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
 
             var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
 
-            pagedResult.AssertHasPagingConsistentWithEmptyResults();
+            pagedResult.AssertEmptyResults();
         }
 
         [Fact]
@@ -606,7 +606,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
 
             var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
 
-            pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPage: page);
+            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 0, expectedPage: page);
         }
 
         [Theory]
@@ -637,7 +637,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
 
             var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
 
-            pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPageSize: pageSize);
+            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 0, expectedPageSize: pageSize);
         }
 
         private async Task<HttpResponseMessage> ListPublicationDataSets(

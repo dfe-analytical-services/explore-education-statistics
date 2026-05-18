@@ -9,8 +9,8 @@ public interface IPublicationReleasesService
 {
     Task<Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>> GetPublicationReleases(
         string publicationSlug,
-        int page = 1,
-        int pageSize = 10,
+        int? page = null,
+        int? pageSize = null,
         CancellationToken cancellationToken = default
     );
 
