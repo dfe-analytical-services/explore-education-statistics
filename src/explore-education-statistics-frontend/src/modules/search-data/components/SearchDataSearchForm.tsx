@@ -3,7 +3,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import styles from '@common/components/form/FormSearchBar.module.scss';
 import logger from '@common/services/logger';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
-import { createPublicationSuggestRequest } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import { createStatisticalReleasesSuggestRequest } from '@frontend/modules/search-data/utils/createStatisticalReleasesListRequest';
 import azurePublicationService, {
   AzurePublicationSuggestResult,
 } from '@frontend/services/azurePublicationService';
@@ -93,7 +93,7 @@ export default function SearchForm({
 
     azurePublicationService
       .suggestPublications(
-        createPublicationSuggestRequest(router.query, enteredText),
+        createStatisticalReleasesSuggestRequest(router.query, enteredText),
       )
       .then(populateResults)
       .catch(error => {
