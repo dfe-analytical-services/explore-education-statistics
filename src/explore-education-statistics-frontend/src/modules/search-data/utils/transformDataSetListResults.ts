@@ -6,6 +6,7 @@ import { DataSetFileSummary } from '@frontend/services/dataSetFileService';
 export default async function transformDataSetListResults(
   results: SearchIterator<
     AzureDataSetIndexItem,
+    | 'dataSetFileId'
     | 'fileId'
     | 'filename'
     | 'fileExtension'
@@ -38,6 +39,7 @@ export default async function transformDataSetListResults(
   for await (const result of results) {
     const { document } = result;
     const {
+      dataSetFileId,
       fileId,
       fileSize,
       filename,
@@ -65,7 +67,7 @@ export default async function transformDataSetListResults(
     } = document;
 
     transformedResults.push({
-      id: fileId,
+      id: dataSetFileId,
       fileId,
       filename,
       fileSize,
