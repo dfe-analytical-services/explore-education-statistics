@@ -31,7 +31,7 @@ public class FileImportService : IFileImportService
         _importerService = importerService;
     }
 
-    public async Task<DataImport?> ImportObservations(DataImport import, StatisticsDbContext context)
+    public async Task ImportObservations(DataImport import, StatisticsDbContext context)
     {
         _logger.LogInformation("Importing Observations for {Filename}", import.File.Filename);
 
@@ -43,7 +43,7 @@ public class FileImportService : IFileImportService
                 import.Status
             );
 
-            return null;
+            return;
         }
 
         if (import.Status == CANCELLING)
@@ -55,7 +55,7 @@ public class FileImportService : IFileImportService
             );
 
             await _dataImportService.UpdateStatus(import.Id, CANCELLED, 100);
-            return null;
+            return;
         }
 
         var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
@@ -70,8 +70,6 @@ public class FileImportService : IFileImportService
             subject,
             context
         );
-
-        return await _dataImportService.GetImport(import.Id);
     }
 
     public async Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context)
@@ -140,6 +138,5 @@ public class FileImportService : IFileImportService
     private async Task FinalImportTasks(DataImport import)
     {
         await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
-        // @MarkFix create DataSetMapping here
     }
 }
