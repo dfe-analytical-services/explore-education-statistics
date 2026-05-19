@@ -8,7 +8,15 @@ import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import {
+  ReleaseType,
+  releaseTypes as statisticsReleaseTypes,
+} from '@common/services/types/releaseType';
+import getAsArray from '@common/utils/getAsArray';
+import locationLevelsMap, {
+  GeographicLevelCode,
+  geographicLevelCodesMap,
+} from '@common/utils/locationLevelsMap';
 import FilterResetButton from '@frontend/components/FilterResetButton';
 import FiltersMobile from '@frontend/components/FiltersMobile';
 import Link from '@frontend/components/Link';
@@ -28,10 +36,12 @@ import {
 } from '@frontend/modules/search-data/utils/searchDataFilters';
 import azureDataSetQueries from '@frontend/queries/azureDataSetQueries';
 import azurePublicationQueries from '@frontend/queries/azurePublicationQueries';
+import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
@@ -44,12 +54,14 @@ type RoutePath = 'search-releases' | 'search-data';
 
 export interface SearchDataPageQuery {
   dataSetType?: DataSetType;
+  geographicLevel?: GeographicLevelCode | GeographicLevelCode[];
   latestDataOnly?: string;
   page?: number;
-  releaseType?: ReleaseType;
+  publicationId?: string | string[];
+  releaseType?: ReleaseType | ReleaseType[];
   search?: string;
   sortBy?: PublicationSortOption;
-  themeId?: string;
+  themeId?: string | string[];
 }
 
 const SearchDataPage: NextPage = () => {
@@ -79,7 +91,7 @@ const SearchDataPage: NextPage = () => {
     isFetching: isPublicationsFetching,
     isLoading: isPublicationsLoading,
   } = useQuery({
-    ...azurePublicationQueries.list(router.query),
+    ...azurePublicationQueries.listStatisticalReleases(router.query),
     keepPreviousData: true,
     refetchOnWindowFocus: false,
     staleTime: 60000,
@@ -88,6 +100,13 @@ const SearchDataPage: NextPage = () => {
 
   const { data: themes = [] } = useQuery({
     ...themeQueries.listProdThemes(),
+    staleTime: Infinity,
+  });
+
+  const { data: publicationTree = [] } = useQuery({
+    ...publicationQueries.getPrototypePublicationTree({
+      filter: 'DataCatalogue',
+    }),
     staleTime: Infinity,
   });
 
@@ -102,8 +121,16 @@ const SearchDataPage: NextPage = () => {
     totalResults = 0,
   } = (isPublicationsSearch ? publicationsPaging : dataSetsPaging) ?? {};
 
-  const { dataSetType, latestDataOnly, releaseType, search, sortBy, themeId } =
-    getParamsFromQuery(router.query);
+  const {
+    dataSetType,
+    geographicLevels,
+    latestDataOnly,
+    publicationIds,
+    releaseTypes,
+    search,
+    sortBy,
+    themeIds,
+  } = getParamsFromQuery(router.query);
 
   const themeOptions = themes.map(theme => {
     return {
@@ -112,34 +139,73 @@ const SearchDataPage: NextPage = () => {
     };
   });
 
-  const releaseTypeOptions = Object.keys(releaseTypes).map(type => {
+  const releaseTypeOptions = Object.keys(statisticsReleaseTypes).map(type => {
     return {
-      label: releaseTypes[type as ReleaseType],
+      label: statisticsReleaseTypes[type as ReleaseType],
       value: type,
     };
   });
 
+  const geographicLevelOptions = Object.values(locationLevelsMap).map(
+    location => {
+      return {
+        label: location.filterLabel,
+        value: location.code,
+      };
+    },
+  );
+
+  const selectedThemes = themes.filter(theme => themeIds?.includes(theme.id));
+  const selectedReleaseTypes = releaseTypes
+    ? getAsArray(releaseTypes)!.map(type => ({
+        id: type,
+        title: statisticsReleaseTypes[type as ReleaseType],
+      }))
+    : [];
+
+  const selectedGeographicLevels = geographicLevels
+    ? getAsArray(geographicLevels)!
+        .map(code => geographicLevelCodesMap[code as GeographicLevelCode])
+        .filter(Boolean)
+    : [];
+
+  const allPublications = publicationTree.flatMap(theme => theme.publications);
+  const selectedPublications = allPublications.filter(
+    publication => publicationIds?.includes(publication.id),
+  );
+
   const isFilteredByDataSetType =
     !isPublicationsSearch && dataSetType === 'api';
   const isFilteredAllReleases = !isPublicationsSearch && !latestDataOnly;
+  const isFilteredByGeographicLevel =
+    !isPublicationsSearch && selectedGeographicLevels.length > 0;
+  const isFilteredByPublicationId =
+    !isPublicationsSearch && selectedPublications.length > 0;
 
   const isFiltered =
     !!search ||
-    !!releaseType ||
-    !!themeId ||
+    selectedReleaseTypes.length > 0 ||
+    selectedThemes.length > 0 ||
     isFilteredByDataSetType ||
-    isFilteredAllReleases;
+    isFilteredAllReleases ||
+    isFilteredByGeographicLevel ||
+    isFilteredByPublicationId;
 
-  const selectedTheme = themes.find(theme => theme.id === themeId);
-  const selectedReleaseType = releaseTypes[releaseType as ReleaseType];
-
-  const filteredByString = compact([
-    search,
-    selectedTheme?.title,
-    selectedReleaseType,
-    isFilteredByDataSetType ? 'API data sets only' : undefined,
-    isFilteredAllReleases ? 'All releases' : undefined,
-  ]).join(', ');
+  const filteredByString = compact(
+    [
+      search,
+      ...selectedThemes.map(t => t.title),
+      ...selectedReleaseTypes.map(rt => rt.title),
+      isFilteredByGeographicLevel
+        ? [...selectedGeographicLevels.map(gl => gl.filterLabel)]
+        : undefined,
+      isFilteredByPublicationId
+        ? [...selectedPublications.map(p => p.title)]
+        : undefined,
+      isFilteredByDataSetType ? 'API data sets only' : undefined,
+      isFilteredAllReleases ? 'All releases' : undefined,
+    ].flat(),
+  ).join(', ');
 
   const sortOptions: SortOption[] = [
     { label: 'Newest', value: 'newest' },
@@ -186,6 +252,37 @@ const SearchDataPage: NextPage = () => {
     });
   };
 
+  const multiValueFilters: string[] = [
+    'themeId',
+    'releaseType',
+    'geographicLevel',
+    'publicationId',
+  ];
+
+  const handleBatchChangeFilters = async (
+    updates: Record<string, string[]>,
+  ) => {
+    let newQuery: Record<string, string | string[] | undefined> = {
+      ...omit(router.query, 'page'),
+    };
+
+    // Apply batch updates
+    Object.entries(updates).forEach(([key, values]) => {
+      if (values.length === 0) {
+        newQuery = omit(newQuery, key);
+      } else {
+        newQuery[key] = values;
+      }
+    });
+
+    await updateQueryParams(newQuery as SearchDataPageQuery);
+
+    logEvent({
+      category: 'Find statistics and data',
+      action: `Data filtered by themes or release`,
+    });
+  };
+
   const handleChangeFilter = async ({
     filterType,
     nextValue,
@@ -193,20 +290,50 @@ const SearchDataPage: NextPage = () => {
     filterType: SearchDataFilter;
     nextValue: string;
   }) => {
-    // If performing a search (by search term), reset sortBy to relevance
+    // 1. If performing a search (by search term), reset sortBy to relevance
     const nextSortBy =
       filterType === 'search' && nextValue.length > 0 ? 'relevance' : sortBy;
 
-    const newParams =
-      nextValue === 'all' && filterType !== 'dataSetType'
-        ? omit(router.query, 'page', filterType)
-        : {
-            ...omit(router.query, 'page'),
-            [filterType]: nextValue,
-            sortBy: nextSortBy,
-          };
+    // 2. Start building the new query.
+    // We use a Record here so TypeScript allows dynamic key assignments.
+    let newQuery: Record<string, string | string[] | undefined> = {
+      ...omit(router.query, 'page'),
+      sortBy: nextSortBy,
+    };
 
-    await updateQueryParams(newParams);
+    // 3. Determine if this filter should be handled as an array (checkboxes) or a single string (radios/selects)
+    if (multiValueFilters.includes(filterType)) {
+      // Safely grab the current query param and ensure it's an array.
+      const currentParam = router.query[filterType] as
+        | string
+        | string[]
+        | undefined;
+      const currentValues = getAsArray(currentParam) ?? [];
+
+      let updatedValues: string[];
+      if (currentValues.includes(nextValue)) {
+        // Remove it if already selected
+        updatedValues = currentValues.filter(v => v !== nextValue);
+      } else {
+        // Add it if not selected
+        updatedValues = [...currentValues, nextValue];
+      }
+
+      // If the array is empty, wipe it from the URL entirely. Otherwise, set it.
+      if (updatedValues.length === 0) {
+        newQuery = omit(newQuery, filterType);
+      } else {
+        newQuery[filterType] = updatedValues;
+      }
+    } else if (nextValue === 'all' && filterType !== 'dataSetType') {
+      // Wipe the parameter from the URL if 'all' is selected (and it's not the dataSetType value of 'all')
+      newQuery = omit(newQuery, filterType);
+    } else {
+      // Set the specific single string value
+      newQuery[filterType] = nextValue;
+    }
+
+    await updateQueryParams(newQuery as SearchDataPageQuery);
 
     logEvent({
       category: 'Find statistics and data',
@@ -261,6 +388,7 @@ const SearchDataPage: NextPage = () => {
       // Don't include the default meta title when filtered to prevent too much screen reader noise.
       includeDefaultMetaTitle={pageTitle === defaultPageTitle}
       metaTitle={pageTitle}
+      width="wide"
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
@@ -368,23 +496,31 @@ const SearchDataPage: NextPage = () => {
         </div>
       </div>
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
+        <div
+          className={classNames([
+            'govuk-grid-column-one-third',
+            styles.stickyFilters,
+          ])}
+        >
           {!isMobileMedia && (
             <SearchDataFilters
-              dataSetType={dataSetType as DataSetType}
+              dataSetType={dataSetType}
+              geographicLevels={geographicLevels}
+              geographicLevelOptions={geographicLevelOptions}
               includeDataFilters={!isPublicationsSearch}
               latestDataOnly={latestDataOnly}
-              releaseType={releaseType}
+              publicationIds={publicationIds}
+              publicationTree={publicationTree}
+              releaseTypes={releaseTypes}
               releaseTypeOptions={releaseTypeOptions}
-              showResetFiltersButton={!isMobileMedia && isFiltered}
               sortBy={sortBy}
               sortOptions={sortOptions}
-              themeId={themeId}
+              themeIds={themeIds}
               themes={themes}
               themeOptions={themeOptions}
               onChange={handleChangeFilter}
+              onChangeBatch={handleBatchChangeFilters}
               onSortChange={handleSortBy}
-              onResetFilters={() => handleResetFilter({ filterType: 'all' })}
             />
           )}
         </div>
@@ -392,17 +528,22 @@ const SearchDataPage: NextPage = () => {
           {isMobileMedia && (
             <FiltersMobile title="Filter and sort" totalResults={totalResults}>
               <SearchDataFilters
-                dataSetType={dataSetType as DataSetType}
+                dataSetType={dataSetType}
+                geographicLevels={geographicLevels}
+                geographicLevelOptions={geographicLevelOptions}
                 includeDataFilters={!isPublicationsSearch}
                 latestDataOnly={latestDataOnly}
+                publicationIds={publicationIds}
+                publicationTree={publicationTree}
                 releaseTypeOptions={releaseTypeOptions}
-                releaseType={releaseType}
+                releaseTypes={releaseTypes}
                 sortBy={sortBy}
                 sortOptions={sortOptions}
-                themeId={themeId}
+                themeIds={themeIds}
                 themes={themes}
                 themeOptions={themeOptions}
                 onChange={handleChangeFilter}
+                onChangeBatch={handleBatchChangeFilters}
                 onSortChange={handleSortBy}
               />
             </FiltersMobile>
@@ -432,22 +573,64 @@ const SearchDataPage: NextPage = () => {
                 />
               )}
 
-              {selectedTheme && (
+              {selectedThemes.map(theme => (
                 <FilterResetButton
+                  key={theme.id}
                   filterType="Theme"
-                  name={selectedTheme.title}
-                  onClick={() => handleResetFilter({ filterType: 'themeId' })}
-                />
-              )}
-              {selectedReleaseType && (
-                <FilterResetButton
-                  filterType="Release type"
-                  name={selectedReleaseType}
+                  name={theme.title}
                   onClick={() =>
-                    handleResetFilter({ filterType: 'releaseType' })
+                    handleChangeFilter({
+                      filterType: 'themeId',
+                      nextValue: theme.id,
+                    })
                   }
                 />
-              )}
+              ))}
+
+              {isFilteredByGeographicLevel &&
+                selectedGeographicLevels.map(gl => (
+                  <FilterResetButton
+                    key={gl.code}
+                    filterType="Geographic level"
+                    name={gl.filterLabel}
+                    onClick={() =>
+                      handleChangeFilter({
+                        filterType: 'geographicLevel',
+                        nextValue: gl.code,
+                      })
+                    }
+                  />
+                ))}
+
+              {isFilteredByPublicationId &&
+                selectedPublications.map(pub => (
+                  <FilterResetButton
+                    key={pub.id}
+                    filterType="Publication"
+                    name={pub.title}
+                    onClick={() =>
+                      handleChangeFilter({
+                        filterType: 'publicationId',
+                        nextValue: pub.id,
+                      })
+                    }
+                  />
+                ))}
+
+              {selectedReleaseTypes.map(rt => (
+                <FilterResetButton
+                  key={rt.id}
+                  filterType="Release type"
+                  name={rt.title}
+                  onClick={() =>
+                    handleChangeFilter({
+                      filterType: 'releaseType',
+                      nextValue: rt.id,
+                    })
+                  }
+                />
+              ))}
+
               {isFilteredByDataSetType && (
                 <FilterResetButton
                   filterType="Data set type"
@@ -467,6 +650,16 @@ const SearchDataPage: NextPage = () => {
                 />
               )}
             </div>
+
+            {isFiltered && (
+              <div className="govuk-!-width-full">
+                <ButtonText
+                  onClick={() => handleResetFilter({ filterType: 'all' })}
+                >
+                  Clear all filters
+                </ButtonText>
+              </div>
+            )}
           </div>
 
           <LoadingSpinner
@@ -576,9 +769,17 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   await Promise.all([
     isPublicationsSearch
-      ? queryClient.prefetchQuery(azurePublicationQueries.list(query))
+      ? queryClient.prefetchQuery(
+          azurePublicationQueries.listStatisticalReleases(query),
+        )
       : queryClient.prefetchQuery(azureDataSetQueries.list(query)),
-    queryClient.prefetchQuery(themeQueries.listProdThemes()),
+    isPublicationsSearch
+      ? queryClient.prefetchQuery(themeQueries.listProdThemes())
+      : queryClient.prefetchQuery(
+          publicationQueries.getPrototypePublicationTree({
+            filter: 'DataCatalogue',
+          }),
+        ),
   ]);
 
   return {
