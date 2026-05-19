@@ -75,6 +75,57 @@ public abstract class DataReplacementControllerTests
                 },
                 OriginalSubjectId = Guid.NewGuid(),
                 ReplacementSubjectId = Guid.NewGuid(),
+                Mapping = new ReplacementPlanMappingViewModel
+                {
+                    Indicators = new ReplacementPlanIndicatorsMappingViewModel
+                    {
+                        Mappings = new Dictionary<string, ReplacementPlanIndicatorMappingViewModel>
+                        {
+                            {
+                                "original_indicator",
+                                new ReplacementPlanIndicatorMappingViewModel
+                                {
+                                    Source = new ReplacementPlanIndicatorViewModel { Label = "Original indicator" },
+                                    Type = "Unset",
+                                    CandidateKey = null,
+                                }
+                            },
+                        },
+                        Candidates = new Dictionary<string, ReplacementPlanIndicatorViewModel>
+                        {
+                            {
+                                "replacement_indicator",
+                                new ReplacementPlanIndicatorViewModel { Label = "Replacement indicator" }
+                            },
+                        },
+                    },
+                    Locations = new ReplacementPlanLocationMappingsViewModel
+                    {
+                        Mappings = new Dictionary<Guid, ReplacementPlanLocationMappingViewModel>
+                        {
+                            {
+                                Guid.NewGuid(),
+                                new ReplacementPlanLocationMappingViewModel
+                                {
+                                    Source = new ReplacementPlanLocationViewModel
+                                    {
+                                        Code = "E9000",
+                                        Name = "OriginalLocation",
+                                    },
+                                    Type = "Unset",
+                                    CandidateKey = null,
+                                }
+                            },
+                        },
+                        Candidates = new Dictionary<Guid, ReplacementPlanLocationViewModel>
+                        {
+                            {
+                                Guid.NewGuid(),
+                                new ReplacementPlanLocationViewModel { Code = "E9393", Name = "ReplacementLocation" }
+                            },
+                        },
+                    },
+                },
             };
 
             replacementPlanService

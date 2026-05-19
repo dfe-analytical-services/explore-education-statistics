@@ -166,7 +166,7 @@ public class ReplacementPlanService(
                             .Indicator.Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
                             .ToDictionary(i => i.Name, i => new ReplacementPlanIndicatorViewModel { Label = i.Label }),
                     },
-                    Locations = new ReplacementPlanLocationMappingsViewModel // @MarkFix write tests for this
+                    Locations = new ReplacementPlanLocationMappingsViewModel
                     {
                         Mappings = mapping.LocationMappings.Values.ToDictionary(
                             map => map.OriginalId,

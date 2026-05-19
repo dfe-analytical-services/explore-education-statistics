@@ -154,8 +154,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
       ),
       queryClient.fetchQuery(
         publicationQueries.getPublicationReleaseList(publicationSlug, {
-          page: page ? Number(page) : undefined,
-          pageSize: pageSize ? Number(pageSize) : undefined,
+          page: page ? Number(page) : 1,
+          pageSize: pageSize ? Number(pageSize) : 25,
         }),
       ),
     ]);
