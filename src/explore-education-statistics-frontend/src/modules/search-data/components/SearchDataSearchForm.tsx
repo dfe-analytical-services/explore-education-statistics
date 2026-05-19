@@ -3,7 +3,11 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import styles from '@common/components/form/FormSearchBar.module.scss';
 import logger from '@common/services/logger';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
+import { createDataSetSuggestRequest } from '@frontend/modules/search-data/utils/createDataSetListRequest';
 import { createStatisticalReleasesSuggestRequest } from '@frontend/modules/search-data/utils/createStatisticalReleasesListRequest';
+import azureDataSetService, {
+  AzureDataSetSuggestResult,
+} from '@frontend/services/azureDataSetService';
 import azurePublicationService, {
   AzurePublicationSuggestResult,
 } from '@frontend/services/azurePublicationService';
@@ -19,9 +23,15 @@ interface Props {
   onSubmit: (value: string) => void;
 }
 
-// Nb we are not using tanstack-query or react-hook-form here, as
-// accessible-autocomplete lib is managing its own state, and we can't
-// access the generated text input to be able to hook into its value easily
+type AzureSuggestResult =
+  | AzureDataSetSuggestResult
+  | AzurePublicationSuggestResult;
+
+const isDataSetResult = (
+  result: AzureSuggestResult,
+): result is AzureDataSetSuggestResult => {
+  return result && 'dataSetFileId' in result;
+};
 
 export default function SearchForm({
   isSearchData = false,
@@ -47,6 +57,16 @@ export default function SearchForm({
 
     // 1
     autocompleteInput.setAttribute('type', 'search');
+    // also create a MutationObserver to prevent re-renders resetting input type
+    const observer = new MutationObserver(() => {
+      if (autocompleteInput.getAttribute('type') !== 'search') {
+        autocompleteInput.setAttribute('type', 'search');
+      }
+    });
+    observer.observe(autocompleteInput, {
+      attributes: true,
+      attributeFilter: ['type'],
+    });
 
     function handleEnter(evt: KeyboardEvent) {
       const dropdownVisible =
@@ -68,12 +88,14 @@ export default function SearchForm({
     autocompleteInput.addEventListener('keyup', handleEnter);
 
     return () => {
+      observer.disconnect();
       autocompleteInput.removeEventListener('keyup', handleEnter);
     };
   }, [onSubmit]);
 
+  // When switching between dataset/release search mode, clear the autocomplete state
   useEffect(() => {
-    if (isSearchData && autocompleteRef.current) {
+    if (autocompleteRef.current) {
       autocompleteRef.current.setState({
         menuOpen: false,
         options: [],
@@ -84,10 +106,16 @@ export default function SearchForm({
 
   const fetchResults = (
     enteredText: string,
-    populateResults: (suggestions: AzurePublicationSuggestResult[]) => void,
+    populateResults: (suggestions: AzureSuggestResult[]) => void,
   ) => {
     if (isSearchData) {
-      populateResults([]);
+      azureDataSetService
+        .suggestDatasets(createDataSetSuggestRequest(router.query, enteredText))
+        .then(populateResults)
+        .catch(error => {
+          populateResults([]);
+          logger.error(error);
+        });
       return;
     }
 
@@ -102,7 +130,7 @@ export default function SearchForm({
       });
   };
 
-  const suggestionTemplate = (result: AzurePublicationSuggestResult) => {
+  const suggestionTemplate = (result: AzureSuggestResult) => {
     // The result has a `highlightedMatch` property with HTML tags which could
     // either be from the `title` or the `summary`. So we will strip out the HTML
     // tags to be able to check which field it is from, and use accordingly.
@@ -182,18 +210,28 @@ export default function SearchForm({
           }}
           confirmOnBlur={false}
           showNoOptionsFound={false}
-          onConfirm={(result: AzurePublicationSuggestResult) => {
-            if (result) {
+          onConfirm={(result: AzureSuggestResult) => {
+            if (!result) return null;
+
+            if (isDataSetResult(result)) {
               logEvent({
                 category: 'Find statistics and data',
-                action: `Autocomplete suggestion accepted`,
+                action: `Autocomplete dataset suggestion accepted`,
                 label: result.title,
               });
               return router.push(
-                `/find-statistics/${result.publicationSlug}/${result.releaseSlug}`,
+                `/data-catalogue/data-set/${result.dataSetFileId}`,
               );
             }
-            return null;
+
+            logEvent({
+              category: 'Find statistics and data',
+              action: `Autocomplete suggestion accepted`,
+              label: result.title,
+            });
+            return router.push(
+              `/find-statistics/${result.publicationSlug}/${result.releaseSlug}`,
+            );
           }}
           tNoResults={() => 'No search suggestions found'}
           tAssistiveHint={() =>
