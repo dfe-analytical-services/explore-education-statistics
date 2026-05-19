@@ -24,11 +24,11 @@ import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import { SortOption } from '@frontend/components/SortControls';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
-import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
 import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
+import SearchDataSearchForm from '@frontend/modules/search-data/components/SearchDataSearchForm';
 import { getParamsFromQuery } from '@frontend/modules/search-data/utils/createDataSetListRequest';
 import {
   SearchDataFilter,
@@ -392,7 +392,7 @@ const SearchDataPage: NextPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <FindStatisticsSearchForm
+          <SearchDataSearchForm
             label={isPublicationsSearch ? 'Search releases' : 'Search data'}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
