@@ -269,14 +269,6 @@ Approve release for scheduled publication
     ...    next_release_month=12
     ...    next_release_year=3001
 
-    set suite variable    ${EXPECTED_SCHEDULED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
-
-Verify release is scheduled
-    user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
-    user checks summary list contains    Next release expected    December 3001
-
 Get public release link
     ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}

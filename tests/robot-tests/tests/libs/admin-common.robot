@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 Library     admin-utilities.py
+Library     DateTime
 Library     String
 
 
@@ -756,6 +757,13 @@ user approves release for scheduled publication
     ...    ${next_release_month}=01
     ...    ${next_release_year}=2200
     ...    ${update_amendment_published_date}=${False}
+    ${expected_scheduled_date}=    Convert Date    ${publish_date_day} ${publish_date_month} ${publish_date_year}
+    ...    date_format=%d %m %Y
+    ...    result_format=%d %B %Y
+    ${expected_next_release_date}=    Convert Date    1 ${next_release_month} ${next_release_year}
+    ...    date_format=%d %m %Y
+    ...    result_format=%B %Y
+
     user edits release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
@@ -772,8 +780,14 @@ user approves release for scheduled publication
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${next_release_year}
 
     user clicks button    Update status
-    user waits until h2 is visible    Confirm publish date    %{WAIT_SMALL}
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
+
+    user waits until h2 is visible    Sign off
+    user checks summary list contains    Current status    Approved
+    user checks summary list contains    Scheduled release    ${expected_scheduled_date}
+    user checks summary list contains    Next release expected    ${expected_next_release_date}
+    user waits for release process status to be    Scheduled    %{WAIT_SMALL}
 
 user waits for scheduled release to be published immediately
     ${release_version_id}=    get release id from url
