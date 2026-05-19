@@ -1290,7 +1290,7 @@ public class DataSetMappingServiceTests
         return new DataSetMappingService(
             contentDbContext,
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(MockBehavior.Strict),
-            userService ?? MockUtils.AlwaysTrueUserService().Object // @MarkFix add permission tests
+            userService ?? MockUtils.AlwaysTrueUserService().Object
         );
     }
 }
