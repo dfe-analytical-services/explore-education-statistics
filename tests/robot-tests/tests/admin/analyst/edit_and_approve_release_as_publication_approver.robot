@@ -127,7 +127,7 @@ Verify release status is in higher review
 Put release back into draft
     user puts release into draft
 
-Approve release for scheduled release
+Approve release for scheduled publication
     ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}

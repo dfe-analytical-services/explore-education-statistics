@@ -720,7 +720,7 @@ Check public prerelease access list for amendment is same as original release
 Update public prerelease access list
     user updates public prerelease access list    Amended public access list
 
-Approve amendment for scheduled release
+Approve amendment for scheduled publication
     ${days_until_release}=    set variable    1
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
@@ -734,6 +734,7 @@ Approve amendment for scheduled release
     ...    next_release_month=12
     ...    next_release_year=3001
 
+Publish the scheduled amendment
     user waits for scheduled release to be published immediately
 
     ${EXPECTED_PUBLISHED_DATE}=    get london date
@@ -950,8 +951,7 @@ Verify published date on publication page is overridden with past date
 
 Verify public published date is overridden with past date
     user waits for caches to expire
-    user navigates to    ${PUBLIC_RELEASE_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
 
 Return to Admin and create second amendment
@@ -978,11 +978,12 @@ Remove the content section that originally contained the deleted data block
     user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user deletes editable accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-Approve release amendment for scheduled publication and update published date
+Approve second amendment for scheduled publication and update published date
     ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
     ${publish_date_year}=    get london year    offset_days=${days_until_release}
+
     user approves release for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
@@ -990,7 +991,10 @@ Approve release amendment for scheduled publication and update published date
     ...    next_release_month=8
     ...    next_release_year=4001
     ...    update_amendment_published_date=${True}
+
+Publish the scheduled second amendment
     user waits for scheduled release to be published immediately
+
     ${EXPECTED_PUBLISHED_DATE}=    get london date
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
@@ -999,10 +1003,9 @@ Verify published date on publication page has been updated
     ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
-Navigate to amended public release
+Navigate to second amendment release page
     user waits for caches to expire
-    user navigates to    ${PUBLIC_RELEASE_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Verify public published date has been updated
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}

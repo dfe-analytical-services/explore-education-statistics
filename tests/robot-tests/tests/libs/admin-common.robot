@@ -513,10 +513,7 @@ user approves amended release for immediate publication
 
 user approves release for immediate publication
     [Arguments]    ${release_type}=original    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
-    user navigates to Sign off page
-    user waits until page contains button    Edit release status
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status
+    user edits release status
     user checks page does not contain    Notify subscribers by email
     user clicks radio    Approved for publication
     IF    '${release_type}' == 'amendment'
@@ -740,9 +737,7 @@ user puts release into draft
     user checks summary list contains    Next release expected    ${expected_next_release_date}
 
 user edits release status
-    user clicks link    Sign off
-    user waits until page finishes loading
-    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
+    user navigates to Sign off page
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
 

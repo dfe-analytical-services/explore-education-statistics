@@ -156,18 +156,8 @@ Approve release for scheduled publication
     ...    ${publish_date_month}
     ...    ${publish_date_year}
 
-    set suite variable    ${EXPECTED_SCHEDULED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
-
 Publish the scheduled release
     user waits for scheduled release to be published immediately
-
-    ${publish_date_day}=    get london day of month
-    ${publish_date_month_word}=    get london month word
-    ${publish_date_year}=    get london year
-    set suite variable    ${EXPECTED_PUBLISHED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
-
     user waits for caches to expire
 
 Get public release link
