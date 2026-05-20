@@ -8,7 +8,7 @@ import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import mapValues from 'lodash/mapValues';
 import startCase from 'lodash/startCase';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 import DifferencesMappingTableRows from './DataFileReplacementDifferencesTableRows';
 
@@ -87,14 +87,12 @@ export default function DataFileReplacementDifferences({
 
   const mappingCounts: { indicators: { mapped: number; unmapped: number } } =
     useMemo(() => {
-      return mapValues(planMappings, (itemType, itemTypeKey) => {
+      return mapValues(referencedFilters, (referencedFilter, itemTypeKey) => {
+        const itemType = planMappings[itemTypeKey as keyof PlanMappings];
+
         // convert dictionary to array, AND filter mapping list to only referenced mappings
         const mappingsList = Object.entries(itemType.mappings).filter(
-          ([mappingKey]) => {
-            return referencedFilters[
-              itemTypeKey as keyof typeof referencedFilters
-            ].has(mappingKey);
-          },
+          ([mappingKey]) => referencedFilter.has(mappingKey),
         );
 
         const totalMappingCount = mappingsList.length;
@@ -135,29 +133,29 @@ export default function DataFileReplacementDifferences({
           data-testid={tableId}
         >
           <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
-            {Object.entries(mappingCounts).map(
-              ([itemType, { mapped, unmapped }]) => (
-                <span key={itemType}>
-                  {startCase(itemType)}{' '}
-                  <TagGroup className="govuk-!-margin-left-2">
-                    {unmapped > 0 && (
-                      <Tag colour="red">
-                        {`${unmapped} unmapped ${
-                          unmapped > 1 ? itemType : itemType.slice(0, -1)
-                        } `}
-                      </Tag>
-                    )}
-                    {mapped > 0 && (
-                      <Tag colour="blue">
-                        {`${mapped} mapped ${
-                          mapped > 1 ? itemType : itemType.slice(0, -1)
-                        }`}
-                      </Tag>
-                    )}
-                  </TagGroup>
-                </span>
-              ),
-            )}
+            {Object.entries(mappingCounts).map(([itemType, itemCounts]) => (
+              <span key={itemType}>
+                {startCase(itemType)}{' '}
+                <TagGroup className="govuk-!-margin-left-2">
+                  {itemCounts.unmapped > 0 && (
+                    <Tag colour="red">
+                      {`${itemCounts.unmapped} unmapped ${
+                        itemCounts.unmapped > 1
+                          ? itemType
+                          : itemType.slice(0, -1)
+                      } `}
+                    </Tag>
+                  )}
+                  {itemCounts.mapped > 0 && (
+                    <Tag colour="blue">
+                      {`${itemCounts.mapped} mapped ${
+                        itemCounts.mapped > 1 ? itemType : itemType.slice(0, -1)
+                      }`}
+                    </Tag>
+                  )}
+                </TagGroup>
+              </span>
+            ))}
           </caption>
           <thead>
             <VisuallyHidden as="tr">
