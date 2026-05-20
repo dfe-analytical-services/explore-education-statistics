@@ -16,11 +16,8 @@ export type ScreenerStatusChangeHandler = (
 ) => void;
 
 interface Props {
-  className?: string;
   dataSetUpload: DataSetUpload;
-  hideErrors?: boolean;
   releaseVersionId: string;
-  //   onStatusChange?: ScreenerStatusChangeHandler;
 }
 
 export const getScreenerTestResultStatusLabel = (
@@ -95,14 +92,17 @@ type StatusState = Pick<
   'status' | 'percentageComplete' | 'stage' | 'completed'
 >;
 
+const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
+  'ScreenerError',
+  'PendingReview',
+  'PendingImport',
+  'FailedScreening',
+];
+
 export default function ScreenerStatus({
   dataSetUpload,
   releaseVersionId,
-  //   onStatusChange,
-  hideErrors,
-  className,
 }: Props) {
-  // TODO: Maybe define a base "Status" component which this and "ImporterStatus" inherit
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
     status: dataSetUpload.status,
     percentageComplete: 0,
@@ -116,24 +116,8 @@ export default function ScreenerStatus({
       dataSetUpload.id,
     );
 
-    console.log(nextStatus.stage); // TODO: remove
-    console.log(nextStatus.status); // TODO: remove
-    console.log(nextStatus.percentageComplete); // TODO: remove
-
     setCurrentStatus(nextStatus);
-
-    // if (onStatusChange && nextStatus.stage !== dataSetUpload.status) {
-    //   onStatusChange(dataSetUpload, nextStatus);
-    // }
-    //   }, [releaseVersionId, dataSetUpload, onStatusChange]);
   }, [releaseVersionId, dataSetUpload]);
-
-  const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
-    'ScreenerError',
-    'PendingReview',
-    'PendingImport',
-    'FailedScreening',
-  ];
 
   const [cancelInterval] = useInterval(fetchStatus, 5000);
 
@@ -144,7 +128,7 @@ export default function ScreenerStatus({
   });
 
   useEffect(() => {
-    if (terminalScreeningStatuses.includes(dataSetUpload.status)) {
+    if (terminalScreeningStatuses.includes(currentStatus.status)) {
       cancelInterval();
     }
   }, [cancelInterval, currentStatus]);
@@ -155,8 +139,8 @@ export default function ScreenerStatus({
 
   return (
     <>
-      <Tag colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}>
-        {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
+      <Tag colour={getDataSetUploadScreeningStatusColour(currentStatus.status)}>
+        {getDataSetUploadScreeningStatusLabel(currentStatus.status)}
       </Tag>
       {!hasTerminalStatus && (
         <ProgressBar
