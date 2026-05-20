@@ -433,7 +433,7 @@ public class ReleaseDataFileService(
                     {
                         result = await dataSetScreenerService.ScreenDataSet(request, cancellationToken: ct);
                     }
-                    catch (DataScreenerException)
+                    catch (Exception)
                     {
                         await dataSetFileStorage.UpdateDataSetUpload(
                             dataSetUpload.Id,
