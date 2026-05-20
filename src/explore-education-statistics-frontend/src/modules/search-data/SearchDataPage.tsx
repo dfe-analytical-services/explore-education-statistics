@@ -1,8 +1,6 @@
 import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
-import InfoIcon from '@common/components/InfoIcon';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import Modal from '@common/components/Modal';
 import RelatedInformation from '@common/components/RelatedInformation';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -24,8 +22,10 @@ import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import { SortOption } from '@frontend/components/SortControls';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
+import DataModal from '@frontend/modules/find-statistics/components/DataModal';
 import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
+import StatisticalReleasesModal from '@frontend/modules/find-statistics/components/StatisticalReleasesModal';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
 import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
@@ -420,34 +420,10 @@ const SearchDataPage: NextPage = () => {
             <RelatedInformation heading="Help and related information">
               <ul className="govuk-list">
                 <li>
-                  <Modal
-                    showClose
-                    title="What are statistical releases?"
-                    triggerButton={
-                      <ButtonText>
-                        What are statistical releases?{' '}
-                        <InfoIcon description="Information on statistical releases" />
-                      </ButtonText>
-                    }
-                  >
-                    {/* TODO EES-7072 add in content */}
-                    <p>Information about statistical releases</p>
-                  </Modal>
+                  <StatisticalReleasesModal />
                 </li>
                 <li>
-                  <Modal
-                    showClose
-                    title="What is data?"
-                    triggerButton={
-                      <ButtonText>
-                        What is data?{' '}
-                        <InfoIcon description="Information on data" />
-                      </ButtonText>
-                    }
-                  >
-                    {/* TODO EES-7072 add in content */}
-                    <p>Information about what is data</p>
-                  </Modal>
+                  <DataModal />
                 </li>
                 <li>
                   <Link to="/glossary">Glossary</Link>
