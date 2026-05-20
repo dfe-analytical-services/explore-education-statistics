@@ -10,7 +10,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
-import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
 import { useAuthContext } from '@admin/contexts/AuthContext';
@@ -18,10 +17,7 @@ import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
 import styles from './DataFilesTable.module.scss';
-import {
-  getDataSetUploadScreeningStatusColour,
-  getDataSetUploadScreeningStatusLabel,
-} from './ImporterStatus';
+import ScreenerStatus from './ScreenerStatus';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -151,11 +147,10 @@ export default function DataFilesTableUploadRow({
         {dataSetUpload.dataFileSize}
       </td>
       <td data-testid="Status">
-        <Tag
-          colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}
-        >
-          {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
-        </Tag>
+        <ScreenerStatus
+          dataSetUpload={dataSetUpload}
+          releaseVersionId={releaseVersionId}
+        />
       </td>
       <td data-testid="Actions">
         <ButtonGroup className={styles.actions}>
