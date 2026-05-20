@@ -128,10 +128,10 @@ export type DataSetUploadScreeningStatus =
 export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
 
 export interface DataSetScreenerProgress {
-  dataSetUploadId: string;
   status: DataSetUploadStatus;
-  stage: string;
   percentageComplete: number;
+  stage: string;
+  completed: boolean;
 }
 
 export interface DataFileImportStatus {
@@ -248,12 +248,12 @@ const releaseDataFileService = {
     const dataFiles = response.filter(file => file.metaFileName.length > 0);
     return dataFiles.map(mapFile);
   },
-  // this should probably be called by the table, rather than the row since it returns a list
   getDataFileScreeningStatus(
     releaseVersionId: string,
-  ): Promise<DataSetScreenerProgress[]> {
-    return client.get<DataSetScreenerProgress[]>(
-      `/releaseVersions/${releaseVersionId}/uploads/screener/progress`,
+    dataSetUploadId: string,
+  ): Promise<DataSetScreenerProgress> {
+    return client.get<DataSetScreenerProgress>(
+      `/releaseVersions/${releaseVersionId}/uploads/${dataSetUploadId}/screener/progress`,
     );
   },
   getDataFileImportStatus(
