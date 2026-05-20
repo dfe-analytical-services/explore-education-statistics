@@ -450,16 +450,7 @@ public class ReleaseDataFileService(
                     }
 
                     // TODO (EES-6693): Remove this automatic warning once the external screener is no longer required.
-                    result.TestResults.Add(
-                        new DataScreenerTestResult
-                        {
-                            Result = TestResult.WARNING,
-                            TestFunctionName = "External screening",
-                            Notes =
-                                "I confirm that this data set has been separately screened by, and passed, the EES data screener (https://rsconnect/rsc/dfe-published-data-qa/).",
-                            Stage = "Manual acknowledgement",
-                        }
-                    );
+                    result.TestResults.Add(DataScreenerTestResult.ExternalScreenerWarningResult);
 
                     await dataSetFileStorage.UpdateDataSetUpload(dataSetUpload.Id, result, cancellationToken: ct);
 

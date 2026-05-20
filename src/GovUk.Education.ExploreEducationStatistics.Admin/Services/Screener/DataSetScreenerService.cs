@@ -274,8 +274,18 @@ public class DataSetScreenerService(
         {
             var report = completionReports.Single(u => u.DataSetId == uploadToComplete.Id);
 
-            uploadToComplete.ScreenerResult = report.CompletionReport;
-            uploadToComplete.ScreeningStatus = GetScreeningCompletionStatus(report.CompletionReport);
+            // TODO EES-6693 - remove this automatic warning once the external screener is no longer required.
+            var reportWithWarning = report.CompletionReport with
+            {
+                TestResults =
+                [
+                    .. report.CompletionReport.TestResults,
+                    DataScreenerTestResult.ExternalScreenerWarningResult,
+                ],
+            };
+
+            uploadToComplete.ScreenerResult = reportWithWarning;
+            uploadToComplete.ScreeningStatus = GetScreeningCompletionStatus(reportWithWarning);
 
             contentDbContext.DataSetUploads.Update(uploadToComplete);
         });
@@ -286,10 +296,24 @@ public class DataSetScreenerService(
         // up its progress and completion report files.
         var dataSetIdsWithSuccessfulCompletionReports = dataSetsToComplete.Select(upload => upload.Id).ToList();
 
-        await dataSetScreenerClient.DeleteScreenerProgressAndCompletionFiles(
-            dataSetIds: dataSetIdsWithSuccessfulCompletionReports,
-            cancellationToken: cancellationToken
-        );
+        // Don't let the failure of deleting progress files prevent successful completion of data set
+        // screening. Whilst this should not happen, transient failures are always possible but should not
+        // prevent screening from completing.
+        try
+        {
+            await dataSetScreenerClient.DeleteScreenerProgressAndCompletionFiles(
+                dataSetIds: dataSetIdsWithSuccessfulCompletionReports,
+                cancellationToken: cancellationToken
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Failed to handle deletion of data set progress and completion files at {Time} (UTC)",
+                DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+            );
+        }
 
         return [.. dataSetsToComplete.Select(mapper.Map<DataSetUploadViewModel>)];
     }

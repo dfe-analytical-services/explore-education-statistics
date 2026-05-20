@@ -372,7 +372,7 @@ Navigate to data upload and confirm data replacement
     user waits until page contains data uploads table
 
 Upload the larger data file via data upload and start it importing
-    user uploads subject    ${SUBJECT_NAME}-updated    large-data-set.csv    large-data-set.meta.csv    Pending import
+    user uploads subject    ${SUBJECT_NAME}-updated    large-data-set.csv    large-data-set.meta.csv    Pending review
     user confirms upload to complete import    ${SUBJECT_NAME}-updated    WAIT_FOR_IMPORT_TO_COMPLETE=False
 
 Validate checklist errors (3rd release)

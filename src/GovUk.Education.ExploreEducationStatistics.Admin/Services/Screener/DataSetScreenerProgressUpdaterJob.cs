@@ -40,6 +40,18 @@ public class DataSetScreenerProgressUpdaterJob(
                 _ => UpdateProgress(serviceScope: scope, cancellationToken: stoppingToken)
             );
 
+            await databaseHelper.ExecuteWithExclusiveLock(
+                dbContext: dbContext,
+                lockName: $"Admin_{nameof(DataSetScreenerProgressUpdaterJob)}",
+                _ => HandleFailures(serviceScope: scope, cancellationToken: stoppingToken)
+            );
+
+            await databaseHelper.ExecuteWithExclusiveLock(
+                dbContext: dbContext,
+                lockName: $"Admin_{nameof(DataSetScreenerProgressUpdaterJob)}",
+                _ => HandleCompletions(serviceScope: scope, cancellationToken: stoppingToken)
+            );
+
             await timer.WaitForNextTickAsync(stoppingToken);
         }
     }
@@ -60,6 +72,22 @@ public class DataSetScreenerProgressUpdaterJob(
                     DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
                 );
             }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Failed to update screener progress at {Time} (UTC)",
+                DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+            );
+        }
+    }
+
+    private async Task HandleFailures(IServiceScope serviceScope, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var dataSetScreenerService = serviceScope.ServiceProvider.GetRequiredService<IDataSetScreenerService>();
 
             var failures = await dataSetScreenerService.MarkDataSetsWithoutProgressAsFailed(
                 cancellationToken: cancellationToken
@@ -75,6 +103,22 @@ public class DataSetScreenerProgressUpdaterJob(
                     DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
                 );
             }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Failed to mark data sets as failed at {Time} (UTC)",
+                DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+            );
+        }
+    }
+
+    private async Task HandleCompletions(IServiceScope serviceScope, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var dataSetScreenerService = serviceScope.ServiceProvider.GetRequiredService<IDataSetScreenerService>();
 
             var completions = await dataSetScreenerService.CompleteDataSetScreeningForFinishedDataSets(
                 cancellationToken: cancellationToken
@@ -110,7 +154,7 @@ public class DataSetScreenerProgressUpdaterJob(
         {
             logger.LogError(
                 ex,
-                "Failed to update screener progress at {Time} (UTC)",
+                "Failed to handle completion of data sets at {Time} (UTC)",
                 DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
             );
         }
