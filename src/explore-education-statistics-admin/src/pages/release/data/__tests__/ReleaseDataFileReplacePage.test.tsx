@@ -107,7 +107,10 @@ describe('ReleaseDataFileReplacePage', () => {
       readyToPublish: false,
       valid: false,
     },
-    mapping: { indicators: { candidates: {}, mappings: {} } },
+    mapping: {
+      indicators: { candidates: {}, mappings: {} },
+      locations: { candidates: {}, mappings: {} },
+    },
   };
 
   test('renders original data file details', async () => {

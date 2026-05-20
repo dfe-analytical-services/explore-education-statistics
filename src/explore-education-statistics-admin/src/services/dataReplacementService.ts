@@ -8,6 +8,13 @@ export interface TargetReplacement {
   valid: boolean;
 }
 
+export type ObjOfKey<T, K extends string | number | symbol> = { [key in K]: T };
+
+export type GroupReplacement = {
+  label: string;
+  valid: boolean;
+};
+
 export interface FilterReplacement extends TargetReplacement {
   groups: Dictionary<FilterGroupReplacement>;
 }
@@ -29,15 +36,18 @@ export interface IndicatorGroupReplacement {
   indicators: IndicatorReplacement[];
 }
 
+export interface LocationAttributeReplacement extends TargetReplacement {
+  id: string;
+  code: string;
+  label: string;
+  target?: string;
+  valid: boolean;
+}
+
 export interface LocationReplacement {
   valid: boolean;
   label: string;
-  locationAttributes: {
-    code: string;
-    label: string;
-    target?: string;
-    valid: boolean;
-  }[];
+  locationAttributes: LocationAttributeReplacement[];
 }
 
 export interface TimePeriodsReplacement {
@@ -113,7 +123,7 @@ export interface ApiDataSetVersionPlan {
 
 type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet';
 
-interface Mapping<TSource> {
+export interface Mapping<TSource> {
   type: MappingType;
   source: TSource;
   candidateKey?: string;
@@ -124,28 +134,36 @@ export type UpdateMappingPayload = {
   candidateKey?: string;
 };
 
-interface MappingsPlan<TSource> {
+export interface MappingsPlan<TSource> {
   candidates: Dictionary<TSource>;
   mappings: Dictionary<Mapping<TSource>>;
 }
 
 export type MappingWithKey<TSource> = { sourceKey: string } & Mapping<TSource>;
 
-interface IndicatorSource {
+export interface IndicatorSource {
   label: string;
+}
+
+export interface LocationSource {
+  code: string;
+  name: string;
 }
 
 export type IndicatorCandidate = IndicatorSource;
 
-export type SourceItem = IndicatorSource /* | LocationSource | FilterSource */;
+export type SourceItem = IndicatorSource | LocationSource /* | FilterSource */;
 
 export type IndicatorMapping = Mapping<IndicatorSource>;
 export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;
+export type LocationMappingWithKey = MappingWithKey<LocationSource>;
 
 export type IndicatorsMappingsPlan = MappingsPlan<IndicatorSource>;
+export type LocationMappingsPlan = MappingsPlan<LocationSource>;
 
 export type PlanMappings = {
   indicators: IndicatorsMappingsPlan;
+  locations: LocationMappingsPlan;
 };
 
 export interface IndicatorsMapping {

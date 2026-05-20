@@ -1,16 +1,15 @@
 import dataReplacementService, {
   DataReplacementPlan,
+  Mapping,
+  MappingsPlan,
   PlanMappings,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
-import Tag from '@common/components/Tag';
-import TagGroup from '@common/components/TagGroup';
-import VisuallyHidden from '@common/components/VisuallyHidden';
-import mapValues from 'lodash/mapValues';
-import startCase from 'lodash/startCase';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useImmer } from 'use-immer';
-import DifferencesMappingTableRows from './DataFileReplacementDifferencesTableRows';
+import pickBy from 'lodash/pickBy';
+import { Dictionary } from '@common/types';
+import DataFileReplacementTable from './DataFileReplacementTable';
 
 interface Props {
   releaseVersionId: string;
@@ -20,6 +19,7 @@ interface Props {
   reloadPlan: () => void;
 }
 
+export type SourceMappingType = 'indicator' | 'location';
 export default function DataFileReplacementDifferences({
   releaseVersionId,
   fileId,
@@ -27,25 +27,78 @@ export default function DataFileReplacementDifferences({
   plan,
   reloadPlan,
 }: Props) {
-  const referencedFilters = useMemo(() => {
-    // collated list of items referenced by datablocks and footnotes
+  const referencedData = useMemo(() => {
+    const getMappingsToShow = <T,>(mappings: MappingsPlan<T>['mappings']) => {
+      return pickBy(mappings, value => value.type !== 'AutoSet');
+    };
 
-    // Indicators listed in dataBlocks
-    const dataBlockIndicators = plan.dataBlocks.flatMap(block =>
-      Object.values(block.indicatorGroups || {}).flatMap(group =>
-        (group.indicators || []).map(indicator => indicator.name),
-      ),
+    type WithLabel = { label: string };
+
+    function uniqueByLabel<T extends WithLabel>(items: T[]): T[] {
+      return Array.from(
+        new Map(items.map(item => [item.label, item])).values(),
+      );
+    }
+
+    function createGroups<
+      GroupType extends WithLabel,
+      ChildKey extends keyof GroupType,
+      ChildType extends GroupType[ChildKey] extends readonly (infer C)[]
+        ? C
+        : never,
+      TargetIdentifier extends keyof ChildType,
+    >(
+      mappingsToShow: Dictionary<Mapping<unknown>>,
+      allGroups: GroupType[],
+      childKey: ChildKey,
+      targetIdentifier: TargetIdentifier &
+        (ChildType[TargetIdentifier] extends string ? TargetIdentifier : never),
+    ): GroupType[] {
+      const uniqueGroups = uniqueByLabel(allGroups);
+
+      return uniqueGroups.filter(group => {
+        const children = (group[childKey] ?? []) as ChildType[];
+
+        return children.some(child => {
+          const key = child[targetIdentifier] as unknown as string;
+          return Boolean(mappingsToShow[key]);
+        });
+      });
+    }
+
+    const indicatorsToShow = getMappingsToShow(
+      plan.mapping.indicators.mappings,
     );
 
-    // Indicators listed in footnotes
-    const footnoteIndicators = (plan.footnotes || [])
-      .flatMap(footnote => Object.values(footnote.indicatorGroups) || [])
-      .flatMap(({ indicators }) => indicators.map(({ name }) => name));
+    const allIndicatorGroups = [
+      ...plan.dataBlocks.flatMap(block =>
+        Object.values(block.indicatorGroups || {}),
+      ),
+      ...plan.footnotes.flatMap(footnote =>
+        Object.values(footnote.indicatorGroups || {}),
+      ),
+    ];
 
-    // Combined unique list
-    const indicators = new Set([...dataBlockIndicators, ...footnoteIndicators]);
+    const res = createGroups(
+      indicatorsToShow,
+      allIndicatorGroups,
+      'indicators',
+      'name',
+    );
 
-    return { indicators };
+    const allLocations = plan.dataBlocks.flatMap(block =>
+      Object.values(block.locations || {}),
+    );
+
+    const locationsToShow = getMappingsToShow(plan.mapping.locations.mappings);
+    const loc = createGroups(
+      locationsToShow,
+      allLocations,
+      'locationAttributes',
+      'id',
+    );
+
+    return { indicators: res, locations: loc };
   }, [plan.dataBlocks, plan.footnotes]);
 
   const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(
@@ -83,39 +136,7 @@ export default function DataFileReplacementDifferences({
     ],
   );
 
-  const tableId = 'replacements-differences-table';
-
-  const mappingCounts: { indicators: { mapped: number; unmapped: number } } =
-    useMemo(() => {
-      return mapValues(planMappings, (itemType, itemTypeKey) => {
-        // convert dictionary to array, AND filter mapping list to only referenced mappings
-        const mappingsList = Object.entries(itemType.mappings).filter(
-          ([mappingKey]) => {
-            return referencedFilters[
-              itemTypeKey as keyof typeof referencedFilters
-            ].has(mappingKey);
-          },
-        );
-
-        const totalMappingCount = mappingsList.length;
-
-        const autoMappedCount = mappingsList.filter(
-          ([_, { type }]) => type === 'AutoSet',
-        ).length;
-
-        const manualMappedCount = mappingsList.filter(
-          ([_, { type }]) => type === 'ManuallySet',
-        ).length;
-
-        const unmappedCount =
-          totalMappingCount - autoMappedCount - manualMappedCount;
-
-        return {
-          mapped: manualMappedCount,
-          unmapped: unmappedCount,
-        };
-      });
-    }, [planMappings, referencedFilters]);
+  console.log(plan);
 
   return (
     <>
@@ -128,54 +149,27 @@ export default function DataFileReplacementDifferences({
         replacement data or select "No mapping" for items that are no longer
         represented.
       </p>
-      <div className="table-container">
-        <table
-          className="dfe-table--vertical-align-middle dfe-table--row-highlights"
-          id={tableId}
-          data-testid={tableId}
-        >
-          <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
-            {Object.entries(mappingCounts).map(
-              ([itemType, { mapped, unmapped }]) => (
-                <span key={itemType}>
-                  {startCase(itemType)}{' '}
-                  <TagGroup className="govuk-!-margin-left-2">
-                    {unmapped > 0 && (
-                      <Tag colour="red">
-                        {`${unmapped} unmapped ${
-                          unmapped > 1 ? itemType : itemType.slice(0, -1)
-                        } `}
-                      </Tag>
-                    )}
-                    {mapped > 0 && (
-                      <Tag colour="blue">
-                        {`${mapped} mapped ${
-                          mapped > 1 ? itemType : itemType.slice(0, -1)
-                        }`}
-                      </Tag>
-                    )}
-                  </TagGroup>
-                </span>
-              ),
-            )}
-          </caption>
-          <thead>
-            <VisuallyHidden as="tr">
-              <th className="govuk-!-width-one-quarter">Original Item</th>
-              <th className="govuk-!-width-one-quarter">Mapping</th>
-              <th className="govuk-!-text-align-right">Actions</th>
-            </VisuallyHidden>
-          </thead>
-          <tbody data-testid={`${tableId}-body`}>
-            <DifferencesMappingTableRows
-              mappingKeysToShow={referencedFilters.indicators}
-              itemType="indicator"
-              mappings={planMappings.indicators}
-              onUpdate={handleIndicatorsMappingUpdate}
-            />
-          </tbody>
-        </table>
-      </div>
+
+      <DataFileReplacementTable
+        tableId="replacements-differences-indicators-table"
+        itemType="indicator"
+        mappingsPlan={planMappings.indicators}
+        mappingGroups={referencedData.indicators}
+        handleIndicatorsMappingUpdate={handleIndicatorsMappingUpdate}
+        replacementGroupKey="indicators"
+        label="label"
+        targetReplacementKey="name"
+      />
+      <DataFileReplacementTable
+        tableId="replacements-differences-locations-table"
+        itemType="location"
+        mappingsPlan={planMappings.locations}
+        mappingGroups={referencedData.locations}
+        handleIndicatorsMappingUpdate={handleIndicatorsMappingUpdate}
+        replacementGroupKey="locationAttributes"
+        label="code"
+        targetReplacementKey="id"
+      />
     </>
   );
 }

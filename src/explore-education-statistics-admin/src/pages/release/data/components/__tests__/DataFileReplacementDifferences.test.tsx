@@ -78,6 +78,10 @@ const testReplacementPlan: DataReplacementPlan = {
         },
       },
     },
+    locations: {
+      mappings: {},
+      candidates: {},
+    },
   },
   dataBlocks: [
     {
@@ -130,6 +134,7 @@ const testReplacementPlan: DataReplacementPlan = {
           label: 'Country',
           locationAttributes: [
             {
+              id: 'country-england',
               code: 'E92000001',
               label: 'England',
               target: 'f628134d-5235-4615-2438-08dc1c5c7fdf',

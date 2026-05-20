@@ -168,6 +168,7 @@ describe('DataReplacementPlan', () => {
             valid: true,
             locationAttributes: [
               {
+                id: 'country-england',
                 code: 'england',
                 label: 'England',
                 target: 'england',
@@ -180,12 +181,14 @@ describe('DataReplacementPlan', () => {
             valid: false,
             locationAttributes: [
               {
+                id: 'localAuthority-barnsley',
                 code: 'barnsley',
                 label: 'Barnsley',
                 target: 'barnsley',
                 valid: true,
               },
               {
+                id: 'localAuthority-birmingham',
                 code: 'birmingham',
                 label: 'Birmingham',
                 valid: false,
@@ -343,6 +346,7 @@ describe('DataReplacementPlan', () => {
     valid: false,
     mapping: {
       indicators: { candidates: {}, mappings: {} },
+      locations: { candidates: {}, mappings: {} },
     },
   };
 
@@ -408,6 +412,7 @@ describe('DataReplacementPlan', () => {
     valid: true,
     mapping: {
       indicators: { candidates: {}, mappings: {} },
+      locations: { candidates: {}, mappings: {} },
     },
   };
 
