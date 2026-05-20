@@ -9,6 +9,8 @@ import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
 import { SortOption } from '@frontend/components/SortControls';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import GeographicLevelsModal from '@frontend/modules/find-statistics/components/GeographicLevelsModal';
+import APIDatasetsModal from '@frontend/modules/find-statistics/components/APIDatasetsModal';
 import ExpandableFilterGroup from '@frontend/modules/search-data/components/ExpandableFilterGroup';
 import styles from '@frontend/modules/search-data/components/SearchDataFilters.module.scss';
 import ThemesAndReleasesFilterGroup from '@frontend/modules/search-data/components/ThemesAndReleasesFilterGroup';
@@ -123,6 +125,9 @@ export default function Filters({
               });
             }}
           />
+          <div className={styles.modalButtonContainer}>
+            <GeographicLevelsModal />
+          </div>
         </ExpandableFilterGroup>
       )}
 
@@ -205,6 +210,9 @@ export default function Filters({
               });
             }}
           />
+          <div className={styles.modalButtonContainer}>
+            <APIDatasetsModal />
+          </div>
         </ExpandableFilterGroup>
       )}
 
