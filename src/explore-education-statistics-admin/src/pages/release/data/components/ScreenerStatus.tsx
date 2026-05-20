@@ -1,7 +1,7 @@
 import releaseDataFileService, {
   DataSetScreenerProgress,
   DataSetUpload,
-  DataSetUploadStatus,
+  DataSetUploadScreeningStatus,
   ScreenerTestResult,
 } from '@admin/services/releaseDataFileService';
 import ProgressBar from '@common/components/ProgressBar';
@@ -53,41 +53,37 @@ export const getScreenerTestResultStatusColour = (
   }
 };
 
-export const getDataSetUploadStatusLabel = (
-  statusCode: DataSetUploadStatus,
+export const getDataSetUploadScreeningStatusLabel = (
+  statusCode: DataSetUploadScreeningStatus,
 ): string | undefined => {
   switch (statusCode) {
-    case 'UPLOADING':
-      return 'Uploading';
-    case 'SCREENING':
+    case 'Screening':
       return 'Screening';
-    case 'PENDING_REVIEW':
+    case 'PendingReview':
       return 'Pending review';
-    case 'PENDING_IMPORT':
+    case 'PendingImport':
       return 'Pending import';
-    case 'FAILED_SCREENING':
+    case 'FailedScreening':
       return 'Failed screening';
-    case 'SCREENER_ERROR':
+    case 'ScreenerError':
       return 'Screener error';
     default:
       return undefined;
   }
 };
 
-export const getDataSetUploadStatusColour = (
-  statusCode: DataSetUploadStatus,
+export const getDataSetUploadScreeningStatusColour = (
+  statusCode: DataSetUploadScreeningStatus,
 ): TagProps['colour'] => {
   switch (statusCode) {
-    case 'UPLOADING':
-      return 'turquoise';
-    case 'PENDING_REVIEW':
+    case 'PendingReview':
       return 'orange';
-    case 'SCREENING':
+    case 'Screening':
       return 'blue';
-    case 'PENDING_IMPORT':
+    case 'PendingImport':
       return 'light-blue';
-    case 'FAILED_SCREENING':
-    case 'SCREENER_ERROR':
+    case 'FailedScreening':
+    case 'ScreenerError':
       return 'red';
     default:
       return undefined;
@@ -132,11 +128,11 @@ export default function ScreenerStatus({
     //   }, [releaseVersionId, dataSetUpload, onStatusChange]);
   }, [releaseVersionId, dataSetUpload]);
 
-  const terminalScreeningStatuses: DataSetUploadStatus[] = [
-    'SCREENER_ERROR',
-    'PENDING_REVIEW',
-    'PENDING_IMPORT',
-    'FAILED_SCREENING',
+  const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
+    'ScreenerError',
+    'PendingReview',
+    'PendingImport',
+    'FailedScreening',
   ];
 
   const [cancelInterval] = useInterval(fetchStatus, 5000);
@@ -159,8 +155,8 @@ export default function ScreenerStatus({
 
   return (
     <>
-      <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
-        {getDataSetUploadStatusLabel(dataSetUpload.status)}
+      <Tag colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}>
+        {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
       </Tag>
       {!hasTerminalStatus && (
         <ProgressBar

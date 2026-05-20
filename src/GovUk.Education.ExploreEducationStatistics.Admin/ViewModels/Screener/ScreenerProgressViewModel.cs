@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 
 public record ScreenerProgressViewModel
 {
-    public DataSetUploadStatus Status { get; set; }
+    public DataSetUploadScreeningStatus Status { get; set; }
 
     public int PercentageComplete { get; set; }
 

@@ -7,8 +7,8 @@ import React from 'react';
 import ButtonText from '@common/components/ButtonText';
 import downloadTemporaryReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadTemporaryReleaseFileSecurely';
 import {
-  getDataSetUploadStatusColour,
-  getDataSetUploadStatusLabel,
+  getDataSetUploadScreeningStatusColour,
+  getDataSetUploadScreeningStatusLabel,
 } from './ScreenerStatus';
 import ApiCompatibilityTag from './ApiCompatibilityTag';
 
