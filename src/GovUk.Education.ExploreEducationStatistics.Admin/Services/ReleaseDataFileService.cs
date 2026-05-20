@@ -510,13 +510,17 @@ public class ReleaseDataFileService(
 
                         return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                     }
-                    catch (DataScreenerException)
+                    catch (Exception)
                     {
-                        await dataSetFileStorage.UpdateDataSetUpload(
-                            dataSetUpload.Id,
-                            screenerResult: null,
+                        var upload = await contentDbContext.DataSetUploads.SingleAsync(
+                            upload => upload.Id == request.DataSetId,
                             cancellationToken: ct
                         );
+
+                        upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
+
+                        contentDbContext.DataSetUploads.Update(upload);
+                        await contentDbContext.SaveChangesAsync(cancellationToken: ct);
 
                         return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                     }
