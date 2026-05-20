@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -365,7 +364,9 @@ public class ReleaseDataFileService(
                         )
                     )
                     .OnSuccess(async dataSetUploads =>
-                        await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
+                        screenerOptions.Value.EnhancedScreenerJourney
+                            ? await StartDataSetUploadScreening([.. dataSetUploads], cancellationToken)
+                            : await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
                     );
             });
     }
@@ -392,7 +393,11 @@ public class ReleaseDataFileService(
                     )
                 )
             )
-            .OnSuccess(async dataSetUploads => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
+            .OnSuccess(async dataSetUploads =>
+                screenerOptions.Value.EnhancedScreenerJourney
+                    ? await StartDataSetUploadScreening([.. dataSetUploads], cancellationToken)
+                    : await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
+            );
     }
 
     private async Task<List<DataSetUploadViewModel>> ScreenDataSetUploads(
@@ -552,8 +557,8 @@ public class ReleaseDataFileService(
     {
         var dataSetFiles = ExtractDataSetZipFile(zipFile);
 
-        var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
-        var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
+        var dataFile = dataSetFiles.First(file => !file.FileName.EndsWith(".meta.csv"));
+        var metaFile = dataSetFiles.First(file => file.FileName.EndsWith(".meta.csv"));
 
         return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle);
     }

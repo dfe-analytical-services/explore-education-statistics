@@ -145,13 +145,19 @@ export default function DataFilesTableUploadRow({
 
   return (
     <tr key={dataSetUpload.dataSetTitle}>
-      <td data-testid="Title" className={styles.title}>
+      <td
+        data-testid={`${dataSetUpload.dataSetTitle}-title`}
+        className={styles.title}
+      >
         {dataSetUpload.dataSetTitle}
       </td>
-      <td data-testid="Size" className={styles.fileSize}>
+      <td
+        data-testid={`${dataSetUpload.dataSetTitle}-size`}
+        className={styles.fileSize}
+      >
         {dataSetUpload.dataFileSize}
       </td>
-      <td data-testid="Status">
+      <td data-testid={`${dataSetUpload.dataSetTitle}-status`}>
         <ScreenerStatus
           dataSetUpload={dataSetUpload}
           releaseVersionId={releaseVersionId}
