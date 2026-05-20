@@ -7,7 +7,7 @@ import { FormCheckbox } from '@common/components/form';
 import {
   getScreenerTestResultStatusColour,
   getScreenerTestResultStatusLabel,
-} from './ImporterStatus';
+} from './ScreenerStatus';
 
 interface Props {
   screenerResult?: ScreenerResult;
