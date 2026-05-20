@@ -245,6 +245,9 @@ Validate other releases section of first published release contains updated lega
     user clicks link    All releases in this series
     user waits until page finishes loading
 
+    ## TODO remove!
+    User reloads page
+
     user checks table body has x rows    3    testid:release-updates-table
 
     user checks table cell contains    1    1    ${LEGACY_RELEASE_2_DESCRIPTION}    testid:release-updates-table

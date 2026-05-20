@@ -218,7 +218,7 @@ public class DataSetScreenerService(
                             Math.Round(upload.ScreenerProgress?.PercentageComplete ?? 0, MidpointRounding.ToZero),
                         Stage = upload.ScreenerProgress?.Stage,
                         Completed = upload.ScreenerProgress?.Completed ?? false,
-                        Status = upload.Status,
+                        Status = upload.ScreeningStatus,
                     }
                     : null
             );
@@ -275,9 +275,8 @@ public class DataSetScreenerService(
             var report = completionReports.Single(u => u.DataSetId == uploadToComplete.Id);
 
             uploadToComplete.ScreenerResult = report.CompletionReport;
-            uploadToComplete.ScreeningStatus = report.CompletionReport.Passed
-                ? DataSetUploadScreeningStatus.PendingReview
-                : DataSetUploadScreeningStatus.FailedScreening;
+            uploadToComplete.ScreeningStatus = GetScreeningCompletionStatus(report.CompletionReport);
+
             contentDbContext.DataSetUploads.Update(uploadToComplete);
         });
 
@@ -293,6 +292,18 @@ public class DataSetScreenerService(
         );
 
         return [.. dataSetsToComplete.Select(mapper.Map<DataSetUploadViewModel>)];
+    }
+
+    private DataSetUploadScreeningStatus GetScreeningCompletionStatus(DataSetScreenerResponse completionReport)
+    {
+        if (!completionReport.Passed)
+        {
+            return DataSetUploadScreeningStatus.FailedScreening;
+        }
+
+        return completionReport.TestResults.All(test => test.Result != TestResult.WARNING)
+            ? DataSetUploadScreeningStatus.PendingImport
+            : DataSetUploadScreeningStatus.PendingReview;
     }
 
     private async Task<List<DataSetUpload>> GetDataSetsThatHaveCompletedScreening(CancellationToken cancellationToken)

@@ -160,6 +160,7 @@ export default function ScreenerStatus({
       </Tag>
       {!hasTerminalStatus && (
         <ProgressBar
+          testId={`${dataSetUpload.dataSetTitle}-screener-progress-bar`}
           className="govuk-!-margin-top-2"
           value={currentStatus.percentageComplete}
           width={200}
