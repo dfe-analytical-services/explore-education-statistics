@@ -15,8 +15,8 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
 {
     public async Task<Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>> GetPublicationReleases(
         string publicationSlug,
-        int page = 1,
-        int pageSize = 10,
+        int? page = null,
+        int? pageSize = null,
         CancellationToken cancellationToken = default
     ) =>
         await GetPublicationBySlug(publicationSlug, cancellationToken)
@@ -36,7 +36,11 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
                     latestReleaseEntry
                 );
 
-                return PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(entryDtos, page, pageSize);
+                return PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(
+                    entryDtos,
+                    page: page ?? 1,
+                    pageSize: pageSize ?? Math.Max(entryDtos.Count, 1)
+                );
             });
 
     public async Task<Either<ActionResult, Guid[]>> GetPublicationReleaseIds(

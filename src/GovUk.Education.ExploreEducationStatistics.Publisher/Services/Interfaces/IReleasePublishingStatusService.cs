@@ -53,8 +53,6 @@ public interface IReleasePublishingStatusService
 
     Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey);
 
-    Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId);
-
     Task UpdateState(ReleasePublishingKey releasePublishingKey, ReleasePublishingStatusState state);
 
     Task UpdateFilesStage(

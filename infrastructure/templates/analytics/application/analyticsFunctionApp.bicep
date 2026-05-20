@@ -63,7 +63,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02
 
 var fileShareMountPath = '/data/analytics'
 
-module functionAppModule '../../common/components/functionApp.bicep' = {
+module functionAppModule '../../common/components/function-app/functionApp.bicep' = {
   name: 'analyticsFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-analytics'

@@ -1,5 +1,6 @@
-import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-import { IpRange, StorageAccountPrivateEndpoints } from '../types.bicep'
+import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { StorageAccountPrivateEndpoints } from 'types.bicep'
+import { IpRange } from '../../../public-api/types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -14,7 +15,7 @@ param allowedSubnetIds string[] = []
 param firewallRules IpRange[] = []
 
 @description('Storage Account SKU')
-param sku 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
+param sku 'Standard_LRS' | 'StandardV2_LRS' | 'Standard_GRS' | 'StandardV2_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'StandardV2_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'StandardV2_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
 
 @description('Storage Account kind')
 param kind 'StorageV2' | 'FileStorage' = 'StorageV2'
@@ -68,7 +69,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   tags: tagValues
 }
 
-module fileServicePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?file != null) {
+module fileServicePrivateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSubnetIds.?file != null) {
   name: '${storageAccountName}FileServicePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -81,7 +82,7 @@ module fileServicePrivateEndpointModule '../../common/components/privateEndpoint
   }
 }
 
-module blobStoragePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?blob != null) {
+module blobStoragePrivateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSubnetIds.?blob != null) {
   name: '${storageAccountName}BlobStoragePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -94,7 +95,7 @@ module blobStoragePrivateEndpointModule '../../common/components/privateEndpoint
   }
 }
 
-module queuePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?queue != null) {
+module queuePrivateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSubnetIds.?queue != null) {
   name: '${storageAccountName}QueuePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -107,7 +108,7 @@ module queuePrivateEndpointModule '../../common/components/privateEndpoint.bicep
   }
 }
 
-module tableStoragePrivateEndpointModule '../../common/components/privateEndpoint.bicep' = if (privateEndpointSubnetIds.?table != null) {
+module tableStoragePrivateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSubnetIds.?table != null) {
   name: '${storageAccountName}TableStoragePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
@@ -120,7 +121,7 @@ module tableStoragePrivateEndpointModule '../../common/components/privateEndpoin
   }
 }
 
-module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+module availabilityAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
   name: '${storageAccountName}AvailabilityAlertModule'
   params: {
     resourceName: storageAccountName
@@ -137,7 +138,7 @@ module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null &
   }
 }
 
-module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}LatencyDeploy'
   params: {
     resourceName: storageAccountName
@@ -160,7 +161,7 @@ var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName
 
 var connectionStringSecretName = '${storageAccountName}-connection-string'
 
-module storeADOConnectionStringToKeyVault '../../common/components/key-vault/keyVaultSecret.bicep' = {
+module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = {
   name: '${storageAccountName}ConnectionStringSecretDeploy'
   params: {
     keyVaultName: keyVaultName
@@ -171,7 +172,7 @@ module storeADOConnectionStringToKeyVault '../../common/components/key-vault/key
 
 var accessKeySecretName = '${storageAccountName}-access-key'
 
-module storeAccessKeyToKeyVault '../../common/components/key-vault/keyVaultSecret.bicep' = {
+module storeAccessKeyToKeyVault '../key-vault/keyVaultSecret.bicep' = {
   name: '${storageAccountName}AccessKeySecretDeploy'
   params: {
     keyVaultName: keyVaultName

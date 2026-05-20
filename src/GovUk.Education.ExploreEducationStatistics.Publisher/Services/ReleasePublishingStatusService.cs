@@ -165,17 +165,6 @@ public class ReleasePublishingStatusService(
         return await QueryEntitiesAsTableRowKeys(filter);
     }
 
-    public async Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId)
-    {
-        var asyncPages = await publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
-            PublisherReleaseStatusTableName,
-            status => status.PartitionKey == releaseVersionId.ToString()
-        );
-        var statusList = await asyncPages.ToListAsync();
-
-        return statusList.OrderByDescending(status => status.Created).FirstOrDefault();
-    }
-
     public async Task UpdateState(ReleasePublishingKey releasePublishingKey, ReleasePublishingStatusState state)
     {
         await UpdateWithRetries(

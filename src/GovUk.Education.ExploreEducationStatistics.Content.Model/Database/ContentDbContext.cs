@@ -177,6 +177,11 @@ public class ContentDbContext : DbContext
             .Entity<DataSetUpload>()
             .Property(m => m.Created)
             .HasConversion(d => d, d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
+
+        modelBuilder
+            .Entity<DataSetUpload>()
+            .Property(import => import.ScreeningStatus)
+            .HasConversion(new EnumToStringConverter<DataSetUploadScreeningStatus>());
     }
 
     private static void ConfigureDataImport(ModelBuilder modelBuilder)

@@ -7,8 +7,8 @@ import {
   StaticWebAppSku
   ContainerAppWorkloadProfile
   PostgreSqlFlexibleServerConfig
-  StorageAccountConfig
 } from 'types.bicep'
+import { StorageAccountConfig } from '../common/components/storage/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''

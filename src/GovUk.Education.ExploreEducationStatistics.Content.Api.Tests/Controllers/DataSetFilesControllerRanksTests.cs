@@ -106,7 +106,7 @@ public abstract class DataSetFilesControllerRanksTests(DataSetFilesControllerRan
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+                pagedResult.AssertEmptyResults();
             }
         }
 

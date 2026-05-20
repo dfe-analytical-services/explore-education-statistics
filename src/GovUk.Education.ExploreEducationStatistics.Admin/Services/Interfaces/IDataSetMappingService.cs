@@ -16,6 +16,14 @@ public interface IDataSetMappingService
     );
 
     Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(
-        IndicatorMappingUpdatesRequest request
+        Guid releaseVersionId,
+        IndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Either<ActionResult, List<LocationMappingDto>>> UpdateLocationMappings(
+        Guid releaseVersionId,
+        LocationMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
     );
 }

@@ -65,6 +65,14 @@ const azurePublicationService = {
   ): Promise<AzurePublicationSuggestResult[]> {
     return frontendApi.post(`/suggest-publications`, { searchOptions: params });
   },
+  // Used for the 'search data' prototype
+  async listStatisticalReleases(
+    params: AzurePublicationListRequest,
+  ): Promise<PaginatedList<PublicationListSummary>> {
+    return frontendApi.post(`/search-statistical-releases`, {
+      searchOptions: params,
+    });
+  },
 };
 
 export default azurePublicationService;

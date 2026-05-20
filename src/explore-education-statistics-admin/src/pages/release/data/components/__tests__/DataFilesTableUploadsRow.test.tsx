@@ -21,7 +21,7 @@ describe('DataFilesTableUploadsRow', () => {
       dataFileSize: '696 B',
       metaFileName: 'one-pass.meta.csv',
       metaFileSize: '210 B',
-      status: 'PENDING_IMPORT',
+      status: 'PendingImport',
       screenerResult: {
         overallResult: 'Passed',
         passed: true,
@@ -59,7 +59,7 @@ describe('DataFilesTableUploadsRow', () => {
       dataFileSize: '696 B',
       metaFileName: 'one-pass.meta.csv',
       metaFileSize: '210 B',
-      status: 'PENDING_IMPORT',
+      status: 'PendingImport',
       screenerResult: {
         overallResult: 'Passed',
         passed: true,
@@ -97,7 +97,7 @@ describe('DataFilesTableUploadsRow', () => {
       dataFileSize: '677 Kb',
       metaFileName: 'absence-fail.meta.csv',
       metaFileSize: '2 Kb',
-      status: 'FAILED_SCREENING',
+      status: 'FailedScreening',
       screenerResult: {
         overallResult: 'Passed',
         passed: true,
