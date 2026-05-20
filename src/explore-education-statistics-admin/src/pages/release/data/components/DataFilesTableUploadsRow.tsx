@@ -25,10 +25,6 @@ interface Props {
   releaseVersionId: string;
   onConfirmDelete: (deletedUploadId: string) => void;
   onConfirmImport: (uploadIds: string[]) => void;
-  // onProgressChange: (
-  //   dataSetUpload: DataSetUpload,
-  //   screenerProgress: DataSetScreenerProgress,
-  // ) => Promise<void>;
   testId?: string;
 }
 
@@ -38,7 +34,6 @@ export default function DataFilesTableUploadRow({
   releaseVersionId,
   onConfirmDelete,
   onConfirmImport,
-  // onProgressChange,
   testId,
 }: Props) {
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
@@ -145,23 +140,16 @@ export default function DataFilesTableUploadRow({
 
   return (
     <tr key={dataSetUpload.dataSetTitle}>
-      <td
-        data-testid={`${dataSetUpload.dataSetTitle}-title`}
-        className={styles.title}
-      >
+      <td data-testid="Title" className={styles.title}>
         {dataSetUpload.dataSetTitle}
       </td>
-      <td
-        data-testid={`${dataSetUpload.dataSetTitle}-size`}
-        className={styles.fileSize}
-      >
+      <td data-testid="Size" className={styles.fileSize}>
         {dataSetUpload.dataFileSize}
       </td>
-      <td data-testid={`${dataSetUpload.dataSetTitle}-status`}>
+      <td data-testid="Status">
         <ScreenerStatus
           dataSetUpload={dataSetUpload}
           releaseVersionId={releaseVersionId}
-          // onStatusChange={onProgressChange}
         />
       </td>
       <td data-testid="Actions">
@@ -207,23 +195,25 @@ export default function DataFilesTableUploadRow({
                   />
                 </TabsSection>
               )}
-              <TabsSection
-                id={dataSetUploadTabIds.screenerResults}
-                testId={dataSetUploadTabIds.screenerResults}
-                title="All tests"
-                headingTitle={
-                  dataSetUpload.screenerResult
-                    ? `Full breakdown of ${dataSetUpload.screenerResult?.testResults.length} tests checked against this file`
-                    : 'No tests checked against this file'
-                }
-              >
-                {hasFailures && failuresNoticeMessage}
-                {hasWarnings && !hasFailures && warningsNoticeMessage}
-                <ScreenerResultsTable
-                  screenerResult={dataSetUpload.screenerResult}
-                  showAll
-                />
-              </TabsSection>
+              {dataSetUpload.status !== 'Screening' && (
+                <TabsSection
+                  id={dataSetUploadTabIds.screenerResults}
+                  testId={dataSetUploadTabIds.screenerResults}
+                  title="All tests"
+                  headingTitle={
+                    dataSetUpload.screenerResult
+                      ? `Full breakdown of ${dataSetUpload.screenerResult?.testResults.length} tests checked against this file`
+                      : 'No tests checked against this file'
+                  }
+                >
+                  {hasFailures && failuresNoticeMessage}
+                  {hasWarnings && !hasFailures && warningsNoticeMessage}
+                  <ScreenerResultsTable
+                    screenerResult={dataSetUpload.screenerResult}
+                    showAll
+                  />
+                </TabsSection>
+              )}
               <TabsSection
                 id={dataSetUploadTabIds.fileDetails}
                 testId={dataSetUploadTabIds.fileDetails}
