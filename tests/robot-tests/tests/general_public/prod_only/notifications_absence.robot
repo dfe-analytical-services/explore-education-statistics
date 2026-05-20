@@ -14,7 +14,7 @@ Navigate to Absence publication
     user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
 
 Go to Notify me page for Absence publication
-    user clicks link    Sign up for email alerts
+    user clicks link    Get email alerts
 
     user waits until page contains title caption    Notify me    %{WAIT_LONG}
     user waits until h1 is visible    Pupil absence in schools in England
@@ -27,7 +27,6 @@ Go to Notify me page for Absence publication
 
 Sign up for email alerts
     [Documentation]    EES-716    EES-1265
-    [Tags]    Failing    # Currently failing on Production when running UI tests directly following deploys.
     user clicks element    id:subscriptionForm-email
     press keys    id:subscriptionForm-email    mark@hiveit.co.uk
     user clicks button    Subscribe
