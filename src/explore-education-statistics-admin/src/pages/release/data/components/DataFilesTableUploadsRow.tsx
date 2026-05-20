@@ -1,7 +1,5 @@
 import releaseDataFileService, {
-  DataSetScreenerProgress,
   DataSetUpload,
-  DataSetUploadStatus,
 } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';

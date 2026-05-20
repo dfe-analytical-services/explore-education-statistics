@@ -128,7 +128,7 @@ export type DataSetUploadScreeningStatus =
 export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
 
 export interface DataSetScreenerProgress {
-  status: DataSetUploadStatus;
+  status: DataSetUploadScreeningStatus;
   percentageComplete: number;
   stage: string;
   completed: boolean;
