@@ -552,8 +552,8 @@ public class ReleaseDataFileService(
     {
         var dataSetFiles = ExtractDataSetZipFile(zipFile);
 
-        var dataFile = dataSetFiles.First(file => !file.FileName.EndsWith(".meta.csv"));
-        var metaFile = dataSetFiles.First(file => file.FileName.EndsWith(".meta.csv"));
+        var dataFile = dataSetFiles.FirstOrDefault(file => !file.FileName.EndsWith(".meta.csv"));
+        var metaFile = dataSetFiles.FirstOrDefault(file => file.FileName.EndsWith(".meta.csv"));
 
         return await ValidateAndBuildDataSet(releaseVersionId, dataFile, metaFile, dataSetTitle);
     }
