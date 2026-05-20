@@ -96,7 +96,7 @@ export const getDataSetUploadStatusColour = (
 
 type StatusState = Pick<
   DataSetScreenerProgress,
-  'stage' | 'percentageComplete'
+  'status' | 'percentageComplete' | 'stage' | 'completed'
 >;
 
 export default function ScreenerStatus({
@@ -108,21 +108,23 @@ export default function ScreenerStatus({
 }: Props) {
   // TODO: Maybe define a base "Status" component which this and "ImporterStatus" inherit
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
-    // status: dataSetUpload.status,
-    stage: 'PENDING',
+    status: dataSetUpload.status,
     percentageComplete: 0,
+    stage: 'PENDING',
+    completed: false,
   });
 
   const fetchStatus = useCallback(async () => {
     const nextStatus = await releaseDataFileService.getDataFileScreeningStatus(
       releaseVersionId,
+      dataSetUpload.id,
     );
 
-    console.log(nextStatus[0].stage); // TODO: remove
-    console.log(nextStatus[0].status); // TODO: remove
-    console.log(nextStatus[0].percentageComplete); // TODO: remove
+    console.log(nextStatus.stage); // TODO: remove
+    console.log(nextStatus.status); // TODO: remove
+    console.log(nextStatus.percentageComplete); // TODO: remove
 
-    setCurrentStatus(nextStatus[0]);
+    setCurrentStatus(nextStatus);
 
     // if (onStatusChange && nextStatus.stage !== dataSetUpload.status) {
     //   onStatusChange(dataSetUpload, nextStatus);
