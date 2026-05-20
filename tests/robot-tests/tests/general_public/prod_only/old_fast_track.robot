@@ -14,19 +14,11 @@ Navigate to Absence publication
     user waits until h1 is visible    Further education and skills    %{WAIT_MEDIUM}
     user checks page contains    Not the latest release
 
-Open Overall absence accordion
-    user opens accordion section    About these statistics    id:content-1
-    user scrolls to accordion section    About these statistics    id:content-1
-
-Follow Explore data link
-    user clicks link containing text    Explore data
-    user clicks link containing text    View or create your own tables
-
-Navigate to the Table Tool
-    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
-    user clicks radio    View all featured tables
-    user clicks link containing text
-    ...    Adult education and training participation and achievement by ethnicity group, 2014/15 to 2019/20
+Navigate to ethnicity featured table
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Featured tables    %{WAIT_MEDIUM}
+    user clicks element
+    ...    xpath://li[.//h4[normalize-space()='Adult education and training participation and achievement by ethnicity group, 2014/15 to 2019/20']]//a[starts-with(normalize-space(.), 'View, edit or download')]
 
 Visit featured table and generate a permalink
     user waits until page contains    This data is not from the latest release
