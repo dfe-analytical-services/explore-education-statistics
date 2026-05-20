@@ -1,5 +1,7 @@
 import releaseDataFileService, {
+  DataSetScreenerProgress,
   DataSetUpload,
+  DataSetUploadStatus,
 } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -25,6 +27,10 @@ interface Props {
   releaseVersionId: string;
   onConfirmDelete: (deletedUploadId: string) => void;
   onConfirmImport: (uploadIds: string[]) => void;
+  // onProgressChange: (
+  //   dataSetUpload: DataSetUpload,
+  //   screenerProgress: DataSetScreenerProgress,
+  // ) => Promise<void>;
   testId?: string;
 }
 
@@ -34,6 +40,7 @@ export default function DataFilesTableUploadRow({
   releaseVersionId,
   onConfirmDelete,
   onConfirmImport,
+  // onProgressChange,
   testId,
 }: Props) {
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
@@ -150,6 +157,7 @@ export default function DataFilesTableUploadRow({
         <ScreenerStatus
           dataSetUpload={dataSetUpload}
           releaseVersionId={releaseVersionId}
+          // onStatusChange={onProgressChange}
         />
       </td>
       <td data-testid="Actions">

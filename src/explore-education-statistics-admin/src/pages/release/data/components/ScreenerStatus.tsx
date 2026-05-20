@@ -1,5 +1,5 @@
 import releaseDataFileService, {
-  DataSetScreenerStatus,
+  DataSetScreenerProgress,
   DataSetUpload,
   DataSetUploadStatus,
   ScreenerTestResult,
@@ -12,7 +12,7 @@ import Tag, { TagProps } from '@common/components/Tag';
 
 export type ScreenerStatusChangeHandler = (
   dataSetUpload: DataSetUpload,
-  status: DataSetScreenerStatus,
+  progress: DataSetScreenerProgress,
 ) => void;
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
   dataSetUpload: DataSetUpload;
   hideErrors?: boolean;
   releaseVersionId: string;
-  onStatusChange?: ScreenerStatusChangeHandler;
+  //   onStatusChange?: ScreenerStatusChangeHandler;
 }
 
 export const getScreenerTestResultStatusLabel = (
@@ -95,38 +95,40 @@ export const getDataSetUploadStatusColour = (
 };
 
 type StatusState = Pick<
-  DataSetScreenerStatus,
-  'status' | 'percentageComplete' | 'errors'
+  DataSetScreenerProgress,
+  'stage' | 'percentageComplete'
 >;
 
 export default function ScreenerStatus({
   dataSetUpload,
   releaseVersionId,
-  onStatusChange,
+  //   onStatusChange,
   hideErrors,
   className,
 }: Props) {
   // TODO: Maybe define a base "Status" component which this and "ImporterStatus" inherit
-
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
-    status: dataSetUpload.status,
+    // status: dataSetUpload.status,
+    stage: 'PENDING',
     percentageComplete: 0,
-    // errors: [], // TODO: Do any errors get returned from the progress endpoint?
   });
 
   const fetchStatus = useCallback(async () => {
     const nextStatus = await releaseDataFileService.getDataFileScreeningStatus(
       releaseVersionId,
     );
-    console.log(nextStatus.status); // TODO: remove
-    console.log(nextStatus.percentageComplete); // TODO: remove
 
-    setCurrentStatus(nextStatus);
+    console.log(nextStatus[0].stage); // TODO: remove
+    console.log(nextStatus[0].status); // TODO: remove
+    console.log(nextStatus[0].percentageComplete); // TODO: remove
 
-    if (onStatusChange && nextStatus.status !== dataSetUpload.status) {
-      onStatusChange(dataSetUpload, nextStatus);
-    }
-  }, [releaseVersionId, dataSetUpload, onStatusChange]);
+    setCurrentStatus(nextStatus[0]);
+
+    // if (onStatusChange && nextStatus.stage !== dataSetUpload.status) {
+    //   onStatusChange(dataSetUpload, nextStatus);
+    // }
+    //   }, [releaseVersionId, dataSetUpload, onStatusChange]);
+  }, [releaseVersionId, dataSetUpload]);
 
   const terminalScreeningStatuses: DataSetUploadStatus[] = [
     'SCREENER_ERROR',

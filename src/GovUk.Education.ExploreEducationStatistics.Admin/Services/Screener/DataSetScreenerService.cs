@@ -218,6 +218,7 @@ public class DataSetScreenerService(
                             Math.Round(upload.ScreenerProgress?.PercentageComplete ?? 0, MidpointRounding.ToZero),
                         Stage = upload.ScreenerProgress?.Stage,
                         Completed = upload.ScreenerProgress?.Completed ?? false,
+                        Status = upload.Status,
                     }
                     : null
             );

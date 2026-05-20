@@ -77,6 +77,7 @@ export default function DataFilesTable({
               releaseVersionId={releaseVersionId}
               onConfirmDelete={onDeleteUpload}
               onConfirmImport={onDataSetImport}
+              // onProgressChange={onProgressChange}
             />
           ))}
         </tbody>
