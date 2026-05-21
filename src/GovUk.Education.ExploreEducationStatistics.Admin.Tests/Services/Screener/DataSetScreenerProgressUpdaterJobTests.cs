@@ -130,6 +130,116 @@ public class DataSetScreenerProgressUpdaterJobTests
         );
     }
 
+    [Fact]
+    public async Task ExecuteTask_FailureInUpdateScreeningProgress_DoesNotPreventFurtherActions()
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = cancellationTokenSource.Token;
+
+        var periodicTimer = new Mock<IPeriodicTimer>(MockBehavior.Strict);
+
+        // When WaitForNextTickAsync is called, cancel the CancellationToken so that we drop out of the
+        // hosted service's execution loop after a single iteration.
+        periodicTimer
+            .Setup(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()))
+            .Callback(() => cancellationTokenSource.Cancel())
+            .Returns(ValueTask.FromResult(true));
+
+        periodicTimer.Setup(p => p.Dispose());
+
+        var dataSetScreenerService = new Mock<IDataSetScreenerService>(MockBehavior.Strict);
+
+        // Throw an exception in the first stage of the job.
+        dataSetScreenerService
+            .Setup(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Failed to update"));
+
+        dataSetScreenerService
+            .Setup(s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        dataSetScreenerService
+            .Setup(s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var job = BuildService(
+            dataSetScreenerService: dataSetScreenerService.Object,
+            periodicTimer: periodicTimer.Object
+        );
+
+        await job.StartAsync(cancellationToken);
+
+        await job.ExecuteTask!;
+
+        periodicTimer.Verify(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+        dataSetScreenerService.Verify(
+            s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()),
+            Times.Exactly(1)
+        );
+
+        dataSetScreenerService.Verify(
+            s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()),
+            Times.Exactly(1)
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteTask_FailureInMarkDataSetsWithoutProgressAsFailed_DoesNotPreventFurtherActions()
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = cancellationTokenSource.Token;
+
+        var periodicTimer = new Mock<IPeriodicTimer>(MockBehavior.Strict);
+
+        // When WaitForNextTickAsync is called, cancel the CancellationToken so that we drop out of the
+        // hosted service's execution loop after a single iteration.
+        periodicTimer
+            .Setup(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()))
+            .Callback(() => cancellationTokenSource.Cancel())
+            .Returns(ValueTask.FromResult(true));
+
+        periodicTimer.Setup(p => p.Dispose());
+
+        var dataSetScreenerService = new Mock<IDataSetScreenerService>(MockBehavior.Strict);
+
+        dataSetScreenerService.Setup(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+
+        // Throw an exception in the second stage of the job.
+        dataSetScreenerService
+            .Setup(s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Failed to mark data sets as failed"));
+
+        dataSetScreenerService
+            .Setup(s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var job = BuildService(
+            dataSetScreenerService: dataSetScreenerService.Object,
+            periodicTimer: periodicTimer.Object
+        );
+
+        await job.StartAsync(cancellationToken);
+
+        await job.ExecuteTask!;
+
+        periodicTimer.Verify(p => p.WaitForNextTickAsync(It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+        dataSetScreenerService.Verify(s => s.UpdateScreeningProgress(It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+        dataSetScreenerService.Verify(
+            s => s.MarkDataSetsWithoutProgressAsFailed(It.IsAny<CancellationToken>()),
+            Times.Exactly(1)
+        );
+
+        dataSetScreenerService.Verify(
+            s => s.CompleteDataSetScreeningForFinishedDataSets(It.IsAny<CancellationToken>()),
+            Times.Exactly(1)
+        );
+    }
+
     private DataSetScreenerProgressUpdaterJob BuildService(
         IDataSetScreenerService? dataSetScreenerService = null,
         IPeriodicTimer? periodicTimer = null
