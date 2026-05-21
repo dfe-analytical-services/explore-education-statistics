@@ -266,8 +266,8 @@ Approve release for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    12
-    ...    3001
+    ...    next_release_month=12
+    ...    next_release_year=3001
 
     set suite variable    ${EXPECTED_SCHEDULED_DATE}
     ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
@@ -731,8 +731,8 @@ Approve amendment for scheduled release
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    12
-    ...    3001
+    ...    next_release_month=12
+    ...    next_release_year=3001
 
     user waits for scheduled release to be published immediately
 
