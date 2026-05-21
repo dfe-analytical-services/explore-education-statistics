@@ -1019,3 +1019,10 @@ user moves item of draggable list down
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
+
+user validates pre-release access list on help tab in release preview
+    [Arguments]    @{access_list_content}
+    user clicks link    Help and related information
+    user waits until h2 is visible    Get help by contacting us
+    user checks section with ID contains elements and back to top link    pre-release-access-list-section
+    ...    @{access_list_content}

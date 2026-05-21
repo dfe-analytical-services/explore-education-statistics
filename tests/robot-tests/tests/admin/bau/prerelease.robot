@@ -293,59 +293,32 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
 Validate metadata guidance page
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Data guidance
-
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
-    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
-    user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
-
-    user waits until page contains accordion section    UI test subject    %{WAIT_SMALL}
-    user checks there are x accordion sections    1
-
-    user opens accordion section    UI test subject
-    user checks summary list contains    Filename    upload-file-test.csv
-    user checks summary list contains    Geographic levels
-    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
-    user checks summary list contains    Time period    2005 to 2020
-    user checks summary list contains    Content    Test file guidance content
-
-    user opens details dropdown    Variable names and descriptions
-
-    user checks table column heading contains    1    1    Variable name
-    user checks table column heading contains    1    2    Variable description
-
-    user checks table cell contains    1    1    admission_numbers
-    user checks table cell contains    1    2    Admission Numbers
+    user validates data guidance on explore tab in release preview
+    ...    Test metadata guidance content
+    ...    UI test subject
+    ...    Test file guidance content
+    ...    Local authority, Local authority district, Local enterprise partnership, Opportunity area, Parliamentary constituency, Regional, RSC region, Ward
+    ...    2005 to 2020
+    ${data_guidance_section}=    Get WebElement    id:data-guidance-section
+    user checks element should contain    ${data_guidance_section}    Test metadata guidance content
+    user checks element should contain    testid:indicators    Admission Numbers
 
 Go back to prerelease content page
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
+    user returns to release home tab in release preview
+    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
-
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Pre-release access list
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-    user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
-    user waits until page contains    Updated test public access list    %{WAIT_SMALL}
+    user validates pre-release access list on help tab in release preview
+    ...    Updated test public access list
 
 Go back to prerelease content page again
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user returns to release home tab in release preview
+    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -408,8 +381,6 @@ Create and validate methodology
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate prerelease has started for Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
     user changes to analyst1
     user navigates to    ${RELEASE_URL}/prerelease/content
 
@@ -423,67 +394,37 @@ Validate prerelease has started for Analyst user
     user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate public metdata guidance for Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Data guidance
-
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
-    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
-    user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
-
-    user waits until page contains accordion section    UI test subject    %{WAIT_SMALL}
-    user checks there are x accordion sections    1
-
-    user opens accordion section    UI test subject
-    user checks summary list contains    Filename    upload-file-test.csv
-    user checks summary list contains    Geographic levels
-    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
-    user checks summary list contains    Time period    2005 to 2020
-    user checks summary list contains    Content    Test file guidance content
-
-    user opens details dropdown    Variable names and descriptions
-
-    user checks table column heading contains    1    1    Variable name
-    user checks table column heading contains    1    2    Variable description
-
-    user checks table cell contains    1    1    admission_numbers
-    user checks table cell contains    1    2    Admission Numbers
+    user validates data guidance on explore tab in release preview
+    ...    Test metadata guidance content
+    ...    UI test subject
+    ...    Test file guidance content
+    ...    Local authority, Local authority district, Local enterprise partnership, Opportunity area, Parliamentary constituency, Regional, RSC region, Ward
+    ...    2005 to 2020
+    ${data_guidance_section}=    Get WebElement    id:data-guidance-section
+    user checks element should contain    ${data_guidance_section}    Test metadata guidance content
+    user checks element should contain    testid:indicators    Admission Numbers
 
 Go back to prerelease content page as Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
+    user returns to release home tab in release preview
+    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
-
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list as Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Pre-release access list
-
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
-    user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
-    user waits until page contains    Updated test public access list    %{WAIT_SMALL}
+    user validates pre-release access list on help tab in release preview
+    ...    Updated test public access list
 
 Go back to prerelease content page again as Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
-
+    user returns to release home tab in release preview
+    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
-
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Go to prerelease table tool page as Analyst user
     user clicks link    Table tool
@@ -595,6 +536,36 @@ user validates table rows
     user checks table cell in offset row contains    ${row}    2    1    6,060
     user checks table cell in offset row contains    ${row}    3    1    1,109
     user checks table cell in offset row contains    ${row}    4    1    1,959
+
+user validates data guidance on explore tab in release preview
+    [Arguments]
+    ...    ${main_guidance_content}
+    ...    ${subject_name}
+    ...    ${file_guidance_content}
+    ...    ${data_file_description}
+    ...    ${time_period}
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user checks section with ID contains elements and back to top link    data-guidance-section
+    ...    ${main_guidance_content}
+    user scrolls to element    id:datasets-section
+
+    ${dataset_xpath}=    Set Variable
+    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${subject_name}"]]
+    Wait Until Element Is Visible    xpath=${dataset_xpath}
+    ${toggle_xpath}=    Set Variable
+    ...    ${dataset_xpath}//button[@aria-expanded="false"]
+    Run Keyword And Ignore Error    Click Element    xpath=${toggle_xpath}
+
+    user checks element should contain    ${dataset_xpath}    ${file_guidance_content}
+    user checks element should contain    ${dataset_xpath}    ${data_file_description}
+    user checks summary list contains    Time period    ${time_period}    ${dataset_xpath}
+
+user returns to release home tab in release preview
+    [Arguments]    ${headlines_text}
+    user clicks link    Release home
+    user waits until h2 is visible    Headline facts and figures
+    user waits until element contains    id:headlines-section    ${headlines_text}    %{WAIT_SMALL}
 
 do suite teardown
     user closes the browser
