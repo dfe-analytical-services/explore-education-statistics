@@ -636,6 +636,7 @@ public abstract class DataSetScreenerServiceTests
                     PercentageComplete = (int)dataSetsUndergoingScreening[0].ScreenerProgress!.PercentageComplete,
                     Stage = dataSetsUndergoingScreening[0].ScreenerProgress!.Stage,
                     Completed = dataSetsUndergoingScreening[0].ScreenerProgress!.Completed,
+                    Status = dataSetsUndergoingScreening[0].ScreeningStatus,
                 };
 
                 result.AssertRight(expectedProgressUpdate);
@@ -839,7 +840,7 @@ public abstract class DataSetScreenerServiceTests
 
                 results.ForEach(result =>
                 {
-                    Assert.Equal(nameof(DataSetUploadScreeningStatus.FailedScreening), result.Status);
+                    Assert.Equal(nameof(DataSetUploadScreeningStatus.ScreenerError), result.Status);
                     Assert.NotNull(result.ScreenerResult);
                     Assert.Equal("Failed to retrieve progress updates", result.ScreenerResult.OverallResult);
                     Assert.Empty(result.ScreenerResult.TestResults);
@@ -1127,16 +1128,22 @@ public abstract class DataSetScreenerServiceTests
                 Assert.Equal(dataSetsUndergoingScreening[0].Id, results[0].Id);
                 var expectedDataSet1CompletionReport = completionReportsResponse[1].CompletionReport;
                 Assert.Equal(expectedDataSet1CompletionReport.OverallResult, results[0].ScreenerResult!.OverallResult);
+
+                // TODO EES-6693 - remove the additional automatic warning from the TestResults count once
+                // the external screener is no longer required.
                 Assert.Equal(
-                    expectedDataSet1CompletionReport.TestResults.Count,
+                    expectedDataSet1CompletionReport.TestResults.Count + 1,
                     results[0].ScreenerResult!.TestResults.Count
                 );
 
                 Assert.Equal(dataSetsUndergoingScreening[2].Id, results[1].Id);
                 var expectedDataSet3CompletionReport = completionReportsResponse[0].CompletionReport;
                 Assert.Equal(expectedDataSet3CompletionReport.OverallResult, results[1].ScreenerResult!.OverallResult);
+
+                // TODO EES-6693 - remove the additional automatic warning from the TestResults count once
+                // the external screener is no longer required.
                 Assert.Equal(
-                    expectedDataSet3CompletionReport.TestResults.Count,
+                    expectedDataSet3CompletionReport.TestResults.Count + 1,
                     results[1].ScreenerResult!.TestResults.Count
                 );
             }
@@ -1148,7 +1155,17 @@ public abstract class DataSetScreenerServiceTests
                 // Expect that data set 1 had its completion report applied and status updated to
                 // show that it passed screening successfully.
                 var dataSetUpload1 = updatedDataSetUploads[0];
-                var expectedDataSet1CompletionReport = completionReportsResponse[1].CompletionReport;
+
+                // TODO EES-6693 - remove the additional automatic warning from the TestResults once
+                // the external screener is no longer required.
+                var expectedDataSet1CompletionReport = completionReportsResponse[1].CompletionReport with
+                {
+                    TestResults =
+                    [
+                        .. completionReportsResponse[1].CompletionReport.TestResults,
+                        DataScreenerTestResult.ExternalScreenerWarningResult,
+                    ],
+                };
                 expectedDataSet1CompletionReport.AssertDeepEqualTo(dataSetUpload1.ScreenerResult);
                 Assert.Equal(DataSetUploadScreeningStatus.PendingReview, dataSetUpload1.ScreeningStatus);
 
@@ -1160,7 +1177,17 @@ public abstract class DataSetScreenerServiceTests
                 // Expect that data set 3 had its completion report applied and status updated to
                 // show that it failed screening.
                 var dataSetUpload3 = updatedDataSetUploads[2];
-                var expectedDataSet3CompletionReport = completionReportsResponse[0].CompletionReport;
+                // TODO EES-6693 - remove the additional automatic warning from the TestResults once
+                // the external screener is no longer required.
+                var expectedDataSet3CompletionReport = completionReportsResponse[0].CompletionReport with
+                {
+                    TestResults =
+                    [
+                        .. completionReportsResponse[0].CompletionReport.TestResults,
+                        DataScreenerTestResult.ExternalScreenerWarningResult,
+                    ],
+                };
+
                 expectedDataSet3CompletionReport.AssertDeepEqualTo(dataSetUpload3.ScreenerResult);
                 Assert.Equal(DataSetUploadScreeningStatus.FailedScreening, dataSetUpload3.ScreeningStatus);
             }
@@ -1266,6 +1293,118 @@ public abstract class DataSetScreenerServiceTests
 
                 // Expect it not to have had any ScreenerResult applied.
                 Assert.Null(upload.ScreenerResult);
+            }
+        }
+
+        [Fact]
+        public async Task DataSetWithCompletedScreeningProgress_FailureToDeleteProgressFiles_MarkedAsComplete()
+        {
+            // Arrange
+            DataSetUpload dataSetUndergoingScreening = _dataFixture
+                .DefaultDataSetUpload()
+                .WithStatus(DataSetUploadScreeningStatus.Screening)
+                .WithScreenerProgress(
+                    new DataSetScreenerProgress
+                    {
+                        Completed = true,
+                        Passed = false,
+                        PercentageComplete = 100,
+                        Stage = "Completed",
+                    }
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.DataSetUploads.AddRangeAsync(dataSetUndergoingScreening);
+                await context.SaveChangesAsync();
+            }
+
+            List<DataSetScreenerCompletionReportResponse> completionReportsResponse =
+            [
+                new()
+                {
+                    DataSetId = dataSetUndergoingScreening.Id,
+                    CompletionReport = new DataSetScreenerResponse
+                    {
+                        OverallResult = "Failed screening at stage 2",
+                        Passed = false,
+                        PublicApiCompatible = false,
+                        TestResults =
+                        [
+                            new DataScreenerTestResult
+                            {
+                                Stage = "stage 2",
+                                TestFunctionName = "a test",
+                                Notes = "Some notes",
+                                GuidanceUrl = "https://example.com",
+                                Result = TestResult.FAIL,
+                            },
+                        ],
+                    },
+                },
+            ];
+
+            var screenerClient = new Mock<IDataSetScreenerClient>(MockBehavior.Strict);
+
+            screenerClient
+                .Setup(s =>
+                    s.GetScreenerCompletionReports(new[] { dataSetUndergoingScreening.Id }, CancellationToken.None)
+                )
+                .ReturnsAsync(completionReportsResponse);
+
+            screenerClient
+                .Setup(s =>
+                    s.DeleteScreenerProgressAndCompletionFiles(
+                        new[] { dataSetUndergoingScreening.Id },
+                        CancellationToken.None
+                    )
+                )
+                .ThrowsAsync(new Exception("Failed to delete progress files"));
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildService(screenerClient: screenerClient.Object, contentDbContext: context);
+
+                // Act
+                var results = await service.CompleteDataSetScreeningForFinishedDataSets(CancellationToken.None);
+
+                // Assert
+                screenerClient.VerifyAll();
+
+                var result = Assert.Single(results);
+
+                Assert.Equal(dataSetUndergoingScreening.Id, result.Id);
+                var expectedDataSet1CompletionReport = completionReportsResponse[0].CompletionReport;
+                Assert.Equal(expectedDataSet1CompletionReport.OverallResult, result.ScreenerResult!.OverallResult);
+
+                // TODO EES-6693 - remove the additional automatic warning from the TestResults count once
+                // the external screener is no longer required.
+                Assert.Equal(
+                    expectedDataSet1CompletionReport.TestResults.Count + 1,
+                    result.ScreenerResult!.TestResults.Count
+                );
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var updatedDataSetUpload = context.DataSetUploads.Single();
+
+                // Expect that the data set has its completion report applied and status updated to
+                // show that it passed screening successfully, despite the failure to clean up the
+                // progress files.
+                // TODO EES-6693 - remove the additional automatic warning from the TestResults once
+                // the external screener is no longer required.
+                var expectedDataSetCompletionReport = completionReportsResponse[0].CompletionReport with
+                {
+                    TestResults =
+                    [
+                        .. completionReportsResponse[0].CompletionReport.TestResults,
+                        DataScreenerTestResult.ExternalScreenerWarningResult,
+                    ],
+                };
+                expectedDataSetCompletionReport.AssertDeepEqualTo(updatedDataSetUpload.ScreenerResult);
+                Assert.Equal(DataSetUploadScreeningStatus.FailedScreening, updatedDataSetUpload.ScreeningStatus);
             }
         }
     }

@@ -4,6 +4,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 
 public class DataScreenerTestResult
 {
+    public static readonly DataScreenerTestResult ExternalScreenerWarningResult = new()
+    {
+        Result = TestResult.WARNING,
+        TestFunctionName = "External screening",
+        Notes =
+            "I confirm that this data set has been separately screened by, and passed, the EES data screener (https://rsconnect/rsc/dfe-published-data-qa/).",
+        Stage = "Manual acknowledgement",
+    };
+
     [JsonPropertyName("check")]
     public required string TestFunctionName { get; set; }
 

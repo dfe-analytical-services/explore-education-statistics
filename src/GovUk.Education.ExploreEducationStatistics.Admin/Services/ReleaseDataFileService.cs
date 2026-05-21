@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -365,7 +364,9 @@ public class ReleaseDataFileService(
                         )
                     )
                     .OnSuccess(async dataSetUploads =>
-                        await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
+                        screenerOptions.Value.EnhancedScreenerJourney
+                            ? await StartDataSetUploadScreening([.. dataSetUploads], cancellationToken)
+                            : await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
                     );
             });
     }
@@ -392,7 +393,11 @@ public class ReleaseDataFileService(
                     )
                 )
             )
-            .OnSuccess(async dataSetUploads => await ScreenDataSetUploads([.. dataSetUploads], cancellationToken));
+            .OnSuccess(async dataSetUploads =>
+                screenerOptions.Value.EnhancedScreenerJourney
+                    ? await StartDataSetUploadScreening([.. dataSetUploads], cancellationToken)
+                    : await ScreenDataSetUploads([.. dataSetUploads], cancellationToken)
+            );
     }
 
     private async Task<List<DataSetUploadViewModel>> ScreenDataSetUploads(
@@ -445,16 +450,7 @@ public class ReleaseDataFileService(
                     }
 
                     // TODO (EES-6693): Remove this automatic warning once the external screener is no longer required.
-                    result.TestResults.Add(
-                        new DataScreenerTestResult
-                        {
-                            Result = TestResult.WARNING,
-                            TestFunctionName = "External screening",
-                            Notes =
-                                "I confirm that this data set has been separately screened by, and passed, the EES data screener (https://rsconnect/rsc/dfe-published-data-qa/).",
-                            Stage = "Manual acknowledgement",
-                        }
-                    );
+                    result.TestResults.Add(DataScreenerTestResult.ExternalScreenerWarningResult);
 
                     await dataSetFileStorage.UpdateDataSetUpload(dataSetUpload.Id, result, cancellationToken: ct);
 
@@ -514,13 +510,17 @@ public class ReleaseDataFileService(
 
                         return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                     }
-                    catch (DataScreenerException)
+                    catch (Exception)
                     {
-                        await dataSetFileStorage.UpdateDataSetUpload(
-                            dataSetUpload.Id,
-                            screenerResult: null,
+                        var upload = await contentDbContext.DataSetUploads.SingleAsync(
+                            upload => upload.Id == request.DataSetId,
                             cancellationToken: ct
                         );
+
+                        upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
+
+                        contentDbContext.DataSetUploads.Update(upload);
+                        await contentDbContext.SaveChangesAsync(cancellationToken: ct);
 
                         return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
                     }
