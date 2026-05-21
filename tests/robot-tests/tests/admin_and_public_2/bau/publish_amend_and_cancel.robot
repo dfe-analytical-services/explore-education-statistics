@@ -145,7 +145,7 @@ Add public prerelease access list
     user creates public prerelease access list    Test public access list
 
 Approve release for scheduled publication
-    ${days_until_release}=    set variable    0
+    ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
     ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}

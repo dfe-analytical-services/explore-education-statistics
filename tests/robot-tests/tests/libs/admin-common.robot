@@ -750,6 +750,16 @@ user puts release into higher level review
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review    %{WAIT_SMALL}
 
 user approves release for scheduled publication
+    [Documentation]
+    ...    Approves a release version for scheduled publication on a specific date, with an optional next release date, and verifies that the overall release status is Scheduled.
+    ...
+    ...    If this keyword will be followed by 'user waits for scheduled release to be published immediately' (to advance the release version through the publishing process immediately,
+    ...    instead of waiting for the scheduled trigger), set the publish date to at least one day in the future.
+    ...
+    ...    This prevents a race condition where the publishing process may begin processing naturally at the same time that the test is attempting to trigger it via the API.
+    ...
+    ...    This can lead to ambiguity in the source of status transitions, i.e. whether changes were caused by normal scheduled processing or test-triggered API processing.
+    ...    It may also lead to false positive test results, where processing appears to have progressed correctly when it was actually advanced by the normal scheduled processing before the test-triggered API processing occurred.
     [Arguments]
     ...    ${publish_date_day}
     ...    ${publish_date_month}
@@ -789,24 +799,38 @@ user approves release for scheduled publication
     user checks summary list contains    Next release expected    ${expected_next_release_date}
     user waits for release process status to be    Scheduled    %{WAIT_SMALL}
 
+user waits for release process status and stages to be
+    [Arguments]
+    ...    ${overall_status}
+    ...    ${files_stage}
+    ...    ${publishing_stage}
+    user waits for release process status to be    ${overall_status}    %{WAIT_SMALL}
+    user waits until page contains element    id:release-process-stage-files-${files_stage}
+    user waits until page contains element    id:release-process-stage-publishing-${publishing_stage}
+
 user waits for scheduled release to be published immediately
+    [Documentation]    Uses the API to advance a scheduled release version through the release publishing process immediately, instead of waiting for the Publisher app to trigger the publishing functions on the release version's scheduled publication date.
     ${release_version_id}=    get release id from url
-    # It's possible that the scheduled "PrepareScheduledReleaseVersions" function may begin processing
-    # this scheduled release version before the test manually triggers the
-    # "PrepareScheduledReleaseVersionsNow" function via the API.
-    #
-    # Because of this potential overlap, the release version may already be in the overall
-    # "Started" state instead of the "Scheduled" state that would normally be expected.
-    # The test therefore needs to expect both states.
-    user waits until page contains element
-    ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_SMALL}
+
+    # The release should be in the Scheduled state at this point.
+    # If this fails, the "PrepareScheduledReleaseVersions" function may have already started processing the release version before this test
+    # can trigger the "PrepareScheduledReleaseVersionsNow" function via the API.
+    # To avoid this race condition, use a publish date at least one day in the future when approving the release for scheduled publishing.
+    user waits for release process status to be    Scheduled    %{WAIT_SMALL}
+
     prepare scheduled release versions now via api    ['${release_version_id}']
     user reloads page
-    user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
+    user waits until page contains details dropdown    View stages
     user opens details dropdown    View stages
-    user waits until page contains    Files - complete    %{WAIT_MEDIUM}
+    user waits for release process status and stages to be
+    ...    overall_status=Started
+    ...    files_stage=Complete
+    ...    publishing_stage=Scheduled
     publish scheduled release versions now via api    ['${release_version_id}']
-    user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
+    user waits for release process status and stages to be
+    ...    overall_status=Complete
+    ...    files_stage=Complete
+    ...    publishing_stage=Complete
 
 user verifies release summary
     [Arguments]
