@@ -11,6 +11,7 @@ describe('DataFilesTableUploadsRow', () => {
     releaseVersionId: 'release-version-id-1',
     onConfirmDelete: jest.fn(),
     onConfirmImport: jest.fn(),
+    onRefreshUploads: jest.fn(),
   };
 
   const fileUploads: Dictionary<DataSetUpload> = {

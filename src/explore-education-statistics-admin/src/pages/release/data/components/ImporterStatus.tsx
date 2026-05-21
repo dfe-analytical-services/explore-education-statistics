@@ -12,7 +12,7 @@ import useInterval from '@common/hooks/useInterval';
 import useMounted from '@common/hooks/useMounted';
 import React, { useCallback, useEffect, useState } from 'react';
 
-export const getImportStatusLabel = (
+const getImportStatusLabel = (
   statusCode: ImportStatusCode,
 ): string | undefined => {
   switch (statusCode) {
@@ -84,6 +84,7 @@ interface ImporterStatusProps {
   releaseVersionId: string;
   onStatusChange?: ImporterStatusChangeHandler;
 }
+
 const ImporterStatus = ({
   className,
   dataFile,
