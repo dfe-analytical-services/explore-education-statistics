@@ -26,6 +26,7 @@ interface Props {
   releaseVersionId: string;
   onConfirmDelete: (deletedUploadId: string) => void;
   onConfirmImport: (uploadIds: string[]) => void;
+  onRefreshUploads: () => void;
   testId?: string;
 }
 
@@ -35,6 +36,7 @@ export default function DataFilesTableUploadRow({
   releaseVersionId,
   onConfirmDelete,
   onConfirmImport,
+  onRefreshUploads,
   testId,
 }: Props) {
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
@@ -53,22 +55,10 @@ export default function DataFilesTableUploadRow({
       setCurrentUpload(upload => ({ ...upload, status: progress.status }));
 
       if (terminalScreeningStatuses.includes(progress.status)) {
-        (async () => {
-          try {
-            const uploads = await releaseDataFileService.getDataSetUploads(
-              releaseVersionId,
-            );
-            const updated = uploads.find(u => u.id === _upload.id);
-            if (updated) {
-              setCurrentUpload(updated);
-            }
-          } catch (err) {
-            // swallow - leave currentUpload as-is if fetch fails
-          }
-        })();
+        onRefreshUploads();
       }
     },
-    [setCurrentUpload, releaseVersionId],
+    [setCurrentUpload, onRefreshUploads],
   );
 
   const hasFailures = currentUpload.screenerResult?.testResults.some(
