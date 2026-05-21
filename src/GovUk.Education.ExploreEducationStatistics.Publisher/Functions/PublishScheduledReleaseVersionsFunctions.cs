@@ -16,7 +16,7 @@ public class PublishScheduledReleaseVersionsFunctions(
 {
     /// <summary>
     /// Azure Function that publishes scheduled release versions.
-    /// It uses <see cref="IPublishingCompletionService"/> to mark releases as publicly accessible and to
+    /// It uses <see cref="IPublishingCompletionService"/> to mark release versions as publicly accessible and to
     /// execute tasks required to complete the publishing process.
     /// </summary>
     /// <remarks>
@@ -30,22 +30,23 @@ public class PublishScheduledReleaseVersionsFunctions(
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var releasesReadyForPublishing = await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
+        var releaseVersionsReadyForPublishing =
+            await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
         // Complete publishing of these release versions
-        await publishingCompletionService.CompletePublishing(releasesReadyForPublishing);
+        await publishingCompletionService.CompletePublishing(releaseVersionsReadyForPublishing);
 
         logger.LogInformation(
             "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
             context.FunctionDefinition.Name,
-            releasesReadyForPublishing.ToReleaseVersionIdsString()
+            releaseVersionsReadyForPublishing.ToReleaseVersionIdsString()
         );
     }
 
     /// <summary>
     /// HTTP-triggered function to immediately publish scheduled release versions.
     /// Intended for use by manual and automated testing to avoid waiting for the scheduled trigger.
-    /// It uses <see cref="IPublishingCompletionService"/> to mark releases as publicly accessible and to
+    /// It uses <see cref="IPublishingCompletionService"/> to mark release versions as publicly accessible and to
     /// execute tasks required to complete the publishing process.
     /// </summary>
     /// <remarks>
@@ -69,23 +70,26 @@ public class PublishScheduledReleaseVersionsFunctions(
 
         var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
-        var releasesReadyForPublishing = await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
+        var releaseVersionsReadyForPublishing =
+            await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
-        var selectedReleasesToPublish =
+        var selectedReleaseVersionsToPublish =
             releaseVersionIds?.Length > 0
-                ? releasesReadyForPublishing.Where(key => releaseVersionIds.Contains(key.ReleaseVersionId)).ToList()
-                : releasesReadyForPublishing;
+                ? releaseVersionsReadyForPublishing
+                    .Where(key => releaseVersionIds.Contains(key.ReleaseVersionId))
+                    .ToList()
+                : releaseVersionsReadyForPublishing;
 
         // Complete publishing of these release versions
-        await publishingCompletionService.CompletePublishing(selectedReleasesToPublish);
+        await publishingCompletionService.CompletePublishing(selectedReleaseVersionsToPublish);
 
         logger.LogInformation(
             "{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            selectedReleasesToPublish.ToReleaseVersionIdsString()
+            selectedReleaseVersionsToPublish.ToReleaseVersionIdsString()
         );
 
-        return new ManualTriggerResponse(selectedReleasesToPublish.ToReleaseVersionIds());
+        return new ManualTriggerResponse(selectedReleaseVersionsToPublish.ToReleaseVersionIds());
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local

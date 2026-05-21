@@ -56,17 +56,18 @@ public class PrepareScheduledReleaseVersionsFunctions(
             );
 
         // Fetch release versions scheduled for publishing before or on the next run time
-        var scheduledReleases = await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
-            DateComparison.BeforeOrOn,
-            nextScheduledPublishingTime
-        );
+        var scheduledReleaseVersions =
+            await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
+                DateComparison.BeforeOrOn,
+                nextScheduledPublishingTime
+            );
 
-        await QueueReleaseFilesTask(scheduledReleases);
+        await QueueReleaseFilesTask(scheduledReleaseVersions);
 
         logger.LogInformation(
             "{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            scheduledReleases.ToReleaseVersionIdsString()
+            scheduledReleaseVersions.ToReleaseVersionIdsString()
         );
     }
 
@@ -99,7 +100,7 @@ public class PrepareScheduledReleaseVersionsFunctions(
         var now = timeProvider.GetLocalNow();
         var startOfToday = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset);
 
-        var scheduledReleases =
+        var scheduledReleaseVersions =
             releaseVersionIds?.Length > 0
                 ? await releasePublishingStatusService.GetScheduledReleasesForPublishingRelativeToDate(
                     DateComparison.AfterOrOn,
@@ -110,20 +111,20 @@ public class PrepareScheduledReleaseVersionsFunctions(
                     startOfToday.AddDays(1)
                 );
 
-        var selectedReleases =
+        var selectedReleaseVersions =
             releaseVersionIds?.Length > 0
-                ? scheduledReleases.Where(key => releaseVersionIds.Contains(key.ReleaseVersionId)).ToList()
-                : scheduledReleases;
+                ? scheduledReleaseVersions.Where(key => releaseVersionIds.Contains(key.ReleaseVersionId)).ToList()
+                : scheduledReleaseVersions;
 
-        await QueueReleaseFilesTask(selectedReleases);
+        await QueueReleaseFilesTask(selectedReleaseVersions);
 
         logger.LogInformation(
             "{FunctionName} completed. Queued tasks for release versions: [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            selectedReleases.ToReleaseVersionIdsString()
+            selectedReleaseVersions.ToReleaseVersionIdsString()
         );
 
-        return new ManualTriggerResponse(selectedReleases.ToReleaseVersionIds());
+        return new ManualTriggerResponse(selectedReleaseVersions.ToReleaseVersionIds());
     }
 
     private async Task QueueReleaseFilesTask(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
