@@ -88,7 +88,7 @@ public class PrepareScheduledReleaseVersionsFunctions(
     /// <param name="context"></param>
     /// <returns></returns>
     [Function(nameof(PrepareScheduledReleaseVersionsNow))]
-    public async Task<ActionResult<ManualTriggerResponse>> PrepareScheduledReleaseVersionsNow(
+    public async Task<IActionResult> PrepareScheduledReleaseVersionsNow(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
         FunctionContext context
     )
@@ -124,7 +124,7 @@ public class PrepareScheduledReleaseVersionsFunctions(
             selectedReleaseVersions.ToReleaseVersionIdsString()
         );
 
-        return new ManualTriggerResponse(selectedReleaseVersions.ToReleaseVersionIds());
+        return new OkObjectResult(new ManualTriggerResponse(selectedReleaseVersions.ToReleaseVersionIds()));
     }
 
     private async Task QueueReleaseFilesTask(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
@@ -148,5 +148,5 @@ public class PrepareScheduledReleaseVersionsFunctions(
     // ReSharper disable once ClassNeverInstantiated.Local
     private record ManualTriggerRequest(Guid[] ReleaseVersionIds);
 
-    public record ManualTriggerResponse(Guid[] ReleaseVersionIds);
+    private record ManualTriggerResponse(Guid[] ReleaseVersionIds);
 }

@@ -61,7 +61,7 @@ public class PublishScheduledReleaseVersionsFunctions(
     /// <param name="context"></param>
     /// <returns></returns>
     [Function(nameof(PublishScheduledReleaseVersionsNow))]
-    public async Task<ActionResult<ManualTriggerResponse>> PublishScheduledReleaseVersionsNow(
+    public async Task<IActionResult> PublishScheduledReleaseVersionsNow(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
         FunctionContext context
     )
@@ -89,11 +89,11 @@ public class PublishScheduledReleaseVersionsFunctions(
             selectedReleaseVersionsToPublish.ToReleaseVersionIdsString()
         );
 
-        return new ManualTriggerResponse(selectedReleaseVersionsToPublish.ToReleaseVersionIds());
+        return new OkObjectResult(new ManualTriggerResponse(selectedReleaseVersionsToPublish.ToReleaseVersionIds()));
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record ManualTriggerRequest(Guid[] ReleaseVersionIds);
 
-    public record ManualTriggerResponse(Guid[] ReleaseVersionIds);
+    private record ManualTriggerResponse(Guid[] ReleaseVersionIds);
 }
