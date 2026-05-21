@@ -93,7 +93,7 @@ type StatusState = Pick<
   'status' | 'percentageComplete' | 'stage' | 'completed'
 >;
 
-const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
+export const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
   'ScreenerError',
   'PendingReview',
   'PendingImport',

@@ -18,7 +18,7 @@ import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
 import styles from './DataFilesTable.module.scss';
-import ScreenerStatus from './ScreenerStatus';
+import ScreenerStatus, { terminalScreeningStatuses } from './ScreenerStatus';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -51,8 +51,24 @@ export default function DataFilesTableUploadRow({
   const handleScreenerStatusChange = useCallback(
     (_upload: DataSetUpload, progress: DataSetScreenerProgress) => {
       setCurrentUpload(upload => ({ ...upload, status: progress.status }));
+
+      if (terminalScreeningStatuses.includes(progress.status)) {
+        (async () => {
+          try {
+            const uploads = await releaseDataFileService.getDataSetUploads(
+              releaseVersionId,
+            );
+            const updated = uploads.find(u => u.id === _upload.id);
+            if (updated) {
+              setCurrentUpload(updated);
+            }
+          } catch (err) {
+            // swallow - leave currentUpload as-is if fetch fails
+          }
+        })();
+      }
     },
-    [setCurrentUpload],
+    [setCurrentUpload, releaseVersionId],
   );
 
   const hasFailures = currentUpload.screenerResult?.testResults.some(
@@ -218,10 +234,10 @@ export default function DataFilesTableUploadRow({
                   testId={dataSetUploadTabIds.screenerResults}
                   title="All tests"
                   headingTitle={
-                    currentUpload.screenerResult &&
-                    currentUpload.status !== 'ScreenerError' // this bit is still showing the wrong "All tests" before a page refresh
-                      ? `Full breakdown of ${currentUpload.screenerResult?.testResults.length} tests checked against this file`
-                      : 'No tests checked against this file'
+                    !currentUpload.screenerResult &&
+                    currentUpload.status === 'ScreenerError'
+                      ? 'No tests checked against this file'
+                      : `Full breakdown of ${currentUpload.screenerResult?.testResults.length} tests checked against this file`
                   }
                 >
                   {hasFailures && failuresNoticeMessage}
