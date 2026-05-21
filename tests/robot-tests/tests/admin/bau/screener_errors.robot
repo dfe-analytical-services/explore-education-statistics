@@ -71,6 +71,7 @@ Upload an invalid data set in a ZIP file and wait for it to fail the screener ch
     user clicks button    Upload data files
 
     user waits until page contains data uploads table
+    user waits for screening to complete    Invalid data set
     user checks invalid data set details in data uploads table
 
 Check the screening failures for the ZIP file
