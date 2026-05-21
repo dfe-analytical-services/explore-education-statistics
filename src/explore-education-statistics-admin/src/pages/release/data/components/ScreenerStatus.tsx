@@ -18,6 +18,7 @@ export type ScreenerStatusChangeHandler = (
 interface Props {
   dataSetUpload: DataSetUpload;
   releaseVersionId: string;
+  onStatusChange?: ScreenerStatusChangeHandler;
 }
 
 export const getScreenerTestResultStatusLabel = (
@@ -102,6 +103,7 @@ const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
 export default function ScreenerStatus({
   dataSetUpload,
   releaseVersionId,
+  onStatusChange,
 }: Props) {
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
     status: dataSetUpload.status,
@@ -117,7 +119,11 @@ export default function ScreenerStatus({
     );
 
     setCurrentStatus(nextStatus);
-  }, [releaseVersionId, dataSetUpload]);
+
+    if (onStatusChange && nextStatus.status !== dataSetUpload.status) {
+      onStatusChange(dataSetUpload, nextStatus);
+    }
+  }, [releaseVersionId, dataSetUpload, onStatusChange]);
 
   const [cancelInterval] = useInterval(fetchStatus, 5000);
 
