@@ -178,6 +178,7 @@ module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
     kind: 'functionapp'
     sku: sku
     operatingSystem: operatingSystem
+    maximumElasticWorkerCount: maximumInstanceCount
     alerts: alerts != null
       ? {
           cpuPercentage: alerts!.cpuPercentage
