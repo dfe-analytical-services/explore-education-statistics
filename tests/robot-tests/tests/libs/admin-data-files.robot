@@ -289,8 +289,12 @@ user waits for screening to complete
     [Arguments]
     ...    ${SUBJECT_NAME}
 
-    # TODO EES-7130 - update to not require the hard page refresh when EES-7007 is complete.
-    sleep    40
+    user waits until subject has status    ${SUBJECT_NAME}    Screening
+    user waits until page contains element    testid:${SUBJECT_NAME}-screener-progress-bar
+    user waits until page does not contain element    testid:${SUBJECT_NAME}-screener-progress-bar
+    ...    wait=%{WAIT_DATA_FILE_SCREEN}
+
+    # TODO EES-7130 - remove this page reload. This is to allow the "View details" modal to refresh with the latest
+    # screener results when screening has completed.
     user reloads page
     user waits until page finishes loading
-    user waits until page does not contain element    testid:${SUBJECT_NAME}-screener-progress-bar

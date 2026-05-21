@@ -162,13 +162,19 @@ export default function DataFilesTableUploadRow({
 
   return (
     <tr key={currentUpload.dataSetTitle}>
-      <td data-testid="Title" className={styles.title}>
+      <td
+        data-testid={`${currentUpload.dataSetTitle}-title`}
+        className={styles.title}
+      >
         {currentUpload.dataSetTitle}
       </td>
-      <td data-testid="Size" className={styles.fileSize}>
+      <td
+        data-testid={`${currentUpload.dataSetTitle}-size`}
+        className={styles.fileSize}
+      >
         {currentUpload.dataFileSize}
       </td>
-      <td data-testid="Status">
+      <td data-testid={`${currentUpload.dataSetTitle}-status`}>
         <ScreenerStatus
           dataSetUpload={currentUpload}
           releaseVersionId={releaseVersionId}
