@@ -57,6 +57,7 @@ const InvitePublicationDrafterForm = ({
         errorMappings={errorMappings}
         initialValues={inviteDrafterInitialValues}
         validationSchema={inviteDrafterValidationSchema}
+        reValidateMode="onSubmit"
         resetAfterSubmit
       >
         {({ formState }) => {

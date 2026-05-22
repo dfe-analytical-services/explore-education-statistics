@@ -476,6 +476,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
         services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>();
         services.AddTransient<IDataBlockService, DataBlockService>();
+        services.AddTransient<IGlobalRoleService, GlobalRoleService>();
         services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
         services.AddTransient<IPreReleaseService, PreReleaseService>();
         services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();

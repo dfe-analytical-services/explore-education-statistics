@@ -30,6 +30,7 @@ public class UserManagementService(
     ContentDbContext contentDbContext,
     IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
     IUserRoleService userRoleService,
+    IGlobalRoleService globalRoleService,
     IUserRepository userRepository,
     IUserService userService,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
@@ -107,7 +108,7 @@ public class UserManagementService(
                     .CheckEntityExists<ApplicationUser, string>(id.ToString())
                     .OnSuccess(async user =>
                     {
-                        return await userRoleService
+                        return await globalRoleService
                             .GetGlobalRolesForUser(user.Id)
                             .OnSuccessCombineWith(_ => userRoleService.GetPublicationRolesForUser(id))
                             .OnSuccessCombineWith(_ => preReleaseUserService.GetPreReleaseRolesForUser(id))
@@ -273,7 +274,7 @@ public class UserManagementService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => userRoleService.SetGlobalRoleForUser(userId, roleId));
+            .OnSuccess(() => globalRoleService.SetGlobalRoleForUser(userId, roleId));
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteUser(string email)
