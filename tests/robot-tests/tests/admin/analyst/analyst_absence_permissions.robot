@@ -78,24 +78,24 @@ Validate Analyst1 can see correct publication release order
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010
     user checks table cell contains    7    3    Legacy release
 
-Check Analyst1 cannot create a legacy release
-    user checks page does not contain button    Create legacy release
+Check Analyst1 can create a legacy release
+    user checks page contains button    Create legacy release
 
-Check Analyst1 cannot reorder releases
-    user checks page does not contain button    Reorder releases
+Check Analyst1 can reorder releases
+    user checks page contains button    Reorder releases
 
-Check Analyst1 cannot edit a legacy release
-    user checks page does not contain button    Edit
+Check Analyst1 can edit a legacy release
+    user checks page contains button    Edit
 
-Check Analyst1 cannot delete a legacy release
-    user checks page does not contain button    Delete
+Check Analyst1 can delete a legacy release
+    user checks page contains button    Delete
 
 Navigate to releases
     user clicks link    Releases
     user waits until h2 is visible    Manage releases
 
-Validate Analyst1 cannot create a release for Seed Data Theme 1 Publication 1 publication
-    user checks page does not contain    link:Create new release
+Validate Analyst1 can create a release for Seed Data Theme 1 Publication 1 publication
+    user checks page contains link    Create new release
 
 Navigate to Absence release
     ${ROW}=    user gets table row    Academic year 2016/17    testid:publication-published-releases

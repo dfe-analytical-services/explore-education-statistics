@@ -56,13 +56,13 @@ const PreReleaseUsersPage = () => {
           {allPreReleaseUsers && (
             <tbody>
               {allPreReleaseUsers.map(preReleaseUser => (
-                <tr key={preReleaseUser.userId}>
+                <tr key={preReleaseUser.id}>
                   <th scope="row">{preReleaseUser.name}</th>
                   <td>{preReleaseUser.email}</td>
                   <td>
                     <Link
                       className={styles.manageUserLink}
-                      to={`/administration/users/${preReleaseUser.userId}`}
+                      to={`/administration/users/${preReleaseUser.id}`}
                     >
                       Manage
                     </Link>

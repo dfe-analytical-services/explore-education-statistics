@@ -15,6 +15,7 @@ Force Tags          Admin    Local    Dev
 Import permissions test variables
     Set suite variable    ${PUBLICATION_NAME}    ${ROLE_PERMISSIONS_PUBLICATION_APPROVER_PUBLICATION}
     Set suite variable    ${THEME_NAME}    ${ROLE_PERMISSIONS_THEME_TITLE}
+    Set suite variable    ${DRAFT_RELEASE_TYPE}    ${ROLE_PERMISSIONS_DRAFT_RELEASE_TYPE}
     Set suite variable    ${PUBLISHED_RELEASE_TYPE}    ${ROLE_PERMISSIONS_PUBLISHED_RELEASE_TYPE}
 
 Validates publication approver publication page is correct

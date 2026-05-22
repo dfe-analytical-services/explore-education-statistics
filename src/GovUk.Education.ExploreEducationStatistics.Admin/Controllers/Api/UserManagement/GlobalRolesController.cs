@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 [ApiController]
 [Route("api")]
 [Authorize]
-public class GlobalRolesController(IUserRoleService userRoleService) : ControllerBase
+public class GlobalRolesController(IGlobalRoleService globalRoleService) : ControllerBase
 {
     /// <summary>
     /// Provides a list of global roles that are available within the service
@@ -20,6 +20,6 @@ public class GlobalRolesController(IUserRoleService userRoleService) : Controlle
     [ProducesResponseType(200)]
     public async Task<ActionResult<List<RoleViewModel>>> GetGlobalRoles()
     {
-        return await userRoleService.GetAllGlobalRoles().HandleFailuresOrOk();
+        return await globalRoleService.GetAllGlobalRoles().HandleFailuresOrOk();
     }
 }

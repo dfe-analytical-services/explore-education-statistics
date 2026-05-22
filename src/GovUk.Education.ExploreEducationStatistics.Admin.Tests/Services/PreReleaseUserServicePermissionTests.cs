@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
@@ -225,7 +224,8 @@ public class PreReleaseUserServicePermissionTests
         IUserService? userService = null,
         IUserRepository? userRepository = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
-        IReleaseVersionRepository? releaseVersionRepository = null
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IGlobalRoleService? globalRoleService = null
     )
     {
         return new(
@@ -236,7 +236,8 @@ public class PreReleaseUserServicePermissionTests
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
-            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict)
+            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
+            globalRoleService: Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
         );
     }
 }

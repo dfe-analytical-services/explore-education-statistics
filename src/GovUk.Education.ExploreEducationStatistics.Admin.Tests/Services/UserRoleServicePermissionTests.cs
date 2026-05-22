@@ -28,18 +28,6 @@ public class UserRoleServicePermissionTests
     private readonly Publication _publication = new DataFixture().DefaultPublication();
 
     [Fact]
-    public async Task SetGlobalRoleForUser()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .ExpectCheckToFail(CanManageUsersOnSystem)
-            .AssertForbidden(async userService =>
-            {
-                var service = SetupService(userService: userService.Object);
-                return await service.SetGlobalRoleForUser(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-            });
-    }
-
-    [Fact]
     public async Task AddPublicationRole()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
@@ -48,30 +36,6 @@ public class UserRoleServicePermissionTests
             {
                 var service = SetupService(userService: userService.Object);
                 return await service.AddPublicationRole(Guid.NewGuid(), Guid.NewGuid(), PublicationRole.Drafter);
-            });
-    }
-
-    [Fact]
-    public async Task GetAllGlobalRoles()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .ExpectCheckToFail(CanManageUsersOnSystem)
-            .AssertForbidden(async userService =>
-            {
-                var service = SetupService(userService: userService.Object);
-                return await service.GetAllGlobalRoles();
-            });
-    }
-
-    [Fact]
-    public async Task GetGlobalRolesForUser()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .ExpectCheckToFail(CanManageUsersOnSystem)
-            .AssertForbidden(async userService =>
-            {
-                var service = SetupService(userService: userService.Object);
-                return await service.GetGlobalRolesForUser(Guid.NewGuid().ToString());
             });
     }
 
@@ -194,7 +158,8 @@ public class UserRoleServicePermissionTests
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserRepository? userRepository = null,
         UserManager<ApplicationUser>? userManager = null,
-        IUserService? userService = null
+        IUserService? userService = null,
+        IGlobalRoleService? globalRoleService = null
     )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
@@ -210,7 +175,8 @@ public class UserRoleServicePermissionTests
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
-            userManager ?? MockUserManager().Object
+            userManager ?? MockUserManager().Object,
+            globalRoleService ?? Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
         );
     }
 }

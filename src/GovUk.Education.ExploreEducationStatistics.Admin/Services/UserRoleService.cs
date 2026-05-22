@@ -32,68 +32,10 @@ public class UserRoleService(
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserRepository userRepository,
-    UserManager<ApplicationUser> identityUserManager
+    UserManager<ApplicationUser> identityUserManager,
+    IGlobalRoleService globalRoleService
 ) : IUserRoleService
 {
-    public async Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles() =>
-        await userService
-            .CheckCanManageAllUsers()
-            .OnSuccess(async () =>
-            {
-                return await usersAndRolesDbContext
-                    .Roles.AsQueryable()
-                    .Select(r => new RoleViewModel
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        NormalizedName = r.NormalizedName,
-                    })
-                    .OrderBy(x => x.Name)
-                    .ToListAsync();
-            });
-
-    public async Task<Either<ActionResult, List<RoleViewModel>>> GetGlobalRolesForUser(string userId) =>
-        await userService
-            .CheckCanManageAllUsers()
-            .OnSuccess(_ => usersAndRolesPersistenceHelper.CheckEntityExists<ApplicationUser, string>(userId))
-            .OnSuccess(async () =>
-            {
-                var roleIds = await usersAndRolesDbContext
-                    .UserRoles.AsQueryable()
-                    .Where(r => r.UserId == userId)
-                    .Select(r => r.RoleId)
-                    .ToListAsync();
-
-                return await usersAndRolesDbContext
-                    .Roles.AsQueryable()
-                    .Where(r => roleIds.Contains(r.Id))
-                    .OrderBy(r => r.Name)
-                    .Select(r => new RoleViewModel
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        NormalizedName = r.NormalizedName,
-                    })
-                    .ToListAsync();
-            });
-
-    public async Task<Either<ActionResult, Unit>> SetGlobalRoleForUser(string userId, string roleId) =>
-        await userService
-            .CheckCanManageAllUsers()
-            .OnSuccess(async () =>
-            {
-                return await usersAndRolesPersistenceHelper
-                    .CheckEntityExists<ApplicationUser, string>(userId)
-                    .OnSuccessCombineWith(_ =>
-                        usersAndRolesPersistenceHelper.CheckEntityExists<IdentityRole, string>(roleId)
-                    )
-                    .OnSuccessVoid(async tuple =>
-                    {
-                        var (user, role) = tuple;
-                        await SetExclusiveGlobalRole(role.Name, user);
-                    });
-            });
-
     public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(
         Guid userId
     ) =>
@@ -171,8 +113,7 @@ public class UserRoleService(
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                return await usersAndRolesPersistenceHelper
-                    .CheckEntityExists<ApplicationUser, string>(userId.ToString())
+                return await GetIdentityUser(userId)
                     .OnSuccessCombineWith(_ => contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
                     .OnSuccessDo(_ => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
                     .OnSuccessVoid(async tuple =>
@@ -188,7 +129,7 @@ public class UserRoleService(
                                 createdById: userService.GetUserId()
                             );
 
-                            await UpgradeToGlobalRoleIfRequired(AssociatedGlobalRoleNameForPublicationRole, user);
+                            await globalRoleService.UpgradeToGlobalRoleIfRequired(user, RoleNames.Analyst);
 
                             await userResourceRoleNotificationService.NotifyUserOfNewPublicationRole(
                                 createdUserPublicationRole!.Id
@@ -258,117 +199,17 @@ public class UserRoleService(
             );
         }
 
-        var checkAspNetUserExistsResult = await usersAndRolesPersistenceHelper.CheckEntityExists<
-            ApplicationUser,
-            string
-        >(userPublicationRole.UserId.ToString());
+        var checkAspNetUserExistsResult = await GetIdentityUser(userPublicationRole.UserId);
 
         if (checkAspNetUserExistsResult.IsRight)
         {
-            await DowngradeFromGlobalRoleIfRequired(
+            await globalRoleService.DowngradeFromGlobalRoleIfRequired(
                 checkAspNetUserExistsResult.Right,
-                AssociatedGlobalRoleNameForPublicationRole
+                RoleNames.Analyst
             );
         }
 
         return Unit.Instance;
-    }
-
-    private async Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(
-        string globalRoleNameToSet,
-        Guid userId
-    )
-    {
-        return await usersAndRolesPersistenceHelper
-            .CheckEntityExists<ApplicationUser, string>(userId.ToString())
-            .OnSuccessVoid(user => UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, user));
-    }
-
-    internal async Task UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, ApplicationUser user)
-    {
-        var existingRoleNames = await identityUserManager.GetRolesAsync(user) ?? [];
-
-        var userAlreadyAssignedToRole = existingRoleNames.Contains(globalRoleNameToSet);
-
-        var higherRoleAlreadyAssigned = !existingRoleNames
-            .Intersect(GetHigherRoles(globalRoleNameToSet))
-            .IsNullOrEmpty();
-
-        if (!userAlreadyAssignedToRole && !higherRoleAlreadyAssigned)
-        {
-            await identityUserManager.AddToRoleAsync(user, globalRoleNameToSet);
-        }
-
-        var lowerRolesToRemove = GetLowerRoles(globalRoleNameToSet).Intersect(existingRoleNames).ToList();
-
-        if (lowerRolesToRemove.Count > 0)
-        {
-            await identityUserManager.RemoveFromRolesAsync(user, lowerRolesToRemove);
-        }
-    }
-
-    private async Task DowngradeFromGlobalRoleIfRequired(ApplicationUser user, string globalRoleNameToDowngradeFrom)
-    {
-        var existingGlobalRoleNames = await identityUserManager.GetRolesAsync(user) ?? [];
-
-        var higherPrecedenceExistingGlobalRoleNames = existingGlobalRoleNames.Where(role =>
-            GlobalRolePrecedenceOrder.IndexOf(role) > GlobalRolePrecedenceOrder.IndexOf(globalRoleNameToDowngradeFrom)
-        );
-
-        var requiredGlobalRoleNames = await GetRequiredGlobalRoleNamesForResourceRoles(user);
-
-        var highestPrecedenceRoleNameToRetain = higherPrecedenceExistingGlobalRoleNames
-            .Concat(requiredGlobalRoleNames)
-            .OrderBy(GlobalRolePrecedenceOrder.IndexOf)
-            .LastOrDefault();
-
-        await SetExclusiveGlobalRole(highestPrecedenceRoleNameToRetain, user);
-    }
-
-    private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
-    {
-        var userId = Guid.Parse(user.Id);
-
-        var userHasAPreReleaseRole = await userPreReleaseRoleRepository.Query().WhereForUser(userId).AnyAsync();
-
-        var userHasAPublicationRole = await userPublicationRoleRepository.Query().WhereForUser(userId).AnyAsync();
-
-        var globalRoles = new List<string>();
-
-        if (userHasAPreReleaseRole)
-        {
-            globalRoles.Add(AssociatedGlobalRoleNameForPreReleaseRole);
-        }
-
-        if (userHasAPublicationRole)
-        {
-            globalRoles.Add(AssociatedGlobalRoleNameForPublicationRole);
-        }
-
-        return globalRoles;
-    }
-
-    private async Task SetExclusiveGlobalRole(string? globalRoleNameToSet, ApplicationUser user)
-    {
-        var existingRoleNames = await identityUserManager.GetRolesAsync(user) ?? [];
-
-        if (globalRoleNameToSet == null)
-        {
-            await identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
-            return;
-        }
-
-        if (!existingRoleNames.Contains(globalRoleNameToSet))
-        {
-            await identityUserManager.AddToRoleAsync(user, globalRoleNameToSet);
-        }
-
-        var rolesToRemove = existingRoleNames.Where(roleName => roleName != globalRoleNameToSet).ToList();
-
-        if (rolesToRemove.Count > 0)
-        {
-            await identityUserManager.RemoveFromRolesAsync(user, rolesToRemove);
-        }
     }
 
     private async Task<Either<ActionResult, Unit>> ValidatePublicationRoleCanBeAdded(
@@ -467,7 +308,9 @@ public class UserRoleService(
 
             if (user.Active)
             {
-                await UpgradeToGlobalRoleIfRequired(AssociatedGlobalRoleNameForPublicationRole, user.Id);
+                var identityUser = await GetIdentityUser(user.Id, cancellationToken);
+
+                await globalRoleService.UpgradeToGlobalRoleIfRequired(identityUser.Right, RoleNames.Analyst);
             }
         });
     }
@@ -490,7 +333,8 @@ public class UserRoleService(
             .Include(upr => upr.Publication)
             .SingleOrNotFoundAsync();
 
-    private static string AssociatedGlobalRoleNameForPreReleaseRole => RoleNames.PrereleaseUser;
-
-    private static string AssociatedGlobalRoleNameForPublicationRole => RoleNames.Analyst;
+    private async Task<Either<ActionResult, ApplicationUser>> GetIdentityUser(
+        Guid userId,
+        CancellationToken cancellationToken = default
+    ) => await usersAndRolesDbContext.Users.SingleOrNotFoundAsync(u => u.Id == userId.ToString(), cancellationToken);
 }

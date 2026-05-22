@@ -5,7 +5,7 @@ export interface PreReleaseUserSummary {
 }
 
 export interface PreReleaseUser extends PreReleaseUserSummary {
-  userId: string;
+  id: string;
   name: string;
 }
 

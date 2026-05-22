@@ -5,7 +5,7 @@ public record PreReleaseUserSummaryViewModel(string Email);
 
 public record PreReleaseUserViewModel
 {
-    public required Guid UserId { get; init; }
+    public required Guid Id { get; init; }
 
     public required string Name { get; init; }
 
