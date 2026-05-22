@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -30,7 +31,8 @@ public class PreReleaseUserService(
     IUserService userService,
     IUserRepository userRepository,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
-    IReleaseVersionRepository releaseVersionRepository
+    IReleaseVersionRepository releaseVersionRepository,
+    IGlobalRoleService globalRoleService
 ) : IPreReleaseUserService
 {
     public async Task<List<PreReleaseUserViewModel>> GetAllPreReleaseUsers()
@@ -63,7 +65,7 @@ public class PreReleaseUserService(
                     .ToListAsync()
             ).Select(u => new PreReleaseUserViewModel
             {
-                UserId = u.UserId,
+                Id = u.UserId,
                 Name = u.Name,
                 Email = u.Email!,
             }),
@@ -290,6 +292,13 @@ public class PreReleaseUserService(
             createdById: userService.GetUserId()
         );
 
+        if (user.Active)
+        {
+            var identityUser = await GetIdentityUser(user.Id);
+
+            await globalRoleService.UpgradeToGlobalRoleIfRequired(identityUser, RoleNames.PrereleaseUser);
+        }
+
         var shouldSendEmail = releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved;
 
         if (shouldSendEmail)
@@ -301,7 +310,7 @@ public class PreReleaseUserService(
     private async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(UserReleaseRole userPreReleaseRole) =>
         await userService
             .CheckCanAssignPreReleaseContactsToReleaseVersion(userPreReleaseRole.ReleaseVersion)
-            .OnSuccessVoid(async _ =>
+            .OnSuccessDo(async _ =>
             {
                 var removed = await userPreReleaseRoleRepository.RemoveById(userPreReleaseRole.Id);
 
@@ -310,6 +319,15 @@ public class PreReleaseUserService(
                     throw new InvalidOperationException(
                         $"Failed to remove User Pre-Release Role with ID {userPreReleaseRole.Id}"
                     );
+                }
+            })
+            .OnSuccessVoid(async _ =>
+            {
+                if (userPreReleaseRole.User.Active)
+                {
+                    var identityUser = await GetIdentityUser(userPreReleaseRole.UserId);
+
+                    await globalRoleService.DowngradeFromGlobalRoleIfRequired(identityUser, RoleNames.PrereleaseUser);
                 }
             });
 
@@ -340,6 +358,7 @@ public class PreReleaseUserService(
                     .Query(ResourceRoleFilter.All)
                     .WhereForUser(user.Id)
                     .WhereForReleaseVersion(releaseVersionId)
+                    .Include(uprr => uprr.User)
                     .Include(uprr => uprr.ReleaseVersion)
                         .ThenInclude(rv => rv.Release)
                     .SingleOrNotFoundAsync()
@@ -351,6 +370,7 @@ public class PreReleaseUserService(
         await userPreReleaseRoleRepository
             .Query(ResourceRoleFilter.All)
             .Where(uprr => uprr.Id == userPreReleaseRoleId)
+            .Include(uprr => uprr.User)
             .Include(uprr => uprr.ReleaseVersion)
                 .ThenInclude(rv => rv.Release)
             .SingleOrNotFoundAsync();
@@ -363,4 +383,7 @@ public class PreReleaseUserService(
 
     private async Task<Either<ActionResult, User>> FindActiveUser(Guid userId) =>
         await userRepository.FindActiveUserById(userId) ?? new Either<ActionResult, User>(new NotFoundResult());
+
+    private async Task<ApplicationUser> GetIdentityUser(Guid userId) =>
+        await usersAndRolesDbContext.Users.SingleAsync(u => u.Id == userId.ToString());
 }

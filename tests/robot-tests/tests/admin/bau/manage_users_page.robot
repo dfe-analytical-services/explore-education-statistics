@@ -91,6 +91,7 @@ Check the initial manage user page
 Give the user prerelease access to a release
     user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user clicks button    Add pre-release access
+
     user checks table body has x rows    1    testid:preReleaseAccessTable
     user checks table column heading contains    1    1    Publication    testid:preReleaseAccessTable
     user checks table column heading contains    1    2    Release    testid:preReleaseAccessTable

@@ -1456,7 +1456,8 @@ public abstract class PreReleaseUserServiceTests
         IUserService? userService = null,
         IUserRepository? userRepository = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
-        IReleaseVersionRepository? releaseVersionRepository = null
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IGlobalRoleService? globalRoleService = null
     )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
@@ -1470,7 +1471,8 @@ public abstract class PreReleaseUserServiceTests
             userService ?? MockUtils.AlwaysTrueUserService(_userId).Object,
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
-            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict)
+            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
+            globalRoleService: Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
         );
     }
 }

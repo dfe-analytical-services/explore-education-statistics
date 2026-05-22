@@ -11,7 +11,9 @@ export interface PreReleaseSummary {
 
 const preReleaseService = {
   getPreReleaseSummary(releaseId: string): Promise<PreReleaseSummary> {
-    return client.get<PreReleaseSummary>(`/release/${releaseId}/prerelease`);
+    return client.get<PreReleaseSummary>(
+      `/release/${releaseId}/pre-release-summary`,
+    );
   },
 };
 

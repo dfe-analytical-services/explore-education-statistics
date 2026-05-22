@@ -47,7 +47,7 @@ public class ReleaseService : IReleaseService
     public async Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseVersionId)
     {
         return await _contentPersistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
             {

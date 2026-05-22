@@ -8,12 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserRoleService
 {
-    Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles();
-
-    Task<Either<ActionResult, List<RoleViewModel>>> GetGlobalRolesForUser(string userId);
-
-    Task<Either<ActionResult, Unit>> SetGlobalRoleForUser(string userId, string roleId);
-
     Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId);
 
     Task<Either<ActionResult, List<UserPublicationRoleWithUserViewModel>>> GetPublicationRolesForPublication(

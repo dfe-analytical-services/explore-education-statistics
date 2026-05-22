@@ -495,7 +495,7 @@ Backdate ${PUPIL_ABSENCE_METHODOLOGY_TITLE} published date
     ...    ${methodology_id}
     ...    ${published_override}
 
-Give Analyst1 Drafter access to ${RELEASE_1_NAME}
+Give Analyst1 Drafter access to ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user gives analyst publication drafter access
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    EES-test.ANALYST1@education.gov.uk
@@ -881,9 +881,7 @@ Backdate ${EXCLUSIONS_METHODOLOGY_TITLE} published date
     ...    ${methodology_id}
     ...    ${published_override}
 
-    user gives release access to analyst
-
-Give Analyst1 Drafter access to ${RELEASE_2_NAME}
+Give Analyst1 Drafter access to ${EXCLUSIONS_PUBLICATION_TITLE}
     user gives analyst publication drafter access
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    EES-test.ANALYST1@education.gov.uk

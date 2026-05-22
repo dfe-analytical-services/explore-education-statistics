@@ -103,10 +103,11 @@ public abstract class UserManagementServiceTests
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
+            var globalRoleService = new Mock<IGlobalRoleService>(Strict);
             var userRoleService = new Mock<IUserRoleService>(Strict);
             var preReleaseUserService = new Mock<IPreReleaseUserService>(Strict);
 
-            userRoleService.Setup(mock => mock.GetGlobalRolesForUser(user.Id)).ReturnsAsync(globalRoles);
+            globalRoleService.Setup(mock => mock.GetGlobalRolesForUser(user.Id)).ReturnsAsync(globalRoles);
 
             userRoleService.Setup(mock => mock.GetPublicationRolesForUser(userId)).ReturnsAsync(publicationRoles);
 
@@ -117,12 +118,13 @@ public abstract class UserManagementServiceTests
                 var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userRoleService: userRoleService.Object,
+                    globalRoleService: globalRoleService.Object,
                     preReleaseUserService: preReleaseUserService.Object
                 );
 
                 var result = await service.GetUser(userId);
 
-                VerifyAllMocks(userRoleService, preReleaseUserService);
+                VerifyAllMocks(userRoleService, globalRoleService, preReleaseUserService);
 
                 Assert.True(result.IsRight);
                 var userViewModel = result.Right;
@@ -135,7 +137,7 @@ public abstract class UserManagementServiceTests
                 Assert.Equal(publicationRoles, userViewModel.UserPublicationRoles);
                 Assert.Equal(preReleaseRoles, userViewModel.UserPreReleaseRoles);
 
-                userRoleService.Verify(mock => mock.GetGlobalRolesForUser(user.Id), Times.Once);
+                globalRoleService.Verify(mock => mock.GetGlobalRolesForUser(user.Id), Times.Once);
                 userRoleService.Verify(mock => mock.GetPublicationRolesForUser(userId), Times.Once);
                 preReleaseUserService.Verify(mock => mock.GetPreReleaseRolesForUser(userId), Times.Once);
             }
@@ -336,24 +338,24 @@ public abstract class UserManagementServiceTests
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var userRoleService = new Mock<IUserRoleService>(Strict);
+            var globalRoleService = new Mock<IGlobalRoleService>(Strict);
 
-            userRoleService.Setup(mock => mock.SetGlobalRoleForUser(user.Id, role.Id)).ReturnsAsync(Unit.Instance);
+            globalRoleService.Setup(mock => mock.SetGlobalRoleForUser(user.Id, role.Id)).ReturnsAsync(Unit.Instance);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
                 var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
-                    userRoleService: userRoleService.Object
+                    globalRoleService: globalRoleService.Object
                 );
 
                 var result = await service.UpdateUser(user.Id, role.Id);
 
-                VerifyAllMocks(userRoleService);
+                VerifyAllMocks(globalRoleService);
 
                 Assert.True(result.IsRight);
 
-                userRoleService.Verify(mock => mock.SetGlobalRoleForUser(user.Id, role.Id), Times.Once);
+                globalRoleService.Verify(mock => mock.SetGlobalRoleForUser(user.Id, role.Id), Times.Once);
             }
         }
     }
@@ -914,6 +916,7 @@ public abstract class UserManagementServiceTests
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IUserRoleService? userRoleService = null,
+        IGlobalRoleService? globalRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
@@ -931,6 +934,7 @@ public abstract class UserManagementServiceTests
             contentDbContext,
             usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
+            globalRoleService: Mock.Of<IGlobalRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),

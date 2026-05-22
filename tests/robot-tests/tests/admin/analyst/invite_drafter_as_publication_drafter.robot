@@ -53,13 +53,51 @@ Validate updated drafters displayed for the publication
     user checks table cell contains    2    1    Analyst2 User2    testid:publicationDrafterRoles
     user checks table cell contains    2    2    ees-test.analyst2@education.gov.uk    testid:publicationDrafterRoles
 
-Remove drafter for publication
-    user clicks remove user button for row    Analyst2 User2
+Invite brand new user
+    user enters text into element    id:inviteDrafterForm-email    ${INVITEE_EMAIL}
+    user clicks button    Invite drafter
 
-Validate removed drafter no longer visible in publication drafter roles table
+Validate drafters table contains the brand new user
+    user checks table body has x rows    3    testid:publicationDrafterRoles
+    user checks table cell contains    1    1    Analyst1 User1    testid:publicationDrafterRoles
+    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationDrafterRoles
+    user checks table cell contains    2    1    Analyst2 User2    testid:publicationDrafterRoles
+    user checks table cell contains    2    2    ees-test.analyst2@education.gov.uk    testid:publicationDrafterRoles
+    user checks table cell contains    3    2    ${INVITEE_EMAIL}    testid:publicationDrafterRoles
+
+Remove analyst2 as a drafter for the publication
+    user clicks remove user button for row    Analyst2 User2
+    user waits until page contains element    testid:modal-title
+    user waits until modal is visible    Confirm drafter removal
+    user clicks button    Confirm
+
+Validate removed analyst2 no longer visible in publication drafter roles table
+    user checks table body has x rows    2    testid:publicationDrafterRoles
+    user checks table cell contains    1    1    Analyst1 User1    testid:publicationDrafterRoles
+    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationDrafterRoles
+    user checks table cell contains    2    2    ${INVITEE_EMAIL}    testid:publicationDrafterRoles
+
+Cancel brand new user drafter invite for the publication
+    user clicks cancel invite button for row    ${INVITEE_EMAIL}
+    user waits until page contains element    testid:modal-title
+    user waits until modal is visible    Confirm cancelling of user invite
+    user clicks button    Confirm
+
+Validate removed brand new user no longer visible in publication drafter roles table
     user checks table body has x rows    1    testid:publicationDrafterRoles
     user checks table cell contains    1    1    Analyst1 User1    testid:publicationDrafterRoles
     user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationDrafterRoles
+
+Invite existing user analyst2 to be a drafter for the publication again
+    user enters text into element    id:inviteDrafterForm-email    EES-test.ANALYST2@education.gov.uk
+    user clicks button    Invite drafter
+
+Validate publication drafters table containst analyst2 again
+    user checks table body has x rows    2    testid:publicationDrafterRoles
+    user checks table cell contains    1    1    Analyst1 User1    testid:publicationDrafterRoles
+    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationDrafterRoles
+    user checks table cell contains    2    1    Analyst2 User2    testid:publicationDrafterRoles
+    user checks table cell contains    2    2    ees-test.analyst2@education.gov.uk    testid:publicationDrafterRoles
 
 
 *** Keywords ***
@@ -67,6 +105,11 @@ user clicks remove user button for row
     [Arguments]    ${text}
     ${row}=    get webelement    xpath://tbody/tr/td[.="${text}"]/..
     user clicks button    Remove    ${row}
+
+user clicks cancel invite button for row
+    [Arguments]    ${text}
+    ${row}=    get webelement    xpath://tbody/tr/td[contains(., "${text}")]/..
+    user clicks button    Cancel invite    ${row}
 
 do suite teardown
     user closes the browser
