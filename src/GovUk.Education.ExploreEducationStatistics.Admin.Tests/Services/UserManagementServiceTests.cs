@@ -934,7 +934,7 @@ public abstract class UserManagementServiceTests
             contentDbContext,
             usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-            globalRoleService: Mock.Of<IGlobalRoleService>(Strict),
+            globalRoleService ?? Mock.Of<IGlobalRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
