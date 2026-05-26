@@ -12,7 +12,6 @@ public record DataSetMapping
 {
     public Guid Id { get; set; }
 
-    // @MarkFix need to update frontend code to use *DataFileId rather than *DataSetId
     public Guid OriginalDataFileId { get; set; }
     public File OriginalDataFile { get; set; } = null!;
     public Guid ReplacementDataFileId { get; set; }

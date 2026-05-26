@@ -190,8 +190,8 @@ const dataReplacementService = {
   },
   async updatePlanIndicatorMappings(
     releaseVersionId: string,
-    originalDataSetId: string,
-    replacementDataSetId: string,
+    originalDataFileId: string,
+    replacementDataFileId: string,
     updates: {
       originalColumnName: string;
       newReplacementColumnName?: string;
@@ -201,8 +201,8 @@ const dataReplacementService = {
       await client.patch(
         `releases/${releaseVersionId}/data/replacements/mapping/indicators`,
         {
-          originalDataSetId,
-          replacementDataSetId,
+          originalDataFileId,
+          replacementDataFileId,
           updates,
         },
       );

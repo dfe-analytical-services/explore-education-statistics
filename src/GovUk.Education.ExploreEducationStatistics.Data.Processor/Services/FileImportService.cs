@@ -129,6 +129,7 @@ public class FileImportService : IFileImportService
         if (import.Errors.Count > 0)
         {
             await _dataImportService.UpdateStatus(import.Id, FAILED, 100);
+            return;
         }
 
         await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
