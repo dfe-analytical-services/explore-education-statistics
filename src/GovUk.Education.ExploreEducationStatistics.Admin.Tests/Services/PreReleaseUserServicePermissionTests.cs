@@ -237,7 +237,7 @@ public class PreReleaseUserServicePermissionTests
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
-            globalRoleService: Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
+            globalRoleService ?? Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
         );
     }
 }
