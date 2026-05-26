@@ -127,6 +127,13 @@ export type DataSetUploadScreeningStatus =
 
 export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
 
+export interface DataSetScreenerProgress {
+  status: DataSetUploadScreeningStatus;
+  percentageComplete: number;
+  stage: string;
+  completed: boolean;
+}
+
 export interface DataFileImportStatus {
   status: ImportStatusCode;
   percentageComplete: number;
@@ -240,6 +247,14 @@ const releaseDataFileService = {
     );
     const dataFiles = response.filter(file => file.metaFileName.length > 0);
     return dataFiles.map(mapFile);
+  },
+  getDataFileScreeningStatus(
+    releaseVersionId: string,
+    dataSetUploadId: string,
+  ): Promise<DataSetScreenerProgress> {
+    return client.get<DataSetScreenerProgress>(
+      `/releaseVersions/${releaseVersionId}/uploads/${dataSetUploadId}/screener/progress`,
+    );
   },
   getDataFileImportStatus(
     releaseId: string,
