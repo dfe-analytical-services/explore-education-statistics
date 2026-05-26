@@ -23,9 +23,9 @@ public class IndicatorMappingUpdatesRequest
 
             RuleFor(x => x.Updates)
                 .Must(HaveUniqueOriginalNames)
-                .WithMessage("Each OriginalColumnName must be unique.")
+                .WithMessage("Each OriginalId must be unique.")
                 .Must(HaveUniqueReplacementNames)
-                .WithMessage("Each NewReplacementColumnName must be unique (if provided).");
+                .WithMessage("Each NewReplacementId must be unique (if provided).");
         }
 
         private bool HaveUniqueOriginalNames(List<IndicatorMappingUpdateRequest> updates)
@@ -35,7 +35,7 @@ public class IndicatorMappingUpdatesRequest
                 return true;
             }
 
-            return updates.Select(u => u.OriginalColumnName).Distinct().Count() == updates.Count;
+            return updates.Select(u => u.OriginalId).Distinct().Count() == updates.Count;
         }
 
         private bool HaveUniqueReplacementNames(List<IndicatorMappingUpdateRequest> updates)
@@ -46,8 +46,8 @@ public class IndicatorMappingUpdatesRequest
             }
 
             var nonNullReplacements = updates
-                .Where(u => !string.IsNullOrEmpty(u.NewReplacementColumnName))
-                .Select(u => u.NewReplacementColumnName)
+                .Where(u => u.NewReplacementId != null)
+                .Select(u => u.NewReplacementId)
                 .ToList();
 
             return nonNullReplacements.Distinct().Count() == nonNullReplacements.Count;
@@ -57,14 +57,14 @@ public class IndicatorMappingUpdatesRequest
 
 public record IndicatorMappingUpdateRequest
 {
-    public string OriginalColumnName { get; init; } = "";
-    public string? NewReplacementColumnName { get; init; }
+    public Guid OriginalId { get; init; }
+    public Guid? NewReplacementId { get; init; }
 
     public class Validator : AbstractValidator<IndicatorMappingUpdateRequest>
     {
         public Validator()
         {
-            RuleFor(x => x.OriginalColumnName).NotEmpty().WithMessage("OriginalColumnName cannot be an empty.");
+            RuleFor(x => x.OriginalId).NotEmpty().WithMessage("OriginalId cannot be an empty.");
         }
     }
 }
