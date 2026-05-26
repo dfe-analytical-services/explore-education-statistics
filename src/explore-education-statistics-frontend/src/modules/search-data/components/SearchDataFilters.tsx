@@ -9,13 +9,13 @@ import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
 import { SortOption } from '@frontend/components/SortControls';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
-import GeographicLevelsModal from '@frontend/modules/find-statistics/components/GeographicLevelsModal';
-import APIDatasetsModal from '@frontend/modules/find-statistics/components/APIDatasetsModal';
 import ExpandableFilterGroup from '@frontend/modules/search-data/components/ExpandableFilterGroup';
 import styles from '@frontend/modules/search-data/components/SearchDataFilters.module.scss';
 import ThemesAndReleasesFilterGroup from '@frontend/modules/search-data/components/ThemesAndReleasesFilterGroup';
 import { SearchDataFilter } from '@frontend/modules/search-data/utils/searchDataFilters';
 import { DataSetType } from '@frontend/services/dataSetFileService';
+import ApiDataSetsGuidanceModal from '@frontend/modules/search-data/components/ApiDataSetsGuidanceModal';
+import GeographicLevelsGuidanceModal from '@frontend/modules/search-data/components/GeographicLevelsGuidanceModal';
 import React from 'react';
 
 const formId = 'filters-form';
@@ -126,7 +126,7 @@ export default function Filters({
             }}
           />
           <div className={styles.modalButtonContainer}>
-            <GeographicLevelsModal />
+            <GeographicLevelsGuidanceModal />
           </div>
         </ExpandableFilterGroup>
       )}
@@ -211,7 +211,7 @@ export default function Filters({
             }}
           />
           <div className={styles.modalButtonContainer}>
-            <APIDatasetsModal />
+            <ApiDataSetsGuidanceModal />
           </div>
         </ExpandableFilterGroup>
       )}

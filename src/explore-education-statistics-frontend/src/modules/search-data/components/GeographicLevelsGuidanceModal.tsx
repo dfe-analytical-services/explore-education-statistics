@@ -2,7 +2,7 @@ import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import React from 'react';
 
-export default function GeographicLevelsModal() {
+export default function GeographicLevelsGuidanceModal() {
   return (
     <Modal
       showClose

@@ -22,10 +22,8 @@ import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import { SortOption } from '@frontend/components/SortControls';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
-import DataModal from '@frontend/modules/find-statistics/components/DataModal';
 import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
-import StatisticalReleasesModal from '@frontend/modules/find-statistics/components/StatisticalReleasesModal';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
 import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
@@ -46,6 +44,8 @@ import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
+import StatisticalReleasesGuidanceModal from '@frontend/modules/search-data/StatisticalReleasesGuidanceModal';
+import DataSetsGuidanceModal from '@frontend/modules/search-data/components/DataSetsGuidanceModal';
 import React, { useState } from 'react';
 
 const defaultPageTitle = 'Explore our education statistics';
@@ -420,10 +420,10 @@ const SearchDataPage: NextPage = () => {
             <RelatedInformation heading="Help and related information">
               <ul className="govuk-list">
                 <li>
-                  <StatisticalReleasesModal />
+                  <StatisticalReleasesGuidanceModal />
                 </li>
                 <li>
-                  <DataModal />
+                  <DataSetsGuidanceModal />
                 </li>
                 <li>
                   <Link to="/glossary">Glossary</Link>

@@ -3,7 +3,7 @@ import Modal from '@common/components/Modal';
 import InfoIcon from '@common/components/InfoIcon';
 import React from 'react';
 
-export default function StatisticalReleasesModal() {
+export default function StatisticalReleasesGuidanceModal() {
   return (
     <Modal
       showClose

@@ -3,7 +3,7 @@ import Modal from '@common/components/Modal';
 import InfoIcon from '@common/components/InfoIcon';
 import React from 'react';
 
-export default function DataModal() {
+export default function DataSetsGuidanceModal() {
   return (
     <Modal
       showClose
