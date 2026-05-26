@@ -1018,7 +1018,6 @@ public abstract class UserRoleServiceTests
 
             var globalRoleService = new Mock<IGlobalRoleService>(Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
 
             globalRoleService
                 .Setup(mock => mock.DowngradeFromGlobalRoleIfRequired(ItIsUser(identityUser), RoleNames.Analyst))
@@ -1028,17 +1027,13 @@ public abstract class UserRoleServiceTests
                 .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
-            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     globalRoleService: globalRoleService.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
@@ -1064,20 +1059,13 @@ public abstract class UserRoleServiceTests
                 .WithRole(PublicationRole.Drafter);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
 
             userPublicationRoleRepository
                 .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
-            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
-            var service = SetupService(
-                userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
-            );
+            var service = SetupService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
 
@@ -1155,7 +1143,6 @@ public abstract class UserRoleServiceTests
 
             var globalRoleService = new Mock<IGlobalRoleService>(Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
 
             globalRoleService
                 .Setup(mock => mock.DowngradeFromGlobalRoleIfRequired(ItIsUser(identityUser), RoleNames.Analyst))
@@ -1163,17 +1150,13 @@ public abstract class UserRoleServiceTests
 
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
-            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var service = SetupService(
                     usersAndRolesDbContext: userAndRolesDbContext,
                     globalRoleService: globalRoleService.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
                 var result = await service.RemoveDrafter(userPublicationRole.Id);
@@ -1197,18 +1180,11 @@ public abstract class UserRoleServiceTests
                 .WithRole(PublicationRole.Drafter);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
 
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, userPublicationRole);
             userPublicationRoleRepository.Setup(m => m.RemoveById(userPublicationRole.Id, default)).ReturnsAsync(true);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
-            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
-
-            var service = SetupService(
-                userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
-            );
+            var service = SetupService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             var result = await service.RemoveDrafter(userPublicationRole.Id);
 
@@ -1380,7 +1356,7 @@ public abstract class UserRoleServiceTests
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userManager ?? MockUserManager().Object,
-            globalRoleService: Mock.Of<IGlobalRoleService>(Strict)
+            globalRoleService ?? Mock.Of<IGlobalRoleService>(Strict)
         );
     }
 }
