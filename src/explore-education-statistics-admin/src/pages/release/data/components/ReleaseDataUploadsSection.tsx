@@ -326,6 +326,7 @@ export default function ReleaseDataUploadsSection({
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
                     onConfirmReplacement={refetchDataFiles}
+                    onRefreshUploads={refetchDataSetUploads}
                     onDeleteUpload={handleDeleteUploadConfirm}
                     onDataSetImport={handleDataSetImport}
                     onReplacementStatusChange={handleReplacementStatusChange}
@@ -346,6 +347,7 @@ export default function ReleaseDataUploadsSection({
                     onDeleteUpload={handleDeleteUploadConfirm}
                     onDataSetImport={handleDataSetImport}
                     onReplaceFile={handleSubmit}
+                    onRefreshUploads={refetchDataSetUploads}
                     onStatusChange={handleStatusChange}
                   />
                 )}

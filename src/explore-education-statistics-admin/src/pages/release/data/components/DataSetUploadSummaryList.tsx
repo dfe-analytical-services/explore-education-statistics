@@ -9,7 +9,7 @@ import downloadTemporaryReleaseFileSecurely from '@admin/pages/release/data/comp
 import {
   getDataSetUploadScreeningStatusColour,
   getDataSetUploadScreeningStatusLabel,
-} from './ImporterStatus';
+} from './ScreenerStatus';
 import ApiCompatibilityTag from './ApiCompatibilityTag';
 
 interface Props {
