@@ -60,6 +60,7 @@ export default function ReleasePublishingStages({
           return (
             <li key={key}>
               <StatusBlock
+                id={`release-process-stage-${key.replace('Stage', '')}-${text}`}
                 checklistStyle={checklistStyle}
                 color={color}
                 text={
