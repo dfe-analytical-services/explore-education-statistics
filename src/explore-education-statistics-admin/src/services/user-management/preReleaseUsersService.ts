@@ -24,8 +24,8 @@ export interface PreReleaseUserService {
     releaseVersionId: string,
     emails: string[],
   ): Promise<PreReleaseInvitePlan>;
-  removePreReleaseRoleById(userPreReleaseRoleId: string): Promise<boolean>;
-  removePreReleaseRoleByEmail(
+  revokePreReleaseAccessById(userPreReleaseRoleId: string): Promise<boolean>;
+  revokePreReleaseAccessByEmail(
     releaseVersionId: string,
     email: string,
   ): Promise<void>;
@@ -61,11 +61,11 @@ const preReleaseUsersService: PreReleaseUserService = {
     );
   },
 
-  removePreReleaseRoleById(userPreReleaseRoleId: string): Promise<boolean> {
+  revokePreReleaseAccessById(userPreReleaseRoleId: string): Promise<boolean> {
     return client.delete(`/pre-release/roles/${userPreReleaseRoleId}`);
   },
 
-  removePreReleaseRoleByEmail(
+  revokePreReleaseAccessByEmail(
     releaseVersionId: string,
     email: string,
   ): Promise<void> {

@@ -705,7 +705,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       await waitFor(() => {
         expect(
-          preReleaseUsersService.removePreReleaseRoleByEmail,
+          preReleaseUsersService.revokePreReleaseAccessByEmail,
         ).toHaveBeenCalledWith('release-1', 'test2@test.com');
       });
 

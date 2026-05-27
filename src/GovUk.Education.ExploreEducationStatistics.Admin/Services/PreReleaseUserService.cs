@@ -230,7 +230,7 @@ public class PreReleaseUserService(
             .OnSuccessVoid(tuple => GrantPreReleaseAccess(tuple.ReleaseVersion!, tuple.User));
     }
 
-    public async Task<Either<ActionResult, Unit>> RemovePreReleaseRoleByCompositeKey(
+    public async Task<Either<ActionResult, Unit>> RevokePreReleaseAccessByCompositeKey(
         Guid releaseVersionId,
         PreReleaseUserRemoveRequest request
     )
@@ -239,7 +239,7 @@ public class PreReleaseUserService(
             .OnSuccess(RemovePreReleaseRole);
     }
 
-    public async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPreReleaseRoleId)
+    public async Task<Either<ActionResult, Unit>> RevokePreReleaseAccessById(Guid userPreReleaseRoleId)
     {
         return await CheckUserPreReleaseRoleExists(userPreReleaseRoleId: userPreReleaseRoleId)
             .OnSuccess(RemovePreReleaseRole);

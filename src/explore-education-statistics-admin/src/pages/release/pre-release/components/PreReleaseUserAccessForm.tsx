@@ -242,7 +242,7 @@ export default function PreReleaseUserAccessForm({
                         onClick={async () => {
                           toggleRemoving.on();
 
-                          await preReleaseUsersService.removePreReleaseRoleByEmail(
+                          await preReleaseUsersService.revokePreReleaseAccessByEmail(
                             releaseVersionId,
                             user.email,
                           );

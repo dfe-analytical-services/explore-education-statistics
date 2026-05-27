@@ -26,10 +26,10 @@ public interface IPreReleaseUserService
 
     Task<Either<ActionResult, Unit>> GrantPreReleaseAccess(Guid userId, Guid releaseId);
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseRoleByCompositeKey(
+    Task<Either<ActionResult, Unit>> RevokePreReleaseAccessByCompositeKey(
         Guid releaseVersionId,
         PreReleaseUserRemoveRequest request
     );
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseRole(Guid userPreReleaseRoleId);
+    Task<Either<ActionResult, Unit>> RevokePreReleaseAccessById(Guid userPreReleaseRoleId);
 }

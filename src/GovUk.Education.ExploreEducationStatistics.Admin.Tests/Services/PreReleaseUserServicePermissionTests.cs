@@ -175,7 +175,7 @@ public class PreReleaseUserServicePermissionTests
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
-                var result = service.RemovePreReleaseRoleByCompositeKey(_releaseVersion.Id, request);
+                var result = service.RevokePreReleaseAccessByCompositeKey(_releaseVersion.Id, request);
 
                 MockUtils.VerifyAllMocks(userService, userRepository, userPreReleaseRoleRepository);
 
@@ -203,7 +203,7 @@ public class PreReleaseUserServicePermissionTests
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
-                var result = await service.RemovePreReleaseRole(userPreReleaseRole.Id);
+                var result = await service.RevokePreReleaseAccessById(userPreReleaseRole.Id);
 
                 MockUtils.VerifyAllMocks(userService, userPreReleaseRoleRepository);
 
