@@ -6,9 +6,7 @@ const BrowseReleasesPage = () => {
   return (
     <Page
       wide
-      breadcrumbs={[
-        { name: "Administrator's guide", link: '/prototypes/documentation' },
-      ]}
+      breadcrumbs={[{ name: "Administrator's guide" }]}
       title="Documentation"
     >
       <h1>Documentation</h1>
