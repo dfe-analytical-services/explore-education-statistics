@@ -47,18 +47,11 @@ const PageFooter = ({ wide }: Props) => {
                 <h2 className="govuk-visually-hidden">Support links</h2>
                 <ul className="govuk-footer__inline-list">
                   {user?.permissions.isBauUser && (
-                    <>
-                      <li className="govuk-footer__inline-list-item">
-                        <a className="govuk-footer__link" href="/docs">
-                          API Documentation
-                        </a>
-                      </li>
-                      <li className="govuk-footer__inline-list-item">
-                        <Link className="govuk-footer__link" to="/prototypes">
-                          Prototypes
-                        </Link>
-                      </li>
-                    </>
+                    <li className="govuk-footer__inline-list-item">
+                      <a className="govuk-footer__link" href="/docs">
+                        API Documentation
+                      </a>
+                    </li>
                   )}
                   <li className="govuk-footer__inline-list-item">
                     <Link className="govuk-footer__link" to="/contact-us">
