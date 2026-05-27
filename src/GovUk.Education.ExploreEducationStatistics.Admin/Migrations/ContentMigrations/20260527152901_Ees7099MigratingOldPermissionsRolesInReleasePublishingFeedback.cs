@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 /// <inheritdoc />
 public partial class Ees7099MigratingOldPermissionsRolesInReleasePublishingFeedback : Migration
 {
-    private const string MigrationId = "20260423155823";
+    private const string MigrationId = "20260527152901";
 
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
