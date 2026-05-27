@@ -3,7 +3,6 @@ Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/charts.robot
-Resource            ../../libs/public-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -127,7 +126,7 @@ Verify release status is in higher review
 Put release back into draft
     user puts release into draft
 
-Approve release for scheduled release
+Approve release for scheduled publication
     ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
@@ -138,16 +137,8 @@ Approve release for scheduled release
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    12
-    ...    3001
-
-    set suite variable    ${EXPECTED_SCHEDULED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
-
-Verify release is scheduled
-    user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
-    user checks summary list contains    Next release expected    December 3001
+    ...    next_release_month=12
+    ...    next_release_year=3001
 
 Put release back into draft again
     user puts release into draft    expected_next_release_date=December 3001

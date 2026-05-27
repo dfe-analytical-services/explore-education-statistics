@@ -145,7 +145,7 @@ Add public prerelease access list
     user creates public prerelease access list    Test public access list
 
 Approve release for scheduled publication
-    ${days_until_release}=    set variable    0
+    ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
     ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}
@@ -155,21 +155,9 @@ Approve release for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    12
-    ...    3001
-
-    set suite variable    ${EXPECTED_SCHEDULED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Publish the scheduled release
     user waits for scheduled release to be published immediately
-
-    ${publish_date_day}=    get london day of month
-    ${publish_date_month_word}=    get london month word
-    ${publish_date_year}=    get london year
-    set suite variable    ${EXPECTED_PUBLISHED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
-
     user waits for caches to expire
 
 Get public release link
