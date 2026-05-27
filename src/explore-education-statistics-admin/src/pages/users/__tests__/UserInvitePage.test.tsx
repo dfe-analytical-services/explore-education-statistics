@@ -138,7 +138,7 @@ describe('UserInvitePage', () => {
       expect(
         screen.getByTestId('inviteUserForm-releaseId-error'),
       ).toHaveTextContent(
-        'You can only add one pre-release role for each release',
+        'This user already has a pre-release role for this release',
       );
     });
 

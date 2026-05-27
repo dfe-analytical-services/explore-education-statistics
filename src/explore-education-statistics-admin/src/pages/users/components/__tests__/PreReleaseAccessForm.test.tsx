@@ -83,7 +83,7 @@ describe('PreReleaseAccessForm', () => {
     const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
 
     expect(
-      preReleaseUsersService.removePreReleaseRoleById,
+      preReleaseUsersService.revokePreReleaseAccessById,
     ).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
@@ -91,12 +91,12 @@ describe('PreReleaseAccessForm', () => {
 
     await waitFor(() => {
       expect(
-        preReleaseUsersService.removePreReleaseRoleById,
+        preReleaseUsersService.revokePreReleaseAccessById,
       ).toHaveBeenCalledTimes(1);
     });
 
     expect(
-      preReleaseUsersService.removePreReleaseRoleById,
+      preReleaseUsersService.revokePreReleaseAccessById,
     ).toHaveBeenCalledWith('rr-id-1');
     expect(handleUpdate).toHaveBeenCalledTimes(1);
   });

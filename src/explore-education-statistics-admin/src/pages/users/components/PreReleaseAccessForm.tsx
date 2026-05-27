@@ -49,7 +49,7 @@ export default function PreReleaseAccessForm({
   const handleRemovePreReleaseAccess = async (
     userPreReleaseRole: UserPreReleaseRole,
   ) => {
-    await preReleaseUsersService.removePreReleaseRoleById(
+    await preReleaseUsersService.revokePreReleaseAccessById(
       userPreReleaseRole.id,
     );
     onUpdate();

@@ -35,7 +35,7 @@ export default function InviteUserPreReleaseRoleForm({ releases }: Props) {
     ) {
       setError('releaseId', {
         type: 'custom',
-        message: 'You can only add one pre-release role for each release',
+        message: 'This user already has a pre-release role for this release',
       });
       return;
     }
@@ -43,7 +43,7 @@ export default function InviteUserPreReleaseRoleForm({ releases }: Props) {
     if (!releaseId) {
       setError('releaseId', {
         type: 'custom',
-        message: 'Choose release to give the user access to',
+        message: 'Choose a release to give the user access to',
       });
 
       return;

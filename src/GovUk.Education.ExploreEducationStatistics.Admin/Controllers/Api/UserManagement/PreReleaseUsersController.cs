@@ -26,9 +26,9 @@ public class PreReleaseUsersController(IPreReleaseUserService preReleaseUserServ
 
     [HttpDelete("pre-release/roles/{id:guid}")]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<Unit>> RemovePreReleaseRoleById(Guid id)
+    public async Task<ActionResult<Unit>> RevokePreReleaseAccessById(Guid id)
     {
-        return await preReleaseUserService.RemovePreReleaseRole(id).HandleFailuresOrOk();
+        return await preReleaseUserService.RevokePreReleaseAccessById(id).HandleFailuresOrOk();
     }
 
     [HttpGet("pre-release/release-versions/{releaseVersionId:guid}/users")]
@@ -58,13 +58,13 @@ public class PreReleaseUsersController(IPreReleaseUserService preReleaseUserServ
     }
 
     [HttpDelete("pre-release/release-versions/{releaseVersionId:guid}/users/by-email")]
-    public async Task<ActionResult> RemovePreReleaseRoleByEmail(
+    public async Task<ActionResult> RevokePreReleaseAccessByEmail(
         Guid releaseVersionId,
         [FromBody] PreReleaseUserRemoveRequest request
     )
     {
         return await preReleaseUserService
-            .RemovePreReleaseRoleByCompositeKey(releaseVersionId, request)
+            .RevokePreReleaseAccessByCompositeKey(releaseVersionId, request)
             .HandleFailuresOrNoContent();
     }
 
