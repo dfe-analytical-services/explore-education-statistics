@@ -1299,7 +1299,7 @@ public abstract class PreReleaseUserServiceTests
         }
     }
 
-    public class RemovePreReleaseRoleByCompositeKeyTests : PreReleaseUserServiceTests
+    public class RevokePreReleaseAccessByCompositeKeyTests : PreReleaseUserServiceTests
     {
         [Fact]
         public async Task ActiveUser_AttemptsToDowngradeGlobalRole()
@@ -1350,7 +1350,7 @@ public abstract class PreReleaseUserServiceTests
                     globalRoleService: globalRoleService.Object
                 );
 
-                var result = await service.RemovePreReleaseRoleByCompositeKey(
+                var result = await service.RevokePreReleaseAccessByCompositeKey(
                     userPreReleaseRole.ReleaseVersionId,
                     request
                 );
@@ -1389,7 +1389,10 @@ public abstract class PreReleaseUserServiceTests
                 userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
-            var result = await service.RemovePreReleaseRoleByCompositeKey(userPreReleaseRole.ReleaseVersionId, request);
+            var result = await service.RevokePreReleaseAccessByCompositeKey(
+                userPreReleaseRole.ReleaseVersionId,
+                request
+            );
 
             result.AssertRight();
 
@@ -1414,7 +1417,7 @@ public abstract class PreReleaseUserServiceTests
                 userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
             );
 
-            var result = await service.RemovePreReleaseRoleByCompositeKey(Guid.NewGuid(), request);
+            var result = await service.RevokePreReleaseAccessByCompositeKey(Guid.NewGuid(), request);
 
             result.AssertNotFound();
 
@@ -1448,14 +1451,14 @@ public abstract class PreReleaseUserServiceTests
             );
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await service.RemovePreReleaseRoleByCompositeKey(userPreReleaseRole.ReleaseVersionId, request)
+                await service.RevokePreReleaseAccessByCompositeKey(userPreReleaseRole.ReleaseVersionId, request)
             );
 
             MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository);
         }
     }
 
-    public class RemovePreReleaseRoleTests : PreReleaseUserServiceTests
+    public class RevokePreReleaseAccessByIdTests : PreReleaseUserServiceTests
     {
         [Fact]
         public async Task ActiveUser_AttemptsToDowngradeGlobalRole()
@@ -1498,7 +1501,7 @@ public abstract class PreReleaseUserServiceTests
                     globalRoleService: globalRoleService.Object
                 );
 
-                var result = await service.RemovePreReleaseRole(userPreReleaseRole.Id);
+                var result = await service.RevokePreReleaseAccessById(userPreReleaseRole.Id);
 
                 result.AssertRight();
             }
@@ -1524,7 +1527,7 @@ public abstract class PreReleaseUserServiceTests
 
             var service = SetupService(userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object);
 
-            var result = await service.RemovePreReleaseRole(userPreReleaseRole.Id);
+            var result = await service.RevokePreReleaseAccessById(userPreReleaseRole.Id);
 
             result.AssertRight();
 
@@ -1539,7 +1542,7 @@ public abstract class PreReleaseUserServiceTests
 
             var service = SetupService(userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object);
 
-            var result = await service.RemovePreReleaseRole(Guid.NewGuid());
+            var result = await service.RevokePreReleaseAccessById(Guid.NewGuid());
 
             result.AssertNotFound();
 
@@ -1562,7 +1565,7 @@ public abstract class PreReleaseUserServiceTests
             var service = SetupService(userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await service.RemovePreReleaseRole(userPreReleaseRole.Id)
+                await service.RevokePreReleaseAccessById(userPreReleaseRole.Id)
             );
 
             MockUtils.VerifyAllMocks(userPreReleaseRoleRepository);

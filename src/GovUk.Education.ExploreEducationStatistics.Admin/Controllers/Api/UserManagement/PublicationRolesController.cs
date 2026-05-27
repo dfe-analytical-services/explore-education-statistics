@@ -70,9 +70,9 @@ public class PublicationRolesController(IUserRoleService userRoleService) : Cont
     }
 
     [HttpDelete("users/publication-roles/drafters/{id:guid}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(204)]
     public async Task<ActionResult<Unit>> RemoveDrafter(Guid id)
     {
-        return await userRoleService.RemoveDrafter(id).HandleFailuresOrOk();
+        return await userRoleService.RemoveDrafter(id).HandleFailuresOrNoContent();
     }
 }
