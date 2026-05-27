@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20260423155823_Ees7099MigratingOldPermissionsRolesInReleasePublishingFeedback")]
+    [Migration("20260527152901_Ees7099MigratingOldPermissionsRolesInReleasePublishingFeedback")]
     partial class Ees7099MigratingOldPermissionsRolesInReleasePublishingFeedback
     {
         /// <inheritdoc />
@@ -350,6 +350,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LocationMappings")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OriginalDataSetId")
                         .HasColumnType("uniqueidentifier");
 
@@ -360,7 +364,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UnmappedReplacementLocations")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OriginalDataSetId")
+                        .IsUnique();
+
+                    b.HasIndex("ReplacementDataSetId")
+                        .IsUnique();
 
                     b.ToTable("DataSetMappings");
                 });
@@ -404,7 +418,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("ReplacingFileId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ScreenerProgress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ScreenerProgressLastChecked")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ScreenerProgressLastUpdated")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("ScreenerResult")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScreeningStatus")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -417,52 +444,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.ToTable("DataSetUploads");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EducationInNumbersPage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2047)
-                        .HasColumnType("nvarchar(2047)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("Published")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Slug")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTimeOffset?>("Updated")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EducationInNumbersPages");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentBlock", b =>
@@ -499,7 +480,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("EducationInNumbersPageId")
+                    b.Property<Guid>("EinPageVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Heading")
@@ -512,9 +493,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EducationInNumbersPageId");
+                    b.HasIndex("EinPageVersionId");
 
                     b.ToTable("EinContentSections");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2047)
+                        .HasColumnType("nvarchar(2047)");
+
+                    b.Property<Guid?>("LatestPublishedVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("LatestVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Slug")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LatestPublishedVersionId");
+
+                    b.HasIndex("LatestVersionId");
+
+                    b.ToTable("EinPages");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPageVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EinPageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("Published")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EinPageId");
+
+                    b.ToTable("EinPageVersions");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTile", b =>
@@ -2014,13 +2067,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentSection", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.EducationInNumbersPage", "EducationInNumbersPage")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPageVersion", "EinPageVersion")
                         .WithMany("Content")
-                        .HasForeignKey("EducationInNumbersPageId")
+                        .HasForeignKey("EinPageVersionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EducationInNumbersPage");
+                    b.Navigation("EinPageVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPage", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPageVersion", "LatestPublishedVersion")
+                        .WithMany()
+                        .HasForeignKey("LatestPublishedVersionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPageVersion", "LatestVersion")
+                        .WithMany()
+                        .HasForeignKey("LatestVersionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("LatestPublishedVersion");
+
+                    b.Navigation("LatestVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPageVersion", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPage", "EinPage")
+                        .WithMany("PageVersions")
+                        .HasForeignKey("EinPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EinPage");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTile", b =>
@@ -2615,12 +2696,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("Errors");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EducationInNumbersPage", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentSection", b =>
                 {
                     b.Navigation("Content");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentSection", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPage", b =>
+                {
+                    b.Navigation("PageVersions");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinPageVersion", b =>
                 {
                     b.Navigation("Content");
                 });
