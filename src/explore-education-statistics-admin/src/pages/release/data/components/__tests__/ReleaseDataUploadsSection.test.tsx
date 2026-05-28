@@ -162,15 +162,27 @@ describe('ReleaseDataUploadsSection', () => {
 
     const fileTableRow1 = within(fileTableRows[1]);
 
-    expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
-    expect(fileTableRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
-    expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(fileTableRow1.getByTestId('Test data 1-title')).toHaveTextContent(
+      'Test data 1',
+    );
+    expect(fileTableRow1.getByTestId('Test data 1-size')).toHaveTextContent(
+      '50 Kb',
+    );
+    expect(fileTableRow1.getByTestId('Test data 1-status')).toHaveTextContent(
+      'Complete',
+    );
 
     const fileTableRow2 = within(fileTableRows[2]);
 
-    expect(fileTableRow2.getByTestId('Title')).toHaveTextContent('Test data 2');
-    expect(fileTableRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
-    expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(fileTableRow2.getByTestId('Test data 2-title')).toHaveTextContent(
+      'Test data 2',
+    );
+    expect(fileTableRow2.getByTestId('Test data 2-size')).toHaveTextContent(
+      '100 Kb',
+    );
+    expect(fileTableRow2.getByTestId('Test data 2-status')).toHaveTextContent(
+      'Complete',
+    );
   });
 
   test('renders data files replacements table', async () => {
@@ -355,9 +367,15 @@ describe('ReleaseDataUploadsSection', () => {
 
     const fileTableRow2 = within(fileTableRows[1]);
 
-    expect(fileTableRow2.getByTestId('Title')).toHaveTextContent('Test data 2');
-    expect(fileTableRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
-    expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(fileTableRow2.getByTestId('Test data 2-title')).toHaveTextContent(
+      'Test data 2',
+    );
+    expect(fileTableRow2.getByTestId('Test data 2-size')).toHaveTextContent(
+      '100 Kb',
+    );
+    expect(fileTableRow2.getByTestId('Test data 2-status')).toHaveTextContent(
+      'Complete',
+    );
   });
 
   test('renders empty message when there are no data files', async () => {
@@ -498,7 +516,9 @@ describe('ReleaseDataUploadsSection', () => {
 
       const fileTableRow1 = within(fileTableRows[1]);
 
-      expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(fileTableRow1.getByTestId('Test data 1-status')).toHaveTextContent(
+        'Queued',
+      );
       expect(
         fileTableRow1.queryByRole('button', {
           name: 'Delete files for Test data 1',
@@ -507,7 +527,9 @@ describe('ReleaseDataUploadsSection', () => {
 
       const fileTableRow2 = within(fileTableRows[2]);
 
-      expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
+      expect(fileTableRow2.getByTestId('Test data 2-status')).toHaveTextContent(
+        'Complete',
+      );
       expect(
         fileTableRow2.getByRole('button', {
           name: 'Delete files for Test data 2',
@@ -676,9 +698,9 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(fileTableRows).toHaveLength(2);
 
-      expect(within(fileTableRows[1]).getByTestId('Title')).toHaveTextContent(
-        'Test data 1',
-      );
+      expect(
+        within(fileTableRows[1]).getByTestId('Test data 1-title'),
+      ).toHaveTextContent('Test data 1');
     });
 
     test('does not allow deleting files when linked to an API data set', async () => {
@@ -1088,7 +1110,9 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', 'file-1'),
       );
 
-      expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');
+      expect(fileTableRow3.getByTestId('Test title 2-size')).toHaveTextContent(
+        '150 Kb',
+      );
     });
 
     test('updates the file size after importing ZIP file when status changes', async () => {
@@ -1157,7 +1181,9 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', 'file-1'),
       );
 
-      expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');
+      expect(fileTableRow3.getByTestId('Test title 2-size')).toHaveTextContent(
+        '150 Kb',
+      );
     });
 
     describe('permissions during upload', () => {

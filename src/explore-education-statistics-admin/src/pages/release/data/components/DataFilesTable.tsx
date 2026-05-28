@@ -24,6 +24,7 @@ interface Props {
     dataFile: DataFile,
     importStatus: DataFileImportStatus,
   ) => Promise<void>;
+  onRefreshUploads: () => void;
 }
 
 export default function DataFilesTable({
@@ -38,6 +39,7 @@ export default function DataFilesTable({
   onDeleteUpload,
   onDataSetImport,
   onReplaceFile,
+  onRefreshUploads,
   onStatusChange,
 }: Props) {
   return (
@@ -77,6 +79,7 @@ export default function DataFilesTable({
               releaseVersionId={releaseVersionId}
               onConfirmDelete={onDeleteUpload}
               onConfirmImport={onDataSetImport}
+              onRefreshUploads={onRefreshUploads}
             />
           ))}
         </tbody>

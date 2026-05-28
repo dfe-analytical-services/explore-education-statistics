@@ -13,6 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    Upload files %{RUN_IDENTIFIER}
+${SUBJECT_NAME}=        Absence in PRUs
 
 
 *** Test Cases ***
@@ -29,13 +30,14 @@ Navigate to 'Data and files' page
 
 Upload a ZIP file
     [Documentation]    EES-1397
-    user enters text into element    id:dataFileUploadForm-title    Absence in PRUs
+    user enters text into element    id:dataFileUploadForm-title    ${SUBJECT_NAME}
     user clicks radio    ZIP file
     user waits until page contains element    id:dataFileUploadForm-zipFile
     user chooses file    id:dataFileUploadForm-zipFile    ${FILES_DIR}upload-zip-test.zip
     user clicks button    Upload data files
     user waits until page contains data uploads table
-    user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
+    user waits for screening to complete    ${SUBJECT_NAME}
+    user checks table cell contains    1    1    ${SUBJECT_NAME}    testid:Data files table
     user checks table cell contains    1    2    140 Kb    testid:Data files table
 
     user waits until table cell contains    1    3    Pending review    testid:Data files table
@@ -56,7 +58,7 @@ Check the file details in the modal
     user clicks element    id:file-details-tab
     user waits until h3 is visible    File details
 
-    user checks summary list contains    Title    Absence in PRUs    testid:Data file details
+    user checks summary list contains    Title    ${SUBJECT_NAME}    testid:Data file details
     user checks summary list contains    Data file    absence_in_prus.csv    testid:Data file details
     user checks summary list contains    Meta file    absence_in_prus.meta.csv    testid:Data file details
     user checks summary list contains    Size    140 Kb    testid:Data file details
@@ -73,7 +75,7 @@ Continue the import
     user waits until modal is not visible    Data file details
 
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
-    user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
+    user checks table cell contains    1    1    ${SUBJECT_NAME}    testid:Data files table
     user checks table cell contains    1    2    140 Kb    testid:Data files table
     user waits until table cell contains    1    3    Complete    testid:Data files table
     user checks table cell contains    1    4    View details    testid:Data files table
@@ -85,13 +87,13 @@ Change data file title
 
     user waits until h2 is visible    Edit data file details
     user clears element text    label:Title
-    user enters text into element    label:Title    Updated Absence in PRUs
+    user enters text into element    label:Title    Updated ${SUBJECT_NAME}
 
     user clicks button    Save changes
 
 Validate data file title has been updated
     user waits until h2 is visible    Uploaded data files
-    user checks table cell contains    1    1    Updated Absence in PRUs    testid:Data files table
+    user checks table cell contains    1    1    Updated ${SUBJECT_NAME}    testid:Data files table
 
 Check data file appears in 'Data blocks' page
     user clicks link    Data blocks
@@ -103,7 +105,7 @@ Check data file appears in 'Data blocks' page
 
     user waits until table tool wizard step is available    1    Select a data set
 
-    user waits until page contains    Updated Absence in PRUs
+    user waits until page contains    Updated ${SUBJECT_NAME}
 
 Navigate to 'Data and files' page - 'Supporting file uploads' tab
     user clicks link    Data and files
@@ -164,7 +166,7 @@ Validate 'Explore data and files' section
     ${datasets_section}=    user gets testid element    datasets-section
     user checks list has x items    testid:release-data-list    1    ${datasets_section}
     ${data_files_1}=    user gets list item element    testid:release-data-list    1    ${datasets_section}
-    user checks element should contain    ${data_files_1}    Updated Absence in PRUs
+    user checks element should contain    ${data_files_1}    Updated ${SUBJECT_NAME}
 
     # Ancillary files
     ${supporting_files_section}=    user gets testid element    supporting-files-section

@@ -198,6 +198,7 @@ def validate_environment_variables():
         "WAIT_MEDIUM",
         "WAIT_LONG",
         "WAIT_SMALL",
+        "WAIT_DATA_FILE_SCREEN",
         "WAIT_DATA_FILE_IMPORT",
         "IDENTITY_PROVIDER",
         "WAIT_CACHE_EXPIRY",

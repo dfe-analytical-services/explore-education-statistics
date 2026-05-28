@@ -214,6 +214,7 @@ Upload a replacement data set using the button
     user chooses file    id:dataFileReplacementUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
     user clicks element    testid:upload-replacement-files-button
     user waits until page contains element    testid:Data file replacements table
+    user waits for screening to complete    Dates test subject
     user confirms replacement upload    Dates test subject
 
 Confirm data replacement via quick action

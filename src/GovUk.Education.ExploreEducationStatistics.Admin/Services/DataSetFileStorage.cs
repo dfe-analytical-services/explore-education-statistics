@@ -230,13 +230,13 @@ public class DataSetFileStorage(
             var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
             var hasFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
 
-            if (hasWarnings)
-            {
-                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingReview;
-            }
-            else if (hasFailures)
+            if (hasFailures)
             {
                 upload.ScreeningStatus = DataSetUploadScreeningStatus.FailedScreening;
+            }
+            else if (hasWarnings)
+            {
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingReview;
             }
             else
             {

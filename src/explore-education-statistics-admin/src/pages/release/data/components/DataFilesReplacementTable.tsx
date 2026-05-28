@@ -18,6 +18,7 @@ interface Props {
   onConfirmReplacement?: () => void;
   onDeleteUpload: (deletedUploadId: string) => void;
   onDataSetImport: (dataSetImportIds: string[]) => void;
+  onRefreshUploads: () => void;
   onReplacementStatusChange: (updatedDataFile: DataFile) => void;
 }
 
@@ -30,6 +31,7 @@ export default function DataFilesReplacementTable({
   releaseVersionId,
   testId,
   onConfirmReplacement,
+  onRefreshUploads,
   onDeleteUpload,
   onDataSetImport,
   onReplacementStatusChange,
@@ -69,6 +71,7 @@ export default function DataFilesReplacementTable({
               releaseVersionId={releaseVersionId}
               onConfirmDelete={onDeleteUpload}
               onConfirmImport={onDataSetImport}
+              onRefreshUploads={onRefreshUploads}
               testId={`data-set-upload-row-${index + 1}`}
             />
           ))}
