@@ -186,7 +186,10 @@ export default function DataFilesTableUploadRow({
           <ModalConfirm
             title="Data set details"
             open={openImportConfirm}
-            hideConfirm={importBlocked && !canOverride}
+            hideConfirm={
+              currentUpload.status === 'Screening' ||
+              (importBlocked && !canOverride)
+            }
             disableConfirm={
               importUnavailable && !(importBlocked && canOverride)
             }
@@ -259,7 +262,7 @@ export default function DataFilesTableUploadRow({
               </TabsSection>
             </Tabs>
           </ModalConfirm>
-          {canUpdateRelease && (
+          {currentUpload.status !== 'Screening' && canUpdateRelease && (
             <ModalConfirm
               open={openDeleteConfirm}
               title="Confirm deletion of selected data files"
