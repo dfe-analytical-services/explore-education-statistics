@@ -2,6 +2,7 @@
 Library             Collections
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/tables-common.robot
 
@@ -292,20 +293,14 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    If you have an enquiry about this release contact
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
-Validate metadata guidance page
-    user validates data guidance on explore tab in release preview
-    ...    Test metadata guidance content
-    ...    UI test subject
-    ...    Test file guidance content
-    ...    Local authority, Local authority district, Local enterprise partnership, Opportunity area, Parliamentary constituency, Regional, RSC region, Ward
-    ...    2005 to 2020
+Validate metadata guidance section and data set details section on the Explore and download data
+    user checks data set details for UI test subject
+
     ${data_guidance_section}=    Get WebElement    id:data-guidance-section
     user checks element should contain    ${data_guidance_section}    Test metadata guidance content
-    user checks element should contain    testid:indicators    Admission Numbers
 
-Go back to prerelease content page
+Go back to pre-release access list section on the help and related information tab
     user returns to release home tab in release preview
-    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -313,12 +308,11 @@ Go back to prerelease content page
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list
-    user validates pre-release access list on help tab in release preview
+    user checks pre-release access list on help and related information tab
     ...    Updated test public access list
 
-Go back to prerelease content page again
+Go back to pre-release access list section on the help and related information tab again
     user returns to release home tab in release preview
-    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -393,20 +387,14 @@ Validate prerelease has started for Analyst user
 
     user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
 
-Validate public metdata guidance for Analyst user
-    user validates data guidance on explore tab in release preview
-    ...    Test metadata guidance content
-    ...    UI test subject
-    ...    Test file guidance content
-    ...    Local authority, Local authority district, Local enterprise partnership, Opportunity area, Parliamentary constituency, Regional, RSC region, Ward
-    ...    2005 to 2020
+Validate data set details and meta data guidance for Analyst user
+    user checks data set details for UI test subject
+
     ${data_guidance_section}=    Get WebElement    id:data-guidance-section
     user checks element should contain    ${data_guidance_section}    Test metadata guidance content
-    user checks element should contain    testid:indicators    Admission Numbers
 
-Go back to prerelease content page as Analyst user
+Go back to pre-release access list section on the help and related information tab as Analyst user
     user returns to release home tab in release preview
-    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -414,12 +402,11 @@ Go back to prerelease content page as Analyst user
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list as Analyst user
-    user validates pre-release access list on help tab in release preview
+    user checks pre-release access list on help and related information tab
     ...    Updated test public access list
 
-Go back to prerelease content page again as Analyst user
+Go back to pre-release access list section on the help and related information tab again as Analyst user
     user returns to release home tab in release preview
-    ...    Test headlines summary text for ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -537,35 +524,22 @@ user validates table rows
     user checks table cell in offset row contains    ${row}    3    1    1,109
     user checks table cell in offset row contains    ${row}    4    1    1,959
 
-user validates data guidance on explore tab in release preview
-    [Arguments]
-    ...    ${main_guidance_content}
-    ...    ${subject_name}
-    ...    ${file_guidance_content}
-    ...    ${data_file_description}
-    ...    ${time_period}
-    user clicks link    Explore and download data
-    user waits until h2 is visible    Explore data used in this release
-    user checks section with ID contains elements and back to top link    data-guidance-section
-    ...    ${main_guidance_content}
-    user scrolls to element    id:datasets-section
-
-    ${dataset_xpath}=    Set Variable
-    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${subject_name}"]]
-    Wait Until Element Is Visible    xpath=${dataset_xpath}
-    ${toggle_xpath}=    Set Variable
-    ...    ${dataset_xpath}//button[@aria-expanded="false"]
-    Run Keyword And Ignore Error    Click Element    xpath=${toggle_xpath}
-
-    user checks element should contain    ${dataset_xpath}    ${file_guidance_content}
-    user checks element should contain    ${dataset_xpath}    ${data_file_description}
-    user checks summary list contains    Time period    ${time_period}    ${dataset_xpath}
-
 user returns to release home tab in release preview
-    [Arguments]    ${headlines_text}
     user clicks link    Release home
     user waits until h2 is visible    Headline facts and figures
-    user waits until element contains    id:headlines-section    ${headlines_text}    %{WAIT_SMALL}
+
+user checks data set details for UI test subject
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    User checks page 'Explore and download data' data set available properties
+    ...    UI test subject
+    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
+    ...    144
+    ...    2005 to 2020
+    ...    ${PUBLICATION_NAME}
+    ...    Test file guidance content
+    ...    indicators=Admission Numbers
+    ...    is_public_site=False
 
 do suite teardown
     user closes the browser

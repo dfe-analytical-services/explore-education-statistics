@@ -414,7 +414,9 @@ Verify Explore and Download data
     ${file_size}=    Get File Size    ${DOWNLOAD_DIR}/seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
     Should Be True    ${file_size} > 0
 
-    User checks page 'Explore and download data' data set available properties    Absence by characteristic    201,625
+    User checks page 'Explore and download data' data set available properties    Absence by characteristic
+    ...    Local authority, Local authority district, National
+    ...    201,625
     ...    2012/13 to 2016/17
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
@@ -422,7 +424,9 @@ Verify Explore and Download data
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
-    User checks page 'Explore and download data' data set available properties    Absence in PRUs    612
+    User checks page 'Explore and download data' data set available properties    Absence in PRUs
+    ...    Local authority, National, Regional
+    ...    612
     ...    2013/14 to 2016/17
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 

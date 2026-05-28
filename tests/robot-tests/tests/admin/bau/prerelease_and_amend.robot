@@ -286,7 +286,7 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
 Validate public prerelease access list as Analyst user
-    user validates pre-release access list on help tab in release preview
+    user checks pre-release access list on help and related information tab
     ...    Amended test public access list
 
 

@@ -307,7 +307,7 @@ Verify release associated files
     ...    Data guidance
     ...    Data catalogue
 
-    User checks page 'Explore and download data' data set available properties    ${SUBJECT_NAME}    118
+    User checks page 'Explore and download data' data set available properties    ${SUBJECT_NAME}    118    National
     ...    2020 Week 13 to 2021 Week 24    ${PUBLICATION_NAME}    Dates test subject test data guidance content
     user goes back
 

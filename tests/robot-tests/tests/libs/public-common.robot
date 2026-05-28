@@ -90,10 +90,15 @@ user checks main links for page 'Explore and download data' are present
 
 User checks page 'Explore and download data' data set available properties
     [Arguments]    ${data_set_name}
+    ...    ${geographical_levels}
     ...    ${expected_row_count}
     ...    ${expected_time_period}
-    ...    ${PUBLICATION_TITLE}
+    ...    ${publication_title}
     ...    ${expected_data_guidance}=${data_set_name} data guidance content
+    ...    ${indicators}=${EMPTY}
+    ...    ${filters}=${EMPTY}
+    ...    ${api_data_set_id}=${EMPTY}
+    ...    ${is_public_site}=True
 
     ${dataset_xpath}=    Set Variable
     ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
@@ -113,6 +118,66 @@ User checks page 'Explore and download data' data set available properties
     ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]
     ...    Dataset "${data_set_name}" is missing "Number of rows" label
 
+    # Assert geographic levels
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}
+    ...    //p[contains(normalize-space(.), "Geographical levels: ${geographical_levels}")]
+    ...    Dataset "${data_set_name}" has incorrect geographical levels
+
+    # Normalize the incoming parameters ($indicators or $filters) into a Python list so the rest of the Robot keyword can treat it uniformly.
+    #    Examples:
+    # Input "" or None → ${indicators} becomes [] (falsey).
+    # Input ["A","B"] → ${indicators} stays ["A","B"] (truthy).
+    # Input "X" → ${indicators} becomes ["X"] (truthy).
+    ${indicators}=    Evaluate
+    ...    [] if $indicators in ('', None) else $indicators if isinstance($indicators, (list, tuple)) else [$indicators]
+    ${filters}=    Evaluate
+    ...    [] if $filters in ('', None) else $filters if isinstance($filters, (list, tuple)) else [$filters]
+    IF    ${indicators}
+        # Assert indicators label exists
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Indicators"]
+        ...    Dataset "${data_set_name}" is missing "Indicators" label
+
+        # If indicators provided, assert each indicator exists in the list
+        FOR    ${indicator}    IN    @{indicators}
+            Page Should Contain Element
+            ...    xpath=${dataset_xpath}//div[@data-testid="Indicators"]//li[normalize-space(.)="${indicator}"]
+            ...    Dataset "${data_set_name}" is missing indicator "${indicator}"
+        END
+    END
+
+    IF    ${filters}
+        # Assert filters label exists
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Filters"]
+        ...    Dataset "${data_set_name}" is missing "Filters" label
+
+        # If filters provided, assert each filter exists in the list
+        FOR    ${filter}    IN    @{filters}
+            Page Should Contain Element
+            ...    xpath=${dataset_xpath}//div[@data-testid="Filters"]//li[normalize-space(.)="${filter}"]
+            ...    Dataset "${data_set_name}" is missing filter "${filter}"
+        END
+    END
+
+    IF    "${api_data_set_id}" != "${EMPTY}"
+        # Assert API ID label exists
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="API data set ID"]
+        ...    Dataset "${data_set_name}" is missing "API data set ID" label
+
+        # Assert API ID value is correct
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="API data set ID"]/following-sibling::dd[normalize-space(.)="${api_data_set_id}"]
+        ...    Dataset "${data_set_name}" has incorrect API ID value
+
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}
+        ...    //strong[contains(normalize-space(.), "Available by API")]
+        ...    Dataset "${data_set_name}" is missing "Available by API" tag
+    END
+
     # Assert dd value for "Number of rows"
     Page Should Contain Element
     ...    xpath=${dataset_xpath}
@@ -130,27 +195,29 @@ User checks page 'Explore and download data' data set available properties
     ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${expected_data_guidance}")]
     ...    Dataset "${data_set_name}" is missing the data guidance content text
 
-    # Verify Data set information page link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
-    ...    Dataset "${data_set_name}" is missing the "Data set information page" link
-
-    # Verify Create table link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    ...    Dataset "${data_set_name}" is missing the "Create table" link
-
     # Verify Download (ZIP) button
     Page Should Contain Element
     ...    xpath=${dataset_xpath}//button[contains(normalize-space(.), "Download")]
     ...    Dataset "${data_set_name}" is missing the "Download (ZIP)" button
 
-    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
-    user waits until page finishes loading
+    IF    "${is_public_site}" == "True"
+        # Verify Data set information page link
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
+        ...    Dataset "${data_set_name}" is missing the "Data set information page" link
 
-    user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    ${PUBLICATION_TITLE}
+        # Verify Create table link
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
+        ...    Dataset "${data_set_name}" is missing the "Create table" link
+
+        user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
+        user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
+        user waits until page finishes loading
+
+        user waits until table tool wizard step is available    2    Select a data set
+        user checks previous table tool step contains    1    Publication    ${publication_title}
+    END
 
 user checks 'On this page section' for this tab contains
     [Arguments]    @{expected_link_texts}
