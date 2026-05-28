@@ -519,7 +519,6 @@ public class ReleaseDataFileService(
 
                         upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
 
-                        contentDbContext.DataSetUploads.Update(upload);
                         await contentDbContext.SaveChangesAsync(cancellationToken: ct);
 
                         return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
