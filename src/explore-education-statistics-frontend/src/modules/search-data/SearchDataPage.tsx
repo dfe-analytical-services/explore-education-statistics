@@ -44,9 +44,9 @@ import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import StatisticalReleasesGuidanceModal from '@frontend/modules/search-data/StatisticalReleasesGuidanceModal';
-import DataSetsGuidanceModal from '@frontend/modules/search-data/components/DataSetsGuidanceModal';
 import React, { useState } from 'react';
+import DataSetsGuidanceModal from './components/DataSetsGuidanceModal';
+import StatisticalReleasesGuidanceModal from './components/StatisticalReleasesGuidanceModal';
 
 const defaultPageTitle = 'Explore our education statistics';
 
