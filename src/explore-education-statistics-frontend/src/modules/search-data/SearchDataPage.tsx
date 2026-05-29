@@ -416,7 +416,7 @@ const SearchDataPage: NextPage = () => {
           <ScreenReaderMessage message={totalResultsMessage} />
         </div>
         <div className="govuk-grid-column-one-third">
-          <div className={styles.helpColumn}>
+          <div className={styles.helpColumn} data-testid="related-info-column">
             <RelatedInformation heading="Help and related information">
               <ul className="govuk-list">
                 <li>
