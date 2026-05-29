@@ -88,7 +88,10 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new ReleaseVersion { Id = statisticsReleaseVersion.Id };
+        ReleaseVersion contentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(statisticsReleaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -252,7 +255,10 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion().WithId(statisticsReleaseVersion.Id);
+        ReleaseVersion contentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(statisticsReleaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         ReleaseFile releaseFile1 = _fixture
             .DefaultReleaseFile()
@@ -326,7 +332,10 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new ReleaseVersion { Id = statisticsReleaseVersion.Id };
+        ReleaseVersion contentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(statisticsReleaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -439,7 +448,10 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new ReleaseVersion { Id = statisticsReleaseVersion.Id };
+        ReleaseVersion contentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(statisticsReleaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -519,7 +531,10 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new ReleaseVersion { Id = statisticsReleaseVersion.Id };
+        ReleaseVersion contentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(statisticsReleaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -560,9 +575,7 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FiltersSubjectsWithNoFileSubjectId()
     {
-        var releaseVersionId = Guid.NewGuid();
-
-        var releaseVersion = new ReleaseVersion { Id = releaseVersionId };
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -642,7 +655,10 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new ReleaseVersion { Id = statisticsReleaseVersion.Id };
+        ReleaseVersion contentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(statisticsReleaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -739,7 +755,10 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new ReleaseVersion { Id = statisticsReleaseVersion.Id };
+        ReleaseVersion contentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(statisticsReleaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {

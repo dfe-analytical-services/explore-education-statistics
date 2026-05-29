@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -946,7 +947,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1042,8 +1049,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.Add(releaseFootnote);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
-
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1221,7 +1233,13 @@ public class FootnoteServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1291,7 +1309,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1369,7 +1393,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnote);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1478,7 +1508,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnote);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1561,7 +1597,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1710,7 +1752,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1774,7 +1822,13 @@ public class FootnoteServiceTests
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1810,7 +1864,7 @@ public class FootnoteServiceTests
         }
     }
 
-    private static async Task SeedDatabase(
+    private async Task SeedDatabase(
         string contextId,
         ReleaseVersion releaseVersion,
         IReadOnlyList<Subject>? subjects = null,
@@ -1840,7 +1894,13 @@ public class FootnoteServiceTests
 
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
     }
