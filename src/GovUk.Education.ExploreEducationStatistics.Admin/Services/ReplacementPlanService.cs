@@ -154,17 +154,30 @@ public class ReplacementPlanService(
                     Indicators = new ReplacementPlanIndicatorsMappingViewModel
                     {
                         Mappings = mapping.IndicatorMappings.Values.ToDictionary(
-                            map => map.OriginalColumnName,
+                            map => map.OriginalId,
                             map => new ReplacementPlanIndicatorMappingViewModel
                             {
-                                Source = new ReplacementPlanIndicatorViewModel { Label = map.OriginalLabel },
+                                Source = new ReplacementPlanIndicatorViewModel
+                                {
+                                    Id = map.OriginalId,
+                                    Name = map.OriginalColumnName,
+                                    Label = map.OriginalLabel,
+                                },
                                 Type = map.Status.ToString(),
-                                CandidateKey = map.ReplacementColumnName,
+                                CandidateKey = map.ReplacementId,
                             }
                         ),
                         Candidates = statisticsDbContext
                             .Indicator.Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
-                            .ToDictionary(i => i.Name, i => new ReplacementPlanIndicatorViewModel { Label = i.Label }),
+                            .ToDictionary(
+                                i => i.Id,
+                                i => new ReplacementPlanIndicatorViewModel
+                                {
+                                    Id = i.Id,
+                                    Name = i.Name,
+                                    Label = i.Label,
+                                }
+                            ),
                     },
                     Locations = new ReplacementPlanLocationMappingsViewModel
                     {
@@ -174,6 +187,7 @@ public class ReplacementPlanService(
                             {
                                 Source = new ReplacementPlanLocationViewModel
                                 {
+                                    Id = map.OriginalId,
                                     Code = map.OriginalCode,
                                     Name = map.OriginalName,
                                 },
@@ -189,6 +203,7 @@ public class ReplacementPlanService(
                                 l => l.Id,
                                 l => new ReplacementPlanLocationViewModel
                                 {
+                                    Id = l.Id,
                                     Code = l.ToLocationAttribute().GetCodeOrFallback(),
                                     Name = l.ToLocationAttribute().Name ?? "",
                                 }

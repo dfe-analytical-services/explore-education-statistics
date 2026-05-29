@@ -1,5 +1,4 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
-import { replaceMultiple } from '../../../common/functions.bicep'
 
 @description('Environment: Subscription name. Used as a prefix for created resources.')
 @allowed([
@@ -51,16 +50,7 @@ var publicSiteHostName = subscription == 's101p01'
   // Handle the case for Prod to allow access via "https://afd.explore-education-statistics.service.gov.uk" during
   // testing.
   ? 'afd.explore-education-statistics.service.gov.uk'
-  
-  : replaceMultiple(publicSiteUrl, {
-  
-  // Handle the case for Pre-Production to allow access via
-  // "https://pre-productionafd.explore-education-statistics.service.gov.uk" during testing.
-  'pre-production.explore-education': 'pre-productionafd.explore-education'
-  
-  // Remove the "https://" from the URL to leave just the domain name.
-  'https://': ''
-})
+  : replace(publicSiteUrl, 'https://', '')
 
 // TODO EES-6883 - remove the "afd" from the line below once we're ready to
 // switch DNS over to point at Azure Front Door rather than the Public Site
@@ -69,10 +59,10 @@ var publicSiteHostName = subscription == 's101p01'
 // URL with an associated certificate so as not to break the use of the environment
 // for others.
 //
-// Note that Dev and Test now have the original public site URLs pointing towards
+// Note that Dev, Test and Pre-Prod now have the original public site URLs pointing towards
 // their AFD instances now rather than the original App Service, so they can serve
 // up the real certificate rather than the temporary testing one.  
-var certificateName = subscription == 's101d01' || subscription == 's101t01'
+var certificateName = subscription != 's101p01'
     ? '${legacyResourcePrefix}as-ees-public-site-certificate'
     : '${legacyResourcePrefix}as-ees-public-site-afd-certificate'
 

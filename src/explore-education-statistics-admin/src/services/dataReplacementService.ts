@@ -142,6 +142,8 @@ export interface MappingsPlan<TSource> {
 export type MappingWithKey<TSource> = { sourceKey: string } & Mapping<TSource>;
 
 export interface IndicatorSource {
+  id: string;
+  name: string; // csv column name
   label: string;
 }
 
@@ -211,8 +213,8 @@ const dataReplacementService = {
     originalDataSetId: string,
     replacementDataSetId: string,
     updates: {
-      originalColumnName: string;
-      newReplacementColumnName?: string;
+      originalId: string;
+      newReplacementId?: string;
     }[],
   ): Promise<DataReplacementPlan['mapping']['indicators']['mappings']> {
     const indicatorsMappings: PlanMappingIndicatorsUpdateResponse =
