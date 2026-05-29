@@ -38,7 +38,7 @@ const RoleForm = ({ roles, user, onUpdate }: Props) => {
   }, []);
 
   const handleSubmit = async (values: FormValues) => {
-    await usersService.updateUser(user.id, values);
+    await usersService.updateUserGlobalRole(user.id, values);
     onUpdate();
   };
 
