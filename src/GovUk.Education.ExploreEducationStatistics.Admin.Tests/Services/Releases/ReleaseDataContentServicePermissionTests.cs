@@ -39,12 +39,10 @@ public class ReleaseDataContentServicePermissionTests
                 {
                     var sut = BuildService(contentDbContext, userService.Object);
 
-                    var x = await sut.GetReleaseDataContent(
+                    return await sut.GetReleaseDataContent(
                         releaseVersionId: releaseVersion.Id,
                         cancellationToken: CancellationToken.None
                     );
-
-                    return x;
                 }
             });
     }
