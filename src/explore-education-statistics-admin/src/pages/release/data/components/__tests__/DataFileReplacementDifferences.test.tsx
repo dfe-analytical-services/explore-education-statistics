@@ -17,18 +17,24 @@ const testReplacementPlan: DataReplacementPlan = {
       mappings: {
         enrolments_again: {
           source: {
+            id: 'enrolments_again',
+            name: 'Enrolments_Again',
             label: 'Enrolments_Again',
           },
           type: 'Unset',
         },
         enrolments: {
           source: {
+            id: 'enrolments',
+            name: 'Enrolments',
             label: 'Enrolments',
           },
           type: 'Unset',
         },
         sess_possible: {
           source: {
+            id: 'sess_possible',
+            name: 'Number of possible sessions',
             label: 'Number of possible sessions',
           },
           type: 'AutoSet',
@@ -36,6 +42,8 @@ const testReplacementPlan: DataReplacementPlan = {
         },
         sess_authorised: {
           source: {
+            id: 'sess_authorised',
+            name: 'Number of authorised sessions',
             label: 'Number of authorised sessions',
           },
           type: 'AutoSet',
@@ -43,6 +51,8 @@ const testReplacementPlan: DataReplacementPlan = {
         },
         sess_unauthorised: {
           source: {
+            id: 'sess_unauthorised',
+            name: 'Number of unauthorised sessions',
             label: 'Number of unauthorised sessions',
           },
           type: 'AutoSet',
@@ -50,6 +60,8 @@ const testReplacementPlan: DataReplacementPlan = {
         },
         sess_unauthorised_percent: {
           source: {
+            id: 'sess_unauthorised_percent',
+            name: 'Percentage of unauthorised sessions',
             label: 'Percentage of unauthorised sessions',
           },
           type: 'AutoSet',
@@ -59,22 +71,34 @@ const testReplacementPlan: DataReplacementPlan = {
       candidates: {
         // indicators from the replacement data
         sess_possible: {
+          id: 'sess_possible',
+          name: 'Number of possible sessions',
           label: 'Number of possible sessions',
         },
         sess_authorised: {
+          id: 'sess_authorised',
+          name: 'Number of authorised sessions',
           label: 'Number of authorised sessions',
         },
         sess_unauthorised: {
+          id: 'sess_unauthorised',
+          name: 'Number of unauthorised sessions',
           label: 'Number of unauthorised sessions',
         },
         number_of_enrolments_again: {
+          id: 'number_of_enrolments_again',
+          name: 'Number of enrolments again',
           label: 'Number of enrolments again',
         },
         number_of_enrolments: {
+          id: 'number_of_enrolments',
+          name: 'Number of enrolments',
           label: 'Number of enrolments',
         },
         sess_unauthorised_percent: {
+          id: 'sess_unauthorised_percent',
           label: 'Percentage of unauthorised sessions',
+          name: 'Percentage of unauthorised sessions',
         },
       },
     },
@@ -109,19 +133,19 @@ const testReplacementPlan: DataReplacementPlan = {
         },
       },
       indicatorGroups: {
-        '1': {
+        'Enrolment Group': {
           id: '1',
-          label: 'some Indicators',
+          label: 'Enrolment Group',
           indicators: [
             {
               name: 'enrolments_again',
-              id: '1',
+              id: 'enrolments_again',
               label: 'Enrolments_Again',
               valid: false,
             },
             {
               name: 'enrolments',
-              id: '2',
+              id: 'enrolments',
               label: 'Enrolments',
               valid: false,
             },
@@ -176,7 +200,7 @@ describe('DataFileReplacementDifferences', () => {
       />,
     );
 
-  const tableId = 'replacements-differences-table';
+  const tableId = 'replacements-differences-indicators-table';
 
   test('renders differences/mappings table with options and available actions', async () => {
     const { user } = sharedRender();
@@ -232,9 +256,12 @@ describe('DataFileReplacementDifferences', () => {
     const enrolmentsAgainRow = rows[0];
 
     expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
+      'Enrolment Group',
+    );
+    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
       'Enrolments_Again',
     );
-    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent('not present');
+    expect(enrolmentsAgainRow.childNodes[2]).toHaveTextContent('not present');
 
     await user.click(
       within(enrolmentsAgainRow).getByRole('button', {
@@ -261,7 +288,7 @@ describe('DataFileReplacementDifferences', () => {
 
     expect(modal).not.toBeInTheDocument();
 
-    expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
+    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
       'Enrolments_Again',
     );
 
@@ -289,9 +316,12 @@ describe('DataFileReplacementDifferences', () => {
     const enrolmentsAgainRow = rows[0];
 
     expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
+      'Enrolment Group',
+    );
+    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
       'Enrolments_Again',
     );
-    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent('not present');
+    expect(enrolmentsAgainRow.childNodes[2]).toHaveTextContent('not present');
 
     const noMappingButton = within(enrolmentsAgainRow).getByRole('button', {
       name: 'No mapping for Enrolments_Again',
@@ -307,10 +337,10 @@ describe('DataFileReplacementDifferences', () => {
       ).toHaveBeenCalled();
     });
 
-    expect(enrolmentsAgainRow.childNodes[0]).toHaveTextContent(
+    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent(
       'Enrolments_Again',
     );
 
-    expect(enrolmentsAgainRow.childNodes[1]).toHaveTextContent('No mapping');
+    expect(enrolmentsAgainRow.childNodes[2]).toHaveTextContent('No mapping');
   });
 });

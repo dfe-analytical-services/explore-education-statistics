@@ -1,8 +1,6 @@
 import FormModal from '@admin/components/FormModal';
 import {
-  IndicatorSource,
-  LocationSource,
-  MappingWithKey,
+  Mapping,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import ButtonText from '@common/components/ButtonText';
@@ -15,20 +13,10 @@ import { Dictionary, KeysWithType } from '@common/types';
 import prefixNoun from '@common/utils/string/prefixNoun';
 import Yup from '@common/validation/yup';
 import React from 'react';
+import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementTable';
+import startCase from 'lodash/startCase';
 
 type ItemType = 'indicator' | 'location';
-
-interface ModalProps<
-  TItemType extends ItemType,
-  TSourceItemType = LocationSource | IndicatorSource,
-> {
-  itemType: TItemType;
-  allCandidateOptions: Dictionary<TSourceItemType>;
-  unmappedCandidateOptions: Dictionary<TSourceItemType>;
-  mapping: MappingWithKey<TSourceItemType>;
-  onSubmit: (payload: UpdateMappingPayload) => void;
-  label: KeysWithType<TSourceItemType, string>;
-}
 
 interface FormValues {
   selectedCandidate: string;
@@ -36,16 +24,24 @@ interface FormValues {
 
 export default function DifferencesItemMappingModal<
   TItemType extends ItemType,
-  TSourceItemType = LocationSource | IndicatorSource,
+  TSourceItemType extends TypeMapping[TItemType]['source'],
 >({
   mapping,
   itemType,
   allCandidateOptions,
   unmappedCandidateOptions,
   onSubmit,
-  label,
-}: ModalProps<TItemType, TSourceItemType>) {
+  mappedDataLabels,
+}: {
+  itemType: TItemType;
+  allCandidateOptions: Dictionary<TSourceItemType>;
+  unmappedCandidateOptions: Dictionary<TSourceItemType>;
+  mapping: Mapping<TSourceItemType>;
+  onSubmit: (payload: UpdateMappingPayload) => void;
+  mappedDataLabels: KeysWithType<TSourceItemType, string>[];
+}) {
   const noMappingValue = 'noMapping';
+  const [mainLabel, ...otherLabels] = mappedDataLabels;
 
   const currentCandidate = !mapping.candidateKey
     ? undefined
@@ -56,10 +52,25 @@ export default function DifferencesItemMappingModal<
 
   const handleSubmit = async ({ selectedCandidate }: FormValues) => {
     onSubmit({
-      sourceKey: mapping.sourceKey,
+      sourceKey: mapping.source.id,
       candidateKey:
         selectedCandidate !== noMappingValue ? selectedCandidate : undefined,
     });
+  };
+
+  const generateCandidateOption = ([id, candidate]: [
+    string,
+    TSourceItemType,
+  ]) => {
+    return {
+      value: id,
+      label: candidate[mainLabel] as string,
+      hint: otherLabels?.length
+        ? `(${otherLabels
+            .map(item => `${String(item)} : ${candidate[item]}`)
+            .join(', ')})`
+        : undefined,
+    };
   };
 
   const options: RadioOption<string>[] = [
@@ -69,21 +80,9 @@ export default function DifferencesItemMappingModal<
       divider: `Select ${itemType}:`,
     },
     ...(currentCandidate
-      ? [
-          {
-            label: currentCandidate[label] as string,
-            value: currentCandidate.key,
-          },
-        ]
+      ? [generateCandidateOption([currentCandidate.key, currentCandidate])]
       : []),
-    ...Object.entries(unmappedCandidateOptions).map(
-      ([candidateName, candidate]) => {
-        return {
-          label: candidate[label] as string,
-          value: candidateName,
-        };
-      },
-    ),
+    ...Object.entries(unmappedCandidateOptions).map(generateCandidateOption),
   ];
 
   const initialValue = {
@@ -111,16 +110,20 @@ export default function DifferencesItemMappingModal<
       triggerButton={
         <ButtonText className="govuk-!-margin-left-2">
           Map item{' '}
-          <VisuallyHidden>{mapping.source[label] as string}</VisuallyHidden>
+          <VisuallyHidden>{mapping.source[mainLabel] as string}</VisuallyHidden>
         </ButtonText>
       }
     >
       <h3>Original data set {itemType}</h3>
       <SummaryList>
-        <SummaryListItem term="Name">{mapping.sourceKey}</SummaryListItem>
-        <SummaryListItem term="Label">
-          {mapping.source[label] as string}
-        </SummaryListItem>
+        {mappedDataLabels.map(dataLabel => (
+          <SummaryListItem
+            key={String(dataLabel)}
+            term={startCase(String(dataLabel))}
+          >
+            {mapping.source[dataLabel] as string}
+          </SummaryListItem>
+        ))}
       </SummaryList>
 
       <FormFieldRadioSearchGroup<FormValues>
@@ -128,7 +131,7 @@ export default function DifferencesItemMappingModal<
         hint={`Choose ${prefixNoun(
           itemType,
         )} ${itemType} that will be mapped to the current data set ${itemType} (see above).`}
-        legend={`Next data set ${itemType}`}
+        legend={`Replacement data set ${itemType}`}
         name="selectedCandidate"
         options={options}
         order={[]}

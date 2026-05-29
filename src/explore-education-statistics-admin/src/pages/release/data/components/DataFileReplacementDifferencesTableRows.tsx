@@ -1,6 +1,5 @@
 import {
   MappingsPlan,
-  MappingWithKey,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import ButtonText from '@common/components/ButtonText';
@@ -11,36 +10,28 @@ import classNames from 'classnames';
 import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
 import React, { useMemo } from 'react';
-import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementTable';
+import {
+  TableMappingGroup,
+  TypeMapping,
+} from '@admin/pages/release/data/components/DataFileReplacementTable';
 import DifferencesItemMappingModal from './DataFileReplacementDifferencesMappingModal';
 import { SourceMappingType } from './DataFileReplacementDifferences';
 
 export default function DifferencesMappingTableRows<
   ItemType extends SourceMappingType,
-  SourceItemType = TypeMapping[ItemType]['source'],
-  ReplacementGroupType extends
-    TypeMapping[ItemType]['group'] = TypeMapping[ItemType]['group'],
-  TargetReplacementType extends
-    TypeMapping[ItemType]['target'] = TypeMapping[ItemType]['target'],
+  SourceItemType extends TypeMapping[ItemType]['source'],
 >({
   itemType,
   mappingsPlan: { candidates, mappings },
   onUpdate,
-  label,
   replacementGroups,
-  replacementGroupKey,
-  targetReplacementKey,
+  mappedDataLabels,
 }: {
   onUpdate: (payload: UpdateMappingPayload) => Promise<void>;
   itemType: ItemType;
   mappingsPlan: MappingsPlan<SourceItemType>;
-  label: KeysWithType<SourceItemType, string>;
-  replacementGroups: Array<ReplacementGroupType>;
-  targetReplacementKey: KeysWithType<TargetReplacementType, string>;
-  replacementGroupKey: KeysWithType<
-    ReplacementGroupType,
-    TargetReplacementType[]
-  >;
+  mappedDataLabels: KeysWithType<SourceItemType, string>[];
+  replacementGroups: Array<TableMappingGroup>;
 }) {
   const {
     allCandidates,
@@ -75,65 +66,67 @@ export default function DifferencesMappingTableRows<
   return (
     <>
       {replacementGroups.map(group =>
-        (group[replacementGroupKey] as TargetReplacementType[]).map(
-          (targetReplacement, index) => {
-            const sourceKey = targetReplacement[targetReplacementKey] as string;
+        group.mappings.map((sourceKey, index) => {
+          const mapping = mappings[sourceKey];
 
-            const mapping = mappings[sourceKey];
+          const { source, type, candidateKey } = mapping;
+          const isUnset = type === 'Unset';
+          const itemCurrentMapping =
+            (candidateKey &&
+              String(
+                allCandidates[candidateKey]?.[mappedDataLabels[0]] ?? '',
+              )) ??
+            'No mapping';
 
-            const { source, type } = mapping;
-            const isUnset = type === 'Unset';
-            const itemCurrentMapping =
-              (mapping.candidateKey &&
-                String(allCandidates[mapping.candidateKey]?.[label])) ??
-              'No mapping';
+          return (
+            <tr
+              key={`mapping-${sourceKey}`}
+              className={classNames({
+                'rowHighlight--alert': isUnset,
+              })}
+            >
+              <td className="govuk-!-width-one-quarter">
+                {index === 0 ? group.label : ''}
+              </td>
+              <td className="govuk-!-width-one-quarter">
+                {String(source[mappedDataLabels[0]])}
+              </td>
+              <td>
+                {isUnset ? (
+                  <Tag colour="red">not present</Tag>
+                ) : (
+                  `${itemCurrentMapping}`
+                )}
+              </td>
+              <td className="govuk-!-text-align-right">
+                {isUnset && (
+                  <ButtonText
+                    onClick={() =>
+                      onUpdate({
+                        sourceKey,
+                        candidateKey: undefined, // no mapping
+                      })
+                    }
+                  >
+                    No mapping{' '}
+                    <VisuallyHidden>
+                      for {`${String(source[mappedDataLabels[0]])}`}
+                    </VisuallyHidden>
+                  </ButtonText>
+                )}
 
-            return (
-              <tr
-                key={`mapping-${sourceKey}`}
-                className={classNames({
-                  'rowHighlight--alert': isUnset,
-                })}
-              >
-                <td>{index === 0 ? group.label : ''}</td>
-                <td>{targetReplacement.label}</td>
-                <td>
-                  {isUnset ? (
-                    <Tag colour="red">not present</Tag>
-                  ) : (
-                    `${itemCurrentMapping}`
-                  )}
-                </td>
-                <td className="govuk-!-text-align-right">
-                  {mapping.type === 'Unset' && (
-                    <ButtonText
-                      onClick={() =>
-                        onUpdate({
-                          sourceKey,
-                          candidateKey: undefined, // no mapping
-                        })
-                      }
-                    >
-                      No mapping{' '}
-                      <VisuallyHidden>
-                        for {`${mapping.source[label]}`}
-                      </VisuallyHidden>
-                    </ButtonText>
-                  )}
-
-                  <DifferencesItemMappingModal
-                    itemType={itemType}
-                    allCandidateOptions={allCandidates}
-                    unmappedCandidateOptions={unmappedCandidates}
-                    mapping={{ ...mapping, sourceKey }}
-                    onSubmit={onUpdate}
-                    label={label}
-                  />
-                </td>
-              </tr>
-            );
-          },
-        ),
+                <DifferencesItemMappingModal
+                  itemType={itemType}
+                  allCandidateOptions={allCandidates}
+                  unmappedCandidateOptions={unmappedCandidates}
+                  mapping={mapping}
+                  onSubmit={onUpdate}
+                  mappedDataLabels={mappedDataLabels}
+                />
+              </td>
+            </tr>
+          );
+        }),
       )}
     </>
   );

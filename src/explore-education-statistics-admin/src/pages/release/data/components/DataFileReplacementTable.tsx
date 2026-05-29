@@ -1,6 +1,5 @@
 ﻿import startCase from 'lodash/startCase';
 import TagGroup from '@common/components/TagGroup';
-import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useMemo } from 'react';
 import {
@@ -11,51 +10,11 @@ import {
   LocationReplacement,
   LocationSource,
   MappingsPlan,
-  PlanMappings,
-  SourceItem,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
-import { Dictionary, KeysWithType } from '@common/types';
-import mapValues from 'lodash/mapValues';
-import pickBy from 'lodash/pickBy';
-import { SourceMappingType } from '@admin/pages/release/data/components/DataFileReplacementDifferences';
+import { KeysWithType } from '@common/types';
 import DifferencesMappingTableRows from '@admin/pages/release/data/components/DataFileReplacementDifferencesTableRows';
-
-const TypeName = React.memo(function GetTypeName({
-  mappingType,
-  capitalise = false,
-  plural = true,
-}: {
-  mappingType: SourceMappingType;
-  capitalise?: boolean;
-  plural?: boolean;
-}) {
-  let name = `${mappingType}${plural ? 's' : ''}`;
-  name = capitalise ? startCase(name) : name;
-
-  return <>{name}</>;
-});
-
-function MappingCountsTag({
-  mappingType,
-  countType,
-  count,
-}: {
-  mappingType: SourceMappingType;
-  countType: 'mapped' | 'unmapped';
-  count: number;
-}) {
-  return count === 0 ? null : (
-    <Tag colour={countType === 'mapped' ? 'blue' : 'red'}>
-      {`${count} ${countType} `}
-      <TypeName
-        mappingType={mappingType}
-        capitalise={false}
-        plural={count > 1}
-      />
-    </Tag>
-  );
-}
+import DataFileReplacementMappingCountsTag from '@admin/pages/release/data/components/DataFileReplacementMappingCountsTag';
 
 export interface TypeMapping {
   indicator: {
@@ -70,21 +29,21 @@ export interface TypeMapping {
   };
 }
 
+export type TableMappingGroup = {
+  label: string;
+  mappings: string[];
+};
+
 export default function DataFileReplacementTable<
   ItemType extends keyof TypeMapping,
-  ReplacementGroupType extends
-    TypeMapping[ItemType]['group'] = TypeMapping[ItemType]['group'],
-  TargetReplacementType extends
-    TypeMapping[ItemType]['target'] = TypeMapping[ItemType]['target'],
 >({
   tableId,
   itemType,
   handleIndicatorsMappingUpdate,
   mappingsPlan,
   mappingGroups,
-  label,
-  replacementGroupKey,
-  targetReplacementKey,
+  mappedDataLabels,
+  mappingsToShow,
 }: {
   tableId: string;
   itemType: ItemType;
@@ -92,68 +51,27 @@ export default function DataFileReplacementTable<
     payload: UpdateMappingPayload,
   ) => Promise<void>;
   mappingsPlan: MappingsPlan<TypeMapping[ItemType]['source']>;
-  mappingGroups: Array<ReplacementGroupType>;
-  label: KeysWithType<TypeMapping[ItemType]['source'], string>;
-  targetReplacementKey: KeysWithType<TargetReplacementType, string>;
-  replacementGroupKey: KeysWithType<
-    ReplacementGroupType,
-    TargetReplacementType[]
-  >;
+  mappingsToShow: string[];
+  mappingGroups: Array<TableMappingGroup>;
+  mappedDataLabels: KeysWithType<TypeMapping[ItemType]['source'], string>[];
 }) {
-  const filteredGroups = useMemo(() => {
-    // mapping groups are the ones we built and are the the ones we want to show
-    // filteredMappingsWithSource filters out ones that have AutoSet to true
-    return mappingGroups
-      .map(group => {
-        const targets = group[replacementGroupKey] as TargetReplacementType[];
-
-        const newTargets = targets.filter(target => {
-          const k = target[targetReplacementKey] as string;
-          return mappingsPlan.mappings[k]?.type !== 'AutoSet';
-        });
-
-        if (newTargets.length === 0) return undefined;
-
-        if (newTargets.length === targets.length) return group;
-
-        return {
-          ...group,
-          [replacementGroupKey]: newTargets,
-        };
-      })
-      .filter(group => group !== undefined);
-  }, [mappingsPlan, mappingGroups, replacementGroupKey]);
-
   const mappingCounts: {
     mapped: number;
     unmapped: number;
   } = useMemo(() => {
-    const allTargets = Object.values(filteredGroups).flatMap(
-      group => group[replacementGroupKey] as TargetReplacementType[],
-    );
+    const totalMappingCount = mappingsToShow.length;
 
-    const totalMappingCount = allTargets.length;
-
-    const autoMappedCount = allTargets.filter(
-      target =>
-        mappingsPlan.mappings[target[targetReplacementKey] as string]?.type ===
-        'AutoSet',
+    const manualMappedCount = mappingsToShow.filter(
+      target => mappingsPlan.mappings[target]?.type === 'ManuallySet',
     ).length;
 
-    const manualMappedCount = allTargets.filter(
-      target =>
-        mappingsPlan.mappings[target[targetReplacementKey] as string]?.type ===
-        'ManuallySet',
-    ).length;
-
-    const unmappedCount =
-      totalMappingCount - autoMappedCount - manualMappedCount;
+    const unmappedCount = totalMappingCount - manualMappedCount;
 
     return {
       mapped: manualMappedCount,
       unmapped: unmappedCount,
     };
-  }, [filteredGroups, mappingsPlan, replacementGroupKey, targetReplacementKey]);
+  }, [mappingsPlan.mappings, mappingsToShow]);
 
   return (
     <div className="table-container">
@@ -164,14 +82,14 @@ export default function DataFileReplacementTable<
       >
         <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
           <span key={itemType}>
-            <TypeName mappingType={itemType} capitalise plural />{' '}
+            {`${startCase(itemType)}s`}
             <TagGroup className="govuk-!-margin-left-2">
-              <MappingCountsTag
+              <DataFileReplacementMappingCountsTag
                 mappingType={itemType}
                 countType="unmapped"
                 count={mappingCounts.unmapped}
               />
-              <MappingCountsTag
+              <DataFileReplacementMappingCountsTag
                 mappingType={itemType}
                 countType="mapped"
                 count={mappingCounts.mapped}
@@ -192,10 +110,8 @@ export default function DataFileReplacementTable<
             itemType={itemType}
             mappingsPlan={mappingsPlan}
             onUpdate={handleIndicatorsMappingUpdate}
-            label={label}
-            replacementGroups={filteredGroups}
-            replacementGroupKey={replacementGroupKey}
-            targetReplacementKey={targetReplacementKey}
+            mappedDataLabels={mappedDataLabels}
+            replacementGroups={mappingGroups}
           />
         </tbody>
       </table>

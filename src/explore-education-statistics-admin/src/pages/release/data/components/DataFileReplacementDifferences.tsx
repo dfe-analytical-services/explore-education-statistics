@@ -1,15 +1,20 @@
 import dataReplacementService, {
   DataReplacementPlan,
+  IndicatorGroupReplacement,
+  LocationReplacement,
   Mapping,
   MappingsPlan,
   PlanMappings,
+  TargetReplacement,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import React, { useCallback, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 import pickBy from 'lodash/pickBy';
 import { Dictionary } from '@common/types';
-import DataFileReplacementTable from './DataFileReplacementTable';
+import DataFileReplacementTable, {
+  TableMappingGroup,
+} from './DataFileReplacementTable';
 
 interface Props {
   releaseVersionId: string;
@@ -33,6 +38,7 @@ export default function DataFileReplacementDifferences({
     };
 
     type WithLabel = { label: string };
+    type GroupType = IndicatorGroupReplacement | LocationReplacement;
 
     function uniqueByLabel<T extends WithLabel>(items: T[]): T[] {
       return Array.from(
@@ -40,35 +46,42 @@ export default function DataFileReplacementDifferences({
       );
     }
 
-    function createGroups<
-      GroupType extends WithLabel,
-      ChildKey extends keyof GroupType,
-      ChildType extends GroupType[ChildKey] extends readonly (infer C)[]
-        ? C
-        : never,
-      TargetIdentifier extends keyof ChildType,
+    function createGroupsOfMappingIds<
+      G extends GroupType,
+      R extends G[keyof G] extends TargetReplacement ? G[keyof G] : never,
     >(
       mappingsToShow: Dictionary<Mapping<unknown>>,
-      allGroups: GroupType[],
-      childKey: ChildKey,
-      targetIdentifier: TargetIdentifier &
-        (ChildType[TargetIdentifier] extends string ? TargetIdentifier : never),
-    ): GroupType[] {
+      allGroups: G[],
+      childKey: keyof G,
+    ) {
       const uniqueGroups = uniqueByLabel(allGroups);
 
-      return uniqueGroups.filter(group => {
-        const children = (group[childKey] ?? []) as ChildType[];
+      return uniqueGroups.reduce<TableMappingGroup[]>(
+        (groupOfMapping, group) => {
+          const children = (group[childKey] ?? []) as R[];
 
-        return children.some(child => {
-          const key = child[targetIdentifier] as unknown as string;
-          return Boolean(mappingsToShow[key]);
-        });
-      });
+          const filteredChildren = children.filter(
+            child => mappingsToShow[child.id],
+          );
+          if (filteredChildren.length === 0) return groupOfMapping;
+
+          return [
+            ...groupOfMapping,
+            {
+              label: group.label,
+              mappings: filteredChildren.map(child => child.id),
+            },
+          ];
+        },
+        [] as TableMappingGroup[],
+      );
     }
 
     const indicatorsToShow = getMappingsToShow(
       plan.mapping.indicators.mappings,
     );
+
+    const indicatorsToShowIds = Object.keys(indicatorsToShow);
 
     const allIndicatorGroups = [
       ...plan.dataBlocks.flatMap(block =>
@@ -79,11 +92,10 @@ export default function DataFileReplacementDifferences({
       ),
     ];
 
-    const res = createGroups(
+    const groupedIndicatorMappings = createGroupsOfMappingIds(
       indicatorsToShow,
       allIndicatorGroups,
       'indicators',
-      'name',
     );
 
     const allLocations = plan.dataBlocks.flatMap(block =>
@@ -91,15 +103,28 @@ export default function DataFileReplacementDifferences({
     );
 
     const locationsToShow = getMappingsToShow(plan.mapping.locations.mappings);
-    const loc = createGroups(
+
+    const locationsToShowIds = Object.keys(locationsToShow);
+
+    const groupedLocationMappings = createGroupsOfMappingIds(
       locationsToShow,
       allLocations,
       'locationAttributes',
-      'id',
     );
 
-    return { indicators: res, locations: loc };
-  }, [plan.dataBlocks, plan.footnotes]);
+    return {
+      indicators: {
+        all: indicatorsToShowIds,
+        grouped: groupedIndicatorMappings,
+      },
+      locations: { all: locationsToShowIds, grouped: groupedLocationMappings },
+    };
+  }, [
+    plan.dataBlocks,
+    plan.footnotes,
+    plan.mapping.indicators.mappings,
+    plan.mapping.locations.mappings,
+  ]);
 
   const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(
     plan.mapping,
@@ -112,15 +137,14 @@ export default function DataFileReplacementDifferences({
         draft.indicators.mappings[sourceKey].type = 'ManuallySet';
         return draft;
       });
-
       await dataReplacementService.updatePlanIndicatorMappings(
         releaseVersionId,
         fileId,
         replacementFileId,
         [
           {
-            originalColumnName: sourceKey,
-            newReplacementColumnName: candidateKey,
+            originalId: sourceKey,
+            newReplacementId: candidateKey,
           },
         ],
       );
@@ -129,14 +153,42 @@ export default function DataFileReplacementDifferences({
     },
     [
       updatePlanMappings,
-      fileId,
       releaseVersionId,
-      reloadPlan,
+      fileId,
       replacementFileId,
+      reloadPlan,
     ],
   );
 
-  console.log(plan);
+  const handleLocationsMappingUpdate = useCallback(
+    async ({ sourceKey, candidateKey }: UpdateMappingPayload) => {
+      updatePlanMappings(draft => {
+        draft.locations.mappings[sourceKey].candidateKey = candidateKey;
+        draft.locations.mappings[sourceKey].type = 'ManuallySet';
+        return draft;
+      });
+      await dataReplacementService.updatePlanLocationMappings(
+        releaseVersionId,
+        fileId,
+        replacementFileId,
+        [
+          {
+            originalLocationId: sourceKey,
+            newReplacementLocationId: candidateKey,
+          },
+        ],
+      );
+
+      reloadPlan();
+    },
+    [
+      updatePlanMappings,
+      releaseVersionId,
+      fileId,
+      replacementFileId,
+      reloadPlan,
+    ],
+  );
 
   return (
     <>
@@ -154,21 +206,19 @@ export default function DataFileReplacementDifferences({
         tableId="replacements-differences-indicators-table"
         itemType="indicator"
         mappingsPlan={planMappings.indicators}
-        mappingGroups={referencedData.indicators}
+        mappingGroups={referencedData.indicators.grouped}
+        mappingsToShow={referencedData.indicators.all}
         handleIndicatorsMappingUpdate={handleIndicatorsMappingUpdate}
-        replacementGroupKey="indicators"
-        label="label"
-        targetReplacementKey="name"
+        mappedDataLabels={['label', 'name']}
       />
       <DataFileReplacementTable
         tableId="replacements-differences-locations-table"
         itemType="location"
         mappingsPlan={planMappings.locations}
-        mappingGroups={referencedData.locations}
-        handleIndicatorsMappingUpdate={handleIndicatorsMappingUpdate}
-        replacementGroupKey="locationAttributes"
-        label="code"
-        targetReplacementKey="id"
+        mappingGroups={referencedData.locations.grouped}
+        mappingsToShow={referencedData.locations.all}
+        handleIndicatorsMappingUpdate={handleLocationsMappingUpdate}
+        mappedDataLabels={['name', 'code']}
       />
     </>
   );
