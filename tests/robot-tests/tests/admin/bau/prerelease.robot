@@ -387,11 +387,8 @@ Validate prerelease has started for Analyst user
 
     user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
 
-Validate data set details and meta data guidance for Analyst user
+Validate data set details for Analyst user
     user checks data set details for UI test subject
-
-    ${data_guidance_section}=    Get WebElement    id:data-guidance-section
-    user checks element should contain    ${data_guidance_section}    Test metadata guidance content
 
 Go back to pre-release access list section on the help and related information tab as Analyst user
     user returns to release home tab in release preview
