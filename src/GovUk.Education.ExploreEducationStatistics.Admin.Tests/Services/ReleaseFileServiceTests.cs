@@ -135,11 +135,12 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete_FileFromAmendment()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+        Release release = _dataFixture.DefaultRelease();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release);
         ReleaseVersion amendmentReleaseVersion = _dataFixture
             .DefaultReleaseVersion()
             .WithPreviousVersionId(releaseVersion.Id)
-            .WithRelease(_dataFixture.DefaultRelease());
+            .WithRelease(release);
 
         var ancillaryFile = new File
         {
@@ -617,11 +618,12 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete_MultipleFilesWithAFileFromAmendment()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+        Release release = _dataFixture.DefaultRelease();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release);
         ReleaseVersion amendmentReleaseVersion = _dataFixture
             .DefaultReleaseVersion()
             .WithPreviousVersionId(releaseVersion.Id)
-            .WithRelease(_dataFixture.DefaultRelease());
+            .WithRelease(release);
 
         var ancillaryFile = new File
         {
@@ -891,11 +893,12 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task DeleteAll_FileFromAmendment()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+        Release release = _dataFixture.DefaultRelease();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release);
         ReleaseVersion amendmentReleaseVersion = _dataFixture
             .DefaultReleaseVersion()
             .WithPreviousVersionId(releaseVersion.Id)
-            .WithRelease(_dataFixture.DefaultRelease());
+            .WithRelease(release);
 
         var ancillaryFile = new File
         {
