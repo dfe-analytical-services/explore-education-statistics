@@ -114,7 +114,7 @@ describe('UserInvitePage', () => {
 
       expect(
         screen.getByTestId('inviteUserForm-releaseId-error'),
-      ).toHaveTextContent('Choose release to give the user access to');
+      ).toHaveTextContent('Choose a release to give the user access to');
     });
 
     test('shows validation error if try to add another pre-release role for the same release', async () => {

@@ -27,7 +27,7 @@ public class ContentServiceTests
     [Fact]
     public async Task GetContentBlocks_NoContentSections()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -52,14 +52,13 @@ public class ContentServiceTests
     [Fact]
     public async Task GetContentBlocks_NoContentBlocks()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Content =
-            [
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithGenericContent([
                 new ContentSection { Heading = "New section", Order = 1 },
                 new ContentSection { Heading = "New section", Order = 2 },
-            ],
-        };
+            ]);
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -86,11 +85,11 @@ public class ContentServiceTests
     {
         var releaseVersionId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = releaseVersionId,
-            Content =
-            [
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithId(releaseVersionId)
+            .WithGenericContent([
                 new ContentSection
                 {
                     Heading = "New section",
@@ -115,8 +114,9 @@ public class ContentServiceTests
                     ],
                     ReleaseVersionId = releaseVersionId,
                 },
-            ],
-        };
+            ]);
+
+        var genericContentSections = releaseVersion.GenericContent.ToList();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -134,10 +134,10 @@ public class ContentServiceTests
             var contentBlocks = result.AssertRight();
 
             Assert.Equal(4, contentBlocks.Count);
-            Assert.Equal(releaseVersion.Content[0].Content[0].Id, contentBlocks[0].Id);
-            Assert.Equal(releaseVersion.Content[0].Content[1].Id, contentBlocks[1].Id);
-            Assert.Equal(releaseVersion.Content[1].Content[0].Id, contentBlocks[2].Id);
-            Assert.Equal(releaseVersion.Content[1].Content[1].Id, contentBlocks[3].Id);
+            Assert.Equal(genericContentSections[0].Content[0].Id, contentBlocks[0].Id);
+            Assert.Equal(genericContentSections[0].Content[1].Id, contentBlocks[1].Id);
+            Assert.Equal(genericContentSections[1].Content[0].Id, contentBlocks[2].Id);
+            Assert.Equal(genericContentSections[1].Content[1].Id, contentBlocks[3].Id);
 
             Assert.Equal("Test html block 1", contentBlocks[0].Body);
             Assert.Equal("Test html block 2", contentBlocks[1].Body);
@@ -149,7 +149,7 @@ public class ContentServiceTests
     [Fact]
     public async Task RemoveGenericContentSection()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var contentSectionToRemove = new ContentSection
         {
@@ -200,16 +200,19 @@ public class ContentServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var contentSections = contentDbContext.ContentSections.ToList();
-            Assert.Equal(2, contentSections.Count);
+            var genericContentSections = contentDbContext
+                .ContentSections.Where(cs => cs.Type == ContentSectionType.Generic)
+                .ToList();
 
-            Assert.Equal(contentSection2.Id, contentSections[0].Id);
-            Assert.Equal(contentSection2.ReleaseVersionId, contentSections[0].ReleaseVersionId);
-            Assert.Equal(1, contentSections[0].Order);
+            Assert.Equal(2, genericContentSections.Count);
 
-            Assert.Equal(contentSection3.Id, contentSections[1].Id);
-            Assert.Equal(contentSection3.ReleaseVersionId, contentSections[1].ReleaseVersionId);
-            Assert.Equal(2, contentSections[1].Order);
+            Assert.Equal(contentSection2.Id, genericContentSections[0].Id);
+            Assert.Equal(contentSection2.ReleaseVersionId, genericContentSections[0].ReleaseVersionId);
+            Assert.Equal(1, genericContentSections[0].Order);
+
+            Assert.Equal(contentSection3.Id, genericContentSections[1].Id);
+            Assert.Equal(contentSection3.ReleaseVersionId, genericContentSections[1].ReleaseVersionId);
+            Assert.Equal(2, genericContentSections[1].Order);
 
             var contentBlocks = contentDbContext.ContentBlocks.ToList();
 
@@ -226,7 +229,7 @@ public class ContentServiceTests
     [Fact]
     public async Task RemoveGenericContentSection_SectionTypeIsNotGeneric_ThrowsException()
     {
-        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var sectionToRemove = releaseVersion.HeadlinesSection!;
 
@@ -341,7 +344,7 @@ public class ContentServiceTests
         {
             Id = contentSectionId,
             Content = [blockToRemove, dataBlockVersion.ContentBlock, new HtmlBlock { Order = 2 }],
-            ReleaseVersion = new ReleaseVersion(),
+            ReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -517,7 +520,7 @@ public class ContentServiceTests
     [Fact]
     public async Task AttachDataBlock()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()

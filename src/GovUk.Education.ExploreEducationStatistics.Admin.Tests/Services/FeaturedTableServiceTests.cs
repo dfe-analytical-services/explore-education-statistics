@@ -30,6 +30,7 @@ public class FeaturedTableServiceTests
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
             .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!))
             .Generate();
 
@@ -150,6 +151,7 @@ public class FeaturedTableServiceTests
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
             .WithDataBlockVersions(dataBlockParents.Select(p => p.LatestPublishedVersion!))
             .Generate();
 
@@ -217,7 +219,7 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task List_Order()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var featuredTable1 = new FeaturedTable
         {
             Name = "Featured table name 1",
@@ -291,6 +293,7 @@ public class FeaturedTableServiceTests
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
             .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!))
             .Generate();
 
@@ -395,7 +398,7 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Create_DataBlockAlreadyHasFeaturedTable()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var dataBlock = new DataBlock { ReleaseVersion = releaseVersion };
         var featuredTable = new FeaturedTable
         {
@@ -451,6 +454,7 @@ public class FeaturedTableServiceTests
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
             .WithDataBlockVersions(ListOf(dataBlockParent.LatestPublishedVersion!))
             .Generate();
 
@@ -600,7 +604,7 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Delete()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var dataBlock = new DataBlock { ReleaseVersion = releaseVersion };
         var featuredTable = new FeaturedTable
         {
@@ -737,6 +741,7 @@ public class FeaturedTableServiceTests
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
             .WithDataBlockVersions(dataBlockParents.Select(p => p.LatestPublishedVersion!))
             .Generate();
 
@@ -862,7 +867,7 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Reorder_ProvidedIdsDifferFromReleaseFeaturedTableIds()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var dataBlock = new DataBlock();
         var featuredTable1 = new FeaturedTable
         {

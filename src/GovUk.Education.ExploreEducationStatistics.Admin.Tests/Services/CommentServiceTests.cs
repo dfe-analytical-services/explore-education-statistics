@@ -3,10 +3,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -15,12 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class CommentServiceTests
 {
+    private readonly DataFixture _fixture = new();
+
     [Fact]
     public async Task AddComment()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Content = ListOf(
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithGenericContent([
                 new ContentSection
                 {
                     Heading = "New section",
@@ -32,9 +37,10 @@ public class CommentServiceTests
                             Comments = ListOf(new Comment { Content = "Existing comment" }),
                         }
                     ),
-                }
-            ),
-        };
+                },
+            ]);
+
+        var genericContentSection = releaseVersion.GenericContent.Single();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -49,8 +55,8 @@ public class CommentServiceTests
 
             var result = await service.AddComment(
                 releaseVersion.Id,
-                releaseVersion.Content[0].Id,
-                releaseVersion.Content[0].Content[0].Id,
+                genericContentSection.Id,
+                genericContentSection.Content[0].Id,
                 new CommentSaveRequest { Content = "New comment" }
             );
 

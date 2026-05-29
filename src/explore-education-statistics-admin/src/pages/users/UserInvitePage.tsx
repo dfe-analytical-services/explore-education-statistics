@@ -115,7 +115,7 @@ export default function UserInvitePage({
       userPreReleaseRoles: Yup.array().of(
         Yup.object({
           releaseId: Yup.string().required(
-            'Choose release to give the user access to',
+            'Choose a release to give the user access to',
           ),
         }),
       ),

@@ -21,7 +21,7 @@ public class ReleasePublishingStatusServicePermissionTests
     public async Task GetReleaseStatus()
     {
         // Arrange
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         // Act & Assert
         await PolicyCheckBuilder<ContentSecurityPolicies>()

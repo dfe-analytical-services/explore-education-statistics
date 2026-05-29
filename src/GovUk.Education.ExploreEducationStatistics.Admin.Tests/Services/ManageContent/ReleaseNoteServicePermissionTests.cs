@@ -20,7 +20,7 @@ public class ReleaseNoteServicePermissionTests
     public async Task AddReleaseNote()
     {
         // Arrange
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         // Act & Assert
         await PolicyCheckBuilder<SecurityPolicies>()
@@ -53,7 +53,7 @@ public class ReleaseNoteServicePermissionTests
     public async Task DeleteReleaseNote()
     {
         // Arrange
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
         var releaseNoteId = Guid.NewGuid();
 
         // Act & Assert
@@ -87,7 +87,7 @@ public class ReleaseNoteServicePermissionTests
     public async Task UpdateReleaseNote()
     {
         // Arrange
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
         var releaseNoteId = Guid.NewGuid();
 
         // Act & Assert

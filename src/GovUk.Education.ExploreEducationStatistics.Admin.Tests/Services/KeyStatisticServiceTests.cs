@@ -29,7 +29,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -113,7 +113,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_Order()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -271,7 +271,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_DataBlockAttachedToContent()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -322,7 +322,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticText()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -406,15 +406,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticText_Order()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            KeyStatistics = new List<KeyStatistic>
-            {
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithKeyStatistics([
                 new KeyStatisticText { Order = 0 },
                 new KeyStatisticText { Order = 1 },
                 new KeyStatisticDataBlock { Order = 2 },
-            },
-        };
+            ]);
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -456,7 +455,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticDataBlock()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -703,11 +702,11 @@ public class KeyStatisticServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = releaseVersionId,
-            KeyStatistics = new List<KeyStatistic> { keyStatisticText },
-        };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithId(releaseVersionId)
+            .WithRelease(_fixture.DefaultRelease())
+            .WithKeyStatistics([keyStatisticText]);
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -919,7 +918,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_KeyStatisticDataBlock()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -980,7 +979,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_KeyStatisticText()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var keyStatisticText = new KeyStatisticText
         {
@@ -1143,10 +1142,11 @@ public class KeyStatisticServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        var releaseVersion = new ReleaseVersion
-        {
-            KeyStatistics = new List<KeyStatistic> { keyStat0, keyStat1, keyStat2, keyStat3 },
-        };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithKeyStatistics([keyStat0, keyStat1, keyStat2, keyStat3]);
+
         var dataBlock = new DataBlock { Id = dataBlockId, ReleaseVersion = releaseVersion };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1216,10 +1216,11 @@ public class KeyStatisticServiceTests
         var keyStat2 = new KeyStatisticText { Order = 2 };
         var keyStat3 = new KeyStatisticDataBlock { Order = 3 };
 
-        var releaseVersion = new ReleaseVersion
-        {
-            KeyStatistics = new List<KeyStatistic> { keyStat0, keyStat1, keyStat2, keyStat3 },
-        };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithKeyStatistics([keyStat0, keyStat1, keyStat2, keyStat3]);
+
         var dataBlock = new DataBlock { Id = dataBlockId, ReleaseVersion = releaseVersion };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1269,10 +1270,11 @@ public class KeyStatisticServiceTests
         var keyStat2 = new KeyStatisticText { Order = 2 };
         var keyStat3 = new KeyStatisticDataBlock { Order = 3 };
 
-        var releaseVersion = new ReleaseVersion
-        {
-            KeyStatistics = new List<KeyStatistic> { keyStat0, keyStat1, keyStat2, keyStat3 },
-        };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithKeyStatistics([keyStat0, keyStat1, keyStat2, keyStat3]);
+
         var dataBlock = new DataBlock { Id = dataBlockId, ReleaseVersion = releaseVersion };
 
         var contextId = Guid.NewGuid().ToString();
