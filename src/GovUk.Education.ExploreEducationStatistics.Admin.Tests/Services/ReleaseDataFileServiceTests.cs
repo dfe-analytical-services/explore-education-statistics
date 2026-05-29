@@ -787,8 +787,9 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task GetInfo_AmendedRelease()
     {
-        ReleaseVersion originalReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
-        ReleaseVersion amendedReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+        Release release = _fixture.DefaultRelease();
+        ReleaseVersion originalReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
+        ReleaseVersion amendedReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
 
         var dataFile = new File
         {
@@ -1263,10 +1264,9 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ListAll_WithReplacementInProgressOnNewerReleaseVersion_ReplacedByDataFileIsNull()
     {
-        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
-        ReleaseVersion amendmentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease());
+        Release release = _fixture.DefaultRelease();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
+        ReleaseVersion amendmentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
         var originalFileId = Guid.NewGuid();
         var replacementFileId = Guid.NewGuid();
         var originalFile = new File
@@ -1622,8 +1622,9 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ListAll_AmendedRelease()
     {
-        ReleaseVersion originalReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
-        ReleaseVersion amendedReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+        Release release = _fixture.DefaultRelease();
+        ReleaseVersion originalReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
+        ReleaseVersion amendedReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
 
         var dataReleaseFile1 = new ReleaseFile
         {
