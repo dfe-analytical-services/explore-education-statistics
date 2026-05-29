@@ -115,8 +115,14 @@ public class DataSetValidatorTests
     public async Task ValidateDataSet_UserOnPublicationTeam_ReturnsDataSetObject()
     {
         // Arrange
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
-        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithVersion(1)
+            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion amendmentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithVersion(2)
+            .WithRelease(_fixture.DefaultRelease());
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
@@ -194,8 +200,14 @@ public class DataSetValidatorTests
     public async Task ValidateDataSet_UserNotOnPublicationTeam_ReturnsErrorDetails()
     {
         // Arrange
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
-        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithVersion(1)
+            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion amendmentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithVersion(2)
+            .WithRelease(_fixture.DefaultRelease());
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
@@ -580,7 +592,10 @@ public class DataSetValidatorTests
     public async Task ValidateDataSet_ReplacementHasApiDataSet_ReturnsErrorDetails()
     {
         // Arrange
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithVersion(2)
+            .WithRelease(_fixture.DefaultRelease());
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);
@@ -633,8 +648,14 @@ public class DataSetValidatorTests
     public async Task ValidateDataSet_MultipleDraftAPIDatasetVersions_ReturnsErrorDetails()
     {
         // Arrange
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 1 };
-        var amendmentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithVersion(1)
+            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion amendmentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithVersion(2)
+            .WithRelease(_fixture.DefaultRelease());
 
         var dataFile = await new DataSetFileBuilder().Build(FileType.Data);
         var metaFile = await new DataSetFileBuilder().Build(FileType.Metadata);

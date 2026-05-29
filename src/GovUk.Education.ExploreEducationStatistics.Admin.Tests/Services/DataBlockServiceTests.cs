@@ -39,7 +39,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -123,7 +123,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -178,7 +178,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -233,7 +233,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -298,7 +298,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -383,7 +383,7 @@ public class DataBlockServiceTests
     [Fact]
     public async Task List()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlock1 = new DataBlock
         {
@@ -509,7 +509,7 @@ public class DataBlockServiceTests
     [Fact]
     public async Task List_KeyStatisticInContent()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlock = new DataBlock { ContentSectionId = null, ReleaseVersion = releaseVersion };
 
@@ -541,7 +541,7 @@ public class DataBlockServiceTests
     [Fact]
     public async Task List_FiltersUnrelated()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var relatedDataBlock = new DataBlock
         {
@@ -627,7 +627,7 @@ public class DataBlockServiceTests
     {
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -697,7 +697,7 @@ public class DataBlockServiceTests
     [Fact]
     public async Task GetDeletePlan_DependentDataBlockIsKeyStatistic()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -741,7 +741,7 @@ public class DataBlockServiceTests
     [Fact]
     public async Task GetDeletePlan_DependentDataBlockIncludesFeaturedTableDetails()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -857,7 +857,7 @@ public class DataBlockServiceTests
     {
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -958,7 +958,7 @@ public class DataBlockServiceTests
     {
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -1130,7 +1130,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -1262,7 +1262,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -1359,7 +1359,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -1481,7 +1481,7 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -1609,7 +1609,7 @@ public class DataBlockServiceTests
         var subjectId = Guid.NewGuid();
         var fileId = Guid.NewGuid();
 
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
@@ -1711,7 +1711,7 @@ public class DataBlockServiceTests
     [Fact]
     public async Task GetUnattachedDataBlocks()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()

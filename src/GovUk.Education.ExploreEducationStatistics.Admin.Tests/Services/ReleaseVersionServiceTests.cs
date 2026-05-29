@@ -59,7 +59,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             Subject subject = _dataFixture.DefaultSubject();
 
@@ -145,7 +147,9 @@ public abstract class ReleaseVersionServiceTests
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet);
 
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             Subject subject = _dataFixture.DefaultSubject();
 
@@ -236,7 +240,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             Subject subject = _dataFixture.DefaultSubject();
 
@@ -329,7 +335,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task FileImporting()
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             Subject subject = _dataFixture.DefaultSubject();
 
@@ -371,7 +379,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ReplacementExists()
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             Subject subject = _dataFixture.DefaultSubject();
 
@@ -529,7 +539,9 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task ReplacementFileImporting()
         {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             Subject subject = _dataFixture.DefaultSubject();
 

@@ -50,7 +50,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile = new ReleaseFile
         {
@@ -135,9 +135,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete_FileFromAmendment()
     {
-        var releaseVersion = new ReleaseVersion();
-
-        var amendmentReleaseVersion = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+        ReleaseVersion amendmentReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPreviousVersionId(releaseVersion.Id)
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile = new File
         {
@@ -190,7 +192,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete_InvalidFileType()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var dataFile = new ReleaseFile
         {
@@ -305,7 +307,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete_MultipleFiles()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile = new ReleaseFile
         {
@@ -411,7 +413,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete_MultipleFilesWithAnInvalidFileType()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile = new ReleaseFile
         {
@@ -615,9 +617,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task Delete_MultipleFilesWithAFileFromAmendment()
     {
-        var releaseVersion = new ReleaseVersion();
-
-        var amendmentRelease = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+        ReleaseVersion amendmentReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPreviousVersionId(releaseVersion.Id)
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile = new File
         {
@@ -635,15 +639,19 @@ public class ReleaseFileServiceTests : IDisposable
 
         var ancillaryReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = ancillaryFile };
 
-        var ancillaryAmendmentReleaseFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = ancillaryFile };
+        var ancillaryAmendmentReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            File = ancillaryFile,
+        };
 
-        var chartAmendmentReleaseFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = chartFile };
+        var chartAmendmentReleaseFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = chartFile };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentRelease);
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentReleaseVersion);
             contentDbContext.Files.AddRange(ancillaryFile, chartFile);
             contentDbContext.ReleaseFiles.AddRange(
                 ancillaryReleaseFile,
@@ -666,7 +674,10 @@ public class ReleaseFileServiceTests : IDisposable
                 privateBlobStorageService: privateBlobStorageService.Object
             );
 
-            var result = await service.Delete(amendmentRelease.Id, new List<Guid> { ancillaryFile.Id, chartFile.Id });
+            var result = await service.Delete(
+                amendmentReleaseVersion.Id,
+                new List<Guid> { ancillaryFile.Id, chartFile.Id }
+            );
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -696,7 +707,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task DeleteAll()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile = new ReleaseFile
         {
@@ -850,7 +861,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task DeleteAll_NoFiles()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -880,9 +891,11 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task DeleteAll_FileFromAmendment()
     {
-        var releaseVersion = new ReleaseVersion();
-
-        var amendmentRelease = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+        ReleaseVersion amendmentReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPreviousVersionId(releaseVersion.Id)
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile = new File
         {
@@ -907,13 +920,17 @@ public class ReleaseFileServiceTests : IDisposable
 
         var ancillaryReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = ancillaryFile };
 
-        var ancillaryAmendmentReleaseFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = ancillaryFile };
+        var ancillaryAmendmentReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            File = ancillaryFile,
+        };
 
-        var chartAmendmentReleaseFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = chartFile };
+        var chartAmendmentReleaseFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = chartFile };
 
         var dataGuidanceAmendmentReleaseFile = new ReleaseFile
         {
-            ReleaseVersion = amendmentRelease,
+            ReleaseVersion = amendmentReleaseVersion,
             File = dataGuidanceFile,
         };
 
@@ -921,7 +938,7 @@ public class ReleaseFileServiceTests : IDisposable
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentRelease);
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentReleaseVersion);
             contentDbContext.Files.AddRange(ancillaryFile, chartFile, dataGuidanceFile);
             contentDbContext.ReleaseFiles.AddRange(
                 ancillaryReleaseFile,
@@ -949,7 +966,7 @@ public class ReleaseFileServiceTests : IDisposable
                 privateBlobStorageService: privateBlobStorageService.Object
             );
 
-            var result = await service.DeleteAll(amendmentRelease.Id);
+            var result = await service.DeleteAll(amendmentReleaseVersion.Id);
 
             MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -983,7 +1000,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ListAll_NoFiles()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1019,7 +1036,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task ListAll()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile1 = new ReleaseFile
         {
@@ -1146,7 +1163,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task GetAncillaryFiles()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var ancillaryFile1 = new ReleaseFile
         {
@@ -1262,7 +1279,7 @@ public class ReleaseFileServiceTests : IDisposable
     {
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion(),
+            ReleaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease()).Generate(),
             Name = "Test PDF File",
             File = new File
             {
@@ -1335,7 +1352,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task GetDownloadToken()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -1461,7 +1478,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task GetDownloadToken_BlobDoesNotExist()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -2181,7 +2198,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateDataFileDetails()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -2243,7 +2260,7 @@ public class ReleaseFileServiceTests : IDisposable
         string? expectedFileSummary
     )
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var originalPublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -2352,7 +2369,7 @@ public class ReleaseFileServiceTests : IDisposable
     {
         const string filename = "ancillary.pdf";
 
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -2446,7 +2463,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateAncillary()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -2576,7 +2593,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateAncillary_DoNotRemoveFileAttachedToOtherRelease()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -2696,7 +2713,7 @@ public class ReleaseFileServiceTests : IDisposable
     [Fact]
     public async Task UpdateAncillary_NoFile()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -2760,7 +2777,7 @@ public class ReleaseFileServiceTests : IDisposable
     {
         const string filename = "chart.png";
 
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 

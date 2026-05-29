@@ -18,7 +18,7 @@ public class ReleaseDataContentServicePermissionTests
     public async Task GetReleaseDataContent()
     {
         // Arrange
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         // Act & Assert
         await PolicyCheckBuilder<ContentSecurityPolicies>()
@@ -39,10 +39,12 @@ public class ReleaseDataContentServicePermissionTests
                 {
                     var sut = BuildService(contentDbContext, userService.Object);
 
-                    return await sut.GetReleaseDataContent(
+                    var x = await sut.GetReleaseDataContent(
                         releaseVersionId: releaseVersion.Id,
                         cancellationToken: CancellationToken.None
                     );
+
+                    return x;
                 }
             });
     }
