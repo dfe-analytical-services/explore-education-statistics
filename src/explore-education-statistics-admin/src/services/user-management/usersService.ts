@@ -1,7 +1,7 @@
 import client from '@admin/services/utils/service';
 import { User, UserWithRoles } from '../types/userWithRoles';
 
-export interface UserUpdate {
+export interface UserGlobalRoleUpdateRequest {
   roleId: string;
 }
 
@@ -12,7 +12,10 @@ export interface RemoveUser {
 export interface UsersService {
   getAllUsers(): Promise<User[]>;
   getUser(userId: string): Promise<UserWithRoles>;
-  updateUser: (userId: string, update: UserUpdate) => Promise<boolean>;
+  updateUserGlobalRole: (
+    userId: string,
+    update: UserGlobalRoleUpdateRequest,
+  ) => Promise<boolean>;
   deleteUser(email: string): Promise<RemoveUser>;
 }
 
@@ -25,7 +28,10 @@ const userService: UsersService = {
     return client.get<UserWithRoles>(`users/${userId}`);
   },
 
-  updateUser(userId: string, update: UserUpdate): Promise<boolean> {
+  updateUserGlobalRole(
+    userId: string,
+    update: UserGlobalRoleUpdateRequest,
+  ): Promise<boolean> {
     return client.put(`users/${userId}`, update);
   },
 

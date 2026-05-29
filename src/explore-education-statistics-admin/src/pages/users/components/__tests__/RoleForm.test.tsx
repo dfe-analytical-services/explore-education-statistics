@@ -35,17 +35,20 @@ describe('RoleForm', () => {
 
     await user.selectOptions(screen.getByLabelText('Role'), ['Role 1']);
 
-    expect(usersService.updateUser).not.toHaveBeenCalled();
+    expect(usersService.updateUserGlobalRole).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Update role' }));
 
     await waitFor(() => {
-      expect(usersService.updateUser).toHaveBeenCalledTimes(1);
+      expect(usersService.updateUserGlobalRole).toHaveBeenCalledTimes(1);
     });
-    expect(usersService.updateUser).toHaveBeenCalledWith('user-1-id', {
-      roleId: 'role-1-id',
-    });
+    expect(usersService.updateUserGlobalRole).toHaveBeenCalledWith(
+      'user-1-id',
+      {
+        roleId: 'role-1-id',
+      },
+    );
     expect(handleUpdate).toHaveBeenCalledTimes(1);
   });
 });

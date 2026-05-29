@@ -100,14 +100,14 @@ public class UserManagementServicePermissionTests
     }
 
     [Fact]
-    public async Task UpdateUser()
+    public async Task UpdateUserGlobalRole()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(CanManageUsersOnSystem)
             .AssertForbidden(async userService =>
             {
                 var service = SetupUserManagementService(userService: userService.Object);
-                return await service.UpdateUser(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                return await service.UpdateUserGlobalRole(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
             });
     }
 

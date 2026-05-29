@@ -12,9 +12,9 @@ public class UserEditRequestTests
     [InlineData("123")]
     public void WhenObjectIsValid_ValidationPasses(string roleId)
     {
-        var validator = new UserEditRequest.Validator();
+        var validator = new UserGlobalRoleUpdateRequest.Validator();
 
-        var request = new UserEditRequest { RoleId = roleId };
+        var request = new UserGlobalRoleUpdateRequest { RoleId = roleId };
 
         var result = validator.TestValidate(request);
 
@@ -26,9 +26,9 @@ public class UserEditRequestTests
     [InlineData(" ")]
     public void WhenRoleIdIsEmpty_ValidationFails(string roleId)
     {
-        var validator = new UserEditRequest.Validator();
+        var validator = new UserGlobalRoleUpdateRequest.Validator();
 
-        var request = new UserEditRequest { RoleId = roleId };
+        var request = new UserGlobalRoleUpdateRequest { RoleId = roleId };
 
         var result = validator.TestValidate(request);
 

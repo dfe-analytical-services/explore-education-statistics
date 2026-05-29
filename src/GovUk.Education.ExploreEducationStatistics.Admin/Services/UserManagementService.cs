@@ -270,7 +270,7 @@ public class UserManagementService(
             });
     }
 
-    public async Task<Either<ActionResult, Unit>> UpdateUser(string userId, string roleId)
+    public async Task<Either<ActionResult, Unit>> UpdateUserGlobalRole(string userId, string roleId)
     {
         return await userService
             .CheckCanManageAllUsers()

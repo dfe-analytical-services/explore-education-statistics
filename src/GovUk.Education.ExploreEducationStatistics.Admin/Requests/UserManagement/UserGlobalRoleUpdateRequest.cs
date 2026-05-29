@@ -3,11 +3,11 @@ using FluentValidation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 
-public record UserEditRequest
+public record UserGlobalRoleUpdateRequest
 {
     public string RoleId { get; init; } = string.Empty;
 
-    public class Validator : AbstractValidator<UserEditRequest>
+    public class Validator : AbstractValidator<UserGlobalRoleUpdateRequest>
     {
         public Validator()
         {
