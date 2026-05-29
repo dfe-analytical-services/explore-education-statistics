@@ -315,7 +315,7 @@ public abstract class UserManagementServiceTests
         }
     }
 
-    public class UpdateUserTests : UserManagementServiceTests
+    public class UpdateUserGlobalRoleTests : UserManagementServiceTests
     {
         [Fact]
         public async Task Success()
@@ -349,7 +349,7 @@ public abstract class UserManagementServiceTests
                     globalRoleService: globalRoleService.Object
                 );
 
-                var result = await service.UpdateUser(user.Id, role.Id);
+                var result = await service.UpdateUserGlobalRole(user.Id, role.Id);
 
                 VerifyAllMocks(globalRoleService);
 

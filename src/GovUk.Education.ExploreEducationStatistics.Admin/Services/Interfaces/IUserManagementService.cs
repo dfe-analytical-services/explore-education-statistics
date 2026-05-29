@@ -19,7 +19,7 @@ public interface IUserManagementService
 
     Task<Either<ActionResult, Unit>> CancelInvite(string email);
 
-    Task<Either<ActionResult, Unit>> UpdateUser(string userId, string roleId);
+    Task<Either<ActionResult, Unit>> UpdateUserGlobalRole(string userId, string roleId);
 
     Task<Either<ActionResult, Unit>> DeleteUser(string email);
 }
