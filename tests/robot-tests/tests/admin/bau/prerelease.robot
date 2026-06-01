@@ -299,14 +299,6 @@ Validate metadata guidance section and data set details section on the Explore a
     ${data_guidance_section}=    Get WebElement    id:data-guidance-section
     user checks element should contain    ${data_guidance_section}    Test metadata guidance content
 
-Go back to pre-release access list section on the help and related information tab
-    user returns to release home tab in release preview
-    user checks breadcrumb count should be    2
-    user checks nth breadcrumb contains    1    Home
-    user checks nth breadcrumb contains    2    Pre-release access
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h2 is visible    ${PUBLICATION_NAME}
-
 Validate public prerelease access list
     user checks pre-release access list on help and related information tab
     ...    Updated test public access list
@@ -389,14 +381,6 @@ Validate prerelease has started for Analyst user
 
 Validate data set details for Analyst user
     user checks data set details for UI test subject
-
-Go back to pre-release access list section on the help and related information tab as Analyst user
-    user returns to release home tab in release preview
-    user checks breadcrumb count should be    2
-    user checks nth breadcrumb contains    1    Home
-    user checks nth breadcrumb contains    2    Pre-release access
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list as Analyst user
     user checks pre-release access list on help and related information tab
@@ -529,12 +513,12 @@ user checks data set details for UI test subject
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     User checks page 'Explore and download data' data set available properties
-    ...    UI test subject
-    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
-    ...    144
-    ...    2005 to 2020
-    ...    ${PUBLICATION_NAME}
-    ...    Test file guidance content
+    ...    data_set_name=UI test subject
+    ...    geographical_levels=Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
+    ...    expected_row_count=144
+    ...    expected_time_period=2005 to 2020
+    ...    publication_title=${PUBLICATION_NAME}
+    ...    expected_data_guidance=Test file guidance content
     ...    indicators=Admission Numbers
     ...    is_public_site=False
 
