@@ -1,4 +1,5 @@
-import { ResourceNames, IpRange, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../../types.bicep'
+import { IpRange } from '../../../common/types.bicep'
+import { ResourceNames, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../../types.bicep'
 import { replaceMultiple } from '../../../common/functions.bicep'
 
 @description('Specifies common resource naming variables.')
