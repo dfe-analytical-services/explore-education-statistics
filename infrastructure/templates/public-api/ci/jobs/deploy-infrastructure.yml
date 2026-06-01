@@ -38,7 +38,7 @@ jobs:
                 deployAlerts: false
                 dataProcessorExists: false
 
-            - template: ../tasks/check-function-app-exists.yml
+            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
