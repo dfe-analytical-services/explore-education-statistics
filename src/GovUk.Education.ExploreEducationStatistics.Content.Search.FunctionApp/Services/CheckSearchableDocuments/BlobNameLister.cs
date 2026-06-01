@@ -19,7 +19,7 @@ public class BlobNameLister(
         // Get a list of all blobs
         var blobStorageClient = azureBlobStorageClientFactory();
         var blobNames = await blobStorageClient.ListBlobsInContainer(
-            appOptions.Value.SearchableDocumentsContainerName,
+            appOptions.Value.SearchDocumentsContainerName,
             cancellationToken: cancellationToken
         );
         return blobNames;
