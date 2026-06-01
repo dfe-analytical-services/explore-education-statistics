@@ -18,7 +18,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02
   name: resourceNames.existingResources.logAnalyticsWorkspace
 }
 
-module applicationInsightsModule '../../public-api/components/appInsights.bicep' = {
+module applicationInsightsModule '../../common/components/monitoring/appInsights.bicep' = {
   name: 'applicationInsightsModuleDeploy'
   params: {
     location: location
