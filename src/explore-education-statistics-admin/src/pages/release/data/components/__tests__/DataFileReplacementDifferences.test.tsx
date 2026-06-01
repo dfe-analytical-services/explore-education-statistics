@@ -3,9 +3,19 @@ import dataReplacementService, {
 } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
+import DataFileReplacementTable from '../DataFileReplacementTable';
 import DataFileReplacementDifferences from '../DataFileReplacementDifferences';
 
+jest.mock('../DataFileReplacementTable');
 jest.mock('@admin/services/dataReplacementService');
+
+beforeEach(() =>
+  (
+    DataFileReplacementTable as jest.MockedFn<typeof DataFileReplacementTable>
+  ).mockImplementation(
+    jest.requireActual('../DataFileReplacementTable').default,
+  ),
+);
 
 const testReplacementPlan: DataReplacementPlan = {
   originalSubjectId: 'subId',
@@ -103,8 +113,23 @@ const testReplacementPlan: DataReplacementPlan = {
       },
     },
     locations: {
-      mappings: {},
-      candidates: {},
+      mappings: {
+        'country-england': {
+          source: {
+            id: 'country-england',
+            name: 'England',
+            code: 'E92000001',
+          },
+          type: 'Unset',
+        },
+      },
+      candidates: {
+        'country-england': {
+          id: 'country-england',
+          name: 'England',
+          code: 'E92000001',
+        },
+      },
     },
   },
   dataBlocks: [
@@ -200,16 +225,58 @@ describe('DataFileReplacementDifferences', () => {
       />,
     );
 
-  const tableId = 'replacements-differences-indicators-table';
+  const indicatorsTableId = 'replacements-differences-indicators-table';
+  const locationsTableId = 'replacements-differences-locations-table';
+
+  test('generates indicator and location table attributes correctly', async () => {
+    sharedRender();
+    // check table is there
+    await waitFor(() => {
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
+      expect(screen.getByTestId(locationsTableId)).toBeInTheDocument();
+    });
+
+    expect(DataFileReplacementTable).toHaveBeenCalledTimes(2);
+
+    const { calls } = (DataFileReplacementTable as jest.Mock).mock;
+
+    expect(calls[0][0]).toMatchObject({
+      tableId: indicatorsTableId,
+      itemType: 'indicator',
+      mappingsPlan: testReplacementPlan.mapping.indicators,
+      mappingGroups: [
+        {
+          label: 'Enrolment Group',
+          mappings: ['enrolments_again', 'enrolments'],
+        },
+      ],
+      mappingsToShow: ['enrolments_again', 'enrolments'],
+      mappedDataLabels: ['label', 'name'],
+    });
+
+    expect(calls[1][0]).toMatchObject({
+      tableId: locationsTableId,
+      itemType: 'location',
+      mappingsPlan: testReplacementPlan.mapping.locations,
+      mappingGroups: [
+        {
+          label: 'Country',
+          mappings: ['country-england'],
+        },
+      ],
+      mappingsToShow: ['country-england'],
+      mappedDataLabels: ['name', 'code'],
+    });
+  });
 
   test('renders differences/mappings table with options and available actions', async () => {
     const { user } = sharedRender();
     // check table is there
     await waitFor(() => {
-      expect(screen.getByTestId(tableId)).toBeInTheDocument();
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
     });
 
-    const tbody = screen.getByTestId(`${tableId}-body`);
+    const tbody = screen.getByTestId(`${indicatorsTableId}-body`);
     expect(tbody).toBeInTheDocument();
 
     // check table items there
@@ -246,10 +313,10 @@ describe('DataFileReplacementDifferences', () => {
     const { user } = sharedRender();
 
     await waitFor(() => {
-      expect(screen.getByTestId(tableId)).toBeInTheDocument();
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
     });
 
-    const tbody = screen.getByTestId(`${tableId}-body`);
+    const tbody = screen.getByTestId(`${indicatorsTableId}-body`);
     expect(tbody).toBeInTheDocument();
 
     const rows = within(tbody).getAllByRole('row');
@@ -306,10 +373,10 @@ describe('DataFileReplacementDifferences', () => {
     const { user } = sharedRender();
 
     await waitFor(() => {
-      expect(screen.getByTestId(tableId)).toBeInTheDocument();
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
     });
 
-    const tbody = screen.getByTestId(`${tableId}-body`);
+    const tbody = screen.getByTestId(`${indicatorsTableId}-body`);
     expect(tbody).toBeInTheDocument();
 
     const rows = within(tbody).getAllByRole('row');

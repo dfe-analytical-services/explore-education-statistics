@@ -81,21 +81,19 @@ export default function DataFileReplacementTable<
         data-testid={tableId}
       >
         <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
-          <span key={itemType}>
-            {`${startCase(itemType)}s`}
-            <TagGroup className="govuk-!-margin-left-2">
-              <DataFileReplacementMappingCountsTag
-                mappingType={itemType}
-                countType="unmapped"
-                count={mappingCounts.unmapped}
-              />
-              <DataFileReplacementMappingCountsTag
-                mappingType={itemType}
-                countType="mapped"
-                count={mappingCounts.mapped}
-              />
-            </TagGroup>
-          </span>
+          {`${startCase(itemType)}s`}
+          <TagGroup className="govuk-!-margin-left-2">
+            <DataFileReplacementMappingCountsTag
+              mappingType={itemType}
+              countType="unmapped"
+              count={mappingCounts.unmapped}
+            />
+            <DataFileReplacementMappingCountsTag
+              mappingType={itemType}
+              countType="mapped"
+              count={mappingCounts.mapped}
+            />
+          </TagGroup>
         </caption>
         <thead>
           <VisuallyHidden as="tr">

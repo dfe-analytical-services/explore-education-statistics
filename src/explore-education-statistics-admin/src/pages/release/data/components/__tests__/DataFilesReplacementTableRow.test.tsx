@@ -58,7 +58,10 @@ describe('DataFilesReplacementTableRow', () => {
       readyToPublish: false,
     },
     valid: true,
-    mapping: { indicators: { mappings: {}, candidates: {} } },
+    mapping: {
+      indicators: { mappings: {}, candidates: {} },
+      locations: { mappings: {}, candidates: {} },
+    },
   };
 
   const defaultPermissions = {
