@@ -7,8 +7,8 @@ import {
 } from '../../common/components/alerts/dynamicAlertConfig.bicep'
 
 import { staticAverageLessThanHundred, capacity, staticTotalGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
-
-import { IpRange, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../types.bicep'
+import { IpRange } from '../../common/types.bicep'
+import { PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string

@@ -1,6 +1,6 @@
 import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { StorageAccountPrivateEndpoints } from 'types.bicep'
-import { IpRange } from '../../../public-api/types.bicep'
+import { IpRange } from '../../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
