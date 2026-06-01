@@ -43,8 +43,8 @@ param concurrentRWorkers int = 4
 @description('The minimum number of instances for the function app.')
 param minimumInstanceCount int = 1
 
-@description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
-param maximumInstanceCount int = 0
+@description('The maximum number of instances for the function app.')
+param maximumInstanceCount int = 1
 
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
