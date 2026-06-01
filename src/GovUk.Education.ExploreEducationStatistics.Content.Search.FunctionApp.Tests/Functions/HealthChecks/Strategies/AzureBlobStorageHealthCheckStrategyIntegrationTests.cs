@@ -17,7 +17,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
 
     private static AzureBlobStorageHealthCheckStrategy GetSUT(
         string? searchStorageConnectionString = null,
-        string? searchableDocumentsContainerName = null
+        string? searchDocumentsContainerName = null
     ) =>
         new(
             CreateAzureBlobStorageClientFactory(),
@@ -27,7 +27,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
                 {
                     SearchStorageConnectionString =
                         searchStorageConnectionString ?? IntegrationTestStorageAccountConnectionString,
-                    SearchableDocumentsContainerName = searchableDocumentsContainerName ?? IntegrationTestContainerName,
+                    SearchDocumentsContainerName = searchDocumentsContainerName ?? IntegrationTestContainerName,
                 }
             )
         );
@@ -57,7 +57,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     public async Task WhenContainerNotFound_ThenShouldRespondIsUnhealthy()
     {
         //  ARRANGE
-        var sut = GetSUT(searchableDocumentsContainerName: "some-unknown-container-name");
+        var sut = GetSUT(searchDocumentsContainerName: "some-unknown-container-name");
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);
@@ -74,7 +74,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     {
         //  ARRANGE
         // Missing container name
-        var sut = GetSUT(searchableDocumentsContainerName: string.Empty);
+        var sut = GetSUT(searchDocumentsContainerName: string.Empty);
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);

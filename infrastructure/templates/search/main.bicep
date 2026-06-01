@@ -133,7 +133,7 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
-    searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName
+    searchDocumentsContainerName: searchServiceModule.outputs.searchDocumentsContainerName
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
@@ -166,7 +166,7 @@ module searchServiceModule 'application/searchService.bicep' = {
   }
 }
 
-output searchableDocumentsContainerName string = searchServiceModule.outputs.searchableDocumentsContainerName
+output searchDocumentsContainerName string = searchServiceModule.outputs.searchDocumentsContainerName
 output searchDocsFunctionAppUrl string = searchDocsFunctionAppModule.outputs.functionAppUrl
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchStorageAccountManagedIdentityConnectionString string = searchServiceModule.outputs.searchStorageAccountManagedIdentityConnectionString

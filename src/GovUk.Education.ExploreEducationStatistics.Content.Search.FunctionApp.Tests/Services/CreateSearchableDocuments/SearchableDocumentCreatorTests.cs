@@ -47,10 +47,10 @@ public class SearchableDocumentCreatorTests
         public async Task Should_upload_searchable_document_to_expected_AzureBlobStorage_container()
         {
             // ARRANGE
-            _appOptions = new AppOptions()
+            _appOptions = new AppOptions
             {
                 SearchStorageConnectionString = "azure storage connection string",
-                SearchableDocumentsContainerName = "searchable-documents-container-name",
+                SearchDocumentsContainerName = "search-documents-container-name",
             };
 
             var sut = GetSut();
@@ -62,7 +62,7 @@ public class SearchableDocumentCreatorTests
 
             // ASSERT
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
-                containerName: _appOptions.SearchableDocumentsContainerName
+                containerName: _appOptions.SearchDocumentsContainerName
             );
         }
 
