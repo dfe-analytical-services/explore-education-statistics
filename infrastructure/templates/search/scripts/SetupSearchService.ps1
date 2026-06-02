@@ -1,7 +1,17 @@
+<#
+.SYNOPSIS
+Configures Azure AI Search index, indexer and data source resources using the Azure AI Search Management REST API.
+
+.DESCRIPTION
+Reads the JSON definition of an index from file, injects CORS settings into it, builds indexer and data source definitions 
+based on the provided parameters, and sends REST API requests to create or update the Search service resources.
+#>
 param(
     [string[]] [Parameter(Mandatory=$true)] $indexCorsAllowedOrigins,
     [string] [Parameter(Mandatory=$true)] $indexDefinitionFilePath,
     [string] [Parameter(Mandatory=$true)] $indexerName,
+    [string] [Parameter(Mandatory=$false)] [AllowEmptyString()] $indexerOutputFieldMappingsFilePath = '',
+    [string] [Parameter(Mandatory=$true)] [AllowEmptyString()] $indexerParsingMode,
     [string] [Parameter(Mandatory=$true)] [AllowEmptyString()] $indexerScheduleInterval,
     [string] [Parameter(Mandatory=$true)] $dataSourceName,
     [string] [Parameter(Mandatory=$true)] $dataSourceType,
@@ -51,67 +61,44 @@ switch ($dataSourceType)
                 '@odata.type' = '#Microsoft.Azure.Search.NativeBlobSoftDeleteDeletionDetectionPolicy'
             }
         }
+
+        $indexerParameters = $null
+        if (-not [string]::IsNullOrWhiteSpace($indexerParsingMode)) {
+            $indexerParameters = @{
+                'configuration' = @{
+                    'parsingMode' = $indexerParsingMode
+                }
+            }
+        }
+
+        $indexerSchedule = $null
+        if (-not [string]::IsNullOrWhiteSpace($indexerScheduleInterval)) {
+            $indexerSchedule = @{
+                'interval' = $indexerScheduleInterval
+                'startTime' = '2025-01-01T00:00:00Z'
+            }
+        }
+
+        $indexerOutputFieldMappings = @()
+        if (-not [string]::IsNullOrWhiteSpace($indexerOutputFieldMappingsFilePath)) {
+            $indexerOutputFieldMappingsConfig = Get-Content -Path $indexerOutputFieldMappingsFilePath -Raw | ConvertFrom-Json
+
+            if ($indexerOutputFieldMappingsConfig -is [System.Array]) {
+                $indexerOutputFieldMappings = @($indexerOutputFieldMappingsConfig)
+            }
+            else {
+                throw "Output field mappings config must be a JSON array. File: $indexerOutputFieldMappingsFilePath"
+            }
+        }
+
         $indexerDefinition = @{
             'name' = $indexerName
             'disabled' = $indexerDisabled.IsPresent
             'targetIndexName' = $indexDefinition.name
             'dataSourceName' = $dataSourceName
-            'schedule' = $indexerScheduleInterval.Length -gt 0 ? @{ 
-                'interval' = $indexerScheduleInterval
-                'startTime' = '2025-01-01T00:00:00Z'
-            } : $null
-            'outputFieldMappings' = @(
-                @{
-                    'sourceFieldName' = '/document/summary'
-                    'targetFieldName' = 'summary'
-                    'mappingFunction' = @{
-                        'name' = 'base64Decode'
-                        'parameters' = @{
-                            'useHttpServerUtilityUrlTokenDecode' = $false
-                        }
-                    }
-                }
-                @{
-                    'sourceFieldName' = '/document/publicationSlug'
-                    'targetFieldName' = 'publicationSlug'
-                    'mappingFunction' = @{
-                        'name' = 'base64Decode'
-                        'parameters' = @{
-                            'useHttpServerUtilityUrlTokenDecode' = $false
-                        }
-                    }
-                }
-                @{
-                    'sourceFieldName' = '/document/releaseSlug'
-                    'targetFieldName' = 'releaseSlug'
-                    'mappingFunction' = @{
-                        'name' = 'base64Decode'
-                        'parameters' = @{
-                            'useHttpServerUtilityUrlTokenDecode' = $false
-                        }
-                    }
-                }
-                @{
-                    'sourceFieldName' = '/document/themeTitle'
-                    'targetFieldName' = 'themeTitle'
-                    'mappingFunction' = @{
-                        'name' = 'base64Decode'
-                        'parameters' = @{
-                            'useHttpServerUtilityUrlTokenDecode' = $false
-                        }
-                    }
-                }
-                @{
-                    'sourceFieldName' = '/document/title'
-                    'targetFieldName' = 'title'
-                    'mappingFunction' = @{
-                        'name' = 'base64Decode'
-                        'parameters' = @{
-                            'useHttpServerUtilityUrlTokenDecode' = $false
-                        }
-                    }
-                }
-            )
+            'parameters' = $indexerParameters
+            'schedule' = $indexerSchedule
+            'outputFieldMappings' = $indexerOutputFieldMappings
         }
     }
     default {
@@ -133,7 +120,7 @@ try {
         -Body (ConvertTo-Json -Compress -Depth 100 $indexDefinition)
     Write-Host "Create/update request for '$($indexDefinition.name)' succeeded with status code: $($indexResponse.StatusCode)."
 
-    if ($dataSourceContainerName.Length -gt 0 -and $dataSourceConnectionString.Length -gt 0)
+    if (-not [string]::IsNullOrWhiteSpace($dataSourceContainerName) -and -not [string]::IsNullOrWhiteSpace($dataSourceConnectionString))
     {
         # https://learn.microsoft.com/rest/api/searchservice/create-data-source
         $dataSourceResponse = Invoke-WebRequest `
@@ -149,7 +136,7 @@ try {
             -Uri "$searchServiceEndpoint/indexers/$($indexerDefinition.name)?api-version=$apiVersion" `
             -Headers $headers `
             -Body (ConvertTo-Json -Compress -Depth 100 $indexerDefinition)
-        Write-Host "Create/update request for '$($indexerDefinition.name) succeeded with status code: $($indexerResponse.StatusCode)."
+        Write-Host "Create/update request for '$($indexerDefinition.name)' succeeded with status code: $($indexerResponse.StatusCode)."
     }
     else {
         Write-Host "No data source name or connection string provided, skipping data source and indexer requests."

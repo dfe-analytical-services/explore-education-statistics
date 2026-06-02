@@ -1,0 +1,52 @@
+[
+  {
+    "sourceFieldName": "/document/summary",
+    "targetFieldName": "summary",
+    "mappingFunction": {
+      "name": "base64Decode",
+      "parameters": {
+        "useHttpServerUtilityUrlTokenDecode": false
+      }
+    }
+  },
+  {
+    "sourceFieldName": "/document/publicationSlug",
+    "targetFieldName": "publicationSlug",
+    "mappingFunction": {
+      "name": "base64Decode",
+      "parameters": {
+        "useHttpServerUtilityUrlTokenDecode": false
+      }
+    }
+  },
+  {
+    "sourceFieldName": "/document/releaseSlug",
+    "targetFieldName": "releaseSlug",
+    "mappingFunction": {
+      "name": "base64Decode",
+      "parameters": {
+        "useHttpServerUtilityUrlTokenDecode": false
+      }
+    }
+  },
+  {
+    "sourceFieldName": "/document/themeTitle",
+    "targetFieldName": "themeTitle",
+    "mappingFunction": {
+      "name": "base64Decode",
+      "parameters": {
+        "useHttpServerUtilityUrlTokenDecode": false
+      }
+    }
+  },
+  {
+    "sourceFieldName": "/document/title",
+    "targetFieldName": "title",
+    "mappingFunction": {
+      "name": "base64Decode",
+      "parameters": {
+        "useHttpServerUtilityUrlTokenDecode": false
+      }
+    }
+  }
+]
