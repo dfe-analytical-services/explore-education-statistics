@@ -123,15 +123,8 @@ User checks page 'Explore and download data' data set available properties
     ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${geographical_levels}")]
     ...    Dataset "${data_set_name}" has incorrect geographical levels
 
-    # Normalize the incoming parameters ($indicators or $filters) into a Python list so the rest of the Robot keyword can treat it uniformly.
-    #    Examples:
-    # Input "" or None → ${indicators} becomes [] (falsey).
-    # Input ["A","B"] → ${indicators} stays ["A","B"] (truthy).
-    # Input "X" → ${indicators} becomes ["X"] (truthy).
-    ${indicators}=    Evaluate
-    ...    [] if $indicators in ('', None) else $indicators if isinstance($indicators, (list, tuple)) else [$indicators]
-    ${filters}=    Evaluate
-    ...    [] if $filters in ('', None) else $filters if isinstance($filters, (list, tuple)) else [$filters]
+    ${indicators}=    Normalise To List    ${indicators}
+    ${filters}=    Normalise To List    ${filters}
     IF    ${indicators}
         # Assert indicators label exists
         Page Should Contain Element
