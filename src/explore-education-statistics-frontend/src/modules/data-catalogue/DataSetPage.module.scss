@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .info {
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-colour('black', $variant: 'tint-95');
   margin-bottom: govuk-spacing(4);
   padding: govuk-spacing(3);
 
@@ -12,7 +12,7 @@
 }
 
 .infoSectionHeading {
-  color: govuk-colour('dark-grey');
+  color: govuk-colour('black', $variant: 'tint-25');
   display: block;
 
   @include govuk-media-query($until: tablet) {

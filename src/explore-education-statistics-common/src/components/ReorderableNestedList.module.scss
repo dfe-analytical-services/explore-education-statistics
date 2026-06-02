@@ -1,19 +1,19 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .list {
   .list {
-    border-top: 1px solid govuk-colour('mid-grey');
+    border-top: 1px solid govuk-colour('black', $variant: 'tint-80');
   }
 }
 
 .item {
-  border-bottom: 1px solid govuk-colour('mid-grey');
+  border-bottom: 1px solid govuk-colour('black', $variant: 'tint-80');
   min-height: 60px;
   padding: govuk-spacing(2);
 }
 
 .itemExpanded {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
 
   > span {
     padding: govuk-spacing(1) 0;

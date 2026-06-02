@@ -1,5 +1,5 @@
-@import '~govuk-frontend/dist/govuk/base';
-@import '@admin/styles/variables';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use '@admin/styles/variables' as *;
 
 // scroll-padding to ensure the sticky bar doesn't
 // obscure keyboard focus.

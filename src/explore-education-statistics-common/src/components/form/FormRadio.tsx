@@ -110,7 +110,7 @@ const FormRadio = ({
           <div
             id={`${id}-item-hint`}
             className={classNames('govuk-hint govuk-radios__hint', {
-              'govuk-!-font-size-14': hintSmall,
+              'govuk-!-font-size-16': hintSmall,
             })}
           >
             {hint}

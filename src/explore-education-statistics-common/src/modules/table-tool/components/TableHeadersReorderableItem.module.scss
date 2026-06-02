@@ -1,16 +1,16 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .option {
   align-items: center;
   background: govuk-colour('white');
-  border-bottom: 1px solid govuk-colour('mid-grey');
+  border-bottom: 1px solid govuk-colour('black', $variant: 'tint-80');
   display: flex;
   min-height: 60px;
   padding: govuk-spacing(2) govuk-spacing(1);
   user-select: none;
 
   &:hover {
-    background: govuk-colour('light-grey');
+    background: govuk-colour('black', $variant: 'tint-95');
     // Fallback if grab is unsupported
     cursor: move;
     cursor: grab;

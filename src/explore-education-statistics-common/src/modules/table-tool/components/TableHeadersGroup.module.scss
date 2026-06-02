@@ -1,8 +1,8 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .group {
-  background: govuk-colour('light-grey');
-  border: 2px solid govuk-colour('mid-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
+  border: 2px solid govuk-colour('black', $variant: 'tint-80');
   box-sizing: border-box;
   display: block;
   padding: govuk-spacing(2);
@@ -47,7 +47,7 @@
   }
 
   &.isDraggingActive {
-    border-bottom: 2px solid govuk-colour('mid-grey');
+    border-bottom: 2px solid govuk-colour('black', $variant: 'tint-80');
   }
 
   &.isDraggedOutside {

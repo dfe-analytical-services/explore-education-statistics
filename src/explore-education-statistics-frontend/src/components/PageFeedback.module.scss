@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .container {
-  border-top: 1px govuk-colour('mid-grey') solid;
+  border-top: 1px govuk-colour('black', $variant: 'tint-80') solid;
 
   @include govuk-media-query($until: tablet) {
     margin: 0;
@@ -13,7 +13,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   padding: 0 govuk-spacing(3);
   gap: govuk-spacing(3);
 
@@ -44,7 +44,7 @@
   composes: promptQuestion;
 
   @include govuk-media-query($until: tablet) {
-    border-top: 1px govuk-colour('mid-grey') solid;
+    border-top: 1px govuk-colour('black', $variant: 'tint-80') solid;
   }
 }
 

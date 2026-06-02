@@ -1,3 +1,5 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
 .recharts-legend-wrapper ul {
   display: flex;
   flex-direction: row;

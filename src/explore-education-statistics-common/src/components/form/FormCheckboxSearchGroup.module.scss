@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .optionsContainer {
   margin: govuk-spacing(4) 0 govuk-spacing(1);

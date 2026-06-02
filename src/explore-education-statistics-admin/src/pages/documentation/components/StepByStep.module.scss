@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .test {
   border: 1px solid #f60;
@@ -35,7 +35,7 @@ $step-padding-top: govuk-spacing(6);
     border-left: $circle-border-size solid $govuk-border-colour;
     content: '';
     height: 100%;
-    left: ($circle-size / 2) - ($circle-border-size / 2);
+    left: calc($circle-size / 2) - calc($circle-border-size / 2);
     position: absolute;
     top: $circle-size - (2 * $circle-border-size);
     z-index: 2;
@@ -88,7 +88,7 @@ $step-padding-top: govuk-spacing(6);
 }
 
 .content {
-  border-top: 2px solid govuk-colour('light-grey');
+  border-top: 2px solid govuk-colour('black', $variant: 'tint-95');
   display: block;
   margin-left: govuk-spacing(6);
   padding-top: $step-padding-top;

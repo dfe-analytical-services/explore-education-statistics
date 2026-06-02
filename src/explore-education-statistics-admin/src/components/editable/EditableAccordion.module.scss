@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .dragover {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
 }
 
 // Override the default dnd style as it causes accordion sections within the dnd area to sometime open in the wrong direction.

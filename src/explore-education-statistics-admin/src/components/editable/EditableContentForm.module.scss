@@ -1,5 +1,5 @@
-@import '~govuk-frontend/dist/govuk/base';
-@import '@admin/styles/variables';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use '@admin/styles/variables' as *;
 
 .form {
   // stylelint-disable selector-no-qualifying-type

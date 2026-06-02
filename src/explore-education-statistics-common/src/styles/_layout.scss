@@ -1,4 +1,9 @@
-@import './variables';
+@use './breakpoints' as breakpoints;
+@use 'govuk-frontend/settings/media-queries' as * with (
+  $govuk-breakpoints: breakpoints.$govuk-breakpoints
+);
+@use 'govuk-frontend/helpers/media-queries' as *;
+@use './variables' as *;
 
 .dfe-width-container--wide {
   margin: 0 $dfe-page-width-wide-gutter;

@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use 'govuk-frontend/base' as *;
 // These styles are adapted from the original Accessible Autocomplete component stylesheet, mostly
 // to remove superfluous styles that are already provided by the GOV.UK Design System, and to adapt
 // the styling to match the new GOV.UK search box designs (e.g. to remove the zebra striping on
@@ -55,7 +55,8 @@ $input-size: 40px;
 .autocomplete__menu {
   background-color: govuk-colour('white');
   border: $govuk-border-width-form-element solid $govuk-input-border-colour;
-  border: $govuk-border-width-form-element solid govuk-colour('dark-grey');
+  border: $govuk-border-width-form-element solid
+    govuk-colour('black', $variant: 'tint-25');
   border-top: 0;
   color: $govuk-text-colour;
   margin: 0;
@@ -75,7 +76,7 @@ $input-size: 40px;
 }
 
 .autocomplete__option {
-  border-bottom: solid govuk-colour('mid-grey');
+  border-bottom: solid govuk-colour('black', $variant: 'tint-80');
   border-width: 1px 0;
   cursor: pointer;
   display: block;
@@ -96,11 +97,11 @@ $input-size: 40px;
 }
 
 .autocomplete__option-summary {
-  color: govuk-colour('dark-grey');
+  color: govuk-colour('black', $variant: 'tint-25');
 }
 
 // .autocomplete__option--odd {
-//   background-color: govuk-colour('light-grey');
+//   background-color: govuk-colour('black', $variant: 'tint-95');
 // }
 
 .autocomplete__option--focused,

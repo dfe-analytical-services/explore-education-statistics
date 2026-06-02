@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 @mixin focused-input {
   box-shadow: inset 0 0 0 $govuk-border-width-form-element;

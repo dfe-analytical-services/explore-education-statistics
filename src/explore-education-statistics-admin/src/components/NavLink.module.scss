@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .currentPage {
   border-bottom: 0.3rem solid $govuk-link-colour;

@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .preview {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   border: 1px solid $govuk-border-colour;
   margin-bottom: govuk-spacing(4);
   padding: govuk-spacing(4);
