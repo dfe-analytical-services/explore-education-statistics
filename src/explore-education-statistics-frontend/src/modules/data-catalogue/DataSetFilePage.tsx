@@ -30,7 +30,7 @@ import {
   ApiDataSet,
   ApiDataSetVersion,
 } from '@frontend/services/apiDataSetService';
-import downloadService from '@frontend/services/downloadService';
+import downloadService from '@common/services/downloadService';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import publicationQueries from '@frontend/queries/publicationQueries';

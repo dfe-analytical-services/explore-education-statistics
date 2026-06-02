@@ -86,9 +86,10 @@ const TimePeriodDataTable = ({
               <ButtonText
                 className="govuk-!-margin-bottom-0"
                 onClick={async () => {
-                  await downloadService.downloadFiles(
+                  await downloadService.downloadZip(
                     coalescedReleaseVersionId,
-                    [subjectMeta.dataSetFileId],
+                    'TableToolCropped',
+                    subjectMeta.dataSetFileId,
                   );
                 }}
               >
