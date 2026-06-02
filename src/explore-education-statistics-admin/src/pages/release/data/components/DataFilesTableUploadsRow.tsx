@@ -54,7 +54,12 @@ export default function DataFilesTableUploadRow({
     (_upload: DataSetUpload, progress: DataSetScreenerProgress) => {
       setCurrentUpload(upload => ({ ...upload, status: progress.status }));
 
-      if (terminalScreeningStatuses.includes(progress.status)) {
+      // TODO EES-7139 - change status to be non-nullable when foreground screening process
+      // is decommissioned.
+      if (
+        progress.status &&
+        terminalScreeningStatuses.includes(progress.status)
+      ) {
         onRefreshUploads();
       }
     },
