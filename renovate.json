@@ -72,6 +72,12 @@
       "enabled": false
     },
     {
+      "description": "Disable CliFx as v3 requires tinkering to update - EES-7179 to update or remove",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["CliFx"],
+      "enabled": false
+    },
+    {
       "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
