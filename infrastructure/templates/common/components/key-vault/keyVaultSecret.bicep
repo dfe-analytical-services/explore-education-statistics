@@ -17,7 +17,7 @@ param contentType string = 'text/plain'
 param isEnabled bool = true
 
 // Reference an existing Key Vault.
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: keyVaultName
 }
 

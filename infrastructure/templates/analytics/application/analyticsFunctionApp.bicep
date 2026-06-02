@@ -35,7 +35,7 @@ param functionAppExists bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 
