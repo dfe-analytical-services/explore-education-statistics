@@ -2,12 +2,12 @@ import { abbreviations } from '../common/abbreviations.bicep'
 import { abbreviations as publicApiAbbreviations } from 'abbreviations.bicep'
 import {
   ContainerAppResourceConfig
-  IpRange
   PrincipalNameAndId
   StaticWebAppSku
   ContainerAppWorkloadProfile
   PostgreSqlFlexibleServerConfig
 } from 'types.bicep'
+import { IpRange } from '../common/types.bicep'
 import { StorageAccountConfig } from '../common/components/storage/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
