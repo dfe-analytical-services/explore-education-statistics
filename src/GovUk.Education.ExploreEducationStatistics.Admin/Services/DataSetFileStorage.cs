@@ -222,6 +222,14 @@ public class DataSetFileStorage(
         if (screenerResult is null)
         {
             upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
+
+            upload.ScreenerProgress = new DataSetScreenerProgress
+            {
+                Completed = true,
+                Passed = false,
+                PercentageComplete = 100,
+                Stage = "Screener error",
+            };
         }
         else
         {
@@ -242,6 +250,14 @@ public class DataSetFileStorage(
             {
                 upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingImport;
             }
+
+            upload.ScreenerProgress = new DataSetScreenerProgress
+            {
+                Completed = true,
+                Passed = !hasFailures,
+                PercentageComplete = 100,
+                Stage = "Complete",
+            };
         }
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
