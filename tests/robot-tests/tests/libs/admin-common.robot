@@ -574,12 +574,23 @@ user approves release for scheduled publication
     ...    ${next_release_month}=01
     ...    ${next_release_year}=2200
     ...    ${update_amendment_published_date}=${False}
-    ${expected_scheduled_date}=    Convert Date    ${publish_date_day} ${publish_date_month} ${publish_date_year}
+
+    ${expected_scheduled_dt}=    Convert Date    ${publish_date_day} ${publish_date_month} ${publish_date_year}
     ...    date_format=%d %m %Y
-    ...    result_format=%d %B %Y
-    ${expected_next_release_date}=    Convert Date    1 ${next_release_month} ${next_release_year}
+    ...    result_format=datetime
+    ${expected_next_release_dt}=    Convert Date    1 ${next_release_month} ${next_release_year}
     ...    date_format=%d %m %Y
-    ...    result_format=%B %Y
+    ...    result_format=datetime
+
+    # Use the 'format datetime' keyword to ensure platform-independent date formatting.
+    # For example, formatting the day of the month without a leading zero differs by platform
+    # ('%-d' on Linux vs. '%#d' on Windows).
+    ${expected_scheduled_date}=    format datetime
+    ...    datetime=${expected_scheduled_dt}
+    ...    format_string=%-d %B %Y
+    ${expected_next_release_date}=    format datetime
+    ...    datetime=${expected_next_release_dt}
+    ...    format_string=%B %Y
 
     user edits release status
     user clicks radio    Approved for publication
