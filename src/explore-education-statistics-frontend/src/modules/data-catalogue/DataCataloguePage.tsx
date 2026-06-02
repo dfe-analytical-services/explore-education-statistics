@@ -54,7 +54,7 @@ import {
   GeographicLevelCode,
   geographicLevelCodesMap,
 } from '@common/utils/locationLevelsMap';
-import downloadService from '@frontend/services/downloadService';
+import downloadService from '@common/services/downloadService';
 import Button from '@common/components/Button';
 
 const defaultPageTitle = 'Data catalogue';
