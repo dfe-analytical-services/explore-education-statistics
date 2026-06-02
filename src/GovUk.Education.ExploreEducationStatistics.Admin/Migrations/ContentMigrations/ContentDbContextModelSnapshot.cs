@@ -367,9 +367,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OriginalDataFileId");
+                    b.HasIndex("OriginalDataFileId")
+                        .IsUnique();
 
-                    b.HasIndex("ReplacementDataFileId");
+                    b.HasIndex("ReplacementDataFileId")
+                        .IsUnique();
 
                     b.ToTable("DataSetMappings");
                 });

@@ -54,13 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.CreateIndex(
                 name: "IX_DataSetMappings_OriginalDataFileId",
                 table: "DataSetMappings",
-                column: "OriginalDataFileId"
+                column: "OriginalDataFileId",
+                unique: true
             );
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataSetMappings_ReplacementDataFileId",
                 table: "DataSetMappings",
-                column: "ReplacementDataFileId"
+                column: "ReplacementDataFileId",
+                unique: true
             );
 
             migrationBuilder.AddForeignKey(
