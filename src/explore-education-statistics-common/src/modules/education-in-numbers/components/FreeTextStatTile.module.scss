@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .tile {
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-colour('black', $variant: 'tint-95');
   padding: govuk-spacing(4);
   display: flex;
   flex-direction: column;

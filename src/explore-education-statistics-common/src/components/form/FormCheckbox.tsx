@@ -100,7 +100,7 @@ const FormCheckbox = ({
           <div
             id={`${id}-item-hint`}
             className={classNames('govuk-hint govuk-checkboxes__hint', {
-              'govuk-!-font-size-14 govuk-!-margin-bottom-1': hintSmall,
+              'govuk-!-font-size-16 govuk-!-margin-bottom-1': hintSmall,
             })}
           >
             {hint}

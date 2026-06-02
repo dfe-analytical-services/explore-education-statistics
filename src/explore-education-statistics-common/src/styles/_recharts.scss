@@ -1,3 +1,5 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
 .recharts-legend-wrapper ul {
   display: flex;
   flex-direction: row;
@@ -40,7 +42,7 @@
 }
 
 .recharts-surface:focus {
-  box-shadow: 0 0 0 5px $govuk-focus-colour;
+  box-shadow: 0 0 0 5px govuk-functional-colour(focus);
   outline: #000 solid $govuk-focus-width;
 }
 

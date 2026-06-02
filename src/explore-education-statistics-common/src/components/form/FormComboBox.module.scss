@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .container {
   margin-bottom: govuk-spacing(0);
@@ -7,7 +7,7 @@
 
 .optionsContainer {
   background-color: govuk-colour('white');
-  border: 2px solid govuk-colour('light-grey');
+  border: 2px solid govuk-colour('black', $variant: 'tint-95');
   width: 100%;
   z-index: 2000;
 
@@ -17,7 +17,7 @@
 }
 
 .optionsLabel {
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-colour('black', $variant: 'tint-95');
   font-size: 1rem;
   padding: govuk-spacing(2) govuk-spacing(1);
 }
@@ -33,7 +33,7 @@
 
   &:focus {
     border: $govuk-focus-width solid #000;
-    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline: govuk-functional-colour(focus) solid $govuk-focus-width;
   }
 }
 
@@ -50,17 +50,17 @@
 
   &:focus,
   &:hover {
-    background-color: $govuk-brand-colour;
+    background-color: govuk-functional-colour(brand);
     color: govuk-colour('white');
     cursor: pointer;
   }
 
   &:not(:first-child) {
-    border-top: 1px solid $govuk-border-colour;
+    border-top: 1px solid govuk-functional-colour(border);
   }
 }
 
 .selected {
-  background-color: $govuk-brand-colour;
+  background-color: govuk-functional-colour(brand);
   color: govuk-colour('white');
 }

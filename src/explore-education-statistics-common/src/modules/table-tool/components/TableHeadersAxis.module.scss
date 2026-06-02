@@ -1,9 +1,9 @@
-@import '~govuk-frontend/dist/govuk/base';
-@import '@common/styles/variables';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use '@common/styles/variables' as *;
 
 .container {
   background-color: govuk-colour('white');
-  border: 2px solid govuk-colour('mid-grey');
+  border: 2px solid govuk-colour('black', $variant: 'tint-80');
   overflow-x: auto;
   padding: govuk-spacing(2);
   position: relative;
@@ -14,8 +14,8 @@
   }
 
   &.isDraggingActive {
-    background-color: $govuk-focus-colour;
-    border-color: govuk-colour('dark-grey');
+    background-color: govuk-functional-colour(focus);
+    border-color: govuk-colour('black', $variant: 'tint-25');
   }
 }
 

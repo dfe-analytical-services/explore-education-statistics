@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .card {
-  border-top: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour(border);
   padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(6) 0;
   position: relative;
 
@@ -26,8 +26,8 @@
 
 .linkWithChevron {
   &::before {
-    border-right: 3px solid $govuk-link-colour;
-    border-top: 3px solid $govuk-link-colour;
+    border-right: 3px solid govuk-functional-colour(link);
+    border-top: 3px solid govuk-functional-colour(link);
     content: '';
     display: block;
     height: 7px;
@@ -39,11 +39,11 @@
   }
 
   &:focus::before {
-    border-color: $govuk-focus-text-colour;
+    border-color: govuk-functional-colour(focus-text);
   }
 
   &:hover::before {
-    border-color: $govuk-link-hover-colour;
+    border-color: govuk-functional-colour(link-hover);
   }
 }
 

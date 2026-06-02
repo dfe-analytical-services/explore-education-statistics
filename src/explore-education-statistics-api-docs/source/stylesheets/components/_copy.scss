@@ -19,14 +19,14 @@
   z-index: 1;
 
   &:focus:not(:hover) {
-    background-color: $govuk-focus-colour;
-    box-shadow: 0 2px 0 0 $govuk-focus-text-colour;
-    color: $govuk-focus-text-colour;
+    background-color: govuk-functional-colour(focus);
+    box-shadow: 0 2px 0 0 govuk-functional-colour(focus-text);
+    color: govuk-functional-colour(focus-text);
   }
 
   &:active,
   &:focus {
-    border: 2px solid $govuk-focus-colour;
+    border: 2px solid govuk-functional-colour(focus);
     box-shadow: none;
     opacity: 1;
     outline: 2px solid transparent;

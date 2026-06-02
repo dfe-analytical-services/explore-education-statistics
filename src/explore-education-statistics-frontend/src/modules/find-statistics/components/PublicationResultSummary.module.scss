@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .container {
-  border-bottom: 1px solid govuk-colour('mid-grey');
+  border-bottom: 1px solid govuk-colour('black', $variant: 'tint-80');
 
   em {
     background-color: govuk-colour('yellow');
@@ -12,5 +12,5 @@
 }
 
 .highlightContent {
-  color: govuk-colour('dark-grey');
+  color: govuk-colour('black', $variant: 'tint-25');
 }

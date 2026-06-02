@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .container {
   align-items: center;
@@ -10,7 +10,7 @@
   $width-modifier: 0.15;
 
   animation: spin 2s linear infinite;
-  border-color: govuk-colour('light-grey');
+  border-color: govuk-colour('black', $variant: 'tint-95');
   border-radius: 50%;
   border-style: solid;
   border-top-color: govuk-colour('blue');

@@ -1,22 +1,31 @@
+@use './variables' as *;
+@use './breakpoints' as breakpoints;
+
+@forward '~govuk-frontend/dist/govuk/settings/media-queries' with (
+  $govuk-breakpoints: breakpoints.$govuk-breakpoints
+);
+
+@use '~govuk-frontend/dist/govuk/index' as *;
+
+@use './reset' as *;
+@use './form' as *;
+@use './layout' as *;
+@use './tables' as *;
+@use './typography' as *;
+@use './print' as *;
+
+@use './content' as *;
+@use './header' as *;
+@use './recharts' as *;
+
+@use './utils/border' as *;
+@use './utils/card' as *;
+@use './utils/colour' as *;
+@use './utils/flex' as *;
+@use './utils/js-hidden' as *;
+@use './utils/modifiers' as *;
+@use './utils/overflow' as *;
+@use './utils/position' as *;
+@use './utils/text' as *;
+
 @import '~leaflet/dist/leaflet.css';
-
-@import './variables';
-@import './reset';
-@import './form';
-@import './layout';
-@import './tables';
-@import './typography';
-@import './print';
-
-@import './content';
-@import './recharts';
-
-@import './utils/border';
-@import './utils/card';
-@import './utils/colour';
-@import './utils/flex';
-@import './utils/js-hidden';
-@import './utils/modifiers';
-@import './utils/overflow';
-@import './utils/position';
-@import './utils/text';

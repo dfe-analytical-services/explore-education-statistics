@@ -1,8 +1,8 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .tooltip {
   background-color: #fff;
-  border: 1px solid govuk-colour('mid-grey');
+  border: 1px solid govuk-colour('black', $variant: 'tint-80');
   padding: 10px;
 }
 

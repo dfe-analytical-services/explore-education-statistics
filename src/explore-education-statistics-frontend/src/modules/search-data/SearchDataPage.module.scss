@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .helpColumn {
   margin-top: govuk-spacing(3);
@@ -14,7 +14,7 @@
   padding: 0;
   display: flex;
   gap: govuk-spacing(3);
-  border-bottom: 1px solid govuk-colour('mid-grey');
+  border-bottom: 1px solid govuk-colour('black', $variant: 'tint-80');
   list-style: none;
 
   > li {
