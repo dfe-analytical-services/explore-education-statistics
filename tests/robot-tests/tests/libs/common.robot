@@ -1266,3 +1266,13 @@ user checks section is in position
     ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
     user waits until parent contains element    ${parent}
     ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]
+
+user checks section with ID contains elements and back to top link
+    [Arguments]    ${section_id}    @{paragraph_texts}    ${back_to_top}=True
+    ${section}=    Get WebElement    id:${section_id}
+    FOR    ${paragraph_text}    IN    @{paragraph_texts}
+        user checks element should contain    ${section}    ${paragraph_text}
+    END
+    IF    ${back_to_top}
+        user waits until parent contains element    ${section}    xpath://a[text()="Back to top" and @href="\#top"]
+    END

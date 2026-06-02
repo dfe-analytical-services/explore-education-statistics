@@ -307,8 +307,13 @@ Verify release associated files
     ...    Data guidance
     ...    Data catalogue
 
-    User checks page 'Explore and download data' data set available properties    ${SUBJECT_NAME}    118
-    ...    2020 Week 13 to 2021 Week 24    ${PUBLICATION_NAME}    Dates test subject test data guidance content
+    User checks page 'Explore and download data' data set available properties
+    ...    data_set_name=${SUBJECT_NAME}
+    ...    expected_row_count=118
+    ...    geographical_levels=National
+    ...    expected_time_period=2020 Week 13 to 2021 Week 24
+    ...    publication_title=${PUBLICATION_NAME}
+    ...    expected_data_guidance=Dates test subject test data guidance content
     user goes back
 
     ${supporting_files_xpath}=    Set Variable

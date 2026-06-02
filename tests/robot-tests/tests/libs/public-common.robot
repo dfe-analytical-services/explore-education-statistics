@@ -42,16 +42,6 @@ user checks methodology note
 user checks related information panel is visible
     user waits until page contains element    xpath://h2[text()='Related information']
 
-user checks section with ID contains elements and back to top link
-    [Arguments]    ${section_id}    @{paragraph_texts}    ${back_to_top}=True
-    ${section}=    Get WebElement    id:${section_id}
-    FOR    ${paragraph_text}    IN    @{paragraph_texts}
-        user checks element should contain    ${section}    ${paragraph_text}
-    END
-    IF    ${back_to_top}
-        user waits until parent contains element    ${section}    xpath://a[text()="Back to top" and @href="\#top"]
-    END
-
 user goes to explore and download data and navigates to data set details page
     [Arguments]    ${SUBJECT_NAME}
     user clicks link    Explore and download data
@@ -100,10 +90,15 @@ user checks main links for page 'Explore and download data' are present
 
 User checks page 'Explore and download data' data set available properties
     [Arguments]    ${data_set_name}
+    ...    ${geographical_levels}
     ...    ${expected_row_count}
     ...    ${expected_time_period}
-    ...    ${PUBLICATION_TITLE}
+    ...    ${publication_title}
     ...    ${expected_data_guidance}=${data_set_name} data guidance content
+    ...    ${indicators}=${EMPTY}
+    ...    ${filters}=${EMPTY}
+    ...    ${api_data_set_id}=${EMPTY}
+    ...    ${is_public_site}=True
 
     ${dataset_xpath}=    Set Variable
     ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
@@ -123,16 +118,65 @@ User checks page 'Explore and download data' data set available properties
     ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]
     ...    Dataset "${data_set_name}" is missing "Number of rows" label
 
+    # Assert geographic levels
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${geographical_levels}")]
+    ...    Dataset "${data_set_name}" has incorrect geographical levels
+
+    ${indicators}=    Normalise To List    ${indicators}
+    ${filters}=    Normalise To List    ${filters}
+    IF    ${indicators}
+        # Assert indicators label exists
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Indicators"]
+        ...    Dataset "${data_set_name}" is missing "Indicators" label
+
+        # If indicators provided, assert each indicator exists in the list
+        FOR    ${indicator}    IN    @{indicators}
+            Page Should Contain Element
+            ...    xpath=${dataset_xpath}//div[@data-testid="Indicators"]//li[normalize-space(.)="${indicator}"]
+            ...    Dataset "${data_set_name}" is missing indicator "${indicator}"
+        END
+    END
+
+    IF    ${filters}
+        # Assert filters label exists
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Filters"]
+        ...    Dataset "${data_set_name}" is missing "Filters" label
+
+        # If filters provided, assert each filter exists in the list
+        FOR    ${filter}    IN    @{filters}
+            Page Should Contain Element
+            ...    xpath=${dataset_xpath}//div[@data-testid="Filters"]//li[normalize-space(.)="${filter}"]
+            ...    Dataset "${data_set_name}" is missing filter "${filter}"
+        END
+    END
+
+    IF    "${api_data_set_id}" != "${EMPTY}"
+        # Assert API ID label exists
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="API data set ID"]
+        ...    Dataset "${data_set_name}" is missing "API data set ID" label
+
+        # Assert API ID value is correct
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//dt[normalize-space(.)="API data set ID"]/following-sibling::dd[normalize-space(.)="${api_data_set_id}"]
+        ...    Dataset "${data_set_name}" has incorrect API ID value
+
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//strong[contains(normalize-space(.), "Available by API")]
+        ...    Dataset "${data_set_name}" is missing "Available by API" tag
+    END
+
     # Assert dd value for "Number of rows"
     Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
+    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
     ...    Dataset "${data_set_name}" has incorrect Number of rows
 
     # Assert dd value for "Time period"
     Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
+    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
     ...    Dataset "${data_set_name}" has incorrect Time period
 
     # Verify data guidance content
@@ -140,27 +184,29 @@ User checks page 'Explore and download data' data set available properties
     ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${expected_data_guidance}")]
     ...    Dataset "${data_set_name}" is missing the data guidance content text
 
-    # Verify Data set information page link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
-    ...    Dataset "${data_set_name}" is missing the "Data set information page" link
-
-    # Verify Create table link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    ...    Dataset "${data_set_name}" is missing the "Create table" link
-
     # Verify Download (ZIP) button
     Page Should Contain Element
     ...    xpath=${dataset_xpath}//button[contains(normalize-space(.), "Download")]
     ...    Dataset "${data_set_name}" is missing the "Download (ZIP)" button
 
-    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
-    user waits until page finishes loading
+    IF    "${is_public_site}" == "True"
+        # Verify Data set information page link
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
+        ...    Dataset "${data_set_name}" is missing the "Data set information page" link
 
-    user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    ${PUBLICATION_TITLE}
+        # Verify Create table link
+        Page Should Contain Element
+        ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
+        ...    Dataset "${data_set_name}" is missing the "Create table" link
+
+        user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
+        user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
+        user waits until page finishes loading
+
+        user waits until table tool wizard step is available    2    Select a data set
+        user checks previous table tool step contains    1    Publication    ${publication_title}
+    END
 
 user checks 'On this page section' for this tab contains
     [Arguments]    @{expected_link_texts}
