@@ -57,9 +57,9 @@ describe('SearchDataSearchForm', () => {
     expect(within(listItems[0]).getAllByText('Publication')).toHaveLength(2);
   });
 
-  test('searches datasets when isSearchData is true', async () => {
+  test('searches datasets when isSearchDataSets is true', async () => {
     dataSetService.suggestDatasets.mockResolvedValue(testDataSetSuggestions);
-    render(<SearchDataSearchForm onSubmit={noop} isSearchData />);
+    render(<SearchDataSearchForm onSubmit={noop} isSearchDataSets />);
     await userEvent.type(screen.getByRole('combobox'), 'find me');
     expect(screen.getByRole('listbox')).not.toHaveClass(
       'autocomplete__menu--hidden',

@@ -18,7 +18,7 @@ import { truncate } from 'lodash';
 import { useRouter } from 'next/router';
 
 interface Props {
-  isSearchData?: boolean;
+  isSearchDataSets?: boolean;
   label?: string;
   onSubmit: (value: string) => void;
 }
@@ -34,7 +34,7 @@ const isDataSetResult = (
 };
 
 export default function SearchForm({
-  isSearchData = false,
+  isSearchDataSets = false,
   label = 'Search',
   onSubmit,
 }: Props) {
@@ -42,6 +42,7 @@ export default function SearchForm({
 
   const wrapper = useRef<HTMLFormElement>(null);
   const autocompleteRef = useRef<Autocomplete>(null);
+  const activeSearchModeRef = useRef(isSearchDataSets);
 
   // The accessible-autocomplete component generates a text input element.
   // We need to access the created elements to:
@@ -69,9 +70,14 @@ export default function SearchForm({
     });
 
     function handleEnter(evt: KeyboardEvent) {
+      if (evt.key !== 'Enter') {
+        return;
+      }
+
       const dropdownVisible =
         autocompleteInput.getAttribute('aria-expanded') === 'true';
-      if (dropdownVisible && evt.key && evt.key === 'Enter') {
+
+      if (dropdownVisible) {
         const searchTerm = new FormData(wrapper.current!).get(
           'search',
         ) as string;
@@ -93,8 +99,12 @@ export default function SearchForm({
     };
   }, [onSubmit]);
 
-  // When switching between dataset/release search mode, clear the autocomplete state
+  // When switching between dataset/release search mode:
+  // 1. Sync the ref to prevent race conditions on in-flight requests
+  // 2. Clear the autocomplete state
   useEffect(() => {
+    activeSearchModeRef.current = isSearchDataSets;
+
     if (autocompleteRef.current) {
       autocompleteRef.current.setState({
         menuOpen: false,
@@ -102,18 +112,28 @@ export default function SearchForm({
         validChoiceMade: false,
       });
     }
-  }, [isSearchData]);
+  }, [isSearchDataSets]);
 
   const fetchResults = (
     enteredText: string,
     populateResults: (suggestions: AzureSuggestResult[]) => void,
   ) => {
-    if (isSearchData) {
+    // Keep track of the search mode at the time of fetch to handle results correctly
+    const modeAtFetchTime = isSearchDataSets;
+
+    if (isSearchDataSets) {
       azureDataSetService
         .suggestDatasets(createDataSetSuggestRequest(router.query, enteredText))
-        .then(populateResults)
+        .then(results => {
+          // Make sure the current mode still matches the mode from when we started
+          if (activeSearchModeRef.current === modeAtFetchTime) {
+            populateResults(results);
+          }
+        })
         .catch(error => {
-          populateResults([]);
+          if (activeSearchModeRef.current === modeAtFetchTime) {
+            populateResults([]);
+          }
           logger.error(error);
         });
       return;
@@ -123,9 +143,16 @@ export default function SearchForm({
       .suggestPublications(
         createStatisticalReleasesSuggestRequest(router.query, enteredText),
       )
-      .then(populateResults)
+      .then(results => {
+        // Make sure the current mode still matches the mode from when we started
+        if (activeSearchModeRef.current === modeAtFetchTime) {
+          populateResults(results);
+        }
+      })
       .catch(error => {
-        populateResults([]);
+        if (activeSearchModeRef.current === modeAtFetchTime) {
+          populateResults([]);
+        }
         logger.error(error);
       });
   };
@@ -136,6 +163,7 @@ export default function SearchForm({
     // tags to be able to check which field it is from, and use accordingly.
     const highlightMatchWithoutTags = sanitizeHtml(result.highlightedMatch, {
       allowedTags: [],
+      allowedAttributes: {},
     });
 
     // We also need to find out which term was highlighted in order to manually
@@ -144,13 +172,25 @@ export default function SearchForm({
       /(?<=<strong>)(.*?)(?=<\/strong>)/,
     );
 
-    const wrapHighlightedTermWithTag = (snippet: string) =>
-      highlightedTerm
-        ? snippet.replaceAll(
+    const wrapHighlightedTermWithTag = (snippet: string) => {
+      const sanitizedSnippet = sanitizeHtml(snippet, {
+        allowedTags: [],
+        allowedAttributes: {},
+      });
+
+      return highlightedTerm
+        ? sanitizedSnippet.replaceAll(
             highlightedTerm[0],
             match => `<strong>${match}</strong>`,
           )
-        : snippet;
+        : sanitizedSnippet;
+    };
+
+    // Sanitize the highlighted match for safety
+    const safeHighlight = sanitizeHtml(result.highlightedMatch, {
+      allowedTags: ['strong'],
+      allowedAttributes: {},
+    });
 
     // For both title and summary, render the `highlightedMatch` from azure
     // if it is from this field.
@@ -159,14 +199,14 @@ export default function SearchForm({
       <span class="autocomplete__option-title">
         ${
           result.title.includes(highlightMatchWithoutTags)
-            ? result.highlightedMatch
+            ? safeHighlight
             : wrapHighlightedTermWithTag(result.title)
         }
       </span>
       <span class="autocomplete__option-summary">
       ${
         result.summary.includes(highlightMatchWithoutTags)
-          ? result.highlightedMatch
+          ? safeHighlight
           : wrapHighlightedTermWithTag(
               truncate(result.summary, { length: 140 }),
             )

@@ -397,7 +397,7 @@ const SearchDataPage: NextPage = () => {
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
             }
-            isSearchData={!isPublicationsSearch}
+            isSearchDataSets={!isPublicationsSearch}
           />
           <a href="#searchResults" className="govuk-skip-link">
             Skip to search results
