@@ -514,7 +514,7 @@ user checks data set details for UI test subject
     user waits until h2 is visible    Explore data used in this release
     User checks page 'Explore and download data' data set available properties
     ...    data_set_name=UI test subject
-    ...    geographical_levels=Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
+    ...    geographical_levels=Local authority, Local authority district, Local enterprise partnership, Opportunity area, Parliamentary constituency, Regional, RSC region, Ward
     ...    expected_row_count=144
     ...    expected_time_period=2005 to 2020
     ...    publication_title=${PUBLICATION_NAME}

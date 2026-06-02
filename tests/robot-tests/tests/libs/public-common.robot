@@ -120,8 +120,7 @@ User checks page 'Explore and download data' data set available properties
 
     # Assert geographic levels
     Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //p[contains(normalize-space(.), "Geographical levels: ${geographical_levels}")]
+    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${geographical_levels}")]
     ...    Dataset "${data_set_name}" has incorrect geographical levels
 
     # Normalize the incoming parameters ($indicators or $filters) into a Python list so the rest of the Robot keyword can treat it uniformly.
@@ -173,21 +172,18 @@ User checks page 'Explore and download data' data set available properties
         ...    Dataset "${data_set_name}" has incorrect API ID value
 
         Page Should Contain Element
-        ...    xpath=${dataset_xpath}
-        ...    //strong[contains(normalize-space(.), "Available by API")]
+        ...    xpath=${dataset_xpath}//strong[contains(normalize-space(.), "Available by API")]
         ...    Dataset "${data_set_name}" is missing "Available by API" tag
     END
 
     # Assert dd value for "Number of rows"
     Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
+    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
     ...    Dataset "${data_set_name}" has incorrect Number of rows
 
     # Assert dd value for "Time period"
     Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
+    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
     ...    Dataset "${data_set_name}" has incorrect Time period
 
     # Verify data guidance content
