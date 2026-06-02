@@ -78,6 +78,12 @@
       "enabled": false
     },
     {
+      "description": "Disable Generator.Equals as v4 requires change - EES-7194 to update",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["Generator.Equals"],
+      "enabled": false
+    },
+    {
       "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
