@@ -6,19 +6,17 @@ import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary, KeysWithType } from '@common/types';
-import classNames from 'classnames';
 import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
 import React, { useMemo } from 'react';
 import {
   TableMappingGroup,
   TypeMapping,
-} from '@admin/pages/release/data/components/DataFileReplacementTable';
+} from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
 import DifferencesItemMappingModal from './DataFileReplacementDifferencesMappingModal';
-import { SourceMappingType } from './DataFileReplacementDifferences';
 
 export default function DifferencesMappingTableRows<
-  ItemType extends SourceMappingType,
+  ItemType extends keyof TypeMapping,
   SourceItemType extends TypeMapping[ItemType]['source'],
 >({
   itemType,
@@ -79,15 +77,15 @@ export default function DifferencesMappingTableRows<
             'No mapping';
 
           return (
-            <tr
-              key={`mapping-${sourceKey}`}
-              className={classNames({
-                'rowHighlight--alert': isUnset,
-              })}
-            >
-              <td className="govuk-!-width-one-quarter">
-                {index === 0 ? group.label : ''}
-              </td>
+            <tr key={`mapping-${sourceKey}`}>
+              {index === 0 && (
+                <th
+                  className="govuk-!-width-one-quarter"
+                  rowSpan={group.mappings.length}
+                >
+                  {group.label}
+                </th>
+              )}
               <td className="govuk-!-width-one-quarter">
                 {String(source[mappedDataLabels[0]])}
               </td>

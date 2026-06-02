@@ -12,9 +12,9 @@ import React, { useCallback, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 import pickBy from 'lodash/pickBy';
 import { Dictionary } from '@common/types';
-import DataFileReplacementTable, {
+import DataFileReplacementDifferencesTable, {
   TableMappingGroup,
-} from './DataFileReplacementTable';
+} from './DataFileReplacementDifferencesTable';
 
 interface Props {
   releaseVersionId: string;
@@ -24,7 +24,6 @@ interface Props {
   reloadPlan: () => void;
 }
 
-export type SourceMappingType = 'indicator' | 'location';
 export default function DataFileReplacementDifferences({
   releaseVersionId,
   fileId,
@@ -202,7 +201,7 @@ export default function DataFileReplacementDifferences({
         represented.
       </p>
 
-      <DataFileReplacementTable
+      <DataFileReplacementDifferencesTable
         tableId="replacements-differences-indicators-table"
         itemType="indicator"
         mappingsPlan={planMappings.indicators}
@@ -211,7 +210,7 @@ export default function DataFileReplacementDifferences({
         handleIndicatorsMappingUpdate={handleIndicatorsMappingUpdate}
         mappedDataLabels={['label', 'name']}
       />
-      <DataFileReplacementTable
+      <DataFileReplacementDifferencesTable
         tableId="replacements-differences-locations-table"
         itemType="location"
         mappingsPlan={planMappings.locations}

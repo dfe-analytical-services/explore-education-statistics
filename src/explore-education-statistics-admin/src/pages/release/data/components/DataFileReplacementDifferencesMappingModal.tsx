@@ -13,17 +13,15 @@ import { Dictionary, KeysWithType } from '@common/types';
 import prefixNoun from '@common/utils/string/prefixNoun';
 import Yup from '@common/validation/yup';
 import React from 'react';
-import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementTable';
+import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
 import startCase from 'lodash/startCase';
-
-type ItemType = 'indicator' | 'location';
 
 interface FormValues {
   selectedCandidate: string;
 }
 
 export default function DifferencesItemMappingModal<
-  TItemType extends ItemType,
+  TItemType extends keyof TypeMapping,
   TSourceItemType extends TypeMapping[TItemType]['source'],
 >({
   mapping,

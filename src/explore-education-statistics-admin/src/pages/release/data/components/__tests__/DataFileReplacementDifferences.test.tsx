@@ -3,17 +3,19 @@ import dataReplacementService, {
 } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
-import DataFileReplacementTable from '../DataFileReplacementTable';
+import DataFileReplacementDifferencesTable from '../DataFileReplacementDifferencesTable';
 import DataFileReplacementDifferences from '../DataFileReplacementDifferences';
 
-jest.mock('../DataFileReplacementTable');
+jest.mock('../DataFileReplacementDifferencesTable');
 jest.mock('@admin/services/dataReplacementService');
 
 beforeEach(() =>
   (
-    DataFileReplacementTable as jest.MockedFn<typeof DataFileReplacementTable>
+    DataFileReplacementDifferencesTable as jest.MockedFn<
+      typeof DataFileReplacementDifferencesTable
+    >
   ).mockImplementation(
-    jest.requireActual('../DataFileReplacementTable').default,
+    jest.requireActual('../DataFileReplacementDifferencesTable').default,
   ),
 );
 
@@ -236,9 +238,9 @@ describe('DataFileReplacementDifferences', () => {
       expect(screen.getByTestId(locationsTableId)).toBeInTheDocument();
     });
 
-    expect(DataFileReplacementTable).toHaveBeenCalledTimes(2);
+    expect(DataFileReplacementDifferencesTable).toHaveBeenCalledTimes(2);
 
-    const { calls } = (DataFileReplacementTable as jest.Mock).mock;
+    const { calls } = (DataFileReplacementDifferencesTable as jest.Mock).mock;
 
     expect(calls[0][0]).toMatchObject({
       tableId: indicatorsTableId,

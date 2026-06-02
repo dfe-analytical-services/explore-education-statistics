@@ -4,9 +4,9 @@ import {
 } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
-import DataFileReplacementTable, {
+import DataFileReplacementDifferencesTable, {
   TableMappingGroup,
-} from '@admin/pages/release/data/components/DataFileReplacementTable';
+} from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
 
 jest.mock('@admin/services/dataReplacementService');
 
@@ -141,7 +141,7 @@ describe('DataFileReplacementDifferences', () => {
   const handler = jest.fn(() => Promise.resolve());
   const sharedRender = () =>
     render(
-      <DataFileReplacementTable
+      <DataFileReplacementDifferencesTable
         tableId="replacements-differences-indicators-table"
         itemType="indicator"
         mappingsPlan={mappingsPlan}
@@ -158,7 +158,7 @@ describe('DataFileReplacementDifferences', () => {
     const locationsTableId = 'locations-table';
 
     render(
-      <DataFileReplacementTable
+      <DataFileReplacementDifferencesTable
         tableId={locationsTableId}
         itemType="location"
         handleIndicatorsMappingUpdate={handler}
@@ -225,8 +225,7 @@ describe('DataFileReplacementDifferences', () => {
 
     const secondRow = within(tbody).getAllByRole('row')[1];
 
-    expect(secondRow.childNodes[0]).toBeEmptyDOMElement();
-    expect(secondRow.childNodes[1]).toHaveTextContent('Enrolments');
+    expect(secondRow.childNodes[0]).toHaveTextContent('Enrolments');
   });
 
   test('renders replacement table and dialog', async () => {

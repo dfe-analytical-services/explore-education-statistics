@@ -34,7 +34,7 @@ export type TableMappingGroup = {
   mappings: string[];
 };
 
-export default function DataFileReplacementTable<
+export default function DataFileDifferencesReplacementTable<
   ItemType extends keyof TypeMapping,
 >({
   tableId,
@@ -76,7 +76,7 @@ export default function DataFileReplacementTable<
   return (
     <div className="table-container">
       <table
-        className="dfe-table--vertical-align-middle dfe-table--row-highlights"
+        className="dfe-table--vertical-align-middle "
         id={tableId}
         data-testid={tableId}
       >
