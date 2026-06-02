@@ -95,7 +95,9 @@
         "MockQueryable.Moq",
         "Npgsql.EntityFrameworkCore.PostgreSQL",
         "Thinktecture.EntityFrameworkCore",
-        "linq2db.EntityFrameworkCore"
+        "linq2db.EntityFrameworkCore",
+        "Asp.Versioning.Mvc",
+        "Asp.Versioning.Mvc.ApiExplorer"
       ],
       "matchUpdateTypes": ["major"],
       "enabled": false
