@@ -129,6 +129,28 @@ def user_checks_dashboard_theme_dropdown_exists():
     return True
 
 
+def _assert_response_contains_requested_release_version_ids(response, requested_release_version_ids: list[str]):
+    # The requested release version IDs array is optional and limits the scope of the Publisher function to only operate on the requested subset of release versions.
+    # If it is empty, the function operates on all relevant release versions, and so the response is not expected to be limited to a specific set of IDs.
+    # In this case, skip the assertion that compares response IDs to requested IDs since there are no requested IDs to compare against.
+    if not requested_release_version_ids:
+        return
+
+    response_json = response.json()
+    response_release_version_ids = response_json.get("releaseVersionIds", [])
+
+    missing_ids = sorted(set(requested_release_version_ids) - set(response_release_version_ids))
+    unexpected_ids = sorted(set(response_release_version_ids) - set(requested_release_version_ids))
+
+    assert not missing_ids and not unexpected_ids, (
+        "Response release version IDs did not match requested release version IDs. "
+        f"Missing IDs: [{', '.join(missing_ids)}]. "
+        f"Unexpected IDs: [{', '.join(unexpected_ids)}]. "
+        f"Requested IDs: [{', '.join(requested_release_version_ids)}]. "
+        f"Response IDs: [{', '.join(response_release_version_ids)}]"
+    )
+
+
 def prepare_scheduled_release_versions_now_via_api(release_version_ids: list[str]):
     response = publisher_functions_client.post(
         "/api/PrepareScheduledReleaseVersionsNow", {"releaseVersionIds": release_version_ids}
@@ -139,6 +161,7 @@ def prepare_scheduled_release_versions_now_via_api(release_version_ids: list[str
         f"Status code: {response.status_code}. "
         f"Response body: {response.text}"
     )
+    _assert_response_contains_requested_release_version_ids(response, release_version_ids)
 
 
 def publish_scheduled_release_versions_now_via_api(release_version_ids: list[str]):
@@ -151,3 +174,4 @@ def publish_scheduled_release_versions_now_via_api(release_version_ids: list[str
         f"Status code: {response.status_code}. "
         f"Response body: {response.text}"
     )
+    _assert_response_contains_requested_release_version_ids(response, release_version_ids)

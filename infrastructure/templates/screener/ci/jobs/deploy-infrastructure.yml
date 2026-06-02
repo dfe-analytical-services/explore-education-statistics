@@ -33,7 +33,7 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
 
-            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
+            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)

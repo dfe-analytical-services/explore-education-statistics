@@ -5,4 +5,5 @@ public enum AnalyticsFromPage
     ReleaseUsefulInfo,
     ReleaseDownloads,
     DataCatalogue,
+    TableToolCropped,
 };

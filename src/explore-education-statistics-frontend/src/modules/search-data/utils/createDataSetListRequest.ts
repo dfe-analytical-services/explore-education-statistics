@@ -1,9 +1,15 @@
 import { odata } from '@azure/search-documents';
-import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
+import {
+  releaseTypes as statisticsReleaseTypes,
+  ReleaseType,
+} from '@common/services/types/releaseType';
+import getAsArray from '@common/utils/getAsArray';
 import getFirst from '@common/utils/getFirst';
+import locationLevelsMap, {
+  GeographicLevelCode,
+} from '@common/utils/locationLevelsMap';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
-import { FindStatisticsPageQuery } from '@frontend/modules/find-statistics/FindStatisticsPage';
 import {
   PublicationSortOption,
   publicationSortOptions,
@@ -11,28 +17,32 @@ import {
 import { SearchDataPageQuery } from '@frontend/modules/search-data/SearchDataPage';
 import { AzureDataSetListRequest } from '@frontend/services/azureDataSetService';
 import { AzureOrderByParam } from '@frontend/services/azurePublicationService';
+import { DataSetType } from '@frontend/services/dataSetFileService';
 import omitBy from 'lodash/omitBy';
 
 export default function createDataSetListRequest(
-  query: FindStatisticsPageQuery,
+  query: SearchDataPageQuery,
 ): AzureDataSetListRequest {
   const {
     dataSetType,
+    geographicLevels,
     latestDataOnly,
-    releaseType,
+    publicationIds,
+    releaseTypes,
     search: searchParam,
     sortBy,
-    themeId,
+    themeIds,
   } = getParamsFromQuery(query);
 
   const orderBy = getSortParam(sortBy);
 
-  // TOOD-7072 finish converting filters into arrays
   const filter = buildODataFilter({
     dataSetType,
+    geographicLevels,
     latestDataOnly,
-    releaseType: releaseType ? [releaseType] : undefined,
-    themeId: themeId ? [themeId] : undefined,
+    publicationIds,
+    releaseTypes,
+    themeIds,
   });
 
   const minSearchCharacters = 3;
@@ -54,33 +64,46 @@ interface SearchFilters {
   geographicLevels?: string[];
   dataSetType: string;
   latestDataOnly?: boolean;
-  releaseId?: string[];
-  releaseType?: string[];
-  themeId?: string[];
+  publicationIds?: string[];
+  releaseTypes?: string[];
+  themeIds?: string[];
 }
 
-// TOOD-7072 add tests
 function buildODataFilter(filters: SearchFilters): string | undefined {
   const conditions: string[] = [];
+  const themeAndPubConditions: string[] = [];
 
-  if (filters.releaseType?.length) {
-    const joined = filters.releaseType.join('|');
-    conditions.push(odata`search.in(releaseType, ${joined}, '|')`);
+  if (filters.themeIds?.length) {
+    const joined = filters.themeIds.join('|');
+    themeAndPubConditions.push(odata`search.in(themeId, ${joined}, '|')`);
   }
 
-  if (filters.themeId?.length) {
-    const joined = filters.themeId.join('|');
-    conditions.push(odata`search.in(themeId, ${joined}, '|')`);
+  if (filters.publicationIds?.length) {
+    const joined = filters.publicationIds.join('|');
+    themeAndPubConditions.push(odata`search.in(publicationId, ${joined}, '|')`);
+  }
+
+  if (themeAndPubConditions.length > 0) {
+    // If both theme and publication ids, we want to match either, so join them with 'or' and wrap in parentheses.
+    // If only one exists, just use it as is.
+    const combinedGroup =
+      themeAndPubConditions.length > 1
+        ? `(${themeAndPubConditions.join(' or ')})`
+        : themeAndPubConditions[0];
+
+    conditions.push(combinedGroup);
+  }
+
+  if (filters.releaseTypes?.length) {
+    const joined = filters.releaseTypes.join('|');
+    conditions.push(odata`search.in(releaseType, ${joined}, '|')`);
   }
 
   if (filters.geographicLevels?.length) {
     const joined = filters.geographicLevels.join('|');
-    conditions.push(odata`search.in(geographicLevels, ${joined}, '|')`);
-  }
-
-  if (filters.releaseId?.length) {
-    const joined = filters.releaseId.join('|');
-    conditions.push(odata`search.in(releaseId, ${joined}, '|')`);
+    conditions.push(
+      odata`geographicLevels/any(g: search.in(g, ${joined}, '|'))`,
+    );
   }
 
   if (filters.latestDataOnly) {
@@ -111,20 +134,34 @@ function getSortParam(sortBy: PublicationSortOption): AzureOrderByParam {
 }
 
 export function getParamsFromQuery(query: SearchDataPageQuery) {
+  const releaseTypesArray = getAsArray(query.releaseType) ?? [];
+
+  const validReleaseTypes = releaseTypesArray.filter(type =>
+    isOneOf(type, Object.keys(statisticsReleaseTypes)),
+  ) as ReleaseType[];
+
+  const geographicLevelsArray = getAsArray(query.geographicLevel) ?? [];
+
+  const validGeographicLevels = geographicLevelsArray.filter(type =>
+    isOneOf(
+      type,
+      Object.values(locationLevelsMap).map(level => level.code),
+    ),
+  ) as GeographicLevelCode[];
+
   return {
-    dataSetType: query.dataSetType === 'api' ? 'api' : 'all',
+    dataSetType: query.dataSetType === 'api' ? 'api' : ('all' as DataSetType),
+    geographicLevels:
+      validGeographicLevels.length > 0 ? validGeographicLevels : undefined,
     latestDataOnly: !query.latestDataOnly || query.latestDataOnly !== 'false',
     page: getFirst(query.page),
-    releaseType:
-      query.releaseType &&
-      isOneOf(query.releaseType, Object.keys(releaseTypes) as ReleaseType[])
-        ? query.releaseType
-        : undefined,
+    publicationIds: getAsArray(query.publicationId),
+    releaseTypes: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,
     search: getFirst(query.search),
     sortBy:
       query.sortBy && isOneOf(query.sortBy, publicationSortOptions)
         ? query.sortBy
         : 'newest',
-    themeId: getFirst(query.themeId),
+    themeIds: getAsArray(query.themeId),
   };
 }

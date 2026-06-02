@@ -12,7 +12,14 @@ import { Dictionary } from '@common/types';
 import sortAlphabeticalTotalsFirst from '@common/utils/sortAlphabeticalTotalsFirst';
 import classNames from 'classnames';
 import get from 'lodash/get';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import styles from './FilterHierarchy.module.scss';
 import FilterHierarchyOptions, {
@@ -77,21 +84,8 @@ function FilterHierarchy({
   });
 
   const [expandedOptionsList, setExpandedOptionsList] = useState<string[]>([]);
-  const [tierSelectionLoading, setTierSelectionLoading] = useState(false);
-
-  const updateTierSelectionState = useCallback(
-    (updater: (prev: TierSelectionState[]) => TierSelectionState[]) => {
-      setTierSelectionLoading(true);
-      setTierSelectionState(updater);
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (tierSelectionLoading) {
-      setTierSelectionLoading(false);
-    }
-  }, [tierSelectionState, tierSelectionLoading]);
+  const [isPendingTierSelection, startTierSelectionTransition] =
+    useTransition();
 
   const filterLabels: string[] = [
     ...filterHierarchy.map(({ filterId }) => optionLabelsMap[filterId ?? '']),
@@ -182,41 +176,44 @@ function FilterHierarchy({
           selectedValues.includes(filterOptionId),
         );
 
-      updateTierSelectionState(prev =>
+      setTierSelectionState(prev =>
         prev.map((item, index) =>
           index === tier ? { ...item, selected: allTierOptionsSelected } : item,
         ),
       );
     },
-    [tierOptions, selectedValues, updateTierSelectionState],
+    [tierOptions, selectedValues, setTierSelectionState],
   );
 
   const toggleTierSelection = useCallback(
     (tier: number) => {
-      const deselectAllFiltersForTier = () => {
-        setValue(
-          name,
-          selectedValues.filter(sv => !tierOptions[tier].includes(sv)),
-        );
-      };
+      startTierSelectionTransition(() => {
+        const deselectAllFiltersForTier = () => {
+          setValue(
+            name,
+            selectedValues.filter(sv => !tierOptions[tier].includes(sv)),
+          );
+        };
 
-      const selectAllFiltersForTier = () => {
-        const combinedSelections = [...selectedValues, ...tierOptions[tier]];
-        const distinctSelections = combinedSelections.reduce(
-          (acc: string[], item) => (acc.includes(item) ? acc : [...acc, item]),
-          [],
-        );
+        const selectAllFiltersForTier = () => {
+          const combinedSelections = [...selectedValues, ...tierOptions[tier]];
+          const distinctSelections = combinedSelections.reduce(
+            (acc: string[], item) =>
+              acc.includes(item) ? acc : [...acc, item],
+            [],
+          );
 
-        setValue(name, distinctSelections);
-      };
+          setValue(name, distinctSelections);
+        };
 
-      if (tierSelectionState[tier].selected) {
-        deselectAllFiltersForTier();
-      } else {
-        selectAllFiltersForTier();
-      }
+        if (tierSelectionState[tier].selected) {
+          deselectAllFiltersForTier();
+        } else {
+          selectAllFiltersForTier();
+        }
 
-      handleTierOptionChange(tier);
+        handleTierOptionChange(tier);
+      });
     },
     [
       name,
@@ -229,7 +226,7 @@ function FilterHierarchy({
   );
 
   useEffect(() => {
-    updateTierSelectionState(prev =>
+    setTierSelectionState(prev =>
       prev.map((item, index) => ({
         ...item,
         disabled:
@@ -242,12 +239,7 @@ function FilterHierarchy({
           ),
       })),
     );
-  }, [
-    tierOptions,
-    hierarchySearchTerm,
-    selectedValues,
-    updateTierSelectionState,
-  ]);
+  }, [tierOptions, hierarchySearchTerm, selectedValues, setTierSelectionState]);
 
   const getOptionUniqueValue = useCallback(
     (optionValue: string): string => {
@@ -456,7 +448,7 @@ function FilterHierarchy({
                 </div>
               );
             })}
-            <LoadingSpinner loading={tierSelectionLoading} inline size="sm" />
+            <LoadingSpinner loading={isPendingTierSelection} inline size="sm" />
           </div>
           {rootOptionTrees.map(optionTree => {
             return (

@@ -1,0 +1,20 @@
+[checking]
+recursionlevel=4
+timeout=10
+threads=30
+
+[output]
+log=text
+fileoutput=html
+verbose=0
+
+[html]
+filename=linkcheckerreport.html
+
+[filtering]
+ignore=
+	_next/.*
+	data-tables/*
+	data-catalogue/*
+
+[AnchorCheck]

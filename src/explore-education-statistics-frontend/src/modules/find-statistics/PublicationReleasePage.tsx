@@ -143,6 +143,26 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
         };
       }
 
+      // We have some links in publications which do not contain a release slug but do contain '#' anchors/quick-jump.
+      // For example, `find-statistics/apprenticeships-and-traineeships/explore#supporting-files-section`
+      // as opposed to `find-statistics/apprenticeships-and-traineeships/2022-23/explore#supporting-files-section`
+      // For these links, a redirect is needed in order for them to work as expected.
+      // This logic works around this issue, so that links which don't contain a release slug and do contain an anchor/quick jump ('#')
+      // continue to work as expected when clicked on.
+      const linkMissingReleaseSlugAndContainsTabName =
+        releaseSlug === 'explore' ||
+        releaseSlug === 'help' ||
+        releaseSlug === 'methodology';
+
+      if (linkMissingReleaseSlugAndContainsTabName) {
+        return {
+          redirect: {
+            destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}/${releaseSlug}`,
+            permanent: true,
+          },
+        };
+      }
+
       const releaseVersionSummary = await queryClient.fetchQuery(
         publicationQueries.getReleaseVersionSummary(
           publicationSlug,

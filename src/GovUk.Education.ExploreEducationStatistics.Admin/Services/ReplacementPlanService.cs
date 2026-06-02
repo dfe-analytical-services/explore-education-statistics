@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -27,7 +26,6 @@ public class ReplacementPlanService(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
     IFilterRepository filterRepository,
-    ILocationRepository locationRepository,
     IFootnoteRepository footnoteRepository,
     IDataSetVersionService dataSetVersionService,
     ITimePeriodService timePeriodService,
@@ -168,6 +166,34 @@ public class ReplacementPlanService(
                             .Indicator.Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
                             .ToDictionary(i => i.Name, i => new ReplacementPlanIndicatorViewModel { Label = i.Label }),
                     },
+                    Locations = new ReplacementPlanLocationMappingsViewModel
+                    {
+                        Mappings = mapping.LocationMappings.Values.ToDictionary(
+                            map => map.OriginalId,
+                            map => new ReplacementPlanLocationMappingViewModel
+                            {
+                                Source = new ReplacementPlanLocationViewModel
+                                {
+                                    Code = map.OriginalCode,
+                                    Name = map.OriginalName,
+                                },
+                                Type = map.Status.ToString(),
+                                CandidateKey = map.ReplacementId,
+                            }
+                        ),
+                        Candidates = statisticsDbContext
+                            .Observation.Where(o => o.SubjectId == replacementSubjectId)
+                            .Select(o => o.Location)
+                            .Distinct()
+                            .ToDictionary(
+                                l => l.Id,
+                                l => new ReplacementPlanLocationViewModel
+                                {
+                                    Code = l.ToLocationAttribute().GetCodeOrFallback(),
+                                    Name = l.ToLocationAttribute().Name ?? "",
+                                }
+                            ),
+                    },
                 };
 
                 return new DataReplacementPlanViewModel
@@ -223,19 +249,12 @@ public class ReplacementPlanService(
 
         var filters = filtersIncludingItems.ToDictionary(filter => filter.Name, filter => filter);
 
-        var locations = await locationRepository.GetDistinctForSubject(subjectId);
-
         var timePeriods = await timePeriodService.GetTimePeriods(subjectId);
 
-        // We don't need to include data about indicators here - DataSetMapping contains the data we require to
+        // We don't need to include data about locations or indicators here - DataSetMapping contains the data we require to
         // validate the replacement
 
-        return new ReplacementSubjectMeta
-        {
-            Filters = filters,
-            Locations = locations,
-            TimePeriods = timePeriods,
-        };
+        return new ReplacementSubjectMeta { Filters = filters, TimePeriods = timePeriods };
     }
 
     private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(
@@ -255,7 +274,7 @@ public class ReplacementPlanService(
                 var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
                 var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
                 var indicatorGroups = CreateIndicatorGroupReplacementViewModel(dataBlock.Query.Indicators, mapping);
-                var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
+                var locations = ValidateLocationsForDataBlock(dataBlock.Query.LocationIds, mapping);
                 var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
                 return new DataBlockReplacementPlanViewModel(
@@ -455,27 +474,24 @@ public class ReplacementPlanService(
     }
 
     private Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
-        DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta
+        List<Guid> dataBlockLocationIds,
+        DataSetMapping mapping
     )
     {
-        return statisticsDbContext
-            .Location.AsNoTracking()
-            .Where(location => dataBlock.Query.LocationIds.Contains(location.Id))
-            .ToList()
-            .GroupBy(location => location.GeographicLevel)
+        return mapping
+            .LocationMappings.Values.Where(map => dataBlockLocationIds.Contains(map.OriginalId))
+            .GroupBy(map => map.OriginalGeographicLevel)
             .ToDictionary(
                 group => group.Key.ToString(),
                 group => new LocationReplacementViewModel(
                     label: group.Key.ToString(),
                     locationAttributes: group
-                        .Select(location =>
-                            ValidateLocationForReplacement(
-                                location: location,
-                                level: group.Key,
-                                replacementSubjectMeta: replacementSubjectMeta
-                            )
-                        )
+                        .Select(map => new LocationAttributeReplacementViewModel(
+                            id: map.OriginalId,
+                            code: map.OriginalCode,
+                            label: map.OriginalName,
+                            target: map.ReplacementId
+                        ))
                         .OrderBy(location => location.Label, LabelComparer)
                 )
             );
@@ -544,29 +560,6 @@ public class ReplacementPlanService(
         );
     }
 
-    private static LocationAttributeReplacementViewModel ValidateLocationForReplacement(
-        Location location,
-        GeographicLevel level,
-        ReplacementSubjectMeta replacementSubjectMeta
-    )
-    {
-        var locationAttribute = location.ToLocationAttribute();
-        var code = locationAttribute.GetCodeOrFallback();
-
-        // If the replacement subject contains the same location by id then use it,
-        // otherwise try to find a location with the same code
-        var target =
-            replacementSubjectMeta.Locations.SingleOrDefault(l => l.Id == location.Id)?.Id
-            ?? FindReplacementLocation(replacementSubjectMeta, level, code);
-
-        return new LocationAttributeReplacementViewModel(
-            id: location.Id,
-            code: code,
-            label: locationAttribute.Name ?? string.Empty,
-            target: target
-        );
-    }
-
     private static Dictionary<Guid, IndicatorGroupReplacementViewModel> CreateIndicatorGroupReplacementViewModel(
         IEnumerable<Guid> indicatorIds,
         DataSetMapping mapping
@@ -619,31 +612,9 @@ public class ReplacementPlanService(
         return replacementFilterGroup?.FilterItems.SingleOrDefault(filterItem => filterItem.Label == filterItemLabel);
     }
 
-    private static Guid? FindReplacementLocation(
-        ReplacementSubjectMeta replacementSubjectMeta,
-        GeographicLevel level,
-        string locationCode
-    )
-    {
-        var candidateReplacements = replacementSubjectMeta
-            .Locations.Where(location =>
-                // Filter by level as the other locations are unlikely to have matching codes
-                // and even if they did we shouldn't target a replacement location with a different level
-                location.GeographicLevel == level
-                && location.ToLocationAttribute().GetCodeOrFallback() == locationCode
-            )
-            .ToList();
-
-        // Only return a location if there's exactly one.
-        // We could try and reduce the chance of there being multiple by matching on name as well as code,
-        // but this would restrict replacements from correcting location names.
-        return candidateReplacements.Count == 1 ? candidateReplacements[0].Id : null;
-    }
-
     private class ReplacementSubjectMeta
     {
         public Dictionary<string, Filter> Filters { get; set; } = new();
-        public IList<Location> Locations { get; set; } = null!;
         public IList<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; } = null!;
     }
 }

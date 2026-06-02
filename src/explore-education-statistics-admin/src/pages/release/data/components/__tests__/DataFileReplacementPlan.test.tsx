@@ -1,15 +1,16 @@
+import { AuthContext } from '@admin/contexts/AuthContext';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFileReplacementPlan';
 import _dataBlockService from '@admin/services/dataBlockService';
 import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _footnoteService from '@admin/services/footnoteService';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
-import userEvent from '@testing-library/user-event';
-import { AuthContext } from '@admin/contexts/AuthContext';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
@@ -340,6 +341,9 @@ describe('DataReplacementPlan', () => {
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
     valid: false,
+    mapping: {
+      indicators: { candidates: {}, mappings: {} },
+    },
   };
 
   const testValidReplacementPlan: DataReplacementPlan = {
@@ -402,6 +406,9 @@ describe('DataReplacementPlan', () => {
       valid: true,
     },
     valid: true,
+    mapping: {
+      indicators: { candidates: {}, mappings: {} },
+    },
   };
 
   const locationsBauInstruction =
@@ -1576,13 +1583,28 @@ describe('DataReplacementPlan', () => {
       permissions: defaultPermissions,
     };
 
+    const createTestQueryClient = () => {
+      return new QueryClient({
+        defaultOptions: {
+          queries: {
+            // Avoid retries to speed up testing feedback
+            retry: false,
+          },
+        },
+      });
+    };
+
+    const testQueryClient = createTestQueryClient();
+
     return render(
       <TestConfigContextProvider
         config={{
           ...defaultTestConfig,
         }}
       >
-        <AuthContext value={{ user }}>{children}</AuthContext>
+        <QueryClientProvider client={testQueryClient}>
+          <AuthContext value={{ user }}>{children}</AuthContext>
+        </QueryClientProvider>
       </TestConfigContextProvider>,
     );
   }
