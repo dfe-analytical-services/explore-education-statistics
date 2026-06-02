@@ -365,6 +365,13 @@ public class DataSetFileStorageTests
             Assert.NotNull(result);
             Assert.Equal(DataSetUploadScreeningStatus.ScreenerError, result.ScreeningStatus);
             Assert.Null(result.ScreenerResult);
+
+            Assert.NotNull(result.ScreenerProgress);
+            Assert.NotNull(result.ScreenerProgress);
+            Assert.Equal(100, result.ScreenerProgress.PercentageComplete);
+            Assert.False(result.ScreenerProgress.Passed);
+            Assert.True(result.ScreenerProgress.Completed);
+            Assert.Equal("Screener error", result.ScreenerProgress.Stage);
         }
     }
 

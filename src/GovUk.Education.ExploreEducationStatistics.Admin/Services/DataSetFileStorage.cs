@@ -222,6 +222,14 @@ public class DataSetFileStorage(
         if (screenerResult is null)
         {
             upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
+
+            upload.ScreenerProgress = new DataSetScreenerProgress
+            {
+                Completed = true,
+                Passed = false,
+                PercentageComplete = 100,
+                Stage = "Screener error",
+            };
         }
         else
         {
