@@ -409,16 +409,24 @@ public class DataSetFileStorageTests
 
             Assert.NotNull(updatedDataSetUpload);
 
+            Assert.NotNull(updatedDataSetUpload.ScreenerProgress);
+            Assert.Equal(100, updatedDataSetUpload.ScreenerProgress.PercentageComplete);
+            Assert.True(updatedDataSetUpload.ScreenerProgress.Completed);
+            Assert.Equal("Complete", updatedDataSetUpload.ScreenerProgress.Stage);
+
             switch (testResult)
             {
                 case TestResult.PASS:
                     Assert.Equal(DataSetUploadScreeningStatus.PendingImport, updatedDataSetUpload.ScreeningStatus);
+                    Assert.True(updatedDataSetUpload.ScreenerProgress.Passed);
                     break;
                 case TestResult.WARNING:
                     Assert.Equal(DataSetUploadScreeningStatus.PendingReview, updatedDataSetUpload.ScreeningStatus);
+                    Assert.True(updatedDataSetUpload.ScreenerProgress.Passed);
                     break;
                 case TestResult.FAIL:
                     Assert.Equal(DataSetUploadScreeningStatus.FailedScreening, updatedDataSetUpload.ScreeningStatus);
+                    Assert.False(updatedDataSetUpload.ScreenerProgress.Passed);
                     break;
             }
 
