@@ -84,6 +84,12 @@
       "enabled": false
     },
     {
+      "description": "Disable Microsoft.ApplicationInsights.* - EES-7198 to update",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["Microsoft.ApplicationInsights", "Microsoft.ApplicationInsights.AspNetCore", "Microsoft.ApplicationInsights.WorkerService"],
+      "enabled": false
+    },
+    {
       "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
