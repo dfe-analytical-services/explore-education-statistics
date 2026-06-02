@@ -11,8 +11,12 @@ param resourceNames ResourceNames
 @description('Location for all resources.')
 param location string
 
-@description('Storage container name for search documents in the Search storage account.')
-param searchDocumentsContainerName string = 'searchable-documents'
+@description('Storage container names for search documents. A container for each value will be created in the Search storage account.')
+param searchStorageDocumentContainerNames object = {
+  searchDocuments: 'searchable-documents'
+  nlSearchDocuments: 'nl-search-documents'
+  nlDatasetSearchDocuments: 'nl-dataset-search-documents'
+}
 
 @description('A list of IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
 param searchServiceIpRules IpRange[]
@@ -96,7 +100,7 @@ module searchStorageAccountBlobServiceModule '../../common/components/blobServic
   name: 'searchStorageAccountBlobServiceModuleDeploy'
   params: {
     storageAccountName: searchStorageAccountModule.outputs.storageAccountName
-    containerNames: [searchDocumentsContainerName]
+    containerNames: items(searchStorageDocumentContainerNames)
   }
 }
 
@@ -109,9 +113,9 @@ module searchServiceBlobRoleAssignmentModule '../../common/components/storageAcc
   }
 }
 
-output searchDocumentsContainerName string = searchDocumentsContainerName
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
 output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName
 output searchStorageAccountManagedIdentityConnectionString string = 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
 output searchStorageAccountName string = searchStorageAccountModule.outputs.storageAccountName
+output searchStorageDocumentContainerNames object = searchStorageDocumentContainerNames
