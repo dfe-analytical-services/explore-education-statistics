@@ -69,7 +69,7 @@ jobs:
                   - $(publicSiteUrl)
                   - 'http://localhost:3000'
                 dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
-                dataSourceContainerName: $(searchableDocumentsContainerName)
+                dataSourceContainerName: $(searchDocumentsContainerName)
                 indexName: ${{ variables.searchServiceIndexName }}
                 indexerName: ${{ variables.searchServiceIndexerName }}
                 searchServiceEndpoint: $(searchServiceEndpoint)

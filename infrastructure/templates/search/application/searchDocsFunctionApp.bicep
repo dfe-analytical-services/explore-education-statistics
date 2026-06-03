@@ -24,8 +24,8 @@ param searchStorageAccountName string
 @secure()
 param searchStorageAccountConnectionStringSecretName string
 
-@description('Name of the searchable documents container in the storage account.')
-param searchableDocumentsContainerName string
+@description('Storage container name for search documents in the Search storage account.')
+param searchDocumentsContainerName string
 
 @description('The IP address ranges that can access the Search Docs Function App storage accounts.')
 param storageFirewallRules IpRange[]
@@ -91,9 +91,9 @@ resource searchBlobStorage 'Microsoft.Storage/storageAccounts/blobServices@2023-
   parent: searchStorageAccount
 }
 
-resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+resource searchDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
   parent: searchBlobStorage
-  name: searchableDocumentsContainerName
+  name: searchDocumentsContainerName
 }
 
 resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
@@ -113,8 +113,8 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
         value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName})'
       }
       {
-        name: 'App__SearchableDocumentsContainerName'
-        value: searchableDocumentsContainer.name
+        name: 'App__SearchDocumentsContainerName'
+        value: searchDocumentsContainer.name
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
