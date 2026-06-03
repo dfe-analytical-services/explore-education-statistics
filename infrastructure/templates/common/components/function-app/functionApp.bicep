@@ -27,8 +27,8 @@ param operatingSystem 'Windows' | 'Linux' = 'Linux'
 ])
 param functionAppRuntime string = 'dotnet-isolated'
 
-@description('Function app runtime version.')
-param functionAppRuntimeVersion string = '8.0'
+@description('.NET Framework version.')
+param netFrameworkVersion string?
 
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
@@ -276,7 +276,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       functionAppScaleLimit: maximumInstanceCount
       healthCheckPath: healthCheckPath
       minTlsVersion: '1.3'
-      netFrameworkVersion: functionAppRuntimeVersion
+      netFrameworkVersion: netFrameworkVersion
       linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
       ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
