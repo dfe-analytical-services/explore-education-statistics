@@ -11,8 +11,8 @@ param functionAppFirewallRules FirewallRule[]
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Specifies the Search Service indexer name.')
-param searchServiceIndexerName string
+@description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
+param searchServiceSearchIndexerName string
 
 @description('Specifies the Search Service name.')
 param searchServiceName string
@@ -122,7 +122,7 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
       }
       {
         name: 'AzureSearch__IndexerName'
-        value: searchServiceIndexerName
+        value: searchServiceSearchIndexerName
       }
       {
         name: 'ContentApi__Url'

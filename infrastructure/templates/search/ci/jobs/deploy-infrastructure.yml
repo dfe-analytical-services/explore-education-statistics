@@ -53,7 +53,7 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                searchServiceIndexerName: ${{ variables.searchServiceSearchIndexerName }}
+                searchServiceSearchIndexerName: ${{ variables.searchServiceSearchIndexerName }}
                 searchDocsFunctionAppExists: false
 
             - template: ../../../../common/ci/tasks/check-function-app-exists.yml
@@ -69,7 +69,7 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                searchServiceIndexerName: ${{ variables.searchServiceSearchIndexerName }}
+                searchServiceSearchIndexerName: ${{ variables.searchServiceSearchIndexerName }}
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)
 
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml

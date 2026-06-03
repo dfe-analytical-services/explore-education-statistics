@@ -29,8 +29,8 @@ param contentApiUrl string
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param searchDocsFunctionAppExists bool = true
 
-@description('Specifies the name of the Azure AI Search indexer.')
-param searchServiceIndexerName string = ''
+@description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
+param searchServiceSearchIndexerName string = ''
 
 @description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
 @allowed([
@@ -129,7 +129,7 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
       maintenanceFirewallRules
     )
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
-    searchServiceIndexerName: searchServiceIndexerName
+    searchServiceSearchIndexerName: searchServiceSearchIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName

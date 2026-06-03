@@ -14,7 +14,7 @@ parameters:
   - name: searchDocsFunctionAppExists
     type: string
     default: true
-  - name: searchServiceIndexerName
+  - name: searchServiceSearchIndexerName
     type: string
 
 steps:
@@ -36,6 +36,6 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
-              searchServiceIndexerName=${{ parameters.searchServiceIndexerName }} \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
-              searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }}
+              searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }} \
+              searchServiceSearchIndexerName=${{ parameters.searchServiceIndexerName }}
