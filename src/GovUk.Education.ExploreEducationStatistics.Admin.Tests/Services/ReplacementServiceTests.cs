@@ -676,7 +676,7 @@ public class ReplacementServiceTests
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>(), false))
             .ReturnsAsync(Unit.Instance);
 
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
@@ -1069,7 +1069,7 @@ public class ReplacementServiceTests
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, false))
             .ReturnsAsync(Unit.Instance);
 
         var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
@@ -1566,7 +1566,7 @@ public class ReplacementServiceTests
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, false))
             .ReturnsAsync(Unit.Instance);
 
         var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
@@ -1905,7 +1905,7 @@ public class ReplacementServiceTests
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, false))
             .ReturnsAsync(Unit.Instance);
 
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
@@ -2143,7 +2143,7 @@ public class ReplacementServiceTests
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, false))
             .ReturnsAsync(Unit.Instance);
 
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
@@ -2346,7 +2346,7 @@ public class ReplacementServiceTests
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id, false))
             .ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2546,7 +2546,7 @@ public class ReplacementServiceTests
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(contentReleaseVersion.Id, originalFile.Id))
+            .Setup(service => service.RemoveDataFiles(contentReleaseVersion.Id, originalFile.Id, false))
             .ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

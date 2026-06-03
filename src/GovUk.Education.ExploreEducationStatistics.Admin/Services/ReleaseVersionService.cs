@@ -639,7 +639,10 @@ public class ReleaseVersionService(
             });
     }
 
-    private async Task<Either<ActionResult, Unit>> ValidateDataFilesStatusForDeletion(ReleaseFile releaseFile)
+    private async Task<Either<ActionResult, Unit>> ValidateDataFilesStatusForDeletion(
+        ReleaseFile releaseFile,
+        bool isReplacement
+    )
     {
         var dataSetVersionStatus = await GetDataSetVersionStatus(releaseFile);
         var fileExistsInPublishedReleaseVersion = await context
@@ -650,6 +653,16 @@ public class ReleaseVersionService(
         );
         var draftReleaseFile = !fileExistsInPublishedReleaseVersion;
 
+        if (!isReplacement && releaseFile.File.ReplacingId.HasValue)
+        {
+            return ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.CannotCancelReplacementWhenOriginalFile.Code,
+                    Message = ValidationMessages.CannotCancelReplacementWhenOriginalFile.Message,
+                }
+            );
+        }
         if (releaseFile.File.ReplacedById is not null && releaseFile.PublicApiDataSetId is not null)
         {
             return ValidationUtils.ValidationResult(
@@ -674,14 +687,18 @@ public class ReleaseVersionService(
         return Unit.Instance;
     }
 
-    public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
+    public async Task<Either<ActionResult, Unit>> RemoveDataFiles(
+        Guid releaseVersionId,
+        Guid fileId,
+        bool isReplacement = false
+    )
     {
         return await context
             .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
-            .OnSuccessDo(ValidateDataFilesStatusForDeletion)
+            .OnSuccessDo(releaseFile => ValidateDataFilesStatusForDeletion(releaseFile, isReplacement))
             .OnSuccessDo(async releaseFile =>
             {
                 // Remove any mapping that exists for the data set
@@ -701,7 +718,8 @@ public class ReleaseVersionService(
                 {
                     return await RemoveDataFiles(
                         releaseVersionId: releaseVersionId,
-                        fileId: releaseFile.File.ReplacedById.Value
+                        fileId: releaseFile.File.ReplacedById.Value,
+                        isReplacement: true
                     );
                 }
 

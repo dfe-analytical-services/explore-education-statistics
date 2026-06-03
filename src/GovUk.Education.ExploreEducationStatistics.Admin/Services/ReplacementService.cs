@@ -143,7 +143,8 @@ public class ReplacementService(
 
                 return await releaseVersionService.RemoveDataFiles(
                     releaseVersionId: releaseVersionId,
-                    fileId: originalReleaseFile.FileId
+                    fileId: originalReleaseFile.FileId,
+                    isReplacement: false
                 );
             });
     }

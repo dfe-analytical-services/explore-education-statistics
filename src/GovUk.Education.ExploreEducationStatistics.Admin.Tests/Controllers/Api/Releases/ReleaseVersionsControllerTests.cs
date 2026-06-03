@@ -300,7 +300,7 @@ public class ReleaseVersionsControllerUnitTests
         var fileId = Guid.NewGuid();
 
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
+            .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId, false))
             .ReturnsAsync(Unit.Instance);
 
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
@@ -323,7 +323,7 @@ public class ReleaseVersionsControllerUnitTests
         var fileId = Guid.NewGuid();
 
         releaseVersionService
-            .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId))
+            .Setup(service => service.RemoveDataFiles(_releaseVersionId, fileId, false))
             .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
 
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);

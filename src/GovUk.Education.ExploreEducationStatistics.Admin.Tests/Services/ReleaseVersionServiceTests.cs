@@ -621,6 +621,42 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
+        public async Task FileIsOriginalButAttemptedToCancelReplacement_ValidationProblem()
+        {
+            var contextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+
+            var testFixture = await RemoveDataSetTestFixture.CreateApiLinkedToRelease(
+                _dataFixture,
+                DataSetVersionStatus.Published,
+                statisticsDbContext,
+                contentDbContext,
+                replacedById: null,
+                replacingId: Guid.NewGuid(),
+                releaseVersionPublished: false
+            );
+
+            var releaseVersionService = BuildService(
+                contentDbContext: contentDbContext,
+                dataSetVersionService: testFixture.DataSetVersionService.Object,
+                dataImportService: testFixture.DataImportService.Object
+            );
+
+            var result = await releaseVersionService.RemoveDataFiles(
+                releaseVersionId: testFixture.ReleaseVersion.Id,
+                fileId: testFixture.File.Id,
+                isReplacement: false // default when omitted, included for clarity
+            );
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: null,
+                expectedCode: ValidationMessages.CannotCancelReplacementWhenOriginalFile.Code
+            );
+        }
+
+        [Fact]
         public async Task FileLinkedToPublicApiDataSetAndIsReplaced_ValidationProblem()
         {
             var contextId = Guid.NewGuid().ToString();
@@ -681,7 +717,8 @@ public abstract class ReleaseVersionServiceTests
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await releaseVersionService.RemoveDataFiles(
                     releaseVersionId: testFixture.ReleaseVersion.Id,
-                    fileId: testFixture.File.Id
+                    fileId: testFixture.File.Id,
+                    isReplacement: true
                 )
             );
 

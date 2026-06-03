@@ -39,6 +39,11 @@ public static class ValidationMessages
         Message: "The data file uploaded has incomplete sections or has resulted in a major version update which is not allowed in release amendments."
     );
 
+    public static readonly LocalizableMessage CannotCancelReplacementWhenOriginalFile = new(
+        Code: nameof(CannotCancelReplacementWhenOriginalFile),
+        Message: "This must be a replacement file linked to an original file, not the original file itself."
+    );
+
     public static readonly LocalizableMessage ReleaseFileMustBeOriginal = new(
         Code: nameof(ReleaseFileMustBeOriginal),
         Message: "This must be an original file linked to a replacement. You must cancel the replacement first before removing file."
