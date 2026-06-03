@@ -20,10 +20,24 @@ jobs:
         value: $(templateDirectory)/parameters
       - name: paramFile
         value: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
-      - name: searchServiceIndexName
+      - name: searchServiceSearchIndexName
         value: 'index-1'
-      - name: searchServiceIndexerName
-        value: ${{ variables.searchServiceIndexName }}-indexer
+      - name: searchServiceSearchIndexerName
+        value: ${{ variables.searchServiceSearchIndexName }}-indexer
+      - name: searchServiceSearchIndexerParsingMode
+        value: 'default'
+      - name: searchServiceNLSearchIndexName
+        value: 'nl-search-index'
+      - name: searchServiceNLSearchIndexerName
+        value: ${{ variables.searchServiceNLSearchIndexName }}-indexer
+      - name: searchServiceNLSearchIndexerParsingMode
+        value: 'json'
+      - name: searchServiceNLDatasetSearchIndexName
+        value: 'nl-dataset-search-index'
+      - name: searchServiceNLDatasetSearchIndexerName
+        value: ${{ variables.searchServiceNLDatasetSearchIndexName }}-indexer
+      - name: searchServiceNLDatasetSearchIndexerParsingMode
+        value: 'json'
     strategy:
       runOnce:
         deploy:
@@ -39,7 +53,7 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                searchServiceIndexerName: ${{ variables.searchServiceIndexerName }}
+                searchServiceIndexerName: ${{ variables.searchServiceSearchIndexerName }}
                 searchDocsFunctionAppExists: false
 
             - template: ../../../../common/ci/tasks/check-function-app-exists.yml
@@ -55,13 +69,14 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                searchServiceIndexerName: ${{ variables.searchServiceIndexerName }}
+                searchServiceIndexerName: ${{ variables.searchServiceSearchIndexerName }}
                 searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)
 
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
 
+            # Deploy Azure AI Search index/indexer/data source configuration for search documents
             - template: ../tasks/deploy-search-service-config.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
@@ -70,6 +85,36 @@ jobs:
                   - 'http://localhost:3000'
                 dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
                 dataSourceContainerName: $(searchDocumentsContainerName)
-                indexName: ${{ variables.searchServiceIndexName }}
-                indexerName: ${{ variables.searchServiceIndexerName }}
+                indexName: ${{ variables.searchServiceSearchIndexName }}
+                indexerName: ${{ variables.searchServiceSearchIndexerName }}
+                indexerOutputFieldMappingsFilePath: $(templateDirectory)/application/indexer-output-field-mappings/index-1.json
+                indexerParsingMode: ${{ variables.searchServiceSearchIndexerParsingMode }}
+                searchServiceEndpoint: $(searchServiceEndpoint)
+
+            # Deploy Azure AI Search index/indexer/data source configuration for natural language search documents
+            - template: ../tasks/deploy-search-service-config.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                indexCorsAllowedOrigins:
+                  - $(publicSiteUrl)
+                  - 'http://localhost:3000'
+                dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
+                dataSourceContainerName: $(nlSearchDocumentsContainerName)
+                indexName: ${{ variables.searchServiceNLSearchIndexName }}
+                indexerName: ${{ variables.searchServiceNLSearchIndexerName }}
+                indexerParsingMode: ${{ variables.searchServiceNLSearchIndexerParsingMode }}
+                searchServiceEndpoint: $(searchServiceEndpoint)
+
+            # Deploy Azure AI Search index/indexer/data source configuration for natural language dataset search documents
+            - template: ../tasks/deploy-search-service-config.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                indexCorsAllowedOrigins:
+                  - $(publicSiteUrl)
+                  - 'http://localhost:3000'
+                dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
+                dataSourceContainerName: $(nlDatasetSearchDocumentsContainerName)
+                indexName: ${{ variables.searchServiceNLDatasetSearchIndexName }}
+                indexerName: ${{ variables.searchServiceNLDatasetSearchIndexerName }}
+                indexerParsingMode: ${{ variables.searchServiceNLDatasetSearchIndexerParsingMode }}
                 searchServiceEndpoint: $(searchServiceEndpoint)
