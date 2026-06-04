@@ -27,7 +27,7 @@ param searchStorageAccountConnectionStringSecretName string
 @description('Storage container name for search documents in the Search storage account.')
 param searchDocumentsContainerName string
 
-@description('The IP address ranges that can access the Search Docs Function App storage accounts.')
+@description('The IP address ranges that can access the Search Docs Function App storage account.')
 param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
