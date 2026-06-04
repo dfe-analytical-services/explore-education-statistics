@@ -25,10 +25,21 @@ param operatingSystem 'Windows' | 'Linux' = 'Linux'
   'java'
   'python'
 ])
-param functionAppRuntime string = 'dotnet-isolated'
+param functionAppRuntime string
 
 @description('.NET Framework version.')
 param netFrameworkVersion string?
+
+@description('The language and version for the language-specific worker process.  This is used to determine the correct Linux base image.')
+@allowed([
+  'DOTNET-ISOLATED|10.0'
+  'DOTNET-ISOLATED|8.0'
+  'DOTNET|8.0'
+  'Node|24'
+  'Python|3.14'
+  'Java|25'
+])
+param linuxFxVersion string?
 
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
@@ -277,7 +288,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       healthCheckPath: healthCheckPath
       minTlsVersion: '1.3'
       netFrameworkVersion: netFrameworkVersion
-      linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+      linuxFxVersion: operatingSystem == 'Linux' ? linuxFxVersion : null
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
       ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
       ipSecurityRestrictionsDefaultAction: 'Deny'
