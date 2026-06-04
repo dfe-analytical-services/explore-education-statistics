@@ -1,6 +1,7 @@
 import { PublicationReleaseSeriesItem } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import PublicationReleaseListPage from '../PublicationReleaseListPage';
 import { testPublicationSummary } from './__data__/testReleaseData';
@@ -36,16 +37,121 @@ describe('PublicationReleaseListPage', () => {
     ],
     paging: {
       page: 1,
-      pageSize: 10,
+      pageSize: 3,
       totalResults: 3,
       totalPages: 1,
     },
   };
+
+  const testReleasesLonger: PaginatedList<PublicationReleaseSeriesItem> = {
+    results: [
+      ...testReleases.results,
+      {
+        title: 'Legacy title 4',
+        url: 'https://example.com/legacy-title-4',
+      },
+      {
+        title: 'Legacy title 5',
+        url: 'https://example.com/legacy-title-5',
+      },
+      {
+        title: 'Legacy title 6',
+        url: 'https://example.com/legacy-title-6',
+      },
+      {
+        title: 'Legacy title 7',
+        url: 'https://example.com/legacy-title-7',
+      },
+      {
+        title: 'Legacy title 8',
+        url: 'https://example.com/legacy-title-8',
+      },
+      {
+        title: 'Legacy title 9',
+        url: 'https://example.com/legacy-title-9',
+      },
+      {
+        title: 'Legacy title 10',
+        url: 'https://example.com/legacy-title-10',
+      },
+      {
+        title: 'Legacy title 11',
+        url: 'https://example.com/legacy-title-11',
+      },
+      {
+        title: 'Legacy title 12',
+        url: 'https://example.com/legacy-title-12',
+      },
+      {
+        title: 'Legacy title 13',
+        url: 'https://example.com/legacy-title-13',
+      },
+      {
+        title: 'Legacy title 14',
+        url: 'https://example.com/legacy-title-14',
+      },
+      {
+        title: 'Legacy title 15',
+        url: 'https://example.com/legacy-title-15',
+      },
+      {
+        title: 'Legacy title 16',
+        url: 'https://example.com/legacy-title-16',
+      },
+      {
+        title: 'Legacy title 17',
+        url: 'https://example.com/legacy-title-17',
+      },
+      {
+        title: 'Legacy title 18',
+        url: 'https://example.com/legacy-title-18',
+      },
+      {
+        title: 'Legacy title 19',
+        url: 'https://example.com/legacy-title-19',
+      },
+      {
+        title: 'Legacy title 20',
+        url: 'https://example.com/legacy-title-20',
+      },
+      {
+        title: 'Legacy title 21',
+        url: 'https://example.com/legacy-title-21',
+      },
+      {
+        title: 'Legacy title 22',
+        url: 'https://example.com/legacy-title-22',
+      },
+      {
+        title: 'Legacy title 23',
+        url: 'https://example.com/legacy-title-23',
+      },
+      {
+        title: 'Legacy title 24',
+        url: 'https://example.com/legacy-title-24',
+      },
+      {
+        title: 'Legacy title 25',
+        url: 'https://example.com/legacy-title-25',
+      },
+      {
+        title: 'Legacy title 26',
+        url: 'https://example.com/legacy-title-26',
+      },
+    ],
+    paging: {
+      page: 1,
+      pageSize: 26,
+      totalResults: 26,
+      totalPages: 1,
+    },
+  };
+
   test('renders next publish date', () => {
     render(
       <PublicationReleaseListPage
         publicationSummary={testPublicationSummary}
-        releases={testReleases}
+        allReleases={testReleases}
       />,
     );
 
@@ -58,7 +164,7 @@ describe('PublicationReleaseListPage', () => {
     render(
       <PublicationReleaseListPage
         publicationSummary={testPublicationSummary}
-        releases={testReleases}
+        allReleases={testReleases}
       />,
     );
 
@@ -109,39 +215,61 @@ describe('PublicationReleaseListPage', () => {
     );
     expect(within(row3Cells[1]).getByText('Not available')).toBeInTheDocument();
     expect(within(row3Cells[2]).getByText('Not available')).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('navigation', { name: 'Pagination' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('Number of results per page'),
+    ).not.toBeInTheDocument();
   });
 
-  test('renders pagination when multiple pages', () => {
-    const testReleasesMultiPage: PaginatedList<PublicationReleaseSeriesItem> = {
-      ...testReleases,
-      paging: {
-        page: 2,
-        pageSize: 1,
-        totalResults: 3,
-        totalPages: 3,
-      },
-    };
-    render(
+  test('pagination', async () => {
+    const { user } = render(
       <PublicationReleaseListPage
         publicationSummary={testPublicationSummary}
-        releases={testReleasesMultiPage}
+        allReleases={testReleasesLonger}
       />,
     );
 
     expect(
       screen.getByRole('navigation', { name: 'Pagination' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Page 1' })).toHaveAttribute(
-      'href',
-      '?page=1',
+    expect(
+      screen.getByLabelText('Number of results per page'),
+    ).toBeInTheDocument();
+
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
+      26,
+    ); // including header row
+
+    await user.click(screen.getByRole('button', { name: 'Page 2' }));
+
+    await waitFor(() =>
+      expect(screen.queryByText('10 August 2025')).not.toBeInTheDocument(),
     );
-    expect(screen.getByRole('link', { name: 'Page 2' })).toHaveAttribute(
-      'aria-current',
-      'page',
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+    expect(rows).toHaveLength(2);
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('Legacy title 26');
+
+    expect(
+      screen.getByRole('button', { name: 'Previous page' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Next page' }),
+    ).not.toBeInTheDocument();
+
+    // Check pagination window functionality
+    await user.selectOptions(
+      screen.getByLabelText('Number of results per page'),
+      '50',
     );
-    expect(screen.getByRole('link', { name: 'Page 3' })).toHaveAttribute(
-      'href',
-      '?page=3',
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
+      27,
     );
+    expect(
+      screen.queryByRole('navigation', { name: 'Pagination' }),
+    ).not.toBeInTheDocument();
   });
 });
