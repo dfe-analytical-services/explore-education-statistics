@@ -17,7 +17,7 @@ import {
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { useCallback, useMemo, useState } from 'react';
-import { bool, ObjectSchema } from 'yup';
+import { ObjectSchema } from 'yup';
 
 type FileType = 'csv' | 'zip' | 'bulkZip';
 
@@ -127,8 +127,8 @@ interface Props {
   isDataReplacement?: boolean;
   releaseVersionId: string;
   dataFileTitle?: string;
-  disableSubmit: boolean;
-  onSubmit: () => void;
+  hideFormFields?: boolean;
+  onSubmit: () => Promise<void>;
   onCancel?: () => void;
 }
 
@@ -137,7 +137,7 @@ export default function DataFileUploadForm({
   isDataReplacement = false,
   releaseVersionId,
   dataFileTitle,
-  disableSubmit,
+  hideFormFields = false,
   onSubmit,
   onCancel,
 }: Props) {
@@ -190,7 +190,7 @@ export default function DataFileUploadForm({
           break;
       }
 
-      onSubmit();
+      await onSubmit();
       toggleCompletionStatus.on();
       toggleReplacementWarning.off();
     },
@@ -269,6 +269,7 @@ export default function DataFileUploadForm({
       initialValues={defaultInitialValues}
       resetAfterSubmit
       validationSchema={validationSchema}
+      enableReinitialize
     >
       {({ formState, reset, getValues, watch }) => {
         const uploadType = getValues('uploadType');
@@ -291,7 +292,7 @@ export default function DataFileUploadForm({
               {formState.isSubmitting && (
                 <LoadingSpinner text="Uploading files" overlay />
               )}
-              {!disableSubmit && (
+              {!hideFormFields && (
                 <>
                   {!isDataReplacement && uploadType !== 'bulkZip' && (
                     <>
@@ -305,7 +306,7 @@ export default function DataFileUploadForm({
                             dataSetFileTitles.includes(title),
                           );
                         }}
-                        disabled={disableSubmit}
+                        disabled={hideFormFields}
                       />
                       {showReplacementWarning && (
                         <WarningMessage>
@@ -331,14 +332,14 @@ export default function DataFileUploadForm({
                               name="dataFile"
                               label="Upload data file"
                               accept=".csv"
-                              disabled={disableSubmit}
+                              disabled={hideFormFields}
                             />
 
                             <FormFieldFileInput<DataFileUploadFormValues>
                               name="metadataFile"
                               label="Upload metadata file"
                               accept=".csv"
-                              disabled={disableSubmit}
+                              disabled={hideFormFields}
                             />
                           </>
                         ),
@@ -353,7 +354,7 @@ export default function DataFileUploadForm({
                             name="zipFile"
                             label="Upload ZIP file"
                             accept=".zip"
-                            disabled={disableSubmit}
+                            disabled={hideFormFields}
                           />
                         ),
                       },
@@ -369,7 +370,7 @@ export default function DataFileUploadForm({
                                   name="bulkZipFile"
                                   label="Upload bulk ZIP file"
                                   accept=".zip"
-                                  disabled={disableSubmit}
+                                  disabled={hideFormFields}
                                 />
                               ),
                             },
@@ -379,7 +380,7 @@ export default function DataFileUploadForm({
                     onChange={event => {
                       setSelectedFileType(event.target.value as FileType);
                     }}
-                    disabled={disableSubmit}
+                    disabled={hideFormFields}
                   />
                 </>
               )}
@@ -387,7 +388,7 @@ export default function DataFileUploadForm({
               <ButtonGroup>
                 <Button
                   type="submit"
-                  disabled={formState.isSubmitting || disableSubmit}
+                  disabled={formState.isSubmitting || hideFormFields}
                   testId={
                     isDataReplacement
                       ? 'upload-replacement-files-button'

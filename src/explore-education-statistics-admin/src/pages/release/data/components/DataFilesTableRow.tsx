@@ -29,8 +29,8 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmDelete: (deletedFileId: string) => void;
-  onEditFile: () => void;
-  onReplaceFile: () => void;
+  onEditFile: () => Promise<void>;
+  onReplaceFile: () => Promise<void>;
   onStatusChange: (
     dataFile: DataFile,
     importStatus: DataFileImportStatus,

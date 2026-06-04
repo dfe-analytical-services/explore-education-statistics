@@ -180,14 +180,10 @@ export default function ReleaseDataUploadsSection({
     ],
   );
 
-  const handleDeleteUploadConfirm = useCallback(
-    async (deletedUploadId: string) => {
-      setAllDataUploads(
-        uploads => uploads?.filter(upload => upload.id !== deletedUploadId),
-      );
-    },
-    [setAllDataUploads],
-  );
+  const handleDeleteUploadConfirm = useCallback(async () => {
+    await refetchDataFiles();
+    await refetchDataSetUploads();
+  }, [setAllDataUploads]);
 
   const handleDeleteConfirm = useCallback(
     async (deletedFileId: string) => {

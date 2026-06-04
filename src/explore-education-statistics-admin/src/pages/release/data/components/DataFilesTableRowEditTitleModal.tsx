@@ -20,7 +20,7 @@ interface Props {
   releaseVersionId: string;
   dataFileId: string;
   dataFileTitle: string;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
 }
 
 interface FormValues {
@@ -59,7 +59,7 @@ export default function DataFilesTableRowEditTitleModal({
       queryKey: releaseDataFileQueries.listUploads._def,
     });
     toggleOpen.off();
-    onConfirm();
+    await onConfirm();
   };
 
   return (
@@ -80,7 +80,7 @@ export default function DataFilesTableRowEditTitleModal({
             {dataFile.replacementInProgress && (
               <>
                 <p>This data file is currently being replaced.</p>
-                <p>Cancel the replacement first.</p>
+                <p>Cancel or complete the replacement first.</p>
               </>
             )}
             <FormProvider
@@ -93,6 +93,7 @@ export default function DataFilesTableRowEditTitleModal({
                     `Title must be ${titleMaxLength} characters or fewer`,
                   ),
               })}
+              enableReinitialize
             >
               <Form id="dataFileForm" onSubmit={handleSubmit}>
                 {!dataFile.replacementInProgress && (
