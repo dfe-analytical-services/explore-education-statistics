@@ -91,12 +91,6 @@ public class FileImportService : IFileImportService
                 import.File.Filename,
                 import.Status
             );
-
-            if (import.Status == COMPLETE)
-            {
-                await FinalImportTasks(import);
-            }
-
             return;
         }
 
@@ -132,12 +126,21 @@ public class FileImportService : IFileImportService
             return;
         }
 
-        await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
         await FinalImportTasks(import);
+        await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
     }
 
     private async Task FinalImportTasks(DataImport import)
     {
-        await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+        try
+        {
+            await _dataImportService.CreateInitialDataSetMappingIfReplacement(import.FileId);
+            await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+        }
+        catch (Exception e)
+        {
+            await _dataImportService.FailImport(import.Id, $"Failed to complete final import tasks. Exception: {e}");
+            throw new Exception($"Failed to complete final import tasks\n{e}");
+        }
     }
 }

@@ -12,20 +12,12 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class DataImportService : IDataImportService
+public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
+    : IDataImportService
 {
-    private readonly IDbContextSupplier _dbContextSupplier;
-    private readonly ILogger<DataImportService> _logger;
-
-    public DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
-    {
-        _dbContextSupplier = dbContextSupplier;
-        _logger = logger;
-    }
-
     public async Task FailImport(Guid id, List<DataImportError> errors)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
         var import = await contentDbContext.DataImports.SingleAsync(d => d.Id == id);
 
@@ -46,7 +38,7 @@ public class DataImportService : IDataImportService
 
     public async Task<DataImport> GetImport(Guid id)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         return await contentDbContext
             .DataImports.AsNoTracking()
             .Include(import => import.Errors)
@@ -57,15 +49,10 @@ public class DataImportService : IDataImportService
 
     public async Task<DataImportStatus> GetImportStatus(Guid id)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         var import = await contentDbContext.DataImports.AsNoTracking().SingleOrDefaultAsync(i => i.Id == id);
 
-        if (import == null)
-        {
-            return NOT_FOUND;
-        }
-
-        return import.Status;
+        return import?.Status ?? NOT_FOUND;
     }
 
     public async Task Update(
@@ -77,7 +64,7 @@ public class DataImportService : IDataImportService
         int? lastProcessedRowIndex = null
     )
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         var import = await contentDbContext.DataImports.SingleAsync(import => import.Id == id);
         contentDbContext.Update(import);
 
@@ -92,7 +79,7 @@ public class DataImportService : IDataImportService
 
     public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
     {
-        await using var context = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var context = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
         var import = await context.DataImports.Include(i => i.File).SingleAsync(i => i.Id == id);
 
@@ -105,7 +92,7 @@ public class DataImportService : IDataImportService
         // finishing status update.
         if (import.Status.IsFinished() || (import.Status.IsAborting() && !newStatus.IsFinished()))
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> "
                     + "{NewStatus} ({PercentageCompleteAfter}%) ignored as this import is already in finished or "
                     + "completed state state {FinishedImportStatus}",
@@ -126,7 +113,7 @@ public class DataImportService : IDataImportService
             return;
         }
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> {NewStatus} ({PercentageCompleteAfter}%)",
             filename,
             import.Status,
@@ -143,8 +130,8 @@ public class DataImportService : IDataImportService
 
     public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
         var observations = statisticsDbContext.Observation.AsNoTracking().Where(o => o.SubjectId == subjectId);
 
@@ -318,5 +305,191 @@ public class DataImportService : IDataImportService
         }
 
         return new DataSetFileFilterHierarchy(FilterIds: filterIds, Tiers: tiers);
+    }
+
+    public async Task CreateInitialDataSetMappingIfReplacement(Guid replacementFileId)
+    {
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
+
+        var replacementFile = await contentDbContext
+            .Files.Include(f => f.Replacing)
+            .SingleOrDefaultAsync(f => f.Id == replacementFileId && f.Type == FileType.Data);
+
+        if (replacementFile?.Replacing == null)
+        {
+            return; // it's not an ongoing replacement so we don't need to generate a DataSetMappings entry
+        }
+
+        var originalFile = replacementFile.Replacing!;
+
+        var (initialIndicatorMappingDictionary, unmappedReplacementIndicators) = await GenerateInitialIndicatorMapping(
+            statisticsDbContext,
+            originalFile.SubjectId!.Value,
+            replacementFile.SubjectId!.Value
+        );
+
+        var (initialLocationMappingDictionary, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
+            statisticsDbContext,
+            originalFile.SubjectId!.Value,
+            replacementFile.SubjectId!.Value
+        );
+
+        var newMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = initialIndicatorMappingDictionary,
+            UnmappedReplacementIndicators = unmappedReplacementIndicators,
+            LocationMappings = initialLocationMappingDictionary,
+            UnmappedReplacementLocations = unmappedReplacementLocations,
+        };
+
+        contentDbContext.DataSetMappings.Add(newMapping);
+        await contentDbContext.SaveChangesAsync();
+    }
+
+    private async Task<(Dictionary<Guid, IndicatorMapping>, List<UnmappedIndicator>)> GenerateInitialIndicatorMapping(
+        StatisticsDbContext statisticsDbContext,
+        Guid originalSubjectId,
+        Guid replacementSubjectId
+    )
+    {
+        var originalIndicators = await statisticsDbContext
+            .Indicator.Include(i => i.IndicatorGroup)
+            .Where(i => i.IndicatorGroup.SubjectId == originalSubjectId)
+            .ToListAsync();
+
+        var replacementIndicatorNameToIndicatorMap = await statisticsDbContext
+            .Indicator.Include(i => i.IndicatorGroup)
+            .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
+            .ToDictionaryAsync(i => i.Name, i => i);
+
+        var initialMappingDictionary = originalIndicators.ToDictionary(
+            originalIndicator => originalIndicator.Id,
+            originalIndicator =>
+            {
+                // Only if a replacement indicator has the same column name as an original indicator AND the same group
+                // label, we auto map it.
+                if (
+                    replacementIndicatorNameToIndicatorMap.TryGetValue(
+                        originalIndicator.Name,
+                        out var replacementIndicator
+                    )
+                )
+                {
+                    if (replacementIndicator.IndicatorGroup.Label != originalIndicator.IndicatorGroup.Label)
+                    {
+                        replacementIndicator = null;
+                    }
+                }
+
+                return new IndicatorMapping
+                {
+                    OriginalId = originalIndicator.Id,
+                    OriginalLabel = originalIndicator.Label,
+                    OriginalColumnName = originalIndicator.Name,
+                    OriginalGroupId = originalIndicator.IndicatorGroupId,
+                    OriginalGroupLabel = originalIndicator.IndicatorGroup.Label,
+                    ReplacementId = replacementIndicator?.Id,
+                    ReplacementLabel = replacementIndicator?.Label,
+                    ReplacementColumnName = replacementIndicator?.Name,
+                    ReplacementGroupId = replacementIndicator?.IndicatorGroupId,
+                    ReplacementGroupLabel = replacementIndicator?.IndicatorGroup.Label,
+                    Status = replacementIndicator == null ? MapStatus.Unset : MapStatus.AutoSet,
+                };
+            }
+        );
+
+        var mappedReplacementIds = initialMappingDictionary
+            .Values.Where(m => m.ReplacementId.HasValue)
+            .Select(m => m.ReplacementId!.Value);
+
+        var unmappedReplacements = replacementIndicatorNameToIndicatorMap
+            .Values.ExceptBy(mappedReplacementIds, indicator => indicator.Id)
+            .Select(i => new UnmappedIndicator
+            {
+                Id = i.Id,
+                Label = i.Label,
+                ColumnName = i.Name,
+                GroupId = i.IndicatorGroupId,
+                GroupLabel = i.IndicatorGroup.Label,
+            })
+            .ToList();
+
+        return (initialMappingDictionary, unmappedReplacements);
+    }
+
+    private async Task<(Dictionary<Guid, LocationMapping>, List<UnmappedLocation>)> GenerateInitialLocationMapping(
+        StatisticsDbContext statisticsDbContext,
+        Guid originalSubjectId,
+        Guid replacementSubjectId
+    )
+    {
+        var originalLocations = await statisticsDbContext
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == originalSubjectId)
+            .Select(observation => observation.Location)
+            .Distinct()
+            .ToListAsync();
+
+        var replacementLocationMap = await statisticsDbContext
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == replacementSubjectId)
+            .Select(observation => observation.Location)
+            .Distinct()
+            .ToDictionaryAsync(location => location.Id, location => location);
+
+        var initialMappingDictionary = originalLocations.ToDictionary(
+            originalLocation => originalLocation.Id,
+            originalLocation =>
+            {
+                replacementLocationMap.TryGetValue(originalLocation.Id, out var replacementLocation);
+                if (replacementLocation == null)
+                {
+                    // If none matching by Id, check if any matching by GeogLvl + Code. We don't check by Name to
+                    // preserve behaviour from before location mapping was introduced (which allowed analysts to
+                    // change/fix location names with replacements).
+                    var candidateReplacements = replacementLocationMap
+                        .Values.Where(location =>
+                            location.GeographicLevel == originalLocation.GeographicLevel
+                            && location.ToLocationAttribute().GetCodeOrFallback()
+                                == originalLocation.ToLocationAttribute().GetCodeOrFallback()
+                        )
+                        .ToList();
+                    replacementLocation = candidateReplacements.Count == 1 ? candidateReplacements[0] : null;
+                }
+
+                return new LocationMapping
+                {
+                    OriginalId = originalLocation.Id,
+                    OriginalCode = originalLocation.ToLocationAttribute().GetCodeOrFallback(),
+                    OriginalName = originalLocation.ToLocationAttribute().Name ?? "",
+                    OriginalGeographicLevel = originalLocation.GeographicLevel,
+                    ReplacementId = replacementLocation?.Id,
+                    ReplacementCode = replacementLocation?.ToLocationAttribute().GetCodeOrFallback(),
+                    ReplacementName = replacementLocation?.ToLocationAttribute().Name ?? "",
+                    ReplacementGeographicLevel = replacementLocation?.GeographicLevel,
+                    Status = replacementLocation == null ? MapStatus.Unset : MapStatus.AutoSet,
+                };
+            }
+        );
+
+        var mappedReplacementIds = initialMappingDictionary
+            .Values.Where(map => map.ReplacementId.HasValue)
+            .Select(map => map.ReplacementId!.Value);
+
+        var unmappedReplacements = replacementLocationMap
+            .Values.ExceptBy(mappedReplacementIds, location => location.Id)
+            .Select(location => new UnmappedLocation
+            {
+                Id = location.Id,
+                Code = location.ToLocationAttribute().GetCodeOrFallback(),
+                Name = location.ToLocationAttribute().Name ?? "",
+                GeographicLevel = location.GeographicLevel,
+            })
+            .ToList();
+
+        return (initialMappingDictionary, unmappedReplacements);
     }
 }

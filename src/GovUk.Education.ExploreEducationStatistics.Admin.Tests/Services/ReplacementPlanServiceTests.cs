@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -140,6 +139,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -168,32 +168,22 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(
+                new DataSetMapping
+                {
+                    OriginalDataFileId = originalFile.Id,
+                    ReplacementDataFileId = replacementFile.Id,
+                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Indicators = [new Indicator()],
-        };
-
-        var replacementLocationObservation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E0200000", "England"),
-            },
-        };
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
-            statisticsDbContext.IndicatorGroup.Add(replacementIndicatorGroup);
-            statisticsDbContext.Observation.Add(replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -247,6 +237,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -254,9 +245,13 @@ public class ReplacementPlanServiceTests
 
         originalFile.ReplacedBy = replacementFile;
 
-        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+        var originalReleaseFile = new ReleaseFile { ReleaseVersionId = releaseVersion.Id, FileId = originalFile.Id };
 
-        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            FileId = replacementFile.Id,
+        };
 
         var originalFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Original Test filter item" };
 
@@ -297,10 +292,16 @@ public class ReplacementPlanServiceTests
             Name = "original_indicator",
         };
 
-        var replacementIndicator = new Indicator { Label = "Replacement Indicator", Name = "replacement_indicator" };
+        var replacementIndicator = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Replacement Indicator",
+            Name = "replacement_indicator",
+        };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Original Default group",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -308,6 +309,7 @@ public class ReplacementPlanServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Replacement Default group",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
@@ -323,12 +325,6 @@ public class ReplacementPlanServiceTests
         {
             SubjectId = originalReleaseSubject.SubjectId,
             Location = originalLocation,
-        };
-
-        var replacementObservationForLocation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthority, LocalAuthority = _derby },
         };
 
         var timePeriod = new TimePeriodQuery
@@ -383,6 +379,32 @@ public class ReplacementPlanServiceTests
             indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicator } }
         );
 
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalReleaseFile.FileId,
+            ReplacementDataFileId = replacementReleaseFile.FileId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                { originalIndicator.Id, CreateIndicatorMapping(originalIndicator, originalIndicatorGroup) },
+            },
+            UnmappedReplacementIndicators =
+            [
+                new UnmappedIndicator
+                {
+                    Id = replacementIndicator.Id,
+                    ColumnName = replacementIndicator.Name,
+                    Label = replacementIndicator.Label,
+                    GroupId = replacementIndicatorGroup.Id,
+                    GroupLabel = replacementIndicatorGroup.Label,
+                },
+            ],
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                { originalLocation.Id, CreateLocationMapping(originalLocation) },
+            },
+            UnmappedReplacementLocations = [],
+        };
+
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -400,8 +422,9 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -419,7 +442,7 @@ public class ReplacementPlanServiceTests
                 footnoteForSubject
             );
             statisticsDbContext.Location.AddRange(originalLocation);
-            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, replacementObservationForLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -623,6 +646,51 @@ public class ReplacementPlanServiceTests
 
             Assert.True(footnoteForSubjectPlan.Valid);
 
+            var indicatorsMappingPlan = replacementPlan.Mapping.Indicators;
+            Assert.Equivalent(new[] { originalIndicator.Id }, indicatorsMappingPlan.Mappings.Keys);
+            Assert.Contains(
+                new ReplacementPlanIndicatorMappingViewModel
+                {
+                    CandidateKey = null,
+                    Type = nameof(MapStatus.Unset),
+                    Source = new ReplacementPlanIndicatorViewModel
+                    {
+                        Id = originalIndicator.Id,
+                        Name = originalIndicator.Name,
+                        Label = originalIndicator.Label,
+                    },
+                },
+                indicatorsMappingPlan.Mappings.Values
+            );
+            Assert.Equivalent(new[] { replacementIndicator.Id }, indicatorsMappingPlan.Candidates.Keys);
+            Assert.Contains(
+                new ReplacementPlanIndicatorViewModel
+                {
+                    Id = replacementIndicator.Id,
+                    Name = replacementIndicator.Name,
+                    Label = replacementIndicator.Label,
+                },
+                indicatorsMappingPlan.Candidates.Values
+            );
+
+            var locationsMappingPlan = replacementPlan.Mapping.Locations;
+            Assert.Equivalent(new[] { originalLocation.Id }, locationsMappingPlan.Mappings.Keys);
+            Assert.Contains(
+                new ReplacementPlanLocationMappingViewModel
+                {
+                    CandidateKey = null,
+                    Type = nameof(MapStatus.Unset),
+                    Source = new ReplacementPlanLocationViewModel
+                    {
+                        Id = originalLocation.Id,
+                        Name = originalLocation.ToLocationAttribute().Name!,
+                        Code = originalLocation.ToLocationAttribute().Code!,
+                    },
+                },
+                locationsMappingPlan.Mappings.Values
+            );
+            Assert.Empty(locationsMappingPlan.Candidates);
+
             Assert.False(replacementPlan.Valid);
         }
     }
@@ -734,13 +802,6 @@ public class ReplacementPlanServiceTests
             Location = location,
         };
 
-        var replacementObservationForLocation = new Observation
-        {
-            Id = Guid.NewGuid(),
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = location,
-        };
-
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -783,7 +844,15 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(
+                new DataSetMapping
+                {
+                    OriginalDataFileId = originalFile.Id,
+                    ReplacementDataFileId = replacementFile.Id,
+                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -794,7 +863,7 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.Filter.AddRange(originalDefaultFilter, replacementDefaultFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
-            statisticsDbContext.Observation.AddRange(observationForLocation, replacementObservationForLocation);
+            statisticsDbContext.Observation.AddRange(observationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -929,13 +998,6 @@ public class ReplacementPlanServiceTests
             Location = location,
         };
 
-        var replacementLocationObservation = new Observation
-        {
-            Id = Guid.NewGuid(),
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = location,
-        };
-
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -978,7 +1040,15 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(
+                new DataSetMapping
+                {
+                    OriginalDataFileId = originalReleaseFile.FileId,
+                    ReplacementDataFileId = replacementReleaseFile.FileId,
+                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -989,7 +1059,7 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.Filter.AddRange(originalDefaultFilter, replacementDefaultFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
-            statisticsDbContext.Observation.AddRange(observationForLocation, replacementLocationObservation);
+            statisticsDbContext.Observation.AddRange(observationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1143,13 +1213,6 @@ public class ReplacementPlanServiceTests
             Location = location,
         };
 
-        var replacementObservationForLocation = new Observation
-        {
-            Id = Guid.NewGuid(),
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = location,
-        };
-
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -1192,7 +1255,15 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(
+                new DataSetMapping
+                {
+                    OriginalDataFileId = originalReleaseFile.FileId,
+                    ReplacementDataFileId = replacementReleaseFile.FileId,
+                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1207,7 +1278,7 @@ public class ReplacementPlanServiceTests
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
-            statisticsDbContext.Observation.AddRange(observationForLocation, replacementObservationForLocation);
+            statisticsDbContext.Observation.AddRange(observationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1234,229 +1305,6 @@ public class ReplacementPlanServiceTests
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
             Assert.False(dataBlockPlan.Valid);
-        }
-    }
-
-    [Fact]
-    public async Task GetReplacementPlan_ReplacementHasDifferentLocation_LocationMatchedByCode_ReplacementValid()
-    {
-        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
-
-        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
-
-        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(statsReleaseVersion)
-            .WithSubjects(_fixture.DefaultSubject().Generate(2))
-            .GenerateTuple2();
-
-        var originalFile = new File
-        {
-            Id = Guid.NewGuid(),
-            Type = FileType.Data,
-            SubjectId = originalReleaseSubject.SubjectId,
-        };
-
-        var replacementFile = new File
-        {
-            Type = FileType.Data,
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Replacing = originalFile,
-        };
-
-        originalFile.ReplacedBy = replacementFile;
-
-        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
-
-        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
-
-        var originalFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item - not changing" };
-
-        var replacementFilterItem = new FilterItem { Label = "Test filter item - not changing" };
-
-        var originalFilterGroup = new FilterGroup
-        {
-            Label = "Default group - not changing",
-            FilterItems = new List<FilterItem> { originalFilterItem },
-        };
-
-        var replacementFilterGroup = new FilterGroup
-        {
-            Label = "Default group - not changing",
-            FilterItems = new List<FilterItem> { replacementFilterItem },
-        };
-
-        var originalFilter = new Filter
-        {
-            Label = "Filter - not changing",
-            Name = "filter_not_changing",
-            Subject = originalReleaseSubject.Subject,
-            FilterGroups = new List<FilterGroup> { originalFilterGroup },
-        };
-
-        var replacementFilter = new Filter
-        {
-            Label = "Filter - not changing",
-            Name = "filter_not_changing",
-            Subject = replacementReleaseSubject.Subject,
-            FilterGroups = new List<FilterGroup> { replacementFilterGroup },
-        };
-
-        var originalIndicator = new Indicator
-        {
-            Id = Guid.NewGuid(),
-            Label = "Indicator - not changing",
-            Name = "indicator_not_changing",
-        };
-
-        var replacementIndicator = new Indicator
-        {
-            Label = "Indicator - not changing",
-            Name = "indicator_not_changing",
-        };
-
-        var originalIndicatorGroup = new IndicatorGroup
-        {
-            Label = "Default group - not changing",
-            Subject = originalReleaseSubject.Subject,
-            Indicators = new List<Indicator> { originalIndicator },
-        };
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            Label = "Default group - not changing",
-            Subject = replacementReleaseSubject.Subject,
-            Indicators = new List<Indicator> { replacementIndicator },
-        };
-
-        var originalLocation = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.LocalAuthority,
-            LocalAuthority = _derby,
-        };
-        var observationForOriginalLocation = new Observation
-        {
-            SubjectId = originalReleaseSubject.SubjectId,
-            Location = originalLocation,
-        };
-
-        // Replacement location has a different id but the primary attribute code remains the same
-        var replacementLocation = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.LocalAuthority,
-            Country = _england,
-            LocalAuthority = _derby,
-        };
-        var observationForReplacementLocation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = replacementLocation,
-        };
-
-        var timePeriod = new TimePeriodQuery
-        {
-            StartYear = 2019,
-            StartCode = CalendarYear,
-            EndYear = 2020,
-            EndCode = CalendarYear,
-        };
-
-        var dataBlock = new DataBlock
-        {
-            Name = "Test DataBlock",
-            Query = new FullTableQuery
-            {
-                SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] { originalFilterItem.Id },
-                Indicators = new[] { originalIndicator.Id },
-                LocationIds = ListOf(originalLocation.Id),
-                TimePeriod = timePeriod,
-            },
-            ReleaseVersion = releaseVersion,
-        };
-
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
-        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
-        releaseFileRepository
-            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
-            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlocks.AddRange(dataBlock);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
-            statisticsDbContext.Filter.AddRange(originalFilter, replacementFilter);
-            statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
-            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var replacementPlanService = BuildReplacementPlanService(
-                contentDbContext,
-                statisticsDbContext,
-                timePeriodService: timePeriodService.Object,
-                releaseFileRepository: releaseFileRepository.Object
-            );
-
-            var result = await replacementPlanService.GetReplacementPlan(
-                releaseVersionId: releaseVersion.Id,
-                originalFileId: originalFile.Id
-            );
-
-            VerifyAllMocks(timePeriodService, releaseFileRepository);
-
-            var replacementPlan = result.AssertRight();
-
-            Assert.Equal(originalReleaseSubject.SubjectId, replacementPlan.OriginalSubjectId);
-            Assert.Equal(replacementReleaseSubject.SubjectId, replacementPlan.ReplacementSubjectId);
-
-            Assert.Single(replacementPlan.DataBlocks);
-            var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
-            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
-
-            Assert.NotNull(dataBlockPlan.Locations);
-            Assert.Single(dataBlockPlan.Locations);
-            Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.LocalAuthority.ToString()));
-            Assert.Single(dataBlockPlan.Locations[GeographicLevel.LocalAuthority.ToString()].LocationAttributes);
-            Assert.True(dataBlockPlan.Locations[GeographicLevel.LocalAuthority.ToString()].Valid);
-
-            var dataBlockLocationPlan = dataBlockPlan
-                .Locations[GeographicLevel.LocalAuthority.ToString()]
-                .LocationAttributes.First();
-
-            Assert.Equal(originalLocation.Id, dataBlockLocationPlan.Id);
-            Assert.Equal(_derby.GetCodeOrFallback(), dataBlockLocationPlan.Code);
-            Assert.Equal(_derby.Name, dataBlockLocationPlan.Label);
-            Assert.Equal(replacementLocation.Id, dataBlockLocationPlan.Target);
-            Assert.True(dataBlockLocationPlan.Valid);
-
-            Assert.True(dataBlockPlan.Valid);
-            Assert.True(replacementPlan.Valid);
         }
     }
 
@@ -1580,31 +1428,16 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(
+                new DataSetMapping
+                {
+                    OriginalDataFileId = originalReleaseFile.FileId,
+                    ReplacementDataFileId = replacementReleaseFile.FileId,
+                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
+                }
+            );
             await contentDbContext.SaveChangesAsync();
-        }
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            Subject = replacementReleaseSubject.Subject,
-            Indicators = [new Indicator()],
-        };
-
-        var replacementLocationObservation = new Observation
-        {
-            Subject = replacementReleaseSubject.Subject,
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E0200000", "England"),
-            },
-        };
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.IndicatorGroup.Add(replacementIndicatorGroup);
-            statisticsDbContext.Observation.Add(replacementLocationObservation);
-            await statisticsDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1665,6 +1498,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -1672,9 +1506,13 @@ public class ReplacementPlanServiceTests
 
         originalFile.ReplacedBy = replacementFile;
 
-        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+        var originalReleaseFile = new ReleaseFile { ReleaseVersionId = releaseVersion.Id, FileId = originalFile.Id };
 
-        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            FileId = replacementFile.Id,
+        };
 
         var originalDefaultFilterItem = new FilterItem
         {
@@ -1784,12 +1622,14 @@ public class ReplacementPlanServiceTests
 
         var replacementIndicator = new Indicator
         {
+            Id = Guid.NewGuid(),
             Label = "Indicator - not changing",
             Name = "indicator_not_changing",
         };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -1797,6 +1637,7 @@ public class ReplacementPlanServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
@@ -1888,6 +1729,32 @@ public class ReplacementPlanServiceTests
             subject: originalReleaseSubject.Subject
         );
 
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalReleaseFile.FileId,
+            ReplacementDataFileId = replacementReleaseFile.FileId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator.Id,
+                    CreateIndicatorMapping(
+                        originalIndicator,
+                        originalIndicatorGroup,
+                        replacementIndicator,
+                        replacementIndicatorGroup,
+                        MapStatus.AutoSet
+                    )
+                },
+            },
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    originalLocation.Id,
+                    CreateLocationMapping(originalLocation, replacementLocation, MapStatus.AutoSet)
+                },
+            },
+        };
+
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -1902,13 +1769,13 @@ public class ReplacementPlanServiceTests
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
-
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.AddRange(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1977,8 +1844,6 @@ public class ReplacementPlanServiceTests
             Assert.Equal(originalIndicator.Label, dataBlockIndicatorPlan.Label);
             Assert.Equal(originalIndicator.Name, dataBlockIndicatorPlan.Name);
             Assert.Equal(replacementIndicator.Id, dataBlockIndicatorPlan.Target);
-            // valid because generated mapping auto mapped originalIndicator -> replacementIndicator
-            // generated mapping tested elsewhere
             Assert.True(dataBlockIndicatorPlan.Valid);
 
             Assert.Equal(2, dataBlockPlan.Filters.Count);
@@ -2172,8 +2037,6 @@ public class ReplacementPlanServiceTests
             Assert.Equal(originalIndicator.Label, footnoteForIndicatorIndicatorPlan.Label);
             Assert.Equal(originalIndicator.Name, footnoteForIndicatorIndicatorPlan.Name);
             Assert.Equal(replacementIndicator.Id, footnoteForIndicatorIndicatorPlan.Target);
-            // valid because generated mapping auto mapped originalIndicator -> replacementIndicator
-            // the generated mapping is tested elsewhere
             Assert.True(footnoteForIndicatorIndicatorPlan.Valid);
 
             Assert.True(footnoteForIndicatorPlan.Valid);
@@ -2188,6 +2051,68 @@ public class ReplacementPlanServiceTests
             Assert.True(footnoteForSubjectPlan.Valid);
 
             Assert.Null(replacementPlan.ApiDataSetVersionPlan);
+
+            var indicatorsMappingPlan = replacementPlan.Mapping.Indicators;
+
+            Assert.Equivalent(new[] { originalIndicator.Id }, indicatorsMappingPlan.Mappings.Keys);
+            var indicatorMapping = Assert.Single(indicatorsMappingPlan.Mappings.Values);
+            Assert.Equal(
+                new ReplacementPlanIndicatorMappingViewModel
+                {
+                    CandidateKey = replacementIndicator.Id,
+                    Type = nameof(MapStatus.AutoSet),
+                    Source = new ReplacementPlanIndicatorViewModel
+                    {
+                        Id = originalIndicator.Id,
+                        Label = originalIndicator.Label,
+                        Name = originalIndicator.Name,
+                    },
+                },
+                indicatorMapping
+            );
+
+            Assert.Equivalent(new[] { replacementIndicator.Id }, indicatorsMappingPlan.Candidates.Keys);
+            var indicatorCandidate = Assert.Single(indicatorsMappingPlan.Candidates.Values);
+            Assert.Equal(
+                new ReplacementPlanIndicatorViewModel
+                {
+                    Id = replacementIndicator.Id,
+                    Name = replacementIndicator.Name,
+                    Label = replacementIndicator.Label,
+                },
+                indicatorCandidate
+            );
+
+            var locationsMappingPlan = replacementPlan.Mapping.Locations;
+
+            Assert.Equivalent(new[] { originalLocation.Id }, locationsMappingPlan.Mappings.Keys);
+            var locationMapping = Assert.Single(locationsMappingPlan.Mappings.Values);
+            Assert.Equal(
+                new ReplacementPlanLocationMappingViewModel
+                {
+                    CandidateKey = replacementLocation.Id,
+                    Type = nameof(MapStatus.AutoSet),
+                    Source = new ReplacementPlanLocationViewModel
+                    {
+                        Id = originalLocation.Id,
+                        Name = originalLocation.ToLocationAttribute().Name!,
+                        Code = originalLocation.ToLocationAttribute().Code!,
+                    },
+                },
+                locationMapping
+            );
+
+            Assert.Equivalent(new[] { replacementLocation.Id }, locationsMappingPlan.Candidates.Keys);
+            var locationCandidate = Assert.Single(locationsMappingPlan.Candidates.Values);
+            Assert.Equal(
+                new ReplacementPlanLocationViewModel
+                {
+                    Id = replacementLocation.Id,
+                    Name = replacementLocation.ToLocationAttribute().Name!,
+                    Code = replacementLocation.ToLocationAttribute().Code!,
+                },
+                locationCandidate
+            );
 
             Assert.True(replacementPlan.Valid);
         }
@@ -2326,33 +2251,17 @@ public class ReplacementPlanServiceTests
             {
                 {
                     originalIndicatorA.Id,
-                    new IndicatorMapping
-                    {
-                        OriginalId = originalIndicatorA.Id,
-                        OriginalLabel = originalIndicatorA.Label,
-                        OriginalColumnName = originalIndicatorA.Name,
-                        OriginalGroupId = originalIndicatorGroup.Id,
-                        OriginalGroupLabel = originalIndicatorGroup.Label,
-                        ReplacementId = replacementIndicatorAUpdated.Id,
-                        ReplacementLabel = replacementIndicatorAUpdated.Label,
-                        ReplacementGroupId = replacementIndicatorAUpdated.IndicatorGroupId,
-                        Status = MapStatus.ManuallySet,
-                    }
+                    CreateIndicatorMapping(
+                        originalIndicatorA,
+                        originalIndicatorGroup,
+                        replacementIndicatorAUpdated,
+                        replacementIndicatorGroup,
+                        MapStatus.ManuallySet
+                    )
                 },
                 {
                     originalIndicatorToBeRemoved.Id,
-                    new IndicatorMapping
-                    {
-                        OriginalId = originalIndicatorToBeRemoved.Id,
-                        OriginalLabel = originalIndicatorToBeRemoved.Label,
-                        OriginalColumnName = originalIndicatorToBeRemoved.Name,
-                        OriginalGroupId = originalIndicatorGroup.Id,
-                        OriginalGroupLabel = originalIndicatorGroup.Label,
-                        ReplacementId = null,
-                        ReplacementLabel = null,
-                        ReplacementGroupId = null,
-                        Status = MapStatus.Unset,
-                    }
+                    CreateIndicatorMapping(originalIndicatorToBeRemoved, originalIndicatorGroup)
                 },
             },
             UnmappedReplacementIndicators =
@@ -2368,26 +2277,10 @@ public class ReplacementPlanServiceTests
             ],
             LocationMappings = new Dictionary<Guid, LocationMapping>
             {
-                {
-                    location.Id,
-                    new LocationMapping { OriginalId = location.Id, ReplacementId = location.Id }
-                },
+                { location.Id, CreateLocationMapping(location, location, MapStatus.AutoSet) },
             },
             UnmappedReplacementLocations = [],
         };
-
-        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
-        dataSetMappingService
-            .Setup(mock =>
-                mock.GetOrCreateMapping(
-                    originalFile.Id,
-                    replacementFile.Id,
-                    originalReleaseSubject.SubjectId,
-                    replacementReleaseSubject.SubjectId,
-                    CancellationToken.None
-                )
-            )
-            .ReturnsAsync(dataSetMapping);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2417,8 +2310,7 @@ public class ReplacementPlanServiceTests
                 contentDbContext,
                 statisticsDbContext,
                 timePeriodService: timePeriodService.Object,
-                releaseFileRepository: releaseFileRepository.Object,
-                dataSetMappingService: dataSetMappingService.Object
+                releaseFileRepository: releaseFileRepository.Object
             );
 
             var result = await replacementPlanService.GetReplacementPlan(
@@ -2477,6 +2369,66 @@ public class ReplacementPlanServiceTests
             Assert.True(footnoteForIndicatorIndicatorPlan.Valid);
 
             Assert.True(footnoteForIndicatorPlan.Valid);
+
+            var indicatorMappingPlan = replacementPlan.Mapping.Indicators;
+
+            Assert.Equal(2, indicatorMappingPlan.Mappings.Values.Count);
+            Assert.Equivalent(
+                new[] { originalIndicatorA.Id, originalIndicatorToBeRemoved.Id },
+                indicatorMappingPlan.Mappings.Keys
+            );
+            Assert.Contains(
+                new ReplacementPlanIndicatorMappingViewModel
+                {
+                    CandidateKey = replacementIndicatorAUpdated.Id,
+                    Source = new ReplacementPlanIndicatorViewModel
+                    {
+                        Id = originalIndicatorA.Id,
+                        Label = originalIndicatorA.Label,
+                        Name = originalIndicatorA.Name,
+                    },
+                    Type = nameof(MapStatus.ManuallySet),
+                },
+                indicatorMappingPlan.Mappings.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanIndicatorMappingViewModel
+                {
+                    CandidateKey = null,
+                    Source = new ReplacementPlanIndicatorViewModel
+                    {
+                        Id = originalIndicatorToBeRemoved.Id,
+                        Label = originalIndicatorToBeRemoved.Label,
+                        Name = originalIndicatorToBeRemoved.Name,
+                    },
+                    Type = nameof(MapStatus.Unset),
+                },
+                indicatorMappingPlan.Mappings.Values
+            );
+
+            Assert.Equal(2, indicatorMappingPlan.Candidates.Count);
+            Assert.Equivalent(
+                new[] { replacementIndicatorAUpdated.Id, replacementNewIndicator.Id },
+                indicatorMappingPlan.Candidates.Keys
+            );
+            Assert.Contains(
+                new ReplacementPlanIndicatorViewModel
+                {
+                    Id = replacementIndicatorAUpdated.Id,
+                    Label = replacementIndicatorAUpdated.Label,
+                    Name = replacementIndicatorAUpdated.Name,
+                },
+                indicatorMappingPlan.Candidates.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanIndicatorViewModel
+                {
+                    Id = replacementNewIndicator.Id,
+                    Label = replacementNewIndicator.Label,
+                    Name = replacementNewIndicator.Name,
+                },
+                indicatorMappingPlan.Candidates.Values
+            );
 
             Assert.True(replacementPlan.Valid);
         }
@@ -2601,19 +2553,7 @@ public class ReplacementPlanServiceTests
             {
                 {
                     originalIndicatorA.Id,
-                    new IndicatorMapping
-                    {
-                        OriginalId = originalIndicatorA.Id,
-                        OriginalLabel = originalIndicatorA.Label,
-                        OriginalColumnName = originalIndicatorA.Name,
-                        OriginalGroupId = originalIndicatorGroup.Id,
-                        OriginalGroupLabel = originalIndicatorGroup.Label,
-                        // not mapped to anything despite being included in data block/footnote, so plan should be invalid
-                        ReplacementId = null,
-                        ReplacementLabel = null,
-                        ReplacementGroupId = null,
-                        Status = MapStatus.Unset,
-                    }
+                    CreateIndicatorMapping(originalIndicatorA, originalIndicatorGroup) // not mapped to anything despite being included in data block/footnote, so plan should be invalid
                 },
             },
             UnmappedReplacementIndicators =
@@ -2629,10 +2569,7 @@ public class ReplacementPlanServiceTests
             ],
             LocationMappings = new Dictionary<Guid, LocationMapping>
             {
-                {
-                    location.Id,
-                    new LocationMapping { OriginalId = location.Id, ReplacementId = location.Id }
-                },
+                { location.Id, CreateLocationMapping(location, location, MapStatus.AutoSet) },
             },
             UnmappedReplacementLocations = [],
         };
@@ -2726,6 +2663,35 @@ public class ReplacementPlanServiceTests
             Assert.False(footnoteForIndicatorIndicatorPlan.Valid);
 
             Assert.False(footnoteForIndicatorPlan.Valid);
+
+            var indicatorMappingPlan = replacementPlan.Mapping.Indicators;
+            Assert.Equivalent(new[] { originalIndicatorA.Id }, indicatorMappingPlan.Mappings.Keys); // @MarkFix add this test elsewhere
+            var indicatorMapping = Assert.Single(indicatorMappingPlan.Mappings.Values);
+            Assert.Equal(
+                new ReplacementPlanIndicatorMappingViewModel
+                {
+                    CandidateKey = null,
+                    Type = nameof(MapStatus.Unset),
+                    Source = new ReplacementPlanIndicatorViewModel
+                    {
+                        Id = originalIndicatorA.Id,
+                        Label = originalIndicatorA.Label,
+                        Name = originalIndicatorA.Name,
+                    },
+                },
+                indicatorMapping
+            );
+            Assert.Equivalent(new[] { replacementIndicatorAUpdated.Id }, indicatorMappingPlan.Candidates.Keys);
+            var indicatorCandidate = Assert.Single(indicatorMappingPlan.Candidates.Values);
+            Assert.Equal(
+                new ReplacementPlanIndicatorViewModel
+                {
+                    Id = replacementIndicatorAUpdated.Id,
+                    Label = replacementIndicatorAUpdated.Label,
+                    Name = replacementIndicatorAUpdated.Name,
+                },
+                indicatorCandidate
+            );
 
             Assert.False(replacementPlan.Valid);
         }
@@ -2877,80 +2843,28 @@ public class ReplacementPlanServiceTests
             {
                 {
                     originalIndicator.Id,
-                    new IndicatorMapping
-                    {
-                        OriginalId = originalIndicator.Id,
-                        OriginalLabel = originalIndicator.Label,
-                        OriginalColumnName = originalIndicator.Name,
-                        OriginalGroupId = originalIndicatorGroup.Id,
-                        OriginalGroupLabel = originalIndicatorGroup.Label,
-                        ReplacementId = replacementIndicator.Id,
-                        ReplacementLabel = replacementIndicator.Label,
-                        ReplacementGroupId = replacementIndicator.IndicatorGroupId,
-                        Status = MapStatus.ManuallySet,
-                    }
+                    CreateIndicatorMapping(
+                        originalIndicator,
+                        originalIndicatorGroup,
+                        replacementIndicator,
+                        replacementIndicatorGroup,
+                        MapStatus.ManuallySet
+                    )
                 },
             },
             UnmappedReplacementIndicators = [],
             LocationMappings = new Dictionary<Guid, LocationMapping>
             {
-                {
-                    locationEng.Id,
-                    new LocationMapping
-                    {
-                        OriginalId = locationEng.Id,
-                        OriginalGeographicLevel = locationEng.GeographicLevel,
-                        OriginalName = locationEng.ToLocationAttribute().Name!,
-                        OriginalCode = locationEng.ToLocationAttribute().GetCodeOrFallback(),
-                        ReplacementId = locationEng.Id,
-                        ReplacementGeographicLevel = locationEng.GeographicLevel,
-                        ReplacementName = locationEng.ToLocationAttribute().Name,
-                        ReplacementCode = locationEng.ToLocationAttribute().GetCodeOrFallback(),
-                        Status = MapStatus.AutoSet,
-                    }
-                },
+                { locationEng.Id, CreateLocationMapping(locationEng, locationEng, MapStatus.AutoSet) },
                 {
                     originalLocationDerby.Id,
-                    new LocationMapping
-                    {
-                        OriginalId = originalLocationDerby.Id,
-                        OriginalGeographicLevel = originalLocationDerby.GeographicLevel,
-                        OriginalName = originalLocationDerby.ToLocationAttribute().Name!,
-                        OriginalCode = originalLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
-                        ReplacementId = replacementLocationDerby.Id,
-                        ReplacementGeographicLevel = replacementLocationDerby.GeographicLevel,
-                        ReplacementName = replacementLocationDerby.ToLocationAttribute().Name,
-                        ReplacementCode = replacementLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
-                        Status = MapStatus.ManuallySet,
-                    }
+                    CreateLocationMapping(originalLocationDerby, replacementLocationDerby, MapStatus.ManuallySet)
                 },
                 {
                     locationLeicester.Id,
-                    new LocationMapping
-                    {
-                        OriginalId = locationLeicester.Id,
-                        OriginalGeographicLevel = locationLeicester.GeographicLevel,
-                        OriginalName = locationLeicester.ToLocationAttribute().Name!,
-                        OriginalCode = locationLeicester.ToLocationAttribute().GetCodeOrFallback(),
-                        ReplacementId = locationLeicester.Id,
-                        ReplacementGeographicLevel = locationLeicester.GeographicLevel,
-                        ReplacementName = locationLeicester.ToLocationAttribute().Name,
-                        ReplacementCode = locationLeicester.ToLocationAttribute().GetCodeOrFallback(),
-                        Status = MapStatus.AutoSet,
-                    }
+                    CreateLocationMapping(locationLeicester, locationLeicester, MapStatus.AutoSet)
                 },
-                {
-                    originalLocationBirmingham.Id,
-                    new LocationMapping
-                    {
-                        OriginalId = originalLocationBirmingham.Id,
-                        OriginalGeographicLevel = originalLocationBirmingham.GeographicLevel,
-                        OriginalName = originalLocationBirmingham.ToLocationAttribute().Name!,
-                        OriginalCode = originalLocationBirmingham.ToLocationAttribute().GetCodeOrFallback(),
-                        ReplacementId = null, // not used in a data block so replacement still valid despite no mapping
-                        Status = MapStatus.Unset,
-                    }
-                },
+                { originalLocationBirmingham.Id, CreateLocationMapping(originalLocationBirmingham) },
             },
             UnmappedReplacementLocations =
             [
@@ -2963,19 +2877,6 @@ public class ReplacementPlanServiceTests
                 },
             ],
         };
-
-        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
-        dataSetMappingService
-            .Setup(mock =>
-                mock.GetOrCreateMapping(
-                    originalFile.Id,
-                    replacementFile.Id,
-                    originalReleaseSubject.SubjectId,
-                    replacementReleaseSubject.SubjectId,
-                    CancellationToken.None
-                )
-            )
-            .ReturnsAsync(dataSetMapping);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3004,8 +2905,7 @@ public class ReplacementPlanServiceTests
                 contentDbContext,
                 statisticsDbContext,
                 timePeriodService: timePeriodService.Object,
-                releaseFileRepository: releaseFileRepository.Object,
-                dataSetMappingService: dataSetMappingService.Object
+                releaseFileRepository: releaseFileRepository.Object
             );
 
             var result = await replacementPlanService.GetReplacementPlan(
@@ -3061,6 +2961,112 @@ public class ReplacementPlanServiceTests
             Assert.True(laPlan.Valid);
 
             Assert.True(dataBlockPlan.Valid);
+
+            var locationMappingPlan = replacementPlan.Mapping.Locations;
+
+            Assert.Equal(4, locationMappingPlan.Mappings.Count);
+            Assert.Equivalent(
+                new[] { locationEng.Id, originalLocationDerby.Id, locationLeicester.Id, originalLocationBirmingham.Id },
+                locationMappingPlan.Mappings.Keys
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationMappingViewModel
+                {
+                    CandidateKey = locationEng.Id,
+                    Source = new ReplacementPlanLocationViewModel
+                    {
+                        Id = locationEng.Id,
+                        Code = locationEng.ToLocationAttribute().Code!,
+                        Name = locationEng.ToLocationAttribute().Name!,
+                    },
+                    Type = nameof(MapStatus.AutoSet),
+                },
+                locationMappingPlan.Mappings.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationMappingViewModel
+                {
+                    CandidateKey = replacementLocationDerby.Id,
+                    Source = new ReplacementPlanLocationViewModel
+                    {
+                        Id = originalLocationDerby.Id,
+                        Code = originalLocationDerby.ToLocationAttribute().Code!,
+                        Name = originalLocationDerby.ToLocationAttribute().Name!,
+                    },
+                    Type = nameof(MapStatus.ManuallySet),
+                },
+                locationMappingPlan.Mappings.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationMappingViewModel
+                {
+                    CandidateKey = locationLeicester.Id,
+                    Source = new ReplacementPlanLocationViewModel
+                    {
+                        Id = locationLeicester.Id,
+                        Code = locationLeicester.ToLocationAttribute().Code!,
+                        Name = locationLeicester.ToLocationAttribute().Name!,
+                    },
+                    Type = nameof(MapStatus.AutoSet),
+                },
+                locationMappingPlan.Mappings.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationMappingViewModel
+                {
+                    CandidateKey = null,
+                    Source = new ReplacementPlanLocationViewModel
+                    {
+                        Id = originalLocationBirmingham.Id,
+                        Code = originalLocationBirmingham.ToLocationAttribute().Code!,
+                        Name = originalLocationBirmingham.ToLocationAttribute().Name!,
+                    },
+                    Type = nameof(MapStatus.Unset),
+                },
+                locationMappingPlan.Mappings.Values
+            );
+
+            Assert.Equal(4, locationMappingPlan.Candidates.Count);
+            Assert.Equivalent(
+                new[] { replacementLocationNott.Id, locationEng.Id, replacementLocationDerby.Id, locationLeicester.Id },
+                locationMappingPlan.Candidates.Keys
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationViewModel
+                {
+                    Id = replacementLocationNott.Id,
+                    Name = replacementLocationNott.ToLocationAttribute().Name!,
+                    Code = replacementLocationNott.ToLocationAttribute().Code!,
+                },
+                locationMappingPlan.Candidates.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationViewModel
+                {
+                    Id = locationEng.Id,
+                    Name = locationEng.ToLocationAttribute().Name!,
+                    Code = locationEng.ToLocationAttribute().Code!,
+                },
+                locationMappingPlan.Candidates.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationViewModel
+                {
+                    Id = replacementLocationDerby.Id,
+                    Name = replacementLocationDerby.ToLocationAttribute().Name!,
+                    Code = replacementLocationDerby.ToLocationAttribute().Code!,
+                },
+                locationMappingPlan.Candidates.Values
+            );
+            Assert.Contains(
+                new ReplacementPlanLocationViewModel
+                {
+                    Id = locationLeicester.Id,
+                    Name = locationLeicester.ToLocationAttribute().Name!,
+                    Code = locationLeicester.ToLocationAttribute().Code!,
+                },
+                locationMappingPlan.Candidates.Values
+            );
 
             Assert.True(replacementPlan.Valid);
         }
@@ -3185,35 +3191,19 @@ public class ReplacementPlanServiceTests
             {
                 {
                     originalIndicator.Id,
-                    new IndicatorMapping
-                    {
-                        OriginalId = originalIndicator.Id,
-                        OriginalLabel = originalIndicator.Label,
-                        OriginalColumnName = originalIndicator.Name,
-                        OriginalGroupId = originalIndicatorGroup.Id,
-                        OriginalGroupLabel = originalIndicatorGroup.Label,
-                        ReplacementId = replacementIndicator.Id,
-                        ReplacementLabel = replacementIndicator.Label,
-                        ReplacementGroupId = replacementIndicator.IndicatorGroupId,
-                        Status = MapStatus.ManuallySet,
-                    }
+                    CreateIndicatorMapping(
+                        originalIndicator,
+                        originalIndicatorGroup,
+                        replacementIndicator,
+                        replacementIndicatorGroup,
+                        MapStatus.ManuallySet
+                    )
                 },
             },
             UnmappedReplacementIndicators = [],
             LocationMappings = new Dictionary<Guid, LocationMapping>
             {
-                {
-                    originalLocationDerby.Id,
-                    new LocationMapping
-                    {
-                        OriginalId = originalLocationDerby.Id,
-                        OriginalGeographicLevel = originalLocationDerby.GeographicLevel,
-                        OriginalName = originalLocationDerby.ToLocationAttribute().Name!,
-                        OriginalCode = originalLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
-                        ReplacementId = null,
-                        Status = MapStatus.Unset,
-                    }
-                },
+                { originalLocationDerby.Id, CreateLocationMapping(originalLocationDerby) },
             },
             UnmappedReplacementLocations =
             [
@@ -3226,19 +3216,6 @@ public class ReplacementPlanServiceTests
                 },
             ],
         };
-
-        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
-        dataSetMappingService
-            .Setup(mock =>
-                mock.GetOrCreateMapping(
-                    originalFile.Id,
-                    replacementFile.Id,
-                    originalReleaseSubject.SubjectId,
-                    replacementReleaseSubject.SubjectId,
-                    CancellationToken.None
-                )
-            )
-            .ReturnsAsync(dataSetMapping);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3267,8 +3244,7 @@ public class ReplacementPlanServiceTests
                 contentDbContext,
                 statisticsDbContext,
                 timePeriodService: timePeriodService.Object,
-                releaseFileRepository: releaseFileRepository.Object,
-                dataSetMappingService: dataSetMappingService.Object
+                releaseFileRepository: releaseFileRepository.Object
             );
 
             var result = await replacementPlanService.GetReplacementPlan(
@@ -3300,6 +3276,31 @@ public class ReplacementPlanServiceTests
             Assert.False(laPlan.Valid);
 
             Assert.False(dataBlockPlan.Valid);
+
+            var locationMapping = Assert.Single(replacementPlan.Mapping.Locations.Mappings);
+            Assert.Equal(originalLocationDerby.Id, locationMapping.Key);
+            var expectedLocationMapping = new ReplacementPlanLocationMappingViewModel
+            {
+                CandidateKey = null,
+                Source = new ReplacementPlanLocationViewModel
+                {
+                    Id = originalLocationDerby.Id,
+                    Code = originalLocationDerby.ToLocationAttribute().Code!,
+                    Name = originalLocationDerby.ToLocationAttribute().Name!,
+                },
+                Type = nameof(MapStatus.Unset),
+            };
+            Assert.Equal(expectedLocationMapping, locationMapping.Value);
+
+            var locationCandidate = Assert.Single(replacementPlan.Mapping.Locations.Candidates);
+            Assert.Equal(replacementLocationDerby.Id, locationCandidate.Key);
+            var expectedLocationCandidate = new ReplacementPlanLocationViewModel
+            {
+                Id = replacementLocationDerby.Id,
+                Code = replacementLocationDerby.ToLocationAttribute().Code!,
+                Name = replacementLocationDerby.ToLocationAttribute().Name!,
+            };
+            Assert.Equal(expectedLocationCandidate, locationCandidate.Value);
 
             Assert.False(replacementPlan.Valid);
         }
@@ -3335,7 +3336,6 @@ public class ReplacementPlanServiceTests
         StatisticsDbContext statisticsDbContext,
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
-        IDataSetMappingService? dataSetMappingService = null,
         IDataSetVersionMappingService? apiDataSetVersionMappingService = null,
         IReleaseFileRepository? releaseFileRepository = null
     )
@@ -3349,9 +3349,52 @@ public class ReplacementPlanServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService,
-            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext, userService),
             apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );
+    }
+
+    private static IndicatorMapping CreateIndicatorMapping(
+        Indicator original,
+        IndicatorGroup originalGroup,
+        Indicator? replacement = null,
+        IndicatorGroup? replacementGroup = null,
+        MapStatus mapStatus = MapStatus.Unset
+    )
+    {
+        return new IndicatorMapping
+        {
+            OriginalId = original.Id,
+            OriginalColumnName = original.Name,
+            OriginalLabel = original.Label,
+            OriginalGroupId = originalGroup.Id,
+            OriginalGroupLabel = originalGroup.Label,
+            ReplacementId = replacement?.Id,
+            ReplacementColumnName = replacement?.Name,
+            ReplacementLabel = replacement?.Label,
+            ReplacementGroupId = replacementGroup?.Id,
+            ReplacementGroupLabel = replacementGroup?.Label,
+            Status = mapStatus,
+        };
+    }
+
+    private static LocationMapping CreateLocationMapping(
+        Location original,
+        Location? replacement = null,
+        MapStatus status = MapStatus.Unset
+    )
+    {
+        return new LocationMapping
+        {
+            OriginalId = original.Id,
+            OriginalCode = original.ToLocationAttribute().Code!,
+            OriginalName = original.ToLocationAttribute().Name!,
+            OriginalGeographicLevel = original.GeographicLevel,
+            ReplacementId = replacement?.Id,
+            ReplacementCode = replacement?.ToLocationAttribute().Code!,
+            ReplacementName = replacement?.ToLocationAttribute().Name!,
+            ReplacementGeographicLevel = replacement?.GeographicLevel,
+            Status = status,
+        };
     }
 }

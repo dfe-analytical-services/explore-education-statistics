@@ -124,11 +124,7 @@ public class ReplacementService(
                     originalReleaseFile,
                     replacementReleaseFile
                 );
-                replacementReleaseFile.IndicatorSequence = await ReplaceIndicatorSequence(
-                    originalReleaseFile,
-                    replacementSubjectId,
-                    mapping
-                );
+                replacementReleaseFile.IndicatorSequence = ReplaceIndicatorSequence(originalReleaseFile, mapping);
                 replacementReleaseFile.Summary = originalReleaseFile.Summary; // Set Data guidance
 
                 // To remove original, we first unlink the files. If we don't do this,
@@ -671,9 +667,8 @@ public class ReplacementService(
         );
     }
 
-    private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
+    private static List<IndicatorGroupSequenceEntry>? ReplaceIndicatorSequence(
         ReleaseFile originalReleaseFile,
-        Guid replacementSubjectId,
         DataSetMapping mapping
     )
     {
@@ -683,13 +678,17 @@ public class ReplacementService(
             return null;
         }
 
-        var originalGroupIdToLabelMap = await statisticsDbContext
-            .IndicatorGroup.Where(ig => ig.SubjectId == originalReleaseFile.File.SubjectId!.Value)
-            .ToDictionaryAsync(ig => ig.Id, ig => ig.Label);
+        var originalGroupIdToLabelMap = mapping
+            .IndicatorMappings.Values.Select(i => new { Id = i.OriginalGroupId, Label = i.OriginalGroupLabel })
+            .Distinct()
+            .ToDictionary(ig => ig.Id, ig => ig.Label);
 
-        var replacementGroupLabelToIdMap = await statisticsDbContext
-            .IndicatorGroup.Where(ig => ig.SubjectId == replacementSubjectId)
-            .ToDictionaryAsync(ig => ig.Label, ig => ig.Id);
+        var replacementGroupLabelToIdMap = mapping
+            .IndicatorMappings.Values.Where(indMap => indMap.ReplacementId != null)
+            .Select(indMap => new { Id = indMap.ReplacementGroupId!.Value, Label = indMap.ReplacementGroupLabel! })
+            .Concat(mapping.UnmappedReplacementIndicators.Select(i => new { Id = i.GroupId, Label = i.GroupLabel }))
+            .Distinct()
+            .ToDictionary(ig => ig.Label, ig => ig.Id);
 
         return ReplacementServiceHelper.ReplaceIndicatorSequence(
             mapping: mapping,

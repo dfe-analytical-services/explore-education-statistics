@@ -48,7 +48,9 @@ public class FileImportServiceTests
         var dataImportService = new Mock<IDataImportService>(Strict);
 
         dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
-
+        dataImportService
+            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
+            .Returns(Task.CompletedTask);
         dataImportService
             .Setup(s => s.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value))
             .Returns(Task.CompletedTask);
@@ -187,24 +189,12 @@ public class FileImportServiceTests
                     TotalRows = 93,
                 };
 
-                var dataImportService = new Mock<IDataImportService>(Strict);
-                if (finishedStatus == COMPLETE)
-                {
-                    dataImportService
-                        .Setup(mock =>
-                            mock.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value)
-                        )
-                        .Returns(Task.CompletedTask);
-                }
-
                 var statisticsDbContextId = Guid.NewGuid().ToString();
                 await using var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId);
                 {
-                    var service = BuildFileImportService(dataImportService: dataImportService.Object);
+                    var service = BuildFileImportService();
                     await service.CompleteImport(import, statisticsDbContext);
                 }
-
-                VerifyAllMocks(dataImportService);
             });
     }
 
