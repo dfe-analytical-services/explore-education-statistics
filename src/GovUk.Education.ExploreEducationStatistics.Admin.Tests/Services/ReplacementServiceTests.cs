@@ -38,6 +38,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using IndicatorMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.IndicatorMapping;
 using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -73,6 +74,7 @@ public class ReplacementServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -122,13 +124,21 @@ public class ReplacementServiceTests
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new Guid[] { },
-                Indicators = new Guid[] { },
-                LocationIds = ListOf(originalLocation.Id),
+                Filters = [],
+                Indicators = [],
+                LocationIds = [originalLocation.Id],
                 TimePeriod = timePeriod,
             },
             Table = table,
             ReleaseVersion = releaseVersion,
+        };
+
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+            LocationMappings = new Dictionary<Guid, LocationMapping>(),
         };
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
@@ -149,33 +159,15 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Indicators = [new Indicator()],
-        };
-
-        var replacementLocationObservation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E0200000", "England"),
-            },
-        };
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.Location.AddRange(originalLocation);
-            statisticsDbContext.IndicatorGroup.AddRange(replacementIndicatorGroup);
-            statisticsDbContext.Observation.AddRange(replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -229,6 +221,7 @@ public class ReplacementServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -509,7 +502,15 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlockVersions.Add(dataBlockVersion);
             contentDbContext.DataImports.Add(dataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(
+                new DataSetMapping
+                {
+                    OriginalDataFileId = originalFile.Id,
+                    ReplacementDataFileId = replacementFile.Id,
+                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -709,31 +710,16 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseVersions.Add(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataImports.Add(replacementDataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(
+                new DataSetMapping
+                {
+                    OriginalDataFileId = originalFile.Id,
+                    ReplacementDataFileId = replacementFile.Id,
+                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
+                }
+            );
             await contentDbContext.SaveChangesAsync();
-        }
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Indicators = [new Indicator()],
-        };
-
-        var replacementLocationObservation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E0200000", "England"),
-            },
-        };
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.IndicatorGroup.AddRange(replacementIndicatorGroup);
-            statisticsDbContext.Observation.AddRange(replacementLocationObservation);
-            await statisticsDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -788,6 +774,7 @@ public class ReplacementServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -882,12 +869,14 @@ public class ReplacementServiceTests
 
         var replacementIndicator = new Indicator
         {
+            Id = Guid.NewGuid(),
             Label = "Indicator - not changing",
             Name = "indicator_not_changing",
         };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -895,6 +884,7 @@ public class ReplacementServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
@@ -1071,6 +1061,28 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator.Id,
+                    CreateIndicatorMapping(
+                        originalIndicator,
+                        originalIndicatorGroup,
+                        replacementIndicator,
+                        replacementIndicatorGroup
+                    )
+                },
+            },
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
+            },
+        };
+
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -1081,7 +1093,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlockVersions.Add(dataBlockVersion);
             contentDbContext.DataImports.Add(replacementDataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1351,6 +1363,7 @@ public class ReplacementServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -1455,12 +1468,14 @@ public class ReplacementServiceTests
 
         var replacementIndicator = new Indicator
         {
+            Id = Guid.NewGuid(),
             Label = "Indicator - not changing",
             Name = "indicator_not_changing",
         };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -1468,6 +1483,7 @@ public class ReplacementServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
@@ -1513,8 +1529,8 @@ public class ReplacementServiceTests
             {
                 SubjectId = originalReleaseSubject.SubjectId,
                 Filters = [],
-                Indicators = new[] { originalIndicator.Id },
-                LocationIds = ListOf(originalLocation.Id),
+                Indicators = [originalIndicator.Id],
+                LocationIds = [originalLocation.Id],
                 TimePeriod = timePeriod,
                 FilterHierarchiesOptions = new List<FilterHierarchyOptions>
                 {
@@ -1568,6 +1584,28 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator.Id,
+                    CreateIndicatorMapping(
+                        originalIndicator,
+                        originalIndicatorGroup,
+                        replacementIndicator,
+                        replacementIndicatorGroup
+                    )
+                },
+            },
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
+            },
+        };
+
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -1585,7 +1623,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
             contentDbContext.DataImports.Add(replacementDataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1713,10 +1751,16 @@ public class ReplacementServiceTests
             .WithSubjects(_fixture.DefaultSubject().Generate(2))
             .GenerateTuple2();
 
-        var originalFile = new File { Type = FileType.Data, SubjectId = originalReleaseSubject.SubjectId };
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -1801,12 +1845,14 @@ public class ReplacementServiceTests
 
         var replacementIndicator = new Indicator
         {
+            Id = Guid.NewGuid(),
             Label = "Indicator - not changing",
             Name = "indicator_not_changing",
         };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -1814,6 +1860,7 @@ public class ReplacementServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
@@ -1897,6 +1944,28 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator.Id,
+                    CreateIndicatorMapping(
+                        originalIndicator,
+                        originalIndicatorGroup,
+                        replacementIndicator,
+                        replacementIndicatorGroup
+                    )
+                },
+            },
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
+            },
+        };
+
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -1914,7 +1983,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataImports.Add(replacementDataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -2018,10 +2087,16 @@ public class ReplacementServiceTests
             .WithSubjects(_fixture.DefaultSubject().Generate(2))
             .GenerateTuple2();
 
-        var originalFile = new File { Type = FileType.Data, SubjectId = originalReleaseSubject.SubjectId };
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2074,12 +2149,14 @@ public class ReplacementServiceTests
 
         var replacementIndicator = new Indicator
         {
+            Id = Guid.NewGuid(),
             Label = "Indicator - not changing",
             Name = "indicator_not_changing",
         };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -2087,6 +2164,7 @@ public class ReplacementServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
@@ -2141,6 +2219,25 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator.Id,
+                    CreateIndicatorMapping(
+                        originalIndicator,
+                        originalIndicatorGroup,
+                        replacementIndicator,
+                        replacementIndicatorGroup
+                    )
+                },
+            },
+            LocationMappings = new Dictionary<Guid, LocationMapping>(),
+        };
+
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -2158,19 +2255,9 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataImports.Add(replacementDataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
-
-        var replacementLocationObservation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E0200000", "England"),
-            },
-        };
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
@@ -2179,7 +2266,6 @@ public class ReplacementServiceTests
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.Filter.AddRange(originalFilter1, replacementFilter1);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Observation.AddRange(replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -2277,6 +2363,7 @@ public class ReplacementServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2364,6 +2451,14 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
+            LocationMappings = new Dictionary<Guid, LocationMapping>(),
+        };
+
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -2373,25 +2468,9 @@ public class ReplacementServiceTests
             contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataImports.Add(replacementDataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Indicators = [new Indicator()],
-        };
-
-        var replacementLocationObservation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E0200000", "England"),
-            },
-        };
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
@@ -2399,8 +2478,6 @@ public class ReplacementServiceTests
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.Filter.AddRange(originalFilters);
             statisticsDbContext.Filter.AddRange(replacementFilters);
-            statisticsDbContext.IndicatorGroup.AddRange(replacementIndicatorGroup);
-            statisticsDbContext.Observation.AddRange(replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -2499,6 +2576,7 @@ public class ReplacementServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2510,6 +2588,19 @@ public class ReplacementServiceTests
 
         var replacementReleaseFile = new ReleaseFile { ReleaseVersion = contentReleaseVersion, File = replacementFile };
 
+        var originalIndicatorA = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator a",
+            Name = "indicator_a",
+        };
+        var originalIndicatorB = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator b",
+            Name = "indicator_b",
+        };
+
         // Define a set of indicator groups and indicators belonging to the original subject
         var originalGroups = new List<IndicatorGroup>
         {
@@ -2518,21 +2609,7 @@ public class ReplacementServiceTests
                 Id = Guid.NewGuid(),
                 Label = "Group a",
                 Subject = originalReleaseSubject.Subject,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator a",
-                        Name = "indicator_a",
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator b",
-                        Name = "indicator_b",
-                    },
-                },
+                Indicators = new List<Indicator> { originalIndicatorA, originalIndicatorB },
             },
         };
 
@@ -2551,6 +2628,19 @@ public class ReplacementServiceTests
             ),
         };
 
+        var replacementIndicatorA = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator a",
+            Name = "indicator_a",
+        };
+        var replacementIndicatorB = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator b",
+            Name = "indicator_b",
+        };
+
         // Define the set of indicator groups and indicators belonging to the replacement subject
         var replacementGroups = new List<IndicatorGroup>
         {
@@ -2560,25 +2650,39 @@ public class ReplacementServiceTests
                 Id = Guid.NewGuid(),
                 Label = "Group a",
                 Subject = replacementReleaseSubject.Subject,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator a",
-                        Name = "indicator_a",
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator b",
-                        Name = "indicator_b",
-                    },
-                },
+                Indicators = new List<Indicator> { replacementIndicatorA, replacementIndicatorB },
             },
         };
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
+
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicatorA.Id,
+                    CreateIndicatorMapping(
+                        originalIndicatorA,
+                        originalGroups[0],
+                        replacementIndicatorA,
+                        replacementGroups[0]
+                    )
+                },
+                {
+                    originalIndicatorB.Id,
+                    CreateIndicatorMapping(
+                        originalIndicatorB,
+                        originalGroups[0],
+                        replacementIndicatorB,
+                        replacementGroups[0]
+                    )
+                },
+            },
+            LocationMappings = new Dictionary<Guid, LocationMapping>(),
+        };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2588,19 +2692,9 @@ public class ReplacementServiceTests
             contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataImports.Add(replacementDataImport);
-            // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
-
-        var replacementLocationObservation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = new Location
-            {
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E0200000", "England"),
-            },
-        };
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
@@ -2609,7 +2703,6 @@ public class ReplacementServiceTests
             statisticsDbContext.IndicatorGroup.AddRange(originalGroups);
             statisticsDbContext.IndicatorGroup.AddRange(replacementGroups);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
-            statisticsDbContext.Observation.AddRange(replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -2728,7 +2821,6 @@ public class ReplacementServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
         IDataSetVersionMappingService? apiDataSetVersionMappingService = null,
-        IDataSetMappingService? dataSetMappingService = null,
         IReleaseFileRepository? releaseFileRepository = null
     )
     {
@@ -2741,7 +2833,6 @@ public class ReplacementServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService,
-            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext, userService),
             apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );
@@ -2768,5 +2859,42 @@ public class ReplacementServiceTests
             cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict),
             privateBlobCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict)
         );
+    }
+
+    private static IndicatorMapping CreateIndicatorMapping(
+        Indicator original,
+        IndicatorGroup originalGroup,
+        Indicator? replacement = null,
+        IndicatorGroup? replacementGroup = null
+    )
+    {
+        return new IndicatorMapping
+        {
+            OriginalId = original.Id,
+            OriginalColumnName = original.Name,
+            OriginalLabel = original.Label,
+            OriginalGroupId = originalGroup.Id,
+            OriginalGroupLabel = originalGroup.Label,
+            ReplacementId = replacement?.Id,
+            ReplacementColumnName = replacement?.Name,
+            ReplacementLabel = replacement?.Label,
+            ReplacementGroupId = replacementGroup?.Id,
+            ReplacementGroupLabel = replacementGroup?.Label,
+        };
+    }
+
+    private static LocationMapping CreateLocationMapping(Location original, Location? replacement = null)
+    {
+        return new LocationMapping
+        {
+            OriginalId = original.Id,
+            OriginalCode = original.ToLocationAttribute().Code!,
+            OriginalName = original.ToLocationAttribute().Name!,
+            OriginalGeographicLevel = original.GeographicLevel,
+            ReplacementId = replacement?.Id,
+            ReplacementCode = replacement?.ToLocationAttribute().Code!,
+            ReplacementName = replacement?.ToLocationAttribute().Name!,
+            ReplacementGeographicLevel = replacement?.GeographicLevel,
+        };
     }
 }

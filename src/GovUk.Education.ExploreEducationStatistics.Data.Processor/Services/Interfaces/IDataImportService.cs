@@ -18,6 +18,8 @@ public interface IDataImportService
 
     Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows);
 
+    Task CreateInitialDataSetMappingIfReplacement(Guid replacementFileId);
+
     Task Update(
         Guid id,
         int? expectedImportedRows = null,
