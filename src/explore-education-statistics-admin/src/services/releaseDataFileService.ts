@@ -11,7 +11,9 @@ interface DataFileInfo extends FileInfo {
   userName: string;
   created: string;
   status: ImportStatusCode;
-  replacedBy?: string; // the fileId of the replacement file, if it exists
+  replacementInProgress: boolean; // Whether a replacement of this data set is currently in progress, either at the upload or the imported stage.
+  replacedByDataSetUploadId?: string; // the id of the replacement data set upload, if it exists
+  replacedByDataFileId?: string; // the fileId of the replacement file, if it exists
   replacedByDataFile?: ReplacementDataFileInfo; // additional info about the replacement file - although not always returned by the backend, even if it exists!
   permissions: DataFilePermissions;
   publicApiCompatible?: boolean;
@@ -72,7 +74,9 @@ export interface DataFile {
   metaFileName: string;
   userName: string;
   status: ImportStatusCode;
-  replacedBy?: string;
+  replacementInProgress: boolean;
+  replacedByDataSetUploadId?: string;
+  replacedByDataFileId?: string;
   replacedByDataFile?: ReplacementDataFile;
   created?: string;
   isDeleting?: boolean;

@@ -24,7 +24,7 @@ describe('DataFilesReplacementTableRow', () => {
     metaFileId: '',
     userName: '',
     id: 'file-1',
-    replacedBy: 'file-1-replacement',
+    replacedByDataFileId: 'file-1-replacement',
     title: 'Test File',
     status: 'COMPLETE',
     fileSize: { size: 1000, unit: 'B' },

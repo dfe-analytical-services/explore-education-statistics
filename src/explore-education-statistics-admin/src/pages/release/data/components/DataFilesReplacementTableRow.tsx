@@ -44,7 +44,7 @@ export default function DataFilesReplacementTableRow({
   const { data: replacementDataFile, isLoading } = useQuery({
     ...releaseDataFileQueries.getDataFile(
       releaseVersionId,
-      dataFile.replacedBy ?? '',
+      dataFile.replacedByDataFileId ?? '',
     ),
     initialData: dataFile.replacedByDataFile,
   });
@@ -53,7 +53,7 @@ export default function DataFilesReplacementTableRow({
     ...dataFileReplacementQueries.getReplacementPlan(
       releaseVersionId,
       dataFile.id,
-      dataFile.replacedBy ?? '',
+      dataFile.replacedByDataFileId ?? '',
     ),
     enabled: fetchPlan,
   });

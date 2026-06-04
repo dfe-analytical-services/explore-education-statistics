@@ -346,6 +346,7 @@ export default function ReleaseDataUploadsSection({
                     onDeleteFile={handleDeleteConfirm}
                     onDeleteUpload={handleDeleteUploadConfirm}
                     onDataSetImport={handleDataSetImport}
+                    onEditFile={handleSubmit}
                     onReplaceFile={handleSubmit}
                     onRefreshUploads={refetchDataSetUploads}
                     onStatusChange={handleStatusChange}

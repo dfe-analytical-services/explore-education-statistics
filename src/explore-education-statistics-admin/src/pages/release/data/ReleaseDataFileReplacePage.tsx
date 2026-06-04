@@ -39,12 +39,12 @@ const ReleaseDataFileReplacePage = ({
     setState: setReplacementDataFile,
     error: replacementDataFileError,
   } = useAsyncRetry(async () => {
-    if (!dataFile?.replacedBy) {
+    if (!dataFile?.replacedByDataFileId) {
       return undefined;
     }
     return releaseDataFileService.getDataFile(
       releaseVersionId,
-      dataFile.replacedBy,
+      dataFile.replacedByDataFileId,
     );
   }, [dataFile]);
 

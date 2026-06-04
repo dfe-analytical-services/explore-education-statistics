@@ -38,7 +38,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: undefined,
-          replacedBy: undefined,
+          replacedByDataFileId: undefined,
         }}
         releaseVersionId="rel-1"
         onReplacementStatusChange={() => {}}
@@ -58,7 +58,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: undefined,
+          replacedByDataFileId: undefined,
         }}
         releaseVersionId="rel-1"
         onReplacementStatusChange={() => {}}
@@ -78,7 +78,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: 'file-2',
+          replacedByDataFileId: 'file-2',
         }}
         replacementDataFile={{
           ...baseDataFile,
@@ -104,7 +104,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: 'file-2',
+          replacedByDataFileId: 'file-2',
         }}
         replacementDataFile={{
           ...baseDataFile,
@@ -130,7 +130,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: 'file-2',
+          replacedByDataFileId: 'file-2',
         }}
         replacementDataFile={{
           ...baseDataFile,
