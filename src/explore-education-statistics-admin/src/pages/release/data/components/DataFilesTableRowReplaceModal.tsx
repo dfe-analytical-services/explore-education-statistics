@@ -12,7 +12,7 @@ interface Props {
   releaseVersionId: string;
   dataFileId: string;
   dataFileTitle: string;
-  onReplaceFile: () => Promise<void>;
+  onReplaceFile: () => void;
 }
 
 export default function DataFilesTableRowReplaceModal({
@@ -26,8 +26,6 @@ export default function DataFilesTableRowReplaceModal({
     ...releaseDataFileQueries.getDataFile(releaseVersionId, dataFileId),
     enabled: open,
   });
-
-  console.log(dataFileTitle);
 
   return (
     <Modal
@@ -57,7 +55,7 @@ export default function DataFilesTableRowReplaceModal({
               onCancel={toggleOpen.off}
               onSubmit={async () => {
                 toggleOpen.off();
-                await onReplaceFile();
+                onReplaceFile();
               }}
             />
           </>

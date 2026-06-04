@@ -25,6 +25,7 @@ describe('ImporterStatus', () => {
     metaFileId: 'file-meta-1',
     metaFileName: 'meta.csv',
     status: 'COMPLETE',
+    replacementInProgress: false,
     permissions: {
       canCancelImport: false,
     },

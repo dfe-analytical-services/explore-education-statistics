@@ -47,6 +47,7 @@ const defaultProps = {
     type: 'Data',
     rows: 100,
     status: 'COMPLETE' as ImportStatusCode,
+    replacementInProgress: false,
     permissions: {
       canCancelReplacement: true,
       canReplaceData: true,

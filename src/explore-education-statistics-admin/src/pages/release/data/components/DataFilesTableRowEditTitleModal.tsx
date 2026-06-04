@@ -20,7 +20,7 @@ interface Props {
   releaseVersionId: string;
   dataFileId: string;
   dataFileTitle: string;
-  onConfirm: () => Promise<void>;
+  onConfirm: () => void;
 }
 
 interface FormValues {
@@ -59,7 +59,7 @@ export default function DataFilesTableRowEditTitleModal({
       queryKey: releaseDataFileQueries.listUploads._def,
     });
     toggleOpen.off();
-    await onConfirm();
+    onConfirm();
   };
 
   return (

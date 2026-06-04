@@ -19,8 +19,8 @@ interface Props {
   onDeleteFile: (deletedFileId: string) => void;
   onDeleteUpload: (deletedUploadId: string) => void;
   onDataSetImport: (dataSetImportIds: string[]) => void;
-  onEditFile: () => Promise<void>;
-  onReplaceFile: () => Promise<void>;
+  onEditFile: () => void;
+  onReplaceFile: () => void;
   onStatusChange: (
     dataFile: DataFile,
     importStatus: DataFileImportStatus,

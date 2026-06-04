@@ -28,6 +28,7 @@ describe('DataFilesReplacementTableRow', () => {
     title: 'Test File',
     status: 'COMPLETE',
     fileSize: { size: 1000, unit: 'B' },
+    replacementInProgress: false,
     permissions: { canCancelImport: false },
   };
 
@@ -40,6 +41,7 @@ describe('DataFilesReplacementTableRow', () => {
     title: 'Test File',
     status: 'COMPLETE',
     fileSize: { size: 1000, unit: 'B' },
+    replacementInProgress: false,
     permissions: { canCancelImport: false },
   };
 

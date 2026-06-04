@@ -33,6 +33,7 @@ describe('ReleaseDataFilePage', () => {
     },
     created: '2020-06-12T12:00:00',
     status: 'COMPLETE',
+    replacementInProgress: false,
     permissions: {
       canCancelImport: false,
     },

@@ -128,7 +128,7 @@ interface Props {
   releaseVersionId: string;
   dataFileTitle?: string;
   hideFormFields?: boolean;
-  onSubmit: () => Promise<void>;
+  onSubmit: () => void;
   onCancel?: () => void;
 }
 
@@ -190,7 +190,7 @@ export default function DataFileUploadForm({
           break;
       }
 
-      await onSubmit();
+      onSubmit();
       toggleCompletionStatus.on();
       toggleReplacementWarning.off();
     },

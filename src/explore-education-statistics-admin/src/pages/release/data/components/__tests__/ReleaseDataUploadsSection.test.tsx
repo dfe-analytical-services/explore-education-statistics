@@ -48,6 +48,7 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-06-12T12:00:00',
       status: 'COMPLETE',
+      replacementInProgress: false,
       permissions: {
         canCancelImport: false,
       },
@@ -66,6 +67,7 @@ describe('ReleaseDataUploadsSection', () => {
       },
       created: '2020-07-01T12:00:00',
       status: 'COMPLETE',
+      replacementInProgress: false,
       permissions: {
         canCancelImport: false,
       },
@@ -86,6 +88,7 @@ describe('ReleaseDataUploadsSection', () => {
     },
     created: '2020-08-18T12:00:00',
     status: 'QUEUED',
+    replacementInProgress: false,
     permissions: {
       canCancelImport: true,
     },
@@ -196,7 +199,7 @@ describe('ReleaseDataUploadsSection', () => {
     } as ReplacementDataFile;
     const originalDataFile1 = {
       ...testDataFiles[0],
-      replacedBy: replacementDataFile1.id,
+      replacedByDataFileId: replacementDataFile1.id,
       replacedByDataFile: replacementDataFile1,
     };
 
@@ -207,7 +210,7 @@ describe('ReleaseDataUploadsSection', () => {
     } as ReplacementDataFile;
     const originalDataFile2 = {
       ...testDataFiles[1],
-      replacedBy: replacementDataFile2.id,
+      replacedByDataFileId: replacementDataFile2.id,
       replacedByDataFile: replacementDataFile2,
     };
 
@@ -320,7 +323,7 @@ describe('ReleaseDataUploadsSection', () => {
     } as ReplacementDataFile;
     const originalDataFile1 = {
       ...testDataFiles[0],
-      replacedBy: replacementDataFile1.id,
+      replacedByDataFileId: replacementDataFile1.id,
       replacedByDataFile: replacementDataFile1,
     };
 
@@ -569,6 +572,8 @@ describe('ReleaseDataUploadsSection', () => {
         footnoteIds: ['footnote-1'],
       });
 
+      releaseDataFileService.getDataFile.mockResolvedValue(testDataFiles[1]);
+
       const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
@@ -600,10 +605,24 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       expect(
+        releaseDataFileService.getDeleteDataFilePlan,
+      ).toHaveBeenCalledTimes(1);
+
+      expect(releaseDataFileService.getDataFile).toHaveBeenCalledTimes(1);
+
+      expect(
         await screen.findByText('Confirm deletion of selected data files'),
       ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.queryByText('This data file is currently being replaced.'),
+      ).not.toBeInTheDocument();
+
+      expect(
+        modal.queryByText('Cancel the replacement first.'),
+      ).not.toBeInTheDocument();
 
       expect(
         modal.getByText('Confirm deletion of selected data files'),
@@ -653,6 +672,8 @@ describe('ReleaseDataUploadsSection', () => {
       });
       releaseDataFileService.deleteDataFiles.mockResolvedValue();
 
+      releaseDataFileService.getDataFile.mockResolvedValue(testDataFiles[1]);
+
       const { user } = renderWithTestConfig(
         <MemoryRouter>
           <ReleaseDataUploadsSection
@@ -683,6 +704,8 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       );
 
+      expect(releaseDataFileService.getDataFile).toHaveBeenCalledTimes(1);
+
       expect(
         await screen.findByText('Confirm deletion of selected data files'),
       ).toBeInTheDocument();
@@ -704,6 +727,81 @@ describe('ReleaseDataUploadsSection', () => {
       expect(
         within(fileTableRows[1]).getByTestId('Test data 1-title'),
       ).toHaveTextContent('Test data 1');
+    });
+
+    test('does not allow deleting files when it is being replaced', async () => {
+      const dataFileBeingReplaced = {
+        ...testDataFiles[0],
+        replacementInProgress: true,
+      };
+
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        dataFileBeingReplaced,
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+      releaseDataFileService.getDeleteDataFilePlan.mockResolvedValue({
+        deleteDataBlockPlan: {
+          dependentDataBlocks: [],
+        },
+        footnoteIds: [],
+      });
+      releaseDataFileService.getDataFile.mockResolvedValue(
+        dataFileBeingReplaced,
+      );
+
+      const { user } = renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      await user.click(
+        within(fileTableRows[1]).getByRole('button', {
+          name: 'Delete files for Test data 1',
+        }),
+      );
+
+      expect(
+        releaseDataFileService.getDeleteDataFilePlan,
+      ).toHaveBeenCalledTimes(1);
+
+      expect(releaseDataFileService.getDataFile).toHaveBeenCalledTimes(1);
+
+      expect(
+        await screen.findByText('Confirm deletion of selected data files'),
+      ).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText('This data file is currently being replaced.'),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByText('Cancel the replacement first.'),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+
+      expect(modal.getByRole('button', { name: 'Confirm' })).toBeDisabled();
+
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
     test('does not allow deleting files when linked to an API data set', async () => {
@@ -756,6 +854,211 @@ describe('ReleaseDataUploadsSection', () => {
         'href',
         '/publication/publication-1/release/release-1/api-data-sets/test-data-set-id',
       );
+    });
+  });
+
+  describe('editing data file title', () => {
+    test('does not render edit title button if file is not ready for editing', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+
+      renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(3);
+
+      const fileTableRow1 = within(fileTableRows[1]);
+
+      expect(fileTableRow1.getByTestId('Test data 1-status')).toHaveTextContent(
+        'Queued',
+      );
+      expect(
+        fileTableRow1.queryByRole('button', {
+          name: 'Edit title for Test data 1',
+        }),
+      ).not.toBeInTheDocument();
+
+      const fileTableRow2 = within(fileTableRows[2]);
+
+      expect(fileTableRow2.getByTestId('Test data 2-status')).toHaveTextContent(
+        'Complete',
+      );
+      expect(
+        fileTableRow2.getByRole('button', {
+          name: 'Edit title for Test data 2',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('clicking edit title button shows modal to edit title', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+      releaseDataFileService.getDataFile.mockResolvedValue(testDataFiles[1]);
+
+      const { user } = renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(3);
+
+      expect(
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Edit title for Test data 2',
+        }),
+      ).toBeInTheDocument();
+
+      await user.click(
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Edit title for Test data 2',
+        }),
+      );
+
+      expect(releaseDataFileService.getDataFile).toHaveBeenCalledTimes(1);
+
+      expect(
+        await screen.findByRole('heading', {
+          name: 'Edit title',
+        }),
+      ).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.queryByText('This data file is currently being replaced.'),
+      ).not.toBeInTheDocument();
+
+      expect(
+        modal.queryByText('Cancel or complete the replacement first.'),
+      ).not.toBeInTheDocument();
+
+      expect(modal.getByLabelText('Title')).toBeInTheDocument();
+
+      expect(modal.getByLabelText('Title')).toHaveValue('Test data 2');
+
+      user.type(modal.getByLabelText('Title'), 'Test data 2 updated');
+
+      expect(
+        modal.getByText('You have 109 characters remaining'),
+      ).toBeInTheDocument();
+
+      expect(releaseDataFileService.updateFile).not.toHaveBeenCalled();
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() =>
+        expect(releaseDataFileService.updateFile).toHaveBeenCalledTimes(1),
+      );
+
+      await waitFor(() =>
+        expect(releaseDataFileService.getDataFiles).toHaveBeenCalledTimes(2),
+      );
+    });
+
+    test('does not allow editing titles when it is being replaced', async () => {
+      const dataFileBeingReplaced = {
+        ...testDataFiles[0],
+        replacementInProgress: true,
+      };
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        dataFileBeingReplaced,
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+      releaseDataFileService.getDataFile.mockResolvedValue(
+        dataFileBeingReplaced,
+      );
+
+      const { user } = renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      expect(
+        within(fileTableRows[1]).getByRole('button', {
+          name: 'Edit title for Test data 1',
+        }),
+      ).toBeInTheDocument();
+
+      await user.click(
+        within(fileTableRows[1]).getByRole('button', {
+          name: 'Edit title for Test data 1',
+        }),
+      );
+
+      expect(releaseDataFileService.getDataFile).toHaveBeenCalledTimes(1);
+
+      expect(
+        await screen.findByRole('heading', {
+          name: 'Edit title',
+        }),
+      ).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText('This data file is currently being replaced.'),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByText('Cancel or complete the replacement first.'),
+      ).toBeInTheDocument();
+
+      expect(modal.queryByLabelText('Title')).not.toBeInTheDocument();
+
+      expect(
+        modal.getByRole('button', { name: 'Save changes' }),
+      ).toBeInTheDocument();
+      expect(
+        modal.getByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
+
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
   });
 

@@ -20,6 +20,7 @@ const baseDataFile: DataFile = {
   userName: 'user@example.com',
   created: '2024-06-01T12:00:00Z',
   status: 'COMPLETE',
+  replacementInProgress: false,
   permissions: {
     canCancelImport: true,
   },
