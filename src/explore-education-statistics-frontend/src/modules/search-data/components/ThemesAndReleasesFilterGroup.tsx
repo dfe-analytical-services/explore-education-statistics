@@ -98,7 +98,10 @@ const ThemesAndReleasesFilterGroup = ({
   };
 
   return (
-    <div className="govuk-form-group">
+    <div
+      className="govuk-form-group"
+      data-testid="themes-and-releases-filter-group"
+    >
       <FormTextSearchInput
         id="theme-publication-search"
         name="theme-publication-search"

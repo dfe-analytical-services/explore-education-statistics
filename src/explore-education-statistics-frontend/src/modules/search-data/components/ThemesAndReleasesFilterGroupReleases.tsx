@@ -44,7 +44,8 @@ const ThemesAndReleasesFilterGroupReleases = ({
       className={classNames(styles.expandedThemeContainer, 'govuk-fieldset')}
     >
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-bottom-0">
-        Statistical releases
+        Statistical releases{' '}
+        <VisuallyHidden>{`for ${themeTitle}`}</VisuallyHidden>
       </legend>
       <ButtonText
         className="govuk-!-font-size-16 govuk-!-margin-bottom-2 govuk-!-display-block"
