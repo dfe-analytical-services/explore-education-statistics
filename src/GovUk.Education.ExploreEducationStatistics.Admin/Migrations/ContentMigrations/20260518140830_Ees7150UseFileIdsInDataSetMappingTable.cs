@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -33,21 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             migrationBuilder.Sql(
                 """
-                UPDATE DSM
-                SET DSM.OriginalDataFileId = F.Id
-                FROM DataSetMappings AS DSM
-                INNER JOIN Files AS F
-                    ON DSM.OriginalDataSetId = F.SubjectId AND F.Type = 'Data';
-                """
-            );
-
-            migrationBuilder.Sql(
-                """
-                UPDATE DSM
-                SET DSM.ReplacementDataFileId = F.Id
-                FROM DataSetMappings AS DSM
-                INNER JOIN Files AS F
-                    ON DSM.ReplacementDataSetId = F.SubjectId AND F.Type = 'Data';
+                DELETE FROM DataSetMappings;
                 """
             );
 
