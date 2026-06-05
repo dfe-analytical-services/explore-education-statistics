@@ -2147,6 +2147,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2251,8 +2252,8 @@ public class ReplacementPlanServiceTests
 
         var dataSetMapping = new DataSetMapping
         {
-            OriginalDataSetId = originalReleaseSubject.SubjectId,
-            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -2311,6 +2312,8 @@ public class ReplacementPlanServiceTests
         dataSetMappingService
             .Setup(mock =>
                 mock.GetOrCreateMapping(
+                    originalFile.Id,
+                    replacementFile.Id,
                     originalReleaseSubject.SubjectId,
                     replacementReleaseSubject.SubjectId,
                     CancellationToken.None
@@ -2433,6 +2436,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2523,8 +2527,8 @@ public class ReplacementPlanServiceTests
 
         var dataSetMapping = new DataSetMapping
         {
-            OriginalDataSetId = originalReleaseSubject.SubjectId,
-            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -2681,6 +2685,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2798,8 +2803,8 @@ public class ReplacementPlanServiceTests
 
         var dataSetMapping = new DataSetMapping
         {
-            OriginalDataSetId = originalReleaseSubject.SubjectId,
-            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -2895,6 +2900,8 @@ public class ReplacementPlanServiceTests
         dataSetMappingService
             .Setup(mock =>
                 mock.GetOrCreateMapping(
+                    originalFile.Id,
+                    replacementFile.Id,
                     originalReleaseSubject.SubjectId,
                     replacementReleaseSubject.SubjectId,
                     CancellationToken.None
@@ -3013,6 +3020,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -3103,8 +3111,8 @@ public class ReplacementPlanServiceTests
 
         var dataSetMapping = new DataSetMapping
         {
-            OriginalDataSetId = originalReleaseSubject.SubjectId,
-            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -3155,6 +3163,8 @@ public class ReplacementPlanServiceTests
         dataSetMappingService
             .Setup(mock =>
                 mock.GetOrCreateMapping(
+                    originalFile.Id,
+                    replacementFile.Id,
                     originalReleaseSubject.SubjectId,
                     replacementReleaseSubject.SubjectId,
                     CancellationToken.None

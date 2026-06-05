@@ -10,16 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public record DataSetMapping
 {
-    public Guid Id { get; set; }
-    public Guid OriginalDataSetId { get; set; }
-    public Guid ReplacementDataSetId { get; set; }
+    public Guid Id { get; init; }
 
-    public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; set; } = null!;
-    public List<UnmappedIndicator> UnmappedReplacementIndicators { get; set; } = [];
+    public Guid OriginalDataFileId { get; init; }
+    public File OriginalDataFile { get; init; } = null!;
+    public Guid ReplacementDataFileId { get; init; }
+    public File ReplacementDataFile { get; init; } = null!;
 
-    public Dictionary<Guid, LocationMapping> LocationMappings { get; set; } = null!;
+    public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; init; } = null!;
+    public List<UnmappedIndicator> UnmappedReplacementIndicators { get; init; } = [];
 
-    public List<UnmappedLocation> UnmappedReplacementLocations { get; set; } = [];
+    public Dictionary<Guid, LocationMapping> LocationMappings { get; set; } = null!; // TODO EES-7126 Change set -> init
+
+    public List<UnmappedLocation> UnmappedReplacementLocations { get; set; } = []; // TODO EES-7126 Change set -> init
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -32,8 +35,20 @@ public record DataSetMapping
     {
         public void Configure(EntityTypeBuilder<DataSetMapping> builder)
         {
-            builder.HasIndex(x => x.OriginalDataSetId).IsUnique();
-            builder.HasIndex(x => x.ReplacementDataSetId).IsUnique();
+            builder.HasIndex(x => x.OriginalDataFileId).IsUnique();
+            builder.HasIndex(x => x.ReplacementDataFileId).IsUnique();
+
+            builder
+                .HasOne(x => x.OriginalDataFile)
+                .WithMany()
+                .HasForeignKey(x => x.OriginalDataFileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder
+                .HasOne(x => x.ReplacementDataFile)
+                .WithMany()
+                .HasForeignKey(x => x.ReplacementDataFileId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .Property(x => x.IndicatorMappings)

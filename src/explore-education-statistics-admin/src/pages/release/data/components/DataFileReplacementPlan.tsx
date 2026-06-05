@@ -107,6 +107,7 @@ const DataFileReplacementPlan = ({
         <Plan
           cancelButton={cancelButton}
           fileId={fileId}
+          replacementFileId={replacementFileId}
           publicationId={publicationId}
           releaseVersionId={releaseVersionId}
           plan={plan}
@@ -190,7 +191,7 @@ function DataSetMappingProgressTag({
   );
 }
 
-interface PlanProps extends Omit<Props, 'replacementFileId'> {
+interface PlanProps extends Props {
   plan: DataReplacementPlan;
   isFetchingPlan: boolean;
   onMappingUpdate: () => void;
@@ -204,6 +205,7 @@ function Plan({
   cancelButton,
   releaseVersionId,
   fileId,
+  replacementFileId,
   plan,
   publicationId,
   isFetchingPlan,
@@ -334,8 +336,8 @@ function Plan({
 
       <DataFileReplacementDifferences
         releaseVersionId={releaseVersionId}
-        fileId={plan.originalSubjectId}
-        replacementFileId={plan.replacementSubjectId}
+        fileId={fileId}
+        replacementFileId={replacementFileId}
         plan={plan}
         reloadPlan={onMappingUpdate}
       />
