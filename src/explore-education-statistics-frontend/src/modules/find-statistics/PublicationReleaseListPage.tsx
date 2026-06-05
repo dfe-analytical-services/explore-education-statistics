@@ -10,7 +10,6 @@ import {
   PublicationReleaseSeriesItem,
   PublicationSummary,
 } from '@common/services/publicationService';
-import { PaginatedList } from '@common/services/types/pagination';
 import { formatPartialDate } from '@common/utils/date/partialDate';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -24,7 +23,7 @@ import React, { useMemo, useState } from 'react';
 
 interface Props {
   publicationSummary: PublicationSummary;
-  allReleases: PaginatedList<PublicationReleaseSeriesItem>;
+  allReleases: PublicationReleaseSeriesItem[];
 }
 
 const MIN_PAGE_SIZE = 10;
@@ -35,8 +34,6 @@ const PublicationReleaseListPage = ({
   publicationSummary,
   allReleases,
 }: Props) => {
-  const { results } = allReleases ?? {};
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [searchTerm, setSearchTerm] = useState<string>();
@@ -44,11 +41,11 @@ const PublicationReleaseListPage = ({
   const filteredResults = useMemo(
     () =>
       searchTerm
-        ? results.filter(item =>
+        ? allReleases.filter(item =>
             item.title.toLowerCase().includes(searchTerm.toLowerCase()),
           )
-        : results,
-    [results, searchTerm],
+        : allReleases,
+    [allReleases, searchTerm],
   );
 
   const paginatedReleasesPages = useMemo(
@@ -272,7 +269,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   const queryClient = new QueryClient();
 
   try {
-    const [publicationSummary, allReleases] = await Promise.all([
+    const [publicationSummary, releases] = await Promise.all([
       queryClient.fetchQuery(
         publicationQueries.getPublicationSummary(publicationSlug),
       ),
@@ -284,7 +281,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     return {
       props: {
         publicationSummary,
-        allReleases,
+        allReleases: releases.results,
       },
     };
   } catch (error) {
