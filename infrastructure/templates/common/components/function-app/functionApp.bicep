@@ -25,10 +25,21 @@ param operatingSystem 'Windows' | 'Linux' = 'Linux'
   'java'
   'python'
 ])
-param functionAppRuntime string = 'dotnet-isolated'
+param functionAppRuntime string
 
-@description('Function app runtime version.')
-param functionAppRuntimeVersion string = '8.0'
+@description('.NET Framework version.')
+param netFrameworkVersion string?
+
+@description('The language and version for the language-specific worker process.  This is used to determine the correct Linux base image.')
+@allowed([
+  'DOTNET-ISOLATED|10.0'
+  'DOTNET-ISOLATED|8.0'
+  'DOTNET|8.0'
+  'Node|24'
+  'Python|3.14'
+  'Java|25'
+])
+param linuxFxVersion string?
 
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
@@ -178,7 +189,7 @@ module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
 }
 
 module storageAccountModule '../storage/storageAccount.bicep' = {
-  name: 'storageAccountModuleDeploy'
+  name: '${storageAccountName}StorageAccountModuleDeploy'
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -276,8 +287,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       functionAppScaleLimit: maximumInstanceCount
       healthCheckPath: healthCheckPath
       minTlsVersion: '1.3'
-      netFrameworkVersion: functionAppRuntimeVersion
-      linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+      netFrameworkVersion: netFrameworkVersion
+      linuxFxVersion: operatingSystem == 'Linux' ? linuxFxVersion : null
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
       ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
       ipSecurityRestrictionsDefaultAction: 'Deny'

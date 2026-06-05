@@ -1228,8 +1228,10 @@
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
     "publicApiStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-sa-pep')]",
-    "searchDocsFunctionSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
-    "searchDocsFunctionPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
+    "nlSearchFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-nlsearch')]",
+    "nlSearchFunctionAppPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-nlsearch-pep')]",
+    "searchDocsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
+    "searchDocsFunctionAppPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
     "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "eventGridCustomTopicPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-evgt-pep')]",
@@ -3973,7 +3975,7 @@
             }
           },
           {
-            "name": "[variables('searchDocsFunctionSubnetName')]",
+            "name": "[variables('searchDocsFunctionAppSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.14.0/24",
               "serviceEndpoints": [
@@ -3992,7 +3994,7 @@
             }
           },
           {
-            "name": "[variables('searchDocsFunctionPrivateEndpointsSubnetName')]",
+            "name": "[variables('searchDocsFunctionAppPrivateEndpointsSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.15.0/24"
             }
@@ -4051,6 +4053,31 @@
             "name": "[variables('eventGridCustomTopicPrivateEndpointsSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.20.0/24"
+            }
+          },
+          {
+            "name": "[variables('nlSearchFunctionAppPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.21.0/24"
+            }
+          },
+          {
+            "name": "[variables('nlSearchFunctionAppSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.22.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
             }
           }
         ]

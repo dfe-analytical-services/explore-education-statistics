@@ -24,6 +24,8 @@ parameters:
     type: object
   - name: indexName
     type: string
+  - name: indexDefinitionFilePath
+    type: string
   - name: indexerName
     type: string
   - name: indexerOutputFieldMappingsFilePath
@@ -61,7 +63,7 @@ steps:
         -dataSourceName '${{ parameters.dataSourceType }}-${{ parameters.dataSourceContainerName }}-datasource' `
         -dataSourceType '${{ parameters.dataSourceType }}' `
         -indexCorsAllowedOrigins '${{ join(''',''', parameters.indexCorsAllowedOrigins) }}' `
-        -indexDefinitionFilePath '$(templateDirectory)/application/indexes/${{ parameters.indexName }}.json' `
+        -indexDefinitionFilePath '${{ parameters.indexDefinitionFilePath }}' `
         -indexerName '${{ parameters.indexerName }}' `
         -indexerOutputFieldMappingsFilePath '${{ parameters.indexerOutputFieldMappingsFilePath }}' `
         -indexerParsingMode '${{ parameters.indexerParsingMode }}' `

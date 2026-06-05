@@ -14,8 +14,9 @@ param location string
 @description('Storage container names for search documents. A container for each value will be created in the Search storage account.')
 param searchStorageDocumentContainers object = {
   searchDocuments: 'searchable-documents'
-  nlSearchDocuments: 'nl-search-documents'
-  nlDatasetSearchDocuments: 'nl-dataset-search-documents'
+  nlSearchDatasetDocuments: 'nl-search-dataset-documents'
+  nlSearchFilterDocuments: 'nl-search-filter-documents'
+  nlSearchLocationsDictionary: 'nl-search-locations-dictionary'
 }
 
 @description('A list of IP network rules to allow access to the Search Service from specific public internet IP address ranges.')

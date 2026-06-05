@@ -1,5 +1,5 @@
 {
-  "name": "nl-dataset-search-index",
+  "name": "nl-search-dataset-index",
   "analyzers": [],
   "charFilters": [],
   "fields": [
@@ -376,7 +376,7 @@
   },
   "suggesters": [
     {
-      "name": "suggester-dataset-search",
+      "name": "nl-search-dataset-suggester",
       "searchMode": "analyzingInfixMatching",
       "sourceFields": [
         "dataSetFileId",

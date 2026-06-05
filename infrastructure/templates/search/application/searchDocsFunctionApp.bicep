@@ -11,8 +11,8 @@ param functionAppFirewallRules FirewallRule[]
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Specifies the Search Service indexer name.')
-param searchServiceIndexerName string
+@description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
+param searchServiceSearchIndexerName string
 
 @description('Specifies the Search Service name.')
 param searchServiceName string
@@ -27,7 +27,7 @@ param searchStorageAccountConnectionStringSecretName string
 @description('Storage container name for search documents in the Search storage account.')
 param searchDocumentsContainerName string
 
-@description('The IP address ranges that can access the Search Docs Function App storage accounts.')
+@description('The IP address ranges that can access the Search Docs Function App storage account.')
 param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
@@ -73,12 +73,12 @@ resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
 }
 
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.searchDocsFunction
+  name: resourceNames.existingResources.subnets.searchDocsFunctionApp
   parent: vNet
 }
 
-resource searchDocsFunctionPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.searchDocsFunctionPrivateEndpoints
+resource searchDocsFunctionAppPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+  name: resourceNames.existingResources.subnets.searchDocsFunctionAppPrivateEndpoints
   parent: vNet
 }
 
@@ -122,7 +122,7 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
       }
       {
         name: 'AzureSearch__IndexerName'
-        value: searchServiceIndexerName
+        value: searchServiceSearchIndexerName
       }
       {
         name: 'ContentApi__Url'
@@ -187,7 +187,7 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
     healthCheckPath: '/api/HealthCheck'
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
-    functionAppRuntimeVersion: '8.0'
+    linuxFxVersion: 'DOTNET-ISOLATED|8.0'
     deployQueueRoleAssignment: true
     diagnosticSettingEnabled: true
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
@@ -197,8 +197,8 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
     privateEndpoints: {
-      functionApp: searchDocsFunctionPrivateEndpointSubnet.id
-      storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
+      functionApp: searchDocsFunctionAppPrivateEndpointSubnet.id
+      storageAccounts: searchDocsFunctionAppPrivateEndpointSubnet.id
     }
     outboundSubnetId: outboundVnetSubnet.id
     alerts: {
