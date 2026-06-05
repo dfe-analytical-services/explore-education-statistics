@@ -272,4 +272,40 @@ describe('PublicationReleaseListPage', () => {
       screen.queryByRole('navigation', { name: 'Pagination' }),
     ).not.toBeInTheDocument();
   });
+
+  test('search', async () => {
+    const { user } = render(
+      <PublicationReleaseListPage
+        publicationSummary={testPublicationSummary}
+        allReleases={testReleasesLonger}
+      />,
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: 'Pagination' }),
+    ).toBeInTheDocument();
+
+    const searchInput = screen.getByLabelText(/Search release periods/);
+    expect(searchInput).toBeInTheDocument();
+
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
+      26,
+    );
+
+    await user.type(searchInput, 'title 2');
+
+    await waitFor(() => {
+      const rows = within(screen.getByRole('table')).getAllByRole('row');
+      // Should match: header + Test Release Title 2 + Legacy title 20-26 (8 data rows)
+      expect(rows).toHaveLength(9);
+      const row1Cells = within(rows[1]).getAllByRole('cell');
+      expect(row1Cells[0]).toHaveTextContent('Test Release Title 2');
+    });
+
+    expect(screen.queryByText('Test Release Title 3')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('navigation', { name: 'Pagination' }),
+    ).not.toBeInTheDocument();
+  });
 });

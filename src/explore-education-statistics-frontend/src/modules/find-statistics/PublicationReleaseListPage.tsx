@@ -1,8 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
 import { FormGroup, FormSelect } from '@common/components/form';
+import FormSearchBar from '@common/components/form/FormSearchBar';
 import FormattedDate from '@common/components/FormattedDate';
 import Pagination from '@common/components/Pagination';
 import Tag from '@common/components/Tag';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import {
   PublicationReleaseSeriesItem,
   PublicationSummary,
@@ -26,6 +29,7 @@ interface Props {
 
 const MIN_PAGE_SIZE = 10;
 const DEFAULT_PAGE_SIZE = 25;
+const formId = 'releases-search';
 
 const PublicationReleaseListPage = ({
   publicationSummary,
@@ -35,10 +39,21 @@ const PublicationReleaseListPage = ({
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [searchTerm, setSearchTerm] = useState<string>();
+
+  const filteredResults = useMemo(
+    () =>
+      searchTerm
+        ? results.filter(item =>
+            item.title.toLowerCase().includes(searchTerm.toLowerCase()),
+          )
+        : results,
+    [results, searchTerm],
+  );
 
   const paginatedReleasesPages = useMemo(
-    () => chunk(results, pageSize),
-    [results, pageSize],
+    () => chunk(filteredResults, pageSize),
+    [filteredResults, pageSize],
   );
 
   const totalPages = paginatedReleasesPages.length;
@@ -54,6 +69,11 @@ const PublicationReleaseListPage = ({
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+
+  const [handleSearch] = useDebouncedCallback((term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  }, 800);
 
   return (
     <Page
@@ -96,11 +116,42 @@ const PublicationReleaseListPage = ({
             Release home (latest release)
           </Link>
 
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <form
+                id={formId}
+                className="govuk-!-margin-bottom-8"
+                onSubmit={e => {
+                  e.preventDefault();
+                }}
+              >
+                <FormSearchBar
+                  id={`${formId}-search`}
+                  label="Search release periods"
+                  labelSize="s"
+                  min={0}
+                  name="search"
+                  onChange={handleSearch}
+                  onReset={() => handleSearch('')}
+                />
+              </form>
+              <VisuallyHidden>
+                <p aria-atomic aria-live="polite">
+                  {`${filteredResults.length} result${
+                    filteredResults.length > 1 ? 's' : ''
+                  }, showing page ${currentPage} of ${totalPages}`}
+                </p>
+              </VisuallyHidden>
+            </div>
+          </div>
+
           {paginatedReleasesPages.length > 0 ? (
             <div className="table-container">
               <table data-testid="release-updates-table">
-                <caption className="govuk-table__caption--m">
-                  Table showing all published releases in this series
+                <caption className="govuk-table__caption--m" aria-live="polite">
+                  {searchTerm
+                    ? `Table showing release periods with search term ‘${searchTerm}’`
+                    : 'Table showing all published releases in this series'}
                 </caption>
 
                 <thead>
@@ -147,11 +198,21 @@ const PublicationReleaseListPage = ({
               </table>
             </div>
           ) : (
-            'No results found.'
+            <>
+              <p className="govuk-!-font-weight-bold">
+                There are no matching results.
+              </p>
+              <p>Improve your search results by:</p>
+              <ul>
+                <li>double-checking your spelling</li>
+                <li>using fewer keywords</li>
+                <li>searching for something less specific</li>
+              </ul>
+            </>
           )}
 
-          {results.length > MIN_PAGE_SIZE && (
-            <FormGroup>
+          {filteredResults.length > MIN_PAGE_SIZE && (
+            <FormGroup className="govuk-!-margin-top-4">
               <FormSelect
                 className={styles.pageSizeSelect}
                 id="pagination-size-select"
