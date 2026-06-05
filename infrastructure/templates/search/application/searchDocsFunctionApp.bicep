@@ -73,12 +73,12 @@ resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
 }
 
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.searchDocsFunction
+  name: resourceNames.existingResources.subnets.searchDocsFunctionApp
   parent: vNet
 }
 
-resource searchDocsFunctionPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.searchDocsFunctionPrivateEndpoints
+resource searchDocsFunctionAppPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+  name: resourceNames.existingResources.subnets.searchDocsFunctionAppPrivateEndpoints
   parent: vNet
 }
 
@@ -197,8 +197,8 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
     privateEndpoints: {
-      functionApp: searchDocsFunctionPrivateEndpointSubnet.id
-      storageAccounts: searchDocsFunctionPrivateEndpointSubnet.id
+      functionApp: searchDocsFunctionAppPrivateEndpointSubnet.id
+      storageAccounts: searchDocsFunctionAppPrivateEndpointSubnet.id
     }
     outboundSubnetId: outboundVnetSubnet.id
     alerts: {

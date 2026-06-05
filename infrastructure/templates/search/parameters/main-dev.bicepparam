@@ -5,3 +5,5 @@ param environmentName = 'Development'
 
 param contentApiUrl = 'https://content.dev.explore-education-statistics.service.gov.uk'
 param searchServiceSemanticRankerAvailability = 'free'
+
+param deployNaturalLanguageSearchFunctionApp = true

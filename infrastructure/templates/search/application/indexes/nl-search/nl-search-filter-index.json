@@ -1,5 +1,5 @@
 {
-  "name": "nl-search-index",
+  "name": "nl-search-filter-index",
   "analyzers": [],
   "charFilters": [],
   "fields": [
@@ -162,7 +162,7 @@
       "facetable": false,
       "key": false,
       "dimensions": 1536,
-      "vectorSearchProfile": "nl-search-index-vector-profile",
+      "vectorSearchProfile": "nl-search-filter-index-vector-profile",
       "synonymMaps": []
     }
   ],
@@ -176,7 +176,7 @@
   "vectorSearch": {
     "algorithms": [
       {
-        "name": "nl-search-index-hnsw",
+        "name": "nl-search-filter-index-hnsw",
         "kind": "hnsw",
         "hnswParameters": {
           "metric": "cosine",
@@ -188,8 +188,8 @@
     ],
     "profiles": [
       {
-        "name": "nl-search-index-vector-profile",
-        "algorithm": "nl-search-index-hnsw"
+        "name": "nl-search-filter-index-vector-profile",
+        "algorithm": "nl-search-filter-index-hnsw"
       }
     ],
     "vectorizers": [],

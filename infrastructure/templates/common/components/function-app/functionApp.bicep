@@ -189,7 +189,7 @@ module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
 }
 
 module storageAccountModule '../storage/storageAccount.bicep' = {
-  name: 'storageAccountModuleDeploy'
+  name: '${storageAccountName}StorageAccountModuleDeploy'
   params: {
     location: location
     storageAccountName: storageAccountName
