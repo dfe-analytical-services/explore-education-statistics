@@ -162,7 +162,6 @@ export default function DataFilesReplacementTableRow({
                   await releaseDataFileService.deleteDataFiles(
                     releaseVersionId,
                     replacementDataFile.id,
-                    true,
                   );
                   onConfirmAction?.();
                 }}

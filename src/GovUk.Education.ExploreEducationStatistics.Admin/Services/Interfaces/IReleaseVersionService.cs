@@ -61,7 +61,7 @@ public interface IReleaseVersionService
         CancellationToken cancellationToken = default
     );
 
-    Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId, bool isReplacement = false);
+    Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId);
 
     Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(Guid releaseVersionId, Guid fileId);
 }

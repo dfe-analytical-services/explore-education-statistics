@@ -276,14 +276,8 @@ const releaseDataFileService = {
       `/release/${releaseId}/data/${dataFileId}/delete-plan`,
     );
   },
-  deleteDataFiles(
-    releaseId: string,
-    fileId: string,
-    isReplacement?: boolean,
-  ): Promise<void> {
-    return client.delete<void>(
-      `/releaseVersions/${releaseId}/data/${fileId}/${isReplacement ?? false}`,
-    );
+  deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
+    return client.delete<void>(`/releaseVersions/${releaseId}/data/${fileId}`);
   },
   updateFile(
     releaseId: string,

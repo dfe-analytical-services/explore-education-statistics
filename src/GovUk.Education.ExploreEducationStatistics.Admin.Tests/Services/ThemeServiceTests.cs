@@ -1101,11 +1101,8 @@ public class ThemeServiceTests
             CancellationToken cancellationToken = default
         ) => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, Unit>> RemoveDataFiles(
-            Guid releaseVersionId,
-            Guid fileId,
-            bool isReplacement
-        ) => throw new NotImplementedException();
+        public Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId) =>
+            throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
             Guid releaseVersionId,
