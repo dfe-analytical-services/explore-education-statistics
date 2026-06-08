@@ -40,6 +40,8 @@ import { GetServerSideProps } from 'next';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import React, { useEffect, useMemo, useState } from 'react';
 import omit from 'lodash/omit';
+import WarningMessage from '@common/components/WarningMessage';
+import logger from '@common/services/logger';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
@@ -275,28 +277,30 @@ export default function DataSetFilePage({
                 onDownload={handleDownload}
               />
 
-              {apiDataSet && apiDataSetVersion && (
-                <>
-                  <DataSetFileApiQuickStart
-                    id={apiDataSet.id}
-                    name={apiDataSet.title}
-                    version={apiDataSetVersion.version}
-                  />
+              <DataSetFileApiQuickStart
+                id={apiDataSet?.id}
+                name={apiDataSet?.title}
+                version={apiDataSetVersion?.version}
+              />
 
+              {apiDataSet && apiDataSetVersion ? (
+                <>
                   <DataSetFileApiVersionHistory
                     apiDataSetId={apiDataSet.id}
                     currentVersion={apiDataSetVersion.version}
                   />
 
-                  {apiDataSetVersionChanges && (
-                    <DataSetFileApiChangelog
-                      changes={apiDataSetVersionChanges}
-                      guidanceNotes={apiDataSetVersion.notes}
-                      version={apiDataSetVersion.version}
-                      patchHistory={apiDataSetVersionChanges.patchHistory || []}
-                    />
-                  )}
+                  <DataSetFileApiChangelog
+                    changes={apiDataSetVersionChanges}
+                    guidanceNotes={apiDataSetVersion.notes}
+                    version={apiDataSetVersion.version}
+                    patchHistory={apiDataSetVersionChanges?.patchHistory || []}
+                  />
                 </>
+              ) : (
+                <WarningMessage>
+                  API data set version history is not currently available
+                </WarningMessage>
               )}
 
               <DataSetFileContact
@@ -332,44 +336,53 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
       publicationSummary,
     };
 
+    let apiDataSet: ApiDataSet | undefined;
+    let apiDataSetVersion: ApiDataSetVersion | undefined;
+    let apiDataSetVersionChanges: ApiDataSetVersionChanges | null | undefined;
+
     if (dataSetFile.api) {
-      await queryClient.prefetchQuery({
-        ...apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
-          page: versionPage ? Number(versionPage) : 1,
-        }),
-        staleTime: Infinity,
-      });
+      try {
+        await queryClient.prefetchQuery({
+          ...apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
+            page: versionPage ? Number(versionPage) : 1,
+          }),
+          staleTime: Infinity,
+        });
 
-      const [apiDataSet, apiDataSetVersion, apiDataSetVersionChanges] =
-        await Promise.all([
-          queryClient.fetchQuery(
-            apiDataSetQueries.getDataSet(dataSetFile.api.id),
-          ),
-          queryClient.fetchQuery(
-            apiDataSetQueries.getDataSetVersion(
-              dataSetFile.api.id,
-              dataSetFile.api.version,
+        [apiDataSet, apiDataSetVersion, apiDataSetVersionChanges] =
+          await Promise.all([
+            queryClient.fetchQuery(
+              apiDataSetQueries.getDataSet(dataSetFile.api.id),
             ),
-          ),
-          dataSetFile.api.version !== '1.0'
-            ? queryClient.fetchQuery(
-                apiDataSetQueries.getDataSetVersionChanges(
-                  dataSetFile.api.id,
-                  dataSetFile.api.version,
-                  isPatchVersion(dataSetFile.api.version),
-                ),
-              )
-            : null,
-        ]);
-
-      props.apiDataSet = apiDataSet;
-      props.apiDataSetVersion = apiDataSetVersion;
-      props.apiDataSetVersionChanges = apiDataSetVersionChanges;
+            queryClient.fetchQuery(
+              apiDataSetQueries.getDataSetVersion(
+                dataSetFile.api.id,
+                dataSetFile.api.version,
+              ),
+            ),
+            dataSetFile.api.version !== '1.0'
+              ? queryClient.fetchQuery(
+                  apiDataSetQueries.getDataSetVersionChanges(
+                    dataSetFile.api.id,
+                    dataSetFile.api.version,
+                    isPatchVersion(dataSetFile.api.version),
+                  ),
+                )
+              : null,
+          ]);
+      } catch (error) {
+        logger.error(error);
+      }
     }
 
     return {
       props: {
         ...props,
+        ...(apiDataSet !== undefined ? { apiDataSet } : {}),
+        ...(apiDataSetVersion !== undefined ? { apiDataSetVersion } : {}),
+        ...(apiDataSetVersionChanges !== undefined
+          ? { apiDataSetVersionChanges }
+          : {}),
         dehydratedState: dehydrate(queryClient),
       },
     };
