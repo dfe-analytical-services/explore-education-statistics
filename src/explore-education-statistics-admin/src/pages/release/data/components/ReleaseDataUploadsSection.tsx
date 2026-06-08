@@ -183,7 +183,7 @@ export default function ReleaseDataUploadsSection({
   const handleDeleteUploadConfirm = useCallback(async () => {
     await refetchDataFiles();
     await refetchDataSetUploads();
-  }, [setAllDataUploads]);
+  }, [refetchDataFiles, refetchDataSetUploads]);
 
   const handleDeleteConfirm = useCallback(
     async (deletedFileId: string) => {

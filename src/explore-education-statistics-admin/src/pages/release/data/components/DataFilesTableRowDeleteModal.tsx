@@ -8,7 +8,6 @@ import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import { useQueries } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
-import Button from '@common/components/Button';
 
 interface Props {
   dataFileId: string;

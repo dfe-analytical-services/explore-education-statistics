@@ -5,6 +5,7 @@ import _releaseDataFileService, {
   UploadDataFilesRequest,
   UploadZipDataFileRequest,
   ReplacementDataFile,
+  DataSetUpload,
 } from '@admin/services/releaseDataFileService';
 import _dataReplacementService, {
   DataReplacementPlan,
@@ -94,6 +95,18 @@ describe('ReleaseDataUploadsSection', () => {
     },
   };
 
+  const testDataSetUpload: DataSetUpload = {
+    id: 'upload-1',
+    dataSetTitle: 'Test data set upload 1',
+    dataFileName: 'data1.csv',
+    dataFileSize: '200 B',
+    metaFileName: 'meta1.csv',
+    metaFileSize: '100 B',
+    status: 'PendingReview',
+    created: new Date(),
+    uploadedBy: 'test@test.com',
+  };
+
   const testQueuedImportStatus: DataFileImportStatus = {
     status: 'QUEUED',
     percentageComplete: 0,
@@ -140,7 +153,52 @@ describe('ReleaseDataUploadsSection', () => {
     releaseDataFileService.getDataSetUploads.mockResolvedValue([]);
   });
 
-  test('renders uploaded data files table', async () => {
+  test('renders uploaded but not yet imported data files in the uploaded data files table', async () => {
+    releaseDataFileService.getDataFiles.mockResolvedValue([]);
+    releaseDataFileService.getDataSetUploads.mockResolvedValue([
+      testDataSetUpload,
+    ]);
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+
+    expect(releaseDataFileService.getDataSetUploads).toHaveBeenCalledWith(
+      'release-1',
+    );
+
+    expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
+
+    const fileTableRows = getAllFileTableRows('Data files');
+
+    expect(fileTableRows).toHaveLength(2);
+
+    const fileTableRow = within(fileTableRows[1]);
+
+    expect(
+      fileTableRow.getByTestId('Test data set upload 1-title'),
+    ).toHaveTextContent('Test data set upload 1');
+    expect(
+      fileTableRow.getByTestId('Test data set upload 1-size'),
+    ).toHaveTextContent('200 B');
+    expect(
+      fileTableRow.getByTestId('Test data set upload 1-status'),
+    ).toHaveTextContent('Pending review');
+    expect(
+      fileTableRow.getByTestId('Test data set upload 1-actions'),
+    ).toHaveTextContent('View details');
+    expect(
+      fileTableRow.getByTestId('Test data set upload 1-actions'),
+    ).toHaveTextContent('Delete files');
+  });
+
+  test('renders imported data files in the uploaded data files table', async () => {
     releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
@@ -191,7 +249,61 @@ describe('ReleaseDataUploadsSection', () => {
     );
   });
 
-  test('renders data files replacements table', async () => {
+  test('renders data files replacements table with uploaded but not yet imported replacements', async () => {
+    const replacementDataSetUpload = {
+      ...testDataSetUpload,
+      replacingFileId: 'replacement-id',
+    } as DataSetUpload;
+
+    releaseDataFileService.getDataFiles.mockResolvedValue([]);
+
+    releaseDataFileService.getDataSetUploads.mockResolvedValue([
+      replacementDataSetUpload,
+    ]);
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+
+    expect(releaseDataFileService.getDataSetUploads).toHaveBeenCalledTimes(1);
+
+    expect(
+      await screen.findByRole('caption', { name: 'Data file replacements' }),
+    ).toBeInTheDocument();
+
+    const replacementRows = getAllFileTableRows('Data file replacements');
+
+    expect(replacementRows).toHaveLength(2);
+
+    const replacementRow = within(replacementRows[1]);
+
+    expect(
+      replacementRow.getByTestId('Test data set upload 1-title'),
+    ).toHaveTextContent('Test data set upload 1');
+    expect(
+      replacementRow.getByTestId('Test data set upload 1-size'),
+    ).toHaveTextContent('200 B');
+    expect(
+      replacementRow.getByTestId('Test data set upload 1-status'),
+    ).toHaveTextContent('Pending review');
+    expect(
+      replacementRow.getByTestId('Test data set upload 1-actions'),
+    ).toHaveTextContent('View details for Test data set upload 1');
+    expect(
+      replacementRow.getByTestId('Test data set upload 1-actions'),
+    ).toHaveTextContent('Cancel replacement for Test data set upload 1');
+    expect(
+      replacementRow.getByTestId('Test data set upload 1-actions'),
+    ).not.toHaveTextContent('Confirm replacement for Test data set upload 1');
+  });
+
+  test('renders data files replacements table with imported replacements', async () => {
     const replacementDataFile1 = {
       ...testDataFiles[0],
       id: 'data-replacement-1',
@@ -270,10 +382,10 @@ describe('ReleaseDataUploadsSection', () => {
       'View details for Test data 1',
     );
     expect(replacementRow1.getByTestId('Actions')).toHaveTextContent(
-      'Cancel replacement',
+      'Cancel replacement for Test data 1',
     );
     expect(replacementRow1.getByTestId('Actions')).toHaveTextContent(
-      'Confirm replacement',
+      'Confirm replacement for Test data 1',
     );
 
     const replacementRow2 = within(replacementRows[2]);
@@ -287,10 +399,10 @@ describe('ReleaseDataUploadsSection', () => {
       'View details for Test data 2',
     );
     expect(replacementRow2.getByTestId('Actions')).toHaveTextContent(
-      'Cancel replacement',
+      'Cancel replacement for Test data 2',
     );
     expect(replacementRow2.getByTestId('Actions')).toHaveTextContent(
-      'Confirm replacement',
+      'Confirm replacement for Test data 2',
     );
 
     // If a data set import is complete and plan valid, these calls are unnecessary...
@@ -1056,6 +1168,254 @@ describe('ReleaseDataUploadsSection', () => {
       ).toBeInTheDocument();
       expect(
         modal.getByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
+
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+  });
+
+  describe('replacing data file', () => {
+    test('does not render replace data button if file is not ready for replacing', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        testDataFiles[1],
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testQueuedImportStatus,
+      );
+
+      renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(3);
+
+      const fileTableRow1 = within(fileTableRows[1]);
+
+      expect(fileTableRow1.getByTestId('Test data 1-status')).toHaveTextContent(
+        'Queued',
+      );
+      expect(
+        fileTableRow1.queryByRole('button', {
+          name: 'Edit title for Test data 1',
+        }),
+      ).not.toBeInTheDocument();
+
+      const fileTableRow2 = within(fileTableRows[2]);
+
+      expect(fileTableRow2.getByTestId('Test data 2-status')).toHaveTextContent(
+        'Complete',
+      );
+      expect(
+        fileTableRow2.getByRole('button', {
+          name: 'Replace data for Test data 2',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('clicking replace data title button shows modal to replace data', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+      releaseDataFileService.getDataFile.mockResolvedValue(testDataFiles[1]);
+
+      const { user } = renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(3);
+
+      expect(
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Replace data for Test data 2',
+        }),
+      ).toBeInTheDocument();
+
+      await user.click(
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Replace data for Test data 2',
+        }),
+      );
+
+      expect(releaseDataFileService.getDataFile).toHaveBeenCalledTimes(1);
+
+      expect(
+        await screen.findByRole('heading', {
+          name: 'Replace data',
+        }),
+      ).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.queryByText('This data file is currently being replaced.'),
+      ).not.toBeInTheDocument();
+
+      expect(
+        modal.queryByText('Cancel the replacement first.'),
+      ).not.toBeInTheDocument();
+
+      // Don't expect to see a visible title input for a replacement. It inherits the title
+      // of the data set being replaced.
+      expect(modal.queryByLabelText('Data file title')).not.toBeInTheDocument();
+
+      expect(modal.getByLabelText('CSV files')).toBeInTheDocument();
+
+      /**
+       *
+       */
+
+      const zipFile = new File(['test'], 'test-data.zip', {
+        type: 'application/zip',
+      });
+
+      await user.click(modal.getByLabelText('ZIP file'));
+
+      await user.upload(
+        modal.getByTestId('file-input-dataFileReplacementUploadForm-zipFile'),
+        zipFile,
+      );
+
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], status: 'QUEUED' },
+        {
+          ...testDataFiles[1],
+          replacementInProgress: true,
+        },
+      ]);
+
+      await user.click(
+        modal.getByRole('button', { name: 'Upload data files' }),
+      );
+
+      await waitFor(() =>
+        expect(
+          releaseDataFileService.uploadZippedDataSetFilePair,
+        ).toHaveBeenCalledWith('release-1', {
+          title: 'Test data 2',
+          zipFile,
+        } as UploadZipDataFileRequest),
+      );
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      await waitFor(() =>
+        expect(releaseDataFileService.getDataFiles).toHaveBeenCalledTimes(2),
+      );
+
+      const updatedFileTableRows = getAllFileTableRows('Data files');
+
+      // Expect the data file being replaced to still be in the Data files table.
+      expect(updatedFileTableRows).toHaveLength(3);
+
+      const fileTableRow2 = within(updatedFileTableRows[2]);
+
+      // await waitFor(() =>
+      //   expect(
+      //     releaseDataFileService.getDataFileImportStatus,
+      //   ).toHaveBeenCalledWith('release-1', 'file-2'),
+      // );
+
+      expect(fileTableRow2.getByTestId('Test data 2-status')).toHaveTextContent(
+        'Replacing',
+      );
+    });
+
+    test('does not allow replacing data when it is already being replaced', async () => {
+      const dataFileBeingReplaced = {
+        ...testDataFiles[0],
+        replacementInProgress: true,
+      };
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        dataFileBeingReplaced,
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+      releaseDataFileService.getDataFile.mockResolvedValue(
+        dataFileBeingReplaced,
+      );
+
+      const { user } = renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      expect(
+        within(fileTableRows[1]).getByRole('button', {
+          name: 'Replace data for Test data 1',
+        }),
+      ).toBeInTheDocument();
+
+      await user.click(
+        within(fileTableRows[1]).getByRole('button', {
+          name: 'Replace data for Test data 1',
+        }),
+      );
+
+      expect(releaseDataFileService.getDataFile).toHaveBeenCalledTimes(1);
+
+      expect(
+        await screen.findByRole('heading', {
+          name: 'Replace data',
+        }),
+      ).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText('This data file is currently being replaced.'),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByText('Cancel the replacement first.'),
+      ).toBeInTheDocument();
+
+      expect(modal.queryByLabelText('CSV files')).not.toBeInTheDocument();
+
+      expect(
+        modal.getByRole('button', { name: 'Upload data files' }),
+      ).toBeInTheDocument();
+      expect(
+        modal.getByRole('button', { name: 'Upload data files' }),
       ).toBeDisabled();
 
       expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();

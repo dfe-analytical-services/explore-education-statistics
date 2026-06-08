@@ -186,7 +186,7 @@ export default function DataFilesTableUploadRow({
           onStatusChange={handleScreenerStatusChange}
         />
       </td>
-      <td data-testid="Actions">
+      <td data-testid={`${currentUpload.dataSetTitle}-actions`}>
         <ButtonGroup className={styles.actions}>
           <ModalConfirm
             title="Data set details"

@@ -156,6 +156,7 @@ export default function DataFilesReplacementTableRow({
                 triggerButton={
                   <ButtonText variant="secondary">
                     Cancel replacement
+                    <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
                   </ButtonText>
                 }
                 onConfirm={async () => {
@@ -183,6 +184,7 @@ export default function DataFilesReplacementTableRow({
                 }}
               >
                 Confirm replacement
+                <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
               </ButtonText>
             )}
           </>
