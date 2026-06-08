@@ -12,14 +12,14 @@ unzipped_seed_data_folderpath = "tests/files/.unzipped-seed-data-files"
 
 
 class ReleaseFile:
-    def __init__(self, release_id, file_id, filename=""):
-        self.release_id = release_id
+    def __init__(self, release_version_id, file_id, filename=""):
+        self.release_version_id = release_version_id
         self.file_id = file_id
         self.filename = filename
         self.content_type = "text/csv"
 
     def path(self):
-        return f"{self.release_id}/data/{self.file_id}"
+        return f"{self.release_version_id}/data/{self.file_id}"
 
 
 class ReleaseFilesGenerator(object):
