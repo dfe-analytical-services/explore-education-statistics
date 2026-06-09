@@ -9,8 +9,10 @@ type ResourceNames = {
     alertsGroup: string
     subnets: {
       eventGridCustomTopicPrivateEndpoints: string
-      searchDocsFunction: string
-      searchDocsFunctionPrivateEndpoints: string
+      nlSearchFunctionApp: string
+      nlSearchFunctionAppPrivateEndpoints: string
+      searchDocsFunctionApp: string
+      searchDocsFunctionAppPrivateEndpoints: string
       searchStoragePrivateEndpoints: string
     }
   }

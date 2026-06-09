@@ -116,8 +116,8 @@ public class ReplacementService(
                 }
 
                 var mapping = contentDbContext.DataSetMappings.Single(mapping =>
-                    mapping.OriginalDataSetId == originalSubjectId
-                    && mapping.ReplacementDataSetId == replacementSubjectId
+                    mapping.OriginalDataFileId == originalReleaseFile.FileId
+                    && mapping.ReplacementDataFileId == replacementReleaseFile.FileId
                 );
 
                 replacementReleaseFile.FilterSequence = await ReplaceFilterSequence(

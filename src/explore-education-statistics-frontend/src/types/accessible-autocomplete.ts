@@ -171,7 +171,11 @@ declare module 'accessible-autocomplete/react' {
    * The Accessible Autocomplete React component.
    * This component wraps the core accessible-autocomplete library to provide a React-friendly interface.
    */
-  const AccessibleAutocomplete: React.FC<AccessibleAutocompleteProps>;
 
-  export default AccessibleAutocomplete;
+  // eslint-disable-next-line react/prefer-stateless-function
+  export default class Autocomplete extends React.Component<
+    AccessibleAutocompleteProps,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
+  > {}
 }

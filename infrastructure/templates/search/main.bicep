@@ -26,11 +26,20 @@ param dateProvisioned string = utcNow('u')
 @description('The URL of the Content API.')
 param contentApiUrl string
 
+@description('Specifies whether or not the Natural Language Search Function App already exists.')
+param naturalLanguageSearchFunctionAppExists bool = true
+
 @description('Specifies whether or not the Search Docs Function App already exists.')
 param searchDocsFunctionAppExists bool = true
 
-@description('Specifies the name of the Azure AI Search indexer.')
-param searchServiceIndexerName string = ''
+@description('Name of the \'Natural language search filter\' index in Azure AI Search.')
+param searchServiceNLSearchFilterIndexName string = ''
+
+@description('Name of the \'Natural language search dataset\' index in Azure AI Search.')
+param searchServiceNLSearchDatasetIndexName string = ''
+
+@description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
+param searchServiceSearchIndexerName string = ''
 
 @description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
 @allowed([
@@ -42,6 +51,9 @@ param searchServiceSemanticRankerAvailability string
 
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
+
+@description('Indicates whether to deploy the Natural Language Search Function App as part of this deployment.')
+param deployNaturalLanguageSearchFunctionApp bool = false
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -69,8 +81,10 @@ var resourceNames = {
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
     subnets: {
       eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
-      searchDocsFunction: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
-      searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs-pep'
+      nlSearchFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch'
+      nlSearchFunctionAppPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch-pep'
+      searchDocsFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
+      searchDocsFunctionAppPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs-pep'
       searchStoragePrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.storageStorageAccounts}-search-pep'
     }
   }
@@ -109,6 +123,37 @@ module eventMessagingModule '../common/application/eventMessaging.bicep' = {
   }
 }
 
+module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = if (deployNaturalLanguageSearchFunctionApp) {
+  name: 'nlSearchFunctionAppApplicationModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    resourcePrefix: resourcePrefix
+    functionAppExists: naturalLanguageSearchFunctionAppExists
+    functionAppFirewallRules: union(
+      [
+        {
+          cidr: 'AzureCloud'
+          tag: 'ServiceTag'
+          priority: 101
+          name: 'AzureCloud'
+        }
+      ],
+      maintenanceFirewallRules
+    )
+    logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
+    searchServiceName: searchServiceModule.outputs.searchServiceName
+    searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
+    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
+    locationsDictionaryContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.nlSearchLocationsDictionary
+    searchServiceNLSearchFilterIndexName: searchServiceNLSearchFilterIndexName
+    searchServiceNLSearchDatasetIndexName: searchServiceNLSearchDatasetIndexName
+    storageFirewallRules: maintenanceIpRanges
+    applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
+    tagValues: tagValues
+  }
+}
+
 module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
   name: 'searchDocsFunctionAppApplicationModuleDeploy'
   params: {
@@ -129,11 +174,11 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
       maintenanceFirewallRules
     )
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
-    searchServiceIndexerName: searchServiceIndexerName
+    searchServiceSearchIndexerName: searchServiceSearchIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
-    searchableDocumentsContainerName: searchServiceModule.outputs.searchableDocumentsContainerName
+    searchDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.searchDocuments
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
@@ -166,7 +211,10 @@ module searchServiceModule 'application/searchService.bicep' = {
   }
 }
 
-output searchableDocumentsContainerName string = searchServiceModule.outputs.searchableDocumentsContainerName
 output searchDocsFunctionAppUrl string = searchDocsFunctionAppModule.outputs.functionAppUrl
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchStorageAccountManagedIdentityConnectionString string = searchServiceModule.outputs.searchStorageAccountManagedIdentityConnectionString
+output searchDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.searchDocuments
+output nlSearchFunctionAppUrl string = deployNaturalLanguageSearchFunctionApp ? nlSearchFunctionAppModule.outputs.functionAppUrl : ''
+output nlSearchDatasetDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.nlSearchDatasetDocuments
+output nlSearchFilterDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.nlSearchFilterDocuments

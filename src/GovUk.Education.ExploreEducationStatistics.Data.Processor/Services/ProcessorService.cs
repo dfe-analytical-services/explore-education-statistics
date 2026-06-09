@@ -11,42 +11,23 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class ProcessorService : IProcessorService
+public class ProcessorService(
+    ILogger<ProcessorService> logger,
+    IPrivateBlobStorageService privateBlobStorageService,
+    IFileImportService fileImportService,
+    IImporterService importerService,
+    IDataImportService dataImportService,
+    IValidatorService validatorService,
+    IDbContextSupplier dbContextSupplier
+) : IProcessorService
 {
-    private readonly ILogger<ProcessorService> _logger;
-    private readonly IPrivateBlobStorageService _privateBlobStorageService;
-    private readonly IFileImportService _fileImportService;
-    private readonly IImporterService _importerService;
-    private readonly IDataImportService _dataImportService;
-    private readonly IValidatorService _validatorService;
-    private readonly IDbContextSupplier _dbContextSupplier;
-
-    public ProcessorService(
-        ILogger<ProcessorService> logger,
-        IPrivateBlobStorageService privateBlobStorageService,
-        IFileImportService fileImportService,
-        IImporterService importerService,
-        IDataImportService dataImportService,
-        IValidatorService validatorService,
-        IDbContextSupplier dbContextSupplier
-    )
-    {
-        _logger = logger;
-        _privateBlobStorageService = privateBlobStorageService;
-        _fileImportService = fileImportService;
-        _importerService = importerService;
-        _dataImportService = dataImportService;
-        _validatorService = validatorService;
-        _dbContextSupplier = dbContextSupplier;
-    }
-
     public async Task ProcessStage1(Guid importId)
     {
-        await _validatorService
+        await validatorService
             .Validate(importId)
             .OnSuccessDo(async result =>
             {
-                await _dataImportService.Update(
+                await dataImportService.Update(
                     importId,
                     expectedImportedRows: result.ImportableRowCount,
                     totalRows: result.TotalRowCount,
@@ -55,51 +36,52 @@ public class ProcessorService : IProcessorService
             })
             .OnFailureDo(async errors =>
             {
-                await _dataImportService.FailImport(importId, errors);
+                await dataImportService.FailImport(importId, errors);
 
-                _logger.LogError("Import {ImportId} FAILED ...check log", importId);
+                logger.LogError("Import {ImportId} FAILED ...check log", importId);
             });
     }
 
     public async Task ProcessStage2(Guid importId)
     {
-        var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
+        var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
-        var import = await _dataImportService.GetImport(importId);
+        var import = await dataImportService.GetImport(importId);
 
         var subject = await statisticsDbContext.Subject.SingleAsync(subject => subject.Id == import.SubjectId);
 
-        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(import);
+        var metaFileStreamProvider = privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await _importerService.ImportMeta(
+        var subjectMeta = await importerService.ImportMeta(
             metaFileCsvHeaders,
             metaFileCsvRows,
             subject,
             statisticsDbContext
         );
-        await _fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, statisticsDbContext);
+        await fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, statisticsDbContext);
     }
 
     public async Task ProcessStage3(Guid importId)
     {
-        var import = await _dataImportService.GetImport(importId);
+        var import = await dataImportService.GetImport(importId);
 
         try
         {
-            await _fileImportService.ImportObservations(
-                import,
-                _dbContextSupplier.CreateDbContext<StatisticsDbContext>()
-            );
+            var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
+            await fileImportService.ImportObservations(import, statisticsDbContext);
+
+            var completedImport = await dataImportService.GetImport(import.Id);
+            await fileImportService.CompleteImport(completedImport, statisticsDbContext);
         }
         catch (Exception e)
         {
             // If deadlock exception then throw & try up to 3 times
             if (e is SqlException exception && exception.Number == 1205)
             {
-                _logger.LogInformation(
+                logger.LogInformation(
                     "ProcessStage3: Handling known exception when processing Import "
                         + "{ImportId}: {Message} : transaction will be retried",
                     import.Id,
@@ -110,14 +92,14 @@ public class ProcessorService : IProcessorService
 
             var mainException = e.InnerException ?? e;
 
-            _logger.LogError(
+            logger.LogError(
                 mainException,
                 "ProcessStage3 FAILED for Import: {ImportId} : {Message}",
                 import.Id,
                 mainException.Message
             );
 
-            await _dataImportService.FailImport(import.Id);
+            await dataImportService.FailImport(import.Id);
         }
     }
 }

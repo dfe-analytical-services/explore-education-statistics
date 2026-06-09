@@ -16,6 +16,30 @@ import { AzureDataSetListRequest } from '@frontend/services/azureDataSetService'
 import { AzureOrderByParam } from '@frontend/services/azurePublicationService';
 import omitBy from 'lodash/omitBy';
 
+export function createStatisticalReleasesSuggestRequest(
+  query: SearchDataPageQuery,
+  searchTerm: string,
+): AzureDataSetListRequest {
+  const { releaseTypes, sortBy, themeIds } = getParamsFromQuery(query);
+
+  const orderBy = getSortParam(sortBy);
+
+  const filter = buildODataFilter({
+    releaseTypes,
+    themeIds,
+  });
+
+  return omitBy(
+    {
+      filter,
+      page: parseNumber(query.page) ?? 1,
+      search: searchTerm,
+      orderBy,
+    },
+    value => typeof value === 'undefined',
+  );
+}
+
 export default function createStatisticalReleasesListRequest(
   query: SearchDataPageQuery,
 ): AzureDataSetListRequest {

@@ -16,7 +16,7 @@ resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorName
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: keyVaultName
 }
 
