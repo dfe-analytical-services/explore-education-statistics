@@ -16,19 +16,21 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=            Publish release and amend %{RUN_IDENTIFIER}
-${RELEASE_LABEL}=               provisional
-${RELEASE_NAME}=                Financial year 3000-01 ${RELEASE_LABEL}
-${DATABLOCK_NAME}=              Dates data block name
-${SUBJECT_NAME}=                Dates test subject
-${ANCILLARY_FILE_NAME}=         Test ancillary file 1
-${ANCILLARY_FILE_NAME_2}=       Test ancillary file 2
+${PUBLICATION_NAME}=                Publish release and amend %{RUN_IDENTIFIER}
+${RELEASE_LABEL}=                   provisional
+${RELEASE_NAME}=                    Financial year 3000-01 ${RELEASE_LABEL}
+${DATABLOCK_NAME}=                  Dates data block name
+${SUBJECT_NAME}=                    Dates test subject
+${ANCILLARY_FILE_NAME}=             Test ancillary file 1
+${ANCILLARY_FILE_NAME_2}=           Test ancillary file 2
+${LEGACY_SUMMARY_TEXT_BLOCK}=       Test summary text for ${PUBLICATION_NAME}
 
 
 *** Test Cases ***
 Create new publication for "UI tests theme" theme
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user creates test release via api    ${PUBLICATION_ID}    FY    3000    label=${RELEASE_LABEL}
+    user creates test release with legacy summary text block via api    ${PUBLICATION_ID}    FY    3000
+    ...    label=${RELEASE_LABEL}    summary_text_block=${LEGACY_SUMMARY_TEXT_BLOCK}
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -128,7 +130,10 @@ Create chart for data block
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
+
+Verify legacy summary text block content is correct
+    user waits until element contains    id:releaseSummary    ${LEGACY_SUMMARY_TEXT_BLOCK}    %{WAIT_SMALL}
 
 Add free text key stat
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
@@ -231,7 +236,7 @@ Edit data block
 Navigate to the 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a warning text block    %{WAIT_SMALL}
 
 Verify data block is updated correctly
     # checking if data block cache has been invalidated by verifying the updates on the block
@@ -251,7 +256,7 @@ Add public prerelease access list
     user creates public prerelease access list    Test public access list
 
 Approve release for scheduled publication
-    ${days_until_release}=    set variable    0
+    ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
     ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}
@@ -261,16 +266,8 @@ Approve release for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    12
-    ...    3001
-
-    set suite variable    ${EXPECTED_SCHEDULED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
-
-Verify release is scheduled
-    user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
-    user checks summary list contains    Next release expected    December 3001
+    ...    next_release_month=12
+    ...    next_release_year=3001
 
 Get public release link
     ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
@@ -290,6 +287,10 @@ Verify release page meta
     user checks meta description should be
     ...    ${PUBLICATION_NAME} summary
 
+Verify release page background information
+    user waits until element contains    id:background-information    ${LEGACY_SUMMARY_TEXT_BLOCK}
+    ...    %{WAIT_SMALL}
+
 Verify release URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/publish-release-and-amend-%{RUN_IDENTIFIER}
 
@@ -306,8 +307,13 @@ Verify release associated files
     ...    Data guidance
     ...    Data catalogue
 
-    User checks page 'Explore and download data' data set available properties    ${SUBJECT_NAME}    118
-    ...    2020 Week 13 to 2021 Week 24    ${PUBLICATION_NAME}    Dates test subject test data guidance content
+    User checks page 'Explore and download data' data set available properties
+    ...    data_set_name=${SUBJECT_NAME}
+    ...    expected_row_count=118
+    ...    geographical_levels=National
+    ...    expected_time_period=2020 Week 13 to 2021 Week 24
+    ...    publication_title=${PUBLICATION_NAME}
+    ...    expected_data_guidance=Dates test subject test data guidance content
     user goes back
 
     ${supporting_files_xpath}=    Set Variable
@@ -623,7 +629,13 @@ Update data block chart for amendment
 Navigate to 'Content' page for amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block
+    user waits until page contains button    Add a warning text block
+
+Verify legacy summary text block content is correct for amendment
+    user waits until element contains    id:releaseSummary    ${LEGACY_SUMMARY_TEXT_BLOCK}    %{WAIT_SMALL}
+
+Update legacy summary text block for amendment
+    user adds content to autosaving text block    id:releaseSummary    Amended ${LEGACY_SUMMARY_TEXT_BLOCK}
 
 Update free text key stat
     user updates free text key stat    1    Updated title    New stat    Updated trend
@@ -705,8 +717,8 @@ Check public prerelease access list for amendment is same as original release
 Update public prerelease access list
     user updates public prerelease access list    Amended public access list
 
-Approve amendment for scheduled release
-    ${days_until_release}=    set variable    1
+Approve amendment for scheduled publication
+    ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
     ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}
@@ -716,9 +728,10 @@ Approve amendment for scheduled release
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    12
-    ...    3001
+    ...    next_release_month=12
+    ...    next_release_year=3001
 
+Publish the scheduled amendment
     user waits for scheduled release to be published immediately
 
     ${EXPECTED_PUBLISHED_DATE}=    get london date
@@ -733,6 +746,10 @@ Navigate to amendment release page
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
+
+Verify amended background information
+    user waits until element contains    id:background-information    Amended ${LEGACY_SUMMARY_TEXT_BLOCK}
+    ...    %{WAIT_SMALL}
 
 Verify amendment is displayed as the latest release and the 'All releases in this series' page only displays the latest release
     user checks page contains    Latest release
@@ -931,8 +948,7 @@ Verify published date on publication page is overridden with past date
 
 Verify public published date is overridden with past date
     user waits for caches to expire
-    user navigates to    ${PUBLIC_RELEASE_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
 
 Return to Admin and create second amendment
@@ -959,11 +975,12 @@ Remove the content section that originally contained the deleted data block
     user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user deletes editable accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-Approve release amendment for scheduled publication and update published date
+Approve second amendment for scheduled publication and update published date
     ${days_until_release}=    set variable    2
     ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
     ${publish_date_month}=    get london month date    offset_days=${days_until_release}
     ${publish_date_year}=    get london year    offset_days=${days_until_release}
+
     user approves release for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
@@ -971,7 +988,10 @@ Approve release amendment for scheduled publication and update published date
     ...    next_release_month=8
     ...    next_release_year=4001
     ...    update_amendment_published_date=${True}
+
+Publish the scheduled second amendment
     user waits for scheduled release to be published immediately
+
     ${EXPECTED_PUBLISHED_DATE}=    get london date
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
@@ -980,10 +1000,9 @@ Verify published date on publication page has been updated
     ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
-Navigate to amended public release
+Navigate to second amendment release page
     user waits for caches to expire
-    user navigates to    ${PUBLIC_RELEASE_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Verify public published date has been updated
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}

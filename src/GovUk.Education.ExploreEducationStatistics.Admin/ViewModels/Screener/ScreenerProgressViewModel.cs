@@ -1,13 +1,17 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 
 public record ScreenerProgressViewModel
 {
+    [JsonConverter(typeof(StringEnumConverter))]
+    public DataSetUploadScreeningStatus Status { get; set; }
+
     public int PercentageComplete { get; set; }
 
     public string Stage { get; set; } = null!;
-}
 
-public record ScreenerProgressWithDataSetUploadIdViewModel : ScreenerProgressViewModel
-{
-    public Guid DataSetUploadId { get; set; }
+    public bool Completed { get; set; }
 }

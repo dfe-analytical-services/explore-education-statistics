@@ -1,4 +1,4 @@
-import { cpuPercentageConfig, memoryPercentageConfig } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig } from '../alerts/dynamicAlertConfig.bicep'
 import { AppServicePlanSku } from 'types.bicep'
 
 @description('Specifies the App Service plan name')
@@ -18,6 +18,9 @@ param kind
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
+@description('The maximum number of instances that this plan can support. This pool of workers is shared between any services that use this plan.')
+param maximumElasticWorkerCount int = 1
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   cpuPercentage: bool
@@ -35,11 +38,12 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   sku: sku
   properties: {
     reserved: operatingSystem == 'Linux'
+    maximumElasticWorkerCount: maximumElasticWorkerCount
   }
   tags: tagValues
 }
 
-module cpuPercentageAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${planName}CpuPercentageDeploy'
   params: {
     resourceName: planName
@@ -56,7 +60,7 @@ module cpuPercentageAlert '../../../public-api/components/alerts/dynamicMetricAl
   ]
 }
 
-module memoryPercentageAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${planName}MemoryPercentageDeploy'
   params: {
     resourceName: planName

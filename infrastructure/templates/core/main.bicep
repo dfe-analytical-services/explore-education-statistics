@@ -19,7 +19,7 @@ param certificateType FrontDoorCertificateType = 'BringYourOwn'
 param deployBackupVaultReaderRoleAssignment bool = true
 
 @description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
-param averagePublicSiteResponseTimeAlertThresholdMillis int = 1000
+param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false

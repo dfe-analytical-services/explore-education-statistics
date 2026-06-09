@@ -7,9 +7,9 @@ import React from 'react';
 import ButtonText from '@common/components/ButtonText';
 import downloadTemporaryReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadTemporaryReleaseFileSecurely';
 import {
-  getDataSetUploadStatusColour,
-  getDataSetUploadStatusLabel,
-} from './ImporterStatus';
+  getDataSetUploadScreeningStatusColour,
+  getDataSetUploadScreeningStatusLabel,
+} from './ScreenerStatus';
 import ApiCompatibilityTag from './ApiCompatibilityTag';
 
 interface Props {
@@ -62,9 +62,19 @@ export default function DataSetUploadSummaryList({
         {dataSetUpload.dataFileSize}
       </SummaryListItem>
       <SummaryListItem term="Status">
-        <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
-          {getDataSetUploadStatusLabel(dataSetUpload.status)}
-        </Tag>
+        {
+          // TODO EES-7139 - change status to be non-nullable when foreground
+          // screening process is decommissioned.
+        }
+        {dataSetUpload.status ? (
+          <Tag
+            colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}
+          >
+            {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
+          </Tag>
+        ) : (
+          <Tag colour="blue">Uploading</Tag>
+        )}
       </SummaryListItem>{' '}
       <SummaryListItem term="Uploaded by">
         <a href={uploadedByUrl}>{dataSetUpload.uploadedBy}</a>

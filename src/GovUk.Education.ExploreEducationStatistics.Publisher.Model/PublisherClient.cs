@@ -17,13 +17,13 @@ public class PublisherClient(string connectionString) : IPublisherClient
     }
 
     public async Task PublishReleaseFiles(
-        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
+        PublishReleaseFilesMessage message,
         CancellationToken cancellationToken = default
     )
     {
         await _queueServiceClient.SendMessageAsJson(
             PublisherQueues.PublishReleaseFilesQueue,
-            new PublishReleaseFilesMessage(releasePublishingKeys),
+            message,
             cancellationToken
         );
     }

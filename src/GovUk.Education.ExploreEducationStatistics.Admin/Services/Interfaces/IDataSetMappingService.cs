@@ -10,12 +10,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 public interface IDataSetMappingService
 {
     Task<DataSetMapping> GetOrCreateMapping(
+        Guid originalDataFileId,
+        Guid replacementDataFileId,
         Guid originalSubjectId,
         Guid replacementSubjectId,
         CancellationToken cancellationToken = default
     );
 
     Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(
-        IndicatorMappingUpdatesRequest request
+        Guid releaseVersionId,
+        IndicatorMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Either<ActionResult, List<LocationMappingDto>>> UpdateLocationMappings(
+        Guid releaseVersionId,
+        LocationMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
     );
 }

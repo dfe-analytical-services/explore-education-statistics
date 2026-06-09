@@ -20,13 +20,11 @@ public class NotifyChangeFunction(
     /// Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
     /// </summary>
     /// <remarks>
+    /// Triggered via a message queued by the Admin application when a release version is approved or unapproved.
     /// Validation will fail if the release version is already in the process of being published.
     /// A future schedule for publishing a release version that's not yet started will be cancelled.
     /// </remarks>
-    /// <param name="message"></param>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    [Function("NotifyChange")]
+    [Function(nameof(NotifyChange))]
     public async Task NotifyChange(
         [QueueTrigger(NotifyChangeQueue)] NotifyChangeMessage message,
         FunctionContext context
@@ -49,7 +47,7 @@ public class NotifyChangeFunction(
                                 message,
                                 ReleasePublishingStatusStates.ImmediateReleaseStartedState
                             );
-                            await queueService.QueuePublishReleaseFilesMessages([releasePublishingKey]);
+                            await queueService.QueueReleaseFilesForImmediatePublishing(releasePublishingKey);
                         }
                         else
                         {

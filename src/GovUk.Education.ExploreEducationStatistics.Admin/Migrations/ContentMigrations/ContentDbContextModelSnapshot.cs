@@ -347,17 +347,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OriginalDataSetId")
+                    b.Property<string>("LocationMappings")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OriginalDataFileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ReplacementDataSetId")
+                    b.Property<Guid>("ReplacementDataFileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UnmappedReplacementIndicators")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UnmappedReplacementLocations")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OriginalDataFileId")
+                        .IsUnique();
+
+                    b.HasIndex("ReplacementDataFileId")
+                        .IsUnique();
 
                     b.ToTable("DataSetMappings");
                 });
@@ -411,6 +425,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ScreenerResult")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScreeningStatus")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -2031,6 +2049,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("DataSetFileVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetMapping", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "OriginalDataFile")
+                        .WithMany()
+                        .HasForeignKey("OriginalDataFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacementDataFile")
+                        .WithMany()
+                        .HasForeignKey("ReplacementDataFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("OriginalDataFile");
+
+                    b.Navigation("ReplacementDataFile");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentBlock", b =>

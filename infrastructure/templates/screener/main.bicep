@@ -34,6 +34,18 @@ param devopsServicePrincipalId string = ''
 @description('Whether or not to include Data Dictionary checks in the Screener.')
 param includeDataDictionaryChecks bool = false
 
+@description('Whether or not to log screening results in the Screener API logs.')
+param logScreeningResults bool = false
+
+@description('Number of concurrent threads that can be used by Plumber to process background jobs.')
+param concurrentRWorkers int = 4
+
+@description('The minimum number of instances for the function app.')
+param minimumInstanceCount int = 1
+
+@description('The maximum number of instances for the function app.')
+param maximumInstanceCount int = 1
+
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
@@ -53,7 +65,7 @@ param screenerFunctionAppSku AppServicePlanSku = {
   family: 'EP'
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 
@@ -84,8 +96,19 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
+module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
+  name: 'screenerLogsStorageModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    storageFirewallRules: maintenanceIpRanges
+    tagValues: tagValues
+    deployAlerts: deployAlerts
+  }
+}
+
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
-  name: 'screenerFunctionApp'
+  name: 'screenerFunctionModuleDeploy'
   params: {
     location: location
     functionAppImageName: 'ees-screener-api'
@@ -94,6 +117,10 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
     includeDataDictionaryChecks: includeDataDictionaryChecks
+    logScreeningResults: logScreeningResults
+    concurrentRWorkers: concurrentRWorkers
+    minimumInstanceCount: minimumInstanceCount
+    maximumInstanceCount: maximumInstanceCount
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists
@@ -114,6 +141,9 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     tagValues: tagValues
     deployAlerts: deployAlerts
   }
+  dependsOn: [
+    screenerLogsStorageModule
+  ]
 }
 
 var tagValues = union(resourceTags ?? {}, {
@@ -129,6 +159,8 @@ var resourcePrefix = '${subscription}-ees'
 
 // The resource prefix for anything specific to the Screener API.
 var screenerResourcePrefix = '${subscription}-ees-sapi'
+
+var screenerFunctionAppName = '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
 
 var resourceNames = {
   existingResources: {
@@ -147,8 +179,10 @@ var resourceNames = {
       : '${legacyResourcePrefix}saeescore'
   }
   screener: {
-    screenerFunction: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
+    screenerFunction: screenerFunctionAppName
     screenerFunctionStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}fn'
+    screenerLogsStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}logs'
+    screenerLogsFileShare: '${screenerFunctionAppName}-logs-${abbreviations.fileShare}'
   }
 }
 

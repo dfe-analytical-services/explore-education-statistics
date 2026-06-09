@@ -31,12 +31,13 @@ public class DataSetUploadRepositoryTests
         var upload1 = builder.WithReleaseVersionId(releaseVersionId).BuildInitialEntity();
         var upload2 = builder.WithReleaseVersionId(releaseVersionId).WithFailingTests().BuildScreenedEntity();
         var upload3 = builder.WithReleaseVersionId(releaseVersionId).WithWarningTests().BuildScreenedEntity();
+        var upload4 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenerErrorEntity();
         var unrelatedUpload = builder.WithReleaseVersionId(Guid.NewGuid()).BuildScreenedEntity();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            contentDbContext.DataSetUploads.AddRange(upload1, upload2, upload3, unrelatedUpload);
+            contentDbContext.DataSetUploads.AddRange(upload1, upload2, upload3, upload4, unrelatedUpload);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -50,18 +51,16 @@ public class DataSetUploadRepositoryTests
             // Assert
             var uploadViewModels = result.AssertRight();
 
-            Assert.Equal(3, uploadViewModels.Count);
+            Assert.Equal(4, uploadViewModels.Count);
 
             // Assert the basic details are mapped correctly.
             AssertBasicViewModelDetailsCorrect(uploadViewModels[0], upload1);
             AssertBasicViewModelDetailsCorrect(uploadViewModels[1], upload2);
             AssertBasicViewModelDetailsCorrect(uploadViewModels[2], upload3);
+            AssertBasicViewModelDetailsCorrect(uploadViewModels[3], upload4);
 
-            // Assert that a DataSetUpload with no screening is mapped correctly.
-            // TODO EES-7003 - we're currently asserting that status is SCREENER_ERROR at the moment without
-            // a screening result present. This needs to be updated so that initially after upload, it's OK for
-            // there to be no screener result.
-            Assert.Equal(nameof(DataSetUploadStatus.SCREENER_ERROR), uploadViewModels[0].Status);
+            // Assert that a DataSetUpload that is undergoing screening is mapped correctly.
+            Assert.Equal(nameof(DataSetUploadScreeningStatus.Screening), uploadViewModels[0].Status);
 
             // Assert it has no screener results or progress yet.
             Assert.False(uploadViewModels[0].PublicApiCompatible);
@@ -69,7 +68,7 @@ public class DataSetUploadRepositoryTests
             Assert.Null(uploadViewModels[0].ScreenerProgress);
 
             // Assert that a DataSetUpload with a failed screening result is mapped correctly.
-            Assert.Equal(nameof(DataSetUploadStatus.FAILED_SCREENING), uploadViewModels[1].Status);
+            Assert.Equal(upload2.ScreeningStatus.ToString(), uploadViewModels[1].Status);
 
             // Assert its screening progress is mapped correctly.
             Assert.Equal(
@@ -79,7 +78,7 @@ public class DataSetUploadRepositoryTests
             Assert.Equal(upload2.ScreenerProgress!.Stage, uploadViewModels[1].ScreenerProgress!.Stage);
 
             // Assert that a DataSetUpload with a warning screening result is mapped correctly.
-            Assert.Equal(nameof(DataSetUploadStatus.PENDING_REVIEW), uploadViewModels[2].Status);
+            Assert.Equal(upload3.ScreeningStatus.ToString(), uploadViewModels[2].Status);
             Assert.Equal(upload3.ScreenerResult!.PublicApiCompatible, uploadViewModels[2].PublicApiCompatible);
             Assert.Equal(upload3.ScreenerResult!.OverallResult, uploadViewModels[2].ScreenerResult!.OverallResult);
             AssertScreenerTestsCorrect(
@@ -93,6 +92,14 @@ public class DataSetUploadRepositoryTests
                 uploadViewModels[2].ScreenerProgress!.PercentageComplete
             );
             Assert.Equal(upload3.ScreenerProgress!.Stage, uploadViewModels[2].ScreenerProgress!.Stage);
+
+            // Assert that a DataSetUpload that has received a Screener error is mapped correctly.
+            Assert.Equal(upload4.ScreeningStatus.ToString(), uploadViewModels[3].Status);
+
+            // Assert it has no screener results or progress yet.
+            Assert.False(uploadViewModels[3].PublicApiCompatible);
+            Assert.Null(uploadViewModels[3].ScreenerResult);
+            Assert.Null(uploadViewModels[3].ScreenerProgress);
         }
     }
 

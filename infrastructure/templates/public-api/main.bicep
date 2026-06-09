@@ -2,13 +2,13 @@ import { abbreviations } from '../common/abbreviations.bicep'
 import { abbreviations as publicApiAbbreviations } from 'abbreviations.bicep'
 import {
   ContainerAppResourceConfig
-  IpRange
   PrincipalNameAndId
   StaticWebAppSku
   ContainerAppWorkloadProfile
   PostgreSqlFlexibleServerConfig
-  StorageAccountConfig
 } from 'types.bicep'
+import { IpRange } from '../common/types.bicep'
+import { StorageAccountConfig } from '../common/components/storage/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -417,7 +417,7 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 
 var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 

@@ -1,0 +1,8 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.expandedThemeContainer {
+  border-left: 4px solid govuk-colour('mid-grey');
+  padding: 0 0 govuk-spacing(0) govuk-spacing(4);
+  margin-bottom: govuk-spacing(2);
+  margin-top: govuk-spacing(1);
+}

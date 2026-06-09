@@ -46,7 +46,19 @@ param functionAppImageName string
 param screenerDockerImageTag string
 
 @description('Whether or not to include Data Dictionary checks in the Screener.')
-param includeDataDictionaryChecks bool = false
+param includeDataDictionaryChecks bool
+
+@description('Whether or not to log screening results in the Screener API logs.')
+param logScreeningResults bool
+
+@description('Number of concurrent threads that can be used by Plumber to process background jobs.')
+param concurrentRWorkers int
+
+@description('The minimum number of instances for the function app.')
+param minimumInstanceCount int
+
+@description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
+param maximumInstanceCount int
 
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
@@ -54,7 +66,9 @@ param deployAlerts bool
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+var eesyscreenerLogsFileShareMountPath = '/screener/logs'
+
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 
@@ -81,12 +95,16 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
   name: 'default'
 }
 
+resource eesyscreenerLogsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: resourceNames.screener.screenerLogsStorageAccount
+}
+
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoint, '/')
   ? substring(coreStorageBlobEndpoint, 0, length(coreStorageBlobEndpoint) - 1)
   : coreStorageBlobEndpoint
 
-module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
+module containerisedFunctionAppModule '../../common/components/function-app/containerisedFunctionApp.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
   params: {
     operatingSystem: operatingSystem
@@ -98,6 +116,8 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     healthCheckPath: '/api/healthcheck'
+    minimumInstanceCount: minimumInstanceCount
+    maximumInstanceCount: maximumInstanceCount
     appServicePlanName: resourceNames.screener.screenerFunction
     appSettings: [
       {
@@ -110,11 +130,19 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
       }
       {
         name: 'LOG_DIR'
-        value: '/tmp'
+        value: eesyscreenerLogsFileShareMountPath
       }
       {
         name: 'DD_CHECKS'
         value: includeDataDictionaryChecks ? 'TRUE' : 'FALSE'
+      }
+      {
+        name: 'LOG_SCREENING_RESULTS'
+        value: logScreeningResults ? 'TRUE' : 'FALSE'
+      }
+      {
+          name: 'CONCURRENT_R_WORKERS'
+          value: '${concurrentRWorkers}'
       }
       {
         name: 'AzureWebJobs_StartScreening__queueServiceUri'
@@ -148,6 +176,13 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     }
     subnetId: outboundVnetSubnet.id
     includeQueueServices: true
+    azureFileShares: [{
+      storageName: resourceNames.screener.screenerLogsStorageAccount
+      storageAccountKey: eesyscreenerLogsStorageAccount.listKeys().keys[0].value
+      storageAccountName: resourceNames.screener.screenerLogsStorageAccount
+      fileShareName: resourceNames.screener.screenerLogsFileShare
+      mountPath: eesyscreenerLogsFileShareMountPath
+    }]
     alerts: deployAlerts
       ? {
           cpuPercentage: true
@@ -165,7 +200,5 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     tagValues: tagValues
   }
 }
-
-
 
 output functionAppUrl string = containerisedFunctionAppModule.outputs.url

@@ -35,6 +35,16 @@ def cookie_names_should_be_on_page():
             raise_assertion_error(f"Page should contain text \"{cookie['name']}\"!")
 
 
+def normalise_to_list(value):
+    if value is None or value == "":
+        return []
+    if isinstance(value, list):
+        return value
+    if isinstance(value, tuple):
+        return list(value)
+    return [value]
+
+
 def user_checks_number_of_other_releases_is_correct(number):
     elems = sl().driver.find_elements(By.XPATH, '(.//*[@data-testid="other-release-item"])')
     if len(elems) != int(number):

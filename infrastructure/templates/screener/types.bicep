@@ -16,5 +16,7 @@ type ResourceNames = {
   screener: {
     screenerFunction: string
     screenerFunctionStorageAccount: string
+    screenerLogsStorageAccount: string
+    screenerLogsFileShare: string
   }
 }

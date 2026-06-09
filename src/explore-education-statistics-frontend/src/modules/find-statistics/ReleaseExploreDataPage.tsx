@@ -25,7 +25,7 @@ import {
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
-import downloadService from '@frontend/services/downloadService';
+import downloadService from '@common/services/downloadService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 

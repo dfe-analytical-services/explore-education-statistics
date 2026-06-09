@@ -295,7 +295,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect no data set files to be returned for an old release when LatestOnly is true
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+                pagedResult.AssertEmptyResults();
             }
 
             [Theory]
@@ -345,7 +345,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect no data set files to be returned for an unpublished release version regardless of LatestOnly
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+                pagedResult.AssertEmptyResults();
             }
 
             [Theory]
@@ -382,7 +382,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 // Expect no data set files to be returned unless they are associated with the latest published release
                 // version regardless of LatestOnly
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+                pagedResult.AssertEmptyResults();
             }
 
             [Fact]
@@ -420,7 +420,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+                pagedResult.AssertEmptyResults();
             }
 
             [Fact]
@@ -459,7 +459,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+                pagedResult.AssertEmptyResults();
             }
 
             [Theory]
@@ -1352,7 +1352,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPage: page);
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 0, expectedPage: page);
             }
 
             [Theory]
@@ -1381,7 +1381,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPageSize: pageSize);
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 0, expectedPageSize: pageSize);
             }
 
             [Theory]
@@ -1564,7 +1564,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+                pagedResult.AssertEmptyResults();
             }
 
             [Fact]

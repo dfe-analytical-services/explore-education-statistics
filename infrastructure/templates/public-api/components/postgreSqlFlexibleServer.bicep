@@ -4,11 +4,11 @@ import {
   dynamicMaxGreaterThan
   dynamicAverageGreaterThan
   dynamicTotalGreaterThan
-} from 'alerts/dynamicAlertConfig.bicep'
+} from '../../common/components/alerts/dynamicAlertConfig.bicep'
 
-import { staticAverageLessThanHundred, capacity, staticTotalGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-
-import { IpRange, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../types.bicep'
+import { staticAverageLessThanHundred, capacity, staticTotalGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
+import { IpRange } from '../../common/types.bicep'
+import { PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -160,7 +160,7 @@ resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/adminis
   }
 ]
 
-module databaseAliveAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+module databaseAliveAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
   name: '${databaseServerName}DbAliveAlertModule'
   params: {
     resourceName: databaseServerName
@@ -181,7 +181,7 @@ module databaseAliveAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null 
   ]
 }
 
-module queryTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.queryTime) {
+module queryTimeAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.queryTime) {
   name: '${databaseServerName}QueryTimeAlertModule'
   params: {
     resourceName: databaseServerName
@@ -201,7 +201,7 @@ module queryTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && 
   ]
 }
 
-module transactionTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
+module transactionTimeAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
   name: '${databaseServerName}TransactionTimeAlertModule'
   params: {
     resourceName: databaseServerName
@@ -221,7 +221,7 @@ module transactionTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nu
   ]
 }
 
-module clientConnectionsWaitingAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
+module clientConnectionsWaitingAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
   name: '${databaseServerName}ClientConnectionsAlertModule'
   params: {
     resourceName: databaseServerName
@@ -241,7 +241,7 @@ module clientConnectionsWaitingAlert 'alerts/dynamicMetricAlert.bicep' = if (ale
   ]
 }
 
-module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${databaseServerName}CpuPercentageDeploy'
   params: {
     resourceName: databaseServerName
@@ -258,7 +258,7 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
   ]
 }
 
-module diskBandwidthAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
+module diskBandwidthAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
   name: '${databaseServerName}DiskBandwidthAlertModule'
   params: {
     resourceName: databaseServerName
@@ -278,7 +278,7 @@ module diskBandwidthAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
   ]
 }
 
-module diskIopsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskIops) {
+module diskIopsAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskIops) {
   name: '${databaseServerName}DiskIopsAlertModule'
   params: {
     resourceName: databaseServerName
@@ -298,7 +298,7 @@ module diskIopsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && a
   ]
 }
 
-module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${databaseServerName}MemoryPercentageDeploy'
   params: {
     resourceName: databaseServerName
@@ -331,7 +331,7 @@ var capacityAlertThresholds = [{
   description: 'PostgreSQL Flexible Server is at 95% of its storage capacity.'
 }]
 
-module capacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold in capacityAlertThresholds: if (alerts != null && alerts!.capacity) {
+module capacityAlerts '../../common/components/alerts/staticMetricAlert.bicep' = [for capacityThreshold in capacityAlertThresholds: if (alerts != null && alerts!.capacity) {
   name: '${databaseServerName}Capacity${capacityThreshold.threshold}Deploy'
   params: {
     resourceName: databaseServerName
@@ -353,7 +353,7 @@ module capacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold 
   ]
 }]
 
-module failedConnectionsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedConnections) {
+module failedConnectionsAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedConnections) {
   name: '${databaseServerName}FailedConnectionsDeploy'
   params: {
     resourceName: databaseServerName
@@ -373,7 +373,7 @@ module failedConnectionsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != 
   ]
 }
 
-module deadlocksAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.deadlocks) {
+module deadlocksAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.deadlocks) {
   name: '${databaseServerName}DeadlocksDeploy'
   params: {
     resourceName: databaseServerName

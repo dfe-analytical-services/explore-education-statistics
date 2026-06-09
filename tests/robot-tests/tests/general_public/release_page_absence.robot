@@ -414,17 +414,25 @@ Verify Explore and Download data
     ${file_size}=    Get File Size    ${DOWNLOAD_DIR}/seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
     Should Be True    ${file_size} > 0
 
-    User checks page 'Explore and download data' data set available properties    Absence by characteristic    201,625
-    ...    2012/13 to 2016/17
-    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    @{filters}=    create list    Characteristic    School type
+    User checks page 'Explore and download data' data set available properties
+    ...    data_set_name=Absence by characteristic
+    ...    geographical_levels=Local authority, Local authority district, National
+    ...    expected_row_count=201,625
+    ...    expected_time_period=2012/13 to 2016/17
+    ...    publication_title=${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    filters=${filters}
 
     user navigates to the Absence publication
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
-    User checks page 'Explore and download data' data set available properties    Absence in PRUs    612
-    ...    2013/14 to 2016/17
-    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    User checks page 'Explore and download data' data set available properties
+    ...    data_set_name=Absence in PRUs
+    ...    geographical_levels=Local authority, National, Regional
+    ...    expected_row_count=612
+    ...    expected_time_period=2013/14 to 2016/17
+    ...    publication_title=${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
     user navigates to the Absence publication
     user clicks link    Explore and download data

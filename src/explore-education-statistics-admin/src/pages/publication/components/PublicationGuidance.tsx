@@ -108,9 +108,9 @@ export function ScheduledStagesGuidanceModal() {
       <p>
         For <Tag colour="red">Failed</Tag>, <Tag colour="orange">Started</Tag>{' '}
         or <Tag colour="green">Complete</Tag> releases clicking 'View stages'
-        will show a summary of the publication status. There are 4 steps of the
-        process (data, content, files and final publishing). For each of these
-        steps there are different stages as described below:
+        will show a summary of the publication status. The process is split into
+        two steps (files and final publishing). Each step contains a number of
+        different stages as described below:
       </p>
       <SummaryList>
         <SummaryListItem term={<Tag colour="blue">Not started</Tag>}>

@@ -1,0 +1,291 @@
+import SearchIcon from '@common/components/SearchIcon';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import styles from '@common/components/form/FormSearchBar.module.scss';
+import logger from '@common/services/logger';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
+import { createDataSetSuggestRequest } from '@frontend/modules/search-data/utils/createDataSetListRequest';
+import { createStatisticalReleasesSuggestRequest } from '@frontend/modules/search-data/utils/createStatisticalReleasesListRequest';
+import azureDataSetService, {
+  AzureDataSetSuggestResult,
+} from '@frontend/services/azureDataSetService';
+import azurePublicationService, {
+  AzurePublicationSuggestResult,
+} from '@frontend/services/azurePublicationService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import React, { useEffect, useRef } from 'react';
+import Autocomplete from 'accessible-autocomplete/react';
+import { truncate } from 'lodash';
+import { useRouter } from 'next/router';
+
+interface Props {
+  isSearchDataSets?: boolean;
+  label?: string;
+  onSubmit: (value: string) => void;
+}
+
+type AzureSuggestResult =
+  | AzureDataSetSuggestResult
+  | AzurePublicationSuggestResult;
+
+const isDataSetResult = (
+  result: AzureSuggestResult,
+): result is AzureDataSetSuggestResult => {
+  return result && 'dataSetFileId' in result;
+};
+
+export default function SearchForm({
+  isSearchDataSets = false,
+  label = 'Search',
+  onSubmit,
+}: Props) {
+  const router = useRouter();
+
+  const wrapper = useRef<HTMLFormElement>(null);
+  const autocompleteRef = useRef<Autocomplete>(null);
+  const activeSearchModeRef = useRef(isSearchDataSets);
+
+  // The accessible-autocomplete component generates a text input element.
+  // We need to access the created elements to:
+  // 1) change input type to 'search'
+  // 2) add form submission when user presses 'Enter'
+  useEffect(() => {
+    const autocompleteInput = wrapper.current?.querySelector(
+      '#search',
+    ) as HTMLInputElement;
+    if (!autocompleteInput) {
+      return undefined;
+    }
+
+    // 1
+    autocompleteInput.setAttribute('type', 'search');
+    // also create a MutationObserver to prevent re-renders resetting input type
+    const observer = new MutationObserver(() => {
+      if (autocompleteInput.getAttribute('type') !== 'search') {
+        autocompleteInput.setAttribute('type', 'search');
+      }
+    });
+    observer.observe(autocompleteInput, {
+      attributes: true,
+      attributeFilter: ['type'],
+    });
+
+    function handleEnter(evt: KeyboardEvent) {
+      if (evt.key !== 'Enter') {
+        return;
+      }
+
+      const dropdownVisible =
+        autocompleteInput.getAttribute('aria-expanded') === 'true';
+
+      if (dropdownVisible) {
+        const searchTerm = new FormData(wrapper.current!).get(
+          'search',
+        ) as string;
+        onSubmit(searchTerm || '');
+      }
+    }
+
+    // 2) The accessible-autocomplete component has an edge case where when the menu is visible, it
+    // prevents default on the Enter key event, even if the user hasn't put keyboard focus on a
+    // suggestion. This results in a scenario where the user types something, does _not_ interact
+    // with the autocomplete menu at all, and then hits Enter to try to submit the form - but it
+    // isn't submitted.
+    // So let's call our onSubmit when user presses Enter.
+    autocompleteInput.addEventListener('keyup', handleEnter);
+
+    return () => {
+      observer.disconnect();
+      autocompleteInput.removeEventListener('keyup', handleEnter);
+    };
+  }, [onSubmit]);
+
+  // When switching between dataset/release search mode:
+  // 1. Sync the ref to prevent race conditions on in-flight requests
+  // 2. Clear the autocomplete state
+  useEffect(() => {
+    activeSearchModeRef.current = isSearchDataSets;
+
+    if (autocompleteRef.current) {
+      autocompleteRef.current.setState({
+        menuOpen: false,
+        options: [],
+        validChoiceMade: false,
+      });
+    }
+  }, [isSearchDataSets]);
+
+  const fetchResults = (
+    enteredText: string,
+    populateResults: (suggestions: AzureSuggestResult[]) => void,
+  ) => {
+    // Keep track of the search mode at the time of fetch to handle results correctly
+    const modeAtFetchTime = isSearchDataSets;
+
+    if (isSearchDataSets) {
+      azureDataSetService
+        .suggestDatasets(createDataSetSuggestRequest(router.query, enteredText))
+        .then(results => {
+          // Make sure the current mode still matches the mode from when we started
+          if (activeSearchModeRef.current === modeAtFetchTime) {
+            populateResults(results);
+          }
+        })
+        .catch(error => {
+          if (activeSearchModeRef.current === modeAtFetchTime) {
+            populateResults([]);
+          }
+          logger.error(error);
+        });
+      return;
+    }
+
+    azurePublicationService
+      .suggestPublications(
+        createStatisticalReleasesSuggestRequest(router.query, enteredText),
+      )
+      .then(results => {
+        // Make sure the current mode still matches the mode from when we started
+        if (activeSearchModeRef.current === modeAtFetchTime) {
+          populateResults(results);
+        }
+      })
+      .catch(error => {
+        if (activeSearchModeRef.current === modeAtFetchTime) {
+          populateResults([]);
+        }
+        logger.error(error);
+      });
+  };
+
+  const suggestionTemplate = (result: AzureSuggestResult) => {
+    // The result has a `highlightedMatch` property with HTML tags which could
+    // either be from the `title` or the `summary`. So we will strip out the HTML
+    // tags to be able to check which field it is from, and use accordingly.
+    const highlightMatchWithoutTags = sanitizeHtml(result.highlightedMatch, {
+      allowedTags: [],
+      allowedAttributes: {},
+    });
+
+    // We also need to find out which term was highlighted in order to manually
+    // add highlights to the other field.
+    const highlightedTerm = result.highlightedMatch.match(
+      /(?<=<strong>)(.*?)(?=<\/strong>)/,
+    );
+
+    const wrapHighlightedTermWithTag = (snippet: string) => {
+      const sanitizedSnippet = sanitizeHtml(snippet, {
+        allowedTags: [],
+        allowedAttributes: {},
+      });
+
+      return highlightedTerm
+        ? sanitizedSnippet.replaceAll(
+            highlightedTerm[0],
+            match => `<strong>${match}</strong>`,
+          )
+        : sanitizedSnippet;
+    };
+
+    // Sanitize the highlighted match for safety
+    const safeHighlight = sanitizeHtml(result.highlightedMatch, {
+      allowedTags: ['strong'],
+      allowedAttributes: {},
+    });
+
+    // For both title and summary, render the `highlightedMatch` from azure
+    // if it is from this field.
+    // Otherwise, render the field with highlights manually added.
+    return `<p class="autocomplete__option-item">
+      <span class="autocomplete__option-title">
+        ${
+          result.title.includes(highlightMatchWithoutTags)
+            ? safeHighlight
+            : wrapHighlightedTermWithTag(result.title)
+        }
+      </span>
+      <span class="autocomplete__option-summary">
+      ${
+        result.summary.includes(highlightMatchWithoutTags)
+          ? safeHighlight
+          : wrapHighlightedTermWithTag(
+              truncate(result.summary, { length: 140 }),
+            )
+      }
+      </span>
+    </p>`;
+  };
+
+  return (
+    <form
+      id="searchForm"
+      onSubmit={event => {
+        event.preventDefault();
+        const searchTerm = new FormData(event.currentTarget).get(
+          'search',
+        ) as string;
+        onSubmit(searchTerm || '');
+      }}
+      ref={wrapper}
+    >
+      <label
+        htmlFor="search"
+        className="govuk-label govuk-label--m"
+        id="search-label"
+      >
+        {label}
+      </label>
+      <div className="autocomplete__item-wrap">
+        <Autocomplete
+          ref={autocompleteRef}
+          id="search"
+          name="search"
+          menuAttributes={{
+            'aria-labelledby': 'search-label',
+          }}
+          minLength={3}
+          source={fetchResults}
+          templates={{
+            inputValue: result => result?.title,
+            suggestion: suggestionTemplate,
+          }}
+          confirmOnBlur={false}
+          showNoOptionsFound={false}
+          onConfirm={(result: AzureSuggestResult) => {
+            if (!result) return null;
+
+            if (isDataSetResult(result)) {
+              logEvent({
+                category: 'Find statistics and data',
+                action: `Autocomplete dataset suggestion accepted`,
+                label: result.title,
+              });
+              return router.push(
+                `/data-catalogue/data-set/${result.dataSetFileId}`,
+              );
+            }
+
+            logEvent({
+              category: 'Find statistics and data',
+              action: `Autocomplete suggestion accepted`,
+              label: result.title,
+            });
+            return router.push(
+              `/find-statistics/${result.publicationSlug}/${result.releaseSlug}`,
+            );
+          }}
+          tNoResults={() => 'No search suggestions found'}
+          tAssistiveHint={() =>
+            'When search suggestions are available use up and down arrows to review and enter to select. Touch device users, explore by touch or with swipe gestures.'
+          }
+        />
+        <button
+          type="submit"
+          className={`${styles.button} autocomplete__submit-button`}
+        >
+          <SearchIcon className={styles.icon} />
+          <VisuallyHidden>Search</VisuallyHidden>
+        </button>
+      </div>
+    </form>
+  );
+}

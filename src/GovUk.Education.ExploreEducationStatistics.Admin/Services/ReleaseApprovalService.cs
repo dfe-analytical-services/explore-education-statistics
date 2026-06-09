@@ -273,13 +273,13 @@ public class ReleaseApprovalService(
     {
         // Publishing a scheduled release relies on two Azure Functions which are triggered by cron expressions.
         // These notes will refer to them as functions (1) and (2):
-        // StageScheduledReleases (1) - Runs tasks for the releases that are scheduled to be published.
-        // PublishScheduledReleases (2) - Runs after (1) and completes publishing of releases.
+        // PrepareScheduledReleaseVersions (1) - Runs tasks for the releases that are scheduled to be published.
+        // PublishScheduledReleaseVersions (2) - Runs after (1) and completes publishing of releases.
 
         // The cron expressions are configurable per environment to allow different schedules for testing.
 
         // There's a requirement that (1) and (2) always run at specific times in the Prod environment,
-        // e.g. (1) runs at 00:00:00 and (2) runs at 09:30:00 irrespective of daylight saving time.
+        // e.g. (1) runs at 00:05:00 and (2) runs at 09:30:00 irrespective of daylight saving time.
         // To avoid needing to adjust a cron expression for daylight saving time twice a year to express
         // the desired time in UTC (e.g. changing it from '0 30 9 * * *' to '0 30 8 * * *' in British Summer Time),
         // the functions have been configured to run in the UK timezone rather than the UTC default.
@@ -307,7 +307,7 @@ public class ReleaseApprovalService(
 
         // Publishing won't occur unless there's an occurrence of (1) between the publishing range
         var nextOccurrenceUtc = GetNextOccurrenceForCronExpression(
-            cronExpression: options.Value.StageScheduledReleasesFunctionCronSchedule,
+            cronExpression: options.Value.PrepareScheduledReleaseVersionsFunctionCronSchedule,
             fromUtc: fromUtc,
             toUtc: toUtc,
             timeZone: ukTimeZone
@@ -317,7 +317,7 @@ public class ReleaseApprovalService(
         {
             // Publishing won't occur unless there's an occurrence of (2) after (1) but before the end of the range
             return GetNextOccurrenceForCronExpression(
-                cronExpression: options.Value.PublishScheduledReleasesFunctionCronSchedule,
+                cronExpression: options.Value.PublishScheduledReleaseVersionsFunctionCronSchedule,
                 fromUtc: nextOccurrenceUtc.Value,
                 toUtc: toUtc,
                 timeZone: ukTimeZone

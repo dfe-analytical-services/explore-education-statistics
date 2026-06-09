@@ -348,11 +348,18 @@
         "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
       }
     },
-    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+    "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "Enables the Functions in the Publisher App which allow scheduled release versions to be published immediately"
+        "description": "Whether the PrepareScheduledReleaseVersionsNow HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
+      }
+    },
+    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether the PublishScheduledReleaseVersionsNow HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
       }
     },
     "teamEmailAddresses": {
@@ -474,18 +481,18 @@
         "description": "Whether or not to register data sources with Backup Vault."
       }
     },
-    "stageScheduledReleasesFunctionCronSchedule": {
+    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "type": "string",
       "defaultValue": "0 5 0 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the StageScheduledReleases function in the Publisher Function App"
+        "description": "Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App"
       }
     },
-    "publishScheduledReleasesFunctionCronSchedule": {
+    "publishScheduledReleaseVersionsFunctionCronSchedule": {
       "type": "string",
       "defaultValue": "0 30 9 * * *",
       "metadata": {
-        "description": "Cron string that is used to control the schedule of the PublishScheduledReleases function in the Publisher Function App"
+        "description": "Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App"
       }
     },
     "preReleaseMinutesBeforeStart": {
@@ -712,11 +719,18 @@
         "description": "The password to log in to the Container registry"
       }
     },
-    "searchIndexName" : {
+    "searchIndexName": {
       "type": "string",
       "defaultValue": "index-1",
       "metadata": {
         "description": "The name of the Azure AI Search index used by the public frontend application"
+      }
+    },
+    "datasetsSearchIndexName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The name of the Azure AI data set search index used by the public frontend application"
       }
     },
     "publicDataDbExists": {
@@ -1214,8 +1228,10 @@
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
     "publicApiStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-sa-pep')]",
-    "searchDocsFunctionSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
-    "searchDocsFunctionPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
+    "nlSearchFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-nlsearch')]",
+    "nlSearchFunctionAppPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-nlsearch-pep')]",
+    "searchDocsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
+    "searchDocsFunctionAppPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
     "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "eventGridCustomTopicPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-evgt-pep')]",
@@ -1340,6 +1356,8 @@
     "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
+    "screenerStorageAccountConnectionStringSecretKey": "[concat(parameters('subscription'), parameters('environment'), 'sapisafn-connection-string')]",
+    "screenerStorageAccountConnectionStringSecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('screenerStorageAccountConnectionStringSecretKey'))]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
     "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
@@ -1349,10 +1367,7 @@
     "adminAllowedOrigins": "[union(variables('baseAdminAllowedOrigins'), parameters('additionalAdminAllowedOrigins'))]",
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
-      // TODO EES-6883 - remove the entry below when no longer using the temporary URLs for Azure Front Door testing.
-      "[concat('https://', replace(parameters('domain'), '.explore-education', 'afd.explore-education'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
-      // NOTE: reference() cannot be used in variables, so the default FrontDoor hostname cannot be put here. It must added in place wherever we use publicAllowedOrigins
     ],
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
     "apiVersions": {
@@ -1972,8 +1987,8 @@
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
         "PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
-        "ReleaseApproval__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
-        "ReleaseApproval__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
+        "ReleaseApproval__PrepareScheduledReleaseVersionsFunctionCronSchedule": "[parameters('prepareScheduledReleaseVersionsFunctionCronSchedule')]",
+        "ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
         "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicApp__Url": "[variables('publicAppUrl')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
@@ -1985,7 +2000,7 @@
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api')]",
         "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
-        "DataScreener__ScreenerStorage": "",
+        "DataScreener__ScreenerStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('screenerStorageAccountConnectionStringSecret'), '2018-02-14').secretUriWithVersion, ')')]",
         "DataScreener__EnhancedScreenerJourney": false,
         "DataScreener__ScreenerProgressUpdateIntervalSeconds": 5,
         "DataScreener__ScreenerProgressUpdateFailureIntervalMinutes": 1440
@@ -2284,6 +2299,7 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
+        "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
@@ -3573,16 +3589,16 @@
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
-        "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
+        "AzureWebJobs.PrepareScheduledReleaseVersionsNow.Disabled": "[not(parameters('publisherFunctionPrepareScheduledReleaseVersionsNowEnabled'))]",
+        "AzureWebJobs.PublishScheduledReleaseVersionsNow.Disabled": "[not(parameters('publisherFunctionPublishScheduledReleaseVersionsNowEnabled'))]",
         "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_TIME_ZONE": "[parameters('publisherFunctionAppTimeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App__StageScheduledReleasesFunctionCronSchedule": "[parameters('stageScheduledReleasesFunctionCronSchedule')]",
-        "App__PublishScheduledReleasesFunctionCronSchedule": "[parameters('publishScheduledReleasesFunctionCronSchedule')]",
+        "App__PrepareScheduledReleaseVersionsFunctionCronSchedule": "[parameters('prepareScheduledReleaseVersionsFunctionCronSchedule')]",
+        "App__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
         "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
@@ -3959,7 +3975,7 @@
             }
           },
           {
-            "name": "[variables('searchDocsFunctionSubnetName')]",
+            "name": "[variables('searchDocsFunctionAppSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.14.0/24",
               "serviceEndpoints": [
@@ -3978,7 +3994,7 @@
             }
           },
           {
-            "name": "[variables('searchDocsFunctionPrivateEndpointsSubnetName')]",
+            "name": "[variables('searchDocsFunctionAppPrivateEndpointsSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.15.0/24"
             }
@@ -4038,6 +4054,31 @@
             "properties": {
               "addressPrefix": "10.0.20.0/24"
             }
+          },
+          {
+            "name": "[variables('nlSearchFunctionAppPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.21.0/24"
+            }
+          },
+          {
+            "name": "[variables('nlSearchFunctionAppSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.22.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
           }
         ]
       }
@@ -4093,7 +4134,7 @@
     {
       "name": "[variables('keyVaultName')]",
       "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2016-10-01",
+      "apiVersion": "2026-02-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -4119,7 +4160,6 @@
         "enabledForTemplateDeployment": true,
         "enableSoftDelete": true,
         "enablePurgeProtection": true,
-        "accessPolicies": [],
         "enableRbacAuthorization": true
       },
       "resources": [

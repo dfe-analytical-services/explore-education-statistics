@@ -2,6 +2,7 @@
 Library             Collections
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/tables-common.robot
 
@@ -285,8 +286,6 @@ Validate prerelease has started
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
-    user waits until element contains    id:background-information    Test summary text for ${PUBLICATION_NAME}
-    ...    %{WAIT_SMALL}
     user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
     ...    %{WAIT_SMALL}
 
@@ -294,60 +293,18 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    If you have an enquiry about this release contact
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
-Validate metadata guidance page
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Data guidance
+Validate metadata guidance section and data set details section on the Explore and download data
+    user checks data set details for UI test subject
 
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
-    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
-    user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
-
-    user waits until page contains accordion section    UI test subject    %{WAIT_SMALL}
-    user checks there are x accordion sections    1
-
-    user opens accordion section    UI test subject
-    user checks summary list contains    Filename    upload-file-test.csv
-    user checks summary list contains    Geographic levels
-    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
-    user checks summary list contains    Time period    2005 to 2020
-    user checks summary list contains    Content    Test file guidance content
-
-    user opens details dropdown    Variable names and descriptions
-
-    user checks table column heading contains    1    1    Variable name
-    user checks table column heading contains    1    2    Variable description
-
-    user checks table cell contains    1    1    admission_numbers
-    user checks table cell contains    1    2    Admission Numbers
-
-Go back to prerelease content page
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
-    user checks breadcrumb count should be    2
-    user checks nth breadcrumb contains    1    Home
-    user checks nth breadcrumb contains    2    Pre-release access
-
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    ${data_guidance_section}=    Get WebElement    id:data-guidance-section
+    user checks element should contain    ${data_guidance_section}    Test metadata guidance content
 
 Validate public prerelease access list
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Pre-release access list
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-    user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
-    user waits until page contains    Updated test public access list    %{WAIT_SMALL}
+    user checks pre-release access list on help and related information tab
+    ...    Updated test public access list
 
-Go back to prerelease content page again
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+Go back to pre-release access list section on the help and related information tab again
+    user returns to release home tab in release preview
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -410,8 +367,6 @@ Create and validate methodology
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate prerelease has started for Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
     user changes to analyst1
     user navigates to    ${RELEASE_URL}/prerelease/content
 
@@ -422,71 +377,22 @@ Validate prerelease has started for Analyst user
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
-    user waits until element contains    id:background-information    Test summary text for ${PUBLICATION_NAME}
     user waits until element contains    id:headlines-section    Test headlines summary text for ${PUBLICATION_NAME}
 
-Validate public metdata guidance for Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Data guidance
-
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
-    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
-    user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
-
-    user waits until page contains accordion section    UI test subject    %{WAIT_SMALL}
-    user checks there are x accordion sections    1
-
-    user opens accordion section    UI test subject
-    user checks summary list contains    Filename    upload-file-test.csv
-    user checks summary list contains    Geographic levels
-    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
-    user checks summary list contains    Time period    2005 to 2020
-    user checks summary list contains    Content    Test file guidance content
-
-    user opens details dropdown    Variable names and descriptions
-
-    user checks table column heading contains    1    1    Variable name
-    user checks table column heading contains    1    2    Variable description
-
-    user checks table cell contains    1    1    admission_numbers
-    user checks table cell contains    1    2    Admission Numbers
-
-Go back to prerelease content page as Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
-    user checks breadcrumb count should be    2
-    user checks nth breadcrumb contains    1    Home
-    user checks nth breadcrumb contains    2    Pre-release access
-
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+Validate data set details for Analyst user
+    user checks data set details for UI test subject
 
 Validate public prerelease access list as Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Pre-release access list
+    user checks pre-release access list on help and related information tab
+    ...    Updated test public access list
 
-    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-
-    user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
-    user waits until page contains    Updated test public access list    %{WAIT_SMALL}
-
-Go back to prerelease content page again as Analyst user
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-7009
-    [Tags]    Failing
-    user clicks link    Back
-
+Go back to pre-release access list section on the help and related information tab again as Analyst user
+    user returns to release home tab in release preview
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
-
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Go to prerelease table tool page as Analyst user
     user clicks link    Table tool
@@ -598,6 +504,23 @@ user validates table rows
     user checks table cell in offset row contains    ${row}    2    1    6,060
     user checks table cell in offset row contains    ${row}    3    1    1,109
     user checks table cell in offset row contains    ${row}    4    1    1,959
+
+user returns to release home tab in release preview
+    user clicks link    Release home
+    user waits until h2 is visible    Headline facts and figures
+
+user checks data set details for UI test subject
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    User checks page 'Explore and download data' data set available properties
+    ...    data_set_name=UI test subject
+    ...    geographical_levels=Local authority, Local authority district, Local enterprise partnership, Opportunity area, Parliamentary constituency, Regional, RSC region, Ward
+    ...    expected_row_count=144
+    ...    expected_time_period=2005 to 2020
+    ...    publication_title=${PUBLICATION_NAME}
+    ...    expected_data_guidance=Test file guidance content
+    ...    indicators=Admission Numbers
+    ...    is_public_site=False
 
 do suite teardown
     user closes the browser

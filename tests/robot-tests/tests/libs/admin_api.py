@@ -191,6 +191,61 @@ def user_creates_test_release_via_api(
     return response.json()["id"]
 
 
+def user_creates_test_release_with_legacy_summary_text_block_via_api(
+    publication_id: str,
+    time_period: str,
+    year: str,
+    summary_text_block: str,
+    type: str = "AccreditedOfficialStatistics",
+    label: str = None,
+):
+    response = admin_client.post(
+        f"/api/releases",
+        {
+            "publicationId": publication_id,
+            "timePeriodCoverage": {
+                "value": time_period,
+            },
+            "year": int(year),
+            "type": type,
+            "label": label,
+            "templateReleaseId": "",
+        },
+    )
+    assert (
+        response.status_code < 300
+    ), f"Creating release API request failed with {response.status_code} and {response.text}"
+
+    response_json = response.json()
+
+    release_content_response = admin_client.get(
+        f"/api/releaseVersions/{response_json['id']}/content?isPrerelease=false"
+    )
+    summary_section_id = release_content_response.json()["release"]["summarySection"]["id"]
+
+    post_summary_block_response = admin_client.post(
+        f"/api/release/{response_json['id']}/content/section/{summary_section_id}/blocks/add",
+        {"type": "HtmlBlock"},
+    )
+
+    assert (
+        post_summary_block_response.status_code < 300
+    ), f"Creating summary block API request failed with {post_summary_block_response.status_code} and {post_summary_block_response.text}"
+
+    put_summary_block_response = admin_client.put(
+        f"/api/release/{response_json['id']}/content/section/{summary_section_id}/block/{post_summary_block_response.json()['id']}",
+        {
+            "body": summary_text_block,
+        },
+    )
+
+    assert (
+        put_summary_block_response.status_code < 300
+    ), f"Updating summary block API request failed with {put_summary_block_response.status_code} and {put_summary_block_response.text}"
+
+    return response_json["id"]
+
+
 def user_updates_release_published_date_via_api(release_id: str, published: datetime) -> None:
     response = admin_client.patch(
         f"/api/releaseVersions/{release_id}/published-display-date", {"publishedDisplayDate": published.isoformat()}

@@ -111,8 +111,6 @@ public class ReleasePublishingStatus : ITableEntity
         OverallStage = _state.Overall.ToString();
     }
 
-    public bool AllStagesPriorToPublishingComplete() => State.Files == ReleasePublishingStatusFilesStage.Complete;
-
     public ReleasePublishingKey AsTableRowKey()
     {
         return new ReleasePublishingKey(ReleaseVersionId, Id);

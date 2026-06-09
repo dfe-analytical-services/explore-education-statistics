@@ -131,11 +131,6 @@ public class ReplacementServiceTests
             ReleaseVersion = releaseVersion,
         };
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -179,7 +174,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -189,7 +183,7 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(timePeriodService);
 
             result.AssertBadRequest(ReplacementMustBeValid);
         }
@@ -329,19 +323,23 @@ public class ReplacementServiceTests
             Indicators = new List<Indicator> { replacementIndicator },
         };
 
-        var originalLocation = new Location
+        var location = new Location
         {
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.LocalAuthority,
             LocalAuthority = _derby,
         };
-
-        var replacementLocation = new Location
+        var observationForLocationOriginal = new Observation
         {
             Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.LocalAuthority,
-            Country = _england,
-            LocalAuthority = _derby,
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = location,
+        };
+        var observationForLocationReplacement = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = location,
         };
 
         var timePeriod = new TimePeriodQuery
@@ -360,7 +358,7 @@ public class ReplacementServiceTests
                 SubjectId = originalReleaseSubject.SubjectId,
                 Filters = new[] { originalFilterItem1.Id, originalFilterItem2.Id },
                 Indicators = new[] { originalIndicator.Id },
-                LocationIds = ListOf(originalLocation.Id),
+                LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod,
             },
             Table = new TableBuilderConfiguration
@@ -369,13 +367,7 @@ public class ReplacementServiceTests
                 {
                     ColumnGroups = new List<List<TableHeader>>
                     {
-                        new()
-                        {
-                            TableHeader.NewLocationHeader(
-                                GeographicLevel.LocalAuthority,
-                                originalLocation.Id.ToString()
-                            ),
-                        },
+                        new() { TableHeader.NewLocationHeader(GeographicLevel.LocalAuthority, location.Id.ToString()) },
                     },
                     Columns = new List<TableHeader>
                     {
@@ -412,7 +404,7 @@ public class ReplacementServiceTests
                                         Location = new ChartDataSetLocation
                                         {
                                             Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
-                                            Value = originalLocation.Id,
+                                            Value = location.Id,
                                         },
                                     },
                                 },
@@ -432,7 +424,7 @@ public class ReplacementServiceTests
                                     Location = new ChartDataSetLocation
                                     {
                                         Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
-                                        Value = originalLocation.Id,
+                                        Value = location.Id,
                                     },
                                 },
                             },
@@ -475,11 +467,6 @@ public class ReplacementServiceTests
             subject: originalReleaseSubject.Subject
         );
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { replacementLocation });
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -519,7 +506,8 @@ public class ReplacementServiceTests
                 replacementFilter2
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(originalLocation);
+            statisticsDbContext.Location.AddRange(location);
+            statisticsDbContext.Observation.AddRange(observationForLocationOriginal, observationForLocationReplacement);
             statisticsDbContext.Footnote.AddRange(
                 footnoteForFilter,
                 footnoteForFilterGroup,
@@ -543,7 +531,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -555,7 +542,7 @@ public class ReplacementServiceTests
 
             result.AssertBadRequest(ReplacementImportMustBeComplete);
 
-            VerifyAllMocks(locationRepository, timePeriodService);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
         }
     }
 
@@ -666,11 +653,6 @@ public class ReplacementServiceTests
             )
             .ReturnsAsync(dataSetVersion);
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -727,7 +709,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
                     apiDataSetVersionMappingService: apiDataSetVersionMappingService.Object
@@ -739,12 +720,7 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(
-                locationRepository,
-                timePeriodService,
-                dataSetVersionService,
-                apiDataSetVersionMappingService
-            );
+            VerifyAllMocks(timePeriodService, dataSetVersionService, apiDataSetVersionMappingService);
             result.AssertRight();
         }
     }
@@ -889,6 +865,11 @@ public class ReplacementServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             LocalAuthority = _derby,
         };
+        var observationForOriginalLocation = new Observation
+        {
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = originalLocation,
+        };
 
         var replacementLocation = new Location
         {
@@ -896,6 +877,11 @@ public class ReplacementServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             Country = _england,
             LocalAuthority = _derby,
+        };
+        var observationForReplacementLocation = new Observation
+        {
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = replacementLocation,
         };
 
         var timePeriod = new TimePeriodQuery
@@ -1035,11 +1021,6 @@ public class ReplacementServiceTests
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
             .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { replacementLocation });
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -1074,7 +1055,8 @@ public class ReplacementServiceTests
                 replacementFilter2
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(originalLocation);
+            statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
             statisticsDbContext.Footnote.AddRange(
                 footnoteForFilter,
                 footnoteForFilterGroup,
@@ -1115,7 +1097,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     releaseFileRepository: releaseFileRepository.Object
                 )
@@ -1128,13 +1109,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(
-                privateBlobCacheService,
-                cacheKeyService,
-                locationRepository,
-                releaseVersionService,
-                timePeriodService
-            );
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1463,6 +1438,11 @@ public class ReplacementServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             LocalAuthority = _derby,
         };
+        var observationForOriginalLocation = new Observation
+        {
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = originalLocation,
+        };
 
         var replacementLocation = new Location
         {
@@ -1470,6 +1450,11 @@ public class ReplacementServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             Country = _england,
             LocalAuthority = _derby,
+        };
+        var observationForReplacementLocation = new Observation
+        {
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = replacementLocation,
         };
 
         var timePeriod = new TimePeriodQuery
@@ -1542,11 +1527,6 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { replacementLocation });
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -1579,7 +1559,8 @@ public class ReplacementServiceTests
                 replacementFilter2
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(originalLocation);
+            statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1619,7 +1600,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -1629,13 +1609,7 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(
-                privateBlobCacheService,
-                cacheKeyService,
-                locationRepository,
-                releaseVersionService,
-                timePeriodService
-            );
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
 
             result.AssertRight();
         }
@@ -1810,6 +1784,11 @@ public class ReplacementServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             LocalAuthority = _derby,
         };
+        var observationForOriginalLocation = new Observation
+        {
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = originalLocation,
+        };
 
         var replacementLocation = new Location
         {
@@ -1817,6 +1796,11 @@ public class ReplacementServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             Country = _england,
             LocalAuthority = _derby,
+        };
+        var observationForReplacementLocation = new Observation
+        {
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = replacementLocation,
         };
 
         var timePeriod = new TimePeriodQuery
@@ -1872,11 +1856,6 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { replacementLocation });
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -1909,7 +1888,8 @@ public class ReplacementServiceTests
                 replacementFilter2
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(originalLocation);
+            statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1949,7 +1929,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -1961,13 +1940,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(
-                privateBlobCacheService,
-                cacheKeyService,
-                locationRepository,
-                releaseVersionService,
-                timePeriodService
-            );
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2078,14 +2051,6 @@ public class ReplacementServiceTests
             Indicators = new List<Indicator> { replacementIndicator },
         };
 
-        var replacementLocation = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.LocalAuthority,
-            Country = _england,
-            LocalAuthority = _derby,
-        };
-
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -2134,11 +2099,6 @@ public class ReplacementServiceTests
         var dataBlockVersion = new DataBlockVersion { Id = dataBlock.Id, ContentBlock = dataBlock };
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
-
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { replacementLocation });
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -2207,7 +2167,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2217,13 +2176,7 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(
-                privateBlobCacheService,
-                cacheKeyService,
-                locationRepository,
-                releaseVersionService,
-                timePeriodService
-            );
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
 
             result.AssertRight();
         }
@@ -2381,11 +2334,6 @@ public class ReplacementServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -2415,7 +2363,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2427,7 +2374,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(locationRepository, releaseVersionService, timePeriodService);
+            VerifyAllMocks(releaseVersionService, timePeriodService);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2585,11 +2532,6 @@ public class ReplacementServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -2621,7 +2563,6 @@ public class ReplacementServiceTests
                     contentDbContext,
                     statisticsDbContext,
                     filterRepository: filterRepository,
-                    locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2633,7 +2574,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(locationRepository, releaseVersionService, timePeriodService);
+            VerifyAllMocks(releaseVersionService, timePeriodService);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2703,7 +2644,6 @@ public class ReplacementServiceTests
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
         IFilterRepository? filterRepository = null,
-        ILocationRepository? locationRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
         IDataSetVersionMappingService? apiDataSetVersionMappingService = null,
@@ -2711,16 +2651,16 @@ public class ReplacementServiceTests
         IReleaseFileRepository? releaseFileRepository = null
     )
     {
+        var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
             statisticsDbContext,
             filterRepository ?? Mock.Of<IFilterRepository>(Strict),
-            locationRepository ?? Mock.Of<ILocationRepository>(Strict),
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
-            AlwaysTrueUserService().Object,
-            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext),
+            userService,
+            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext, userService),
             apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );

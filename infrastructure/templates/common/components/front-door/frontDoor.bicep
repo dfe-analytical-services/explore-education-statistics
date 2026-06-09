@@ -1,6 +1,6 @@
 import { abbreviations } from '../../abbreviations.bicep'
-import { staticAverageLessThan95, staticAverageGreaterThanZero } from '../../../public-api/components/alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan, dynamicAverageLessThan } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan, dynamicAverageLessThan } from '../alerts/dynamicAlertConfig.bicep'
 import { FrontDoorCertificateType } from 'types.bicep'
 
 @description('Resource prefix for all resources.')
@@ -290,7 +290,7 @@ resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
   }
 }
 
-module latencyAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${frontDoorProfileName}LatencyDeploy'
   params: {
     resourceName: frontDoorProfileName
@@ -308,7 +308,7 @@ module latencyAlert '../../../public-api/components/alerts/staticMetricAlert.bic
   }
 }
 
-module originHealthPercentageAlert '../../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.originHealth) {
+module originHealthPercentageAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.originHealth) {
   name: '${frontDoorProfileName}OriginHealthPercentage'
   params: {
     resourceName: frontDoorProfileName
@@ -317,7 +317,8 @@ module originHealthPercentageAlert '../../../public-api/components/alerts/static
       metric: 'OriginHealthPercentage'
     }
     config: {
-      ...staticAverageLessThan95
+      ...staticAverageLessThanHundred
+      threshold: '90'
       nameSuffix: 'origin-health-percentage'
     }
     alertsGroupName: alerts!.alertsGroupName
@@ -325,7 +326,7 @@ module originHealthPercentageAlert '../../../public-api/components/alerts/static
   }
 }
 
-module percentage4XXAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage4XX) {
+module percentage4XXAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage4XX) {
   name: '${frontDoorProfileName}Percentage4XX'
   params: {
     resourceName: frontDoorProfileName
@@ -342,7 +343,7 @@ module percentage4XXAlert '../../../public-api/components/alerts/dynamicMetricAl
   }
 }
 
-module percentage5XXAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage5XX) {
+module percentage5XXAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.percentage5XX) {
   name: '${frontDoorProfileName}Percentage5XX'
   params: {
     resourceName: frontDoorProfileName
@@ -359,7 +360,7 @@ module percentage5XXAlert '../../../public-api/components/alerts/dynamicMetricAl
   }
 }
 
-module requestCountAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.requestCount) {
+module requestCountAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.requestCount) {
   name: '${frontDoorProfileName}RequestCount'
   params: {
     resourceName: frontDoorProfileName
@@ -376,7 +377,7 @@ module requestCountAlert '../../../public-api/components/alerts/dynamicMetricAle
   }
 }
 
-module cachedResponseRatioAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cachedResponseRatio) {
+module cachedResponseRatioAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cachedResponseRatio) {
   name: '${frontDoorProfileName}CachedResponseRatio'
   params: {
     resourceName: frontDoorProfileName
@@ -394,7 +395,7 @@ module cachedResponseRatioAlert '../../../public-api/components/alerts/dynamicMe
   }
 }
 
-module wafJsRequestCountAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
+module wafJsRequestCountAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
   name: '${frontDoorProfileName}WafJsRequestCount'
   params: {
     resourceName: frontDoorProfileName
@@ -411,7 +412,7 @@ module wafJsRequestCountAlert '../../../public-api/components/alerts/dynamicMetr
   }
 }
 
-module wafCaptchaAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
+module wafCaptchaAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.wafRequestCounts) {
   name: '${frontDoorProfileName}WafCaptchaRequestCount'
   params: {
     resourceName: frontDoorProfileName

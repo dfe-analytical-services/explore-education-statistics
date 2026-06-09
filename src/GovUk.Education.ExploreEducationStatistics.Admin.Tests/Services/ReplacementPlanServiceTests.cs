@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -15,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -151,11 +151,6 @@ public class ReplacementPlanServiceTests
 
         var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -190,7 +185,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -200,7 +194,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -307,6 +301,11 @@ public class ReplacementPlanServiceTests
             GeographicLevel = GeographicLevel.Country,
             Country = _england,
         };
+        var observationForOriginalLocation = new Observation
+        {
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = originalLocation,
+        };
 
         var timePeriod = new TimePeriodQuery
         {
@@ -360,11 +359,6 @@ public class ReplacementPlanServiceTests
             indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicator } }
         );
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -401,6 +395,7 @@ public class ReplacementPlanServiceTests
                 footnoteForSubject
             );
             statisticsDbContext.Location.AddRange(originalLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -410,7 +405,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -420,7 +414,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -487,7 +481,7 @@ public class ReplacementPlanServiceTests
                 .LocationAttributes.First();
 
             Assert.Equal(originalLocation.Id, dataBlockLocationPlan.Id);
-            Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
+            Assert.Equal(_england.GetCodeOrFallback(), dataBlockLocationPlan.Code);
             Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
             Assert.Null(dataBlockLocationPlan.Target);
             Assert.False(dataBlockLocationPlan.Valid);
@@ -709,6 +703,12 @@ public class ReplacementPlanServiceTests
             GeographicLevel = GeographicLevel.Country,
             Country = _england,
         };
+        var observationForLocation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = location,
+        };
 
         var timePeriod = new TimePeriodQuery
         {
@@ -731,11 +731,6 @@ public class ReplacementPlanServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { location });
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -768,6 +763,7 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.Filter.AddRange(originalDefaultFilter, replacementDefaultFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
+            statisticsDbContext.Observation.AddRange(observationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -777,7 +773,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -787,7 +782,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
             Assert.False(replacementPlan.Valid);
@@ -896,6 +891,12 @@ public class ReplacementPlanServiceTests
             GeographicLevel = GeographicLevel.Country,
             Country = _england,
         };
+        var observationForLocation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = location,
+        };
 
         var timePeriod = new TimePeriodQuery
         {
@@ -918,11 +919,6 @@ public class ReplacementPlanServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { location });
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -955,6 +951,7 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.Filter.AddRange(originalDefaultFilter, replacementDefaultFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
+            statisticsDbContext.Observation.AddRange(observationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -964,7 +961,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -974,7 +970,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
             Assert.False(replacementPlan.Valid);
@@ -1102,6 +1098,12 @@ public class ReplacementPlanServiceTests
             GeographicLevel = GeographicLevel.Country,
             Country = _england,
         };
+        var observationForLocation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = location,
+        };
 
         var timePeriod = new TimePeriodQuery
         {
@@ -1124,11 +1126,6 @@ public class ReplacementPlanServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { location });
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -1165,6 +1162,7 @@ public class ReplacementPlanServiceTests
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
+            statisticsDbContext.Observation.AddRange(observationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1174,7 +1172,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -1184,7 +1181,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
             Assert.False(replacementPlan.Valid);
@@ -1293,6 +1290,11 @@ public class ReplacementPlanServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             LocalAuthority = _derby,
         };
+        var observationForOriginalLocation = new Observation
+        {
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = originalLocation,
+        };
 
         // Replacement location has a different id but the primary attribute code remains the same
         var replacementLocation = new Location
@@ -1301,6 +1303,11 @@ public class ReplacementPlanServiceTests
             GeographicLevel = GeographicLevel.LocalAuthority,
             Country = _england,
             LocalAuthority = _derby,
+        };
+        var observationForReplacementLocation = new Observation
+        {
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = replacementLocation,
         };
 
         var timePeriod = new TimePeriodQuery
@@ -1324,11 +1331,6 @@ public class ReplacementPlanServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { replacementLocation });
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -1360,7 +1362,8 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.Filter.AddRange(originalFilter, replacementFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(originalLocation);
+            statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1370,7 +1373,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -1380,7 +1382,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -1403,7 +1405,7 @@ public class ReplacementPlanServiceTests
                 .LocationAttributes.First();
 
             Assert.Equal(originalLocation.Id, dataBlockLocationPlan.Id);
-            Assert.Equal(_derby.Code, dataBlockLocationPlan.Code);
+            Assert.Equal(_derby.GetCodeOrFallback(), dataBlockLocationPlan.Code);
             Assert.Equal(_derby.Name, dataBlockLocationPlan.Label);
             Assert.Equal(replacementLocation.Id, dataBlockLocationPlan.Target);
             Assert.True(dataBlockLocationPlan.Valid);
@@ -1501,11 +1503,6 @@ public class ReplacementPlanServiceTests
             )
             .ReturnsAsync(dataSetVersion);
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -1550,7 +1547,6 @@ public class ReplacementPlanServiceTests
                 statisticsDbContext,
                 dataSetVersionService: dataSetVersionService.Object,
                 timePeriodService: timePeriodService.Object,
-                locationRepository: locationRepository.Object,
                 releaseFileRepository: releaseFileRepository.Object,
                 apiDataSetVersionMappingService: dataSetVersionMappingService.Object
             );
@@ -1560,7 +1556,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(dataSetVersionService, locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(dataSetVersionService, timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -1738,11 +1734,33 @@ public class ReplacementPlanServiceTests
             Indicators = new List<Indicator> { replacementIndicator },
         };
 
-        var location = new Location
+        var originalLocation = new Location
         {
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.Country,
             Country = _england,
+        };
+        var replacementLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.Country,
+            Country = _england with
+            {
+                Name = "England updated", // should still automap even though the name has changed
+            },
+        };
+
+        var observationForOriginalLocation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = originalReleaseSubject.SubjectId,
+            Location = originalLocation,
+        };
+        var observationForReplacementLocation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = replacementLocation,
         };
 
         var timePeriod = new TimePeriodQuery
@@ -1766,7 +1784,7 @@ public class ReplacementPlanServiceTests
                     originalPrimaryAndSecondarySchoolsFilterItem.Id,
                 },
                 Indicators = new[] { originalIndicator.Id },
-                LocationIds = ListOf(location.Id),
+                LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -1801,11 +1819,6 @@ public class ReplacementPlanServiceTests
             "Test footnote for Subject",
             subject: originalReleaseSubject.Subject
         );
-
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { location });
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -1842,7 +1855,8 @@ public class ReplacementPlanServiceTests
                 replacementSchoolTypeFilter
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(location);
+            statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
             statisticsDbContext.Footnote.AddRange(
                 footnoteForFilter,
                 footnoteForFilterGroup,
@@ -1859,7 +1873,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -1869,7 +1882,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -1974,18 +1987,18 @@ public class ReplacementPlanServiceTests
 
             Assert.NotNull(dataBlockPlan.Locations);
             Assert.Single(dataBlockPlan.Locations);
-            Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.Country.ToString()));
-            Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].LocationAttributes);
-            Assert.True(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
+            Assert.True(dataBlockPlan.Locations.ContainsKey(nameof(GeographicLevel.Country)));
+            Assert.Single(dataBlockPlan.Locations[nameof(GeographicLevel.Country)].LocationAttributes);
+            Assert.True(dataBlockPlan.Locations[nameof(GeographicLevel.Country)].Valid);
 
             var dataBlockLocationPlan = dataBlockPlan
-                .Locations[GeographicLevel.Country.ToString()]
+                .Locations[nameof(GeographicLevel.Country)]
                 .LocationAttributes.First();
 
-            Assert.Equal(location.Id, dataBlockLocationPlan.Id);
-            Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
+            Assert.Equal(originalLocation.Id, dataBlockLocationPlan.Id);
+            Assert.Equal(_england.GetCodeOrFallback(), dataBlockLocationPlan.Code);
             Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
-            Assert.Equal(location.Id, dataBlockLocationPlan.Target);
+            Assert.Equal(replacementLocation.Id, dataBlockLocationPlan.Target);
             Assert.True(dataBlockLocationPlan.Valid);
 
             Assert.NotNull(dataBlockPlan.TimePeriods);
@@ -2134,6 +2147,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2224,11 +2238,6 @@ public class ReplacementPlanServiceTests
             indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicatorA } }
         );
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { location });
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -2243,8 +2252,8 @@ public class ReplacementPlanServiceTests
 
         var dataSetMapping = new DataSetMapping
         {
-            OriginalDataSetId = originalReleaseSubject.SubjectId,
-            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -2289,7 +2298,28 @@ public class ReplacementPlanServiceTests
                     GroupLabel = replacementIndicatorGroup.Label,
                 },
             ],
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    location.Id,
+                    new LocationMapping { OriginalId = location.Id, ReplacementId = location.Id }
+                },
+            },
+            UnmappedReplacementLocations = [],
         };
+
+        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
+        dataSetMappingService
+            .Setup(mock =>
+                mock.GetOrCreateMapping(
+                    originalFile.Id,
+                    replacementFile.Id,
+                    originalReleaseSubject.SubjectId,
+                    replacementReleaseSubject.SubjectId,
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(dataSetMapping);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2308,7 +2338,6 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(location);
             statisticsDbContext.Footnote.AddRange(footnoteForIndicator);
             await statisticsDbContext.SaveChangesAsync();
         }
@@ -2319,9 +2348,9 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
-                releaseFileRepository: releaseFileRepository.Object
+                releaseFileRepository: releaseFileRepository.Object,
+                dataSetMappingService: dataSetMappingService.Object
             );
 
             var result = await replacementPlanService.GetReplacementPlan(
@@ -2329,7 +2358,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -2341,12 +2370,10 @@ public class ReplacementPlanServiceTests
             Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
             Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
-            Assert.Single(dataBlockPlan.IndicatorGroups);
+            var dataBlockIndicatorGroupPlan = Assert.Single(dataBlockPlan.IndicatorGroups);
 
-            var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
-
-            Assert.Equal(originalIndicatorA.IndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
-            Assert.Equal(originalIndicatorA.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
+            Assert.Equal(originalIndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
+            Assert.Equal(originalIndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
             Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
             Assert.True(dataBlockIndicatorGroupPlan.Value.Valid);
 
@@ -2409,6 +2436,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -2485,11 +2513,6 @@ public class ReplacementPlanServiceTests
             indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicatorA } }
         );
 
-        var locationRepository = new Mock<ILocationRepository>(Strict);
-        locationRepository
-            .Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location> { location });
-
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -2504,8 +2527,8 @@ public class ReplacementPlanServiceTests
 
         var dataSetMapping = new DataSetMapping
         {
-            OriginalDataSetId = originalReleaseSubject.SubjectId,
-            ReplacementDataSetId = replacementReleaseSubject.SubjectId,
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -2536,6 +2559,14 @@ public class ReplacementPlanServiceTests
                     GroupLabel = replacementIndicatorGroup.Label,
                 },
             ],
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    location.Id,
+                    new LocationMapping { OriginalId = location.Id, ReplacementId = location.Id }
+                },
+            },
+            UnmappedReplacementLocations = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2555,7 +2586,6 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(location);
             statisticsDbContext.Footnote.AddRange(footnoteForIndicator);
             await statisticsDbContext.SaveChangesAsync();
         }
@@ -2566,7 +2596,6 @@ public class ReplacementPlanServiceTests
             var replacementPlanService = BuildReplacementPlanService(
                 contentDbContext,
                 statisticsDbContext,
-                locationRepository: locationRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 releaseFileRepository: releaseFileRepository.Object
             );
@@ -2576,7 +2605,7 @@ public class ReplacementPlanServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(locationRepository, timePeriodService, releaseFileRepository);
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
 
             var replacementPlan = result.AssertRight();
 
@@ -2634,6 +2663,580 @@ public class ReplacementPlanServiceTests
         }
     }
 
+    [Fact]
+    public async Task GetReplacementPlan_CustomMapping_LocationsMappedThatAppearsInDataBlock_ReplacementValid()
+    {
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
+
+        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(statsReleaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+
+        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+
+        var originalIndicator = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator A",
+            Name = "indicator_a",
+        };
+
+        var replacementIndicator = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "New indicator",
+            Name = "new_indicator",
+        };
+
+        var originalIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = originalReleaseSubject.Subject,
+            Indicators = new List<Indicator> { originalIndicator },
+        };
+
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = replacementReleaseSubject.Subject,
+            Indicators = new List<Indicator> { replacementIndicator },
+        };
+
+        var locationEng = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.Country,
+            Country = _england,
+        };
+
+        var originalLocationDerby = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = _derby,
+        };
+        var replacementLocationDerby = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("E06000016", "", "Derby updated"), // updated code and name
+        };
+
+        var locationLeicester = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("E03000033", "", "Leicester"),
+        };
+
+        var originalLocationBirmingham = new Location // doesn't appear in replacement
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
+            LocalAuthorityDistrict = new LocalAuthorityDistrict("E02000022", "Birmingham"),
+        };
+        var replacementLocationNott = new Location // doesn't appear in original
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("E01000011", "", "Nottingham"),
+        };
+
+        var timePeriod = new TimePeriodQuery
+        {
+            StartYear = 2019,
+            StartCode = CalendarYear,
+            EndYear = 2020,
+            EndCode = CalendarYear,
+        };
+
+        var dataBlock = new DataBlock
+        {
+            Name = "Test DataBlock",
+            Query = new FullTableQuery
+            {
+                SubjectId = originalReleaseSubject.SubjectId,
+                Filters = [],
+                Indicators = [originalIndicator.Id],
+                LocationIds = ListOf(locationEng.Id, originalLocationDerby.Id, locationLeicester.Id),
+                TimePeriod = timePeriod,
+            },
+            ReleaseVersion = releaseVersion,
+        };
+
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+        timePeriodService
+            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(
+                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
+            );
+
+        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+        releaseFileRepository
+            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
+            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator.Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator.Id,
+                        OriginalLabel = originalIndicator.Label,
+                        OriginalColumnName = originalIndicator.Name,
+                        OriginalGroupId = originalIndicatorGroup.Id,
+                        OriginalGroupLabel = originalIndicatorGroup.Label,
+                        ReplacementId = replacementIndicator.Id,
+                        ReplacementLabel = replacementIndicator.Label,
+                        ReplacementGroupId = replacementIndicator.IndicatorGroupId,
+                        Status = MapStatus.ManuallySet,
+                    }
+                },
+            },
+            UnmappedReplacementIndicators = [],
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    locationEng.Id,
+                    new LocationMapping
+                    {
+                        OriginalId = locationEng.Id,
+                        OriginalGeographicLevel = locationEng.GeographicLevel,
+                        OriginalName = locationEng.ToLocationAttribute().Name!,
+                        OriginalCode = locationEng.ToLocationAttribute().GetCodeOrFallback(),
+                        ReplacementId = locationEng.Id,
+                        ReplacementGeographicLevel = locationEng.GeographicLevel,
+                        ReplacementName = locationEng.ToLocationAttribute().Name,
+                        ReplacementCode = locationEng.ToLocationAttribute().GetCodeOrFallback(),
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    originalLocationDerby.Id,
+                    new LocationMapping
+                    {
+                        OriginalId = originalLocationDerby.Id,
+                        OriginalGeographicLevel = originalLocationDerby.GeographicLevel,
+                        OriginalName = originalLocationDerby.ToLocationAttribute().Name!,
+                        OriginalCode = originalLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
+                        ReplacementId = replacementLocationDerby.Id,
+                        ReplacementGeographicLevel = replacementLocationDerby.GeographicLevel,
+                        ReplacementName = replacementLocationDerby.ToLocationAttribute().Name,
+                        ReplacementCode = replacementLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
+                        Status = MapStatus.ManuallySet,
+                    }
+                },
+                {
+                    locationLeicester.Id,
+                    new LocationMapping
+                    {
+                        OriginalId = locationLeicester.Id,
+                        OriginalGeographicLevel = locationLeicester.GeographicLevel,
+                        OriginalName = locationLeicester.ToLocationAttribute().Name!,
+                        OriginalCode = locationLeicester.ToLocationAttribute().GetCodeOrFallback(),
+                        ReplacementId = locationLeicester.Id,
+                        ReplacementGeographicLevel = locationLeicester.GeographicLevel,
+                        ReplacementName = locationLeicester.ToLocationAttribute().Name,
+                        ReplacementCode = locationLeicester.ToLocationAttribute().GetCodeOrFallback(),
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    originalLocationBirmingham.Id,
+                    new LocationMapping
+                    {
+                        OriginalId = originalLocationBirmingham.Id,
+                        OriginalGeographicLevel = originalLocationBirmingham.GeographicLevel,
+                        OriginalName = originalLocationBirmingham.ToLocationAttribute().Name!,
+                        OriginalCode = originalLocationBirmingham.ToLocationAttribute().GetCodeOrFallback(),
+                        ReplacementId = null, // not used in a data block so replacement still valid despite no mapping
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+            UnmappedReplacementLocations =
+            [
+                new UnmappedLocation
+                {
+                    Id = replacementLocationNott.Id,
+                    GeographicLevel = replacementLocationNott.GeographicLevel,
+                    Name = replacementLocationNott.ToLocationAttribute().Name!,
+                    Code = replacementLocationNott.ToLocationAttribute().GetCodeOrFallback(),
+                },
+            ],
+        };
+
+        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
+        dataSetMappingService
+            .Setup(mock =>
+                mock.GetOrCreateMapping(
+                    originalFile.Id,
+                    replacementFile.Id,
+                    originalReleaseSubject.SubjectId,
+                    replacementReleaseSubject.SubjectId,
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(dataSetMapping);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var replacementPlanService = BuildReplacementPlanService(
+                contentDbContext,
+                statisticsDbContext,
+                timePeriodService: timePeriodService.Object,
+                releaseFileRepository: releaseFileRepository.Object,
+                dataSetMappingService: dataSetMappingService.Object
+            );
+
+            var result = await replacementPlanService.GetReplacementPlan(
+                releaseVersionId: releaseVersion.Id,
+                originalFileId: originalFile.Id
+            );
+
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
+
+            var replacementPlan = result.AssertRight();
+
+            Assert.Equal(originalReleaseSubject.SubjectId, replacementPlan.OriginalSubjectId);
+            Assert.Equal(replacementReleaseSubject.SubjectId, replacementPlan.ReplacementSubjectId);
+
+            Assert.Single(replacementPlan.DataBlocks);
+            var dataBlockPlan = replacementPlan.DataBlocks.First();
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
+
+            Assert.Equal(2, dataBlockPlan.Locations.Count);
+            var countriesPlan = dataBlockPlan.Locations.Single(l => l.Key == nameof(GeographicLevel.Country)).Value;
+
+            var engPlan = countriesPlan.LocationAttributes.Single();
+            Assert.Multiple(
+                () => Assert.Equal(locationEng.Id, engPlan.Id),
+                () => Assert.Equal(locationEng.ToLocationAttribute().GetCodeOrFallback(), engPlan.Code),
+                () => Assert.Equal(locationEng.ToLocationAttribute().Name, engPlan.Label),
+                () => Assert.Equal(locationEng.Id, engPlan.Target),
+                () => Assert.True(engPlan.Valid)
+            );
+            Assert.True(countriesPlan.Valid);
+
+            var laPlan = dataBlockPlan.Locations.Single(l => l.Key == nameof(GeographicLevel.LocalAuthority)).Value;
+            Assert.Equal(2, laPlan.LocationAttributes.Count());
+            var derbyPlan = laPlan.LocationAttributes.Single(la =>
+                la.Label == originalLocationDerby.ToLocationAttribute().Name
+            );
+            var leicesterPlan = laPlan.LocationAttributes.Single(la =>
+                la.Label == locationLeicester.ToLocationAttribute().Name
+            );
+            Assert.Multiple(
+                () => Assert.Equal(originalLocationDerby.Id, derbyPlan.Id),
+                () => Assert.Equal(originalLocationDerby.ToLocationAttribute().GetCodeOrFallback(), derbyPlan.Code),
+                () => Assert.Equal(originalLocationDerby.ToLocationAttribute().Name, derbyPlan.Label),
+                () => Assert.Equal(replacementLocationDerby.Id, derbyPlan.Target),
+                () => Assert.True(derbyPlan.Valid),
+                () => Assert.Equal(locationLeicester.Id, leicesterPlan.Id),
+                () => Assert.Equal(locationLeicester.ToLocationAttribute().GetCodeOrFallback(), leicesterPlan.Code),
+                () => Assert.Equal(locationLeicester.ToLocationAttribute().Name, leicesterPlan.Label),
+                () => Assert.Equal(locationLeicester.Id, leicesterPlan.Target),
+                () => Assert.True(leicesterPlan.Valid)
+            );
+            Assert.True(laPlan.Valid);
+
+            Assert.True(dataBlockPlan.Valid);
+
+            Assert.True(replacementPlan.Valid);
+        }
+    }
+
+    [Fact]
+    public async Task GetReplacementPlan_CustomMapping_LocationUnmappedThatIsUsedInDataBlock_ReplacementInvalid()
+    {
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+
+        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
+
+        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(statsReleaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+
+        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+
+        var originalIndicator = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator A",
+            Name = "indicator_a",
+        };
+
+        var replacementIndicator = new Indicator
+        {
+            Id = Guid.NewGuid(),
+            Label = "New indicator",
+            Name = "new_indicator",
+        };
+
+        var originalIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = originalReleaseSubject.Subject,
+            Indicators = new List<Indicator> { originalIndicator },
+        };
+
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            Subject = replacementReleaseSubject.Subject,
+            Indicators = new List<Indicator> { replacementIndicator },
+        };
+
+        var originalLocationDerby = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = _derby,
+        };
+        var replacementLocationDerby = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("E06000016", "", "Derby updated"), // updated code and name
+        };
+
+        var timePeriod = new TimePeriodQuery
+        {
+            StartYear = 2019,
+            StartCode = CalendarYear,
+            EndYear = 2020,
+            EndCode = CalendarYear,
+        };
+
+        var dataBlock = new DataBlock
+        {
+            Name = "Test DataBlock",
+            Query = new FullTableQuery
+            {
+                SubjectId = originalReleaseSubject.SubjectId,
+                Filters = [],
+                Indicators = [originalIndicator.Id],
+                LocationIds = ListOf(originalLocationDerby.Id),
+                TimePeriod = timePeriod,
+            },
+            ReleaseVersion = releaseVersion,
+        };
+
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+        timePeriodService
+            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(
+                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
+            );
+
+        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+        releaseFileRepository
+            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
+            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
+        var dataSetMapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalFile.Id,
+            ReplacementDataFileId = replacementFile.Id,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator.Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator.Id,
+                        OriginalLabel = originalIndicator.Label,
+                        OriginalColumnName = originalIndicator.Name,
+                        OriginalGroupId = originalIndicatorGroup.Id,
+                        OriginalGroupLabel = originalIndicatorGroup.Label,
+                        ReplacementId = replacementIndicator.Id,
+                        ReplacementLabel = replacementIndicator.Label,
+                        ReplacementGroupId = replacementIndicator.IndicatorGroupId,
+                        Status = MapStatus.ManuallySet,
+                    }
+                },
+            },
+            UnmappedReplacementIndicators = [],
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    originalLocationDerby.Id,
+                    new LocationMapping
+                    {
+                        OriginalId = originalLocationDerby.Id,
+                        OriginalGeographicLevel = originalLocationDerby.GeographicLevel,
+                        OriginalName = originalLocationDerby.ToLocationAttribute().Name!,
+                        OriginalCode = originalLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
+                        ReplacementId = null,
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+            UnmappedReplacementLocations =
+            [
+                new UnmappedLocation
+                {
+                    Id = replacementLocationDerby.Id,
+                    GeographicLevel = replacementLocationDerby.GeographicLevel,
+                    Name = replacementLocationDerby.ToLocationAttribute().Name!,
+                    Code = replacementLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
+                },
+            ],
+        };
+
+        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
+        dataSetMappingService
+            .Setup(mock =>
+                mock.GetOrCreateMapping(
+                    originalFile.Id,
+                    replacementFile.Id,
+                    originalReleaseSubject.SubjectId,
+                    replacementReleaseSubject.SubjectId,
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(dataSetMapping);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataSetMappings.Add(dataSetMapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var replacementPlanService = BuildReplacementPlanService(
+                contentDbContext,
+                statisticsDbContext,
+                timePeriodService: timePeriodService.Object,
+                releaseFileRepository: releaseFileRepository.Object,
+                dataSetMappingService: dataSetMappingService.Object
+            );
+
+            var result = await replacementPlanService.GetReplacementPlan(
+                releaseVersionId: releaseVersion.Id,
+                originalFileId: originalFile.Id
+            );
+
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
+
+            var replacementPlan = result.AssertRight();
+
+            Assert.Equal(originalReleaseSubject.SubjectId, replacementPlan.OriginalSubjectId);
+            Assert.Equal(replacementReleaseSubject.SubjectId, replacementPlan.ReplacementSubjectId);
+
+            Assert.Single(replacementPlan.DataBlocks);
+            var dataBlockPlan = replacementPlan.DataBlocks.First();
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
+
+            var laPlan = Assert.Single(dataBlockPlan.Locations).Value;
+            var derbyPlan = laPlan.LocationAttributes.Single();
+            Assert.Multiple(
+                () => Assert.Equal(originalLocationDerby.Id, derbyPlan.Id),
+                () => Assert.Equal(originalLocationDerby.ToLocationAttribute().GetCodeOrFallback(), derbyPlan.Code),
+                () => Assert.Equal(originalLocationDerby.ToLocationAttribute().Name, derbyPlan.Label),
+                () => Assert.Null(derbyPlan.Target),
+                () => Assert.False(derbyPlan.Valid)
+            );
+            Assert.False(laPlan.Valid);
+
+            Assert.False(dataBlockPlan.Valid);
+
+            Assert.False(replacementPlan.Valid);
+        }
+    }
+
     private static Footnote CreateFootnote(
         ReleaseVersion releaseVersion,
         string content,
@@ -2662,7 +3265,6 @@ public class ReplacementPlanServiceTests
     private static ReplacementPlanService BuildReplacementPlanService(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
-        ILocationRepository? locationRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
         IDataSetMappingService? dataSetMappingService = null,
@@ -2670,16 +3272,16 @@ public class ReplacementPlanServiceTests
         IReleaseFileRepository? releaseFileRepository = null
     )
     {
+        var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
             statisticsDbContext,
             new FilterRepository(statisticsDbContext),
-            locationRepository ?? Mock.Of<ILocationRepository>(Strict),
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
-            AlwaysTrueUserService().Object,
-            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext),
+            userService,
+            dataSetMappingService ?? new DataSetMappingService(contentDbContext, statisticsDbContext, userService),
             apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );

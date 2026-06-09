@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Options;
 
@@ -39,6 +40,18 @@ public class DataSetScreenerProgressUpdaterJob(
                 _ => UpdateProgress(serviceScope: scope, cancellationToken: stoppingToken)
             );
 
+            await databaseHelper.ExecuteWithExclusiveLock(
+                dbContext: dbContext,
+                lockName: $"Admin_{nameof(DataSetScreenerProgressUpdaterJob)}",
+                _ => HandleFailures(serviceScope: scope, cancellationToken: stoppingToken)
+            );
+
+            await databaseHelper.ExecuteWithExclusiveLock(
+                dbContext: dbContext,
+                lockName: $"Admin_{nameof(DataSetScreenerProgressUpdaterJob)}",
+                _ => HandleCompletions(serviceScope: scope, cancellationToken: stoppingToken)
+            );
+
             await timer.WaitForNextTickAsync(stoppingToken);
         }
     }
@@ -59,6 +72,22 @@ public class DataSetScreenerProgressUpdaterJob(
                     DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
                 );
             }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Failed to update screener progress at {Time} (UTC)",
+                DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+            );
+        }
+    }
+
+    private async Task HandleFailures(IServiceScope serviceScope, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var dataSetScreenerService = serviceScope.ServiceProvider.GetRequiredService<IDataSetScreenerService>();
 
             var failures = await dataSetScreenerService.MarkDataSetsWithoutProgressAsFailed(
                 cancellationToken: cancellationToken
@@ -79,7 +108,53 @@ public class DataSetScreenerProgressUpdaterJob(
         {
             logger.LogError(
                 ex,
-                "Failed to update screener progress at {Time} (UTC)",
+                "Failed to mark data sets as failed at {Time} (UTC)",
+                DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+            );
+        }
+    }
+
+    private async Task HandleCompletions(IServiceScope serviceScope, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var dataSetScreenerService = serviceScope.ServiceProvider.GetRequiredService<IDataSetScreenerService>();
+
+            var completions = await dataSetScreenerService.CompleteDataSetScreeningForFinishedDataSets(
+                cancellationToken: cancellationToken
+            );
+
+            var successfulCompletions = completions
+                .Where(c => c.Status == nameof(DataSetUploadScreeningStatus.PendingReview))
+                .ToList();
+
+            var failedCompletions = completions
+                .Where(c => c.Status == nameof(DataSetUploadScreeningStatus.FailedScreening))
+                .ToList();
+
+            if (successfulCompletions.Count > 0)
+            {
+                logger.LogInformation(
+                    "{Count} data sets completed screening successfully at {Time} (UTC)",
+                    successfulCompletions.Count,
+                    DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+                );
+            }
+
+            if (failedCompletions.Count > 0)
+            {
+                logger.LogInformation(
+                    "{Count} data sets completed screening with failures at {Time} (UTC)",
+                    successfulCompletions.Count,
+                    DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Failed to handle completion of data sets at {Time} (UTC)",
                 DateTimeOffset.UtcNow.ToString("dd/MM/yyyy HH:mm:ss")
             );
         }

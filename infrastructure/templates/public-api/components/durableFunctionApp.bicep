@@ -1,13 +1,9 @@
-import {
-  FirewallRule
-  IpRange
-  AzureFileShareMount
-  EntraIdAuthentication
-} from '../types.bicep'
-
+import { EntraIdAuthentication} from '../types.bicep'
+import { IpRange, FirewallRule } from '../../common/types.bicep'
+import { AzureFileShareMount } from '../../common/components/storage/types.bicep'
 import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
 
 @description('Specifies the location for all resources.')
@@ -159,7 +155,7 @@ var fileServiceAlerts = alerts != null
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
 // management etc.  For performance, it is considered good practice for each Function App to have its own dedicated 
 // Storage Account. See https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
-module manamementStorageAccountModule 'storageAccount.bicep' = {
+module manamementStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
     location: location
@@ -180,7 +176,7 @@ module manamementStorageAccountModule 'storageAccount.bicep' = {
 
 // This is a storage account dedicated to slot 1. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-module slot1StorageAccountModule 'storageAccount.bicep' = {
+module slot1StorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
     location: location
@@ -201,7 +197,7 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
 }
 
 // This is the file share for slot 1 to use for its code storage.
-module slot1FileShareModule 'fileShare.bicep' = {
+module slot1FileShareModule '../../common/components/storage/fileShare.bicep' = {
   name: '${slot1StorageAccountName}${functionAppCodeFileShareName}Deploy'
   params: {
     storageAccountName: slot1StorageAccountName
@@ -216,7 +212,7 @@ module slot1FileShareModule 'fileShare.bicep' = {
 
 // This is a storage account dedicated to slot 2. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-module slot2StorageAccountModule 'storageAccount.bicep' = {
+module slot2StorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
     location: location
@@ -237,7 +233,7 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
 }
 
 // This is the file share for slot 2 to use for its code storage.
-module slot2FileShareModule 'fileShare.bicep' = {
+module slot2FileShareModule '../../common/components/storage/fileShare.bicep' = {
   name: '${slot2StorageAccountName}${functionAppCodeFileShareName}Deploy'
   params: {
     storageAccountName: slot2StorageAccountName
@@ -464,7 +460,7 @@ module privateEndpointModule '../../common/components/privateEndpoint.bicep' = i
   }
 }
 
-module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+module healthAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionAppName
@@ -486,7 +482,7 @@ module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && aler
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
 
-module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
+module unexpectedHttpStatusCodeAlerts '../../common/components/alerts/staticMetricAlert.bicep' = [
   for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
@@ -510,7 +506,7 @@ module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
 
 var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
 
-module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
+module expectedHttpStatusCodeAlerts '../../common/components/alerts/dynamicMetricAlert.bicep' = [
   for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {

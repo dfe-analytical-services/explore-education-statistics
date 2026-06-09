@@ -1,5 +1,6 @@
 import releaseDataFileService, {
   DataSetUpload,
+  DataSetScreenerProgress,
 } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -10,7 +11,6 @@ import WarningMessage from '@common/components/WarningMessage';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
-import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
 import { useAuthContext } from '@admin/contexts/AuthContext';
@@ -18,10 +18,7 @@ import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
 import styles from './DataFilesTable.module.scss';
-import {
-  getDataSetUploadStatusColour,
-  getDataSetUploadStatusLabel,
-} from './ImporterStatus';
+import ScreenerStatus, { terminalScreeningStatuses } from './ScreenerStatus';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -29,6 +26,7 @@ interface Props {
   releaseVersionId: string;
   onConfirmDelete: (deletedUploadId: string) => void;
   onConfirmImport: (uploadIds: string[]) => void;
+  onRefreshUploads: () => void;
   testId?: string;
 }
 
@@ -38,16 +36,40 @@ export default function DataFilesTableUploadRow({
   releaseVersionId,
   onConfirmDelete,
   onConfirmImport,
+  onRefreshUploads,
   testId,
 }: Props) {
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
   const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
   const { user } = useAuthContext();
 
-  const hasFailures = dataSetUpload.screenerResult?.testResults.some(
+  const [currentUpload, setCurrentUpload] =
+    useState<DataSetUpload>(dataSetUpload);
+
+  useEffect(() => {
+    setCurrentUpload(dataSetUpload);
+  }, [dataSetUpload]);
+
+  const handleScreenerStatusChange = useCallback(
+    (_upload: DataSetUpload, progress: DataSetScreenerProgress) => {
+      setCurrentUpload(upload => ({ ...upload, status: progress.status }));
+
+      // TODO EES-7139 - change status to be non-nullable when foreground screening process
+      // is decommissioned.
+      if (
+        progress.status &&
+        terminalScreeningStatuses.includes(progress.status)
+      ) {
+        onRefreshUploads();
+      }
+    },
+    [setCurrentUpload, onRefreshUploads],
+  );
+
+  const hasFailures = currentUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'FAIL',
   );
-  const hasWarnings = dataSetUpload.screenerResult?.testResults.some(
+  const hasWarnings = currentUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'WARNING',
   );
 
@@ -59,30 +81,31 @@ export default function DataFilesTableUploadRow({
 
   const importBlocked =
     !canUpdateRelease ||
-    !dataSetUpload.screenerResult ||
-    dataSetUpload.status === 'SCREENER_ERROR' ||
-    dataSetUpload.status === 'FAILED_SCREENING' ||
+    !currentUpload.screenerResult ||
+    currentUpload.status === 'ScreenerError' ||
+    currentUpload.status === 'FailedScreening' ||
     hasFailures;
 
   const importUnavailable = !Object.values(warningAcknowledgements).every(
-    acknowledgement => acknowledgement === true,
+    acknowledgement => acknowledgement,
   );
 
   useEffect(() => {
-    const warnings = dataSetUpload.screenerResult?.testResults.filter(
+    const warnings = currentUpload.screenerResult?.testResults.filter(
       testResult => testResult.result === 'WARNING',
     );
 
     if (warnings) {
       setWarningAcknowledgements(acknowledgements =>
         Object.fromEntries(
-          warnings.map(warning => {
-            return [warning.id, acknowledgements?.[warning.id] ?? false];
-          }),
+          warnings.map(warning => [
+            warning.id,
+            acknowledgements?.[warning.id] ?? false,
+          ]),
         ),
       );
     }
-  }, [dataSetUpload]);
+  }, [currentUpload]);
 
   const acknowledgeWarning = useCallback(
     (key: string, value: boolean) => {
@@ -115,9 +138,9 @@ export default function DataFilesTableUploadRow({
     try {
       await releaseDataFileService.deleteDataSetUpload(
         releaseVersionId,
-        dataSetUpload.id,
+        currentUpload.id,
       );
-      onConfirmDelete(dataSetUpload.id);
+      onConfirmDelete(currentUpload.id);
     } catch (err) {
       logger.error(err);
     } finally {
@@ -125,7 +148,7 @@ export default function DataFilesTableUploadRow({
     }
   }, [
     releaseVersionId,
-    dataSetUpload.id,
+    currentUpload.id,
     toggleOpenDeleteConfirm,
     onConfirmDelete,
   ]);
@@ -138,33 +161,44 @@ export default function DataFilesTableUploadRow({
     confirmText = 'Continue import (override failures)';
   }
 
-  if (dataSetUpload.status === 'SCREENER_ERROR') {
+  if (currentUpload.status === 'ScreenerError') {
     confirmText = 'Continue import (bypass screening)';
   }
 
   return (
-    <tr key={dataSetUpload.dataSetTitle}>
-      <td data-testid="Title" className={styles.title}>
-        {dataSetUpload.dataSetTitle}
+    <tr key={currentUpload.dataSetTitle}>
+      <td
+        data-testid={`${currentUpload.dataSetTitle}-title`}
+        className={styles.title}
+      >
+        {currentUpload.dataSetTitle}
       </td>
-      <td data-testid="Size" className={styles.fileSize}>
-        {dataSetUpload.dataFileSize}
+      <td
+        data-testid={`${currentUpload.dataSetTitle}-size`}
+        className={styles.fileSize}
+      >
+        {currentUpload.dataFileSize}
       </td>
-      <td data-testid="Status">
-        <Tag colour={getDataSetUploadStatusColour(dataSetUpload.status)}>
-          {getDataSetUploadStatusLabel(dataSetUpload.status)}
-        </Tag>
+      <td data-testid={`${currentUpload.dataSetTitle}-status`}>
+        <ScreenerStatus
+          dataSetUpload={currentUpload}
+          releaseVersionId={releaseVersionId}
+          onStatusChange={handleScreenerStatusChange}
+        />
       </td>
       <td data-testid="Actions">
         <ButtonGroup className={styles.actions}>
           <ModalConfirm
             title="Data set details"
             open={openImportConfirm}
-            hideConfirm={importBlocked && !canOverride}
+            hideConfirm={
+              currentUpload.status === 'Screening' ||
+              (importBlocked && !canOverride)
+            }
             disableConfirm={
               importUnavailable && !(importBlocked && canOverride)
             }
-            onConfirm={() => onConfirmImport([dataSetUpload.id])}
+            onConfirm={() => onConfirmImport([currentUpload.id])}
             confirmText={confirmText}
             triggerButton={
               <ButtonText
@@ -172,7 +206,7 @@ export default function DataFilesTableUploadRow({
                 onClick={toggleOpenImportConfirm.on}
               >
                 View details
-                <VisuallyHidden>{` for ${dataSetUpload.dataSetTitle}`}</VisuallyHidden>
+                <VisuallyHidden>{` for ${currentUpload.dataSetTitle}`}</VisuallyHidden>
               </ButtonText>
             }
           >
@@ -191,30 +225,33 @@ export default function DataFilesTableUploadRow({
                   {hasFailures && failuresNoticeMessage}
                   {hasWarnings && !hasFailures && warningsNoticeMessage}
                   <ScreenerResultsTable
-                    screenerResult={dataSetUpload.screenerResult}
+                    screenerResult={currentUpload.screenerResult}
                     showAll={false}
                     onAcknowledgeWarning={acknowledgeWarning}
                     warningAcknowledgements={warningAcknowledgements}
                   />
                 </TabsSection>
               )}
-              <TabsSection
-                id={dataSetUploadTabIds.screenerResults}
-                testId={dataSetUploadTabIds.screenerResults}
-                title="All tests"
-                headingTitle={
-                  dataSetUpload.screenerResult
-                    ? `Full breakdown of ${dataSetUpload.screenerResult?.testResults.length} tests checked against this file`
-                    : 'No tests checked against this file'
-                }
-              >
-                {hasFailures && failuresNoticeMessage}
-                {hasWarnings && !hasFailures && warningsNoticeMessage}
-                <ScreenerResultsTable
-                  screenerResult={dataSetUpload.screenerResult}
-                  showAll
-                />
-              </TabsSection>
+              {currentUpload.status !== 'Screening' && (
+                <TabsSection
+                  id={dataSetUploadTabIds.screenerResults}
+                  testId={dataSetUploadTabIds.screenerResults}
+                  title="All tests"
+                  headingTitle={
+                    !currentUpload.screenerResult &&
+                    currentUpload.status === 'ScreenerError'
+                      ? 'No tests checked against this file'
+                      : `Full breakdown of ${currentUpload.screenerResult?.testResults.length} tests checked against this file`
+                  }
+                >
+                  {hasFailures && failuresNoticeMessage}
+                  {hasWarnings && !hasFailures && warningsNoticeMessage}
+                  <ScreenerResultsTable
+                    screenerResult={currentUpload.screenerResult}
+                    showAll
+                  />
+                </TabsSection>
+              )}
               <TabsSection
                 id={dataSetUploadTabIds.fileDetails}
                 testId={dataSetUploadTabIds.fileDetails}
@@ -225,12 +262,12 @@ export default function DataFilesTableUploadRow({
                 {hasWarnings && !hasFailures && warningsNoticeMessage}
                 <DataSetUploadSummaryList
                   releaseVersionId={releaseVersionId}
-                  dataSetUpload={dataSetUpload}
+                  dataSetUpload={currentUpload}
                 />
               </TabsSection>
             </Tabs>
           </ModalConfirm>
-          {canUpdateRelease && (
+          {currentUpload.status !== 'Screening' && canUpdateRelease && (
             <ModalConfirm
               open={openDeleteConfirm}
               title="Confirm deletion of selected data files"
@@ -240,14 +277,14 @@ export default function DataFilesTableUploadRow({
                   variant="warning"
                 >
                   Delete files
-                  <VisuallyHidden>{` for ${dataSetUpload.dataSetTitle}`}</VisuallyHidden>
+                  <VisuallyHidden>{` for ${currentUpload.dataSetTitle}`}</VisuallyHidden>
                 </ButtonText>
               }
               onConfirm={handleDeleteConfirm}
             >
               <p>
                 Are you sure you want to delete{' '}
-                <strong>{dataSetUpload.dataSetTitle}</strong>?
+                <strong>{currentUpload.dataSetTitle}</strong>?
               </p>
               <p>This version of the data set has not yet been imported.</p>
             </ModalConfirm>

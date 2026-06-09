@@ -5,10 +5,7 @@ public interface IPublisherClient
 {
     Task PublishMethodologyFiles(Guid methodologyId, CancellationToken cancellationToken = default);
 
-    Task PublishReleaseFiles(
-        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
-        CancellationToken cancellationToken = default
-    );
+    Task PublishReleaseFiles(PublishReleaseFilesMessage message, CancellationToken cancellationToken = default);
 
     Task PublishTaxonomy(CancellationToken cancellationToken = default);
 

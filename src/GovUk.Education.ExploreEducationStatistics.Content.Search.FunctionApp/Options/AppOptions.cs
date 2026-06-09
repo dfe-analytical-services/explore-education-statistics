@@ -6,7 +6,7 @@ public class AppOptions
 {
     public const string Section = "App";
     public string SearchStorageConnectionString { get; init; } = string.Empty;
-    public string SearchableDocumentsContainerName { get; init; } = string.Empty;
+    public string SearchDocumentsContainerName { get; init; } = string.Empty;
 
     public bool IsValid([NotNullWhen(false)] out string? errorMessage)
     {
@@ -15,12 +15,12 @@ public class AppOptions
         if (string.IsNullOrWhiteSpace(SearchStorageConnectionString))
         {
             errorMessage +=
-                $"Azure Search Storage Connection String is not configured. Ensure the {Section}:{nameof(SearchStorageConnectionString)} is set. ";
+                $"Search Azure Storage account connection string is not configured. Ensure the {Section}:{nameof(SearchStorageConnectionString)} is set. ";
         }
-        if (string.IsNullOrWhiteSpace(SearchableDocumentsContainerName))
+        if (string.IsNullOrWhiteSpace(SearchDocumentsContainerName))
         {
             errorMessage +=
-                $"Azure Search Storage Container Name is not configured. Ensure the {Section}:{nameof(SearchableDocumentsContainerName)} is set.";
+                $"Search Documents Azure Blob Storage container name is not configured. Ensure the {Section}:{nameof(SearchDocumentsContainerName)} is set.";
         }
 
         return errorMessage == string.Empty;

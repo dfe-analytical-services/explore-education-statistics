@@ -24,7 +24,23 @@ parameters:
     type: object
   - name: indexName
     type: string
+  - name: indexDefinitionFilePath
+    type: string
   - name: indexerName
+    type: string
+  - name: indexerOutputFieldMappingsFilePath
+    default: ''
+    type: string
+  - name: indexerParsingMode
+    values:
+      - default
+      - text
+      - delimitedText
+      - json
+      - jsonArray
+      - jsonLines
+      - markdown
+    default: default
     type: string
   - name: indexerScheduleInterval
     default: 'PT5M'
@@ -34,7 +50,7 @@ parameters:
 
 steps:
   - task: AzurePowerShell@5
-    displayName: Deploy Search service configuration
+    displayName: Deploy Search service ${{ parameters.indexName }} configuration
     condition: and(eq(variables.deploySearchConfig, true), succeeded())
     inputs:
       azurePowerShellVersion: 'LatestVersion'
@@ -47,8 +63,10 @@ steps:
         -dataSourceName '${{ parameters.dataSourceType }}-${{ parameters.dataSourceContainerName }}-datasource' `
         -dataSourceType '${{ parameters.dataSourceType }}' `
         -indexCorsAllowedOrigins '${{ join(''',''', parameters.indexCorsAllowedOrigins) }}' `
-        -indexDefinitionFilePath '$(templateDirectory)/application/indexes/${{ parameters.indexName }}.json' `
+        -indexDefinitionFilePath '${{ parameters.indexDefinitionFilePath }}' `
         -indexerName '${{ parameters.indexerName }}' `
+        -indexerOutputFieldMappingsFilePath '${{ parameters.indexerOutputFieldMappingsFilePath }}' `
+        -indexerParsingMode '${{ parameters.indexerParsingMode }}' `
         -indexerScheduleInterval '${{ parameters.indexerScheduleInterval }}' `
         -searchServiceEndpoint '${{ parameters.searchServiceEndpoint }}'
       errorActionPreference: 'stop'

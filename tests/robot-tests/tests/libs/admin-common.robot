@@ -1,6 +1,8 @@
 *** Settings ***
 Resource    ./common.robot
+Resource    ./admin-data-files.robot
 Library     admin-utilities.py
+Library     DateTime
 Library     String
 
 
@@ -454,26 +456,6 @@ user clicks footnote subject checkbox
     user clicks element    ${checkbox}
     checkbox should be selected    ${checkbox}
 
-user adds main data guidance content
-    [Arguments]    ${text}=Test data guidance content
-    user waits until page contains element    id:dataGuidanceForm-content
-    user enters text into element    id:dataGuidanceForm-content    ${text}
-
-user gets data guidance data file content editor
-    [Arguments]    ${accordion_heading}
-    user waits until page contains element    id:dataGuidance-dataFiles
-    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
-    user waits until parent contains element    ${accordion}    label:File guidance content
-    ${editor}=    get child element    ${accordion}    label:File guidance content
-    [Return]    ${editor}
-
-user enters text into data guidance data file content editor
-    [Arguments]    ${accordion_heading}    ${text}
-    ${accordion}=    user gets accordion section content element    ${accordion_heading}    id:dataGuidance-dataFiles
-    ${editor}=    user gets data guidance data file content editor    ${accordion_heading}
-    user clicks element    ${editor}
-    user enters text into element    ${editor}    ${text}
-
 user creates amendment for release
     [Arguments]
     ...    ${PUBLICATION_NAME}
@@ -491,15 +473,6 @@ user creates amendment for release
     user waits until page contains title caption    Amend release for ${RELEASE_NAME}
     user checks page contains tag    Amendment
 
-user deletes subject file
-    [Arguments]    ${SUBJECT_NAME}
-    user waits until page contains data uploads table
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
-    user scrolls to element    ${row}
-    ${button}=    user gets button element    Delete files    ${row}
-    user clicks element    ${button}
-    user clicks button    Confirm
-
 user navigates to Sign off page
     user clicks link    Sign off
     user waits until page finishes loading
@@ -513,10 +486,7 @@ user approves amended release for immediate publication
 
 user approves release for immediate publication
     [Arguments]    ${release_type}=original    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
-    user navigates to Sign off page
-    user waits until page contains button    Edit release status
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status
+    user edits release status
     user checks page does not contain    Notify subscribers by email
     user clicks radio    Approved for publication
     IF    '${release_type}' == 'amendment'
@@ -550,171 +520,6 @@ user navigates to admin dashboard
     ...    css:[data-testid='theme-publications'],[data-testid='no-permission-to-access-releases']
     ...    %{WAIT_SMALL}
 
-user uploads subject and waits until complete
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    ${FOLDER}=${FILES_DIR}
-    user uploads subject
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    Complete
-    ...    ${FOLDER}
-
-user uploads subject and waits until pending review
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    ${FOLDER}=${FILES_DIR}
-    user uploads subject
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    Pending review
-    ...    ${FOLDER}
-
-user uploads subject and waits until failed screening
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    ${FOLDER}=${FILES_DIR}
-    user uploads subject
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    Failed screening
-    ...    ${FOLDER}
-
-user uploads subject
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    ${IMPORT_STATUS}
-    ...    ${FOLDER}=${FILES_DIR}
-    user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-title    %{WAIT_SMALL}
-    user enters text into element    id:dataFileUploadForm-title    ${SUBJECT_NAME}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
-    user clicks button    Upload data files
-    user waits until page finishes loading    %{WAIT_DATA_FILE_IMPORT}
-    user waits until page contains data uploads table
-
-    IF    "${IMPORT_STATUS}" == "Complete"
-        user confirms upload to complete import    ${SUBJECT_NAME}
-    ELSE
-        user waits until data file import is in status    ${SUBJECT_NAME}    ${IMPORT_STATUS}
-    END
-
-user uploads subject replacement
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    ${FOLDER}=${FILES_DIR}
-    user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-title    %{WAIT_SMALL}
-    user enters text into element    id:dataFileUploadForm-title    ${SUBJECT_NAME}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
-    user clicks button    Upload data files
-    user waits until page contains data uploads table
-
-user confirms upload to complete import
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${WAIT_FOR_IMPORT_TO_COMPLETE}=True
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
-    ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
-    ${button}=    user gets button element    View details    ${row}
-    user clicks element    ${button}
-
-    IF    '${statusText}' == 'Pending review'
-        user acknowledges any warnings in screener modal
-        user clicks button    Continue import with warnings
-    ELSE
-        user waits until h3 is visible    Screener test failures
-        user clicks button    Continue import (override failures)
-    END
-
-    user waits until modal is not visible    Screener test warnings
-
-    IF    ${WAIT_FOR_IMPORT_TO_COMPLETE}
-        user waits until data file import is complete    ${SUBJECT_NAME}
-    END
-
-user confirms replacement upload
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${EXPECTED_STATUS}=Ready
-    ...    ${ROW}=1
-    user clicks element    testid:data-set-upload-row-${ROW}-view-details
-
-    user waits until modal is visible    Data set details
-    ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
-    IF    '${statusText}' == 'Pending review'
-        user acknowledges any warnings in screener modal
-        user clicks button    Continue import with warnings
-    ELSE
-        User waits until h3 is visible    Screener test failures
-        user clicks button    Continue import (override failures)
-    END
-
-    user waits until data file replacement is in status    ${SUBJECT_NAME}    ${EXPECTED_STATUS}
-
-user waits until data upload is completed
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    user clicks link    Data and files
-    user waits until h2 is visible    Add data file to release
-    user waits until data file import is complete    ${SUBJECT_NAME}
-
-user waits until data files table contains subject
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
-
-user waits until data file import is complete
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    user waits until data file import is in status    ${SUBJECT_NAME}    Complete
-
-user waits until data file import is in status
-    [Arguments]
-    ...    ${subject_name}
-    ...    ${status}
-    user waits until page contains data uploads table
-    user waits until parent contains element
-    ...    testid:Data files table
-    ...    xpath:.//tbody/tr/td[contains(., "${subject_name}")]/../td[contains(., "${status}")]
-    ...    %{WAIT_DATA_FILE_IMPORT}
-
-user waits until data file replacement is in status
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${STATUS}
-    user waits until page contains element    testid:Data file replacements table
-    user waits until parent contains element
-    ...    testid:Data file replacements table
-    ...    xpath:.//tbody/tr/td[contains(., "${SUBJECT_NAME}")]/../td[contains(., "${STATUS}")]
-    ...    %{WAIT_DATA_FILE_IMPORT}
-
-user waits until page contains data uploads table
-    user waits until page contains testid    Data files table    %{WAIT_DATA_FILE_IMPORT}
-
-user waits until page does not contain data uploads table
-    user waits until page does not contain testid    Data files table
-
-user acknowledges any warnings in screener modal
-    user clicks element    id:screener-results-filtered-tab
-    user waits until h3 is visible    Screener test warnings
-    user clicks all checkboxes in parent    screener-results-filtered
-
 user puts release into draft
     [Arguments]
     ...    ${release_note}=Moving back to draft
@@ -740,9 +545,7 @@ user puts release into draft
     user checks summary list contains    Next release expected    ${expected_next_release_date}
 
 user edits release status
-    user clicks link    Sign off
-    user waits until page finishes loading
-    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
+    user navigates to Sign off page
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
 
@@ -754,6 +557,16 @@ user puts release into higher level review
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review    %{WAIT_SMALL}
 
 user approves release for scheduled publication
+    [Documentation]
+    ...    Approves a release version for scheduled publication on a specific date, with an optional next release date, and verifies that the overall release status is Scheduled.
+    ...
+    ...    If this keyword will be followed by 'user waits for scheduled release to be published immediately' (to advance the release version through the publishing process immediately,
+    ...    instead of waiting for the scheduled trigger), set the publish date to at least one day in the future.
+    ...
+    ...    This prevents a race condition where the publishing process may begin processing naturally at the same time that the test is attempting to trigger it via the API.
+    ...
+    ...    This can lead to ambiguity in the source of status transitions, i.e. whether changes were caused by normal scheduled processing or test-triggered API processing.
+    ...    It may also lead to false positive test results, where processing appears to have progressed correctly when it was actually advanced by the normal scheduled processing before the test-triggered API processing occurred.
     [Arguments]
     ...    ${publish_date_day}
     ...    ${publish_date_month}
@@ -761,6 +574,24 @@ user approves release for scheduled publication
     ...    ${next_release_month}=01
     ...    ${next_release_year}=2200
     ...    ${update_amendment_published_date}=${False}
+
+    ${expected_scheduled_dt}=    Convert Date    ${publish_date_day} ${publish_date_month} ${publish_date_year}
+    ...    date_format=%d %m %Y
+    ...    result_format=datetime
+    ${expected_next_release_dt}=    Convert Date    1 ${next_release_month} ${next_release_year}
+    ...    date_format=%d %m %Y
+    ...    result_format=datetime
+
+    # Use the 'format datetime' keyword to ensure platform-independent date formatting.
+    # For example, formatting the day of the month without a leading zero differs by platform
+    # ('%-d' on Linux vs. '%#d' on Windows).
+    ${expected_scheduled_date}=    format datetime
+    ...    datetime=${expected_scheduled_dt}
+    ...    format_string=%-d %B %Y
+    ${expected_next_release_date}=    format datetime
+    ...    datetime=${expected_next_release_dt}
+    ...    format_string=%B %Y
+
     user edits release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
@@ -777,26 +608,47 @@ user approves release for scheduled publication
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${next_release_year}
 
     user clicks button    Update status
-    user waits until h2 is visible    Confirm publish date    %{WAIT_SMALL}
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
 
+    user waits until h2 is visible    Sign off
+    user checks summary list contains    Current status    Approved
+    user checks summary list contains    Scheduled release    ${expected_scheduled_date}
+    user checks summary list contains    Next release expected    ${expected_next_release_date}
+    user waits for release process status to be    Scheduled    %{WAIT_SMALL}
+
+user waits for release process status and stages to be
+    [Arguments]
+    ...    ${overall_status}
+    ...    ${files_stage}
+    ...    ${publishing_stage}
+    user waits for release process status to be    ${overall_status}    %{WAIT_SMALL}
+    user waits until page contains element    id:release-process-stage-files-${files_stage}
+    user waits until page contains element    id:release-process-stage-publishing-${publishing_stage}
+
 user waits for scheduled release to be published immediately
-    # TODO EES-6432 Update this comment when the "stage scheduled releases" function is renamed.
-    # It's possible that the actual scheduled "stage scheduled releases" function might pick up the staging of this
-    # scheduled Release before we get a chance to manually trigger the "stage scheduled releases immediately" function
-    # ourselves - hence we need to account for it going into "Started" state while it stages before we've manually
-    # triggered the function, as well as the standard "Scheduled" state that we would normally expect a scheduled
-    # Release to fall into.
-    ${release_id}=    get release id from url
-    user waits until page contains element
-    ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_SMALL}
-    trigger immediate staging of scheduled release    ${release_id}
+    [Documentation]    Uses the API to advance a scheduled release version through the release publishing process immediately, instead of waiting for the Publisher app to trigger the publishing functions on the release version's scheduled publication date.
+    ${release_version_id}=    get release id from url
+
+    # The release should be in the Scheduled state at this point.
+    # If this fails, the "PrepareScheduledReleaseVersions" function may have already started processing the release version before this test
+    # can trigger the "PrepareScheduledReleaseVersionsNow" function via the API.
+    # To avoid this race condition, use a publish date at least one day in the future when approving the release for scheduled publishing.
+    user waits for release process status to be    Scheduled    %{WAIT_SMALL}
+
+    prepare scheduled release versions now via api    ['${release_version_id}']
     user reloads page
-    user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
+    user waits until page contains details dropdown    View stages
     user opens details dropdown    View stages
-    user waits until page contains    Files - complete    %{WAIT_MEDIUM}
-    trigger immediate publishing of scheduled release    ${release_id}
-    user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
+    user waits for release process status and stages to be
+    ...    overall_status=Started
+    ...    files_stage=Complete
+    ...    publishing_stage=Scheduled
+    publish scheduled release versions now via api    ['${release_version_id}']
+    user waits for release process status and stages to be
+    ...    overall_status=Complete
+    ...    files_stage=Complete
+    ...    publishing_stage=Complete
 
 user verifies release summary
     [Arguments]
@@ -1111,29 +963,6 @@ user removes key stat
 user closes admin feedback banner if needed
     user clicks element if exists    //*[@data-testid="admin-survey-banner"]//button[text()="Close"]
 
-user adds data guidance for subject
-    [Arguments]
-    ...    ${subject_name}
-    ...    ${guidance_text}
-
-    user waits until page contains accordion section    ${subject_name}
-    user enters text into data guidance data file content editor    ${subject_name}
-    ...    ${guidance_text}
-
-user navigates to Data Guidance page and adds data guidance for subject
-    [Arguments]
-    ...    ${subject_name}
-    ...    ${guidance_text}
-    user clicks link    Data and files
-    user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
-    user adds main data guidance content
-    user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${subject_name}
-    user enters text into data guidance data file content editor    ${subject_name}    ${guidance_text}
-    user clicks button    Save guidance
-    user waits until page contains button    Edit guidance
-
 user clicks edit data block link
     [Arguments]
     ...    ${data_block_name}
@@ -1190,3 +1019,10 @@ user moves item of draggable list down
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
+
+user checks pre-release access list on help and related information tab
+    [Arguments]    @{access_list_content}
+    user clicks link    Help and related information
+    user waits until h2 is visible    Pre-release access list
+    user checks section with ID contains elements and back to top link    pre-release-access-list-section
+    ...    @{access_list_content}

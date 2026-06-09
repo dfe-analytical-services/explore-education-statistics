@@ -50,13 +50,13 @@ export default function DataFilesTableRow({
   const [showReplacementModal, toggleReplacementModal] = useToggle(false);
   return (
     <tr key={dataFile.title}>
-      <td data-testid="Title" className={styles.title}>
+      <td data-testid={`${dataFile.title}-title`} className={styles.title}>
         {dataFile.title}
       </td>
-      <td data-testid="Size" className={styles.fileSize}>
+      <td data-testid={`${dataFile.title}-size`} className={styles.fileSize}>
         {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
       </td>
-      <td data-testid="Status">
+      <td data-testid={`${dataFile.title}-status`}>
         <ImporterStatus
           className={styles.fileStatus}
           dataFile={dataFile}
@@ -65,7 +65,7 @@ export default function DataFilesTableRow({
           onStatusChange={onStatusChange}
         />
       </td>
-      <td data-testid="Actions">
+      <td data-testid={`${dataFile.title}-actions`}>
         <ButtonGroup className={styles.actions}>
           <Modal
             showClose

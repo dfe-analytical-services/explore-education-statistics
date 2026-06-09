@@ -36,6 +36,8 @@ stages:
     condition: ${{ parameters.condition }}
     variables:
       - group: Common - ${{ parameters.environment }}
+      - name: naturalLanguageSearchFunctionAppName
+        value: $(subscription)-ees-fa-nlsearch
       - name: searchDocsFunctionAppName
         value: $(subscription)-ees-fa-searchdocs
       - name: infraDeployName

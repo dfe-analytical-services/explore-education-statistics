@@ -1,115 +1,116 @@
-time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_urn,school_laestab,school_name,academy_type,ncyear,enrolments,sess_possible,sess_authorised,sess_unauthorised,sess_unauthorised_percent
-202021,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 4,930365,8380405,4410042,36349,10.0359
-202021,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 6,390233,2895910,2734525,418548,12.8344
-202021,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 8,966035,3669102,4767788,12507,9.4158
-202021,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 10,687704,8880914,3426082,16844,10.9951
-202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 4,748965,7281611,394560,254132,6.2354
-202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 6,819402,4571123,292963,79165,14.8326
-202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 8,999598,2688774,953422,202885,2.5727
-202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 10,863196,5417065,516529,70706,7.8286
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 4,643309,2783829,442519,360329,9.0429
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 6,406128,3922516,529884,228791,9.5496
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 8,954008,2510684,1058785,159578,10.3886
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 10,890581,4446119,4096651,6031,5.4532
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,Primary sponsor led academy,Year 4,296352,7368540,1002108,285622,3.9876
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,Primary sponsor led academy,Year 6,222884,6082113,360617,103563,6.2636
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 4,996491,8002818,4635376,213122,1.6915
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 6,846370,2152920,2828812,338402,7.6658
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 8,122971,2345267,4613665,214274,12.1115
-202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 10,219610,545275,1728142,129069,13.2427
-202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,N/A,Year 4,193938,3822743,699491,21990,1.2297
-202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,N/A,Year 6,420838,646484,3226295,252707,2.5504
-202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,Secondary sponsor led academy,Year 8,425445,6702005,3926588,19445,2.0738
-202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,Secondary sponsor led academy,Year 10,178144,1389676,4679175,151593,5.4475
-202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 4,636969,3414663,3283314,318214,1.2402
-202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 6,17520,5494804,366873,266062,7.4774
-202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 8,817310,4511712,2233435,43576,7.9209
-202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 10,46096,4687214,862914,43010,10.8394
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 4,991280,5127375,1163515,388622,2.175
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 6,436370,4420177,1343905,412913,7.4523
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 8,224856,47538,1958476,337417,11.5369
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 10,906144,3803424,864910,168235,4.6508
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,Secondary sponsor led academy,Year 8,655344,6237122,3417277,99042,3.7976
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,Secondary sponsor led academy,Year 10,789368,5583863,4304947,456541,5.7804
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 4,500911,9586188,578180,21607,3.3617
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 6,477675,9610295,3190487,392393,12.0798
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 8,216141,5952523,4784805,486676,12.6185
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 10,423972,61023,2440931,332898,8.5528
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,Secondary free school,Year 8,485419,3294823,313667,408852,13.7387
-202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,Secondary free school,Year 10,948391,8779565,2607975,135041,12.8666
-202122,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 4,263424,8721586,4167742,383478,5.0415
-202122,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 6,198408,5264285,2710311,494993,5.0129
-202122,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 8,484230,1614115,3534379,87050,6.8986
-202122,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 10,155301,4190557,3231686,207486,5.8223
-202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 4,610330,7640992,3720172,167078,12.0133
-202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 6,890478,5184289,26656,197176,6.2351
-202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 8,649107,4218939,3217805,343102,13.4956
-202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 10,63988,3357225,4901965,332298,8.693
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 4,375793,5942431,186830,124526,9.5212
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 6,732072,1971603,4584099,297972,7.3678
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 8,262655,7628392,370082,207129,5.1999
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 10,683791,569658,2478482,281011,4.9364
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,Primary sponsor led academy,Year 4,291660,4552605,1441830,421128,11.8714
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,Primary sponsor led academy,Year 6,691504,8180301,3458032,11936,7.1623
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 4,65626,8941189,2778792,40825,12.4985
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 6,446000,8180991,4241359,160601,4.396
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 8,672736,2069839,1789330,25253,13.106
-202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 10,710863,4131441,412250,234342,12.7331
-202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,N/A,Year 4,389695,1193807,3889011,292288,10.5549
-202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,N/A,Year 6,298947,3650745,4370595,53048,14.3211
-202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,Secondary sponsor led academy,Year 8,29393,2940163,460442,337613,7.0733
-202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,Secondary sponsor led academy,Year 10,752009,5840033,262396,356628,7.901
-202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 4,934820,1670483,4183571,467206,7.207
-202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 6,10142,7126488,1679362,418191,14.0816
-202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 8,444973,5610555,4967515,359239,9.3129
-202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 10,855721,8989241,2794631,444771,3.8782
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 4,165477,3982999,2881117,494074,5.1466
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 6,322047,7661435,4262799,97475,12.4722
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 8,18416,6851799,2025239,270083,7.1532
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 10,940546,4035799,1299367,17693,14.8835
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,Secondary sponsor led academy,Year 8,324513,9629567,2090853,165020,13.2842
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,Secondary sponsor led academy,Year 10,12135,418821,3617819,471557,1.9472
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 4,429828,2541098,4189699,191836,4.6809
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 6,800267,821476,4743561,380527,5.9484
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 8,277672,1725609,1984888,476621,3.1818
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 10,938510,8382254,4570224,373427,5.9204
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,Secondary free school,Year 8,887815,8905360,511940,110254,8.985
-202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,Secondary free school,Year 10,826025,3168076,1954888,14999,3.7619
-202223,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 4,219863,1211324,2461223,227036,6.8479
-202223,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 6,326899,9400873,3596596,84154,6.4159
-202223,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 8,714610,561356,2907605,433541,5.2496
-202223,Academic year,National,E92000001,England,,,,,,,,,N/A,Year 10,383602,1803285,287864,2883,0.4685
-202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 4,356747,6400821,178815,353079,7.2406
-202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 6,478301,6941924,3385453,137969,14.2775
-202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 8,634983,9628460,3931328,65536,3.7371
-202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,N/A,Year 10,540587,6663635,2179562,323178,1.3373
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 4,362381,1027328,577798,217717,12.313
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 6,448489,2859195,602823,176301,3.8162
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 8,654686,7414000,339649,162343,11.753
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,N/A,Year 10,540640,9354927,2039373,98018,14.8837
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,Primary sponsor led academy,Year 4,294564,6547062,4745554,25788,4.6605
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,Primary sponsor led academy,Year 6,123104,7290192,4578941,19677,5.1375
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 4,357353,1739000,4425257,285842,12.5505
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 6,724898,1043207,389401,473394,14.1792
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 8,216117,7168883,4215280,78439,13.679
-202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,N/A,Year 10,957960,9934276,1638073,147204,10.8101
-202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,N/A,Year 4,296027,2759449,4467649,78337,7.2387
-202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,N/A,Year 6,98921,9008990,2602662,484586,6.1155
-202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,Secondary sponsor led academy,Year 8,929132,182167,4080556,483888,8.1479
-202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,Secondary sponsor led academy,Year 10,751028,1449807,175843,263574,9.6395
-202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 4,577746,7493602,1377020,315021,7.8505
-202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 6,720401,3593781,3441828,186132,12.8428
-202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 8,470788,4851295,1733986,360850,5.5305
-202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,N/A,Year 10,903536,8331786,1760720,215307,10.8352
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 4,288238,9847925,4084552,444552,11.8302
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 6,775782,7953739,787260,180127,8.7798
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 8,783460,233298,1339828,148935,7.5016
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,N/A,Year 10,524941,7991277,1172325,363994,10.5637
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,Secondary sponsor led academy,Year 8,455256,921184,4608260,20074,8.3842
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,Secondary sponsor led academy,Year 10,135692,7302541,324393,244258,7.7954
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 4,303770,670289,4766068,486141,13.9153
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 6,37346,4344143,1516845,387614,3.5746
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 8,903110,9011174,417857,433299,9.0392
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,N/A,Year 10,100966,3931562,4064499,301608,13.4953
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,Secondary free school,Year 8,304011,8070409,1297358,26349,2.1772
-202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,Secondary free school,Year 10,422137,145499,2199762,452887,8.9538
+time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_urn,school_laestab,school_name,ward_code,ward_name,academy_type,ncyear,enrolments,sess_possible,sess_authorised,sess_unauthorised,sess_unauthorised_percent
+202021,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 4,930365,8380405,4410042,36349,10.0359
+202021,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 6,390233,2895910,2734525,418548,12.8344
+202021,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 8,966035,3669102,4767788,12507,9.4158
+202021,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 10,687704,8880914,3426082,16844,10.9951
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 4,748965,7281611,394560,254132,6.2354
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 6,819402,4571123,292963,79165,14.8326
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 8,999598,2688774,953422,202885,2.5727
+202021,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 10,863196,5417065,516529,70706,7.8286
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 4,643309,2783829,442519,360329,9.0429
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 6,406128,3922516,529884,228791,9.5496
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 8,954008,2510684,1058785,159578,10.3886
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 10,890581,4446119,4096651,6031,5.4532
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,Primary sponsor led academy,Year 4,296352,7368540,1002108,285622,3.9876
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,Primary sponsor led academy,Year 6,222884,6082113,360617,103563,6.2636
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 4,996491,8002818,4635376,213122,1.6915
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 6,846370,2152920,2828812,338402,7.6658
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 8,122971,2345267,4613665,214274,12.1115
+202021,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 10,219610,545275,1728142,129069,13.2427
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,,,N/A,Year 4,193938,3822743,699491,21990,1.2297
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,,,N/A,Year 6,420838,646484,3226295,252707,2.5504
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,,,Secondary sponsor led academy,Year 8,425445,6702005,3926588,19445,2.0738
+202021,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,,,Secondary sponsor led academy,Year 10,178144,1389676,4679175,151593,5.4475
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 4,636969,3414663,3283314,318214,1.2402
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 6,17520,5494804,366873,266062,7.4774
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 8,817310,4511712,2233435,43576,7.9209
+202021,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 10,46096,4687214,862914,43010,10.8394
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 4,991280,5127375,1163515,388622,2.175
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 6,436370,4420177,1343905,412913,7.4523
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 8,224856,47538,1958476,337417,11.5369
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 10,906144,3803424,864910,168235,4.6508
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,Secondary sponsor led academy,Year 8,655344,6237122,3417277,99042,3.7976
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,Secondary sponsor led academy,Year 10,789368,5583863,4304947,456541,5.7804
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 4,500911,9586188,578180,21607,3.3617
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 6,477675,9610295,3190487,392393,12.0798
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 8,216141,5952523,4784805,486676,12.6185
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 10,423972,61023,2440931,332898,8.5528
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,Secondary free school,Year 8,485419,3294823,313667,408852,13.7387
+202021,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,Secondary free school,Year 10,948391,8779565,2607975,135041,12.8666
+202122,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 4,263424,8721586,4167742,383478,5.0415
+202122,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 6,198408,5264285,2710311,494993,5.0129
+202122,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 8,484230,1614115,3534379,87050,6.8986
+202122,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 10,155301,4190557,3231686,207486,5.8223
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 4,610330,7640992,3720172,167078,12.0133
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 6,890478,5184289,26656,197176,6.2351
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 8,649107,4218939,3217805,343102,13.4956
+202122,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 10,63988,3357225,4901965,332298,8.693
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 4,375793,5942431,186830,124526,9.5212
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 6,732072,1971603,4584099,297972,7.3678
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 8,262655,7628392,370082,207129,5.1999
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 10,683791,569658,2478482,281011,4.9364
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,Primary sponsor led academy,Year 4,291660,4552605,1441830,421128,11.8714
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,Primary sponsor led academy,Year 6,691504,8180301,3458032,11936,7.1623
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 4,65626,8941189,2778792,40825,12.4985
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 6,446000,8180991,4241359,160601,4.396
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 8,672736,2069839,1789330,25253,13.106
+202122,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 10,710863,4131441,412250,234342,12.7331
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,,,N/A,Year 4,389695,1193807,3889011,292288,10.5549
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,,,N/A,Year 6,298947,3650745,4370595,53048,14.3211
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,,,Secondary sponsor led academy,Year 8,29393,2940163,460442,337613,7.0733
+202122,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,,,Secondary sponsor led academy,Year 10,752009,5840033,262396,356628,7.901
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 4,934820,1670483,4183571,467206,7.207
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 6,10142,7126488,1679362,418191,14.0816
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 8,444973,5610555,4967515,359239,9.3129
+202122,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 10,855721,8989241,2794631,444771,3.8782
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 4,165477,3982999,2881117,494074,5.1466
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 6,322047,7661435,4262799,97475,12.4722
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 8,18416,6851799,2025239,270083,7.1532
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 10,940546,4035799,1299367,17693,14.8835
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,Secondary sponsor led academy,Year 8,324513,9629567,2090853,165020,13.2842
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,Secondary sponsor led academy,Year 10,12135,418821,3617819,471557,1.9472
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 4,429828,2541098,4189699,191836,4.6809
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 6,800267,821476,4743561,380527,5.9484
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 8,277672,1725609,1984888,476621,3.1818
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 10,938510,8382254,4570224,373427,5.9204
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,Secondary free school,Year 8,887815,8905360,511940,110254,8.985
+202122,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,Secondary free school,Year 10,826025,3168076,1954888,14999,3.7619
+202223,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 4,219863,1211324,2461223,227036,6.8479
+202223,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 6,326899,9400873,3596596,84154,6.4159
+202223,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 8,714610,561356,2907605,433541,5.2496
+202223,Academic year,National,E92000001,England,,,,,,,,,,,N/A,Year 10,383602,1803285,287864,2883,0.4685
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 4,356747,6400821,178815,353079,7.2406
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 6,478301,6941924,3385453,137969,14.2775
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 8,634983,9628460,3931328,65536,3.7371
+202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and The Humber,,,,,,,,,N/A,Year 10,540587,6663635,2179562,323178,1.3373
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 4,362381,1027328,577798,217717,12.313
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 6,448489,2859195,602823,176301,3.8162
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 8,654686,7414000,339649,162343,11.753
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,N/A,Year 10,540640,9354927,2039373,98018,14.8837
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,Primary sponsor led academy,Year 4,294564,6547062,4745554,25788,4.6605
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,370,E08000016,Barnsley,,,,,,Primary sponsor led academy,Year 6,123104,7290192,4578941,19677,5.1375
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 4,357353,1739000,4425257,285842,12.5505
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 6,724898,1043207,389401,473394,14.1792
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 8,216117,7168883,4215280,78439,13.679
+202223,Academic year,Local authority,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,,,,,,N/A,Year 10,957960,9934276,1638073,147204,10.8101
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,,,N/A,Year 4,296027,2759449,4467649,78337,7.2387
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,145374,3732341,Greenhill Primary School,,,N/A,Year 6,98921,9008990,2602662,484586,6.1155
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,,,Secondary sponsor led academy,Year 8,929132,182167,4080556,483888,8.1479
+202223,Academic year,School,E92000001,England,E12000003,Yorkshire and The Humber,373,E08000019,Sheffield,140821,3734008,Newfield Secondary School,,,Secondary sponsor led academy,Year 10,751028,1449807,175843,263574,9.6395
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 4,577746,7493602,1377020,315021,7.8505
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 6,720401,3593781,3441828,186132,12.8428
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 8,470788,4851295,1733986,360850,5.5305
+202223,Academic year,Regional,E92000001,England,E13000002,Outer London,,,,,,,,,N/A,Year 10,903536,8331786,1760720,215307,10.8352
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 4,288238,9847925,4084552,444552,11.8302
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 6,775782,7953739,787260,180127,8.7798
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 8,783460,233298,1339828,148935,7.5016
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,N/A,Year 10,524941,7991277,1172325,363994,10.5637
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,Secondary sponsor led academy,Year 8,455256,921184,4608260,20074,8.3842
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,302,E09000003,Barnet,,,,,,Secondary sponsor led academy,Year 10,135692,7302541,324393,244258,7.7954
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 4,303770,670289,4766068,486141,13.9153
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 6,37346,4344143,1516845,387614,3.5746
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 8,903110,9011174,417857,433299,9.0392
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,N/A,Year 10,100966,3931562,4064499,301608,13.4953
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,Secondary free school,Year 8,304011,8070409,1297358,26349,2.1772
+202223,Academic year,Local authority,E92000001,England,E13000002,Outer London,314 / 318,E09000021 / E09000027,Kingston upon Thames / Richmond upon Thames,,,,,,Secondary free school,Year 10,422137,145499,2199762,452887,8.9538
+202223,Academic year,Ward,E92000001,England,,,,,,,,,E05011091,St. Agnes,N/A,Year 10,620300,8365110,938239,103917,14.8688

@@ -1,7 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -101,7 +100,7 @@ public class DataSetFileStorage(
             MetaFileId = metaFileId,
             MetaFileName = dataSet.MetaFile.FileName,
             MetaFileSizeInBytes = dataSet.MetaFile.FileSize,
-            Status = DataSetUploadStatus.SCREENING,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
             UploadedBy = userService.GetProfileFromClaims().Email.ToLower(),
             ReplacingFileId = dataSet.ReplacingFile?.Id,
             ScreenerProgress = screenerOptions.Value.EnhancedScreenerJourney
@@ -222,7 +221,15 @@ public class DataSetFileStorage(
 
         if (screenerResult is null)
         {
-            upload.Status = DataSetUploadStatus.SCREENER_ERROR;
+            upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
+
+            upload.ScreenerProgress = new DataSetScreenerProgress
+            {
+                Completed = true,
+                Passed = false,
+                PercentageComplete = 100,
+                Stage = "Screener error",
+            };
         }
         else
         {
@@ -231,18 +238,26 @@ public class DataSetFileStorage(
             var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
             var hasFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
 
-            if (hasWarnings)
+            if (hasFailures)
             {
-                upload.Status = DataSetUploadStatus.PENDING_REVIEW;
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.FailedScreening;
             }
-            else if (hasFailures)
+            else if (hasWarnings)
             {
-                upload.Status = DataSetUploadStatus.FAILED_SCREENING;
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingReview;
             }
             else
             {
-                upload.Status = DataSetUploadStatus.PENDING_IMPORT;
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingImport;
             }
+
+            upload.ScreenerProgress = new DataSetScreenerProgress
+            {
+                Completed = true,
+                Passed = !hasFailures,
+                PercentageComplete = 100,
+                Stage = "Complete",
+            };
         }
 
         await contentDbContext.SaveChangesAsync(cancellationToken);

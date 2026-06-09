@@ -11,8 +11,13 @@ param resourceNames ResourceNames
 @description('Location for all resources.')
 param location string
 
-@description('Name of the searchable documents container in the Search storage account.')
-param searchableDocumentsContainerName string = 'searchable-documents'
+@description('Storage container names for search documents. A container for each value will be created in the Search storage account.')
+param searchStorageDocumentContainers object = {
+  searchDocuments: 'searchable-documents'
+  nlSearchDatasetDocuments: 'nl-search-dataset-documents'
+  nlSearchFilterDocuments: 'nl-search-filter-documents'
+  nlSearchLocationsDictionary: 'nl-search-locations-dictionary'
+}
 
 @description('A list of IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
 param searchServiceIpRules IpRange[]
@@ -34,7 +39,7 @@ param logAnalyticsWorkspaceId string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 
@@ -48,6 +53,7 @@ resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/s
 }
 
 var searchServiceName = '${resourcePrefix}-${abbreviations.searchSearchServices}'
+var searchStorageDocumentContainerNames = map(items(searchStorageDocumentContainers), item => item.value)
 
 module searchServiceModule '../components/searchService.bicep' = {
   name: 'searchServiceModuleDeploy'
@@ -70,7 +76,7 @@ module searchServiceModule '../components/searchService.bicep' = {
   }
 }
 
-module searchStorageAccountModule '../../public-api/components/storageAccount.bicep' = {
+module searchStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: 'searchStorageAccountModuleDeploy'
   params: {
     location: location
@@ -96,7 +102,7 @@ module searchStorageAccountBlobServiceModule '../../common/components/blobServic
   name: 'searchStorageAccountBlobServiceModuleDeploy'
   params: {
     storageAccountName: searchStorageAccountModule.outputs.storageAccountName
-    containerNames: [searchableDocumentsContainerName]
+    containerNames: searchStorageDocumentContainerNames
   }
 }
 
@@ -109,9 +115,9 @@ module searchServiceBlobRoleAssignmentModule '../../common/components/storageAcc
   }
 }
 
-output searchableDocumentsContainerName string = searchableDocumentsContainerName
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
 output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName
 output searchStorageAccountManagedIdentityConnectionString string = 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
 output searchStorageAccountName string = searchStorageAccountModule.outputs.storageAccountName
+output searchStorageDocumentContainers object = searchStorageDocumentContainers

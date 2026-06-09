@@ -687,8 +687,8 @@ public class ReleaseVersionService(
                 // Remove any mapping that exists for the data set
                 var mappings = await context
                     .DataSetMappings.Where(mapping =>
-                        mapping.OriginalDataSetId == releaseFile.File.SubjectId
-                        || mapping.ReplacementDataSetId == releaseFile.File.SubjectId
+                        mapping.OriginalDataFileId == releaseFile.FileId
+                        || mapping.ReplacementDataFileId == releaseFile.FileId
                     )
                     .ToListAsync();
                 context.DataSetMappings.RemoveRange(mappings);

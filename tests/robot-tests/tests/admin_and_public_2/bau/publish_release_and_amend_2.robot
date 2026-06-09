@@ -280,7 +280,7 @@ Delete second subject file
 Navigate to 'Content' page for release amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block
+    user waits until page contains button    Add a warning text block
 
 Add release note to release amendment
     user clicks button    Add note

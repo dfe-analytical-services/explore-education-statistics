@@ -1,9 +1,7 @@
 import releaseDataFileService, {
   DataFile,
   DataFileImportStatus,
-  DataSetUploadStatus,
   ImportStatusCode,
-  ScreenerTestResult,
 } from '@admin/services/releaseDataFileService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -14,78 +12,7 @@ import useInterval from '@common/hooks/useInterval';
 import useMounted from '@common/hooks/useMounted';
 import React, { useCallback, useEffect, useState } from 'react';
 
-export const getDataSetUploadStatusLabel = (
-  statusCode: DataSetUploadStatus,
-): string | undefined => {
-  switch (statusCode) {
-    case 'UPLOADING':
-      return 'Uploading';
-    case 'SCREENING':
-      return 'Screening';
-    case 'PENDING_REVIEW':
-      return 'Pending review';
-    case 'PENDING_IMPORT':
-      return 'Pending import';
-    case 'FAILED_SCREENING':
-      return 'Failed screening';
-    case 'SCREENER_ERROR':
-      return 'Screener error';
-    default:
-      return undefined;
-  }
-};
-
-export const getDataSetUploadStatusColour = (
-  statusCode: DataSetUploadStatus,
-): TagProps['colour'] => {
-  switch (statusCode) {
-    case 'UPLOADING':
-      return 'turquoise';
-    case 'PENDING_REVIEW':
-      return 'orange';
-    case 'SCREENING':
-      return 'blue';
-    case 'PENDING_IMPORT':
-      return 'light-blue';
-    case 'FAILED_SCREENING':
-    case 'SCREENER_ERROR':
-      return 'red';
-    default:
-      return undefined;
-  }
-};
-
-export const getScreenerTestResultStatusLabel = (
-  statusCode: ScreenerTestResult,
-): string | undefined => {
-  switch (statusCode) {
-    case 'WARNING':
-      return 'Warning';
-    case 'PASS':
-      return 'Pass';
-    case 'FAIL':
-      return 'Fail';
-    default:
-      return undefined;
-  }
-};
-
-export const getScreenerTestResultStatusColour = (
-  statusCode: ScreenerTestResult,
-): TagProps['colour'] => {
-  switch (statusCode) {
-    case 'WARNING':
-      return 'orange';
-    case 'PASS':
-      return 'green';
-    case 'FAIL':
-      return 'red';
-    default:
-      return undefined;
-  }
-};
-
-export const getImportStatusLabel = (
+const getImportStatusLabel = (
   statusCode: ImportStatusCode,
 ): string | undefined => {
   switch (statusCode) {
@@ -157,6 +84,7 @@ interface ImporterStatusProps {
   releaseVersionId: string;
   onStatusChange?: ImporterStatusChangeHandler;
 }
+
 const ImporterStatus = ({
   className,
   dataFile,

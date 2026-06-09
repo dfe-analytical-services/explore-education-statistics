@@ -23,7 +23,7 @@ public abstract class PublicationReleasesServiceTests
         [InlineData(5, 1, 10)]
         [InlineData(15, 1, 10)]
         [InlineData(15, 2, 5)]
-        public async Task WhenPublicationExistsWithPublishedReleases_ReturnsPaginatedReleases(
+        public async Task WhenPublishedReleasesExistAndPaginationParamsProvided_ReturnsPaginatedReleases(
             int numReleases,
             int page,
             int pageSize
@@ -63,6 +63,39 @@ public abstract class PublicationReleasesServiceTests
             }
         }
 
+        [Theory]
+        [InlineData(1)]
+        [InlineData(5)]
+        [InlineData(15)]
+        public async Task WhenPublishedReleasesExistAndNoPaginationParamsProvided_ReturnsAllReleases(int numReleases)
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => _dataFixture.DefaultRelease(publishedVersions: 1).Generate(numReleases));
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleases(publicationSlug: publication.Slug);
+
+                // Assert
+                var pagedResult = outcome.AssertRight();
+
+                // Expect all results to be returned in a single page as no pagination params were provided
+                pagedResult.AssertSinglePage(expectedTotalResults: numReleases);
+            }
+        }
+
         [Fact]
         public async Task WhenPublishedReleasesExist_MapsReleasesCorrectly()
         {
@@ -89,13 +122,7 @@ public abstract class PublicationReleasesServiceTests
                 // Assert
                 var pagedResult = outcome.AssertRight();
 
-                pagedResult.AssertHasExpectedPagingAndResultCount(
-                    expectedTotalResults: 1,
-                    expectedPage: 1,
-                    expectedPageSize: 10
-                );
-
-                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
+                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.AssertSingleResult());
 
                 Assert.Multiple(() =>
                 {
@@ -145,11 +172,7 @@ public abstract class PublicationReleasesServiceTests
                 // Assert
                 var pagedResult = outcome.AssertRight();
 
-                pagedResult.AssertHasExpectedPagingAndResultCount(
-                    expectedTotalResults: 2,
-                    expectedPage: 1,
-                    expectedPageSize: 10
-                );
+                pagedResult.AssertSinglePage(expectedTotalResults: 2);
 
                 var legacyReleaseEntry = Assert.IsType<LegacyPublicationReleaseEntryDto>(pagedResult.Results[1]);
                 var expectedLegacyReleaseEntry = publication.ReleaseSeries[1];
@@ -208,11 +231,7 @@ public abstract class PublicationReleasesServiceTests
                 // Assert
                 var pagedResult = outcome.AssertRight();
 
-                pagedResult.AssertHasExpectedPagingAndResultCount(
-                    expectedTotalResults: 4,
-                    expectedPage: 1,
-                    expectedPageSize: 10
-                );
+                pagedResult.AssertSinglePage(expectedTotalResults: 4);
 
                 var expectedReleases = new[] { (Year: 2023, Index: 0), (Year: 2025, Index: 1), (Year: 2024, Index: 3) };
 
@@ -262,11 +281,7 @@ public abstract class PublicationReleasesServiceTests
                 // Assert
                 var pagedResult = outcome.AssertRight();
 
-                pagedResult.AssertHasExpectedPagingAndResultCount(
-                    expectedTotalResults: 3,
-                    expectedPage: 1,
-                    expectedPageSize: 10
-                );
+                pagedResult.AssertSinglePage(expectedTotalResults: 3);
 
                 var releaseEntries = pagedResult.Results.Select(Assert.IsType<PublicationReleaseEntryDto>).ToList();
 
@@ -314,13 +329,7 @@ public abstract class PublicationReleasesServiceTests
                 // Assert
                 var pagedResult = outcome.AssertRight();
 
-                pagedResult.AssertHasExpectedPagingAndResultCount(
-                    expectedTotalResults: 1,
-                    expectedPage: 1,
-                    expectedPageSize: 10
-                );
-
-                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
+                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.AssertSingleResult());
                 var expectedReleaseVersion = release.Versions[2];
                 Assert.Multiple(() =>
                 {
@@ -360,13 +369,7 @@ public abstract class PublicationReleasesServiceTests
                 var pagedResult = outcome.AssertRight();
 
                 // Only the published release should be in the results
-                pagedResult.AssertHasExpectedPagingAndResultCount(
-                    expectedTotalResults: 1,
-                    expectedPage: 1,
-                    expectedPageSize: 10
-                );
-
-                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
+                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.AssertSingleResult());
                 var expectedRelease = publication.Releases.Single(r => r.Year == 2024);
                 Assert.Equal(expectedRelease.Id, releaseEntry.ReleaseId);
             }

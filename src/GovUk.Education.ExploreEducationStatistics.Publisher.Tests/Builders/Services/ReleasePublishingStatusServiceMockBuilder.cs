@@ -48,19 +48,6 @@ public class ReleasePublishingStatusServiceMockBuilder
             );
         }
 
-        public void UpdatePublishingStageWasNotCalled(ReleasePublishingKey key)
-        {
-            mock.Verify(
-                m =>
-                    m.UpdatePublishingStage(
-                        key,
-                        It.IsAny<ReleasePublishingStatusPublishingStage>(),
-                        It.IsAny<ReleasePublishingStatusLogMessage?>()
-                    ),
-                Times.Never
-            );
-        }
-
         public void UpdatePublishingStageWasCalled(
             ReleasePublishingKey key,
             ReleasePublishingStatusPublishingStage publishingStage

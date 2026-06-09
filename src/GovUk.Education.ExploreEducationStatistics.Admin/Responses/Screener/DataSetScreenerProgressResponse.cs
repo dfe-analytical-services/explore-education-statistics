@@ -8,6 +8,12 @@ public record DataSetScreenerProgressResponse
     [JsonPropertyName("data_set_id")]
     public required Guid DataSetId { get; init; }
 
+    [JsonPropertyName("progress_report")]
+    public required DataSetScreenerProgressReport ProgressReport { get; init; }
+}
+
+public record DataSetScreenerProgressReport
+{
     [JsonPropertyName("percentage_complete")]
     public required double PercentageComplete { get; init; }
 

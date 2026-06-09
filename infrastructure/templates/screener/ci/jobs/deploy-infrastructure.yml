@@ -21,7 +21,10 @@ jobs:
           steps:
             - checkout: self
 
-            - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
+            # Omitting this upgrade step for now in the Screener API pipeline, as it adds
+            # on a chuck of time and doesn't seem to be crucial for this pipeline at the moment.
+            
+            # - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -30,7 +33,7 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
 
-            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
+            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
