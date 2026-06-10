@@ -40,50 +40,6 @@ public class PublicationRoleChangesHelperTests
     }
 
     [Theory]
-    [InlineData(PublicationRole.Allower)]
-    [InlineData(PublicationRole.Owner)]
-    public void DetermineChanges_ExistingRoleIsAnOldPermissionsSystemRole_Throws(
-        PublicationRole publicationRoleToCreate
-    )
-    {
-        var newPermissionsSystemHelper = SetupHelper();
-
-        var exception = Assert.Throws<ArgumentException>(() =>
-            newPermissionsSystemHelper.DetermineChanges(
-                existingPublicationRoleForPublication: publicationRoleToCreate,
-                publicationRoleToCreate: PublicationRole.Drafter
-            )
-        );
-
-        Assert.Equal(
-            $"Unexpected publication role: '{publicationRoleToCreate}'. Expected a NEW permissions system role.",
-            exception.Message
-        );
-    }
-
-    [Theory]
-    [InlineData(PublicationRole.Allower)]
-    [InlineData(PublicationRole.Owner)]
-    public void DetermineChanges_RoleToCreateIsAnOldPermissionsSystemRole_Throws(
-        PublicationRole publicationRoleToCreate
-    )
-    {
-        var newPermissionsSystemHelper = SetupHelper();
-
-        var exception = Assert.Throws<ArgumentException>(() =>
-            newPermissionsSystemHelper.DetermineChanges(
-                existingPublicationRoleForPublication: null,
-                publicationRoleToCreate: publicationRoleToCreate
-            )
-        );
-
-        Assert.Equal(
-            $"Unexpected publication role: '{publicationRoleToCreate}'. Expected a NEW permissions system role.",
-            exception.Message
-        );
-    }
-
-    [Theory]
     [InlineData(PublicationRole.Approver)]
     [InlineData(PublicationRole.Drafter)]
     public void DetermineChanges_RoleToCreateAlreadyExists_Throws(PublicationRole publicationRoleToCreate)

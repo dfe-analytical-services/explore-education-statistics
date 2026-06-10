@@ -88,56 +88,6 @@ public class ReleasePublishingFeedbackFunctionTests
         );
     }
 
-    [Theory]
-    [InlineData(PublicationRole.Owner)]
-    [InlineData(PublicationRole.Allower)]
-    public async Task SendReleasePublishingFeedbackEmail_UnsupportedRoleUsed_NoEmailSent(PublicationRole role)
-    {
-        ReleaseVersion releaseVersion = DataFixture
-            .DefaultReleaseVersion()
-            .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()));
-
-        var feedback = new ReleasePublishingFeedback
-        {
-            Id = Guid.NewGuid(),
-            EmailToken = Guid.NewGuid().ToString(),
-            UserPublicationRole = role,
-            ReleaseVersionId = releaseVersion.Id,
-            ReleaseTitle = "Academic year 2022",
-            PublicationTitle = "Publication title",
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.ReleasePublishingFeedback.Add(feedback);
-            await context.SaveChangesAsync();
-        }
-
-        var releasePublishingFeedbackMessage = new ReleasePublishingFeedbackMessage(
-            ReleasePublishingFeedbackId: feedback.Id,
-            EmailAddress: "test@test.com"
-        );
-
-        var emailService = new Mock<IEmailService>(MockBehavior.Strict);
-
-        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
-        {
-            var function = BuildFunction(contentDbContext: context, emailService: emailService.Object);
-
-            await function.SendReleasePublishingFeedbackEmail(
-                releasePublishingFeedbackMessage,
-                cancellationToken: default
-            );
-        }
-
-        emailService.Verify(
-            s => s.SendEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()),
-            Times.Never
-        );
-    }
-
     private static bool AssertEmailTemplateValues(
         Dictionary<string, dynamic> values,
         string publicationName,
