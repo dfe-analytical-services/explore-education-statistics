@@ -1,4 +1,8 @@
+using System;
+using System.IO;
+using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
