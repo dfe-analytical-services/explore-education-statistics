@@ -351,10 +351,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OriginalDataSetId")
+                    b.Property<Guid>("OriginalDataFileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ReplacementDataSetId")
+                    b.Property<Guid>("ReplacementDataFileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UnmappedReplacementIndicators")
@@ -367,10 +367,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OriginalDataSetId")
+                    b.HasIndex("OriginalDataFileId")
                         .IsUnique();
 
-                    b.HasIndex("ReplacementDataSetId")
+                    b.HasIndex("ReplacementDataFileId")
                         .IsUnique();
 
                     b.ToTable("DataSetMappings");
@@ -2049,6 +2049,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("DataSetFileVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetMapping", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "OriginalDataFile")
+                        .WithMany()
+                        .HasForeignKey("OriginalDataFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacementDataFile")
+                        .WithMany()
+                        .HasForeignKey("ReplacementDataFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("OriginalDataFile");
+
+                    b.Navigation("ReplacementDataFile");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentBlock", b =>

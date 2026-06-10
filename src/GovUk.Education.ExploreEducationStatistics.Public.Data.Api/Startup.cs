@@ -182,7 +182,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             // Search Client
             var searchClientConfiguration = configuration.GetRequiredSection(AzureSearchClientOptions.Section);
-            clientBuilder.AddSearchClient(searchClientConfiguration).WithName("PublicationsSearchClient");
+            SearchClientBuilderExtensions
+                .AddSearchClient(clientBuilder, searchClientConfiguration)
+                .WithName("PublicationsSearchClient");
 
             // Register a shared credential for Microsoft Entra ID authentication
             clientBuilder.UseCredential(new DefaultAzureCredential());

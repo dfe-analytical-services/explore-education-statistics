@@ -51,11 +51,23 @@ export interface AzureDataSetListRequest {
   sortDirection?: SortDirection;
 }
 
+export interface AzureDataSetSuggestResult {
+  highlightedMatch: string;
+  dataSetFileId: string;
+  summary: string;
+  title: string;
+}
+
 const azureDataSetService = {
   async listDataSets(
     params: AzureDataSetListRequest,
   ): Promise<PaginatedList<DataSetFileSummary>> {
     return frontendApi.post(`/search-datasets`, { searchOptions: params });
+  },
+  async suggestDatasets(
+    params: AzureDataSetListRequest,
+  ): Promise<AzureDataSetSuggestResult[]> {
+    return frontendApi.post(`/suggest-datasets`, { searchOptions: params });
   },
 };
 

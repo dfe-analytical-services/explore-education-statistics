@@ -11,8 +11,9 @@ public record DataSetScreenerResponse
     [JsonPropertyName("passed")]
     public bool Passed { get; init; }
 
+    // TODO EES-6693 - replace set with init when the need for a manual warning entry is no longer necessary.
     [JsonPropertyName("results_table")]
-    public List<DataScreenerTestResult> TestResults { get; init; } = [];
+    public List<DataScreenerTestResult> TestResults { get; set; } = [];
 
     [JsonPropertyName("api_suitable")]
     public bool PublicApiCompatible { get; init; }

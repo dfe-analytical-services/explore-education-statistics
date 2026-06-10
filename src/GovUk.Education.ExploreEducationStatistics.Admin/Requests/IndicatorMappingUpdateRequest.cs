@@ -6,8 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public class IndicatorMappingUpdatesRequest
 {
-    public Guid OriginalDataSetId { get; init; }
-    public Guid ReplacementDataSetId { get; init; }
+    public Guid OriginalDataFileId { get; init; }
+    public Guid ReplacementDataFileId { get; init; }
 
     public List<IndicatorMappingUpdateRequest> Updates { get; init; } = [];
 
@@ -15,9 +15,9 @@ public class IndicatorMappingUpdatesRequest
     {
         public Validator()
         {
-            RuleFor(x => x.OriginalDataSetId).NotEmpty();
+            RuleFor(x => x.OriginalDataFileId).NotEmpty();
 
-            RuleFor(x => x.ReplacementDataSetId).NotEmpty();
+            RuleFor(x => x.ReplacementDataFileId).NotEmpty();
 
             RuleForEach(x => x.Updates).SetValidator(new IndicatorMappingUpdateRequest.Validator());
 

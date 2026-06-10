@@ -1,8 +1,6 @@
 import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
-import InfoIcon from '@common/components/InfoIcon';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import Modal from '@common/components/Modal';
 import RelatedInformation from '@common/components/RelatedInformation';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -24,11 +22,11 @@ import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import { SortOption } from '@frontend/components/SortControls';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
-import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
 import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
+import SearchDataSearchForm from '@frontend/modules/search-data/components/SearchDataSearchForm';
 import { getParamsFromQuery } from '@frontend/modules/search-data/utils/createDataSetListRequest';
 import {
   SearchDataFilter,
@@ -47,6 +45,8 @@ import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import DataSetsGuidanceModal from './components/DataSetsGuidanceModal';
+import StatisticalReleasesGuidanceModal from './components/StatisticalReleasesGuidanceModal';
 
 const defaultPageTitle = 'Explore our education statistics';
 
@@ -392,12 +392,12 @@ const SearchDataPage: NextPage = () => {
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <FindStatisticsSearchForm
+          <SearchDataSearchForm
             label={isPublicationsSearch ? 'Search releases' : 'Search data'}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
             }
-            isSearchData={!isPublicationsSearch}
+            isSearchDataSets={!isPublicationsSearch}
           />
           <a href="#searchResults" className="govuk-skip-link">
             Skip to search results
@@ -416,38 +416,14 @@ const SearchDataPage: NextPage = () => {
           <ScreenReaderMessage message={totalResultsMessage} />
         </div>
         <div className="govuk-grid-column-one-third">
-          <div className={styles.helpColumn}>
+          <div className={styles.helpColumn} data-testid="related-info-column">
             <RelatedInformation heading="Help and related information">
               <ul className="govuk-list">
                 <li>
-                  <Modal
-                    showClose
-                    title="What are statistical releases?"
-                    triggerButton={
-                      <ButtonText>
-                        What are statistical releases?{' '}
-                        <InfoIcon description="Information on statistical releases" />
-                      </ButtonText>
-                    }
-                  >
-                    {/* TODO EES-7072 add in content */}
-                    <p>Information about statistical releases</p>
-                  </Modal>
+                  <StatisticalReleasesGuidanceModal />
                 </li>
                 <li>
-                  <Modal
-                    showClose
-                    title="What is data?"
-                    triggerButton={
-                      <ButtonText>
-                        What is data?{' '}
-                        <InfoIcon description="Information on data" />
-                      </ButtonText>
-                    }
-                  >
-                    {/* TODO EES-7072 add in content */}
-                    <p>Information about what is data</p>
-                  </Modal>
+                  <DataSetsGuidanceModal />
                 </li>
                 <li>
                   <Link to="/glossary">Glossary</Link>

@@ -1,9 +1,5 @@
-import {
-  FirewallRule
-  IpRange
-  EntraIdAuthentication
-} from '../types.bicep'
-
+import { EntraIdAuthentication} from '../types.bicep'
+import { IpRange, FirewallRule } from '../../common/types.bicep'
 import { AzureFileShareMount } from '../../common/components/storage/types.bicep'
 import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'

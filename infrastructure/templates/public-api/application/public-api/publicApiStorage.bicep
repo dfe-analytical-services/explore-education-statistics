@@ -1,5 +1,5 @@
-import { ResourceNames, IpRange } from '../../types.bicep'
-
+import { IpRange } from '../../../common/types.bicep'
+import { ResourceNames } from '../../types.bicep'
 import { StorageAccountConfig } from '../../../common/components/storage/types.bicep'
 
 @description('Specifies common resource naming variables.')

@@ -88,6 +88,8 @@ tags
 *.tmp
 lerna-debug.log
 
+linkcheckerreport.html
+
 admin-start.sh
 remote-profile
 
@@ -102,3 +104,4 @@ src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUse
 
 ## IDE Files (e.g. local Visual Studio configuration)
 *.user
+*.lscache

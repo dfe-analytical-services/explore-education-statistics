@@ -7,6 +7,7 @@ interface Props {
   className?: string;
   height?: number | string;
   id?: string;
+  testId?: string;
   max?: number;
   min?: number;
   showText?: boolean;
@@ -18,6 +19,7 @@ const ProgressBar = ({
   className,
   height,
   id,
+  testId,
   min = 0,
   max = 100,
   showText = true,
@@ -36,6 +38,7 @@ const ProgressBar = ({
         aria-valuenow={clamp(value, min, max)}
         className={classNames(styles.container, className)}
         id={id}
+        data-testid={testId}
         role="progressbar"
         style={{ height, width }}
       >

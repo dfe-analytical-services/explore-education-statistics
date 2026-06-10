@@ -18,7 +18,7 @@ var rolesToRoleIds = {
   'Certificate User': 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba'
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: keyVaultName
 }
 

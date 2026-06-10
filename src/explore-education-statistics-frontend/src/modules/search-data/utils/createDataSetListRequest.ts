@@ -20,6 +20,42 @@ import { AzureOrderByParam } from '@frontend/services/azurePublicationService';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import omitBy from 'lodash/omitBy';
 
+export function createDataSetSuggestRequest(
+  query: SearchDataPageQuery,
+  searchTerm: string,
+): AzureDataSetListRequest {
+  const {
+    dataSetType,
+    geographicLevels,
+    latestDataOnly,
+    publicationIds,
+    releaseTypes,
+    sortBy,
+    themeIds,
+  } = getParamsFromQuery(query);
+
+  const orderBy = getSortParam(sortBy);
+
+  const filter = buildODataFilter({
+    dataSetType,
+    geographicLevels,
+    latestDataOnly,
+    publicationIds,
+    releaseTypes,
+    themeIds,
+  });
+
+  return omitBy(
+    {
+      filter,
+      page: parseNumber(query.page) ?? 1,
+      search: searchTerm,
+      orderBy,
+    },
+    value => typeof value === 'undefined',
+  );
+}
+
 export default function createDataSetListRequest(
   query: SearchDataPageQuery,
 ): AzureDataSetListRequest {

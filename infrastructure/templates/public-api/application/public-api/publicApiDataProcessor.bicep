@@ -1,4 +1,5 @@
-import { ResourceNames, FirewallRule, IpRange } from '../../types.bicep'
+import { IpRange, FirewallRule } from '../../../common/types.bicep'
+import { ResourceNames } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames

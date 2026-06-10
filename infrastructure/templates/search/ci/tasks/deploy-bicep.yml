@@ -11,10 +11,17 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: naturalLanguageSearchFunctionAppExists
+    type: string
+    default: true
   - name: searchDocsFunctionAppExists
     type: string
     default: true
-  - name: searchServiceIndexerName
+  - name: searchServiceNLSearchFilterIndexName
+    type: string
+  - name: searchServiceNLSearchDatasetIndexName
+    type: string
+  - name: searchServiceSearchIndexerName
     type: string
 
 steps:
@@ -36,6 +43,9 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
-              searchServiceIndexerName=${{ parameters.searchServiceIndexerName }} \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
-              searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }}
+              naturalLanguageSearchFunctionAppExists=${{ parameters.naturalLanguageSearchFunctionAppExists }} \
+              searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }} \
+              searchServiceNLSearchFilterIndexName=${{ parameters.searchServiceNLSearchFilterIndexName }} \
+              searchServiceNLSearchDatasetIndexName=${{ parameters.searchServiceNLSearchDatasetIndexName }} \
+              searchServiceSearchIndexerName=${{ parameters.searchServiceSearchIndexerName }}

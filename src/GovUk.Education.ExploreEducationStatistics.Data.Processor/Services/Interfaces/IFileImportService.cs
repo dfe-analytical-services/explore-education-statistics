@@ -9,4 +9,6 @@ public interface IFileImportService
     Task ImportObservations(DataImport import, StatisticsDbContext context);
 
     Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context);
+
+    Task CompleteImport(DataImport import, StatisticsDbContext context);
 }

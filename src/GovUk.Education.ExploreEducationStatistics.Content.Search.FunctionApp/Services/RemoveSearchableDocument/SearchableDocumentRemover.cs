@@ -43,7 +43,7 @@ internal class SearchableDocumentRemover(
         var blobName = request.ReleaseId.ToString();
 
         var success = await azureBlobStorageClient.DeleteBlobIfExists(
-            appOptions.Value.SearchableDocumentsContainerName,
+            appOptions.Value.SearchDocumentsContainerName,
             blobName,
             cancellationToken
         );
@@ -54,7 +54,7 @@ internal class SearchableDocumentRemover(
     public async Task RemoveAllSearchableDocuments(CancellationToken cancellationToken = default)
     {
         await azureBlobStorageClient.DeleteAllBlobsFromContainer(
-            appOptions.Value.SearchableDocumentsContainerName,
+            appOptions.Value.SearchDocumentsContainerName,
             cancellationToken
         );
     }

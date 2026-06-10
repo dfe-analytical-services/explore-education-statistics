@@ -68,8 +68,12 @@ Check error that blocks replacing a draft patch data set version is displayed
     # TODO: EES-6418 removes this 'user reloads page' workaround after fixing related frontend bug.
     user reloads page
     user waits until page contains data uploads table
-    user uploads subject replacement    ${SUBJECT_1_NAME}    absence_school.csv    absence_school.meta.csv
+    user uploads subject replacement
+    ...    ${SUBJECT_1_NAME}
+    ...    absence_school.csv
+    ...    absence_school.meta.csv
     ...    ${PUBLIC_API_FILES_DIR}
+    ...    EXPECT_UPLOAD_TO_SUCCEED=False
     user waits until element is visible    testid:errorSummary    %{WAIT_SMALL}
     user waits until page contains    cannot be replaced as it is targeting an existing draft API data set
 

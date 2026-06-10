@@ -22,7 +22,7 @@ param skuName 'standard' | 'premium' = 'standard'
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' = {
+resource keyvault 'Microsoft.KeyVault/vaults@2026-02-01' = {
   name: keyVaultName
   location: location
   properties: {

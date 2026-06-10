@@ -40,51 +40,55 @@ user opens the browser
         user opens ie    ${alias}
     END
 
-    # Visiting a page with basic auth credentials in the URL fails affects
-    # the browser Back button behaviour, causing various tests to fail
-    # when asserting the back button behaviour of certain URLs.
-    #
-    # The cause for this is that visiting a page with auth credentials causes a
-    # page reload with the auth credentials stripped off.    What remains in the
-    # browser's history however is the URL with the auth credentials still included,
-    # thus any forms filled in on the page will not then be filled in when pressing
-    # the back button from the form submission page, as the browser firstly revisits
-    # the URL with the auth credentials in place, then reloads the page again with
-    # the auth details removed.    By this point, the previously filled-in form details
-    # have been lost.
-    #
-    # Therefore, all browsers used in our tests firstly obtain basic auth access, and
-    # then can continue using the site as per usual without any more need to interact
-    # with authentication.
+    # If we're running tests in an environment that requires basic auth, obtain
+    # credentials for the browser before continuing with the tests.
+    IF    "%{PUBLIC_AUTH_USER}" != ""
+        # Visiting a page with basic auth credentials in the URL fails affects
+        # the browser Back button behaviour, causing various tests to fail
+        # when asserting the back button behaviour of certain URLs.
+        #
+        # The cause for this is that visiting a page with auth credentials causes a
+        # page reload with the auth credentials stripped off.    What remains in the
+        # browser's history however is the URL with the auth credentials still included,
+        # thus any forms filled in on the page will not then be filled in when pressing
+        # the back button from the form submission page, as the browser firstly revisits
+        # the URL with the auth credentials in place, then reloads the page again with
+        # the auth details removed.    By this point, the previously filled-in form details
+        # have been lost.
+        #
+        # Therefore, all browsers used in our tests firstly obtain basic auth access, and
+        # then can continue using the site as per usual without any more need to interact
+        # with authentication.
 
-    ${authenticated_url}=    get url with basic auth    %{PUBLIC_URL}
+        ${authenticated_url}=    get url with basic auth    %{PUBLIC_URL}
 
-    # Because responses are cached by Azure Front Door by URL, if we simply allow all tests
-    # to visit the exact same page with the exact same request in order to validate their
-    # basic auth credentials, the first test that calls this method would bypass the cache,
-    # hit the origin App Service, and receive a 200 back in response. The first test's browser
-    # would then know that its basic auth credentials were reliable and would continue to use
-    # them for subsequent requests to the public site.
-    #
-    # When a subsequent test came to requesting this same page in order to validate its basic
-    # auth credentials however, it would not hit the origin and receive a 200, but would instead
-    # receive the cached response from the first test hitting this page and most importantly,
-    # would receive a "304 Not Modified" response status instead of the 200.    This would NOT
-    # give the browser confidence to reuse these basic auth credentials for subsequent requests
-    # to the public site, and therefore the next piece of navigation undertook would hit a 401.
-    #
-    # To overcome this, we need to ensure that each test hits a UNIQUE URL and so always receives
-    # a 200 from the origin.    We therefore use a random string query parameter to ensure each
-    # request is unique and uncached each time a test calls this suite setup method.    We hit the
-    # "/contact-us" page rather than the "/" landing page, as hitting the landing page with request
-    # parameters causes an infinite redirection loop.
+        # Because responses are cached by Azure Front Door by URL, if we simply allow all tests
+        # to visit the exact same page with the exact same request in order to validate their
+        # basic auth credentials, the first test that calls this method would bypass the cache,
+        # hit the origin App Service, and receive a 200 back in response. The first test's browser
+        # would then know that its basic auth credentials were reliable and would continue to use
+        # them for subsequent requests to the public site.
+        #
+        # When a subsequent test came to requesting this same page in order to validate its basic
+        # auth credentials however, it would not hit the origin and receive a 200, but would instead
+        # receive the cached response from the first test hitting this page and most importantly,
+        # would receive a "304 Not Modified" response status instead of the 200.    This would NOT
+        # give the browser confidence to reuse these basic auth credentials for subsequent requests
+        # to the public site, and therefore the next piece of navigation undertook would hit a 401.
+        #
+        # To overcome this, we need to ensure that each test hits a UNIQUE URL and so always receives
+        # a 200 from the origin.    We therefore use a random string query parameter to ensure each
+        # request is unique and uncached each time a test calls this suite setup method.    We hit the
+        # "/contact-us" page rather than the "/" landing page, as hitting the landing page with request
+        # parameters causes an infinite redirection loop.
 
-    ${random_string}=    Generate Random String    10
-    ${authenticated_url_with_random_string}=    Set Variable
-    ...    ${authenticated_url}/contact-us?cacheBust=${random_string}
+        ${random_string}=    Generate Random String    10
+        ${authenticated_url_with_random_string}=    Set Variable
+        ...    ${authenticated_url}/contact-us?cacheBust=${random_string}
 
-    # if the tests fail for you here, update chrome/chromedriver and ensure the public site is running
-    go to    ${authenticated_url_with_random_string}
+        # if the tests fail for you here, update chrome/chromedriver and ensure the public site is running
+        go to    ${authenticated_url_with_random_string}
+    END
 
 user opens chrome
     [Arguments]    ${alias}=chrome
@@ -1262,3 +1266,13 @@ user checks section is in position
     ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
     user waits until parent contains element    ${parent}
     ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]
+
+user checks section with ID contains elements and back to top link
+    [Arguments]    ${section_id}    @{paragraph_texts}    ${back_to_top}=True
+    ${section}=    Get WebElement    id:${section_id}
+    FOR    ${paragraph_text}    IN    @{paragraph_texts}
+        user checks element should contain    ${section}    ${paragraph_text}
+    END
+    IF    ${back_to_top}
+        user waits until parent contains element    ${section}    xpath://a[text()="Back to top" and @href="\#top"]
+    END

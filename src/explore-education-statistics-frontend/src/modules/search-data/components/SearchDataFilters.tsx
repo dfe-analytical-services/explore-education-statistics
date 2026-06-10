@@ -14,6 +14,8 @@ import styles from '@frontend/modules/search-data/components/SearchDataFilters.m
 import ThemesAndReleasesFilterGroup from '@frontend/modules/search-data/components/ThemesAndReleasesFilterGroup';
 import { SearchDataFilter } from '@frontend/modules/search-data/utils/searchDataFilters';
 import { DataSetType } from '@frontend/services/dataSetFileService';
+import ApiDataSetsGuidanceModal from '@frontend/modules/search-data/components/ApiDataSetsGuidanceModal';
+import GeographicLevelsGuidanceModal from '@frontend/modules/search-data/components/GeographicLevelsGuidanceModal';
 import React from 'react';
 
 const formId = 'filters-form';
@@ -123,6 +125,9 @@ export default function Filters({
               });
             }}
           />
+          <div className={styles.modalButtonContainer}>
+            <GeographicLevelsGuidanceModal />
+          </div>
         </ExpandableFilterGroup>
       )}
 
@@ -205,6 +210,9 @@ export default function Filters({
               });
             }}
           />
+          <div className={styles.modalButtonContainer}>
+            <ApiDataSetsGuidanceModal />
+          </div>
         </ExpandableFilterGroup>
       )}
 

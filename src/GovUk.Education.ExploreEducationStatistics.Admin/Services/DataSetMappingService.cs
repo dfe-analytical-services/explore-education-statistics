@@ -23,6 +23,8 @@ public class DataSetMappingService(
 ) : IDataSetMappingService
 {
     public async Task<DataSetMapping> GetOrCreateMapping(
+        Guid originalDataFileId,
+        Guid replacementDataFileId,
         Guid originalSubjectId,
         Guid replacementSubjectId,
         CancellationToken cancellationToken = default
@@ -30,16 +32,24 @@ public class DataSetMappingService(
     {
         var mapping =
             await contentDbContext.DataSetMappings.SingleOrDefaultAsync(
-                map => map.OriginalDataSetId == originalSubjectId && map.ReplacementDataSetId == replacementSubjectId,
+                map =>
+                    map.OriginalDataFileId == originalDataFileId && map.ReplacementDataFileId == replacementDataFileId,
                 cancellationToken
-            ) ?? await GenerateAndSaveInitialDataSetMapping(originalSubjectId, replacementSubjectId, cancellationToken);
+            )
+            ?? await GenerateAndSaveInitialDataSetMapping(
+                originalDataFileId: originalDataFileId,
+                replacementDataFileId: replacementDataFileId,
+                originalSubjectId: originalSubjectId,
+                replacementSubjectId: replacementSubjectId,
+                cancellationToken
+            );
 
         // TODO EES-7126 Remove this code - it was only needed when first introducing LocationMappings to ensure they were set
         if (mapping.LocationMappings.IsNullOrEmpty() && mapping.UnmappedReplacementLocations.IsNullOrEmpty())
         {
             var (initialLocationMappingDictionary, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
-                mapping.OriginalDataSetId,
-                mapping.ReplacementDataSetId,
+                originalSubjectId,
+                replacementSubjectId,
                 cancellationToken
             );
 
@@ -52,27 +62,29 @@ public class DataSetMappingService(
     }
 
     private async Task<DataSetMapping> GenerateAndSaveInitialDataSetMapping(
-        Guid originalDataSetId,
-        Guid replacementDataSetId,
+        Guid originalDataFileId,
+        Guid replacementDataFileId,
+        Guid originalSubjectId,
+        Guid replacementSubjectId,
         CancellationToken cancellationToken
     )
     {
         var (initialIndicatorMappingDictionary, unmappedReplacementIndicators) = await GenerateInitialIndicatorMapping(
-            originalDataSetId,
-            replacementDataSetId,
+            originalSubjectId,
+            replacementSubjectId,
             cancellationToken
         );
 
         var (initialLocationMappingDictionary, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
-            originalDataSetId,
-            replacementDataSetId,
+            originalSubjectId,
+            replacementSubjectId,
             cancellationToken
         );
 
         var newMapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = initialIndicatorMappingDictionary,
             UnmappedReplacementIndicators = unmappedReplacementIndicators,
             LocationMappings = initialLocationMappingDictionary,
@@ -86,19 +98,19 @@ public class DataSetMappingService(
     }
 
     private async Task<(Dictionary<Guid, IndicatorMapping>, List<UnmappedIndicator>)> GenerateInitialIndicatorMapping(
-        Guid originalDataSetId,
-        Guid replacementDataSetId,
+        Guid originalSubjectId,
+        Guid replacementSubjectId,
         CancellationToken cancellationToken
     )
     {
         var originalIndicators = await statisticsDbContext
             .Indicator.Include(i => i.IndicatorGroup)
-            .Where(i => i.IndicatorGroup.SubjectId == originalDataSetId)
+            .Where(i => i.IndicatorGroup.SubjectId == originalSubjectId)
             .ToListAsync(cancellationToken);
 
         var replacementIndicatorNameToIndicatorMap = await statisticsDbContext
             .Indicator.Include(i => i.IndicatorGroup)
-            .Where(i => i.IndicatorGroup.SubjectId == replacementDataSetId)
+            .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
             .ToDictionaryAsync(i => i.Name, i => i, cancellationToken);
 
         var initialMappingDictionary = originalIndicators.ToDictionary(
@@ -157,21 +169,21 @@ public class DataSetMappingService(
     }
 
     private async Task<(Dictionary<Guid, LocationMapping>, List<UnmappedLocation>)> GenerateInitialLocationMapping(
-        Guid originalDataSetId,
-        Guid replacementDataSetId,
+        Guid originalSubjectId,
+        Guid replacementSubjectId,
         CancellationToken cancellationToken
     )
     {
         var originalLocations = await statisticsDbContext
             .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == originalDataSetId)
+            .Where(o => o.SubjectId == originalSubjectId)
             .Select(observation => observation.Location)
             .Distinct()
             .ToListAsync(cancellationToken);
 
         var replacementLocationMap = await statisticsDbContext
             .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == replacementDataSetId)
+            .Where(o => o.SubjectId == replacementSubjectId)
             .Select(observation => observation.Location)
             .Distinct()
             .ToDictionaryAsync(location => location.Id, location => location, cancellationToken);
@@ -240,7 +252,7 @@ public class DataSetMappingService(
             .SingleOrNotFound()
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
-                await ValidateMapping(releaseVersion, request.OriginalDataSetId, request.ReplacementDataSetId)
+                await ValidateMapping(releaseVersion, request.OriginalDataFileId, request.ReplacementDataFileId)
             )
             .OnSuccess(async mapping =>
             {
@@ -349,7 +361,7 @@ public class DataSetMappingService(
             .SingleOrNotFound()
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
-                await ValidateMapping(releaseVersion, request.OriginalDataSetId, request.ReplacementDataSetId)
+                await ValidateMapping(releaseVersion, request.OriginalDataFileId, request.ReplacementDataFileId)
             )
             .OnSuccess(async mapping =>
             {
@@ -468,12 +480,12 @@ public class DataSetMappingService(
 
     private async Task<Either<ActionResult, DataSetMapping>> ValidateMapping(
         ReleaseVersion releaseVersion,
-        Guid originalDataSetId,
-        Guid replacementDataSetId
+        Guid originalDataFileId,
+        Guid replacementDataFileId
     )
     {
         var mapping = await contentDbContext.DataSetMappings.SingleOrDefaultAsync(map =>
-            map.OriginalDataSetId == originalDataSetId && map.ReplacementDataSetId == replacementDataSetId
+            map.OriginalDataFileId == originalDataFileId && map.ReplacementDataFileId == replacementDataFileId
         );
 
         if (mapping == null)
@@ -482,29 +494,29 @@ public class DataSetMappingService(
         }
 
         var originalReleaseFileExists = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
-            rf.ReleaseVersionId == releaseVersion.Id && rf.File.SubjectId == mapping.OriginalDataSetId
+            rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == mapping.OriginalDataFileId
         );
         if (!originalReleaseFileExists)
         {
             return ValidationResult(
                 new ErrorViewModel
                 {
-                    Path = $"{nameof(IndicatorMappingUpdatesRequest.OriginalDataSetId)}",
-                    Code = "OriginalDataSetIdNotLinkedToReleaseVersion",
-                    Message = $"The original data set is not linked to the release version",
+                    Path = $"{nameof(IndicatorMappingUpdatesRequest.OriginalDataFileId)}",
+                    Code = "OriginalDataFileIdNotLinkedToReleaseVersion",
+                    Message = $"The original data file is not linked to the release version",
                 }
             );
         }
         var replacementReleaseFileExists = await contentDbContext.ReleaseFiles.AnyAsync(rf =>
-            rf.ReleaseVersionId == releaseVersion.Id && rf.File.SubjectId == mapping.ReplacementDataSetId
+            rf.ReleaseVersionId == releaseVersion.Id && rf.FileId == mapping.ReplacementDataFileId
         );
         if (!replacementReleaseFileExists)
         {
             return ValidationResult(
                 new ErrorViewModel
                 {
-                    Path = $"{nameof(IndicatorMappingUpdatesRequest.ReplacementDataSetId)}",
-                    Code = "ReplacementDataSetIdNotLinkedToReleaseVersion",
+                    Path = $"{nameof(IndicatorMappingUpdatesRequest.ReplacementDataFileId)}",
+                    Code = "ReplacementDataFileIdNotLinkedToReleaseVersion",
                     Message = $"The replacement data set is not linked to the release version",
                 }
             );

@@ -68,7 +68,7 @@ param tagValues object
 
 var eesyscreenerLogsFileShareMountPath = '/screener/logs'
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: resourceNames.existingResources.keyVault
 }
 

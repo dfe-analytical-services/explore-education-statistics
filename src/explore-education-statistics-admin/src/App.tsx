@@ -6,7 +6,6 @@ import {
   useConfig,
 } from '@admin/contexts/ConfigContext';
 import { ConfiguredMsalProvider } from '@admin/contexts/ConfiguredMsalProvider';
-import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import routes, { publicRoutes } from '@admin/routes/routes';
 import {
   ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
@@ -14,7 +13,6 @@ import {
 } from '@common/contexts/ApplicationInsightsContext';
 import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
 import composeProviders from '@common/hocs/composeProviders';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import {
   QueryClientProvider as BaseQueryClientProvider,
   QueryClient,
@@ -23,7 +21,7 @@ import {
   createHead,
   UnheadProvider as BaseUnheadProvider,
 } from '@unhead/react/client';
-import React, { lazy, ReactNode, Suspense, useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
@@ -35,10 +33,6 @@ import { NotificationHubContextProvider } from './contexts/NotificationHubContex
 const queryClient = new QueryClient();
 
 const head = createHead();
-
-const PrototypeIndexPage = lazy(
-  () => import('@admin/prototypes/PrototypeIndexPage'),
-);
 
 function ApplicationInsightsTracking() {
   const appInsights = useApplicationInsights();
@@ -63,23 +57,6 @@ function ApplicationInsightsTracking() {
   return null;
 }
 
-function PrototypesEntry() {
-  const { value: prototypeRoutes = [] } = useAsyncRetry(() =>
-    import('./prototypes/prototypeRoutes').then(module => module.default),
-  );
-
-  return (
-    <Suspense fallback={<ServiceProblemsPage />}>
-      <Switch>
-        <Route exact path="/prototypes" component={PrototypeIndexPage} />
-        {prototypeRoutes?.map(route => (
-          <Route key={route.path} exact={route.exact ?? true} {...route} />
-        ))}
-      </Switch>
-    </Suspense>
-  );
-}
-
 export default function App() {
   return (
     <Providers>
@@ -95,14 +72,6 @@ export default function App() {
             {Object.entries(routes).map(([key, route]) => (
               <ProtectedRoute key={key} {...route} />
             ))}
-
-            {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
-            {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
-            <ProtectedRoute
-              path="/prototypes"
-              protectionAction={permissions => permissions.isBauUser}
-              component={PrototypesEntry}
-            />
 
             <ProtectedRoute path="*" component={PageNotFoundPage} />
           </Switch>

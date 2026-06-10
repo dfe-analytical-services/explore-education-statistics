@@ -20,15 +20,15 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task GetOrCreateMapping_FetchesDbMapping_Success()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var originalIndicatorId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -79,13 +79,15 @@ public class DataSetMappingServiceTests
             );
 
             var result = await service.GetOrCreateMapping(
-                originalSubjectId: originalDataSetId,
-                replacementSubjectId: replacementDataSetId,
+                originalDataFileId: originalDataFileId,
+                replacementDataFileId: replacementDataFileId,
+                originalSubjectId: Guid.NewGuid(),
+                replacementSubjectId: Guid.NewGuid(),
                 CancellationToken.None
             );
 
-            Assert.Equal(originalDataSetId, result.OriginalDataSetId);
-            Assert.Equal(replacementDataSetId, result.ReplacementDataSetId);
+            Assert.Equal(originalDataFileId, result.OriginalDataFileId);
+            Assert.Equal(replacementDataFileId, result.ReplacementDataFileId);
 
             var indicatorMappingKeyPair = Assert.Single(result.IndicatorMappings);
             Assert.Equal(mapping.IndicatorMappings.Keys.First(), indicatorMappingKeyPair.Key);
@@ -99,8 +101,11 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task GetOrCreateMapping_GenerateMapping_Indicators_Success()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var originalSubjectId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var originalIndicatorA1 = new Indicator
         {
@@ -129,7 +134,7 @@ public class DataSetMappingServiceTests
         {
             Id = Guid.NewGuid(),
             Label = "Group A",
-            SubjectId = originalDataSetId,
+            SubjectId = originalSubjectId,
             Indicators = [originalIndicatorA1, originalIndicatorA2, originalIndicatorA4],
         };
 
@@ -151,7 +156,7 @@ public class DataSetMappingServiceTests
         {
             Id = Guid.NewGuid(),
             Label = "Group A",
-            SubjectId = replacementDataSetId,
+            SubjectId = replacementSubjectId,
             Indicators = [replacementIndicatorA2, replacementIndicatorA3],
         };
 
@@ -166,7 +171,7 @@ public class DataSetMappingServiceTests
         {
             Id = Guid.NewGuid(),
             Label = "Group B",
-            SubjectId = replacementDataSetId,
+            SubjectId = replacementSubjectId,
             Indicators = [replacementIndicatorA4],
         };
 
@@ -191,15 +196,17 @@ public class DataSetMappingServiceTests
             );
 
             var result = await service.GetOrCreateMapping(
-                originalSubjectId: originalDataSetId,
-                replacementSubjectId: replacementDataSetId,
+                originalDataFileId: originalDataFileId,
+                replacementDataFileId: replacementDataFileId,
+                originalSubjectId: originalSubjectId,
+                replacementSubjectId: replacementSubjectId,
                 CancellationToken.None
             );
 
             var expectedMapping = new DataSetMapping
             {
-                OriginalDataSetId = originalDataSetId,
-                ReplacementDataSetId = replacementDataSetId,
+                OriginalDataFileId = originalDataFileId,
+                ReplacementDataFileId = replacementDataFileId,
                 IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
                 {
                     {
@@ -272,8 +279,8 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateIndicatorMapping_Success()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
         var originalIndicator2Id = Guid.NewGuid();
@@ -287,18 +294,18 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -411,8 +418,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                     Updates =
                     [
                         new() { OriginalId = originalIndicator1Id, NewReplacementId = replacementIndicator4Id },
@@ -519,25 +526,25 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateIndicatorMapping_NoDataSetMapping_NotFound()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
             UnmappedReplacementIndicators = [],
         };
@@ -559,8 +566,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = Guid.NewGuid(),
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = Guid.NewGuid(),
                     Updates = [],
                 },
                 CancellationToken.None
@@ -571,16 +578,16 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
-    public async Task UpdateIndicatorMappings_OriginalDataSet_NotFound()
+    public async Task UpdateIndicatorMappings_OriginalDataFile_NotFound()
     {
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -598,37 +605,37 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(IndicatorMappingUpdatesRequest.OriginalDataSetId)}",
-                "OriginalDataSetIdNotLinkedToReleaseVersion"
+                $"{nameof(IndicatorMappingUpdatesRequest.OriginalDataFileId)}",
+                "OriginalDataFileIdNotLinkedToReleaseVersion"
             );
         }
     }
 
     [Fact]
-    public async Task UpdateIndicatorMappings_ReplacementDataSet_NotFound()
+    public async Task UpdateIndicatorMappings_ReplacementDataFile_NotFound()
     {
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
         };
 
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -647,16 +654,16 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(IndicatorMappingUpdatesRequest.ReplacementDataSetId)}",
-                "ReplacementDataSetIdNotLinkedToReleaseVersion"
+                $"{nameof(IndicatorMappingUpdatesRequest.ReplacementDataFileId)}",
+                "ReplacementDataFileIdNotLinkedToReleaseVersion"
             );
         }
     }
@@ -664,8 +671,8 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateIndicatorMapping_OriginalIndicatorNotFound_Fail()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
 
@@ -675,18 +682,18 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -720,8 +727,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                     Updates = [new() { OriginalId = indicatorDoesNotExistId, NewReplacementId = null }],
                 },
                 CancellationToken.None
@@ -742,8 +749,8 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateIndicatorMapping_UnmappedReplacementIndicatorNotFound_Fail()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
 
@@ -753,18 +760,18 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
             {
                 {
@@ -798,8 +805,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new IndicatorMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                     Updates =
                     [
                         new()
@@ -827,8 +834,8 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateLocationMappings_Success()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var loc1Id = Guid.NewGuid();
         var loc2Id = Guid.NewGuid();
@@ -841,8 +848,8 @@ public class DataSetMappingServiceTests
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             LocationMappings = new Dictionary<Guid, LocationMapping>
             {
                 {
@@ -893,12 +900,12 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -918,8 +925,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                     Updates =
                     [
                         new() { OriginalLocationId = loc1Id, NewReplacementLocationId = replacementLocId },
@@ -1001,16 +1008,16 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
-    public async Task UpdateLocationMappings_OriginalDataSet_NotFound()
+    public async Task UpdateLocationMappings_OriginalDataFile_NotFound()
     {
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1028,37 +1035,37 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.OriginalDataSetId)}",
-                "OriginalDataSetIdNotLinkedToReleaseVersion"
+                $"{nameof(LocationMappingUpdatesRequest.OriginalDataFileId)}",
+                "OriginalDataFileIdNotLinkedToReleaseVersion"
             );
         }
     }
 
     [Fact]
-    public async Task UpdateLocationMappings_ReplacementDataSet_NotFound()
+    public async Task UpdateLocationMappings_ReplacementDataFile_NotFound()
     {
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
         };
 
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1077,16 +1084,16 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.ReplacementDataSetId)}",
-                "ReplacementDataSetIdNotLinkedToReleaseVersion"
+                $"{nameof(LocationMappingUpdatesRequest.ReplacementDataFileId)}",
+                "ReplacementDataFileIdNotLinkedToReleaseVersion"
             );
         }
     }
@@ -1094,27 +1101,27 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateLocationMappings_OriginalLocationNotFound_Fail()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             LocationMappings = new(),
         };
 
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1134,8 +1141,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                     Updates = [new() { OriginalLocationId = badId }],
                 },
                 CancellationToken.None
@@ -1152,26 +1159,26 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateLocationMappings_UnmappedLocationNotFound_Fail()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var locId = Guid.NewGuid();
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             LocationMappings = new Dictionary<Guid, LocationMapping>
             {
                 {
@@ -1198,8 +1205,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                     Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = Guid.NewGuid() }],
                 },
                 CancellationToken.None
@@ -1216,19 +1223,19 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateLocationMappings_DifferentGeographicLevel_Fail()
     {
-        var originalDataSetId = Guid.NewGuid();
-        var replacementDataSetId = Guid.NewGuid();
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
 
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = originalDataSetId },
+            File = new Content.Model.File { Id = originalDataFileId },
         };
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { SubjectId = replacementDataSetId },
+            File = new Content.Model.File { Id = replacementDataFileId },
         };
 
         var locId = Guid.NewGuid();
@@ -1236,8 +1243,8 @@ public class DataSetMappingServiceTests
 
         var mapping = new DataSetMapping
         {
-            OriginalDataSetId = originalDataSetId,
-            ReplacementDataSetId = replacementDataSetId,
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
             LocationMappings = new Dictionary<Guid, LocationMapping>
             {
                 {
@@ -1267,8 +1274,8 @@ public class DataSetMappingServiceTests
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
                 {
-                    OriginalDataSetId = originalDataSetId,
-                    ReplacementDataSetId = replacementDataSetId,
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
                     Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = replacementLocId }],
                 },
                 CancellationToken.None

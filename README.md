@@ -820,6 +820,17 @@ Aside from unit tests for each project, we maintain suites of Robot Framework te
 
 See the [Robot Framework tests README](tests/robot-tests/README.md) for more information.
 
+### Checking for bad links
+
+If you want to check the site for broken links \(including broken anchor links\) then you can use linkchecker. 
+
+```
+$ pipenv install --dev
+$ pnpm run linkchecker
+```
+
+See our custom config inside `.linkcheckerrc` and linkchecker docs for more info on what it is checking.
+
 ## Troubleshooting
 
 ### The Function Apps aren't running

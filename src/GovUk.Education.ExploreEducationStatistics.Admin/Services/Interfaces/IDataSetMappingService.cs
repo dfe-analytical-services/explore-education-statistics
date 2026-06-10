@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 public interface IDataSetMappingService
 {
     Task<DataSetMapping> GetOrCreateMapping(
+        Guid originalDataFileId,
+        Guid replacementDataFileId,
         Guid originalSubjectId,
         Guid replacementSubjectId,
         CancellationToken cancellationToken = default

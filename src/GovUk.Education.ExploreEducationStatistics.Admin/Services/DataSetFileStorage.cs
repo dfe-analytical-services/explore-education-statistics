@@ -222,6 +222,14 @@ public class DataSetFileStorage(
         if (screenerResult is null)
         {
             upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
+
+            upload.ScreenerProgress = new DataSetScreenerProgress
+            {
+                Completed = true,
+                Passed = false,
+                PercentageComplete = 100,
+                Stage = "Screener error",
+            };
         }
         else
         {
@@ -230,18 +238,26 @@ public class DataSetFileStorage(
             var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
             var hasFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
 
-            if (hasWarnings)
-            {
-                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingReview;
-            }
-            else if (hasFailures)
+            if (hasFailures)
             {
                 upload.ScreeningStatus = DataSetUploadScreeningStatus.FailedScreening;
+            }
+            else if (hasWarnings)
+            {
+                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingReview;
             }
             else
             {
                 upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingImport;
             }
+
+            upload.ScreenerProgress = new DataSetScreenerProgress
+            {
+                Completed = true,
+                Passed = !hasFailures,
+                PercentageComplete = 100,
+                Stage = "Complete",
+            };
         }
 
         await contentDbContext.SaveChangesAsync(cancellationToken);

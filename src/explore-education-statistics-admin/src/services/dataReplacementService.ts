@@ -225,8 +225,8 @@ const dataReplacementService = {
   },
   async updatePlanIndicatorMappings(
     releaseVersionId: string,
-    originalDataSetId: string,
-    replacementDataSetId: string,
+    originalDataFileId: string,
+    replacementDataFileId: string,
     updates: {
       originalId: string;
       newReplacementId?: string;
@@ -236,8 +236,8 @@ const dataReplacementService = {
       await client.patch(
         `releases/${releaseVersionId}/data/replacements/mapping/indicators`,
         {
-          originalDataSetId,
-          replacementDataSetId,
+          originalDataFileId,
+          replacementDataFileId,
           updates,
         },
       );

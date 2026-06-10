@@ -120,13 +120,16 @@ public class ReplacementPlanService(
         return await GetLinkedDataSetVersion(replacementReleaseFile, cancellationToken)
             .OnSuccess(async replacementApiDataSetVersion =>
             {
-                var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
                 var originalSubjectId = originalReleaseFile.File.SubjectId!.Value;
+                var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
+
                 var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
 
                 var mapping = await dataSetMappingService.GetOrCreateMapping(
-                    originalSubjectId,
-                    replacementSubjectId,
+                    originalDataFileId: originalReleaseFile.FileId,
+                    replacementDataFileId: replacementReleaseFile.FileId,
+                    originalSubjectId: originalSubjectId,
+                    replacementSubjectId: replacementSubjectId,
                     cancellationToken
                 );
 

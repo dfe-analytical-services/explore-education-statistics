@@ -1,9 +1,14 @@
-﻿import { DataSetUpload } from '@admin/services/releaseDataFileService';
+﻿import _releaseDataFileService, {
+  DataSetUpload,
+} from '@admin/services/releaseDataFileService';
 import render from '@common-test/render';
 import { Dictionary } from '@common/types';
 import React from 'react';
 import { screen, waitFor, within } from '@testing-library/dom';
 import DataFilesTableUploadRow from '../DataFilesTableUploadsRow';
+
+jest.mock('@admin/services/releaseDataFileService');
+const releaseDataFileService = jest.mocked(_releaseDataFileService);
 
 describe('DataFilesTableUploadsRow', () => {
   const rowBaseProps = {
@@ -11,6 +16,7 @@ describe('DataFilesTableUploadsRow', () => {
     releaseVersionId: 'release-version-id-1',
     onConfirmDelete: jest.fn(),
     onConfirmImport: jest.fn(),
+    onRefreshUploads: jest.fn(),
   };
 
   const fileUploads: Dictionary<DataSetUpload> = {
@@ -130,9 +136,20 @@ describe('DataFilesTableUploadsRow', () => {
       created: new Date('2025-06-23T13:22:09.0753215'),
       uploadedBy: 'ees-test.bau1@education.gov.uk',
     },
+    screening: {
+      id: 'b13b2247-ae76-41c7-b442-08ddafffd9e4',
+      dataSetTitle: 'screening',
+      dataFileName: 'one-pass.csv',
+      dataFileSize: '696 B',
+      metaFileName: 'one-pass.meta.csv',
+      metaFileSize: '210 B',
+      status: 'Screening',
+      created: new Date('2025-06-23T13:23:08.6258337'),
+      uploadedBy: 'ees-test.bau1@education.gov.uk',
+    },
   };
 
-  test('"passed" screener file', async () => {
+  test('"Passed" screener file', async () => {
     const { user } = render(
       <table>
         <tbody>
@@ -205,7 +222,7 @@ describe('DataFilesTableUploadsRow', () => {
     );
   });
 
-  test('"passed with warnings" screener file', async () => {
+  test('"Passed with warnings" screener file', async () => {
     const { user } = render(
       <table>
         <tbody>
@@ -308,7 +325,7 @@ describe('DataFilesTableUploadsRow', () => {
     );
   });
 
-  test('"failed" screener file', async () => {
+  test('"Failed screening" screener file', async () => {
     const { user } = render(
       <table>
         <tbody>
@@ -388,5 +405,95 @@ describe('DataFilesTableUploadsRow', () => {
         'You will need to delete this file (close this window, and select "Delete files"), fix the failed tests and upload again. If you have any questions, please get in touch with the explore.statistics@education.gov.uk team.',
       ),
     ).toBeInTheDocument();
+  });
+
+  test('"Screening" screener file', async () => {
+    releaseDataFileService.getDataFileScreeningStatus.mockResolvedValue({
+      percentageComplete: 10,
+      stage: 'screening',
+      status: 'Screening',
+      completed: false,
+    });
+
+    const { user } = render(
+      <table>
+        <tbody>
+          <DataFilesTableUploadRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.screening}
+          />
+        </tbody>
+      </table>,
+    );
+
+    await waitFor(() => {
+      expect(
+        releaseDataFileService.getDataFileScreeningStatus,
+      ).toHaveBeenCalled();
+    });
+
+    const cells = await screen.findAllByRole('cell');
+    expect(cells[0]).toHaveTextContent('screening');
+    expect(cells[1]).toHaveTextContent('696 B');
+    expect(cells[2]).toHaveTextContent('Screening');
+    expect(cells[2]).toHaveTextContent('10%');
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Delete files for screening',
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Cancel',
+      }),
+    ).not.toBeInTheDocument();
+
+    const detailsButton = screen.getByRole('button', {
+      name: 'View details for screening',
+    });
+    expect(detailsButton).toBeInTheDocument();
+
+    await user.click(detailsButton);
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Data set details',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('tab', {
+        name: 'All tests',
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('tab', {
+        name: 'File details',
+      }),
+    ).not.toBeInTheDocument();
+
+    const fileDetailsTabPanel = screen.getByTestId('file-details');
+    expect(fileDetailsTabPanel).toBeInTheDocument();
+
+    expect(
+      within(fileDetailsTabPanel).getAllByText('Screening').length,
+    ).toEqual(1);
+
+    expect(screen.queryByText('Continue import')).not.toBeInTheDocument();
+
+    const cancelButton = await screen.findByRole('button', {
+      name: 'Cancel',
+    });
+
+    await user.click(cancelButton);
+
+    expect(
+      screen.queryByRole('heading', {
+        name: 'Data set details',
+      }),
+    ).not.toBeInTheDocument();
   });
 });
