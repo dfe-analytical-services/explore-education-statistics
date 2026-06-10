@@ -640,15 +640,7 @@ public class ContentDbContext : DbContext
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .Entity<UserPublicationRole>()
-            .HasIndex(upr => new
-            {
-                upr.UserId,
-                upr.PublicationId,
-                upr.Role,
-            })
-            .IsUnique();
+        modelBuilder.Entity<UserPublicationRole>().HasIndex(upr => new { upr.UserId, upr.PublicationId }).IsUnique();
 
         modelBuilder
             .Entity<UserPublicationRole>()
@@ -674,15 +666,7 @@ public class ContentDbContext : DbContext
 
     private static void ConfigureUserPreReleaseRole(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .Entity<UserReleaseRole>()
-            .HasIndex(urr => new
-            {
-                urr.UserId,
-                urr.ReleaseVersionId,
-                urr.Role,
-            })
-            .IsUnique();
+        modelBuilder.Entity<UserReleaseRole>().HasIndex(urr => new { urr.UserId, urr.ReleaseVersionId }).IsUnique();
 
         modelBuilder
             .Entity<UserReleaseRole>()
