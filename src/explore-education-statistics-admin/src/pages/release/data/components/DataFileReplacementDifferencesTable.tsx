@@ -12,9 +12,9 @@ import {
   MappingsPlan,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
-import { KeysWithType } from '@common/types';
 import DifferencesMappingTableRows from '@admin/pages/release/data/components/DataFileReplacementDifferencesTableRows';
 import DataFileReplacementMappingCountsTag from '@admin/pages/release/data/components/DataFileReplacementMappingCountsTag';
+import { LabelProps } from './DataFileReplacementDifferencesMappingModal';
 
 export interface TypeMapping {
   indicator: {
@@ -34,34 +34,36 @@ export type TableMappingGroup = {
   mappings: string[];
 };
 
+type DataFileDifferencesReplacementTableProps<
+  ItemType extends keyof TypeMapping,
+> = {
+  tableId: string;
+  itemType: ItemType;
+  handleMappingUpdate: (payload: UpdateMappingPayload) => Promise<void>;
+  mappingsPlan: MappingsPlan<TypeMapping[ItemType]['source']>;
+  mappingsToShow: Set<string>;
+  mappingGroups: Array<TableMappingGroup>;
+} & LabelProps<ItemType>;
+
 export default function DataFileDifferencesReplacementTable<
   ItemType extends keyof TypeMapping,
 >({
   tableId,
   itemType,
-  handleIndicatorsMappingUpdate,
+  handleMappingUpdate,
   mappingsPlan,
   mappingGroups,
   mappedDataLabels,
+  rowLabel,
   mappingsToShow,
-}: {
-  tableId: string;
-  itemType: ItemType;
-  handleIndicatorsMappingUpdate: (
-    payload: UpdateMappingPayload,
-  ) => Promise<void>;
-  mappingsPlan: MappingsPlan<TypeMapping[ItemType]['source']>;
-  mappingsToShow: string[];
-  mappingGroups: Array<TableMappingGroup>;
-  mappedDataLabels: KeysWithType<TypeMapping[ItemType]['source'], string>[];
-}) {
+}: DataFileDifferencesReplacementTableProps<ItemType>) {
   const mappingCounts: {
     mapped: number;
     unmapped: number;
   } = useMemo(() => {
-    const totalMappingCount = mappingsToShow.length;
+    const totalMappingCount = mappingsToShow.size;
 
-    const manualMappedCount = mappingsToShow.filter(
+    const manualMappedCount = Array.from(mappingsToShow).filter(
       target => mappingsPlan.mappings[target]?.type === 'ManuallySet',
     ).length;
 
@@ -107,8 +109,9 @@ export default function DataFileDifferencesReplacementTable<
           <DifferencesMappingTableRows
             itemType={itemType}
             mappingsPlan={mappingsPlan}
-            onUpdate={handleIndicatorsMappingUpdate}
+            onUpdate={handleMappingUpdate}
             mappedDataLabels={mappedDataLabels}
+            rowLabel={rowLabel}
             replacementGroups={mappingGroups}
           />
         </tbody>

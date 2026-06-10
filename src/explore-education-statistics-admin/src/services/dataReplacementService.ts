@@ -8,8 +8,6 @@ export interface TargetReplacement {
   valid: boolean;
 }
 
-export type ObjOfKey<T, K extends string | number | symbol> = { [key in K]: T };
-
 export type GroupReplacement = {
   label: string;
   valid: boolean;
@@ -123,7 +121,7 @@ export interface ApiDataSetVersionPlan {
 
 type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet';
 
-export interface Mapping<TSource> {
+export interface ReplacementMapping<TSource> {
   type: MappingType;
   source: TSource;
   candidateKey?: string;
@@ -136,10 +134,12 @@ export type UpdateMappingPayload = {
 
 export interface MappingsPlan<TSource> {
   candidates: Dictionary<TSource>;
-  mappings: Dictionary<Mapping<TSource>>;
+  mappings: Dictionary<ReplacementMapping<TSource>>;
 }
 
-export type MappingWithKey<TSource> = { sourceKey: string } & Mapping<TSource>;
+export type MappingWithKey<TSource> = {
+  sourceKey: string;
+} & ReplacementMapping<TSource>;
 
 export interface IndicatorSource {
   id: string;
@@ -157,8 +157,8 @@ export type IndicatorCandidate = IndicatorSource;
 
 export type SourceItem = IndicatorSource | LocationSource /* | FilterSource */;
 
-export type IndicatorMapping = Mapping<IndicatorSource>;
-export type LocationMapping = Mapping<LocationSource>;
+export type IndicatorMapping = ReplacementMapping<IndicatorSource>;
+export type LocationMapping = ReplacementMapping<LocationSource>;
 
 export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;
 export type LocationMappingWithKey = MappingWithKey<LocationSource>;

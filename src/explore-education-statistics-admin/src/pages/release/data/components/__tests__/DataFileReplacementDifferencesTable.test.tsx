@@ -106,7 +106,7 @@ const mappingsGroup: TableMappingGroup[] = [
   },
 ];
 
-const mappingsToShow: string[] = ['enrolments_again', 'enrolments'];
+const mappingsToShow = new Set(['enrolments_again', 'enrolments']);
 
 const locationsMappingPlan: LocationMappingsPlan = {
   mappings: {
@@ -135,39 +135,49 @@ const locationsMappingGroup: TableMappingGroup[] = [
   },
 ];
 
-const locationsMappingsToShow: string[] = ['country-england'];
+const locationsMappingsToShow = new Set(['country-england']);
 
 describe('DataFileReplacementDifferences', () => {
+  const indicatorsTableId = 'replacements-differences-indicators-table';
+  const locationsTableId = 'replacements-differences-locations-table';
+
   const handler = jest.fn(() => Promise.resolve());
-  const sharedRender = () =>
+  const indicatorsSharedRender = () =>
     render(
       <DataFileReplacementDifferencesTable
-        tableId="replacements-differences-indicators-table"
+        tableId={indicatorsTableId}
         itemType="indicator"
         mappingsPlan={mappingsPlan}
         mappingGroups={mappingsGroup}
         mappingsToShow={mappingsToShow}
-        handleIndicatorsMappingUpdate={handler}
-        mappedDataLabels={['label', 'name']}
+        handleMappingUpdate={handler}
+        rowLabel="label"
+        mappedDataLabels={{
+          label: 'Label',
+          name: 'Name',
+        }}
       />,
     );
 
-  const tableId = 'replacements-differences-indicators-table';
-
-  test('renders location replacement type', async () => {
-    const locationsTableId = 'locations-table';
-
+  const locationsSharedRender = () =>
     render(
       <DataFileReplacementDifferencesTable
         tableId={locationsTableId}
         itemType="location"
-        handleIndicatorsMappingUpdate={handler}
+        handleMappingUpdate={handler}
         mappingsPlan={locationsMappingPlan}
         mappingsToShow={locationsMappingsToShow}
         mappingGroups={locationsMappingGroup}
-        mappedDataLabels={['name', 'code']}
+        rowLabel="name"
+        mappedDataLabels={{
+          name: 'Name',
+          code: 'Code',
+        }}
       />,
     );
+
+  test('renders location replacement type', async () => {
+    locationsSharedRender();
 
     await waitFor(() => {
       expect(screen.getByTestId(locationsTableId)).toBeInTheDocument();
@@ -197,19 +207,21 @@ describe('DataFileReplacementDifferences', () => {
   });
 
   test('renders indicator replacement type', async () => {
-    sharedRender();
+    indicatorsSharedRender();
 
     await waitFor(() => {
-      expect(screen.getByTestId(tableId)).toBeInTheDocument();
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
     });
 
-    const caption = screen.getByTestId(`${tableId}`).querySelector('caption');
+    const caption = screen
+      .getByTestId(`${indicatorsTableId}`)
+      .querySelector('caption');
 
     expect(caption).toBeInTheDocument();
     expect(caption).toHaveTextContent('Indicators');
     expect(caption).toHaveTextContent('2 unmapped indicators');
 
-    const tbody = screen.getByTestId(`${tableId}-body`);
+    const tbody = screen.getByTestId(`${indicatorsTableId}-body`);
     expect(tbody).toBeInTheDocument();
 
     // check table items there
@@ -229,13 +241,13 @@ describe('DataFileReplacementDifferences', () => {
   });
 
   test('renders replacement table and dialog', async () => {
-    const { user } = sharedRender();
+    const { user } = indicatorsSharedRender();
     // check table is there
     await waitFor(() => {
-      expect(screen.getByTestId(tableId)).toBeInTheDocument();
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
     });
 
-    const tbody = screen.getByTestId(`${tableId}-body`);
+    const tbody = screen.getByTestId(`${indicatorsTableId}-body`);
     expect(tbody).toBeInTheDocument();
 
     // check table items there
@@ -269,13 +281,13 @@ describe('DataFileReplacementDifferences', () => {
   });
 
   test('mapping new indicator to a pre-existing indicator option', async () => {
-    const { user } = sharedRender();
+    const { user } = indicatorsSharedRender();
 
     await waitFor(() => {
-      expect(screen.getByTestId(tableId)).toBeInTheDocument();
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
     });
 
-    const tbody = screen.getByTestId(`${tableId}-body`);
+    const tbody = screen.getByTestId(`${indicatorsTableId}-body`);
     expect(tbody).toBeInTheDocument();
 
     const rows = within(tbody).getAllByRole('row');
@@ -327,13 +339,13 @@ describe('DataFileReplacementDifferences', () => {
   });
 
   test('mapping new indicator to "No mapping" action', async () => {
-    const { user } = sharedRender();
+    const { user } = indicatorsSharedRender();
 
     await waitFor(() => {
-      expect(screen.getByTestId(tableId)).toBeInTheDocument();
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
     });
 
-    const tbody = screen.getByTestId(`${tableId}-body`);
+    const tbody = screen.getByTestId(`${indicatorsTableId}-body`);
     expect(tbody).toBeInTheDocument();
 
     const rows = within(tbody).getAllByRole('row');

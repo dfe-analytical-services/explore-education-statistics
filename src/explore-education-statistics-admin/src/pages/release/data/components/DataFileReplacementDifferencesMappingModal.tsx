@@ -1,6 +1,6 @@
 import FormModal from '@admin/components/FormModal';
 import {
-  Mapping,
+  ReplacementMapping,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import ButtonText from '@common/components/ButtonText';
@@ -9,37 +9,47 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { Dictionary, KeysWithType } from '@common/types';
+import { Dictionary, Pair } from '@common/types';
 import prefixNoun from '@common/utils/string/prefixNoun';
 import Yup from '@common/validation/yup';
 import React from 'react';
 import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
-import startCase from 'lodash/startCase';
 
 interface FormValues {
   selectedCandidate: string;
 }
 
+export type LabelProps<ItemType extends keyof TypeMapping> = {
+  rowLabel: keyof TypeMapping[ItemType]['source'];
+  mappedDataLabels: Partial<
+    Record<keyof TypeMapping[ItemType]['source'], string>
+  >;
+};
+
+export type DifferencesItemMappingModalProps<
+  ItemType extends keyof TypeMapping,
+  SourceItemType extends TypeMapping[ItemType]['source'],
+> = {
+  itemType: ItemType;
+  allCandidateOptions: Dictionary<SourceItemType>;
+  unmappedCandidateOptions: Dictionary<SourceItemType>;
+  mapping: ReplacementMapping<SourceItemType>;
+  onSubmit: (payload: UpdateMappingPayload) => void;
+} & LabelProps<ItemType>;
+
 export default function DifferencesItemMappingModal<
-  TItemType extends keyof TypeMapping,
-  TSourceItemType extends TypeMapping[TItemType]['source'],
+  ItemType extends keyof TypeMapping,
+  SourceItemType extends TypeMapping[ItemType]['source'],
 >({
   mapping,
   itemType,
   allCandidateOptions,
   unmappedCandidateOptions,
   onSubmit,
+  rowLabel,
   mappedDataLabels,
-}: {
-  itemType: TItemType;
-  allCandidateOptions: Dictionary<TSourceItemType>;
-  unmappedCandidateOptions: Dictionary<TSourceItemType>;
-  mapping: Mapping<TSourceItemType>;
-  onSubmit: (payload: UpdateMappingPayload) => void;
-  mappedDataLabels: KeysWithType<TSourceItemType, string>[];
-}) {
+}: DifferencesItemMappingModalProps<ItemType, SourceItemType>) {
   const noMappingValue = 'noMapping';
-  const [mainLabel, ...otherLabels] = mappedDataLabels;
 
   const currentCandidate = !mapping.candidateKey
     ? undefined
@@ -58,20 +68,24 @@ export default function DifferencesItemMappingModal<
 
   const generateCandidateOption = ([id, candidate]: [
     string,
-    TSourceItemType,
+    SourceItemType,
   ]) => {
     return {
       value: id,
-      label: candidate[mainLabel] as string,
-      hint: otherLabels?.length
-        ? `(${otherLabels
-            .map(item => `${String(item)} : ${candidate[item]}`)
+      label: candidate[rowLabel] as string,
+      hint: mappedDataLabels
+        ? `(${Object.entries(mappedDataLabels)
+            .filter(([key, _]) => key !== rowLabel)
+            .map(
+              ([key, label]) =>
+                `${label} : ${candidate[key as keyof SourceItemType]}`,
+            )
             .join(', ')})`
         : undefined,
     };
   };
 
-  const options: RadioOption<string>[] = [
+  const options: RadioOption[] = [
     {
       label: 'No mapping available',
       value: noMappingValue,
@@ -108,18 +122,20 @@ export default function DifferencesItemMappingModal<
       triggerButton={
         <ButtonText className="govuk-!-margin-left-2">
           Map item{' '}
-          <VisuallyHidden>{mapping.source[mainLabel] as string}</VisuallyHidden>
+          <VisuallyHidden>{mapping.source[rowLabel] as string}</VisuallyHidden>
         </ButtonText>
       }
     >
       <h3>Original data set {itemType}</h3>
       <SummaryList>
-        {mappedDataLabels.map(dataLabel => (
-          <SummaryListItem
-            key={String(dataLabel)}
-            term={startCase(String(dataLabel))}
-          >
-            {mapping.source[dataLabel] as string}
+        {(
+          Object.entries(mappedDataLabels) as Pair<
+            keyof typeof mapping.source,
+            string
+          >[]
+        ).map(([key, label]) => (
+          <SummaryListItem key={label} term={label}>
+            {mapping.source[key] as string}
           </SummaryListItem>
         ))}
       </SummaryList>

@@ -5,7 +5,7 @@ import {
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { Dictionary, KeysWithType } from '@common/types';
+import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
 import React, { useMemo } from 'react';
@@ -13,7 +13,25 @@ import {
   TableMappingGroup,
   TypeMapping,
 } from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
-import DifferencesItemMappingModal from './DataFileReplacementDifferencesMappingModal';
+import DifferencesItemMappingModal, {
+  DifferencesItemMappingModalProps,
+  LabelProps,
+} from './DataFileReplacementDifferencesMappingModal';
+
+type DifferencesMappingTableRowsProps<
+  ItemType extends keyof TypeMapping,
+  SourceItemType extends TypeMapping[ItemType]['source'],
+> = {
+  onUpdate: (payload: UpdateMappingPayload) => Promise<void>;
+  itemType: ItemType;
+  mappingsPlan: MappingsPlan<SourceItemType>;
+  rowLabel: keyof TypeMapping[ItemType]['source'];
+  mappedDataLabels: DifferencesItemMappingModalProps<
+    ItemType,
+    SourceItemType
+  >['mappedDataLabels'];
+  replacementGroups: Array<TableMappingGroup>;
+} & LabelProps<ItemType>;
 
 export default function DifferencesMappingTableRows<
   ItemType extends keyof TypeMapping,
@@ -23,14 +41,9 @@ export default function DifferencesMappingTableRows<
   mappingsPlan: { candidates, mappings },
   onUpdate,
   replacementGroups,
+  rowLabel,
   mappedDataLabels,
-}: {
-  onUpdate: (payload: UpdateMappingPayload) => Promise<void>;
-  itemType: ItemType;
-  mappingsPlan: MappingsPlan<SourceItemType>;
-  mappedDataLabels: KeysWithType<SourceItemType, string>[];
-  replacementGroups: Array<TableMappingGroup>;
-}) {
+}: DifferencesMappingTableRowsProps<ItemType, SourceItemType>) {
   const {
     allCandidates,
     unmappedCandidates,
@@ -69,12 +82,12 @@ export default function DifferencesMappingTableRows<
 
           const { source, type, candidateKey } = mapping;
           const isUnset = type === 'Unset';
-          const itemCurrentMapping =
-            (candidateKey &&
-              String(
-                allCandidates[candidateKey]?.[mappedDataLabels[0]] ?? '',
-              )) ??
-            'No mapping';
+          const sourceLabelText = String(source[rowLabel]);
+
+          const candidateText =
+            candidateKey && allCandidates[candidateKey]?.[rowLabel];
+
+          const itemCurrentMapping = candidateText ?? 'No Mapping';
 
           return (
             <tr key={`mapping-${sourceKey}`}>
@@ -86,9 +99,7 @@ export default function DifferencesMappingTableRows<
                   {group.label}
                 </th>
               )}
-              <td className="govuk-!-width-one-quarter">
-                {String(source[mappedDataLabels[0]])}
-              </td>
+              <td className="govuk-!-width-one-quarter">{sourceLabelText}</td>
               <td>
                 {isUnset ? (
                   <Tag colour="red">not present</Tag>
@@ -107,9 +118,7 @@ export default function DifferencesMappingTableRows<
                     }
                   >
                     No mapping{' '}
-                    <VisuallyHidden>
-                      for {`${String(source[mappedDataLabels[0]])}`}
-                    </VisuallyHidden>
+                    <VisuallyHidden>for {`${sourceLabelText}`}</VisuallyHidden>
                   </ButtonText>
                 )}
 
@@ -119,6 +128,7 @@ export default function DifferencesMappingTableRows<
                   unmappedCandidateOptions={unmappedCandidates}
                   mapping={mapping}
                   onSubmit={onUpdate}
+                  rowLabel={rowLabel}
                   mappedDataLabels={mappedDataLabels}
                 />
               </td>
