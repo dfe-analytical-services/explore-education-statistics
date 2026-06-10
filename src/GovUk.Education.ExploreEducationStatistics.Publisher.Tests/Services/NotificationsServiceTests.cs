@@ -165,7 +165,7 @@ public abstract class NotificationsServiceTests
                     0,
                     s =>
                         s.SetPublication(otherPublication)
-                            .SetUser(_dataFixture.DefaultUser().WithEmail("other-publication-owner@example.com"))
+                            .SetUser(_dataFixture.DefaultUser().WithEmail("other-publication-drafter@example.com"))
                 )
                 // Affected publication, but Pending User Invite
                 .ForIndex(
