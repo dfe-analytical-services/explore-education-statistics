@@ -9,7 +9,7 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { Dictionary, Pair } from '@common/types';
+import { Dictionary, KeysWithType } from '@common/types';
 import prefixNoun from '@common/utils/string/prefixNoun';
 import Yup from '@common/validation/yup';
 import React from 'react';
@@ -19,11 +19,14 @@ interface FormValues {
   selectedCandidate: string;
 }
 
+type SourceStringKey<ItemType extends keyof TypeMapping> = KeysWithType<
+  TypeMapping[ItemType]['source'],
+  string
+>;
+
 export type LabelProps<ItemType extends keyof TypeMapping> = {
-  rowLabel: keyof TypeMapping[ItemType]['source'];
-  mappedDataLabels: Partial<
-    Record<keyof TypeMapping[ItemType]['source'], string>
-  >;
+  rowLabel: SourceStringKey<ItemType>;
+  mappedDataLabels: Partial<Record<SourceStringKey<ItemType>, string>>;
 };
 
 export type DifferencesItemMappingModalProps<
@@ -51,6 +54,13 @@ export default function DifferencesItemMappingModal<
 }: DifferencesItemMappingModalProps<ItemType, SourceItemType>) {
   const noMappingValue = 'noMapping';
 
+  const labelEntries = Object.entries(mappedDataLabels) as [
+    keyof SourceItemType,
+    string,
+  ][];
+
+  const hintLabelEntries = labelEntries.filter(([k]) => k !== rowLabel);
+
   const currentCandidate = !mapping.candidateKey
     ? undefined
     : {
@@ -73,13 +83,9 @@ export default function DifferencesItemMappingModal<
     return {
       value: id,
       label: candidate[rowLabel] as string,
-      hint: mappedDataLabels
-        ? `(${Object.entries(mappedDataLabels)
-            .filter(([key, _]) => key !== rowLabel)
-            .map(
-              ([key, label]) =>
-                `${label} : ${candidate[key as keyof SourceItemType]}`,
-            )
+      hint: hintLabelEntries
+        ? `(${hintLabelEntries
+            .map(([key, label]) => `${label} : ${candidate[key]}`)
             .join(', ')})`
         : undefined,
     };
@@ -128,12 +134,7 @@ export default function DifferencesItemMappingModal<
     >
       <h3>Original data set {itemType}</h3>
       <SummaryList>
-        {(
-          Object.entries(mappedDataLabels) as Pair<
-            keyof typeof mapping.source,
-            string
-          >[]
-        ).map(([key, label]) => (
+        {labelEntries.map(([key, label]) => (
           <SummaryListItem key={label} term={label}>
             {mapping.source[key] as string}
           </SummaryListItem>
