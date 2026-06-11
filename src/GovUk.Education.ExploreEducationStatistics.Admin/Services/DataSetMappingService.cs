@@ -205,7 +205,7 @@ public class DataSetMappingService(
                                 == originalLocation.ToLocationAttribute().GetCodeOrFallback()
                         )
                         .ToList();
-                    replacementLocation = candidateReplacements.SingleOrDefault();
+                    replacementLocation = candidateReplacements.Count == 1 ? candidateReplacements[0] : null;
                 }
 
                 return new LocationMapping
