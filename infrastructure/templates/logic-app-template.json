@@ -11,6 +11,13 @@
     "slackAppToken": {
       "type": "securestring"
     },
+    "teamsPowerAutomateWebhookUrl": {
+      "type": "securestring",
+      "defaultValue": "https://fb00b90c0504ebd9a42481ac341cad.a8.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/33b11b4925fc4a0f8f4e3585bf756724/triggers/manual/paths/invoke?api-version=1",
+      "metadata": {
+        "description": "Optional Power Automate HTTP trigger URL for posting Azure alerts to Microsoft Teams"
+      }
+    },
     "subscription": {
       "type": "string"
     },
@@ -37,6 +44,10 @@
           "resourceGroup": {
               "type": "String",
               "value": "[parameters('resourceGroup')]"
+          },
+          "teamsPowerAutomateWebhookUrl": {
+              "type": "SecureString",
+              "value": "[parameters('teamsPowerAutomateWebhookUrl')]"
           }
         },
         "definition": {
@@ -53,6 +64,10 @@
             },
             "resourceGroup": {
               "type": "string",
+              "defaultValue": ""
+            },
+            "teamsPowerAutomateWebhookUrl": {
+              "type": "securestring",
               "defaultValue": ""
             }
           },
@@ -406,6 +421,119 @@
                   }
                 },
                 "unsubscribe": {}
+              }
+            },
+            "Send_Teams_alert_if_configured": {
+              "runAfter": {
+                "Initialize monitorCondition variable": [
+                  "Succeeded"
+                ],
+                "Initialize severityColour variable": [
+                  "Succeeded"
+                ],
+                "Initialize severityDisplay variable": [
+                  "Succeeded"
+                ],
+                "Initialize withinThresholdMessage variable": [
+                  "Succeeded"
+                ],
+                "Initialize outsideThresholdMessage variable": [
+                  "Succeeded"
+                ]
+              },
+              "type": "If",
+              "expression": {
+                "and": [
+                  {
+                    "not": {
+                      "equals": [
+                        "@parameters('teamsPowerAutomateWebhookUrl')",
+                        ""
+                      ]
+                    }
+                  }
+                ]
+              },
+              "actions": {
+                "HTTP_Teams_Webhook": {
+                  "type": "Http",
+                  "inputs": {
+                    "method": "POST",
+                    "uri": "@parameters('teamsPowerAutomateWebhookUrl')",
+                    "headers": {
+                      "Content-Type": "application/json"
+                    },
+                    "body": {
+                      "type": "message",
+                      "attachments": [
+                        {
+                          "contentType": "application/vnd.microsoft.card.adaptive",
+                          "contentUrl": null,
+                          "content": {
+                            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                            "type": "AdaptiveCard",
+                            "version": "1.2",
+                            "body": [
+                              {
+                                "type": "TextBlock",
+                                "text": "Alert @{variables('monitorCondition')}!",
+                                "weight": "Bolder",
+                                "size": "Medium"
+                              },
+                              {
+                                "type": "TextBlock",
+                                "text": "@{triggerBody()?['data']?['essentials']?['alertRule']}",
+                                "weight": "Bolder",
+                                "wrap": true
+                              },
+                              {
+                                "type": "TextBlock",
+                                "text": "@{if(equals(variables('monitorCondition'), 'Resolved'), variables('withinThresholdMessage'), variables('outsideThresholdMessage'))}",
+                                "wrap": true
+                              },
+                              {
+                                "type": "FactSet",
+                                "facts": [
+                                  {
+                                    "title": "Severity",
+                                    "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'Resolved', variables('severityDisplay'))}"
+                                  },
+                                  {
+                                    "title": "@{variables('monitorCondition')} at",
+                                    "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}"
+                                  },
+                                  {
+                                    "title": "Window start",
+                                    "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'dd/MM/yyyy h:mm:sstt'))}"
+                                  },
+                                  {
+                                    "title": "Window end",
+                                    "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}"
+                                  }
+                                ]
+                              }
+                            ],
+                            "actions": [
+                              {
+                                "type": "Action.OpenUrl",
+                                "title": "View alert",
+                                "url": "https://portal.azure.com/#@platform.education.gov.uk/resource/subscriptions/@{parameters('subscription')}/resourceGroups/@{parameters('resourceGroup')}/providers/Microsoft.Insights/metricalerts/@{triggerBody()?['data']?['essentials']?['alertRule']}/ViewAlertRuleHistory"
+                              },
+                              {
+                                "type": "Action.OpenUrl",
+                                "title": "View resource",
+                                "url": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "else": {
+                "actions": {}
               }
             }
           },
