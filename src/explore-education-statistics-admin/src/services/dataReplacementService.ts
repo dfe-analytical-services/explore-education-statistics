@@ -8,6 +8,11 @@ export interface TargetReplacement {
   valid: boolean;
 }
 
+export type GroupReplacement = {
+  label: string;
+  valid: boolean;
+};
+
 export interface FilterReplacement extends TargetReplacement {
   groups: Dictionary<FilterGroupReplacement>;
 }
@@ -29,15 +34,18 @@ export interface IndicatorGroupReplacement {
   indicators: IndicatorReplacement[];
 }
 
+export interface LocationAttributeReplacement extends TargetReplacement {
+  id: string;
+  code: string;
+  label: string;
+  target?: string;
+  valid: boolean;
+}
+
 export interface LocationReplacement {
   valid: boolean;
   label: string;
-  locationAttributes: {
-    code: string;
-    label: string;
-    target?: string;
-    valid: boolean;
-  }[];
+  locationAttributes: LocationAttributeReplacement[];
 }
 
 export interface TimePeriodsReplacement {
@@ -113,7 +121,7 @@ export interface ApiDataSetVersionPlan {
 
 type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet';
 
-interface Mapping<TSource> {
+export interface ReplacementMapping<TSource> {
   type: MappingType;
   source: TSource;
   candidateKey?: string;
@@ -124,28 +132,43 @@ export type UpdateMappingPayload = {
   candidateKey?: string;
 };
 
-interface MappingsPlan<TSource> {
+export interface MappingsPlan<TSource> {
   candidates: Dictionary<TSource>;
-  mappings: Dictionary<Mapping<TSource>>;
+  mappings: Dictionary<ReplacementMapping<TSource>>;
 }
 
-export type MappingWithKey<TSource> = { sourceKey: string } & Mapping<TSource>;
+export type MappingWithKey<TSource> = {
+  sourceKey: string;
+} & ReplacementMapping<TSource>;
 
-interface IndicatorSource {
+export interface IndicatorSource {
+  id: string;
+  name: string; // csv column name
   label: string;
+}
+
+export interface LocationSource {
+  id: string;
+  code: string;
+  name: string;
 }
 
 export type IndicatorCandidate = IndicatorSource;
 
-export type SourceItem = IndicatorSource /* | LocationSource | FilterSource */;
+export type SourceItem = IndicatorSource | LocationSource /* | FilterSource */;
 
-export type IndicatorMapping = Mapping<IndicatorSource>;
+export type IndicatorMapping = ReplacementMapping<IndicatorSource>;
+export type LocationMapping = ReplacementMapping<LocationSource>;
+
 export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;
+export type LocationMappingWithKey = MappingWithKey<LocationSource>;
 
 export type IndicatorsMappingsPlan = MappingsPlan<IndicatorSource>;
+export type LocationMappingsPlan = MappingsPlan<LocationSource>;
 
 export type PlanMappings = {
   indicators: IndicatorsMappingsPlan;
+  locations: LocationMappingsPlan;
 };
 
 export interface IndicatorsMapping {
@@ -177,6 +200,18 @@ type PlanMappingIndicatorsUpdateResponse = {
   replacementGroupLabel?: string;
 }[];
 
+type PlanMappingLocationUpdateResponse = {
+  originalId: string;
+  originalGeographicLevel: string;
+  originalCode: string;
+  originalName: string;
+  replacementId: string;
+  replacementGeographicLevel: string;
+  replacementCode: string;
+  replacementName: string;
+  status: MappingType;
+}[];
+
 const dataReplacementService = {
   async getReplacementPlan(
     releaseVersionId: string,
@@ -193,8 +228,8 @@ const dataReplacementService = {
     originalDataFileId: string,
     replacementDataFileId: string,
     updates: {
-      originalColumnName: string;
-      newReplacementColumnName?: string;
+      originalId: string;
+      newReplacementId?: string;
     }[],
   ): Promise<DataReplacementPlan['mapping']['indicators']['mappings']> {
     const indicatorsMappings: PlanMappingIndicatorsUpdateResponse =
@@ -212,14 +247,19 @@ const dataReplacementService = {
       Object.fromEntries(
         indicatorsMappings.map(
           ({
+            originalId,
             originalLabel,
             originalColumnName,
             status,
             replacementColumnName,
           }) => [
-            originalColumnName,
+            originalId,
             {
-              source: { label: originalLabel },
+              source: {
+                label: originalLabel,
+                name: originalColumnName,
+                id: originalId,
+              },
               type: status,
               candidateKey: replacementColumnName,
             },
@@ -228,6 +268,53 @@ const dataReplacementService = {
       );
 
     return planIndicatorMappings;
+  },
+
+  async updatePlanLocationMappings(
+    releaseVersionId: string,
+    originalDataFileId: string,
+    replacementDataFileId: string,
+    updates: {
+      originalLocationId: string;
+      newReplacementLocationId?: string;
+    }[],
+  ): Promise<DataReplacementPlan['mapping']['locations']['mappings']> {
+    const locationMappings: PlanMappingLocationUpdateResponse =
+      await client.patch(
+        `releases/${releaseVersionId}/data/replacements/mapping/locations`,
+        {
+          originalDataFileId,
+          replacementDataFileId,
+          updates,
+        },
+      );
+
+    // restructure from PlanMappingLocationUpdateResponse to PlanMappings['locations']['mappings']
+    const planLocationMappings: PlanMappings['locations']['mappings'] =
+      Object.fromEntries(
+        locationMappings.map(
+          ({
+            originalId,
+            originalCode,
+            status,
+            originalName,
+            replacementId,
+          }) => [
+            originalId,
+            {
+              source: {
+                id: originalId,
+                name: originalName,
+                code: originalCode,
+              },
+              type: status,
+              candidateKey: replacementId,
+            },
+          ],
+        ),
+      );
+
+    return planLocationMappings;
   },
   replaceData(
     releaseVersionId: string,

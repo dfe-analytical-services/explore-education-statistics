@@ -25,6 +25,12 @@ public abstract class DataReplacementControllerTests
             var releaseVersionId = Guid.NewGuid();
             var originalFileId = Guid.NewGuid();
 
+            var originalIndicatorId = Guid.NewGuid();
+            var replacementIndicatorId = Guid.NewGuid();
+
+            var originalLocationId = Guid.NewGuid();
+            var replacementLocationId = Guid.NewGuid();
+
             var dataReplacementPlan = new DataReplacementPlanViewModel
             {
                 DataBlocks =
@@ -79,23 +85,33 @@ public abstract class DataReplacementControllerTests
                 {
                     Indicators = new ReplacementPlanIndicatorsMappingViewModel
                     {
-                        Mappings = new Dictionary<string, ReplacementPlanIndicatorMappingViewModel>
+                        Mappings = new Dictionary<Guid, ReplacementPlanIndicatorMappingViewModel>
                         {
                             {
-                                "original_indicator",
+                                originalIndicatorId,
                                 new ReplacementPlanIndicatorMappingViewModel
                                 {
-                                    Source = new ReplacementPlanIndicatorViewModel { Label = "Original indicator" },
-                                    Type = "Unset",
-                                    CandidateKey = null,
+                                    Source = new ReplacementPlanIndicatorViewModel
+                                    {
+                                        Id = originalIndicatorId,
+                                        Name = "original_indicator",
+                                        Label = "Original indicator",
+                                    },
+                                    Type = "ManuallySet",
+                                    CandidateKey = replacementIndicatorId,
                                 }
                             },
                         },
-                        Candidates = new Dictionary<string, ReplacementPlanIndicatorViewModel>
+                        Candidates = new Dictionary<Guid, ReplacementPlanIndicatorViewModel>
                         {
                             {
-                                "replacement_indicator",
-                                new ReplacementPlanIndicatorViewModel { Label = "Replacement indicator" }
+                                replacementIndicatorId,
+                                new ReplacementPlanIndicatorViewModel
+                                {
+                                    Id = replacementIndicatorId,
+                                    Name = "replacement_indicator",
+                                    Label = "Replacement indicator",
+                                }
                             },
                         },
                     },
@@ -104,24 +120,30 @@ public abstract class DataReplacementControllerTests
                         Mappings = new Dictionary<Guid, ReplacementPlanLocationMappingViewModel>
                         {
                             {
-                                Guid.NewGuid(),
+                                originalLocationId,
                                 new ReplacementPlanLocationMappingViewModel
                                 {
                                     Source = new ReplacementPlanLocationViewModel
                                     {
+                                        Id = originalLocationId,
                                         Code = "E9000",
                                         Name = "OriginalLocation",
                                     },
-                                    Type = "Unset",
-                                    CandidateKey = null,
+                                    Type = "ManuallySet",
+                                    CandidateKey = replacementLocationId,
                                 }
                             },
                         },
                         Candidates = new Dictionary<Guid, ReplacementPlanLocationViewModel>
                         {
                             {
-                                Guid.NewGuid(),
-                                new ReplacementPlanLocationViewModel { Code = "E9393", Name = "ReplacementLocation" }
+                                replacementLocationId,
+                                new ReplacementPlanLocationViewModel
+                                {
+                                    Id = replacementLocationId,
+                                    Code = "E9393",
+                                    Name = "ReplacementLocation",
+                                }
                             },
                         },
                     },

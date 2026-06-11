@@ -1,7 +1,6 @@
 import FormModal from '@admin/components/FormModal';
 import {
-  MappingWithKey,
-  SourceItem,
+  ReplacementMapping,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import ButtonText from '@common/components/ButtonText';
@@ -10,64 +9,98 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { Dictionary } from '@common/types';
+import { Dictionary, KeysWithType } from '@common/types';
 import prefixNoun from '@common/utils/string/prefixNoun';
 import Yup from '@common/validation/yup';
 import React from 'react';
-
-interface ModalProps {
-  itemType: string;
-  allCandidateOptions: Dictionary<SourceItem>;
-  unmappedCandidateOptions: Dictionary<SourceItem>;
-  mapping: MappingWithKey<SourceItem>;
-  onSubmit: (payload: UpdateMappingPayload) => void;
-}
+import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
 
 interface FormValues {
   selectedCandidate: string;
 }
 
-export default function DifferencesItemMappingModal({
+type SourceStringKey<ItemType extends keyof TypeMapping> = KeysWithType<
+  TypeMapping[ItemType]['source'],
+  string
+>;
+
+export type LabelProps<ItemType extends keyof TypeMapping> = {
+  rowLabel: SourceStringKey<ItemType>;
+  mappedDataLabels: Partial<Record<SourceStringKey<ItemType>, string>>;
+};
+
+export type DifferencesItemMappingModalProps<
+  ItemType extends keyof TypeMapping,
+  SourceItemType extends TypeMapping[ItemType]['source'],
+> = {
+  itemType: ItemType;
+  allCandidateOptions: Dictionary<SourceItemType>;
+  unmappedCandidateOptions: Dictionary<SourceItemType>;
+  mapping: ReplacementMapping<SourceItemType>;
+  onSubmit: (payload: UpdateMappingPayload) => void;
+} & LabelProps<ItemType>;
+
+export default function DifferencesItemMappingModal<
+  ItemType extends keyof TypeMapping,
+  SourceItemType extends TypeMapping[ItemType]['source'],
+>({
   mapping,
   itemType,
   allCandidateOptions,
   unmappedCandidateOptions,
   onSubmit,
-}: ModalProps) {
+  rowLabel,
+  mappedDataLabels,
+}: DifferencesItemMappingModalProps<ItemType, SourceItemType>) {
   const noMappingValue = 'noMapping';
+
+  const labelEntries = Object.entries(mappedDataLabels) as [
+    keyof SourceItemType,
+    string,
+  ][];
+
+  const hintLabelEntries = labelEntries.filter(([k]) => k !== rowLabel);
 
   const currentCandidate = !mapping.candidateKey
     ? undefined
     : {
         key: mapping.candidateKey,
-        label: allCandidateOptions[mapping.candidateKey].label,
+        ...allCandidateOptions[mapping.candidateKey],
       };
 
   const handleSubmit = async ({ selectedCandidate }: FormValues) => {
     onSubmit({
-      sourceKey: mapping.sourceKey,
+      sourceKey: mapping.source.id,
       candidateKey:
         selectedCandidate !== noMappingValue ? selectedCandidate : undefined,
     });
   };
 
-  const options: RadioOption<string>[] = [
+  const generateCandidateOption = ([id, candidate]: [
+    string,
+    SourceItemType,
+  ]) => {
+    return {
+      value: id,
+      label: candidate[rowLabel] as string,
+      hint: hintLabelEntries
+        ? `(${hintLabelEntries
+            .map(([key, label]) => `${label} : ${candidate[key]}`)
+            .join(', ')})`
+        : undefined,
+    };
+  };
+
+  const options: RadioOption[] = [
     {
       label: 'No mapping available',
       value: noMappingValue,
       divider: `Select ${itemType}:`,
     },
     ...(currentCandidate
-      ? [{ label: currentCandidate.label, value: currentCandidate.key }]
+      ? [generateCandidateOption([currentCandidate.key, currentCandidate])]
       : []),
-    ...Object.entries(unmappedCandidateOptions).map(
-      ([candidateName, candidate]) => {
-        return {
-          label: candidate.label,
-          value: candidateName,
-        };
-      },
-    ),
+    ...Object.entries(unmappedCandidateOptions).map(generateCandidateOption),
   ];
 
   const initialValue = {
@@ -94,14 +127,18 @@ export default function DifferencesItemMappingModal({
       title={`Map existing ${itemType}`}
       triggerButton={
         <ButtonText className="govuk-!-margin-left-2">
-          Map item <VisuallyHidden>{mapping.source.label}</VisuallyHidden>
+          Map item{' '}
+          <VisuallyHidden>{mapping.source[rowLabel] as string}</VisuallyHidden>
         </ButtonText>
       }
     >
-      <h3>Current data set {itemType}</h3>
+      <h3>Original data set {itemType}</h3>
       <SummaryList>
-        <SummaryListItem term="Name">{mapping.sourceKey}</SummaryListItem>
-        <SummaryListItem term="Label">{mapping.source.label}</SummaryListItem>
+        {labelEntries.map(([key, label]) => (
+          <SummaryListItem key={label} term={label}>
+            {mapping.source[key] as string}
+          </SummaryListItem>
+        ))}
       </SummaryList>
 
       <FormFieldRadioSearchGroup<FormValues>
@@ -109,7 +146,7 @@ export default function DifferencesItemMappingModal({
         hint={`Choose ${prefixNoun(
           itemType,
         )} ${itemType} that will be mapped to the current data set ${itemType} (see above).`}
-        legend={`Next data set ${itemType}`}
+        legend={`Replacement data set ${itemType}`}
         name="selectedCandidate"
         options={options}
         order={[]}
