@@ -68,7 +68,7 @@ const PublicationReleaseListPage = ({
   };
 
   const [handleSearch] = useDebouncedCallback((term: string) => {
-    setSearchTerm(term);
+    setSearchTerm(term.trim());
     setCurrentPage(1);
   }, 800);
 
@@ -126,7 +126,7 @@ const PublicationReleaseListPage = ({
                   id={`${formId}-search`}
                   label="Search release periods"
                   labelSize="s"
-                  min={0}
+                  min={1}
                   name="search"
                   onChange={handleSearch}
                   onReset={() => handleSearch('')}
