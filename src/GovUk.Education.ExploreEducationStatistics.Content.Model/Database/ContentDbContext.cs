@@ -83,7 +83,7 @@ public class ContentDbContext : DbContext
     public virtual DbSet<MethodologyRedirect> MethodologyRedirects { get; set; }
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
-    public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+    public virtual DbSet<UserPreReleaseRole> UserPreReleaseRoles { get; set; }
     public virtual DbSet<GlossaryEntry> GlossaryEntries { get; set; }
     public virtual DbSet<Comment> Comment { get; set; }
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
@@ -662,18 +662,12 @@ public class ContentDbContext : DbContext
 
     private static void ConfigureUserPreReleaseRole(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<UserReleaseRole>().HasIndex(urr => new { urr.UserId, urr.ReleaseVersionId }).IsUnique();
+        modelBuilder.Entity<UserPreReleaseRole>().HasIndex(urr => new { urr.UserId, urr.ReleaseVersionId }).IsUnique();
 
         modelBuilder
-            .Entity<UserReleaseRole>()
+            .Entity<UserPreReleaseRole>()
             .Property(userReleaseRole => userReleaseRole.Created)
             .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        modelBuilder
-            .Entity<UserReleaseRole>()
-            .Property(r => r.Role)
-            .HasConversion(new EnumToStringConverter<ReleaseRole>())
-            .HasMaxLength(20);
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)

@@ -39,7 +39,6 @@ public class UserResourceRoleNotificationService(
                 urr.Id,
                 PublicationTitle = urr.ReleaseVersion.Release.Publication.Title,
                 ReleaseTitle = urr.ReleaseVersion.Release.Title,
-                urr.Role,
             })
             .ToListAsync(cancellationToken);
 
@@ -226,7 +225,7 @@ public class UserResourceRoleNotificationService(
         ;
     }
 
-    private async Task<UserReleaseRole> CheckUserPreReleaseRoleExists(
+    private async Task<UserPreReleaseRole> CheckUserPreReleaseRoleExists(
         Guid userPreReleaseRoleId,
         CancellationToken cancellationToken
     )
