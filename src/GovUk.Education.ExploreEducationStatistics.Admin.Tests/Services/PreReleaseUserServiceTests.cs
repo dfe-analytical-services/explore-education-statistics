@@ -493,7 +493,7 @@ public abstract class PreReleaseUserServiceTests
                     .WithReleaseVersion(releaseVersion)
                     .Generate();
 
-            var createdUserPreReleaseRolesByEmail = new Dictionary<string, UserReleaseRole>();
+            var createdUserPreReleaseRolesByEmail = new Dictionary<string, UserPreReleaseRole>();
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             foreach (var email in allEmails)
@@ -941,7 +941,7 @@ public abstract class PreReleaseUserServiceTests
             var release = publication.Releases.Single();
             var latestReleaseVersion = release.Versions[0];
 
-            UserReleaseRole createdUserPreReleaseRole = _dataFixture
+            UserPreReleaseRole createdUserPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(latestReleaseVersion);
@@ -1033,7 +1033,7 @@ public abstract class PreReleaseUserServiceTests
             var release = publication.Releases.Single();
             var latestReleaseVersion = release.Versions.Single(rv => rv.ApprovalStatus == ReleaseApprovalStatus.Draft);
 
-            UserReleaseRole createdUserPreReleaseRole = _dataFixture
+            UserPreReleaseRole createdUserPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(latestReleaseVersion);
@@ -1111,7 +1111,7 @@ public abstract class PreReleaseUserServiceTests
             var release = publication.Releases.Single();
             var latestReleaseVersion = release.Versions[0];
 
-            UserReleaseRole createdUserPreReleaseRole = _dataFixture
+            UserPreReleaseRole createdUserPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(latestReleaseVersion);
@@ -1306,7 +1306,7 @@ public abstract class PreReleaseUserServiceTests
         {
             User user = _dataFixture.DefaultUser();
             var applicationUser = new ApplicationUser { Id = user.Id.ToString(), Email = user.Email };
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
@@ -1366,7 +1366,7 @@ public abstract class PreReleaseUserServiceTests
         public async Task NonActiveUser_DoesNotAttemptToDowngradeGlobalRole(Func<DataFixture, User> userFactory)
         {
             User user = userFactory(_dataFixture);
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
@@ -1427,7 +1427,7 @@ public abstract class PreReleaseUserServiceTests
         [Fact]
         public async Task RoleRemovalFails_Throws()
         {
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
@@ -1465,7 +1465,7 @@ public abstract class PreReleaseUserServiceTests
         {
             User user = _dataFixture.DefaultUser();
             var applicationUser = new ApplicationUser { Id = user.Id.ToString(), Email = user.Email };
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
@@ -1514,7 +1514,7 @@ public abstract class PreReleaseUserServiceTests
         public async Task NonActiveUser_DoesNotAttemptToDowngradeGlobalRole(Func<DataFixture, User> userFactory)
         {
             User user = userFactory(_dataFixture);
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
@@ -1552,7 +1552,7 @@ public abstract class PreReleaseUserServiceTests
         [Fact]
         public async Task RoleRemovalFails_Throws()
         {
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(_dataFixture.DefaultReleaseVersion());
 
@@ -1584,24 +1584,24 @@ public abstract class PreReleaseUserServiceTests
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)])
                 .GenerateTuple4();
 
-            UserReleaseRole userPreReleaseRole1 = _dataFixture
+            UserPreReleaseRole userPreReleaseRole1 = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication1.Releases[0].Versions[1])
                 .WithUser(user);
 
-            UserReleaseRole userPreReleaseRole2 = _dataFixture
+            UserPreReleaseRole userPreReleaseRole2 = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication2.Releases[0].Versions[1])
                 .WithUser(user);
 
             // Role assignment for a non-latest release version, which should be filtered out of the results
-            UserReleaseRole userPreReleaseRole3 = _dataFixture
+            UserPreReleaseRole userPreReleaseRole3 = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication3.Releases[0].Versions[0])
                 .WithUser(user);
 
             // Role assignment for a different user, which should be filtered out of the results
-            UserReleaseRole userPreReleaseRole4 = _dataFixture
+            UserPreReleaseRole userPreReleaseRole4 = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithReleaseVersion(publication3.Releases[0].Versions[1])
                 .WithUser(_dataFixture.DefaultUser().Generate());

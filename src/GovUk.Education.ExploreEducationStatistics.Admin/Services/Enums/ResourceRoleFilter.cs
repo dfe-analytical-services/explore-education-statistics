@@ -3,7 +3,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 
 /// <summary>
-/// Represents the possible statuses for a resource role (<see cref="UserPublicationRole"/>/<see cref="UserReleaseRole"/>).
+/// Represents the possible statuses for a resource role (<see cref="UserPublicationRole"/>/<see cref="UserPreReleaseRole"/>).
 /// </summary>
 public enum ResourceRoleFilter
 {

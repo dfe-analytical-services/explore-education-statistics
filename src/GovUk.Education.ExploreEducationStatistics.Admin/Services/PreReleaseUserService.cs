@@ -307,7 +307,7 @@ public class PreReleaseUserService(
         }
     }
 
-    private async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(UserReleaseRole userPreReleaseRole) =>
+    private async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(UserPreReleaseRole userPreReleaseRole) =>
         await userService
             .CheckCanAssignPreReleaseContactsToReleaseVersion(userPreReleaseRole.ReleaseVersion)
             .OnSuccessDo(async _ =>
@@ -348,7 +348,7 @@ public class PreReleaseUserService(
             ResourceRoleFilter.AllButExpired
         );
 
-    private async Task<Either<ActionResult, UserReleaseRole>> CheckUserPreReleaseRoleExists(
+    private async Task<Either<ActionResult, UserPreReleaseRole>> CheckUserPreReleaseRoleExists(
         string email,
         Guid releaseVersionId
     ) =>
@@ -364,7 +364,7 @@ public class PreReleaseUserService(
                     .SingleOrNotFoundAsync()
             );
 
-    private async Task<Either<ActionResult, UserReleaseRole>> CheckUserPreReleaseRoleExists(
+    private async Task<Either<ActionResult, UserPreReleaseRole>> CheckUserPreReleaseRoleExists(
         Guid userPreReleaseRoleId
     ) =>
         await userPreReleaseRoleRepository

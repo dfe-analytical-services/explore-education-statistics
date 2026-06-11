@@ -12,6 +12,6 @@ internal static class UserPreReleaseRoleRepositoryMockExtensions
     public static IReturnsResult<IUserPreReleaseRoleRepository> SetupQuery(
         this Mock<IUserPreReleaseRoleRepository> mock,
         ResourceRoleFilter resourceRoleFilterToApply = ResourceRoleFilter.ActiveOnly,
-        params UserReleaseRole[] userPreReleaseRolesToReturn
+        params UserPreReleaseRole[] userPreReleaseRolesToReturn
     ) => mock.Setup(m => m.Query(resourceRoleFilterToApply)).Returns(userPreReleaseRolesToReturn.BuildMock());
 }

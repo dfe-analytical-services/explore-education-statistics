@@ -464,7 +464,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         {
             var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser()) // Active user
                 .WithReleaseVersion(
@@ -524,7 +524,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         {
             var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUserWithPendingInvite()) // Inactive user
                 .WithReleaseVersion(
@@ -584,7 +584,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         {
             var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser()) // Active user
                 .WithReleaseVersion(

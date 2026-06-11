@@ -63,7 +63,6 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 Assert.NotEqual(Guid.Empty, result.Id);
                 Assert.Equal(user.Id, result.UserId);
                 Assert.Equal(releaseVersion.Id, result.ReleaseVersionId);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, result.Role);
                 result.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, result.CreatedById);
                 Assert.Null(result.EmailSent);
@@ -71,7 +70,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPreReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userPreReleaseRoles = await contentDbContext.UserPreReleaseRoles.ToListAsync();
 
                 // Should have created the pre-release role
                 var createdPreReleaseRole = Assert.Single(userPreReleaseRoles);
@@ -79,7 +78,6 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 Assert.NotEqual(Guid.Empty, createdPreReleaseRole.Id);
                 Assert.Equal(user.Id, createdPreReleaseRole.UserId);
                 Assert.Equal(releaseVersion.Id, createdPreReleaseRole.ReleaseVersionId);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, createdPreReleaseRole.Role);
                 createdPreReleaseRole.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, createdPreReleaseRole.CreatedById);
                 Assert.Null(createdPreReleaseRole.EmailSent);
@@ -120,7 +118,6 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 Assert.NotEqual(Guid.Empty, result.Id);
                 Assert.Equal(user.Id, result.UserId);
                 Assert.Equal(releaseVersion.Id, result.ReleaseVersionId);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, result.Role);
                 Assert.Equal(createdDate, result.Created);
                 Assert.Equal(createdBy.Id, result.CreatedById);
                 Assert.Null(result.EmailSent);
@@ -128,7 +125,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPreReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userPreReleaseRoles = await contentDbContext.UserPreReleaseRoles.ToListAsync();
 
                 // Should have created the pre-release role
                 var createdPreReleaseRole = Assert.Single(userPreReleaseRoles);
@@ -136,7 +133,6 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 Assert.NotEqual(Guid.Empty, createdPreReleaseRole.Id);
                 Assert.Equal(user.Id, createdPreReleaseRole.UserId);
                 Assert.Equal(releaseVersion.Id, createdPreReleaseRole.ReleaseVersionId);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, createdPreReleaseRole.Role);
                 Assert.Equal(createdDate, createdPreReleaseRole.Created);
                 Assert.Equal(createdBy.Id, createdPreReleaseRole.CreatedById);
                 Assert.Null(createdPreReleaseRole.EmailSent);
@@ -191,7 +187,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .ForIndex(4, s => s.SetUser(user3).SetReleaseVersion(releaseVersion3))
                 .GenerateList(5);
 
-            UserReleaseRole[] allUserPreReleaseRoles = [.. existingUserPreReleaseRoles, .. newUserPreReleaseRoles];
+            UserPreReleaseRole[] allUserPreReleaseRoles = [.. existingUserPreReleaseRoles, .. newUserPreReleaseRoles];
             var allUserPreReleaseRolesCreateDtos = allUserPreReleaseRoles
                 .Select(uprr => new UserPreReleaseRoleCreateDto(
                     UserId: uprr.UserId,
@@ -205,7 +201,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(existingUserPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(existingUserPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -224,7 +220,6 @@ public abstract class UserPreReleaseRoleRepositoryTests
                     results,
                     uprr =>
                     {
-                        Assert.Equal(ReleaseRole.PrereleaseViewer, uprr.Role);
                         Assert.Equal(newRolesCreatedDate, uprr.Created);
                         Assert.Equal(createdBy.Id, uprr.CreatedById);
                         Assert.Null(uprr.EmailSent);
@@ -250,7 +245,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPreReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var userPreReleaseRoles = await contentDbContext.UserPreReleaseRoles.ToListAsync();
 
                 // Should have 9 roles in total: 4 existing pre-release roles + 5 new pre-release roles
                 // The existing roles should be unchanged
@@ -266,27 +261,22 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 );
 
                 var actualPreReleaseRoles = userPreReleaseRoles
-                    .Select(uprr => (uprr.UserId, uprr.ReleaseVersionId, uprr.Role, uprr.Created))
+                    .Select(uprr => (uprr.UserId, uprr.ReleaseVersionId, uprr.Created))
                     .ToHashSet();
 
-                var expectedPreReleaseRoles = new HashSet<(
-                    Guid UserId,
-                    Guid PublicationId,
-                    ReleaseRole Role,
-                    DateTime Created
-                )>
+                var expectedPreReleaseRoles = new HashSet<(Guid UserId, Guid PublicationId, DateTime Created)>
                 {
                     // Existing roles
-                    (user1.Id, releaseVersion1.Id, ReleaseRole.PrereleaseViewer, existingRoleCreatedDate),
-                    (user1.Id, releaseVersion2.Id, ReleaseRole.PrereleaseViewer, existingRoleCreatedDate),
-                    (user2.Id, releaseVersion1.Id, ReleaseRole.PrereleaseViewer, existingRoleCreatedDate),
-                    (user2.Id, releaseVersion2.Id, ReleaseRole.PrereleaseViewer, existingRoleCreatedDate),
+                    (user1.Id, releaseVersion1.Id, existingRoleCreatedDate),
+                    (user1.Id, releaseVersion2.Id, existingRoleCreatedDate),
+                    (user2.Id, releaseVersion1.Id, existingRoleCreatedDate),
+                    (user2.Id, releaseVersion2.Id, existingRoleCreatedDate),
                     // New roles
-                    (user1.Id, releaseVersion3.Id, ReleaseRole.PrereleaseViewer, newRolesCreatedDate),
-                    (user2.Id, releaseVersion3.Id, ReleaseRole.PrereleaseViewer, newRolesCreatedDate),
-                    (user3.Id, releaseVersion1.Id, ReleaseRole.PrereleaseViewer, newRolesCreatedDate),
-                    (user3.Id, releaseVersion2.Id, ReleaseRole.PrereleaseViewer, newRolesCreatedDate),
-                    (user3.Id, releaseVersion3.Id, ReleaseRole.PrereleaseViewer, newRolesCreatedDate),
+                    (user1.Id, releaseVersion3.Id, newRolesCreatedDate),
+                    (user2.Id, releaseVersion3.Id, newRolesCreatedDate),
+                    (user3.Id, releaseVersion1.Id, newRolesCreatedDate),
+                    (user3.Id, releaseVersion2.Id, newRolesCreatedDate),
+                    (user3.Id, releaseVersion3.Id, newRolesCreatedDate),
                 };
 
                 Assert.Equal(expectedPreReleaseRoles, actualPreReleaseRoles);
@@ -313,7 +303,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
             var user = userFactory(_fixture);
             User createdBy = _fixture.DefaultUser();
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(
@@ -330,7 +320,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Users.Add(createdBy);
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -370,7 +360,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
             var user = userFactory(_fixture);
             User createdBy = _fixture.DefaultUser();
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(user)
                 .WithReleaseVersion(
@@ -387,7 +377,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Users.Add(createdBy);
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -453,7 +443,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -511,7 +501,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -564,7 +554,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -625,7 +615,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -661,13 +651,13 @@ public abstract class UserPreReleaseRoleRepositoryTests
         public async Task RoleExists_RemovesAndReturnsTrue()
         {
             Publication publication = _fixture.DefaultPublication();
-            UserReleaseRole userPreReleaseRoleToRemove = _fixture
+            UserPreReleaseRole userPreReleaseRoleToRemove = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
                     _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease().WithPublication(publication))
                 );
-            UserReleaseRole otherPreReleaseRole = _fixture
+            UserPreReleaseRole otherPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
@@ -678,7 +668,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoleToRemove, otherPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoleToRemove, otherPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -693,11 +683,10 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedPreReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var updatedPreReleaseRoles = await contentDbContext.UserPreReleaseRoles.ToListAsync();
 
                 // The existing target role should have been deleted, but the other role should remain
                 var remainingUserPreReleaseRole = Assert.Single(updatedPreReleaseRoles);
-                Assert.Equal(otherPreReleaseRole.Role, remainingUserPreReleaseRole.Role);
                 Assert.Equal(otherPreReleaseRole.Id, remainingUserPreReleaseRole.Id);
             }
         }
@@ -759,7 +748,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -772,7 +761,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingUserPreReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+                var remainingUserPreReleaseRoles = await contentDbContext.UserPreReleaseRoles.ToListAsync();
 
                 // Should have removed ALL RELEASE roles except 1
                 var remainingUserPreReleaseRole = Assert.Single(remainingUserPreReleaseRoles);
@@ -783,7 +772,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
         [Fact]
         public async Task EmptyList_DoesNothing()
         {
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
@@ -796,7 +785,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -809,7 +798,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingUserPreReleaseRole = await contentDbContext.UserReleaseRoles.SingleAsync();
+                var remainingUserPreReleaseRole = await contentDbContext.UserPreReleaseRoles.SingleAsync();
 
                 // Existing role should remain. Nothing should have happened.
                 Assert.Equal(remainingUserPreReleaseRole.Id, userPreReleaseRole.Id);
@@ -850,7 +839,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -863,7 +852,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingRoles = await contentDbContext.UserReleaseRoles.Include(urr => urr.User).ToListAsync();
+                var remainingRoles = await contentDbContext.UserPreReleaseRoles.Include(urr => urr.User).ToListAsync();
 
                 Assert.Equal(2, remainingRoles.Count);
 
@@ -902,7 +891,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Users.AddRange(targetUser, otherUser);
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -915,7 +904,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingRoles = await contentDbContext.UserReleaseRoles.Include(urr => urr.User).ToListAsync();
+                var remainingRoles = await contentDbContext.UserPreReleaseRoles.Include(urr => urr.User).ToListAsync();
 
                 Assert.Equal(2, remainingRoles.Count);
 
@@ -937,7 +926,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(targetReleaseVersion);
@@ -946,7 +935,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -968,7 +957,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
         {
             User targetActiveUser = _fixture.DefaultUser();
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(
@@ -981,7 +970,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1006,7 +995,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(targetReleaseVersion);
@@ -1015,7 +1004,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1065,7 +1054,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1129,7 +1118,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1155,7 +1144,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetUserWithPendingInvite)
                 .WithReleaseVersion(targetReleaseVersion);
@@ -1164,7 +1153,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1206,7 +1195,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1273,7 +1262,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1311,7 +1300,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1358,7 +1347,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1434,7 +1423,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1468,7 +1457,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetUser)
                 .WithReleaseVersion(targetReleaseVersion);
@@ -1477,7 +1466,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1580,7 +1569,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1629,7 +1618,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(targetReleaseVersion);
@@ -1638,7 +1627,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1660,7 +1649,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
         {
             User targetActiveUser = _fixture.DefaultUser();
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(
@@ -1673,7 +1662,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1698,7 +1687,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetActiveUser)
                 .WithReleaseVersion(targetReleaseVersion);
@@ -1707,7 +1696,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1758,7 +1747,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1822,7 +1811,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1848,7 +1837,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetUserWithPendingInvite)
                 .WithReleaseVersion(targetReleaseVersion);
@@ -1857,7 +1846,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1900,7 +1889,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1967,7 +1956,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2005,7 +1994,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2053,7 +2042,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2129,7 +2118,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2163,7 +2152,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(targetUser)
                 .WithReleaseVersion(targetReleaseVersion);
@@ -2172,7 +2161,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2275,7 +2264,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.AddRange(userPreReleaseRoles);
+                contentDbContext.UserPreReleaseRoles.AddRange(userPreReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2320,7 +2309,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
         [Fact]
         public async Task Success_NoSuppliedDateSent()
         {
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
@@ -2333,7 +2322,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2346,7 +2335,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleAsync();
+                var updatedUserReleaseRole = await contentDbContext.UserPreReleaseRoles.SingleAsync();
 
                 Assert.Equal(userPreReleaseRole.Id, updatedUserReleaseRole.Id);
                 updatedUserReleaseRole.EmailSent.AssertUtcNow();
@@ -2356,7 +2345,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
         [Fact]
         public async Task Success_SuppliedDateSent()
         {
-            UserReleaseRole userPreReleaseRole = _fixture
+            UserPreReleaseRole userPreReleaseRole = _fixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_fixture.DefaultUser())
                 .WithReleaseVersion(
@@ -2371,7 +2360,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userPreReleaseRole);
+                contentDbContext.UserPreReleaseRoles.Add(userPreReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2384,7 +2373,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleAsync();
+                var updatedUserReleaseRole = await contentDbContext.UserPreReleaseRoles.SingleAsync();
 
                 Assert.Equal(userPreReleaseRole.Id, updatedUserReleaseRole.Id);
                 Assert.Equal(dateSent, updatedUserReleaseRole.EmailSent);
