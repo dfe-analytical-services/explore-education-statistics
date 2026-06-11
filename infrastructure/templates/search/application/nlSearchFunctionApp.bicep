@@ -143,7 +143,7 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
       tier: 'ElasticPremium'
       family: 'EP'
     }
-    healthCheckPath: '/api/HealthCheck'
+    healthCheckPath: '/api/health_check'
     operatingSystem: 'Linux'
     functionAppRuntime: 'python'
     linuxFxVersion: 'Python|3.14'
@@ -161,8 +161,7 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
     outboundSubnetId: outboundVnetSubnet.id
     alerts: {
       cpuPercentage: true
-      // TODO EES-7164 - Enable function app health alert once the health check endpoint is deployed
-      functionAppHealth: false
+      functionAppHealth: true
       httpErrors: true
       memoryPercentage: true
       storageAccountAvailability: true
