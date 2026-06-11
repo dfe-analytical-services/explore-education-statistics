@@ -8,7 +8,7 @@ import { dynamicAverageGreaterThan, dynamicTotalGreaterThan } from '../../common
 @maxLength(60)
 param name string
 
-@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges. These rules are applied only when \'publicNetworkAccess\' is \'Enabled\'.')
+@description('A list of IP network rules to allow access to the Azure AI Search service from specific public internet IP address ranges. These rules are applied only when \'publicNetworkAccess\' is \'Enabled\'.')
 param ipRules IpRange[] = []
 
 @allowed([
@@ -20,7 +20,7 @@ param ipRules IpRange[] = []
   'storage_optimized_l1'
   'storage_optimized_l2'
 ])
-@description('The pricing tier of the Search Service you want to create (for example, basic or standard).')
+@description('The pricing tier of the Azure AI Search service you want to create (for example, basic or standard).')
 param sku string = 'standard'
 
 @description('Replicas distribute search workloads across the service. You need at least two replicas to support high availability of query workloads (not applicable to the free tier).')
