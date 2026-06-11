@@ -264,7 +264,7 @@ const dataReplacementService = {
               candidateKey: replacementColumnName,
             },
           ],
-        ) as [string, IndicatorMapping][],
+        ),
       );
 
     return planIndicatorMappings;
@@ -289,7 +289,7 @@ const dataReplacementService = {
         },
       );
 
-    // restructure from PlanMappingIndicatorsUpdateResponse to PlanMappings['indicators']['mappings']
+    // restructure from PlanMappingLocationUpdateResponse to PlanMappings['locations']['mappings']
     const planLocationMappings: PlanMappings['locations']['mappings'] =
       Object.fromEntries(
         locationMappings.map(
@@ -311,7 +311,7 @@ const dataReplacementService = {
               candidateKey: replacementId,
             },
           ],
-        ) as [string, LocationMapping][],
+        ),
       );
 
     return planLocationMappings;
