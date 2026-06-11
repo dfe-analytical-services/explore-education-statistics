@@ -272,8 +272,8 @@ const dataReplacementService = {
 
   async updatePlanLocationMappings(
     releaseVersionId: string,
-    originalDataSetId: string,
-    replacementDataSetId: string,
+    originalDataFileId: string,
+    replacementDataFileId: string,
     updates: {
       originalLocationId: string;
       newReplacementLocationId?: string;
@@ -283,8 +283,8 @@ const dataReplacementService = {
       await client.patch(
         `releases/${releaseVersionId}/data/replacements/mapping/locations`,
         {
-          originalDataSetId,
-          replacementDataSetId,
+          originalDataFileId,
+          replacementDataFileId,
           updates,
         },
       );
