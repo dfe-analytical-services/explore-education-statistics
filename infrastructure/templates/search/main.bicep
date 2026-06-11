@@ -41,6 +41,9 @@ param searchServiceNLSearchDatasetIndexName string = ''
 @description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
 param searchServiceSearchIndexerName string = ''
 
+@description('Indicates whether API keys are permitted for authentication to Azure AI Search in addition to role-based access control (RBAC). Disabling API keys forces all clients to use RBAC only.')
+param searchServiceLocalAuthEnabled bool = false
+
 @description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
 @allowed([
   'disabled'
@@ -203,6 +206,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
+    searchServiceLocalAuthEnabled: searchServiceLocalAuthEnabled
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     semanticRankerAvailability: searchServiceSemanticRankerAvailability
     storageIpRules: maintenanceIpRanges
