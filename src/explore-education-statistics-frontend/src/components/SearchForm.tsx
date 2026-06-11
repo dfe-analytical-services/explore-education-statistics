@@ -9,12 +9,14 @@ import React from 'react';
 const min = 3;
 
 interface Props {
+  hint?: string;
   label?: string;
   value?: string;
   onSubmit: (value: string) => void;
 }
 
 export default function SearchForm({
+  hint,
   label = 'Search',
   value: initialValue = '',
   onSubmit,
@@ -43,6 +45,7 @@ export default function SearchForm({
             </button>
           }
           announceError
+          hint={hint}
           id="search"
           label={label}
           labelSize="m"
