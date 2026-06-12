@@ -13,42 +13,42 @@
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="AngleSharp" Version="1.4.0" />
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
-    <PackageReference Include="Azure.Identity" Version="1.21.0" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
-    <PackageReference Include="Cronos" Version="0.11.1" />
-    <PackageReference Include="CsvHelper" Version="33.1.0" />
-    <PackageReference Include="FluentValidation" Version="12.1.1" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-    <PackageReference Include="Generator.Equals" Version="3.3.0" />
-    <PackageReference Include="InterpolatedSql" Version="2.5.0" />
-    <PackageReference Include="Medo.Uuid7" Version="3.2.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.28" />
+    <PackageReference Include="AngleSharp" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="Azure.Data.Tables" />
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="Cronos" />
+    <PackageReference Include="CsvHelper" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Generator.Equals" />
+    <PackageReference Include="InterpolatedSql" />
+    <PackageReference Include="Medo.Uuid7" />
+    <PackageReference Include="Microsoft.ApplicationInsights" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
     <!-- TODO EES-4202 DataMovement depends on deprecated Microsoft.Azure.Storage.Blob SDK v11 -->
-    <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="2.0.5" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.28" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.28" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.9" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.16.0" />
-    <PackageReference Include="Namotion.Reflection" Version="3.4.3" />
-    <PackageReference Include="NaturalSort.Extension" Version="4.4.1" />
-    <PackageReference Include="NCrontab.Signed" Version="3.4.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
-    <PackageReference Include="Azure.Storage.Queues" Version="12.25.0" />
-    <PackageReference Include="ObjectCloner" Version="2.2.2" />
-    <PackageReference Include="Semver" Version="3.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
-    <PackageReference Include="System.Linq.Async" Version="7.0.1" />
-    <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-    <PackageReference Include="Mime" Version="3.8.0" />
-    <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
-    <PackageReference Include="System.Text.Json" Version="10.0.9" />
-    <PackageReference Include="Thinktecture.EntityFrameworkCore.BulkOperations" Version="8.4.0" />
-    <PackageReference Include="ZstdSharp.Port" Version="0.8.8" />
+    <PackageReference Include="Microsoft.Azure.Storage.DataMovement" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" />
+    <PackageReference Include="Namotion.Reflection" />
+    <PackageReference Include="NaturalSort.Extension" />
+    <PackageReference Include="NCrontab.Signed" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Azure.Storage.Queues" />
+    <PackageReference Include="ObjectCloner" />
+    <PackageReference Include="Semver" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    <PackageReference Include="System.Linq.Async" />
+    <PackageReference Include="System.Net.NameResolution" />
+    <PackageReference Include="Mime" />
+    <PackageReference Include="Mime-Detective" />
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="Thinktecture.EntityFrameworkCore.BulkOperations" />
+    <PackageReference Include="ZstdSharp.Port" />
   </ItemGroup>
 </Project>
