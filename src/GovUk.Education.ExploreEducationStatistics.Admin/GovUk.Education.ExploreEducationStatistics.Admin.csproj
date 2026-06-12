@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>aspnet-GovUk.Education.ExploreEducationStatistics.Admin-27177B65-FE3A-416B-97FE-420DF4EFF8BF</UserSecretsId>
     <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
