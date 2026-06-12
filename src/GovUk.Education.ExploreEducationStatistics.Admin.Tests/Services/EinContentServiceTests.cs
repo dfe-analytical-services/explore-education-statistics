@@ -1234,8 +1234,8 @@ public class EducationInNumbersContentServiceTests
                     It.Is<string>(query =>
                         query
                         == """
-                        {"indicators":["bbbbb"]}
-                        """
+                            {"indicators":["bbbbb"]}
+                            """
                     ),
                     CancellationToken.None
                 )
@@ -1598,8 +1598,8 @@ public class EducationInNumbersContentServiceTests
                     It.Is<string>(query =>
                         query
                         == """
-                        {"indicators":["bbbbb"]}
-                        """
+                            {"indicators":["bbbbb"]}
+                            """
                     ),
                     CancellationToken.None
                 )
@@ -1762,8 +1762,8 @@ public class EducationInNumbersContentServiceTests
                     It.Is<string>(query =>
                         query
                         == """
-                        {"indicators":["bbbbb"]}
-                        """
+                            {"indicators":["bbbbb"]}
+                            """
                     ),
                     CancellationToken.None
                 )
