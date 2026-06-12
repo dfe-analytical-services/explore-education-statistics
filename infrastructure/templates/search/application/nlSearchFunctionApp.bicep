@@ -8,7 +8,7 @@ param functionAppFirewallRules FirewallRule[]
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Specifies the Search Service name.')
+@description('Specifies the Azure AI Search service name.')
 param searchServiceName string
 
 @description('Name of the \'Natural language search filter\' index in Azure AI Search.')

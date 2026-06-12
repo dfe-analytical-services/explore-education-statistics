@@ -9,7 +9,7 @@ param name string
 @description('Location for all resources.')
 param location string
 
-@description('A list IP network rules to allow access to the Search Service from specific public internet IP address ranges. These rules are applied only when \'publicNetworkAccessEnabled\' is \'true\'.')
+@description('A list IP network rules to allow access to the Event Grid topic from specific public internet IP address ranges. These rules are applied only when \'publicNetworkAccessEnabled\' is \'true\'.')
 param ipRules IpRange[] = []
 
 @description('Specifies whether to enable local authentication. Microsoft Entra access authentication is always enabled.')
