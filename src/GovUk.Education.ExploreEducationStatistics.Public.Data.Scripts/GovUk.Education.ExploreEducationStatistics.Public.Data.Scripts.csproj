@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts</RootNamespace>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -14,7 +13,7 @@
     <PackageReference Include="CliFx" />
     <PackageReference Include="CliWrap" />
     <PackageReference Include="Dapper" />
-    <PackageReference Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.0.0" />
+    <PackageReference Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />

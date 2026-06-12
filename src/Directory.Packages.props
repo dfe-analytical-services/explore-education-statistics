@@ -49,6 +49,10 @@
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.1" />
   </ItemGroup>
 
+  <ItemGroup Label="EES Common">
+    <PackageVersion Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.0.0" />
+  </ItemGroup>
+
   <ItemGroup Label="Entity Framework Core">
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.26" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.26" />
