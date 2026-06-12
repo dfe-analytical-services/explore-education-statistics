@@ -64,7 +64,7 @@ public class ReleaseDataFileService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(async releaseVersion =>
                 await userService.CheckCanUpdateReleaseVersion(releaseVersion, ignoreCheck: forceDelete)
             )
@@ -125,6 +125,7 @@ public class ReleaseDataFileService(
         return await persistenceHelper
             .CheckEntityExists<ReleaseFile>(q =>
                 q.Include(rf => rf.ReleaseVersion)
+                        .ThenInclude(rv => rv.Release)
                     .Include(rf => rf.File.CreatedBy)
                     .Where(rf =>
                         rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data && rf.FileId == fileId
@@ -154,6 +155,7 @@ public class ReleaseDataFileService(
             .CheckEntityExists<ReleaseFile>(q =>
                 q.Include(releaseFile => releaseFile.File)
                     .Include(releaseFile => releaseFile.ReleaseVersion)
+                        .ThenInclude(releaseVersion => releaseVersion.Release)
                     .Where(releaseFile =>
                         releaseFile.ReleaseVersionId == releaseVersionId
                         && releaseFile.FileId == fileId
@@ -187,7 +189,7 @@ public class ReleaseDataFileService(
     public async Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId)
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async () =>
             {
@@ -232,7 +234,7 @@ public class ReleaseDataFileService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -310,7 +312,7 @@ public class ReleaseDataFileService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await ValidateDataSetCsvPair(releaseVersionId, dataFile, metaFile, dataSetTitle)
@@ -342,7 +344,7 @@ public class ReleaseDataFileService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -378,7 +380,7 @@ public class ReleaseDataFileService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ => await ValidateBulkDataSetZip(releaseVersionId, zipFile))
             .OnSuccess(async dataSets =>
@@ -662,7 +664,7 @@ public class ReleaseDataFileService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
                 dataSetUploadIds

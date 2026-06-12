@@ -25,56 +25,48 @@ public class EmailTemplateServiceTests
 
         string userEmail = "test@test.com";
 
-        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo =
+        HashSet<(string PublicationTitle, string ReleaseTitle)> preReleaseRolesInfo =
         [
-            ("Title 3", "Academic year Q1 2022/23", ReleaseRole.Contributor),
-            ("Title 3", "Academic year Q1 2021/22", ReleaseRole.Contributor),
-            ("Title 3", "Academic year Q1 2022/23", ReleaseRole.Approver),
-            ("Title 1", "Academic year Q1 2022/23", ReleaseRole.Approver),
-            ("Title 1", "Academic year Q1 2021/22", ReleaseRole.Approver),
-            ("Title 1", "Academic year Q1 2022/23", ReleaseRole.Contributor),
-            ("Title 2", "Academic year Q1 2022/23", ReleaseRole.Contributor),
-            ("Title 2", "Academic year Q1 2021/22", ReleaseRole.Contributor),
-            ("Title 2", "Academic year Q1 2022/23", ReleaseRole.Approver),
+            ("Title 3", "Academic year Q1 2022/23"),
+            ("Title 3", "Academic year Q1 2021/22"),
+            ("Title 1", "Academic year Q1 2022/23"),
+            ("Title 2", "Academic year Q1 2022/23"),
+            ("Title 2", "Academic year Q1 2021/22"),
         ];
 
         HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo =
         [
-            ("Title 2", PublicationRole.Owner),
-            ("Title 2", PublicationRole.Allower),
-            ("Title 1", PublicationRole.Allower),
-            ("Title 1", PublicationRole.Owner),
-            ("Title 3", PublicationRole.Owner),
-            ("Title 3", PublicationRole.Allower),
+            ("Title 2", PublicationRole.Drafter),
+            ("Title 2", PublicationRole.Approver),
+            ("Title 1", PublicationRole.Approver),
+            ("Title 1", PublicationRole.Drafter),
+            ("Title 3", PublicationRole.Drafter),
+            ("Title 3", PublicationRole.Approver),
         ];
 
         // These should be ordered by publication title, and then by role
         var expectedPublicationRoleList = """
-            * Title 1 - Owner
             * Title 1 - Approver
-            * Title 2 - Owner
+            * Title 1 - Drafter
             * Title 2 - Approver
-            * Title 3 - Owner
+            * Title 2 - Drafter
             * Title 3 - Approver
+            * Title 3 - Drafter
             """;
 
-        // These should be ordered by publication title, and then by release title, and then by role
-        var expectedReleaseRoleList = """
-            * Title 1, Academic year Q1 2021/22 - Approver
-            * Title 1, Academic year Q1 2022/23 - Approver
-            * Title 1, Academic year Q1 2022/23 - Contributor
-            * Title 2, Academic year Q1 2021/22 - Contributor
-            * Title 2, Academic year Q1 2022/23 - Approver
-            * Title 2, Academic year Q1 2022/23 - Contributor
-            * Title 3, Academic year Q1 2021/22 - Contributor
-            * Title 3, Academic year Q1 2022/23 - Approver
-            * Title 3, Academic year Q1 2022/23 - Contributor
+        // These should be ordered by publication title, and then by release title
+        var expectedPreReleaseRoleList = """
+            * Title 1, Academic year Q1 2022/23
+            * Title 2, Academic year Q1 2021/22
+            * Title 2, Academic year Q1 2022/23
+            * Title 3, Academic year Q1 2021/22
+            * Title 3, Academic year Q1 2022/23
             """;
 
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
-            { "release role list", expectedReleaseRoleList },
+            { "pre-release list", expectedPreReleaseRoleList },
             { "publication role list", expectedPublicationRoleList },
         };
 
@@ -87,7 +79,7 @@ public class EmailTemplateServiceTests
 
         var result = service.SendInviteEmail(
             email: userEmail,
-            releaseRolesInfo: releaseRolesInfo,
+            preReleaseRolesInfo: preReleaseRolesInfo,
             publicationRolesInfo: publicationRolesInfo
         );
 
@@ -107,7 +99,7 @@ public class EmailTemplateServiceTests
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
-            { "release role list", "* No release permissions granted" },
+            { "pre-release list", "* No pre-release permissions granted" },
             { "publication role list", "* No publication permissions granted" },
         };
 
@@ -126,8 +118,8 @@ public class EmailTemplateServiceTests
     }
 
     [Theory]
-    [InlineData(PublicationRole.Owner, "Owner")]
-    [InlineData(PublicationRole.Allower, "Approver")]
+    [InlineData(PublicationRole.Drafter, "Drafter")]
+    [InlineData(PublicationRole.Approver, "Approver")]
     public void SendPublicationRoleEmail(PublicationRole role, string expectedRoleText)
     {
         string email = "test@test.com";
@@ -157,83 +149,17 @@ public class EmailTemplateServiceTests
     }
 
     [Fact]
-    public void SendReleaseRoleEmail()
-    {
-        string email = "test@test.com";
-        string publicationTitle = "Publication Title";
-        string releaseTitle = "Release Title";
-        var publicationId = Guid.NewGuid();
-        var releaseVersionId = Guid.NewGuid();
-        var role = ReleaseRole.Approver;
-
-        const string expectedTemplateId = "release-role-template-id";
-
-        var expectedValues = new Dictionary<string, dynamic>
-        {
-            { "url", $"https://admin-uri/publication/{publicationId}/release/{releaseVersionId}/summary" },
-            { "role", role.ToString() },
-            { "publication", publicationTitle },
-            { "release", releaseTitle },
-        };
-
-        var emailService = new Mock<IEmailService>(Strict);
-
-        emailService
-            .Setup(mock => mock.SendEmail("test@test.com", expectedTemplateId, expectedValues))
-            .Returns(Unit.Instance);
-
-        var service = SetupEmailTemplateService(emailService: emailService.Object);
-
-        var result = service.SendReleaseRoleEmail(
-            email: email,
-            publicationTitle: publicationTitle,
-            releaseTitle: releaseTitle,
-            publicationId: publicationId,
-            releaseVersionId: releaseVersionId,
-            role: role
-        );
-
-        emailService.Verify(s => s.SendEmail("test@test.com", expectedTemplateId, expectedValues), Times.Once);
-
-        VerifyAllMocks(emailService);
-
-        result.AssertRight();
-    }
-
-    [Fact]
-    public void SendContributorInviteEmail()
+    public void SendDrafterInviteEmail()
     {
         string email = "test@test.com";
         string publicationTitle = "Publication Title";
 
-        const string expectedTemplateId = "contributor-template-id";
-
-        // Purposefully creating the release info out of order to ensure sorting is working as expected when generating the formatted release titles for the email.
-        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo =
-        [
-            (2021, TimeIdentifier.AcademicYearQ2, "Academic year Q2 2021/22"),
-            (2020, TimeIdentifier.AcademicYearQ1, "Academic year Q1 2020/21"),
-            (2022, TimeIdentifier.AcademicYearQ2, "Academic year Q2 2022/23"),
-            (2020, TimeIdentifier.AcademicYearQ2, "Academic year Q2 2020/21"),
-            (2022, TimeIdentifier.AcademicYearQ1, "Academic year Q1 2022/23"),
-            (2021, TimeIdentifier.AcademicYearQ1, "Academic year Q1 2021/22"),
-        ];
-
-        // These should be ordered by release year and then time period coverage
-        var expectedReleaseList = """
-            * Academic year Q1 2020/21
-            * Academic year Q2 2020/21
-            * Academic year Q1 2021/22
-            * Academic year Q2 2021/22
-            * Academic year Q1 2022/23
-            * Academic year Q2 2022/23
-            """;
+        const string expectedTemplateId = "drafter-template-id";
 
         var expectedValues = new Dictionary<string, dynamic>
         {
             { "url", "https://admin-uri" },
             { "publication name", publicationTitle },
-            { "release list", expectedReleaseList },
         };
 
         var emailService = new Mock<IEmailService>(Strict);
@@ -242,11 +168,7 @@ public class EmailTemplateServiceTests
 
         var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-        var result = service.SendContributorInviteEmail(
-            email: email,
-            publicationTitle: publicationTitle,
-            releasesInfo: releasesInfo
-        );
+        var result = service.SendDrafterInviteEmail(email: email, publicationTitle: publicationTitle);
 
         result.AssertRight();
 
@@ -391,11 +313,10 @@ public class EmailTemplateServiceTests
         {
             InviteWithRolesTemplateId = "invite-with-roles-template-id",
             PublicationRoleTemplateId = "publication-role-template-id",
-            ReleaseRoleTemplateId = "release-role-template-id",
+            DrafterTemplateId = "drafter-template-id",
             ReleaseHigherReviewersTemplateId = "notify-release-higher-reviewers-template-id",
             MethodologyHigherReviewersTemplateId = "notify-methodology-higher-reviewers-template-id",
             PreReleaseTemplateId = "prerelease-template-id",
-            ContributorTemplateId = "contributor-template-id",
         }.ToOptionsWrapper();
 
     private static EmailTemplateService SetupEmailTemplateService(

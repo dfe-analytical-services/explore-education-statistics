@@ -44,7 +44,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task Delete()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
@@ -180,7 +180,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task Delete_DeleteReplacementFiles()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
@@ -316,9 +316,11 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task Delete_DeleteFilesFromAmendment()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
-
-        var amendmentRelease = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion amendmentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithPreviousVersionId(releaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
@@ -342,15 +344,15 @@ public class ReleaseDataFileServiceTests
 
         var releaseMetaFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = metaFile };
 
-        var amendmentReleaseDataFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = dataFile };
+        var amendmentReleaseDataFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = dataFile };
 
-        var amendmentReleaseMetaFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = metaFile };
+        var amendmentReleaseMetaFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = metaFile };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentRelease);
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentReleaseVersion);
             contentDbContext.Files.AddRange(dataFile, metaFile);
             contentDbContext.ReleaseFiles.AddRange(
                 releaseDataFile,
@@ -366,7 +368,7 @@ public class ReleaseDataFileServiceTests
         var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
         releaseFileService
-            .Setup(mock => mock.CheckFileExists(amendmentRelease.Id, dataFile.Id, FileType.Data))
+            .Setup(mock => mock.CheckFileExists(amendmentReleaseVersion.Id, dataFile.Id, FileType.Data))
             .ReturnsAsync(dataFile);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -378,7 +380,7 @@ public class ReleaseDataFileServiceTests
                 releaseFileService: releaseFileService.Object
             );
 
-            var result = await service.Delete(amendmentRelease.Id, dataFile.Id);
+            var result = await service.Delete(amendmentReleaseVersion.Id, dataFile.Id);
 
             Assert.True(result.IsRight);
 
@@ -402,7 +404,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task DeleteAll()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
@@ -519,9 +521,12 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task DeleteAll_FileFromAmendment()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var amendmentRelease = new ReleaseVersion { PreviousVersionId = releaseVersion.Id };
+        ReleaseVersion amendmentReleaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithPreviousVersionId(releaseVersion.Id)
+            .WithRelease(_fixture.DefaultRelease());
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
@@ -545,15 +550,15 @@ public class ReleaseDataFileServiceTests
 
         var metaReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = metaFile };
 
-        var amendmentReleaseDataFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = dataFile };
+        var amendmentReleaseDataFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = dataFile };
 
-        var amendmentReleaseMetaFile = new ReleaseFile { ReleaseVersion = amendmentRelease, File = metaFile };
+        var amendmentReleaseMetaFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = metaFile };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentRelease);
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentReleaseVersion);
             contentDbContext.Files.AddRange(dataFile, metaFile);
             contentDbContext.ReleaseFiles.AddRange(
                 dataReleaseFile,
@@ -569,7 +574,7 @@ public class ReleaseDataFileServiceTests
         var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
         releaseFileService
-            .Setup(mock => mock.CheckFileExists(amendmentRelease.Id, dataFile.Id, FileType.Data))
+            .Setup(mock => mock.CheckFileExists(amendmentReleaseVersion.Id, dataFile.Id, FileType.Data))
             .ReturnsAsync(dataFile);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -581,7 +586,7 @@ public class ReleaseDataFileServiceTests
                 releaseFileService: releaseFileService.Object
             );
 
-            var result = await service.DeleteAll(amendmentRelease.Id);
+            var result = await service.DeleteAll(amendmentReleaseVersion.Id);
 
             Assert.True(result.IsRight);
 
@@ -626,7 +631,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task DeleteAll_NoFiles()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -658,7 +663,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task GetInfo()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataReleaseFile = new ReleaseFile
         {
@@ -782,8 +787,9 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task GetInfo_AmendedRelease()
     {
-        var originalReleaseVersion = new ReleaseVersion();
-        var amendedReleaseVersion = new ReleaseVersion();
+        Release release = _fixture.DefaultRelease();
+        ReleaseVersion originalReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
+        ReleaseVersion amendedReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
 
         var dataFile = new File
         {
@@ -854,7 +860,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task GetAccoutrementsSummary_ReturnsDataBlockAndFootnote()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
@@ -914,7 +920,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task GetAccoutrementsSummary_EmptyResult()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
@@ -972,7 +978,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ReorderDataFiles()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var releaseDataFile1 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
@@ -1141,7 +1147,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ListAll()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var dataReleaseFile1 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
@@ -1258,8 +1264,9 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ListAll_WithReplacementInProgressOnNewerReleaseVersion_ReplacedByDataFileIsNull()
     {
-        var releaseVersion = new ReleaseVersion();
-        var amendmentReleaseVersion = new ReleaseVersion();
+        Release release = _fixture.DefaultRelease();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
+        ReleaseVersion amendmentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
         var originalFileId = Guid.NewGuid();
         var replacementFileId = Guid.NewGuid();
         var originalFile = new File
@@ -1372,7 +1379,7 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ListAll_WithReplacement()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var originalFileId = Guid.NewGuid();
         var replacementFileId = Guid.NewGuid();
         var originalReleaseFile = new ReleaseFile
@@ -1500,12 +1507,12 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ListAll_FiltersCorrectly()
     {
-        var release1 = new ReleaseVersion();
-        var release2 = new ReleaseVersion();
+        ReleaseVersion releaseVersion1 = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion releaseVersion2 = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var dataRelease1File = new ReleaseFile
         {
-            ReleaseVersion = release1,
+            ReleaseVersion = releaseVersion1,
             Name = "Test data",
             File = new File
             {
@@ -1518,13 +1525,13 @@ public class ReleaseDataFileServiceTests
         };
         var metaRelease1File = new ReleaseFile
         {
-            ReleaseVersion = release1,
+            ReleaseVersion = releaseVersion1,
             File = new File { Filename = "test-data-1.meta.csv", Type = Metadata },
         };
 
         var dataRelease2File = new ReleaseFile
         {
-            ReleaseVersion = release2,
+            ReleaseVersion = releaseVersion2,
             Name = "Test data 2",
             File = new File
             {
@@ -1536,13 +1543,13 @@ public class ReleaseDataFileServiceTests
         };
         var metaRelease2File = new ReleaseFile
         {
-            ReleaseVersion = release2,
+            ReleaseVersion = releaseVersion2,
             File = new File { Filename = "test-data-2.meta.csv", Type = Metadata },
         };
 
         var ancillaryRelease1File = new ReleaseFile
         {
-            ReleaseVersion = release1,
+            ReleaseVersion = releaseVersion1,
             File = new File
             {
                 Filename = "ancillary-file.pdf",
@@ -1572,7 +1579,7 @@ public class ReleaseDataFileServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.ReleaseVersions.AddRange(release1, release2);
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2);
             contentDbContext.ReleaseFiles.AddRange(
                 dataRelease1File,
                 metaRelease1File,
@@ -1588,7 +1595,7 @@ public class ReleaseDataFileServiceTests
         {
             var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
 
-            var result = await service.ListAll(release1.Id);
+            var result = await service.ListAll(releaseVersion1.Id);
 
             Assert.True(result.IsRight);
 
@@ -1615,8 +1622,9 @@ public class ReleaseDataFileServiceTests
     [Fact]
     public async Task ListAll_AmendedRelease()
     {
-        var originalReleaseVersion = new ReleaseVersion();
-        var amendedReleaseVersion = new ReleaseVersion();
+        Release release = _fixture.DefaultRelease();
+        ReleaseVersion originalReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
+        ReleaseVersion amendedReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(release);
 
         var dataReleaseFile1 = new ReleaseFile
         {

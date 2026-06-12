@@ -71,11 +71,11 @@ public class MethodologyController : ControllerBase
     [HttpGet("publication/{publicationId:guid}/methodologies")]
     public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
         Guid publicationId,
-        [FromQuery] bool isPrerelease = false
+        [FromQuery] bool isPreRelease = false
     )
     {
         return await _methodologyService
-            .ListLatestMethodologyVersions(publicationId, isPrerelease)
+            .ListLatestMethodologyVersions(publicationId, isPreRelease)
             .HandleFailuresOrOk();
     }
 

@@ -205,21 +205,25 @@ public class ReleaseVersionServicePermissionTests
     {
         var (releaseVersion, otherReleaseVersion) = _dataFixture
             .DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            .ForIndex(
+                0,
+                s => s.SetRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            )
+            .ForIndex(
+                1,
+                s => s.SetRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            )
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .GenerateTuple2();
 
-        UserReleaseRole userReleaseRole = _dataFixture
-            .DefaultUserReleaseRole()
-            .WithReleaseVersion(releaseVersion)
+        UserPublicationRole userPublicationRole = _dataFixture
+            .DefaultUserPublicationRole()
+            .WithPublication(releaseVersion.Release.Publication)
             .WithUser(_dataFixture.DefaultUser().WithId(_userId))
-            .WithRole(ReleaseRole.Contributor);
-
-        var userReleaseRoleRepositoryMock = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
+            .WithRole(PublicationRole.Approver);
 
         var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-        userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
+        userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, userPublicationRole);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupCheck(RegisteredUser)
@@ -259,7 +263,6 @@ public class ReleaseVersionServicePermissionTests
                 var service = BuildService(
                     contentDbContext: contextDbContext,
                     userService: userService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepositoryMock.Object,
                     userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
                 );
 
@@ -269,7 +272,7 @@ public class ReleaseVersionServicePermissionTests
                 Assert.Single(viewModel);
                 Assert.Equal(releaseVersion.Id, viewModel[0].Id);
 
-                MockUtils.VerifyAllMocks(userService, userReleaseRoleRepositoryMock, userPublicationRoleRepositoryMock);
+                MockUtils.VerifyAllMocks(userService, userPublicationRoleRepositoryMock);
 
                 return result;
             });
@@ -366,14 +369,14 @@ public class ReleaseVersionServicePermissionTests
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
         contentDbContext ??= Mock.Of<ContentDbContext>();
         statisticsDbContext ??= Mock.Of<StatisticsDbContext>();
 
-        userReleaseRoleRepository ??= Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userPreReleaseRoleRepository ??= Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
         userPublicationRoleRepository ??= Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict);
 
         return new ReleaseVersionService(
@@ -386,7 +389,6 @@ public class ReleaseVersionServicePermissionTests
                 ?? new ReleaseVersionRepository(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    userReleaseRoleRepository: userReleaseRoleRepository,
                     userPublicationRoleRepository: userPublicationRoleRepository
                 ),
             Mock.Of<IReleaseFileRepository>(),
@@ -402,7 +404,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IProcessorClient>(),
             Mock.Of<IPrivateBlobCacheService>(),
             new OrganisationsValidatorMockBuilder().Build(),
-            userReleaseRoleRepository,
+            userPreReleaseRoleRepository,
             userPublicationRoleRepository,
             Mock.Of<IReleaseSlugValidator>(),
             Mock.Of<ILogger<ReleaseVersionService>>()

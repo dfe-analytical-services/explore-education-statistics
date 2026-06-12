@@ -63,6 +63,7 @@ public class DataSetValidator(
             {
                 var releaseVersion = await contentDbContext
                     .ReleaseVersions.AsNoTracking()
+                    .Include(rv => rv.Release)
                     .SingleAsync(v => v.Id == dataSet.ReleaseVersionId);
 
                 var canUpdateReleaseVersion = await userService.CheckCanUpdateReleaseVersion(releaseVersion).IsRight();

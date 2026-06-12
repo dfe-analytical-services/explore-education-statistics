@@ -1,13 +1,13 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class PendingInviteViewModel
+public record PendingInviteViewModel
 {
-    public string Email { get; set; } = string.Empty;
+    public required string Email { get; init; }
 
-    public string? Role { get; set; }
+    public required string Role { get; init; }
 
-    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; set; } = new();
+    public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
 
-    public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
+    public List<UserPreReleaseRoleViewModel> UserPreReleaseRoles { get; init; } = [];
 }

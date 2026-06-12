@@ -12,7 +12,7 @@ import {
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import DeleteDraftModal from '@admin/pages/admin-dashboard/components/DeleteDraftModal';
-import releaseQueries from '@admin/queries/releaseQueries';
+import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -33,7 +33,7 @@ const DraftReleaseRow = ({
   onAmendmentDelete,
 }: Props) => {
   const { data: checklist, isFetching } = useQuery(
-    releaseQueries.getChecklist(release.id),
+    releaseVersionQueries.getChecklist(release.id),
   );
 
   const { errors = [], warnings = [] } = checklist ?? {};

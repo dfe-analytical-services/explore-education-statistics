@@ -1,0 +1,99 @@
+import client from '@admin/services/utils/service';
+
+export interface PreReleaseUserSummary {
+  email: string;
+}
+
+export interface PreReleaseUser extends PreReleaseUserSummary {
+  id: string;
+  name: string;
+}
+
+export interface PreReleaseInvitePlan {
+  alreadyAccepted: string[];
+  alreadyInvited: string[];
+  invitable: string[];
+}
+
+export interface PreReleaseUserService {
+  getAllPreReleaseUsers(): Promise<PreReleaseUser[]>;
+  getPreReleaseUsers(
+    releaseVersionId: string,
+  ): Promise<PreReleaseUserSummary[]>;
+  getPreReleaseUsersInvitePlan(
+    releaseVersionId: string,
+    emails: string[],
+  ): Promise<PreReleaseInvitePlan>;
+  revokePreReleaseAccessById(userPreReleaseRoleId: string): Promise<boolean>;
+  revokePreReleaseAccessByEmail(
+    releaseVersionId: string,
+    email: string,
+  ): Promise<void>;
+  grantPreReleaseAccessForMany(
+    releaseVersionId: string,
+    emails: string[],
+  ): Promise<PreReleaseUserSummary[]>;
+  grantPreReleaseAccess(userId: string, releaseId: string): Promise<boolean>;
+}
+
+const preReleaseUsersService: PreReleaseUserService = {
+  getAllPreReleaseUsers(): Promise<PreReleaseUser[]> {
+    return client.get('/pre-release/users');
+  },
+
+  getPreReleaseUsers(
+    releaseVersionId: string,
+  ): Promise<PreReleaseUserSummary[]> {
+    return client.get(
+      `/pre-release/release-versions/${releaseVersionId}/users`,
+    );
+  },
+
+  getPreReleaseUsersInvitePlan(
+    releaseVersionId: string,
+    emails: string[],
+  ): Promise<PreReleaseInvitePlan> {
+    return client.post(
+      `/pre-release/release-versions/${releaseVersionId}/users/invite-plan`,
+      {
+        emails,
+      },
+    );
+  },
+
+  revokePreReleaseAccessById(userPreReleaseRoleId: string): Promise<boolean> {
+    return client.delete(`/pre-release/roles/${userPreReleaseRoleId}`);
+  },
+
+  revokePreReleaseAccessByEmail(
+    releaseVersionId: string,
+    email: string,
+  ): Promise<void> {
+    return client.delete(
+      `/pre-release/release-versions/${releaseVersionId}/users/by-email`,
+      {
+        data: {
+          email,
+        },
+      },
+    );
+  },
+
+  grantPreReleaseAccessForMany(
+    releaseVersionId: string,
+    emails: string[],
+  ): Promise<PreReleaseUserSummary[]> {
+    return client.post(
+      `/pre-release/release-versions/${releaseVersionId}/users`,
+      {
+        emails,
+      },
+    );
+  },
+
+  grantPreReleaseAccess(userId: string, releaseId: string): Promise<boolean> {
+    return client.post(`/pre-release/releases/${releaseId}/users/${userId}`);
+  },
+};
+
+export default preReleaseUsersService;

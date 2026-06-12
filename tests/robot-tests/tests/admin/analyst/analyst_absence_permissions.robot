@@ -48,54 +48,54 @@ Validate Analyst1 can see correct publication release order
     ...    %{PUBLIC_URL}/find-statistics/seed-publication-pupil-absence-in-schools-in-england/2016-17
     user checks table cell contains    1    3    Latest release
 
-    user checks table cell contains    2    1    Academic year 2014/15
+    user checks table cell contains    2    1    Academic year 2009/10
     user checks table cell contains    2    2
-    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010
     user checks table cell contains    2    3    Legacy release
 
-    user checks table cell contains    3    1    Academic year 2013/14
+    user checks table cell contains    3    1    Academic year 2010/11
     user checks table cell contains    3    2
-    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011
     user checks table cell contains    3    3    Legacy release
 
-    user checks table cell contains    4    1    Academic year 2012/13
+    user checks table cell contains    4    1    Academic year 2011/12
     user checks table cell contains    4    2
-    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics
     user checks table cell contains    4    3    Legacy release
 
-    user checks table cell contains    5    1    Academic year 2011/12
+    user checks table cell contains    5    1    Academic year 2012/13
     user checks table cell contains    5    2
-    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013
     user checks table cell contains    5    3    Legacy release
 
-    user checks table cell contains    6    1    Academic year 2010/11
+    user checks table cell contains    6    1    Academic year 2013/14
     user checks table cell contains    6    2
-    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014
     user checks table cell contains    6    3    Legacy release
 
-    user checks table cell contains    7    1    Academic year 2009/10
+    user checks table cell contains    7    1    Academic year 2014/15
     user checks table cell contains    7    2
-    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015
     user checks table cell contains    7    3    Legacy release
 
-Check Analyst1 cannot create a legacy release
-    user checks page does not contain button    Create legacy release
+Check Analyst1 can create a legacy release
+    user checks page contains button    Create legacy release
 
-Check Analyst1 cannot reorder releases
-    user checks page does not contain button    Reorder releases
+Check Analyst1 can reorder releases
+    user checks page contains button    Reorder releases
 
-Check Analyst1 cannot edit a legacy release
-    user checks page does not contain button    Edit
+Check Analyst1 can edit a legacy release
+    user checks page contains button    Edit
 
-Check Analyst1 cannot delete a legacy release
-    user checks page does not contain button    Delete
+Check Analyst1 can delete a legacy release
+    user checks page contains button    Delete
 
 Navigate to releases
     user clicks link    Releases
     user waits until h2 is visible    Manage releases
 
-Validate Analyst1 cannot create a release for Seed Data Theme 1 Publication 1 publication
-    user checks page does not contain    link:Create new release
+Validate Analyst1 can create a release for Seed Data Theme 1 Publication 1 publication
+    user checks page contains link    Create new release
 
 Navigate to Absence release
     ${ROW}=    user gets table row    Academic year 2016/17    testid:publication-published-releases

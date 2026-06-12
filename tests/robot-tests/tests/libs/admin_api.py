@@ -91,7 +91,7 @@ def user_creates_test_publication_via_api(publication_name: str, theme_id: str =
 
 def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date: str = None):
     response = admin_client.post(
-        f"/api/user-management/invites",
+        f"/api/user-invites",
         {
             "email": user_email,
             "roleId": _get_global_role_id(role_name),
@@ -104,32 +104,26 @@ def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date:
 
 
 def delete_user_invite_via_api(user_email: str):
-    response = admin_client.delete(f"/api/user-management/invites/{user_email}")
+    response = admin_client.delete(f"/api/user-invites/{user_email}")
     assert (
         response.status_code < 300
     ), f"Removing invite for user {user_email} API request failed with {response.status_code} and {response.text}"
 
 
-def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, role_name: str = None):
+def user_adds_prerelease_role_to_user_via_api(user_email: str, release_id: str):
     user_id = _get_user_details_via_api(user_email)["id"]
 
-    response = admin_client.post(
-        f"/api/user-management/users/{user_id}/release-role",
-        {
-            "releaseId": release_id,
-            "releaseRole": role_name,
-        },
-    )
+    response = admin_client.post(f"/api/pre-release/releases/{release_id}/users/{user_id}")
     assert (
         response.status_code < 300
-    ), f"Adding release role to user API request failed with {response.status_code} and {response.text}"
+    ), f"Adding pre-release role to user API request failed with {response.status_code} and {response.text}"
 
 
 def user_adds_publication_role_to_user_via_api(user_email: str, publication_id: str, role_name: str = None):
     user_id = _get_user_details_via_api(user_email)["id"]
 
     response = admin_client.post(
-        f"/api/user-management/users/{user_id}/publication-role",
+        f"/api/users/{user_id}/publication-roles",
         {
             "publicationId": publication_id,
             "publicationRole": role_name,
@@ -141,7 +135,7 @@ def user_adds_publication_role_to_user_via_api(user_email: str, publication_id: 
 
 
 def user_removes_all_release_and_publication_roles_from_user(user_id: str) -> None:
-    response = admin_client.delete(f"/api/user-management/user/{user_id}/resource-roles/all")
+    response = admin_client.delete(f"/api/users/{user_id}/resource-roles")
     assert (
         response.status_code < 300
     ), f"Removing release role from user API request failed with {response.status_code} and {response.text}"
@@ -256,14 +250,14 @@ def user_updates_release_published_date_via_api(release_id: str, published: date
 
 
 def delete_test_user(email: str):
-    response = admin_client.delete(f"/api/user-management/user/{email}")
+    response = admin_client.delete(f"/api/users/{email}")
     assert (
         response.status_code < 300
     ), f"Deleting test user {email} failed with {response.status_code} and {response.text}"
 
 
 def _get_user_details_via_api(user_email: str):
-    response = admin_client.get("/api/user-management/users")
+    response = admin_client.get("/api/users")
 
     assert response.status_code == 200, "Error when fetching users via api"
 
@@ -280,7 +274,7 @@ def _get_user_details_via_api(user_email: str):
 
 
 def _get_prerelease_user_details_via_api(user_email: str):
-    response = admin_client.get("/api/user-management/pre-release")
+    response = admin_client.get("/api/pre-release/users")
 
     assert response.status_code == 200, "Error when fetching prerelease users via api"
 
@@ -297,7 +291,7 @@ def _get_prerelease_user_details_via_api(user_email: str):
 
 
 def _get_global_role_id(role_name: str):
-    response = admin_client.get("/api/user-management/roles")
+    response = admin_client.get("/api/global-roles")
     assert (
         response.status_code < 300
     ), f"Getting list of global roles failed with {response.status_code} and {response.text}"
@@ -308,15 +302,6 @@ def _get_global_role_id(role_name: str):
     assert matching_roles, f"Could not find global role matching name {role_name}"
 
     return matching_roles[0]["id"]
-
-
-def _get_user_invite(user_email: str):
-    response = admin_client.get("/api/user-management/invites")
-    assert response.status_code < 300, f"Getting list of invites failed with {response.status_code} and {response.text}"
-
-    invites = response.json()
-    matching_invites = list(filter(lambda invite: invite["email"] == user_email, invites))
-    return next(iter(matching_invites), None)
 
 
 def user_updates_methodology_published_date_via_api(methodology_id: str, published: datetime) -> None:

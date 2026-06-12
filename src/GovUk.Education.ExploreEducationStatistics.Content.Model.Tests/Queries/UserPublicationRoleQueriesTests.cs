@@ -70,15 +70,15 @@ public class UserPublicationRoleQueriesTests
     {
         User user = _fixture.DefaultUser();
         Publication publication = _fixture.DefaultPublication();
-        PublicationRole[] rolesToInclude = [PublicationRole.Allower];
+        PublicationRole[] rolesToInclude = [PublicationRole.Approver];
 
         var userPublicationRoles = _fixture
             .DefaultUserPublicationRole()
             .WithUser(user)
             .WithPublication(publication)
-            .ForIndex(0, s => s.SetRole(PublicationRole.Allower))
+            .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
             // This one should be filtered out
-            .ForIndex(1, s => s.SetRole(PublicationRole.Owner))
+            .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
             .GenerateList(2);
 
         var result = userPublicationRoles.AsQueryable().WhereRolesIn(rolesToInclude).ToList();
@@ -91,14 +91,14 @@ public class UserPublicationRoleQueriesTests
     {
         User user = _fixture.DefaultUser();
         Publication publication = _fixture.DefaultPublication();
-        PublicationRole[] rolesToInclude = [PublicationRole.Allower, PublicationRole.Owner];
+        PublicationRole[] rolesToInclude = [PublicationRole.Approver, PublicationRole.Drafter];
 
         var userPublicationRoles = _fixture
             .DefaultUserPublicationRole()
             .WithUser(user)
             .WithPublication(publication)
-            .ForIndex(0, s => s.SetRole(PublicationRole.Allower))
-            .ForIndex(1, s => s.SetRole(PublicationRole.Owner))
+            .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+            .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
             .GenerateList(2);
 
         var result = userPublicationRoles.AsQueryable().WhereRolesIn(rolesToInclude).ToList();
@@ -127,15 +127,15 @@ public class UserPublicationRoleQueriesTests
     {
         User user = _fixture.DefaultUser();
         Publication publication = _fixture.DefaultPublication();
-        PublicationRole[] rolesToNotInclude = [PublicationRole.Allower];
+        PublicationRole[] rolesToNotInclude = [PublicationRole.Approver];
 
         var userPublicationRoles = _fixture
             .DefaultUserPublicationRole()
             .WithUser(user)
             .WithPublication(publication)
-            .ForIndex(0, s => s.SetRole(PublicationRole.Owner))
+            .ForIndex(0, s => s.SetRole(PublicationRole.Drafter))
             // This one should be filtered out
-            .ForIndex(1, s => s.SetRole(PublicationRole.Allower))
+            .ForIndex(1, s => s.SetRole(PublicationRole.Approver))
             .GenerateList(2);
 
         var result = userPublicationRoles.AsQueryable().WhereRolesNotIn(rolesToNotInclude).ToList();
@@ -148,15 +148,15 @@ public class UserPublicationRoleQueriesTests
     {
         User user = _fixture.DefaultUser();
         Publication publication = _fixture.DefaultPublication();
-        PublicationRole[] rolesToNotInclude = [PublicationRole.Allower, PublicationRole.Owner];
+        PublicationRole[] rolesToNotInclude = [PublicationRole.Approver, PublicationRole.Drafter];
 
         var userPublicationRoles = _fixture
             .DefaultUserPublicationRole()
             .WithUser(user)
             .WithPublication(publication)
             // Both should be filtered out
-            .ForIndex(0, s => s.SetRole(PublicationRole.Allower))
-            .ForIndex(1, s => s.SetRole(PublicationRole.Owner))
+            .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+            .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
             .GenerateList(2);
 
         var result = userPublicationRoles.AsQueryable().WhereRolesNotIn(rolesToNotInclude).ToList();

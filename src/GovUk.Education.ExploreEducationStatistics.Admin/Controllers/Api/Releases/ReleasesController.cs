@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Relea
 [Authorize]
 public class ReleasesController(IReleaseService releaseService) : ControllerBase
 {
+    /// <summary>
+    /// Provides a list of releases that are available within the service
+    /// </summary>
+    /// <returns>Id and Title of the releases</returns>
+    [HttpGet("releases")]
+    [ProducesResponseType(200)]
+    public async Task<ActionResult<List<IdTitleViewModel>>> GetReleases()
+    {
+        return await releaseService.ListReleases().HandleFailuresOrOk();
+    }
+
     [HttpPost("releases")]
     public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
     {

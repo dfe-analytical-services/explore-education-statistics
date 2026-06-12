@@ -1,7 +1,7 @@
-import _userService, {
+import _usersService, {
   RemoveUser,
-  UserStatus,
-} from '@admin/services/userService';
+} from '@admin/services/user-management/usersService';
+import { User } from '@admin/services/types/userWithRoles';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
@@ -10,11 +10,11 @@ import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/dom';
 import BauUsersPage from '../BauUsersPage';
 
-jest.mock('@admin/services/userService');
+jest.mock('@admin/services/user-management/usersService');
 
-const userService = _userService as jest.Mocked<typeof _userService>;
+const usersService = _usersService as jest.Mocked<typeof _usersService>;
 
-const user: UserStatus[] = [
+const user: User[] = [
   {
     id: '1',
     name: 'TestUser1',
@@ -29,7 +29,7 @@ const removedUser: RemoveUser = {
 
 describe('BauUsersPage', () => {
   test('renders delete action when user a user is present', async () => {
-    userService.getUsers.mockResolvedValue(user);
+    usersService.getAllUsers.mockResolvedValue(user);
 
     renderPage();
 
@@ -39,8 +39,8 @@ describe('BauUsersPage', () => {
   });
 
   test('calls user service when delete user button is clicked', async () => {
-    userService.getUsers.mockResolvedValue(user);
-    userService.deleteUser.mockResolvedValue(Promise.resolve(removedUser));
+    usersService.getAllUsers.mockResolvedValue(user);
+    usersService.deleteUser.mockResolvedValue(Promise.resolve(removedUser));
     renderPage();
 
     await waitFor(() => {
@@ -55,7 +55,7 @@ describe('BauUsersPage', () => {
     });
     await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-    expect(userService.deleteUser).toHaveBeenCalled();
+    expect(usersService.deleteUser).toHaveBeenCalled();
   });
 
   function renderPage() {

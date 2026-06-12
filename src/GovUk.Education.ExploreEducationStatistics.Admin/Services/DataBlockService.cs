@@ -57,7 +57,7 @@ public class DataBlockService : IDataBlockService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
@@ -93,7 +93,7 @@ public class DataBlockService : IDataBlockService
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid dataBlockVersionId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccessDo(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(releaseVersion =>
                 GetDeletePlan(releaseVersionId: releaseVersion.Id, dataBlockVersionId: dataBlockVersionId)
@@ -171,7 +171,7 @@ public class DataBlockService : IDataBlockService
     public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseVersionId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -260,6 +260,7 @@ public class DataBlockService : IDataBlockService
             .CheckEntityExists<DataBlockVersion>(query =>
                 query
                     .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
+                        .ThenInclude(releaseVersion => releaseVersion.Release)
                     .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
                         .ThenInclude(dataBlock => dataBlock.ContentSection)
                     .Where(dataBlockVersion =>
@@ -282,6 +283,7 @@ public class DataBlockService : IDataBlockService
     {
         return _context
             .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
+                .ThenInclude(rv => rv.Release)
             .SingleOrDefaultAsync(dataBlockVersion =>
                 dataBlockVersion.ReleaseVersionId == releaseVersionId
                 && dataBlockVersion.DataBlockParentId == dataBlockParentId
@@ -434,6 +436,7 @@ public class DataBlockService : IDataBlockService
         return await _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
             query
                 .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
+                    .ThenInclude(rv => rv.Release)
                 .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockId)
         );
     }
@@ -466,7 +469,7 @@ public class DataBlockService : IDataBlockService
     public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {

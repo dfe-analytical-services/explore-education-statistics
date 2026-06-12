@@ -87,7 +87,9 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
         [InlineData(null)]
         public async Task NoPermissionsToViewReleaseVersion_Returns403(SecurityClaimTypes? claimType)
         {
-            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease());
 
             await fixture.GetContentDbContext().AddTestData(context => context.ReleaseVersions.Add(releaseVersion));
 
@@ -103,7 +105,9 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
         [Fact]
         public async Task NoReleaseFileExists_ReturnsEmptyList()
         {
-            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease());
 
             await fixture.GetContentDbContext().AddTestData(context => context.ReleaseVersions.Add(releaseVersion));
 

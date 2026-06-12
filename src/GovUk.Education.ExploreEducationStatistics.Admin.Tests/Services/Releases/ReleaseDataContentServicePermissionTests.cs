@@ -18,7 +18,7 @@ public class ReleaseDataContentServicePermissionTests
     public async Task GetReleaseDataContent()
     {
         // Arrange
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         // Act & Assert
         await PolicyCheckBuilder<ContentSecurityPolicies>()

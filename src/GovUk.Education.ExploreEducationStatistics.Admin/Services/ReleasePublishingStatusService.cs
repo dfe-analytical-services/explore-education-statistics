@@ -25,6 +25,7 @@ public class ReleasePublishingStatusService(
     ) =>
         await contentDbContext
             .ReleaseVersions.AsNoTracking()
+            .Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>

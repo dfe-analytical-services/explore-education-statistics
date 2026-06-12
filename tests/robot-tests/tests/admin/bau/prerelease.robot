@@ -180,11 +180,11 @@ Invite users to the prerelease
     user checks list has x items    testid:invitableList    2    ${modal}
     user checks list item contains    testid:invitableList    1
     ...    simulate-delivered-prerelease-1@notifications.service.gov.uk    ${modal}
-    user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
+    user checks list item contains    testid:invitableList    2    ees-test.analyst1@education.gov.uk    ${modal}
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
     user checks table cell contains    1    1    simulate-delivered-prerelease-1@notifications.service.gov.uk
-    user checks table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
+    user checks table cell contains    2    1    ees-test.analyst1@education.gov.uk
 
 Refresh page and check prerelease user list isn't duplicated
     [Documentation]    EES-3535
@@ -223,7 +223,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     ...    simulate-delivered-prerelease-3@notifications.service.gov.uk    ${modal}
 
     user checks list has x items    testid:acceptedList    1    ${modal}
-    user checks list item contains    testid:acceptedList    1    EES-test.ANALYST1@education.gov.uk    ${modal}
+    user checks list item contains    testid:acceptedList    1    ees-test.analyst1@education.gov.uk    ${modal}
 
     user checks list has x items    testid:invitedList    1    ${modal}
     user checks list item contains    testid:invitedList    1

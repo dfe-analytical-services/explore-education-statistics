@@ -40,7 +40,7 @@ public class FeaturedTableService : IFeaturedTableService
     public async Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseVersionId, Guid dataBlockId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
@@ -53,7 +53,7 @@ public class FeaturedTableService : IFeaturedTableService
     public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> List(Guid releaseVersionId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -68,7 +68,7 @@ public class FeaturedTableService : IFeaturedTableService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ => await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
             .OnSuccessDo(async dataBlock =>
@@ -116,7 +116,7 @@ public class FeaturedTableService : IFeaturedTableService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
@@ -139,7 +139,7 @@ public class FeaturedTableService : IFeaturedTableService
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid dataBlockId)
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
@@ -159,7 +159,7 @@ public class FeaturedTableService : IFeaturedTableService
     )
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion => await ListFeaturedTables(releaseVersion.Id))
             .OnSuccess(async featuredTableList =>
