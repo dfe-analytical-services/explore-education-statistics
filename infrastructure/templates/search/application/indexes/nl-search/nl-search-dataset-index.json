@@ -368,6 +368,54 @@
       "key": false,
       "analyzer": "standard.lucene",
       "synonymMaps": []
+    },
+    {
+      "name": "metadata_content_encoding",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_content_type",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_storage_name",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_storage_path",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
     }
   ],
   "scoringProfiles": [],
@@ -378,11 +426,7 @@
     {
       "name": "nl-search-dataset-suggester",
       "searchMode": "analyzingInfixMatching",
-      "sourceFields": [
-        "dataSetFileId",
-        "title",
-        "content"
-      ]
+      "sourceFields": ["dataSetFileId", "title", "content"]
     }
   ],
   "tokenFilters": [],
