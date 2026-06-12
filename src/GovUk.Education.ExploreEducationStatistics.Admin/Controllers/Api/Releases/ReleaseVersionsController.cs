@@ -298,13 +298,10 @@ public class ReleaseVersionsController(
             .HandleFailuresOrOk();
     }
 
-    // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-    [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}")]
+    [HttpDelete("releaseVersions/{releaseVersionId:guid}/data/{fileId:guid}")]
     public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
     {
-        return await releaseVersionService
-            .RemoveDataFiles(releaseVersionId: releaseVersionId, fileId: fileId)
-            .HandleFailuresOrNoContent();
+        return await releaseVersionService.RemoveDataFiles(releaseVersionId, fileId).HandleFailuresOrNoContent();
     }
 
     // We intend to change this route, to make these endpoints more consistent, as per EES-5895

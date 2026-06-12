@@ -650,13 +650,13 @@ public class ReleaseVersionService(
         );
         var draftReleaseFile = !fileExistsInPublishedReleaseVersion;
 
-        if (releaseFile.File.ReplacedById is not null && releaseFile.PublicApiDataSetId is not null)
+        if (releaseFile.File.ReplacedById.HasValue)
         {
             return ValidationUtils.ValidationResult(
                 new ErrorViewModel
                 {
-                    Code = ValidationMessages.ReleaseFileMustBeOriginal.Code,
-                    Message = ValidationMessages.ReleaseFileMustBeOriginal.Message,
+                    Code = ValidationMessages.CannotDeleteOriginalFileOfOngoingReplacement.Code,
+                    Message = ValidationMessages.CannotDeleteOriginalFileOfOngoingReplacement.Message,
                 }
             );
         }
@@ -680,8 +680,8 @@ public class ReleaseVersionService(
             .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
-            .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
             .OnSuccessDo(ValidateDataFilesStatusForDeletion)
+            .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))
             .OnSuccessDo(async releaseFile =>
             {
                 // Remove any mapping that exists for the data set

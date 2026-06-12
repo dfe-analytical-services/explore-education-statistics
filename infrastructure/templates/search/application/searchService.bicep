@@ -19,7 +19,10 @@ param searchStorageDocumentContainers object = {
   nlSearchLocationsDictionary: 'nl-search-locations-dictionary'
 }
 
-@description('A list of IP network rules to allow access to the Search Service from specific public internet IP address ranges.')
+@description('Indicates whether API keys are permitted for authentication to the Azure AI Search service in addition to role-based access control (RBAC). Disabling API keys forces all clients to use RBAC only.')
+param searchServiceLocalAuthEnabled bool = false
+
+@description('A list of IP network rules to allow access to the Azure AI Search service from specific public internet IP address ranges.')
 param searchServiceIpRules IpRange[]
 
 @description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
@@ -60,6 +63,7 @@ module searchServiceModule '../components/searchService.bicep' = {
   params: {
     name: searchServiceName
     location: location
+    searchServiceLocalAuthEnabled: searchServiceLocalAuthEnabled
     ipRules: searchServiceIpRules
     publicNetworkAccess: 'Enabled'
     semanticRankerAvailability: semanticRankerAvailability

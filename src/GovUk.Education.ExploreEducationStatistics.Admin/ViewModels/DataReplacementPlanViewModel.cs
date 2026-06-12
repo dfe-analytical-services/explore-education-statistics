@@ -215,7 +215,7 @@ public class IndicatorReplacementViewModel : TargetableReplacementViewModel
     public IndicatorReplacementViewModel(Guid id, string label, Guid? target, string name)
         : base(id, label, target)
     {
-        Name = name;
+        Name = name; // csv column name
     }
 }
 
@@ -344,22 +344,26 @@ public record ReplacementPlanMappingViewModel
 
 public record ReplacementPlanIndicatorsMappingViewModel
 {
-    // Key is original indicator csv column name
-    public Dictionary<string, ReplacementPlanIndicatorMappingViewModel> Mappings { get; init; } = null!;
+    // Key is original indicator id
+    public Dictionary<Guid, ReplacementPlanIndicatorMappingViewModel> Mappings { get; init; } = null!;
 
-    // Key is replacement indicator csv column name
-    public Dictionary<string, ReplacementPlanIndicatorViewModel> Candidates { get; init; } = null!;
+    // Key is replacement indicator id
+    public Dictionary<Guid, ReplacementPlanIndicatorViewModel> Candidates { get; init; } = null!;
 }
 
 public record ReplacementPlanIndicatorMappingViewModel
 {
     public ReplacementPlanIndicatorViewModel Source { get; init; } = null!;
     public string Type { get; init; } = "";
-    public string? CandidateKey { get; init; } // replacement indicator csv column name
+    public Guid? CandidateKey { get; init; } // replacement indicator id
 }
 
 public record ReplacementPlanIndicatorViewModel
 {
+    public Guid Id { get; init; }
+
+    public string Name { get; init; } = ""; // csv column name
+
     public string Label { get; init; } = "";
 }
 
@@ -381,6 +385,7 @@ public record ReplacementPlanLocationMappingViewModel
 
 public record ReplacementPlanLocationViewModel
 {
+    public Guid Id { get; init; }
     public string Code { get; init; } = "";
     public string Name { get; init; } = "";
 }

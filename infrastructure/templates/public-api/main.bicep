@@ -156,7 +156,7 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
   workloadProfileName: 'Consumption'
 }
 
-@description('Name of the Search service index used to search publications.')
+@description('Name of the Azure AI Search service index used to search publications.')
 param searchServiceIndexName string = ''
 
 @description('Enable the Swagger UI for public API.')

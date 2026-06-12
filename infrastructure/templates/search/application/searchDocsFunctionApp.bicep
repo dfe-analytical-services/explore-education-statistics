@@ -14,7 +14,7 @@ param logAnalyticsWorkspaceId string
 @description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
 param searchServiceSearchIndexerName string
 
-@description('Specifies the Search Service name.')
+@description('Specifies the Azure AI Search service name.')
 param searchServiceName string
 
 @description('Name of the Search storage account.')

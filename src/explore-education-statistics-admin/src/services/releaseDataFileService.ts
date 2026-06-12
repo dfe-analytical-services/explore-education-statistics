@@ -277,7 +277,7 @@ const releaseDataFileService = {
     );
   },
   deleteDataFiles(releaseId: string, fileId: string): Promise<void> {
-    return client.delete<void>(`/release/${releaseId}/data/${fileId}`);
+    return client.delete<void>(`/releaseVersions/${releaseId}/data/${fileId}`);
   },
   updateFile(
     releaseId: string,
