@@ -38,7 +38,7 @@ export default withMethods({
         search?.length > 2
           ? await azureSearchClient.suggest(
               search,
-              'suggester-dataset-search',
+              'nl-search-dataset-suggester',
               {
                 select: ['dataSetFileId', 'title', 'content'],
                 filter,
