@@ -5,6 +5,7 @@ import {
   testApiDataSet,
   testApiDataSetVersion,
   testDataSetFile,
+  testDataSetWithApi,
 } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import { testPublicationSummary } from '@frontend/modules/find-statistics/__tests__/__data__/testReleaseData';
 import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
@@ -507,7 +508,7 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
-          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+          dataSetFile={{ ...testDataSetWithApi, footnotes: [] }}
           publicationSummary={testPublicationSummary}
         />,
       );
@@ -530,7 +531,7 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          dataSetFile={testDataSetFile}
+          dataSetFile={testDataSetWithApi}
           publicationSummary={testPublicationSummary}
         />,
       );
@@ -547,7 +548,7 @@ describe('DataSetFilePage', () => {
         <DataSetFilePage
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
-          dataSetFile={testDataSetFile}
+          dataSetFile={testDataSetWithApi}
           publicationSummary={testPublicationSummary}
         />,
       );
@@ -587,7 +588,7 @@ describe('DataSetFilePage', () => {
             version: '2.0',
           }}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
-          dataSetFile={testDataSetFile}
+          dataSetFile={testDataSetWithApi}
           publicationSummary={testPublicationSummary}
         />,
       );
@@ -632,7 +633,7 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
-          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+          dataSetFile={{ ...testDataSetWithApi, footnotes: [] }}
           publicationSummary={testPublicationSummary}
         />,
       );

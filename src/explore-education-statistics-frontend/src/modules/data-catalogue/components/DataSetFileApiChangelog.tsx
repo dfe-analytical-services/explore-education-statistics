@@ -7,8 +7,8 @@ import React from 'react';
 import sortVersionChanges from '../utils/sortVersionChanges';
 
 interface Props {
-  changes: ApiDataSetVersionChanges;
-  guidanceNotes?: string;
+  changes: ApiDataSetVersionChanges | null | undefined;
+  guidanceNotes?: string | undefined;
   version: string;
   patchHistory: ApiDataSetVersionChanges[];
 }
@@ -19,6 +19,8 @@ export default function DataSetFileApiChangelog({
   version,
   patchHistory,
 }: Props) {
+  if (!changes || !version || !patchHistory) return null;
+
   const { majorChanges, minorChanges } = changes;
 
   if (
