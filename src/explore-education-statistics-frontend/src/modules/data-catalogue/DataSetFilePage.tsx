@@ -277,30 +277,36 @@ export default function DataSetFilePage({
                 onDownload={handleDownload}
               />
 
-              <DataSetFileApiQuickStart
-                id={apiDataSet?.id}
-                name={apiDataSet?.title}
-                version={apiDataSetVersion?.version}
-              />
-
-              {apiDataSet && apiDataSetVersion ? (
+              {dataSetFile.api && (
                 <>
-                  <DataSetFileApiVersionHistory
-                    apiDataSetId={apiDataSet.id}
-                    currentVersion={apiDataSetVersion.version}
+                  <DataSetFileApiQuickStart
+                    id={apiDataSet?.id}
+                    name={apiDataSet?.title}
+                    version={apiDataSetVersion?.version}
                   />
 
-                  <DataSetFileApiChangelog
-                    changes={apiDataSetVersionChanges}
-                    guidanceNotes={apiDataSetVersion.notes}
-                    version={apiDataSetVersion.version}
-                    patchHistory={apiDataSetVersionChanges?.patchHistory || []}
-                  />
+                  {apiDataSet && apiDataSetVersion ? (
+                    <>
+                      <DataSetFileApiVersionHistory
+                        apiDataSetId={apiDataSet.id}
+                        currentVersion={apiDataSetVersion.version}
+                      />
+
+                      <DataSetFileApiChangelog
+                        changes={apiDataSetVersionChanges}
+                        guidanceNotes={apiDataSetVersion.notes}
+                        version={apiDataSetVersion.version}
+                        patchHistory={
+                          apiDataSetVersionChanges?.patchHistory || []
+                        }
+                      />
+                    </>
+                  ) : (
+                    <WarningMessage>
+                      API data set version history is not currently available
+                    </WarningMessage>
+                  )}
                 </>
-              ) : (
-                <WarningMessage>
-                  API data set version history is not currently available
-                </WarningMessage>
               )}
 
               <DataSetFileContact
@@ -342,34 +348,34 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
 
     if (dataSetFile.api) {
       try {
-        await queryClient.prefetchQuery({
+        await queryClient.fetchQuery({
           ...apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
             page: versionPage ? Number(versionPage) : 1,
           }),
           staleTime: Infinity,
         });
 
-        [apiDataSet, apiDataSetVersion, apiDataSetVersionChanges] =
-          await Promise.all([
-            queryClient.fetchQuery(
-              apiDataSetQueries.getDataSet(dataSetFile.api.id),
-            ),
-            queryClient.fetchQuery(
-              apiDataSetQueries.getDataSetVersion(
-                dataSetFile.api.id,
-                dataSetFile.api.version,
-              ),
-            ),
-            dataSetFile.api.version !== '1.0'
-              ? queryClient.fetchQuery(
-                  apiDataSetQueries.getDataSetVersionChanges(
-                    dataSetFile.api.id,
-                    dataSetFile.api.version,
-                    isPatchVersion(dataSetFile.api.version),
-                  ),
-                )
-              : null,
-          ]);
+        apiDataSet = await queryClient.fetchQuery(
+          apiDataSetQueries.getDataSet(dataSetFile.api.id),
+        );
+
+        apiDataSetVersion = await queryClient.fetchQuery(
+          apiDataSetQueries.getDataSetVersion(
+            dataSetFile.api.id,
+            dataSetFile.api.version,
+          ),
+        );
+
+        apiDataSetVersionChanges =
+          dataSetFile.api.version !== '1.0'
+            ? await queryClient.fetchQuery(
+                apiDataSetQueries.getDataSetVersionChanges(
+                  dataSetFile.api.id,
+                  dataSetFile.api.version,
+                  isPatchVersion(dataSetFile.api.version),
+                ),
+              )
+            : null;
       } catch (error) {
         logger.error(error);
       }

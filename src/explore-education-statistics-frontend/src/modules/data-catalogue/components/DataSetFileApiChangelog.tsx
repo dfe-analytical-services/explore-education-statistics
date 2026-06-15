@@ -19,7 +19,7 @@ export default function DataSetFileApiChangelog({
   version,
   patchHistory,
 }: Props) {
-  if (!changes || !guidanceNotes || !version || !patchHistory) return null;
+  if (!changes || !version || !patchHistory) return null;
 
   const { majorChanges, minorChanges } = changes;
 
