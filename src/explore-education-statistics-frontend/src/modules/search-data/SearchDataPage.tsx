@@ -99,12 +99,12 @@ const SearchDataPage: NextPage = () => {
   });
 
   const { data: themes = [] } = useQuery({
-    ...themeQueries.listProdThemes(),
+    ...themeQueries.list(),
     staleTime: Infinity,
   });
 
   const { data: publicationTree = [] } = useQuery({
-    ...publicationQueries.getPrototypePublicationTree({
+    ...publicationQueries.getPublicationTree({
       filter: 'DataCatalogue',
     }),
     staleTime: Infinity,
@@ -750,9 +750,9 @@ export const getServerSideProps: GetServerSideProps = async ({
         )
       : queryClient.prefetchQuery(azureDataSetQueries.list(query)),
     isPublicationsSearch
-      ? queryClient.prefetchQuery(themeQueries.listProdThemes())
+      ? queryClient.prefetchQuery(themeQueries.list())
       : queryClient.prefetchQuery(
-          publicationQueries.getPrototypePublicationTree({
+          publicationQueries.getPublicationTree({
             filter: 'DataCatalogue',
           }),
         ),
