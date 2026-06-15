@@ -1,4 +1,3 @@
-import PhaseBanner from '@common/components/PhaseBanner';
 import CookieBanner from '@frontend/components/CookieBanner';
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
@@ -67,8 +66,6 @@ const Page = ({
           'dfe-width-container--full': width === 'full',
         })}
       >
-        <PhaseBanner url="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u" />
-
         {customBannerContent}
 
         <Breadcrumbs

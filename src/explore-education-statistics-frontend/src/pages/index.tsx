@@ -1,3 +1,4 @@
+import FeedbackSection from '@common/components/FeedbackSection';
 import InsetText from '@common/components/InsetText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import {
@@ -219,6 +220,11 @@ function HomePage() {
             <br />
             Opening hours: {DfeOpeningHours}
           </InsetText>
+        </div>
+
+        <div className="govuk-grid-column-two-thirds">
+          <h3 className="govuk-heading-m">Provide us with feedback</h3>
+          <FeedbackSection />
         </div>
       </div>
     </Page>
