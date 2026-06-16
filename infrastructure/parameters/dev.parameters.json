@@ -143,7 +143,10 @@
       "value": true
     },
     "datasetsSearchIndexName": {
-      "value": "nl-search-dataset-index"
+      "value": "natural-language-prototype-dataset-level"
+    },
+    "enhancedScreenerJourney": {
+      "value": true
     }
   }
 }

@@ -752,6 +752,13 @@
         "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
       }
     },
+    "enhancedScreenerJourney": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether or not Admin supports the background screening process"
+      }
+    },
     "apiAppRegistrationClientId": {
       "type": "string",
       "metadata": {
@@ -2001,7 +2008,7 @@
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api')]",
         "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
         "DataScreener__ScreenerStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('screenerStorageAccountConnectionStringSecret'), '2018-02-14').secretUriWithVersion, ')')]",
-        "DataScreener__EnhancedScreenerJourney": false,
+        "DataScreener__EnhancedScreenerJourney": "[parameters('enhancedScreenerJourney')]",
         "DataScreener__ScreenerProgressUpdateIntervalSeconds": 5,
         "DataScreener__ScreenerProgressUpdateFailureIntervalMinutes": 1440
       }
