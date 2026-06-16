@@ -62,7 +62,7 @@ export interface StageComplete {
   };
 }
 
-export type AiSseMessage =
+export type TtSearchStreamMessage =
   | StageStarting
   | StageRetrieved
   | StageReranker
@@ -76,9 +76,8 @@ export interface TableToolSearchListRequest {
 export interface SearchStreamOptions {
   maxRetries?: number;
   signal?: AbortSignal;
-  onClose?: () => void;
-  onError?: (errorMessage: string) => void;
-  onMessage: (message: AiSseMessage) => void;
+  onRetriableError?: (errorMessage: string) => void;
+  onMessage: (message: TtSearchStreamMessage) => void;
 }
 
 export class FatalError extends Error {
@@ -127,7 +126,9 @@ const tableToolSearchService = {
         ) {
           throw new FatalError(`Server responded with ${response.status}`);
         }
-        throw new RetriableError(`Server responded with ${response.status}`);
+        throw new RetriableError(
+          `Server responded with ${response.status}. Retrying.`,
+        );
       },
 
       onmessage(msg) {
@@ -138,7 +139,7 @@ const tableToolSearchService = {
         if (!msg.data) return;
 
         try {
-          const parsed: AiSseMessage = JSON.parse(msg.data);
+          const parsed: TtSearchStreamMessage = JSON.parse(msg.data);
           options.onMessage(parsed);
         } catch (err) {
           logger.error(err);
@@ -146,7 +147,7 @@ const tableToolSearchService = {
       },
 
       onclose() {
-        throw new RetriableError('Connection closed by server prematurely');
+        throw new RetriableError();
       },
 
       onerror(err) {
@@ -164,13 +165,11 @@ const tableToolSearchService = {
           );
         }
 
-        if (options.onError) {
-          options.onError(
-            err.message
-              ? err.message
-              : `Connection unstable. Retrying (${retryCount}/${maxRetries})...`,
-          );
-        }
+        options.onRetriableError?.(
+          err.message
+            ? err.message
+            : `Connection unstable. Retrying (${retryCount}/${maxRetries})...`,
+        );
 
         return 3000; // Retry after 3 seconds
       },

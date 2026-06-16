@@ -11,7 +11,10 @@ import SearchForm from '@frontend/components/SearchForm';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
 import tableToolSearchService, {
   FatalError,
-  FinalDataset,
+  StageComplete,
+  StageReranker,
+  StageRetrieved,
+  TtSearchStreamMessage,
 } from '@frontend/services/tableToolSearchService';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef, useState } from 'react';
@@ -21,13 +24,27 @@ export interface TableToolSearchPageProps {
   publicationSummary: PublicationSummary;
 }
 
+export interface SearchPipelineData {
+  currentStage: TtSearchStreamMessage['stage'] | null;
+  retrievedData: StageRetrieved['data'] | null;
+  rerankerData: StageReranker['data'] | null;
+  finalData: StageComplete['data'] | null;
+}
+
+const initialPipelineData: SearchPipelineData = {
+  currentStage: null,
+  retrievedData: null,
+  rerankerData: null,
+  finalData: null,
+};
+
 const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
   latestReleaseVersion,
   publicationSummary,
 }) => {
   const [isSearching, setIsSearching] = useState(false);
-  const [currentStage, setCurrentStage] = useState<string | null>(null);
-  const [finalResults, setFinalResults] = useState<FinalDataset[] | null>(null);
+  const [pipelineData, setPipelineData] =
+    useState<SearchPipelineData>(initialPipelineData);
   const [error, setError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -41,10 +58,8 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
     }
     abortControllerRef.current = new AbortController();
 
+    setPipelineData(initialPipelineData);
     setIsSearching(true);
-    setCurrentStage('Connecting...');
-    setFinalResults(null);
-    setError(null);
 
     try {
       await tableToolSearchService.postSearchStream(
@@ -54,18 +69,32 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
         },
         {
           signal: abortControllerRef.current.signal,
-          onMessage: parsed => {
-            setCurrentStage(parsed.stage);
-            if (parsed.stage === 'pipeline complete') {
-              setFinalResults(parsed.data.datasets);
-              setIsSearching(false);
-            }
+          onMessage: message => {
+            setPipelineData(prev => {
+              const updatedState = { ...prev, currentStage: message.stage };
+
+              switch (message.stage) {
+                case 'retrieved datasets':
+                  updatedState.retrievedData = message.data;
+                  break;
+                case 'reranker complete':
+                  updatedState.rerankerData = message.data;
+                  break;
+                case 'pipeline complete':
+                  updatedState.finalData = message.data;
+                  setIsSearching(false);
+                  break;
+                case 'starting pipeline':
+                  break;
+                default:
+                  return updatedState;
+              }
+
+              return updatedState;
+            });
           },
-          onClose: () => {
-            setIsSearching(false);
-          },
-          onError: errorMessage => {
-            setCurrentStage(errorMessage); // This will be a connection lost error, fetch event source will retry automatically
+          onRetriableError: errorMessage => {
+            setError(errorMessage);
           },
         },
       );
@@ -129,23 +158,35 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
             </p>
           </Details>
 
-          {/* TODO render statuses and data as it's being returned.
-           Could be that we have state vars for each stage, which we fill,
-           then interrogate actual currentStage to determine what to render  */}
-          {isSearching && (
-            <div className="govuk-inset-text">
-              <strong>Status:</strong> {currentStage}
-            </div>
-          )}
+          <div aria-live="polite">
+            {isSearching && (
+              <>
+                <strong>Status:</strong>{' '}
+                {pipelineData.currentStage || 'Connecting...'}
+              </>
+            )}
+          </div>
 
           {error && <ErrorMessage announceError>{error}</ErrorMessage>}
 
-          {finalResults && (
+          {pipelineData.rerankerData && (
+            <div className="govuk-body">
+              <ol>
+                {pipelineData.rerankerData.shortlisted_datasets.map(dataset => (
+                  <li key={dataset.file_id}>
+                    {dataset.title} - {dataset.relevance_reason}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {pipelineData.finalData && (
             // TODO EES-7213 render results
             <div className="results-container">
               <h2 className="govuk-heading-m">Results</h2>
-              <ul>
-                {finalResults.map(dataset => (
+              <ol>
+                {pipelineData.finalData.datasets.map(dataset => (
                   <li key={dataset.fileId}>
                     <h3>Dataset: {dataset.fileId}</h3>
                     <div>
@@ -153,7 +194,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                     </div>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </div>
           )}
         </div>
