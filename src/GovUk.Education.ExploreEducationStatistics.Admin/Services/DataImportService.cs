@@ -49,11 +49,17 @@ public class DataImportService(
 
     public async Task<bool> HasIncompleteImports(Guid releaseVersionId)
     {
-        return await contentDbContext
+        var hasAnyUploads = await contentDbContext
+            .DataSetUploads.AsQueryable()
+            .AnyAsync(dsu => dsu.ReleaseVersionId == releaseVersionId);
+
+        var hasAnyImports = await contentDbContext
             .ReleaseFiles.AsQueryable()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Join(contentDbContext.DataImports, rf => rf.FileId, i => i.FileId, (file, import) => import)
             .AnyAsync(import => import.Status != DataImportStatus.COMPLETE);
+
+        return hasAnyUploads || hasAnyImports;
     }
 
     public async Task<DataImportStatusViewModel> GetImportStatus(Guid fileId)
