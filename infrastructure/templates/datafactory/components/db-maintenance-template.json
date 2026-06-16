@@ -22,6 +22,9 @@
     },
     "slackAppToken": {
       "type": "securestring"
+    },
+    "teamsPowerAutomateWebhookUrl": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -151,6 +154,74 @@
                         "short": true
                       }
                     ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Report indexes rebuilt successfully to Teams",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "Rebuild indexes",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": true
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+              "method": "POST",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "type": "message",
+                "attachments": [
+                  {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": null,
+                    "content": {
+                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                      "type": "AdaptiveCard",
+                      "version": "1.2",
+                      "body": [
+                        {
+                          "type": "TextBlock",
+                          "text": "Data Factory Success! All fragmented indexes rebuilt.",
+                          "weight": "Bolder",
+                          "size": "Medium",
+                          "color": "good",
+                          "wrap": true
+                        },
+                        {
+                          "type": "FactSet",
+                          "facts": [
+                            {
+                              "title": "Data Factory",
+                              "value": "@{pipeline().DataFactory}"
+                            },
+                            {
+                              "title": "Pipeline",
+                              "value": "@{pipeline().Pipeline}"
+                            },
+                            {
+                              "title": "Duration",
+                              "value": "@{activity('Rebuild indexes').Duration}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
                   }
                 ]
               }
@@ -324,6 +395,78 @@
                       }
                     },
                     {
+                      "name": "Report timeout handled successfully to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Kill index reorganizes after timeout",
+                          "dependencyConditions": [
+                            "Succeeded"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory timeout handled successfully.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "good",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
+                                      },
+                                      {
+                                        "title": "Details",
+                                        "value": "Any resumable index rebuilds have been paused.\nAny reorganizations have been killed."
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
                       "name": "Report error when pausing resumable index rebuilds",
                       "type": "WebActivity",
                       "dependsOn": [
@@ -377,6 +520,78 @@
                                   "short": true
                                 }
                               ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Report error when pausing resumable index rebuilds to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Pause resumable index rebuilds after timeout",
+                          "dependencyConditions": [
+                            "Failed"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory failure! Problem encountered when pausing resumable index rebuilds.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "warning",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
+                                      },
+                                      {
+                                        "title": "Activity",
+                                        "value": "@{activity('Pause resumable index rebuilds after timeout').Error.message}"
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
                             }
                           ]
                         }
@@ -440,6 +655,78 @@
                           ]
                         }
                       }
+                    },
+                    {
+                      "name": "Report error when killing index reorganizations to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Kill index reorganizes after timeout",
+                          "dependencyConditions": [
+                            "Failed"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory failure! Problem encountered when killing index reorganizations.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "warning",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
+                                      },
+                                      {
+                                        "title": "Activity",
+                                        "value": "@{activity('Kill index reorganizes after timeout').Error.message}"
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
                     }
                   ]
                 }
@@ -492,6 +779,71 @@
                               "short": true
                             }
                           ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "Report failure to Teams",
+                  "type": "WebActivity",
+                  "dependsOn": [],
+                  "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": true
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                    "method": "POST",
+                    "headers": {
+                      "Content-Type": "application/json"
+                    },
+                    "body": {
+                      "type": "message",
+                      "attachments": [
+                        {
+                          "contentType": "application/vnd.microsoft.card.adaptive",
+                          "contentUrl": null,
+                          "content": {
+                            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                            "type": "AdaptiveCard",
+                            "version": "1.2",
+                            "body": [
+                              {
+                                "type": "TextBlock",
+                                "text": "Data Factory Failure!",
+                                "weight": "Bolder",
+                                "size": "Medium",
+                                "color": "warning",
+                                "wrap": true
+                              },
+                              {
+                                "type": "FactSet",
+                                "facts": [
+                                  {
+                                    "title": "Data Factory",
+                                    "value": "@{pipeline().DataFactory}"
+                                  },
+                                  {
+                                    "title": "Pipeline",
+                                    "value": "@{pipeline().Pipeline}"
+                                  },
+                                  {
+                                    "title": "Error",
+                                    "value": "@{activity('Rebuild indexes').Error.message}"
+                                  },
+                                  {
+                                    "title": "Duration",
+                                    "value": "@{activity('Rebuild indexes').Duration}"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
                         }
                       ]
                     }
@@ -597,24 +949,96 @@
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
                 "text": "Data Factory Success!",
-                "attachments": [{
-                  "color": "good",
-                  "fields": [{
-                    "title": "Data Factory",
-                    "value": "@{pipeline().DataFactory}",
-                    "short": true
-                  },
-                    {
-                      "title": "Pipeline",
-                      "value": "@{pipeline().Pipeline}",
-                      "short": true
-                    },
-                    {
-                      "title": "Duration",
-                      "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}",
-                      "short": true
-                    }]
-                }]
+                "attachments": [
+                  {
+                    "color": "good",
+                    "fields": [
+                      {
+                        "title": "Data Factory",
+                        "value": "@{pipeline().DataFactory}",
+                        "short": true
+                      },
+                      {
+                        "title": "Pipeline",
+                        "value": "@{pipeline().Pipeline}",
+                        "short": true
+                      },
+                      {
+                        "title": "Duration",
+                        "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}",
+                        "short": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Report success to Teams",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_remove_soft_deleted_subjects",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": true
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+              "method": "POST",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "type": "message",
+                "attachments": [
+                  {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": null,
+                    "content": {
+                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                      "type": "AdaptiveCard",
+                      "version": "1.2",
+                      "body": [
+                        {
+                          "type": "TextBlock",
+                          "text": "Data Factory Success!",
+                          "weight": "Bolder",
+                          "size": "Medium",
+                          "color": "good",
+                          "wrap": true
+                        },
+                        {
+                          "type": "FactSet",
+                          "facts": [
+                            {
+                              "title": "Data Factory",
+                              "value": "@{pipeline().DataFactory}"
+                            },
+                            {
+                              "title": "Pipeline",
+                              "value": "@{pipeline().Pipeline}"
+                            },
+                            {
+                              "title": "Duration",
+                              "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
               }
             }
           },
@@ -676,6 +1100,78 @@
                 ]
               }
             }
+          },
+          {
+            "name": "Report failure to Teams",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_remove_soft_deleted_subjects",
+                "dependencyConditions": [
+                  "Failed"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": true
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+              "method": "POST",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "type": "message",
+                "attachments": [
+                  {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": null,
+                    "content": {
+                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                      "type": "AdaptiveCard",
+                      "version": "1.2",
+                      "body": [
+                        {
+                          "type": "TextBlock",
+                          "text": "Data Factory Failure!",
+                          "weight": "Bolder",
+                          "size": "Medium",
+                          "color": "warning",
+                          "wrap": true
+                        },
+                        {
+                          "type": "FactSet",
+                          "facts": [
+                            {
+                              "title": "Data Factory",
+                              "value": "@{pipeline().DataFactory}"
+                            },
+                            {
+                              "title": "Pipeline",
+                              "value": "@{pipeline().Pipeline}"
+                            },
+                            {
+                              "title": "Error",
+                              "value": "@{activity('sp_remove_soft_deleted_subjects').Error.message}"
+                            },
+                            {
+                              "title": "Duration",
+                              "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
           }
         ],
         "parameters": {
@@ -726,8 +1222,12 @@
             "startTime": "2020-11-23T19:00:00",
             "timeZone": "GMT Standard Time",
             "schedule": {
-              "hours": [19],
-              "minutes": [0]
+              "hours": [
+                19
+              ],
+              "minutes": [
+                0
+              ]
             }
           }
         }
@@ -762,8 +1262,12 @@
             "startTime": "2023-03-03T02:00:00",
             "timeZone": "GMT Standard Time",
             "schedule": {
-              "hours": [2],
-              "minutes": [0]
+              "hours": [
+                2
+              ],
+              "minutes": [
+                0
+              ]
             }
           }
         }
