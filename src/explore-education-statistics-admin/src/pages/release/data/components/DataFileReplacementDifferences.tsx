@@ -120,6 +120,8 @@ export default function DataFileReplacementDifferences({
       Object.values(block.locations || {}),
     );
 
+    const uniqueLocationGroups = uniqueByLabel(allLocations);
+
     // second determine the locations
     const locationsToShow = getNonAutoSetMappings(
       plan.mapping.locations.mappings,
@@ -127,7 +129,7 @@ export default function DataFileReplacementDifferences({
 
     const groupedLocationMappings = createTableMappingsAndGroups(
       locationsToShow,
-      allLocations,
+      uniqueLocationGroups,
       'locationAttributes',
     );
 
