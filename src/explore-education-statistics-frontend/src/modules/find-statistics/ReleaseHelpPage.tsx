@@ -32,13 +32,11 @@ const ReleaseHelpPage = ({
         publicationTitle={publicationSummary.title}
         publishingOrganisations={releaseVersionSummary.publishingOrganisations}
         sectionTitle="Get help by contacting us"
-        includeSectionBreak
       />
 
       <ReleasePageContentSection
         heading={releaseTypes[releaseVersionSummary.type]}
         id="release-type-section"
-        includeSectionBreak
       >
         <ReleaseTypeSection
           publishingOrganisations={
@@ -53,7 +51,6 @@ const ReleaseHelpPage = ({
         <ReleasePageContentSection
           heading="Related information"
           id="related-information-section"
-          includeSectionBreak
         >
           <ul
             className="govuk-list govuk-list--spaced"
@@ -73,7 +70,6 @@ const ReleaseHelpPage = ({
         <ReleasePageContentSection
           heading="Pre-release access list"
           id="pre-release-access-list-section"
-          includeSectionBreak
         >
           <ContentHtml html={releaseVersionSummary.preReleaseAccessList} />
         </ReleasePageContentSection>
@@ -82,7 +78,6 @@ const ReleaseHelpPage = ({
       <ReleasePageContentSection
         heading="Provide us with feedback"
         id="feedback-section"
-        includeBackToTopLink
         includeSectionBreak={false}
       >
         <FeedbackSection />

@@ -131,7 +131,8 @@ function AcccessibilityStatementPage() {
           <h2>Non accessible content</h2>
           <p>
             The content listed below is non-accessible for the following
-            reasons.
+            reasons. We are aiming to address these issues as part of ongoing
+            updates of this service.
           </p>
           <ol>
             <li>

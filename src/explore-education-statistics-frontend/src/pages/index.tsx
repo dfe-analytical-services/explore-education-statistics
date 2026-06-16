@@ -220,9 +220,7 @@ function HomePage() {
             <br />
             Opening hours: {DfeOpeningHours}
           </InsetText>
-        </div>
 
-        <div className="govuk-grid-column-two-thirds">
           <h3 className="govuk-heading-m">Provide us with feedback</h3>
           <FeedbackSection />
         </div>
