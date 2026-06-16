@@ -1,5 +1,6 @@
 import Page from '@admin/components/Page';
 import React from 'react';
+import FeedbackSection from '@common/components/FeedbackSection';
 
 function ContactUsPage() {
   return (
@@ -66,6 +67,11 @@ function ContactUsPage() {
               </a>
               .
             </p>
+          </section>
+
+          <section className="govuk-section-break--xl">
+            <h2 className="govuk-heading-m">Provide us with feedback</h2>
+            <FeedbackSection />
           </section>
         </div>
       </div>

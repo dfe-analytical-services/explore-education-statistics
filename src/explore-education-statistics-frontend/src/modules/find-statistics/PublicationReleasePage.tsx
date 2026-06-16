@@ -295,6 +295,10 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                   id: 'pre-release-access-list-section',
                   text: 'Pre-release access list',
                 },
+                {
+                  id: 'feedback-section',
+                  text: 'Provide us with feedback',
+                },
               ].filter(item => !!item),
               relatedInformationItems,
             },

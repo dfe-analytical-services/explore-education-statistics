@@ -53,6 +53,19 @@ Validate homepage
     user checks page contains link with text and url    © Crown copyright
     ...    https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/
 
+Validate Feedback page
+    user clicks link    feedback form (opens in new tab)
+    user selects newly opened window
+    user waits until page contains element    xpath://span[text()="Explore Education Statistics"]    %{WAIT_MEDIUM}
+    user waits until page contains element    xpath://span[text()="Beta Feedback Survey"]
+
+    user checks url contains    forms.office.com/Pages/ResponsePage.aspx
+
+    ${windowhandles}=    Get Window Handles
+    Switch Window    ${windowhandles}[1]
+    Close Window
+    Switch Window    ${windowhandles}[0]
+
 Validate Cookies page
     user clicks link    Cookies
     user waits until h1 is visible    Cookies on Explore education statistics    %{WAIT_MEDIUM}
@@ -129,12 +142,3 @@ Validate Help and support page
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Help and support
-
-Validate Feedback page
-    [Documentation]    EES-942
-    user clicks link    feedback (opens in new tab)
-    user selects newly opened window
-    user waits until page contains element    xpath://span[text()="Explore Education Statistics"]    %{WAIT_MEDIUM}
-    user waits until page contains element    xpath://span[text()="Beta Feedback Survey"]
-
-    user checks url contains    forms.office.com/Pages/ResponsePage.aspx
