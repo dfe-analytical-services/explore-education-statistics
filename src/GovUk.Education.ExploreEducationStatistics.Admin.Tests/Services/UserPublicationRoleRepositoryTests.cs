@@ -188,34 +188,6 @@ public abstract class UserPublicationRoleRepositoryTests
                 Assert.Null(createdPublicationRole.EmailSent);
             }
         }
-
-        [Theory]
-        [InlineData(PublicationRole.Allower)]
-        [InlineData(PublicationRole.Owner)]
-        public async Task OldRole_Throws(PublicationRole oldSystemPublicationRoleToCreate)
-        {
-            User user = _fixture.DefaultUser();
-            User createdBy = _fixture.DefaultUser();
-            Publication publication = _fixture.DefaultPublication();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.Users.AddRange(user, createdBy);
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                await Assert.ThrowsAsync<ArgumentException>(async () =>
-                    await repository.Create(user.Id, publication.Id, oldSystemPublicationRoleToCreate, createdBy.Id)
-                );
-            }
-        }
     }
 
     public class CreateManyIfNotExistsTests : UserPublicationRoleRepositoryTests
@@ -550,55 +522,6 @@ public abstract class UserPublicationRoleRepositoryTests
             var results = await repository.CreateManyIfNotExists([]);
 
             Assert.Empty(results);
-        }
-
-        [Theory]
-        [InlineData(PublicationRole.Allower)]
-        [InlineData(PublicationRole.Owner)]
-        public async Task OldRole_Throws(PublicationRole oldSystemPublicationRoleToCreate)
-        {
-            User user = _fixture.DefaultUser();
-            User createdBy = _fixture.DefaultUser();
-            Publication publication = _fixture.DefaultPublication();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.Users.AddRange(user, createdBy);
-                contentDbContext.Publications.Add(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                await Assert.ThrowsAsync<ArgumentException>(async () =>
-                    await repository.CreateManyIfNotExists([
-                        // try creating a couple of NEW roles and one OLD role (in the middle of the list), to check that an error is thrown whenever
-                        // the list contains a OLD role, even if it also contains NEW roles.
-                        new(
-                            UserId: user.Id,
-                            PublicationId: publication.Id,
-                            Role: PublicationRole.Approver,
-                            CreatedById: createdBy.Id
-                        ),
-                        new(
-                            UserId: user.Id,
-                            PublicationId: publication.Id,
-                            Role: oldSystemPublicationRoleToCreate,
-                            CreatedById: createdBy.Id
-                        ),
-                        new(
-                            UserId: user.Id,
-                            PublicationId: publication.Id,
-                            Role: PublicationRole.Drafter,
-                            CreatedById: createdBy.Id
-                        ),
-                    ])
-                );
-            }
         }
     }
 
@@ -990,35 +913,6 @@ public abstract class UserPublicationRoleRepositoryTests
 
             Assert.False(result);
         }
-
-        [Theory]
-        [InlineData(PublicationRole.Owner)]
-        [InlineData(PublicationRole.Allower)]
-        public async Task OldRole_ReturnsFalseEvenIfExists(PublicationRole oldPublicationRoleToRemove)
-        {
-            UserPublicationRole oldSystemUserPublicationRole = _fixture
-                .DefaultUserPublicationRole()
-                .WithRole(oldPublicationRoleToRemove)
-                .WithUser(_fixture.DefaultUser())
-                .WithPublication(_fixture.DefaultPublication());
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.UserPublicationRoles.Add(oldSystemUserPublicationRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext: contentDbContext);
-
-                var result = await repository.RemoveById(oldSystemUserPublicationRole.Id);
-
-                Assert.False(result);
-            }
-        }
     }
 
     public class RemoveManyTests : UserPublicationRoleRepositoryTests
@@ -1124,35 +1018,6 @@ public abstract class UserPublicationRoleRepositoryTests
 
                 // Existing role should remain. Nothing should have happened.
                 Assert.Equal(remainingUserPublicationRole.Id, userPublicationRole.Id);
-            }
-        }
-
-        [Theory]
-        [InlineData(PublicationRole.Owner)]
-        [InlineData(PublicationRole.Allower)]
-        public async Task OldRole_Throws(PublicationRole oldPublicationRoleToRemove)
-        {
-            UserPublicationRole oldSystemUserPublicationRole = _fixture
-                .DefaultUserPublicationRole()
-                .WithRole(oldPublicationRoleToRemove)
-                .WithUser(_fixture.DefaultUser())
-                .WithPublication(_fixture.DefaultPublication());
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.UserPublicationRoles.Add(oldSystemUserPublicationRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext: contentDbContext);
-
-                await Assert.ThrowsAsync<ArgumentException>(async () =>
-                    await repository.RemoveMany([oldSystemUserPublicationRole])
-                );
             }
         }
     }
