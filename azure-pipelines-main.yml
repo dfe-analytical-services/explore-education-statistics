@@ -8,15 +8,23 @@ parameters:
       - test
 
 variables:
-  BuildConfiguration: Release
-  IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
-  CI: true
-  DotNetVersion: '8.0.x'
-  NodeVersion: '22.22.0'
-  RubyVersion: '3.2'
-  AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
-  PublicApiDir: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
-  PublicApiDocsDir: explore-education-statistics-api-docs
+  - group: EES - Build
+  - name: BuildConfiguration
+    value: Release
+  - name: IsBranchDeployable
+    value: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
+  - name: CI
+    value: true
+  - name: DotNetVersion
+    value: '8.0.x'
+  - name: NodeVersion
+    value: '22.22.0'
+  - name: RubyVersion
+    value: '3.2'
+  - name: PublicApiDir
+    value: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
+  - name: PublicApiDocsDir
+    value: explore-education-statistics-api-docs
 
 trigger:
   branches:
@@ -51,6 +59,10 @@ jobs:
     workspace:
       clean: all
     steps:
+      - task: NuGetAuthenticate@1
+        inputs:
+          nuGetServiceConnections: $(NuGetServiceConnectionName)
+
       - task: UseDotNet@2
         displayName: Install .NET $(DotNetVersion)
         inputs:
