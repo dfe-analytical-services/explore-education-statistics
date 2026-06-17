@@ -4566,6 +4566,14 @@
           },
           "workspaceResourceId": {
             "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+          },
+          "teamsPowerAutomateWebhookUrl": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+              },
+              "secretName": "ees-alerts-teamswebhookurl"
+            }
           }
         }
       },
