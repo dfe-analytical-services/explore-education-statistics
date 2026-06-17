@@ -60,7 +60,7 @@ public class DataSetUploadRepositoryTests
             AssertBasicViewModelDetailsCorrect(uploadViewModels[3], upload4);
 
             // Assert that a DataSetUpload that is undergoing screening is mapped correctly.
-            Assert.Equal(nameof(DataSetUploadScreeningStatus.Screening), uploadViewModels[0].Status);
+            Assert.Equal(nameof(DataSetUploadScreeningStatus.Screening), uploadViewModels[0].ScreeningStatus);
 
             // Assert it has no screener results or progress yet.
             Assert.False(uploadViewModels[0].PublicApiCompatible);

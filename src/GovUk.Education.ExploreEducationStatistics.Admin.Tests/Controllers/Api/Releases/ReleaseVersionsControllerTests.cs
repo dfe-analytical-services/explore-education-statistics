@@ -1285,7 +1285,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             Assert.Equal("434 Kb", dataSet.DataFileSize);
             Assert.Equal("test-data.meta.csv", dataSet.MetaFileName);
             Assert.Equal("157 Kb", dataSet.MetaFileSize);
-            Assert.Equal("Pending import", dataSet.Status);
+            Assert.Equal("Pending import", dataSet.ScreeningStatus);
             Assert.Equal("", dataSet.UploadedBy);
             Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
             Assert.True(dataSet.PublicApiCompatible);
@@ -1324,7 +1324,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             Assert.Equal("15933 Kb", dataSet.DataFileSize);
             Assert.Equal("csvfile.meta.csv", dataSet.MetaFileName);
             Assert.Equal("157 Kb", dataSet.MetaFileSize);
-            Assert.Equal("Pending import", dataSet.Status);
+            Assert.Equal("Pending import", dataSet.ScreeningStatus);
             Assert.Equal("", dataSet.UploadedBy);
             Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
             Assert.True(dataSet.PublicApiCompatible);
@@ -1377,7 +1377,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             Assert.Equal("696 Kb", dataSet1.DataFileSize);
             Assert.Equal("one.meta.csv", dataSet1.MetaFileName);
             Assert.Equal("210 Kb", dataSet1.MetaFileSize);
-            Assert.Equal("Pending import", dataSet1.Status);
+            Assert.Equal("Pending import", dataSet1.ScreeningStatus);
             Assert.Equal("", dataSet1.UploadedBy);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
             Assert.True(dataSet1.PublicApiCompatible);
@@ -1389,7 +1389,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             Assert.Equal("2085 Kb", dataSet2.DataFileSize);
             Assert.Equal("two.meta.csv", dataSet2.MetaFileName);
             Assert.Equal("318 Kb", dataSet2.MetaFileSize);
-            Assert.Equal("Pending import", dataSet2.Status);
+            Assert.Equal("Pending import", dataSet2.ScreeningStatus);
             Assert.Equal("", dataSet2.UploadedBy);
             Assert.Equal("Passed", dataSet2.ScreenerResult?.OverallResult);
             Assert.True(dataSet2.PublicApiCompatible);
@@ -1432,7 +1432,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             Assert.Equal("696 Kb", dataSet1.DataFileSize);
             Assert.Equal("one.meta.csv", dataSet1.MetaFileName);
             Assert.Equal("210 Kb", dataSet1.MetaFileSize);
-            Assert.Equal("Pending import", dataSet1.Status);
+            Assert.Equal("Pending import", dataSet1.ScreeningStatus);
             Assert.Equal("", dataSet1.UploadedBy);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
             Assert.True(dataSet1.PublicApiCompatible);
@@ -1444,7 +1444,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             Assert.Equal("2085 Kb", dataSet2.DataFileSize);
             Assert.Equal("two.meta.csv", dataSet2.MetaFileName);
             Assert.Equal("318 Kb", dataSet2.MetaFileSize);
-            Assert.Equal("Pending import", dataSet2.Status);
+            Assert.Equal("Pending import", dataSet2.ScreeningStatus);
             Assert.Equal("", dataSet2.UploadedBy);
             Assert.True(dataSet2.PublicApiCompatible);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);

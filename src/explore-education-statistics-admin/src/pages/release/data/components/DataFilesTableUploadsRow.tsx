@@ -52,7 +52,10 @@ export default function DataFilesTableUploadRow({
 
   const handleScreenerStatusChange = useCallback(
     (_upload: DataSetUpload, progress: DataSetScreenerProgress) => {
-      setCurrentUpload(upload => ({ ...upload, status: progress.status }));
+      setCurrentUpload(upload => ({
+        ...upload,
+        screeningStatus: progress.status,
+      }));
 
       // TODO EES-7139 - change status to be non-nullable when foreground screening process
       // is decommissioned.
@@ -82,8 +85,8 @@ export default function DataFilesTableUploadRow({
   const importBlocked =
     !canUpdateRelease ||
     !currentUpload.screenerResult ||
-    currentUpload.status === 'ScreenerError' ||
-    currentUpload.status === 'FailedScreening' ||
+    currentUpload.screeningStatus === 'ScreenerError' ||
+    currentUpload.screeningStatus === 'FailedScreening' ||
     hasFailures;
 
   const importUnavailable = !Object.values(warningAcknowledgements).every(
@@ -161,7 +164,7 @@ export default function DataFilesTableUploadRow({
     confirmText = 'Continue import (override failures)';
   }
 
-  if (currentUpload.status === 'ScreenerError') {
+  if (currentUpload.screeningStatus === 'ScreenerError') {
     confirmText = 'Continue import (bypass screening)';
   }
 
@@ -192,7 +195,7 @@ export default function DataFilesTableUploadRow({
             title="Data set details"
             open={openImportConfirm}
             hideConfirm={
-              currentUpload.status === 'Screening' ||
+              currentUpload.screeningStatus === 'Screening' ||
               (importBlocked && !canOverride)
             }
             disableConfirm={
@@ -232,14 +235,14 @@ export default function DataFilesTableUploadRow({
                   />
                 </TabsSection>
               )}
-              {currentUpload.status !== 'Screening' && (
+              {currentUpload.screeningStatus !== 'Screening' && (
                 <TabsSection
                   id={dataSetUploadTabIds.screenerResults}
                   testId={dataSetUploadTabIds.screenerResults}
                   title="All tests"
                   headingTitle={
                     !currentUpload.screenerResult &&
-                    currentUpload.status === 'ScreenerError'
+                    currentUpload.screeningStatus === 'ScreenerError'
                       ? 'No tests checked against this file'
                       : `Full breakdown of ${currentUpload.screenerResult?.testResults.length} tests checked against this file`
                   }
@@ -267,43 +270,46 @@ export default function DataFilesTableUploadRow({
               </TabsSection>
             </Tabs>
           </ModalConfirm>
-          {currentUpload.status !== 'Screening' && canUpdateRelease && (
-            <ModalConfirm
-              open={openDeleteConfirm}
-              title={
-                dataSetUpload.replacingFileId
-                  ? 'Cancel replacement'
-                  : 'Confirm deletion of selected data files'
-              }
-              triggerButton={
-                <ButtonText
-                  onClick={toggleOpenDeleteConfirm.on}
-                  variant="warning"
-                >
-                  {dataSetUpload.replacingFileId
+          {currentUpload.screeningStatus !== 'Screening' &&
+            canUpdateRelease && (
+              <ModalConfirm
+                open={openDeleteConfirm}
+                title={
+                  dataSetUpload.replacingFileId
                     ? 'Cancel replacement'
-                    : 'Delete files'}
-                  <VisuallyHidden>{` for ${currentUpload.dataSetTitle}`}</VisuallyHidden>
-                </ButtonText>
-              }
-              onConfirm={handleDeleteConfirm}
-            >
-              {dataSetUpload.replacingFileId ? (
-                <p>
-                  Are you sure you want to cancel this data replacement? The
-                  pending replacement data file will be deleted.
-                </p>
-              ) : (
-                <>
+                    : 'Confirm deletion of selected data files'
+                }
+                triggerButton={
+                  <ButtonText
+                    onClick={toggleOpenDeleteConfirm.on}
+                    variant="warning"
+                  >
+                    {dataSetUpload.replacingFileId
+                      ? 'Cancel replacement'
+                      : 'Delete files'}
+                    <VisuallyHidden>{` for ${currentUpload.dataSetTitle}`}</VisuallyHidden>
+                  </ButtonText>
+                }
+                onConfirm={handleDeleteConfirm}
+              >
+                {dataSetUpload.replacingFileId ? (
                   <p>
-                    Are you sure you want to delete{' '}
-                    <strong>{currentUpload.dataSetTitle}</strong>?
+                    Are you sure you want to cancel this data replacement? The
+                    pending replacement data file will be deleted.
                   </p>
-                  <p>This version of the data set has not yet been imported.</p>
-                </>
-              )}
-            </ModalConfirm>
-          )}
+                ) : (
+                  <>
+                    <p>
+                      Are you sure you want to delete{' '}
+                      <strong>{currentUpload.dataSetTitle}</strong>?
+                    </p>
+                    <p>
+                      This version of the data set has not yet been imported.
+                    </p>
+                  </>
+                )}
+              </ModalConfirm>
+            )}
         </ButtonGroup>
       </td>
     </tr>
