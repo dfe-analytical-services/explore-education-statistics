@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import {
   releaseAncillaryFileRoute,
-  ReleaseDataFileRouteParams,
+  ReleaseAncillaryFileRouteParams,
 } from '@admin/routes/releaseRoutes';
 import { AncillaryFile } from '@admin/services/releaseAncillaryFileService';
 import ButtonText from '@common/components/ButtonText';
@@ -74,7 +74,7 @@ export default function AncillaryFileSummaryList({
             <>
               <Link
                 className="govuk-!-margin-right-4"
-                to={generatePath<ReleaseDataFileRouteParams>(
+                to={generatePath<ReleaseAncillaryFileRouteParams>(
                   releaseAncillaryFileRoute.path,
                   {
                     publicationId,

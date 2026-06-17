@@ -32,7 +32,7 @@ const DataFileDetailsTable = ({
   const replacementFileHasApi =
     (replacementDataFile?.publicApiDataSetId !== undefined ||
       dataFile.publicApiDataSetId !== undefined) &&
-    dataFile.replacedBy !== undefined;
+    dataFile.replacedByDataFileId !== undefined;
 
   const publicApiDataSetId =
     dataFile.publicApiDataSetId ?? replacementDataFile?.publicApiDataSetId;

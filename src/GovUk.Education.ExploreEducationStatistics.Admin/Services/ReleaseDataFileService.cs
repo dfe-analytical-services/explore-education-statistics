@@ -139,9 +139,13 @@ public class ReleaseDataFileService(
                     .Include(di => di.MetaFile)
                     .SingleAsync(di => di.FileId == releaseFile.FileId);
 
+                var replacingDataSetUpload = await contentDbContext.DataSetUploads.SingleOrDefaultAsync(upload =>
+                    upload.ReplacingFileId == fileId
+                );
+
                 var permissions = await userService.GetDataFilePermissions(dataImport.File);
 
-                return new DataFileInfo(releaseFile, dataImport, permissions);
+                return new DataFileInfo(releaseFile, dataImport, replacingDataSetUpload, permissions);
             });
     }
 
@@ -744,6 +748,12 @@ public class ReleaseDataFileService(
             .Where(di => files.Select(f => f.Id).Contains(di.FileId))
             .ToDictionaryAsync(di => di.FileId);
 
+        var replacingDataSetUploadsDict = await contentDbContext
+            .DataSetUploads.Where(upload =>
+                upload.ReplacingFileId != null && files.Select(f => f.Id).Contains(upload.ReplacingFileId.Value)
+            )
+            .ToDictionaryAsync(upload => upload.ReplacingFileId!.Value);
+
         // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
         // Work out if the user has permission to cancel any import which Bau users can.
         // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
@@ -759,14 +769,17 @@ public class ReleaseDataFileService(
             var fileHasReplacementInCurrentReleaseVersion =
                 releaseFile.File.ReplacedById.HasValue
                 && inProgressReplacementsInCurrentReleaseVersion.Any(rf => rf.FileId == releaseFile.File.ReplacedById);
+
             if (!fileHasReplacementInCurrentReleaseVersion)
             {
                 return new DataFileInfo(
                     releaseFile,
                     dataImportsDict[releaseFile.FileId],
+                    replacingDataSetUploadsDict.GetValueOrDefault(releaseFile.FileId),
                     permissionsDict[releaseFile.FileId]
                 );
             }
+
             var replacement = inProgressReplacementsInCurrentReleaseVersion.Single(rf =>
                 rf.FileId == releaseFile.File.ReplacedById
             );
@@ -783,12 +796,14 @@ public class ReleaseDataFileService(
             return new DataFileInfo(
                 releaseFile,
                 dataImportsDict[releaseFile.FileId],
+                replacingDataSetUploadsDict.GetValueOrDefault(releaseFile.FileId),
                 permissionsDict[releaseFile.FileId]
             )
             {
                 ReplacedByDataFile = new ReplacementDataFileInfo(
                     replacement,
                     dataImportsDict[replacement.FileId],
+                    null,
                     permissionsDict[replacement.FileId],
                     hasValidReplacementPlan
                 ),

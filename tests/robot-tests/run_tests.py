@@ -177,7 +177,12 @@ def run():
                 # Tear down any data created by this test run unless we've disabled teardown.
                 if args_and_variables.includes_data_changing_tests(args) and not args.disable_teardown:
                     logger.info("Tearing down test data...")
-                    admin_api.delete_test_theme()
+
+                    try:
+                        admin_api.delete_test_theme()
+                    except Exception as ex:
+                        logger.error("Error tearing down UI test data")
+                        logger.error(ex)
 
                 test_run_index += 1
 

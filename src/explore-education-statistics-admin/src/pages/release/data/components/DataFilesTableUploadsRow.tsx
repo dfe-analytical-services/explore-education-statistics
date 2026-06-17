@@ -186,7 +186,7 @@ export default function DataFilesTableUploadRow({
           onStatusChange={handleScreenerStatusChange}
         />
       </td>
-      <td data-testid="Actions">
+      <td data-testid={`${currentUpload.dataSetTitle}-actions`}>
         <ButtonGroup className={styles.actions}>
           <ModalConfirm
             title="Data set details"
@@ -270,23 +270,38 @@ export default function DataFilesTableUploadRow({
           {currentUpload.status !== 'Screening' && canUpdateRelease && (
             <ModalConfirm
               open={openDeleteConfirm}
-              title="Confirm deletion of selected data files"
+              title={
+                dataSetUpload.replacingFileId
+                  ? 'Cancel replacement'
+                  : 'Confirm deletion of selected data files'
+              }
               triggerButton={
                 <ButtonText
                   onClick={toggleOpenDeleteConfirm.on}
                   variant="warning"
                 >
-                  Delete files
+                  {dataSetUpload.replacingFileId
+                    ? 'Cancel replacement'
+                    : 'Delete files'}
                   <VisuallyHidden>{` for ${currentUpload.dataSetTitle}`}</VisuallyHidden>
                 </ButtonText>
               }
               onConfirm={handleDeleteConfirm}
             >
-              <p>
-                Are you sure you want to delete{' '}
-                <strong>{currentUpload.dataSetTitle}</strong>?
-              </p>
-              <p>This version of the data set has not yet been imported.</p>
+              {dataSetUpload.replacingFileId ? (
+                <p>
+                  Are you sure you want to cancel this data replacement? The
+                  pending replacement data file will be deleted.
+                </p>
+              ) : (
+                <>
+                  <p>
+                    Are you sure you want to delete{' '}
+                    <strong>{currentUpload.dataSetTitle}</strong>?
+                  </p>
+                  <p>This version of the data set has not yet been imported.</p>
+                </>
+              )}
             </ModalConfirm>
           )}
         </ButtonGroup>
