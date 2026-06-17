@@ -242,7 +242,7 @@ public abstract class UserPublicationRoleRepositoryTests
                     UserId: upr.UserId,
                     PublicationId: upr.PublicationId,
                     Role: upr.Role,
-                    CreatedById: upr.CreatedById!.Value,
+                    CreatedById: upr.CreatedById,
                     CreatedDate: upr.Created
                 ))
                 .ToHashSet();
