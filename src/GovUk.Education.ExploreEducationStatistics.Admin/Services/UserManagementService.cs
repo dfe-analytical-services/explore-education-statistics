@@ -231,7 +231,7 @@ public class UserManagementService(
                         userId: user.Id,
                         releaseVersionId: latestReleaseVersion!.Id,
                         createdById: userService.GetUserId(),
-                        createdDate: request.CreatedDate?.UtcDateTime
+                        createdDate: request.CreatedDate ?? default
                     );
                 }
 
@@ -240,7 +240,7 @@ public class UserManagementService(
                         UserId: user.Id,
                         PublicationId: userPublicationRole.PublicationId,
                         Role: userPublicationRole.PublicationRole,
-                        CreatedDate: request.CreatedDate?.UtcDateTime ?? DateTime.UtcNow,
+                        CreatedDate: request.CreatedDate ?? default,
                         CreatedById: userService.GetUserId()
                     ))
                     .ToHashSet();

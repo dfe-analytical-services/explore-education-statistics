@@ -12,7 +12,7 @@ public interface IUserPublicationRoleRepository
         Guid publicationId,
         PublicationRole role,
         Guid createdById,
-        DateTime? createdDate = null,
+        DateTimeOffset createdDate = default,
         CancellationToken cancellationToken = default
     );
 
