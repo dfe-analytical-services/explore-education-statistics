@@ -668,6 +668,12 @@ public class ContentDbContext : DbContext
             .Entity<UserPreReleaseRole>()
             .Property(userReleaseRole => userReleaseRole.Created)
             .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder
+            .Entity<UserPreReleaseRole>()
+            .HasOne(upr => upr.CreatedBy)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)

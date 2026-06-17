@@ -192,7 +192,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                 .Select(uprr => new UserPreReleaseRoleCreateDto(
                     UserId: uprr.UserId,
                     ReleaseVersionId: uprr.ReleaseVersionId,
-                    CreatedById: uprr.CreatedById!.Value,
+                    CreatedById: uprr.CreatedById,
                     CreatedDate: uprr.Created
                 ))
                 .ToHashSet();
