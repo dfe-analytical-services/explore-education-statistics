@@ -121,7 +121,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Type, m => m.MapFrom(dataSetVersion => dataSetVersion.VersionType));
 
         CreateMap<DataSetUpload, DataSetUploadViewModel>()
-            .ForMember(dest => dest.Status, m => m.MapFrom(upload => upload.ScreeningStatus))
+            .ForMember(dest => dest.ScreeningStatus, m => m.MapFrom(upload => upload.ScreeningStatus))
             .ForMember(
                 dest => dest.PublicApiCompatible,
                 m => m.MapFrom(upload => upload.ScreenerResult != null && upload.ScreenerResult.PublicApiCompatible)

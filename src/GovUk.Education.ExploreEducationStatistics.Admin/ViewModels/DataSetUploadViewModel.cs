@@ -17,7 +17,7 @@ public record DataSetUploadViewModel
 
     public required string MetaFileSize { get; init; }
 
-    public required string Status { get; set; }
+    public required string ScreeningStatus { get; set; }
 
     public ScreenerResultViewModel? ScreenerResult { get; set; }
 

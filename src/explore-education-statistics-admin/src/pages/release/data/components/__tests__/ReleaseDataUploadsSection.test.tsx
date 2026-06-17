@@ -102,7 +102,7 @@ describe('ReleaseDataUploadsSection', () => {
     dataFileSize: '200 B',
     metaFileName: 'meta1.csv',
     metaFileSize: '100 B',
-    status: 'PendingReview',
+    screeningStatus: 'PendingReview',
     created: new Date(),
     uploadedBy: 'test@test.com',
   };

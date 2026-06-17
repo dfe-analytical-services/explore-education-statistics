@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515135422_Ees7129RemoveOldStatusColumnFromDataSetUploadsTable")]
+    partial class Ees7129RemoveOldStatusColumnFromDataSetUploadsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,31 +350,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LocationMappings")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("OriginalDataFileId")
+                    b.Property<Guid>("OriginalDataSetId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ReplacementDataFileId")
+                    b.Property<Guid>("ReplacementDataSetId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UnmappedReplacementIndicators")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UnmappedReplacementLocations")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("OriginalDataFileId")
-                        .IsUnique();
-
-                    b.HasIndex("ReplacementDataFileId")
-                        .IsUnique();
 
                     b.ToTable("DataSetMappings");
                 });
@@ -2046,25 +2035,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("DataSetFileVersion");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetMapping", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "OriginalDataFile")
-                        .WithMany()
-                        .HasForeignKey("OriginalDataFileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "ReplacementDataFile")
-                        .WithMany()
-                        .HasForeignKey("ReplacementDataFileId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("OriginalDataFile");
-
-                    b.Navigation("ReplacementDataFile");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentBlock", b =>

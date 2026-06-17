@@ -186,7 +186,11 @@ def run():
 
                 test_run_index += 1
 
-            failing_suites = reports.get_failing_test_suite_sources(f"{test_run_results_folder}{os.sep}output.xml")
+            try:
+                failing_suites = reports.get_failing_test_suite_sources(f"{test_run_results_folder}{os.sep}output.xml")
+            except Exception as ex:
+                logger.error(f"Unable to determine failing suites from {test_run_results_folder}{os.sep}output.xml")
+                logger.error(ex)
 
             # If all tests passed, return early.
             if len(failing_suites) == 0:
