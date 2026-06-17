@@ -92,7 +92,7 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
     healthCheckPath: '/api/HealthCheck'
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
-    linuxFxVersion: 'DOTNET-ISOLATED|8.0'
+    linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlytfa'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

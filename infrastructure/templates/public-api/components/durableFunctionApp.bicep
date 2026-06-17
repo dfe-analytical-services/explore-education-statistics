@@ -21,8 +21,29 @@ param storageAccountsNamePrefix string
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
-@description('Function App runtime')
-param functionAppRuntime 'dotnet' | 'dotnet-isolated' | 'node' | 'python' | 'java' = 'dotnet'
+@description('The language worker runtime to load in the function app.')
+@allowed([
+  'dotnet'
+  'dotnet-isolated'
+  'node'
+  'java'
+  'python'
+])
+param functionAppRuntime string
+
+@description('.NET Framework version.')
+param netFrameworkVersion string?
+
+@description('The language and version for the language-specific worker process.  This is used to determine the correct Linux base image.')
+@allowed([
+  'DOTNET-ISOLATED|10.0'
+  'DOTNET-ISOLATED|8.0'
+  'DOTNET|8.0'
+  'Node|24'
+  'Python|3.14'
+  'Java|25'
+])
+param linuxFxVersion string?
 
 @description('Specifies the additional setting to add to the Function App')
 param appSettings object = {}
@@ -270,8 +291,8 @@ var commonSiteProperties = {
     alwaysOn: alwaysOn
     healthCheckPath: healthCheckPath
     preWarmedInstanceCount: preWarmedInstanceCount
-    netFrameworkVersion: '8.0'
-    linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+    netFrameworkVersion: netFrameworkVersion
+    linuxFxVersion: operatingSystem == 'Linux' ? linuxFxVersion : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
     minTlsVersion: '1.3'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
