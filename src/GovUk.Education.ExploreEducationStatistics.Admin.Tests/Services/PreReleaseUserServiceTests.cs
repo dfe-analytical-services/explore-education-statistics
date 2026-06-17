@@ -598,7 +598,9 @@ public abstract class PreReleaseUserServiceTests
 
                 var userId = existingUser?.Id ?? newUserIdsByEmail[email];
                 userPreReleaseRoleRepository
-                    .Setup(mock => mock.Create(userId, releaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
+                    .Setup(mock =>
+                        mock.Create(userId, releaseVersion.Id, _userId, default, It.IsAny<CancellationToken>())
+                    )
                     .ReturnsAsync(createdUserPreReleaseRole);
             }
 
@@ -856,7 +858,9 @@ public abstract class PreReleaseUserServiceTests
 
                 var userId = existingUser?.Id ?? newUserIdsByEmail[email];
                 userPreReleaseRoleRepository
-                    .Setup(mock => mock.Create(userId, releaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
+                    .Setup(mock =>
+                        mock.Create(userId, releaseVersion.Id, _userId, default, It.IsAny<CancellationToken>())
+                    )
                     .ReturnsAsync(
                         _dataFixture
                             .DefaultUserPreReleaseRole()
@@ -976,7 +980,7 @@ public abstract class PreReleaseUserServiceTests
                 )
                 .ReturnsAsync(false);
             userPreReleaseRoleRepository
-                .Setup(s => s.Create(user.Id, latestReleaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
+                .Setup(s => s.Create(user.Id, latestReleaseVersion.Id, _userId, default, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(createdUserPreReleaseRole);
 
             var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
@@ -1068,7 +1072,7 @@ public abstract class PreReleaseUserServiceTests
                 )
                 .ReturnsAsync(false);
             userPreReleaseRoleRepository
-                .Setup(s => s.Create(user.Id, latestReleaseVersion.Id, _userId, null, It.IsAny<CancellationToken>()))
+                .Setup(s => s.Create(user.Id, latestReleaseVersion.Id, _userId, default, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(createdUserPreReleaseRole);
 
             var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
@@ -1153,7 +1157,7 @@ public abstract class PreReleaseUserServiceTests
                 .ReturnsAsync(false);
             userPreReleaseRoleRepository
                 .Setup(s =>
-                    s.Create(updatedUser.Id, latestReleaseVersion.Id, _userId, null, It.IsAny<CancellationToken>())
+                    s.Create(updatedUser.Id, latestReleaseVersion.Id, _userId, default, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(createdUserPreReleaseRole);
 

@@ -41,7 +41,7 @@ public static class UserPreReleaseRoleGeneratorExtensions
 
     public static Generator<UserPreReleaseRole> WithCreated(
         this Generator<UserPreReleaseRole> generator,
-        DateTime created
+        DateTimeOffset created
     ) => generator.ForInstance(s => s.SetCreated(created));
 
     public static Generator<UserPreReleaseRole> WithCreatedBy(
@@ -60,11 +60,7 @@ public static class UserPreReleaseRoleGeneratorExtensions
     ) => generator.ForInstance(s => s.SetEmailSent(emailSent));
 
     public static InstanceSetters<UserPreReleaseRole> SetDefaults(this InstanceSetters<UserPreReleaseRole> setters) =>
-        setters
-            .SetDefault(urr => urr.Id)
-            .SetDefault(urr => urr.ReleaseVersionId)
-            .SetDefault(urr => urr.UserId)
-            .SetDefault(urr => urr.Created);
+        setters.SetDefault(urr => urr.Id).SetDefault(urr => urr.ReleaseVersionId).SetDefault(urr => urr.UserId);
 
     public static InstanceSetters<UserPreReleaseRole> SetReleaseVersion(
         this InstanceSetters<UserPreReleaseRole> setters,
@@ -88,7 +84,7 @@ public static class UserPreReleaseRoleGeneratorExtensions
 
     public static InstanceSetters<UserPreReleaseRole> SetCreated(
         this InstanceSetters<UserPreReleaseRole> setters,
-        DateTime created
+        DateTimeOffset created
     ) => setters.Set(urr => urr.Created, created);
 
     public static InstanceSetters<UserPreReleaseRole> SetCreatedBy(
