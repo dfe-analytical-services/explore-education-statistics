@@ -76,14 +76,11 @@ var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
   existingResources: {
-    adminApp: '${subscription}-as-ees-admin'
     logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
-    publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
     keyVault: '${subscription}-${abbreviations.keyVaultVaults}-ees-01'
     vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
     subnets: {
-      eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
       nlSearchFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch'
       nlSearchFunctionAppPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch-pep'
       searchDocsFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
@@ -99,29 +96,6 @@ module monitoringModule 'application/monitoring.bicep' = {
     location: location
     resourcePrefix: resourcePrefix
     resourceNames: resourceNames
-    tagValues: tagValues
-  }
-}
-
-// Provision the event messaging infrastructure utilised by EES for communication between services.
-// While not exclusively part of the Search service infrastructure, it is included here to support
-// other services that publish events but are not yet defined in Bicep such as the Admin App Service
-// and the Publisher Function App.
-// The Search Service relies on this infrastructure to subscribe to events.
-module eventMessagingModule '../common/application/eventMessaging.bicep' = {
-  name: 'eventMessagingModuleDeploy'
-  params: {
-    location: location
-    resourcePrefix: resourcePrefix
-    resourceNames: {
-      adminApp: resourceNames.existingResources.adminApp
-      alertsGroup: resourceNames.existingResources.alertsGroup
-      publisherFunction: resourceNames.existingResources.publisherFunction
-      vNet: resourceNames.existingResources.vNet
-      subnets: {
-        eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
-      }
-    }
     tagValues: tagValues
   }
 }
@@ -195,9 +169,6 @@ module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctio
     searchDocsFunctionAppStorageAccountName: searchDocsFunctionAppModule.outputs.functionAppStorageAccountName
     storageQueueNames: searchDocsFunctionAppModule.outputs.storageQueueNames
   }
-  dependsOn: [
-    eventMessagingModule
-  ]
 }
 
 module searchServiceModule 'application/searchService.bicep' = {

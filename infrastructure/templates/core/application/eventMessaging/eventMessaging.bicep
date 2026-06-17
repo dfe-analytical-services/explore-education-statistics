@@ -3,10 +3,10 @@ Sets up event messaging infrastructure using Azure Event Grid and ensures that b
 Publisher Function App have the necessary permissions to send events to the Event Grid topics.
 '''
 
-import { builtInRoleDefinitionIds } from '../builtInRoles.bicep'
-import { eventTopics } from '../eventTopics.bicep'
-import { buildFullyQualifiedTopicName } from '../functions.bicep'
-import { IpRange } from '../types.bicep'
+import { builtInRoleDefinitionIds } from '../../../common/builtInRoles.bicep'
+import { eventTopics } from '../../../common/eventTopics.bicep'
+import { buildFullyQualifiedTopicName } from '../../../common/functions.bicep'
+import { IpRange } from '../../../common/types.bicep'
 
 @description('Location for all resources.')
 param location string
@@ -54,7 +54,7 @@ resource eventGridCustomTopicPrivateEndpointsSubnet 'Microsoft.Network/virtualNe
   parent: vNet
 }
 
-module eventGridMessagingModule '../components/event-grid/eventGridMessaging.bicep' = {
+module eventGridMessagingModule '../../../common/components/event-grid/eventGridMessaging.bicep' = {
   name: 'eventGridMessagingModuleDeploy'
   params: {
     location: location
@@ -78,7 +78,7 @@ module eventGridMessagingModule '../components/event-grid/eventGridMessaging.bic
 }
 
 // Allow the Admin App Service to send events to Event Grid topics
-module adminTopicRoleAssignmentModuleDeploy '../components/event-grid/eventGridTopicRoleAssignment.bicep' = [
+module adminTopicRoleAssignmentModuleDeploy '../../../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
   for (topicName, index) in topicNames: {
     name: 'adminTopicRoleAssignmentModuleDeploy-${index}'
     params: {
@@ -93,7 +93,7 @@ module adminTopicRoleAssignmentModuleDeploy '../components/event-grid/eventGridT
 ]
 
 // Allow the Publisher Function App to send events to Event Grid topics
-module publisherTopicRoleAssignmentModuleDeploy '../components/event-grid/eventGridTopicRoleAssignment.bicep' = [
+module publisherTopicRoleAssignmentModuleDeploy '../../../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
   for (topicName, index) in topicNames: {
     name: 'publisherTopicRoleAssignmentModuleDeploy-${index}'
     params: {
