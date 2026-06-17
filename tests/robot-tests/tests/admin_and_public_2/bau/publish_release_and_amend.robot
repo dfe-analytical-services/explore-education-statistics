@@ -491,14 +491,14 @@ Confirm data replacement details on replacement page
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
     user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Replacing    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    2    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Data file import status    1    Complete
+    user checks headed table body row cell contains    Data file import status    2    Complete
     ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement

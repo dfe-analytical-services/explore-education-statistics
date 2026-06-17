@@ -34,7 +34,7 @@ user waits until table cell contains
     ...    timeout=${wait}
 
 user waits until modal table cell contains
-    [Arguments]    ${row}    ${column}    ${expected}    ${parent}=css:div[role='dialog']    ${wait}=%{WAIT_SMALL}
+    [Arguments]    ${row}    ${column}    ${expected}    ${parent}=${MODAL_SELECTOR}    ${wait}=%{WAIT_SMALL}
     user waits until parent contains element    ${parent}
     ...    xpath:.//table/tbody/tr[${row}]/td[${column}][contains(., "${expected}")]
     ...    timeout=${wait}
