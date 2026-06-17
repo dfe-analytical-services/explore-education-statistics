@@ -9,6 +9,7 @@ import useInterval from '@common/hooks/useInterval';
 import useMounted from '@common/hooks/useMounted';
 import React, { useCallback, useEffect, useState } from 'react';
 import Tag, { TagProps } from '@common/components/Tag';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 export type ScreenerStatusChangeHandler = (
   dataSetUpload: DataSetUpload,
@@ -106,7 +107,7 @@ export default function ScreenerStatus({
   onStatusChange,
 }: Props) {
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
-    status: dataSetUpload.status,
+    status: dataSetUpload.screeningStatus,
     percentageComplete: 0,
     stage: 'PENDING',
     completed: false,
@@ -120,7 +121,7 @@ export default function ScreenerStatus({
 
     setCurrentStatus(nextStatus);
 
-    if (onStatusChange && nextStatus.status !== dataSetUpload.status) {
+    if (onStatusChange && nextStatus.status !== dataSetUpload.screeningStatus) {
       onStatusChange(dataSetUpload, nextStatus);
     }
   }, [releaseVersionId, dataSetUpload, onStatusChange]);
@@ -131,8 +132,8 @@ export default function ScreenerStatus({
   // is decommissioned.
   useMounted(() => {
     if (
-      dataSetUpload.status &&
-      !terminalScreeningStatuses.includes(dataSetUpload.status)
+      dataSetUpload.screeningStatus &&
+      !terminalScreeningStatuses.includes(dataSetUpload.screeningStatus)
     ) {
       fetchStatus();
     }
@@ -158,6 +159,11 @@ export default function ScreenerStatus({
       <Tag colour={getDataSetUploadScreeningStatusColour(currentStatus.status)}>
         {getDataSetUploadScreeningStatusLabel(currentStatus.status)}
       </Tag>
+
+      {!hasTerminalStatus && (
+        <LoadingSpinner inline size="sm" className="govuk-!-margin-left-1" />
+      )}
+
       {!hasTerminalStatus && (
         <ProgressBar
           testId={`${dataSetUpload.dataSetTitle}-screener-progress-bar`}

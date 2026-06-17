@@ -68,7 +68,7 @@ public class DataSetUploadRepositoryTests
             Assert.Null(uploadViewModels[0].ScreenerProgress);
 
             // Assert that a DataSetUpload with a failed screening result is mapped correctly.
-            Assert.Equal(upload2.ScreeningStatus.ToString(), uploadViewModels[1].Status);
+            Assert.Equal(upload2.ScreeningStatus.ToString(), uploadViewModels[1].ScreeningStatus);
 
             // Assert its screening progress is mapped correctly.
             Assert.Equal(
@@ -78,7 +78,7 @@ public class DataSetUploadRepositoryTests
             Assert.Equal(upload2.ScreenerProgress!.Stage, uploadViewModels[1].ScreenerProgress!.Stage);
 
             // Assert that a DataSetUpload with a warning screening result is mapped correctly.
-            Assert.Equal(upload3.ScreeningStatus.ToString(), uploadViewModels[2].Status);
+            Assert.Equal(upload3.ScreeningStatus.ToString(), uploadViewModels[2].ScreeningStatus);
             Assert.Equal(upload3.ScreenerResult!.PublicApiCompatible, uploadViewModels[2].PublicApiCompatible);
             Assert.Equal(upload3.ScreenerResult!.OverallResult, uploadViewModels[2].ScreenerResult!.OverallResult);
             AssertScreenerTestsCorrect(
@@ -94,7 +94,7 @@ public class DataSetUploadRepositoryTests
             Assert.Equal(upload3.ScreenerProgress!.Stage, uploadViewModels[2].ScreenerProgress!.Stage);
 
             // Assert that a DataSetUpload that has received a Screener error is mapped correctly.
-            Assert.Equal(upload4.ScreeningStatus.ToString(), uploadViewModels[3].Status);
+            Assert.Equal(upload4.ScreeningStatus.ToString(), uploadViewModels[3].ScreeningStatus);
 
             // Assert it has no screener results or progress yet.
             Assert.False(uploadViewModels[3].PublicApiCompatible);
