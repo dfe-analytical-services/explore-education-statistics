@@ -110,7 +110,7 @@ public class ReleaseChecklistServiceTests
 
             releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([new()]);
 
-            dataImportService.Setup(s => s.HasIncompleteImports(releaseVersion.Id)).ReturnsAsync(true);
+            dataImportService.Setup(s => s.HasIncompleteUploadsOrImports(releaseVersion.Id)).ReturnsAsync(true);
 
             dataGuidanceService
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))

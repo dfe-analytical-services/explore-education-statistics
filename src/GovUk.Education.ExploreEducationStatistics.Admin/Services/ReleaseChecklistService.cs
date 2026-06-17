@@ -80,7 +80,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
     {
         var errors = new List<ReleaseChecklistIssue>();
 
-        if (await _dataImportService.HasIncompleteImports(releaseVersion.Id))
+        if (await _dataImportService.HasIncompleteUploadsOrImports(releaseVersion.Id))
         {
             errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileImportsMustBeCompleted));
         }
