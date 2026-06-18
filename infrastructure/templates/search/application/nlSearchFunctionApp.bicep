@@ -143,7 +143,7 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
       tier: 'ElasticPremium'
       family: 'EP'
     }
-    healthCheckPath: '/api/health_check'
+    healthCheckPath: '/health_check'
     operatingSystem: 'Linux'
     functionAppRuntime: 'python'
     linuxFxVersion: 'Python|3.14'

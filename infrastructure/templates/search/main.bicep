@@ -107,17 +107,7 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = if (d
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     functionAppExists: naturalLanguageSearchFunctionAppExists
-    functionAppFirewallRules: union(
-      [
-        {
-          cidr: 'AzureCloud'
-          tag: 'ServiceTag'
-          priority: 101
-          name: 'AzureCloud'
-        }
-      ],
-      maintenanceFirewallRules
-    )
+    functionAppFirewallRules: []
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
