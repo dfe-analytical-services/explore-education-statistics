@@ -18,5 +18,7 @@ public record PreReleaseUserInvitePlan
 
     public required List<string> AlreadyAccepted { get; init; }
 
+    public required List<string> AlreadyHasMorePowerfulRole { get; init; }
+
     public required List<string> Invitable { get; init; }
 }
