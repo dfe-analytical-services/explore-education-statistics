@@ -90,6 +90,13 @@ param privateEndpoints {
 @description('Specifies whether this Function App is accessible from the public internet.')
 param publicNetworkAccessEnabled bool = false
 
+@description('Specifies the \'Unmatched rule action\' for access restrictions if no rules are matched.')
+@allowed([
+  'Allow'
+  'Deny'
+])
+param ipSecurityRestrictionsDefaultAction string?
+
 @description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
 param functionAppFirewallRules FirewallRule[] = []
 
@@ -291,7 +298,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       linuxFxVersion: operatingSystem == 'Linux' ? linuxFxVersion : null
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
       ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
-      ipSecurityRestrictionsDefaultAction: 'Deny'
+      ipSecurityRestrictionsDefaultAction: ipSecurityRestrictionsDefaultAction
       scmIpSecurityRestrictions: [
         {
           ipAddress: 'Any'
