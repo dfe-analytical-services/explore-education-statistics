@@ -799,6 +799,17 @@
       "metadata": {
         "description": "Additional CORS allowed origins for the public"
       }
+    },
+    "sqlServerPublicNetworkAccess": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Whether or not public access is enabled for the Azure SQL database servers"
+      },
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ]
     }
   },
   "variables": {
@@ -2527,7 +2538,8 @@
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
         "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
         "version": "12.0",
-        "minimalTlsVersion": "[parameters('minTlsVersion')]"
+        "minimalTlsVersion": "[parameters('minTlsVersion')]",
+        "publicNetworkAccess": "[parameters('sqlServerPublicNetworkAccess')]"
       },
       "resources": [
         {
@@ -2760,8 +2772,33 @@
       }
     },
     {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2023-07-01",
+      "name": "conditionalFirewallDeployment",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[uri(deployment().properties.templateLink.uri, 'db-firewall-template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sqlServerName": {
+            "value": "[variables('coreSqlServerName')]"
+          },
+          "firewallRules": {
+            "value": "[parameters('sqlFirewallRules')]"
+          }
+        }
+      }
+    },
+    {
       "type": "Microsoft.Sql/servers/firewallRules",
       "name": "[concat(variables('coreSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "scale": null,
       "properties": {
@@ -2777,9 +2814,9 @@
       }
     },
     {
-      "condition": "[parameters('useSubnets')]",
       "name": "[concat(variables('coreSqlServerName'), '/', variables('sqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "properties": {
         "virtualNetworkSubnetId": "[variables('sqlAllowedSubnets')[copyIndex()].id]",
@@ -2803,7 +2840,8 @@
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
         "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
         "version": "12.0",
-        "minimalTlsVersion": "[parameters('minTlsVersion')]"
+        "minimalTlsVersion": "[parameters('minTlsVersion')]",
+        "publicNetworkAccess": "[parameters('sqlServerPublicNetworkAccess')]"
       },
       "resources": [
         {
@@ -2949,6 +2987,7 @@
     {
       "type": "Microsoft.Sql/servers/firewallRules",
       "name": "[concat(variables('publicSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "scale": null,
       "properties": {
@@ -2964,9 +3003,9 @@
       }
     },
     {
-      "condition": "[parameters('useSubnets')]",
       "name": "[concat(variables('publicSqlserverName'), '/', variables('publicSqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "properties": {
         "virtualNetworkSubnetId": "[variables('publicSqlAllowedSubnets')[copyIndex()].id]",

@@ -147,6 +147,9 @@
     },
     "enhancedScreenerJourney": {
       "value": true
+    },
+    "sqlServerPublicNetworkAccess": {
+      "value": "Disabled"
     }
   }
 }
