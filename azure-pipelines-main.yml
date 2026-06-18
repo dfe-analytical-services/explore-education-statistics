@@ -69,6 +69,13 @@ jobs:
           version: $(DotNetVersion)
           performMultiLevelLookup: true
 
+      - task: DotNetCoreCLI@2
+        displayName: Add GitHub package source
+        inputs:
+          command: nuget
+          nuget: add source
+          arguments: --name $(GitHubPackageSourceName) --source $(GitHubPackageSourceUrl) --username $(GitHubPackageSourceUsername) --password $(GitHubPackageSourcePassword)
+
       # Check code formatting
       - task: DotNetCoreCLI@2
         displayName: Restore .NET tools
