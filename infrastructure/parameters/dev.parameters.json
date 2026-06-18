@@ -114,7 +114,7 @@
       "value": 2147483648
     },
     "maxStatsDbSizeBytes": {
-      "value": 644245094400
+      "value": 1099511627776
     },
     "dataFactoryConcurrency": {
       "value": 10
