@@ -1,4 +1,5 @@
 import logger from '@common/services/logger';
+import createMockSseStream from '@frontend/modules/table-tool/utils/createMockSseStream';
 import { NextRequest } from 'next/server';
 
 export const config = {
@@ -13,7 +14,18 @@ export default async function handler(req: NextRequest) {
     });
   }
 
+  if (process.env.USE_MOCK_TABLE_TOOL_SEARCH_API === 'true') {
+    return new Response(createMockSseStream(), {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+      },
+    });
+  }
+
   const endpoint = process.env.AZURE_TABLE_TOOL_SEARCH_ENDPOINT;
+  const functionKey = process.env.AZURE_TABLE_TOOL_SEARCH_FUNCTIONS_KEY;
 
   if (!endpoint) {
     return new Response(
@@ -26,10 +38,17 @@ export default async function handler(req: NextRequest) {
 
   try {
     const body = await req.json();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (functionKey) {
+      headers['X-Functions-Key'] = functionKey;
+    }
 
     const response = await fetch(endpoint, {
       method: 'POST',
       body: JSON.stringify(body),
+      headers,
     });
 
     if (!response.ok) {
@@ -42,6 +61,7 @@ export default async function handler(req: NextRequest) {
         }),
         {
           status: response.status,
+          statusText: response.statusText,
           headers: { 'Content-Type': 'application/json' },
         },
       );

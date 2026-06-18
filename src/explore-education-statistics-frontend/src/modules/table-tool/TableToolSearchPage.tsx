@@ -1,5 +1,8 @@
 import Details from '@common/components/Details';
 import ErrorMessage from '@common/components/ErrorMessage';
+import InsetText from '@common/components/InsetText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import WarningMessage from '@common/components/WarningMessage';
 import logger from '@common/services/logger';
 import publicationService, {
   PublicationSummary,
@@ -11,6 +14,8 @@ import SearchForm from '@frontend/components/SearchForm';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
 import tableToolSearchService, {
   FatalError,
+  PipelineStage,
+  PipelineStageLabels,
   StageComplete,
   StageReranker,
   StageRetrieved,
@@ -42,7 +47,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
   latestReleaseVersion,
   publicationSummary,
 }) => {
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchedTerm, setSearchedTerm] = useState<string | null>(null);
   const [pipelineData, setPipelineData] =
     useState<SearchPipelineData>(initialPipelineData);
   const [error, setError] = useState<string | null>(null);
@@ -52,20 +57,21 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
   const handleSearchSubmit = async (searchTerm: string) => {
     if (!searchTerm.trim()) return;
 
-    // Abort any existing search stream
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     abortControllerRef.current = new AbortController();
 
     setPipelineData(initialPipelineData);
-    setIsSearching(true);
+    setSearchedTerm(searchTerm.trim());
+    setError(null);
 
     try {
       await tableToolSearchService.postSearchStream(
         {
-          userQuery: searchTerm.trim(),
-          publicationId: publicationSummary.id,
+          user_query: searchTerm.trim(),
+          publication:
+            'Pupil attendance in schools in England' || publicationSummary.id, // TODO change to publication ID
         },
         {
           signal: abortControllerRef.current.signal,
@@ -74,17 +80,16 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
               const updatedState = { ...prev, currentStage: message.stage };
 
               switch (message.stage) {
-                case 'retrieved datasets':
+                case PipelineStage.RETRIEVED:
                   updatedState.retrievedData = message.data;
                   break;
-                case 'reranker complete':
+                case PipelineStage.RERANKER:
                   updatedState.rerankerData = message.data;
                   break;
-                case 'pipeline complete':
+                case PipelineStage.COMPLETE:
                   updatedState.finalData = message.data;
-                  setIsSearching(false);
                   break;
-                case 'starting pipeline':
+                case PipelineStage.STARTING:
                   break;
                 default:
                   return updatedState;
@@ -92,6 +97,16 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
 
               return updatedState;
             });
+
+            // Abort early if there are no results.
+            if (
+              (message.stage === PipelineStage.RETRIEVED &&
+                message.data.datasets.length === 0) ||
+              (message.stage === PipelineStage.RERANKER &&
+                message.data.shortlistedDatasets.length === 0)
+            ) {
+              abortControllerRef.current?.abort();
+            }
           },
           onRetriableError: errorMessage => {
             setError(errorMessage);
@@ -103,7 +118,6 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
       if (err instanceof Error && err.name === 'AbortError') return;
 
       logger.error(err);
-      setIsSearching(false);
 
       if (err instanceof FatalError) {
         setError(`Search failed: ${err.message}. Please try again later.`);
@@ -116,6 +130,13 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
       }
     }
   };
+
+  const hasNoResults =
+    (pipelineData.retrievedData &&
+      pipelineData.retrievedData.datasets.length === 0) ||
+    (pipelineData.rerankerData &&
+      pipelineData.rerankerData.shortlistedDatasets.length === 0) ||
+    (pipelineData.finalData && pipelineData.finalData.datasets.length === 0);
 
   return (
     <Page
@@ -158,47 +179,87 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
             </p>
           </Details>
 
-          <div aria-live="polite">
-            {isSearching && (
-              <>
-                <strong>Status:</strong>{' '}
-                {pipelineData.currentStage || 'Connecting...'}
-              </>
-            )}
-          </div>
-
           {error && <ErrorMessage announceError>{error}</ErrorMessage>}
 
-          {pipelineData.rerankerData && (
-            <div className="govuk-body">
-              <ol>
-                {pipelineData.rerankerData.shortlisted_datasets.map(dataset => (
-                  <li key={dataset.file_id}>
-                    {dataset.title} - {dataset.relevance_reason}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {pipelineData.finalData && (
-            // TODO EES-7213 render results
-            <div className="results-container">
-              <h2 className="govuk-heading-m">Results</h2>
-              <ol>
-                {pipelineData.finalData.datasets.map(dataset => (
-                  <li key={dataset.fileId}>
-                    <h3>Dataset: {dataset.fileId}</h3>
-                    <div>
-                      <p className="govuk-body">{dataset.aiSummary}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
+          {hasNoResults && (
+            <WarningMessage className="govuk-!-margin-top-4">
+              We couldn't find any results for your search. <br />
+              Please make sure your query is relevant to{' '}
+              {publicationSummary.title}
+            </WarningMessage>
           )}
         </div>
       </div>
+
+      {pipelineData.currentStage && !hasNoResults && (
+        <div className="govuk-grid-row govuk-!-margin-bottom-4">
+          <div className="govuk-grid-column-two-thirds">
+            <h2 className="govuk-heading-m">
+              {PipelineStageLabels[pipelineData.currentStage]}
+            </h2>
+
+            {pipelineData.currentStage === PipelineStage.STARTING && (
+              <InsetText>
+                <p>Analysing "{searchedTerm}"</p>
+              </InsetText>
+            )}
+
+            {pipelineData.currentStage === PipelineStage.RETRIEVED &&
+              pipelineData.retrievedData?.datasets && (
+                <div className="govuk-body">
+                  <ul>
+                    {pipelineData.retrievedData.datasets.map(dataset => (
+                      <li key={dataset.title} className="dfe-flex">
+                        <p>{dataset.title}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+            {pipelineData.currentStage === PipelineStage.RERANKER &&
+              pipelineData.rerankerData?.shortlistedDatasets && (
+                <div className="govuk-body">
+                  <ul>
+                    {pipelineData.rerankerData.shortlistedDatasets.map(
+                      dataset => (
+                        <li
+                          key={dataset.fileId}
+                          className="dfe-flex dfe-justify-between dfe-justify-content--space-between"
+                        >
+                          <p>{dataset.title}</p>
+                          <p>{dataset.relevanceScore} relevance</p>
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                </div>
+              )}
+
+            {pipelineData.currentStage === PipelineStage.COMPLETE &&
+            pipelineData.finalData &&
+            pipelineData.finalData.datasets.length > 0 ? (
+              // TODO EES-7213 render results
+              <div className="results-container">
+                <ol>
+                  {pipelineData.finalData.datasets.map(dataset => (
+                    <li key={dataset.fileId}>
+                      <p>
+                        Dataset: <strong>{dataset.fileId}</strong>
+                      </p>
+                      <div>
+                        <p className="govuk-body">{dataset.aiSummary}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ) : (
+              <LoadingSpinner />
+            )}
+          </div>
+        </div>
+      )}
     </Page>
   );
 };
