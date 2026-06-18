@@ -526,7 +526,7 @@
                       }
                     },
                     {
-                      "name": "Report error when pausing resumable index rebuilds 2",
+                      "name": "Report error when pausing resumable index rebuilds Teams",
                       "type": "WebActivity",
                       "dependsOn": [
                         {
