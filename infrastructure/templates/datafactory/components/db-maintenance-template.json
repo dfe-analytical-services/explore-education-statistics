@@ -81,7 +81,7 @@
             "type": "SqlServerStoredProcedure",
             "dependsOn": [],
             "policy": {
-              "timeout": "0.06:00:00",
+              "timeout": "@pipeline().parameters.ActivityTimeout",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -857,6 +857,10 @@
           "Tables": {
             "type": "string",
             "defaultValue": "[variables('fragmentationTables')]"
+          },
+          "ActivityTimeout": {
+            "type": "string",
+            "defaultValue": "0.06:00:00"
           }
         },
         "variables": {
@@ -1250,14 +1254,15 @@
               "type": "PipelineReference"
             },
             "parameters": {
-              "Tables": "[variables('fragmentationTables')]"
+              "Tables": "[variables('fragmentationTables')]",
+              "ActivityTimeout": "0.06:00:00"
             }
           }
         ],
         "type": "ScheduleTrigger",
         "typeProperties": {
           "recurrence": {
-            "frequency": "Day",
+            "frequency": "Week",
             "interval": 1,
             "startTime": "2023-03-03T02:00:00",
             "timeZone": "GMT Standard Time",
@@ -1267,6 +1272,56 @@
               ],
               "minutes": [
                 0
+              ],
+              "weekDays": [
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+              ]
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/pipelines/pl_rebuild_statistics_indexes')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/rebuild_indexes_weekend_trigger')]",
+      "type": "Microsoft.DataFactory/factories/triggers",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "runtimeState": "Stopped",
+        "pipelines": [
+          {
+            "pipelineReference": {
+              "referenceName": "pl_rebuild_statistics_indexes",
+              "type": "PipelineReference"
+            },
+            "parameters": {
+              "Tables": "[variables('fragmentationTables')]",
+              "ActivityTimeout": "2.06:00:00"
+            }
+          }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+          "recurrence": {
+            "frequency": "Week",
+            "interval": 1,
+            "startTime": "2023-03-03T02:00:00",
+            "timeZone": "GMT Standard Time",
+            "schedule": {
+              "hours": [
+                2
+              ],
+              "minutes": [
+                0
+              ],
+              "weekDays": [
+                "Saturday"
               ]
             }
           }
