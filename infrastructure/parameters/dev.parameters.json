@@ -149,7 +149,7 @@
       "value": true
     },
     "sqlServerPublicNetworkAccess": {
-      "value": "Disabled"
+      "value": "Enabled"
     }
   }
 }
