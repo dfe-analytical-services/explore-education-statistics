@@ -44,20 +44,6 @@ public class DataSetMappingService(
                 cancellationToken
             );
 
-        // TODO EES-7126 Remove this code - it was only needed when first introducing LocationMappings to ensure they were set
-        if (mapping.LocationMappings.IsNullOrEmpty() && mapping.UnmappedReplacementLocations.IsNullOrEmpty())
-        {
-            var (initialLocationMappingDictionary, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
-                originalSubjectId,
-                replacementSubjectId,
-                cancellationToken
-            );
-
-            mapping.LocationMappings = initialLocationMappingDictionary;
-            mapping.UnmappedReplacementLocations = unmappedReplacementLocations;
-            await contentDbContext.SaveChangesAsync(cancellationToken);
-        }
-
         return mapping;
     }
 
@@ -112,6 +98,11 @@ public class DataSetMappingService(
             .Indicator.Include(i => i.IndicatorGroup)
             .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
             .ToDictionaryAsync(i => i.Name, i => i, cancellationToken);
+
+        if (replacementIndicatorNameToIndicatorMap.IsNullOrEmpty())
+        {
+            throw new Exception($"Replacement data set should have indicators. SubjectId: {replacementSubjectId}");
+        }
 
         var initialMappingDictionary = originalIndicators.ToDictionary(
             originalIndicator => originalIndicator.Id,
@@ -187,6 +178,11 @@ public class DataSetMappingService(
             .Select(observation => observation.Location)
             .Distinct()
             .ToDictionaryAsync(location => location.Id, location => location, cancellationToken);
+
+        if (replacementLocationMap.IsNullOrEmpty())
+        {
+            throw new Exception($"Replacement data set should have locations. SubjectId: {replacementSubjectId}");
+        }
 
         var initialMappingDictionary = originalLocations.ToDictionary(
             originalLocation => originalLocation.Id,
