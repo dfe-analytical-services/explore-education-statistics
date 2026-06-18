@@ -87,6 +87,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
         eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
       }
     }
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }

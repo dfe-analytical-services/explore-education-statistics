@@ -32,6 +32,9 @@ param resourceNames {
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
+@description('Whether to create or update Azure Monitor alerts during this deploy.')
+param deployAlerts bool
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -64,14 +67,14 @@ module eventGridMessagingModule '../../../common/components/event-grid/eventGrid
     customTopics: {
       names: topicNames
       privateEndpointSubnetId: eventGridCustomTopicPrivateEndpointsSubnet.id
-      alerts: {
+      alerts: deployAlerts ? {
         deadLetteredCount: true
         deliveryAttemptFailCount: true
         droppedEventCount: true
         publishFailCount: true
         unmatchedEventCount: true
         alertsGroupName: resourceNames.alertsGroup
-      }
+      } : null
     }
     tagValues: tagValues
   }
