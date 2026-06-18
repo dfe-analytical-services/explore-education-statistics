@@ -90,12 +90,18 @@ public class ReleaseDataFileService(
                         await privateBlobStorageService.DeleteBlob(PrivateReleaseFiles, file.Path());
                         await privateBlobStorageService.DeleteBlob(PrivateReleaseFiles, metaFile.Path());
 
-                        // If this is a replacement then unlink it from the original
+                        // If this is a replacement then unlink it from the original and delete any mapping
                         if (file.ReplacingId.HasValue)
                         {
                             var originalFile = await fileRepository.Get(file.ReplacingId.Value);
                             originalFile.ReplacedById = null;
                             contentDbContext.Update(originalFile);
+
+                            var mappings = await contentDbContext
+                                .DataSetMappings.Where(map => map.ReplacementDataFileId == file.Id)
+                                .ToListAsync();
+                            contentDbContext.DataSetMappings.RemoveRange(mappings);
+
                             await contentDbContext.SaveChangesAsync();
                         }
 
