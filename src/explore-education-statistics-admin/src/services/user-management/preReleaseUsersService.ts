@@ -12,6 +12,7 @@ export interface PreReleaseUser extends PreReleaseUserSummary {
 export interface PreReleaseInvitePlan {
   alreadyAccepted: string[];
   alreadyInvited: string[];
+  alreadyHasMorePowerfulRole: string[];
   invitable: string[];
 }
 
