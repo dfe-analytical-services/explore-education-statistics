@@ -1,3 +1,4 @@
+import { abbreviations } from '../common/abbreviations.bicep'
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
@@ -45,6 +46,18 @@ var tagValues = union(resourceTags ?? {}, {
 var resourcePrefix = '${subscription}-ees'
 var legacyResourcePrefix = '${subscription}-'
 
+var resourceNames = {
+  existingResources: {
+    adminApp: '${subscription}-as-ees-admin'
+    publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
+    vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
+    alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
+    subnets: {
+      eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
+    }
+  }
+}
+
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
   name: '${resourcePrefix}-log'
   scope: resourceGroup()
@@ -56,6 +69,25 @@ module backupsModule 'application/backups/backups.bicep' = {
     location: location
     resourcePrefix: resourcePrefix
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
+    tagValues: tagValues
+  }
+}
+
+module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = {
+  name: 'eventMessagingModuleDeploy'
+  params: {
+    location: location
+    resourcePrefix: resourcePrefix
+    resourceNames: {
+      adminApp: resourceNames.existingResources.adminApp
+      alertsGroup: resourceNames.existingResources.alertsGroup
+      publisherFunction: resourceNames.existingResources.publisherFunction
+      vNet: resourceNames.existingResources.vNet
+      subnets: {
+        eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
+      }
+    }
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
