@@ -109,6 +109,10 @@ jobs:
     workspace:
       clean: all
     steps:
+      - task: NuGetAuthenticate@1
+        inputs:
+          nuGetServiceConnections: $(NuGetServiceConnectionName)
+
       - task: UseDotNet@2
         displayName: Install .NET $(DotNetVersion)
         inputs:
@@ -130,6 +134,10 @@ jobs:
     pool:
       vmImage: ubuntu-22.04
     steps:
+      - task: NuGetAuthenticate@1
+        inputs:
+          nuGetServiceConnections: $(NuGetServiceConnectionName)
+
       - task: UseDotNet@2
         displayName: Install .NET $(DotNetVersion)
         inputs:
@@ -303,6 +311,10 @@ jobs:
           workingDir: .
           targetType: inline
           script: corepack enable
+
+      - task: NuGetAuthenticate@1
+        inputs:
+          nuGetServiceConnections: $(NuGetServiceConnectionName)
 
       - task: UseDotNet@2
         displayName: Install .NET $(DotNetVersion)
