@@ -15,7 +15,7 @@ export default async function handler(req: NextRequest) {
   }
 
   if (process.env.USE_MOCK_TABLE_TOOL_SEARCH_API === 'true') {
-    return new Response(createMockSseStream(), {
+    return new Response(createMockSseStream({ returnResults: true }), {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',

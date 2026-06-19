@@ -24,31 +24,32 @@ export const PipelineStageLabels: Record<PipelineStageType, string> = {
 };
 
 export interface RetrievedDataset {
-  title: string;
-  relevanceScore: number;
   rawRelevanceScore: number;
+  relevanceScore: number;
+  title: string;
 }
 
 export interface ShortlistedDataset {
   fileId: string;
-  title: string;
-  relevanceReason: string;
   relevantFilters: string[];
+  relevanceReason: string;
   relevanceScore: number;
+  title: string;
 }
 
 export interface GeographicLevelItem {
-  property: string;
-  name: string;
-  score: number;
+  id: string;
+  label: string;
+  value: string;
 }
 
 export interface FinalDataset {
+  aiSummary: string;
   fileId: string;
   filters: string[];
-  indicators: string[];
   geographicLevels: Dictionary<GeographicLevelItem[]>;
-  aiSummary: string;
+  indicators: string[];
+  title: string;
 }
 
 export interface StageStarting {
@@ -144,7 +145,6 @@ const tableToolSearchService = {
             response.ok &&
             response.headers.get('content-type') === EventStreamContentType
           ) {
-            retryCount = 0;
             return;
           }
           if (
@@ -167,6 +167,8 @@ const tableToolSearchService = {
           }
 
           if (!msg.data) return;
+
+          retryCount = 0;
 
           try {
             const parsed: TtSearchStreamMessage = JSON.parse(msg.data);

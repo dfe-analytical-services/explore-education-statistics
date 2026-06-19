@@ -1,6 +1,9 @@
 import { TtSearchStreamMessage } from '@frontend/services/tableToolSearchService';
 
-export default function createMockSseStream() {
+export default function createMockSseStream({
+  returnResults = true,
+  testErrorType = 'none', // 'none' | 'fatal' | 'retriable'
+}) {
   const encoder = new TextEncoder();
 
   // Create standard SSE formatted chunks
@@ -13,11 +16,29 @@ export default function createMockSseStream() {
         new Promise(resolve => setTimeout(resolve, ms));
 
       try {
+        // Simulate errors if wanted
+        if (testErrorType === 'fatal') {
+          // Simulates the AI pipeline crashing
+          controller.enqueue(
+            encoder.encode(
+              'event: FatalError\ndata: "Simulated AI pipeline error"\n\n',
+            ),
+          );
+          controller.close();
+          return;
+        }
+
+        if (testErrorType === 'retriable') {
+          // Simulates the Wi-Fi dropping or Azure timing out mid-stream.
+          controller.close();
+          return;
+        }
+
         // Stage 1: Starting
         controller.enqueue(
           encoder.encode(formatSse({ stage: 'starting pipeline' })),
         );
-        await delay(2000); // Wait 1 second
+        await delay(1000);
 
         // Stage 2: Retrieved
         controller.enqueue(
@@ -54,22 +75,24 @@ export default function createMockSseStream() {
                   geography: ['Sheffield'],
                   timePeriod: 'Week 9 2026 to Week 6 2026',
                 },
-                shortlistedDatasets: [
-                  {
-                    fileId: '688db31c-66bd-4dbd-b73c-08dec0963904',
-                    title: 'Reasons for absence and attendance',
-                    relevanceReason:
-                      'This dataset provides local authority level data on reasons for pupil absence, including holidays, with weekly time frames that cover the last 4 weeks, making it directly relevant to the query for Sheffield.',
-                    relevantFilters: ['Attendance reason', 'Time frame'],
-                    relevanceScore: 73.1,
-                  },
-                ],
+                shortlistedDatasets: returnResults
+                  ? [
+                      {
+                        fileId: '688db31c-66bd-4dbd-b73c-08dec0963904',
+                        title: 'Reasons for absence and attendance',
+                        relevanceReason:
+                          'This dataset provides local authority level data on reasons for pupil absence, including holidays, with weekly time frames that cover the last 4 weeks, making it directly relevant to the query for Sheffield.',
+                        relevantFilters: ['Attendance reason', 'Time frame'],
+                        relevanceScore: 73.1,
+                      },
+                    ]
+                  : [],
                 confidence: 'high',
               },
             }),
           ),
         );
-        await delay(6000);
+        await delay(8000);
 
         // Stage 4: Complete
         controller.enqueue(
@@ -85,14 +108,15 @@ export default function createMockSseStream() {
                     geographicLevels: {
                       'Local authority': [
                         {
-                          property: 'LocalAuthority',
-                          name: 'Sheffield',
-                          score: 100,
+                          id: 'bbe3cafc-2c62-42d6-4919-08d93bbc8641',
+                          label: 'Sheffield',
+                          value: 'E08000019',
                         },
                       ],
                     },
                     aiSummary:
                       'This data is relevant because This dataset provides local authority level data on reasons for pupil absence, including holidays, with weekly time frames that cover the last 4 weeks, making it directly relevant to the query for Sheffield.\n It contains information about Daily and weekly local authority, regional and national reasons for pupil attendance and absence. Figures are provided for state-funded primary, secondary and special schools.',
+                    title: 'Reasons for absence and attendance',
                   },
                 ],
                 token_usage: 3766,

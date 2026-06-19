@@ -2,6 +2,7 @@ import Details from '@common/components/Details';
 import ErrorMessage from '@common/components/ErrorMessage';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import WarningMessage from '@common/components/WarningMessage';
 import logger from '@common/services/logger';
 import publicationService, {
@@ -55,7 +56,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleSearchSubmit = async (searchTerm: string) => {
-    if (!searchTerm.trim()) return;
+    if (!searchTerm.trim() || searchedTerm === searchTerm.trim()) return;
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -138,6 +139,16 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
       pipelineData.rerankerData.shortlistedDatasets.length === 0) ||
     (pipelineData.finalData && pipelineData.finalData.datasets.length === 0);
 
+  const { currentStage } = pipelineData;
+
+  const finalDatasets = pipelineData.finalData
+    ? pipelineData.finalData.datasets
+    : [];
+
+  const resultsTitle = `${finalDatasets.length} result${
+    finalDatasets.length !== 1 ? 's' : ''
+  } for "${searchedTerm}"`;
+
   return (
     <Page
       title={`Search statistics - ${publicationSummary.title}`}
@@ -158,8 +169,13 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
           <SearchForm
             label="Search these statistics"
             hint={`Use natural language to search for statistics relating to ${publicationSummary.title}.`}
-            onSubmit={handleSearchSubmit}
+            onSubmit={searchTerm => {
+              handleSearchSubmit(searchTerm);
+            }}
           />
+          <a href="#searchResults" className="govuk-skip-link">
+            Skip to results
+          </a>
           <Details
             className="govuk-!-margin-top-3 govuk-!-margin-bottom-4"
             summary="Help and example searches"
@@ -180,86 +196,91 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
           </Details>
 
           {error && <ErrorMessage announceError>{error}</ErrorMessage>}
+        </div>
+      </div>
 
-          {hasNoResults && (
-            <WarningMessage className="govuk-!-margin-top-4">
+      <div
+        className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-4"
+        id="searchResults"
+      >
+        {hasNoResults && !error && (
+          <div role="alert" className="govuk-grid-column-two-thirds">
+            <WarningMessage>
               We couldn't find any results for your search. <br />
               Please make sure your query is relevant to{' '}
               {publicationSummary.title}
             </WarningMessage>
-          )}
-        </div>
-      </div>
+          </div>
+        )}
 
-      {pipelineData.currentStage && !hasNoResults && (
-        <div className="govuk-grid-row govuk-!-margin-bottom-4">
+        {currentStage && !hasNoResults && !error && (
           <div className="govuk-grid-column-two-thirds">
             <h2 className="govuk-heading-m">
-              {PipelineStageLabels[pipelineData.currentStage]}
+              {currentStage === PipelineStage.COMPLETE
+                ? resultsTitle
+                : PipelineStageLabels[currentStage]}
             </h2>
 
-            {pipelineData.currentStage === PipelineStage.STARTING && (
+            <ScreenReaderMessage
+              message={
+                currentStage === PipelineStage.COMPLETE
+                  ? resultsTitle
+                  : PipelineStageLabels[currentStage]
+              }
+            />
+
+            {currentStage === PipelineStage.STARTING && (
               <InsetText>
                 <p>Analysing "{searchedTerm}"</p>
               </InsetText>
             )}
 
-            {pipelineData.currentStage === PipelineStage.RETRIEVED &&
+            {currentStage === PipelineStage.RETRIEVED &&
               pipelineData.retrievedData?.datasets && (
-                <div className="govuk-body">
-                  <ul>
-                    {pipelineData.retrievedData.datasets.map(dataset => (
-                      <li key={dataset.title} className="dfe-flex">
-                        <p>{dataset.title}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-            {pipelineData.currentStage === PipelineStage.RERANKER &&
-              pipelineData.rerankerData?.shortlistedDatasets && (
-                <div className="govuk-body">
-                  <ul>
-                    {pipelineData.rerankerData.shortlistedDatasets.map(
-                      dataset => (
-                        <li
-                          key={dataset.fileId}
-                          className="dfe-flex dfe-justify-between dfe-justify-content--space-between"
-                        >
-                          <p>{dataset.title}</p>
-                          <p>{dataset.relevanceScore} relevance</p>
-                        </li>
-                      ),
-                    )}
-                  </ul>
-                </div>
-              )}
-
-            {pipelineData.currentStage === PipelineStage.COMPLETE &&
-            pipelineData.finalData &&
-            pipelineData.finalData.datasets.length > 0 ? (
-              // TODO EES-7213 render results
-              <div className="results-container">
-                <ol>
-                  {pipelineData.finalData.datasets.map(dataset => (
-                    <li key={dataset.fileId}>
-                      <p>
-                        Dataset: <strong>{dataset.fileId}</strong>
-                      </p>
-                      <div>
-                        <p className="govuk-body">{dataset.aiSummary}</p>
-                      </div>
+                <ul className="govuk-list">
+                  {pipelineData.retrievedData.datasets.map(dataset => (
+                    <li key={dataset.title} className="dfe-flex">
+                      <p>{dataset.title}</p>
                     </li>
                   ))}
-                </ol>
-              </div>
+                </ul>
+              )}
+
+            {currentStage === PipelineStage.RERANKER &&
+              pipelineData.rerankerData?.shortlistedDatasets && (
+                <ul className="govuk-list">
+                  {pipelineData.rerankerData.shortlistedDatasets.map(
+                    dataset => (
+                      <li
+                        key={dataset.fileId}
+                        className="dfe-flex dfe-justify-between dfe-justify-content--space-between"
+                      >
+                        <p>{dataset.title}</p>
+                        <p>{dataset.relevanceScore} relevance</p>
+                      </li>
+                    ),
+                  )}
+                </ul>
+              )}
+
+            {currentStage === PipelineStage.COMPLETE ? (
+              // TODO EES-7213 render results
+              <ol>
+                {finalDatasets.map(dataset => (
+                  <li key={dataset.fileId}>
+                    <h3 className="govuk-heading-s">{dataset.title}</h3>
+                    <div>
+                      <p className="govuk-body">{dataset.aiSummary}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             ) : (
-              <LoadingSpinner />
+              <LoadingSpinner text="Processing request" hideText size="lg" />
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </Page>
   );
 };
