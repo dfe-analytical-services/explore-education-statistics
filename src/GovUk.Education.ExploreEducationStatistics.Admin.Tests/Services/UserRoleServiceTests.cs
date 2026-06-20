@@ -58,16 +58,72 @@ public abstract class UserRoleServiceTests
         [Fact]
         public async Task AddPublicationRole()
         {
-            var user = new ApplicationUser { Id = _user.Id.ToString(), Email = _user.Email };
+            var identityUser = new ApplicationUser { Id = _user.Id.ToString(), Email = _user.Email };
 
-            var publication = new Publication();
+            Publication publication = _dataFixture.DefaultPublication();
+
+            var userPreReleaseRoles = _dataFixture
+                .DefaultUserPreReleaseRole()
+                // These two pre-release roles are attached to the target publication,
+                // so should be removed as they are less powerful than the publication role being added
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                // This one does not belong to the publication so shouldn't be removed
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                    )
+                            )
+                )
+                // This one does not belong to the target user so shouldn't be removed
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .GenerateList(4);
+
+            var userPreReleaseRolesToRemove = new List<UserPreReleaseRole>()
+            {
+                userPreReleaseRoles[0],
+                userPreReleaseRoles[1],
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
-                userAndRolesDbContext.Users.Add(user);
+                userAndRolesDbContext.Users.Add(identityUser);
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
@@ -84,7 +140,13 @@ public abstract class UserRoleServiceTests
 
             var globalRoleService = new Mock<IGlobalRoleService>(Strict);
             globalRoleService
-                .Setup(mock => mock.UpgradeToGlobalRoleIfRequired(ItIsUser(user), RoleNames.Analyst))
+                .Setup(mock => mock.UpgradeToGlobalRoleIfRequired(ItIsUser(identityUser), RoleNames.Analyst))
+                .Returns(Task.CompletedTask);
+
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPreReleaseRoles]);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(userPreReleaseRolesToRemove, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -127,7 +189,8 @@ public abstract class UserRoleServiceTests
                     contentDbContext: contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
                     globalRoleService: globalRoleService.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
 
                 var result = await service.AddPublicationRole(_user.Id, publication.Id, PublicationRole.Approver);
@@ -135,7 +198,12 @@ public abstract class UserRoleServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userResourceRoleNotificationService, globalRoleService, userPublicationRoleRepository);
+            VerifyAllMocks(
+                userResourceRoleNotificationService,
+                globalRoleService,
+                userPublicationRoleRepository,
+                userPreReleaseRoleRepository
+            );
         }
 
         [Fact]
@@ -415,6 +483,62 @@ public abstract class UserRoleServiceTests
 
             Publication publication = _dataFixture.DefaultPublication();
 
+            var userPreReleaseRoles = _dataFixture
+                .DefaultUserPreReleaseRole()
+                // These two pre-release roles are attached to the target publication,
+                // so should be removed as they are less powerful than the publication role being added
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                // This one does not belong to the publication so shouldn't be removed
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                    )
+                            )
+                )
+                // This one does not belong to the target user so shouldn't be removed
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .GenerateList(4);
+
+            var userPreReleaseRolesToRemove = new List<UserPreReleaseRole>()
+            {
+                userPreReleaseRoles[0],
+                userPreReleaseRoles[1],
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
@@ -449,6 +573,12 @@ public abstract class UserRoleServiceTests
                 .Setup(mock => mock.FindActiveUserByEmail(_user.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_user);
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPreReleaseRoles]);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(userPreReleaseRolesToRemove, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
             userPublicationRoleRepository
@@ -480,6 +610,7 @@ public abstract class UserRoleServiceTests
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
                     globalRoleService: globalRoleService.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -492,6 +623,7 @@ public abstract class UserRoleServiceTests
                 userResourceRoleNotificationService,
                 globalRoleService,
                 userPublicationRoleRepository,
+                userPreReleaseRoleRepository,
                 userRepository
             );
         }
@@ -591,6 +723,62 @@ public abstract class UserRoleServiceTests
         {
             Publication publication = _dataFixture.DefaultPublication();
 
+            var userPreReleaseRoles = _dataFixture
+                .DefaultUserPreReleaseRole()
+                // These two pre-release roles are attached to the target publication,
+                // so should be removed as they are less powerful than the publication role being added
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                // This one does not belong to the publication so shouldn't be removed
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_user)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                    )
+                            )
+                )
+                // This one does not belong to the target user so shouldn't be removed
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .GenerateList(4);
+
+            var userPreReleaseRolesToRemove = new List<UserPreReleaseRole>()
+            {
+                userPreReleaseRoles[0],
+                userPreReleaseRoles[1],
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -599,7 +787,7 @@ public abstract class UserRoleServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            User createdUser = _dataFixture.DefaultUserWithPendingInvite().WithId(_user.Id);
+            User createdUser = _dataFixture.DefaultUserWithPendingInvite().WithId(_user.Id).WithEmail(_user.Email);
 
             UserPublicationRole createdUserDrafterRole = _dataFixture
                 .DefaultUserPublicationRole()
@@ -634,6 +822,12 @@ public abstract class UserRoleServiceTests
                 )
                 .ReturnsAsync(createdUserDrafterRole);
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPreReleaseRoles]);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(userPreReleaseRolesToRemove, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
             userResourceRoleNotificationService
                 .Setup(mock =>
@@ -647,6 +841,7 @@ public abstract class UserRoleServiceTests
                     contentDbContext: contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -655,7 +850,12 @@ public abstract class UserRoleServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userResourceRoleNotificationService, userPublicationRoleRepository, userRepository);
+            VerifyAllMocks(
+                userResourceRoleNotificationService,
+                userPublicationRoleRepository,
+                userRepository,
+                userPreReleaseRoleRepository
+            );
         }
 
         [Theory]
@@ -664,6 +864,62 @@ public abstract class UserRoleServiceTests
         {
             User existingUser = userFactory(_dataFixture);
             Publication publication = _dataFixture.DefaultPublication();
+
+            var userPreReleaseRoles = _dataFixture
+                .DefaultUserPreReleaseRole()
+                // These two pre-release roles are attached to the target publication,
+                // so should be removed as they are less powerful than the publication role being added
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetUser(existingUser)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetUser(existingUser)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                // This one does not belong to the publication so shouldn't be removed
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(existingUser)
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                    )
+                            )
+                )
+                // This one does not belong to the target user so shouldn't be removed
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(_dataFixture.DefaultUser())
+                            .SetReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                            )
+                )
+                .GenerateList(4);
+
+            var userPreReleaseRolesToRemove = new List<UserPreReleaseRole>()
+            {
+                userPreReleaseRoles[0],
+                userPreReleaseRoles[1],
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -707,6 +963,12 @@ public abstract class UserRoleServiceTests
                 )
                 .ReturnsAsync(createdUserDrafterRole);
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPreReleaseRoles]);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(userPreReleaseRolesToRemove, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
             userResourceRoleNotificationService
                 .Setup(mock =>
@@ -720,6 +982,7 @@ public abstract class UserRoleServiceTests
                     contentDbContext: contentDbContext,
                     userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -728,7 +991,12 @@ public abstract class UserRoleServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userResourceRoleNotificationService, userPublicationRoleRepository, userRepository);
+            VerifyAllMocks(
+                userResourceRoleNotificationService,
+                userPublicationRoleRepository,
+                userPreReleaseRoleRepository,
+                userRepository
+            );
         }
 
         [Fact]
