@@ -49,6 +49,7 @@ const ReleasePageShell: NextPage<Props> = ({
         <ReleasePageTitle
           publicationSummary={publicationSummary}
           releaseTitle={releaseVersionSummary.title}
+          releaseVersionSummary={releaseVersionSummary}
           publishingOrganisations={
             releaseVersionSummary.publishingOrganisations
           }

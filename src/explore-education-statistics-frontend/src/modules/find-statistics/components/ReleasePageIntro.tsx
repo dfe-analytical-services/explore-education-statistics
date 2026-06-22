@@ -13,7 +13,6 @@ import {
 } from '@common/utils/date/partialDate';
 import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import Link from '@frontend/components/Link';
-import SubscribeLink from '@frontend/components/SubscribeLink';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageIntro.module.scss';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
@@ -104,44 +103,6 @@ const ReleasePageIntro = ({
           >
             All releases in this series
           </Link>
-
-          <Link
-            to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
-            onClick={() => {
-              logEvent({
-                category: 'Downloads',
-                action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
-              });
-            }}
-            id="download-all-data-link"
-          >
-            Download all data (ZIP)
-          </Link>
-          <Link
-            to={
-              releaseVersionSummary.isLatestRelease
-                ? `/data-tables/${publicationSummary.slug}`
-                : `/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}`
-            }
-          >
-            Create your own tables
-          </Link>
-        </div>
-
-        <div className={styles.container}>
-          {!isMobileMedia && (
-            <div className="dfe-flex-shrink--0">
-              <SubscribeLink
-                url={`/subscriptions/new-subscription/${publicationSummary.slug}`}
-                onClick={() => {
-                  logEvent({
-                    category: 'Subscribe',
-                    action: 'Email subscription',
-                  });
-                }}
-              />
-            </div>
-          )}
         </div>
       </div>
 
