@@ -136,6 +136,49 @@ corepack install
 pnpm i
 ```
 
+### Set up GitHub Packages source
+
+In additional to the common .NET dependencies sourced from [nuget.org](nuget.org), some dependencies 
+are hosted on GitHub Packages. In order to restore these during a build, you will need to create a 
+personal access token (PAT), and add the source to your local NuGet configuration.
+
+#### Create a personal access token (PAT)
+
+You can create a PAT by following the instructions in the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) - 
+note that it must be a "classic" PAT. Create a token and select the `read:packages` scope. If you 
+intend to contribute to a package project, and have the required repository contributor permissions 
+to push new versions to GitHub Packages, this PAT will also need the `write:packages` scope.
+
+#### Add the source to your local NuGet configuration
+
+If you're working on the project in an IDE like Visual Studio or Rider, you may be automatically prompted 
+to add the source to your local NuGet configuration either when opening the solution, or when you attempt
+to restore dependencies. If so, simply enter your GitHub account name for the username field, and the PAT
+generated above for the password.
+
+Alternatively, to add the source to your local NuGet configuration manually, run the following command in a terminal:
+```bash
+dotnet nuget add source https://nuget.pkg.github.com/<OWNER>/index.json -n <NAME> -u <USER> -p <PASSWORD> --configfile "<PATH>"
+```
+
+- Replace `<NAME>` with a name to help identify the source (e.g. `dfe-analytical-services-github`)
+- Replace `<OWNER>` with the source account name, in this case `dfe-analytical-services`
+- Replace `<USER>` with your GitHub username
+- Replace `<PASSWORD>` with your personal access token
+- Replace `<PATH>` with the path to your *local* NuGet.Config file (see warning below)
+
+> [!WARNING]
+> Ensure `PATH` is specified with the full path to your local configuration file, otherwise the command 
+will default to the project-level NuGet.Config file, which is source controlled - PATs should 
+NEVER be source controlled. On Windows, this is typically located at: `C:/Users/<WINDOWS_USER>/AppData/Roaming/NuGet/NuGet.Config`.
+Further information about NuGet configuration files, including use on various operating systems, can be 
+found in [the Microsoft documentation](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#config-file-locations-and-uses).
+
+> [!NOTE]
+> If using a non-Windows machine, you may need to include the `--store-password-in-clear-text` option to the 
+above command, as encryption is only supported on Windows.
+
+
 ### Set up the database and storage emulator hosts
 
 Add the following to your `hosts` file:
