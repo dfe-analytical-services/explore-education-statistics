@@ -83,8 +83,8 @@ describe('TableToolSearchPage', () => {
 
     expect(mockPostSearchStream).toHaveBeenCalledWith(
       {
-        user_query: 'test search term',
-        publication: 'Pupil attendance in schools in England',
+        userQuery: 'test search term',
+        publicationId: '96f418e7-3ddb-4a8c-60dc-08deb7f1c424',
       },
       expect.anything(),
     );

@@ -89,8 +89,8 @@ export type TtSearchStreamMessage =
   | StageComplete;
 
 export interface TableToolSearchListRequest {
-  user_query: string;
-  publication: string;
+  userQuery: string;
+  publicationId: string;
 }
 
 export interface SearchStreamOptions {

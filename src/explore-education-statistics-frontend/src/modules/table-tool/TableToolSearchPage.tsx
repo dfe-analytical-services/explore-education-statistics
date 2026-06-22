@@ -70,9 +70,9 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
     try {
       await tableToolSearchService.postSearchStream(
         {
-          user_query: searchTerm.trim(),
-          publication:
-            'Pupil attendance in schools in England' || publicationSummary.id, // TODO change to publication ID
+          userQuery: searchTerm.trim(),
+          publicationId:
+            '96f418e7-3ddb-4a8c-60dc-08deb7f1c424' || publicationSummary.id, // hardcoding for now
         },
         {
           signal: abortControllerRef.current.signal,
