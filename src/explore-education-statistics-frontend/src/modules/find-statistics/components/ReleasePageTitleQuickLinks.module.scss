@@ -1,0 +1,14 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.quickLinksHeading {
+  @include govuk-font-size(19);
+  margin-bottom: govuk-spacing(2);
+}
+
+@include govuk-media-query($from: tablet) {
+  .quickLinksHeading {
+    @include govuk-font-size(24);
+    border-top: 3px solid #1d70b8;
+    padding-top: 1rem;
+  }
+}

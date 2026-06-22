@@ -19,6 +19,10 @@ import {
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { NextPage } from 'next';
 import React, { ReactNode } from 'react';
+import { useMobileMedia } from '@common/hooks/useMedia';
+import styles from '@frontend/modules/find-statistics/components/ReleasePageShell.module.scss';
+import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
+import ReleasePageTitleQuickLinks from './ReleasePageTitleQuickLinks';
 
 interface Props {
   activePage: ReleasePageTabRouteKey;
@@ -37,6 +41,8 @@ const ReleasePageShell: NextPage<Props> = ({
   tabNavItems,
   children,
 }) => {
+  const { isMedia: isMobileMedia } = useMobileMedia();
+
   return (
     <Page
       title={publicationSummary.title}
@@ -46,14 +52,26 @@ const ReleasePageShell: NextPage<Props> = ({
         { name: 'Find statistics and data', link: '/find-statistics' },
       ]}
       pageTitleComponent={
-        <ReleasePageTitle
-          publicationSummary={publicationSummary}
-          releaseTitle={releaseVersionSummary.title}
-          releaseVersionSummary={releaseVersionSummary}
-          publishingOrganisations={
-            releaseVersionSummary.publishingOrganisations
-          }
-        />
+        <>
+          <PublishingOrganisations
+            publishingOrganisations={
+              releaseVersionSummary.publishingOrganisations
+            }
+          />
+          <div className={styles.releasePageTitleWrap}>
+            <ReleasePageTitle
+              publicationSummary={publicationSummary}
+              releaseTitle={releaseVersionSummary.title}
+            />
+
+            {!isMobileMedia && (
+              <ReleasePageTitleQuickLinks
+                publicationSummary={publicationSummary}
+                releaseVersionSummary={releaseVersionSummary}
+              />
+            )}
+          </div>
+        </>
       }
       customBannerContent={
         <NotificationBanner
