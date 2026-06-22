@@ -38,7 +38,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: false,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: false,
+                CanAccessPreReleasePages: false,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 IsApprover: false
@@ -58,7 +58,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: true,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: true,
                 IsBauUser: true,
                 // Expect "IsApprover" to be false even for BAU as we don't expect BAU users to be assigned
@@ -69,7 +69,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     }
 
     [Fact]
-    public async Task GetGlobalPermissions_AnalystUser_NotReleaseOrPublicationApprover()
+    public async Task GetGlobalPermissions_AnalystUser_NotPublicationApprover()
     {
         var user = _dataFixture.AnalystUser().Generate();
 
@@ -77,28 +77,12 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
             .GetContentDbContext()
             .AddTestData(context =>
             {
-                // Add test data that gives the user access to a Release without being an Approver.
-                context.UserReleaseRoles.Add(
-                    _dataFixture
-                        .DefaultUserReleaseRole()
-                        .WithUserId(user.GetUserId())
-                        .WithRole(ReleaseRole.Contributor)
-                        .WithReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
-                                )
-                        )
-                        .Generate()
-                );
-
                 // Add test data that gives the user access to a Publication without being an Approver.
                 context.UserPublicationRoles.Add(
                     _dataFixture
                         .DefaultUserPublicationRole()
                         .WithUserId(user.GetUserId())
-                        .WithRole(PublicationRole.Owner)
+                        .WithRole(PublicationRole.Drafter)
                         .WithPublication(_dataFixture.DefaultPublication())
                         .Generate()
                 );
@@ -113,46 +97,11 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
-                // Expect this to be false if the user isn't an approver of any kind
+                // Expect this to be false if the user isn't an approver
                 IsApprover: false
-            )
-        );
-    }
-
-    [Fact]
-    public async Task GetGlobalPermissions_AnalystUser_ReleaseApprover()
-    {
-        ClaimsPrincipal identityUser = _dataFixture.AnalystUser();
-        User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
-        UserReleaseRole userReleaseRole = _dataFixture
-            .DefaultUserReleaseRole()
-            .WithUser(user)
-            .WithRole(ReleaseRole.Approver);
-
-        await fixture
-            .GetContentDbContext()
-            .AddTestData(context =>
-            {
-                context.UserReleaseRoles.Add(userReleaseRole);
-            });
-
-        var client = fixture.CreateClient(user: identityUser);
-
-        var response = await client.GetAsync("/api/permissions/access");
-
-        response.AssertOk(
-            new GlobalPermissionsViewModel(
-                CanAccessSystem: true,
-                CanAccessAnalystPages: true,
-                CanAccessAllImports: false,
-                CanAccessPrereleasePages: true,
-                CanManageAllTaxonomy: false,
-                IsBauUser: false,
-                // Expect this to be true if the user is a Release approver
-                IsApprover: true
             )
         );
     }
@@ -165,7 +114,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
         UserPublicationRole userPublicationRole = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
-            .WithRole(PublicationRole.Allower);
+            .WithRole(PublicationRole.Approver);
 
         await fixture
             .GetContentDbContext()
@@ -183,7 +132,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 // Expect this to be true if the user is a Publication approver
@@ -204,7 +153,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: false,
                 CanAccessAllImports: false,
-                CanAccessPrereleasePages: true,
+                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 IsApprover: false

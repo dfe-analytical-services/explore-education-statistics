@@ -82,6 +82,11 @@ public static class PublicationGeneratorExtensions
         return generator.ForInstance(s => s.SetUpdated(updated));
     }
 
+    public static Generator<Publication> WithMethodologies(
+        this Generator<Publication> generator,
+        IEnumerable<PublicationMethodology> methodologies
+    ) => generator.ForInstance(s => s.SetMethodologies(methodologies));
+
     public static InstanceSetters<Publication> SetId(this InstanceSetters<Publication> setters, Guid id) =>
         setters.Set(p => p.Id, id);
 
@@ -261,7 +266,7 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetThemeId(this InstanceSetters<Publication> setters, Guid themeId) =>
         setters.Set(p => p.ThemeId, themeId);
 
-    private static InstanceSetters<Publication> SetTheme(this InstanceSetters<Publication> setters, Theme theme) =>
+    public static InstanceSetters<Publication> SetTheme(this InstanceSetters<Publication> setters, Theme theme) =>
         setters.Set(p => p.Theme, theme).SetThemeId(theme.Id);
 
     public static InstanceSetters<Publication> SetSlug(this InstanceSetters<Publication> setters, string slug) =>
@@ -299,6 +304,27 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         DateTime? updated
     ) => setters.Set(p => p.Updated, updated);
+
+    private static InstanceSetters<Publication> SetMethodologies(
+        this InstanceSetters<Publication> setters,
+        IEnumerable<PublicationMethodology> methodologies
+    )
+    {
+        var methodologyList = methodologies.ToList();
+
+        return setters
+            .Set(p => p.Methodologies, methodologyList)
+            .Set(
+                (_, publication, _) =>
+                {
+                    methodologyList.ForEach(methodology =>
+                    {
+                        methodology.Publication = publication;
+                        methodology.PublicationId = publication.Id;
+                    });
+                }
+            );
+    }
 
     public static ConditionalGeneratorDeclaration If(this Generator<Publication> generator, bool condition) =>
         new(condition, generator);

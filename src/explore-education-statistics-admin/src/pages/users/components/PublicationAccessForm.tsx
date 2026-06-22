@@ -1,7 +1,3 @@
-import userService, {
-  User,
-  UserPublicationRole,
-} from '@admin/services/userService';
 import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -12,14 +8,23 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
-import { PublicationRole } from '@admin/services/types/PublicationRole';
-import publicationRoleDisplayName from '@admin/utils/publicationRoleDisplayName';
+import {
+  PublicationRole,
+  publicationRoles,
+} from '@admin/services/types/PublicationRole';
+import publicationRolesService from '@admin/services/user-management/publicationRolesService';
+import {
+  UserPublicationRole,
+  UserWithRoles,
+} from '@admin/services/types/userWithRoles';
 
 const addPublicationFormErrorMappings = [
   mapFieldErrors<FormValues>({
     target: 'publicationRole',
     messages: {
       UserAlreadyHasResourceRole: 'The user already has this publication role',
+      UserAlreadyHasMorePowerfulRole:
+        'The user already has a more powerful publication role',
     },
   }),
 ];
@@ -31,26 +36,26 @@ interface FormValues {
 
 interface Props {
   publications?: IdTitlePair[];
-  publicationRoles?: PublicationRole[];
-  user: User;
+  user: UserWithRoles;
   onUpdate: () => void;
 }
 
 export default function PublicationAccessForm({
   publications,
-  publicationRoles,
   user,
   onUpdate,
 }: Props) {
   const handleAddPublicationRole = async (values: FormValues) => {
-    await userService.addUserPublicationRole(user.id, values);
+    await publicationRolesService.addPublicationRole(user.id, values);
     onUpdate();
   };
 
   const handleRemovePublicationAccess = async (
     userPublicationRole: UserPublicationRole,
   ) => {
-    await userService.removeUserPublicationRole(user.id, userPublicationRole);
+    await publicationRolesService.removeUserPublicationRole(
+      userPublicationRole.id,
+    );
     onUpdate();
   };
 
@@ -93,11 +98,8 @@ export default function PublicationAccessForm({
                   <FormFieldSelect<FormValues>
                     label="Publication role"
                     name="publicationRole"
-                    options={publicationRoles?.map(role => ({
-                      // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
-                      // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
-                      // rework, this can be reverted to display the role without transformation.
-                      label: publicationRoleDisplayName(role),
+                    options={publicationRoles.map(role => ({
+                      label: role,
                       value: role,
                     }))}
                   />
@@ -141,12 +143,7 @@ export default function PublicationAccessForm({
                         {userPublicationRole.publication}
                       </td>
                       <td className="govuk-table__cell">
-                        {
-                          // Temporarily transforming the displayed role name whilst we have the temporary 'Allower'
-                          // publication role. Once the new 'Approver' role is introduced in STEP 9 (EES-6196) of the permissions
-                          // rework, this can be reverted to display the role without transformation.
-                          publicationRoleDisplayName(userPublicationRole.role)
-                        }
+                        {userPublicationRole.role}
                       </td>
                       <td className="govuk-table__cell">
                         <ButtonText

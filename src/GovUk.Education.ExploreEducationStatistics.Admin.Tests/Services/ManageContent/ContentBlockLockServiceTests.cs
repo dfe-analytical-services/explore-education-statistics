@@ -29,7 +29,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User user = _dataFixture
             .DefaultUser()
@@ -103,7 +103,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_RefreshesExistingLock()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User user = _dataFixture
             .DefaultUser()
@@ -188,7 +188,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_PreviousLockExpired()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User previousUser = _dataFixture
             .DefaultUser()
@@ -279,7 +279,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_Force()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User user = _dataFixture
             .DefaultUser()
@@ -363,7 +363,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_PreviousLockNotExpired()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User previousUser = _dataFixture
             .DefaultUser()
@@ -426,7 +426,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_ConcurrentUsers()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User user1 = _dataFixture
             .DefaultUser()
@@ -560,7 +560,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User user = _dataFixture
             .DefaultUser()
@@ -632,7 +632,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock_PreviousLockExpired()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User nextUser = _dataFixture
             .DefaultUser()
@@ -713,7 +713,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock_PreviousLockNotExpired()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User nextUser = _dataFixture
             .DefaultUser()
@@ -771,7 +771,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock_Force()
     {
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         User nextUser = _dataFixture
             .DefaultUser()

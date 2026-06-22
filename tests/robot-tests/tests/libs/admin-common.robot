@@ -707,19 +707,19 @@ user changes methodology status to Higher level review
     user waits until h2 is visible    Sign off
     user checks page contains tag    In Review
 
-user gives analyst publication owner access
+user gives analyst publication drafter access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
-    user gives publication access to analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
+    user gives publication access to analyst    ${PUBLICATION_NAME}    Drafter    ${ANALYST_EMAIL}
 
 user gives analyst publication approver access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
-user removes publication owner access from analyst
+user removes publication drafter access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
-    user removes publication access from analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
+    user removes publication access from analyst    ${PUBLICATION_NAME}    Drafter    ${ANALYST_EMAIL}
 
-user removes publication release approver access from analyst
+user removes publication approver access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user removes publication access from analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
@@ -748,31 +748,27 @@ user removes publication access from analyst
     user clicks button    Remove    ${row}
     user waits until page finishes loading
 
-user gives release access to analyst
+user gives pre-release access to analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
-    ...    ${ROLE}
     ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user scrolls to element    css:[name="releaseId"]
     user chooses select option    css:[name="releaseId"]    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user waits until element is enabled    css:[name="releaseRole"]
-    user chooses select option    css:[name="releaseRole"]    ${ROLE}
-    user clicks button    Add release access
-    user waits until parent contains element    testid:releaseAccessTable
-    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
+    user clicks button    Add pre-release access
+    user waits until parent contains element    testid:preReleaseAccessTable
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"]]
 
-user removes release access from analyst
+user removes pre-release access from analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
-    ...    ${ROLE}
     ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    ${table}=    user gets testid element    releaseAccessTable
+    ${table}=    user gets testid element    preReleaseAccessTable
     ${row}=    get child element    ${table}
-    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"]]
     user clicks button    Remove    ${row}
     user waits until page finishes loading
 

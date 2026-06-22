@@ -208,7 +208,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             // does this use have permission to view a specific Release?
             options.AddPolicy(
                 ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(),
-                policy => policy.Requirements.Add(new ViewReleaseRequirement())
+                policy => policy.Requirements.Add(new ViewReleaseVersionRequirement())
             );
 
             // does this user have permission to view the subject data of a specific Release?
@@ -243,7 +243,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             }
         );
 
-        services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, ViewReleaseVersionAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSubjectDataForPublishedReleasesAuthorizationHandler>();
 
         services.AddCors();

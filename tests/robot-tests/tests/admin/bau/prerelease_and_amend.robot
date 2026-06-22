@@ -188,7 +188,7 @@ Invite Pre-release users during amendment
     user checks list has x items    testid:invitableList    2    ${modal}
     user checks list item contains    testid:invitableList    1
     ...    simulate-delivered-prerelease-and-amend-3@notifications.service.gov.uk    ${modal}
-    user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
+    user checks list item contains    testid:invitableList    2    ees-test.analyst1@education.gov.uk    ${modal}
     user clicks button    Confirm
 
 Check amendment has original release's public access list and then update

@@ -17,37 +17,33 @@ public class EmailTemplateService(
 {
     public Either<ActionResult, Unit> SendInviteEmail(
         string email,
-        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo,
+        HashSet<(string PublicationTitle, string ReleaseTitle)> preReleaseRolesInfo,
         HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo
     )
     {
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
-        var releaseRoleList = releaseRolesInfo
+        var preReleaseList = preReleaseRolesInfo
             .OrderBy(rri => rri.PublicationTitle)
             .ThenBy(rri => rri.ReleaseTitle)
-            .ThenBy(rri => rri.Role.ToString())
-            .Select(rri => $"* {rri.PublicationTitle}, {rri.ReleaseTitle} - {rri.Role}")
+            .Select(rri => $"* {rri.PublicationTitle}, {rri.ReleaseTitle}")
             .ToList();
 
-        // The transformation step here is necessary to ensure that the email still uses the name 'Approver' for the
-        // temporarily named 'Allower' role, as this is the name used in the UI. This will be removed in the future;
-        // likely in STEP 9 (EES-6196) of the permissions rework approach (NO TICKET HAS BEEN CREATED FOR THIS YET).
         var publicationRoleList = publicationRolesInfo
             .OrderBy(pri => pri.PublicationTitle)
-            .ThenBy(pri => pri.Role)
-            .Select(pri => $"* {pri.PublicationTitle} - {TransformPublicationRole(pri.Role)}")
+            .ThenBy(pri => pri.Role.ToString())
+            .Select(pri => $"* {pri.PublicationTitle} - {pri.Role}")
             .ToList();
 
         var emailValues = new Dictionary<string, dynamic>
         {
             { "url", url },
             {
-                "release role list",
-                releaseRoleList.IsNullOrEmpty()
-                    ? "* No release permissions granted"
-                    : releaseRoleList.JoinToString("\n")
+                "pre-release list",
+                preReleaseList.IsNullOrEmpty()
+                    ? "* No pre-release permissions granted"
+                    : preReleaseList.JoinToString("\n")
             },
             {
                 "publication role list",
@@ -69,66 +65,22 @@ public class EmailTemplateService(
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.PublicationRoleTemplateId;
 
-        // This transformation is necessary to ensure that the email still uses the name 'Approver' for the
-        // temporarily named 'Allower' role, as this is the name used in the UI. This will be removed in the future;
-        // likely in STEP 9 (EES-6196) of the permissions rework approach (NO TICKET HAS BEEN CREATED FOR THIS YET).
-        var transformedRole = TransformPublicationRole(role);
-
         var emailValues = new Dictionary<string, dynamic>
         {
             { "url", url },
-            { "role", transformedRole },
-            { "publication", publicationTitle },
-        };
-
-        return emailService.SendEmail(email, template, emailValues);
-    }
-
-    public Either<ActionResult, Unit> SendReleaseRoleEmail(
-        string email,
-        string publicationTitle,
-        string releaseTitle,
-        Guid publicationId,
-        Guid releaseVersionId,
-        ReleaseRole role
-    )
-    {
-        var url = appOptions.Value.Url;
-        var template = notifyOptions.Value.ReleaseRoleTemplateId;
-
-        var link = role == ReleaseRole.PrereleaseViewer ? "prerelease " : "summary";
-        var emailValues = new Dictionary<string, dynamic>
-        {
-            { "url", $"{url}/publication/{publicationId}/release/{releaseVersionId}/{link}" },
             { "role", role.ToString() },
             { "publication", publicationTitle },
-            { "release", releaseTitle },
         };
 
         return emailService.SendEmail(email, template, emailValues);
     }
 
-    public Either<ActionResult, Unit> SendContributorInviteEmail(
-        string email,
-        string publicationTitle,
-        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo
-    )
+    public Either<ActionResult, Unit> SendDrafterInviteEmail(string email, string publicationTitle)
     {
         var url = appOptions.Value.Url;
-        var template = notifyOptions.Value.ContributorTemplateId;
+        var template = notifyOptions.Value.DrafterTemplateId;
 
-        var releaseTitles = releasesInfo
-            .OrderBy(r => r.Year)
-            .ThenBy(r => r.TimePeriodCoverage)
-            .Select(r => $"* {r.Title}")
-            .JoinToString('\n');
-
-        var emailValues = new Dictionary<string, dynamic>
-        {
-            { "url", url },
-            { "publication name", publicationTitle },
-            { "release list", releaseTitles },
-        };
+        var emailValues = new Dictionary<string, dynamic> { { "url", url }, { "publication name", publicationTitle } };
 
         return emailService.SendEmail(email, template, emailValues);
     }
@@ -206,19 +158,6 @@ public class EmailTemplateService(
         };
 
         return emailService.SendEmail(email, template, emailValues);
-    }
-
-    private static string TransformPublicationRole(PublicationRole role)
-    {
-        // This transformation is necessary to ensure that the email still uses the name 'Approver' for the
-        // temporarily named 'Allower' role, as this is the name used in the UI. This will be removed in the future;
-        // likely in STEP 9 (EES-6196) of the permissions rework approach (NO TICKET HAS BEEN CREATED FOR THIS YET).
-        return role switch
-        {
-            PublicationRole.Owner => role.ToString(),
-            PublicationRole.Allower => "Approver",
-            _ => throw new ArgumentOutOfRangeException(nameof(role), role, null),
-        };
     }
 
     private static string FormatTimeForEmail(DateTimeOffset dateTime)

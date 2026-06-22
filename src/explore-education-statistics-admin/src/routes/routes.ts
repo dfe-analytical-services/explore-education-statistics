@@ -145,7 +145,7 @@ export const releaseCreateRoute: ProtectedRouteProps = {
 export const preReleaseRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/prerelease',
   component: PreReleasePageContainer,
-  protectionAction: permissions => permissions.canAccessPrereleasePages,
+  protectionAction: permissions => permissions.canAccessPreReleasePages,
 };
 
 export const educationInNumbersListRoute: ProtectedRouteProps = {

@@ -44,11 +44,9 @@ public class DataGuidanceService : IDataGuidanceService
     )
     {
         return await _contentDbContext
-            .ReleaseVersions.FirstOrNotFoundAsync(
-                releaseVersion => releaseVersion.Id == releaseVersionId,
-                cancellationToken
-            )
-            .OnSuccess(releaseVersion => _userService.CheckCanViewReleaseVersion(releaseVersion))
+            .ReleaseVersions.Include(rv => rv.Release)
+            .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccessCombineWith(_ =>
                 _dataGuidanceDataSetService.ListDataSets(releaseVersionId, cancellationToken: cancellationToken)
             )
@@ -64,11 +62,9 @@ public class DataGuidanceService : IDataGuidanceService
     )
     {
         return await _contentDbContext
-            .ReleaseVersions.FirstOrNotFoundAsync(
-                releaseVersion => releaseVersion.Id == releaseVersionId,
-                cancellationToken
-            )
-            .OnSuccess(releaseVersion => _userService.CheckCanUpdateReleaseVersion(releaseVersion))
+            .ReleaseVersions.Include(rv => rv.Release)
+            .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccessDo(releaseVersion => UpdateDataGuidance(releaseVersion, request, cancellationToken))
             .OnSuccessCombineWith(_ =>
                 _dataGuidanceDataSetService.ListDataSets(releaseVersionId, cancellationToken: cancellationToken)

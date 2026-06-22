@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -7,17 +8,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IPreReleaseUserService
 {
-    Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId);
+    Task<List<PreReleaseUserViewModel>> GetAllPreReleaseUsers();
+
+    Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GetPreReleaseUsers(Guid releaseVersionId);
 
     Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
         Guid releaseVersionId,
-        List<string> emails
+        PreReleaseUserInviteRequest emails
     );
 
-    Task<Either<ActionResult, List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
+    Task<Either<ActionResult, List<UserPreReleaseRoleViewModel>>> GetPreReleaseRolesForUser(Guid userId);
+
+    Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GrantPreReleaseAccessForMultipleUsers(
         Guid releaseVersionId,
-        List<string> emails
+        PreReleaseUserInviteRequest request
     );
 
-    Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId, string email);
+    Task<Either<ActionResult, Unit>> GrantPreReleaseAccess(Guid userId, Guid releaseId);
+
+    Task<Either<ActionResult, Unit>> RevokePreReleaseAccessByCompositeKey(
+        Guid releaseVersionId,
+        PreReleaseUserRemoveRequest request
+    );
+
+    Task<Either<ActionResult, Unit>> RevokePreReleaseAccessById(Guid userPreReleaseRoleId);
 }

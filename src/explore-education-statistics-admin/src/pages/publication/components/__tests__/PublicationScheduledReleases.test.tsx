@@ -26,7 +26,7 @@ describe('PublicationScheduledReleases', () => {
     releaseId: 'release-1',
     live: false,
     permissions: {
-      canAddPrereleaseUsers: false,
+      canAddPreReleaseUsers: false,
       canUpdateRelease: true,
       canUpdateReleaseVersion: true,
       canDeleteReleaseVersion: false,

@@ -28,9 +28,9 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(SecurityPolicies.CanAccessAnalystPages);
     }
 
-    public static Task<Either<ActionResult, Unit>> CheckCanAccessPrereleasePages(this IUserService userService)
+    public static Task<Either<ActionResult, Unit>> CheckCanAccessPreReleasePages(this IUserService userService)
     {
-        return userService.CheckPolicy(SecurityPolicies.CanAccessPrereleasePages);
+        return userService.CheckPolicy(SecurityPolicies.CanAccessPreReleasePages);
     }
 
     public static Task<Either<ActionResult, PublicationMethodology>> CheckCanDropMethodologyLink(
@@ -217,13 +217,12 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(publication, SecurityPolicies.CanViewReleaseTeamAccess);
     }
 
-    public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(
+    public static Task<Either<ActionResult, Publication>> CheckCanUpdateDrafters(
         this IUserService userService,
-        Publication publication,
-        ReleaseRole role
+        Publication publication
     )
     {
-        return userService.CheckPolicy(TupleOf(publication, role), SecurityPolicies.CanUpdateSpecificReleaseRole);
+        return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateDrafters);
     }
 
     public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
@@ -360,7 +359,7 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanMakeAmendmentOfSpecificReleaseVersion);
     }
 
-    public static Task<Either<ActionResult, ReleaseVersion>> CheckCanAssignPrereleaseContactsToReleaseVersion(
+    public static Task<Either<ActionResult, ReleaseVersion>> CheckCanAssignPreReleaseContactsToReleaseVersion(
         this IUserService userService,
         ReleaseVersion releaseVersion
     )

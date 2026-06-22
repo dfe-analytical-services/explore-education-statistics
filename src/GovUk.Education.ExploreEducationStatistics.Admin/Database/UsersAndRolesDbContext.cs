@@ -48,7 +48,7 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
 
         var bauRoleId = Role.BauUser.GetEnumValue();
         var analystRoleId = Role.Analyst.GetEnumValue();
-        var prereleaseRoleId = Role.PrereleaseUser.GetEnumValue();
+        var preReleaseRoleId = Role.PrereleaseUser.GetEnumValue();
 
         // Note that when amending this list of Claims to add or remove Claims from a given Role,
         // we also need to check to see if updates need to be addressed in ClaimsPrincipalUtils as well.
@@ -135,14 +135,14 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
                 new IdentityRoleClaim<string>
                 {
                     Id = -15,
-                    RoleId = prereleaseRoleId,
+                    RoleId = preReleaseRoleId,
                     ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>
                 {
                     Id = -16,
-                    RoleId = prereleaseRoleId,
+                    RoleId = preReleaseRoleId,
                     ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                     ClaimValue = "",
                 },

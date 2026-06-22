@@ -33,7 +33,6 @@ public class ThemeService(
     IPublishingService publishingService,
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository
 ) : IThemeService
 {
@@ -275,20 +274,12 @@ public class ThemeService(
     {
         var userId = userService.GetUserId();
 
-        return await userReleaseRoleRepository
+        return await userPublicationRoleRepository
             .Query()
             .AsNoTracking()
             .WhereForUser(userId)
-            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
-            .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Publication.Theme)
-            .Concat(
-                userPublicationRoleRepository
-                    .Query()
-                    .AsNoTracking()
-                    .WhereForUser(userId)
-                    .WhereRolesIn([PublicationRole.Owner, PublicationRole.Allower])
-                    .Select(userPublicationRole => userPublicationRole.Publication.Theme)
-            )
+            .WhereRolesIn([PublicationRole.Drafter, PublicationRole.Approver])
+            .Select(upr => upr.Publication.Theme)
             .Distinct()
             .ToListAsync();
     }

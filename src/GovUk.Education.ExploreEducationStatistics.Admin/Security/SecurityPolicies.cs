@@ -12,7 +12,7 @@ public enum SecurityPolicies
      * General role-based page access
      */
     CanAccessAnalystPages,
-    CanAccessPrereleasePages,
+    CanAccessPreReleasePages,
     CanManageUsersOnSystem,
     CanAccessAllImports,
     IsBauUser,
@@ -25,7 +25,7 @@ public enum SecurityPolicies
     CanUpdatePublication,
     CanUpdateContact,
     CanUpdateSpecificPublicationSummary,
-    CanUpdateSpecificReleaseRole,
+    CanUpdateDrafters,
     CanCreatePublicationForSpecificTheme,
     CanViewReleaseTeamAccess,
     CanManagePublicationReleaseSeries,

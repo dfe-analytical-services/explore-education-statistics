@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,7 @@ public class ReplacementBatchServiceTests
     [Fact]
     public async Task Replace_Success()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var originalFileValid1Id = Guid.NewGuid();
         var originalFileValid2Id = Guid.NewGuid();
@@ -82,7 +83,7 @@ public class ReplacementBatchServiceTests
     [Fact]
     public async Task Replace_OneValidThreeErrors()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var originalFileValidId = Guid.NewGuid();
         var originalFileNotFoundId = Guid.NewGuid();
