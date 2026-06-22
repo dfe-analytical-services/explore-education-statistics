@@ -4,8 +4,7 @@ import { ContentPublication } from '@admin/services/publicationService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import releaseFileService from '@admin/services/releaseFileService';
 import ButtonText from '@common/components/ButtonText';
-import { useMobileMedia } from '@common/hooks/useMedia';
-import styles from '@common/modules/release/components/ReleasePageTitleQuickLinks.module.scss';
+import styles from '@common/modules/release/components/ReleasePageQuickLinks.module.scss';
 
 interface Props {
   publication: ContentPublication;
@@ -13,15 +12,13 @@ interface Props {
   showSubscriptionLink?: boolean;
 }
 
-const ReleasePageTitleQuickLinks = ({
+const ReleasePageQuickLinks = ({
   publication,
   release,
   showSubscriptionLink = true,
 }: Props) => {
-  const { isMedia: isMobileMedia } = useMobileMedia();
-
   return (
-    <>
+    <div className={styles.quickLinksContainer}>
       <h2 className={styles.quickLinksHeading} id="quick-links">
         Quick links
       </h2>
@@ -31,11 +28,7 @@ const ReleasePageTitleQuickLinks = ({
         data-testid="quick-links"
       >
         <ul
-          className={
-            isMobileMedia
-              ? 'govuk-list govuk-list--spaced govuk-!-font-size-16 govuk-!-margin-bottom-0'
-              : 'govuk-list govuk-list--spaced'
-          }
+          className={`${styles.quickLinks} govuk-list govuk-list--spaced govuk-!-margin-bottom-0`}
         >
           <li>
             <ButtonText
@@ -61,8 +54,8 @@ const ReleasePageTitleQuickLinks = ({
           )}
         </ul>
       </nav>
-    </>
+    </div>
   );
 };
 
-export default ReleasePageTitleQuickLinks;
+export default ReleasePageQuickLinks;

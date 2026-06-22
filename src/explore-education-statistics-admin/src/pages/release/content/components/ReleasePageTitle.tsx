@@ -3,7 +3,7 @@ import { ContentPublication } from '@admin/services/publicationService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import React from 'react';
-import ReleasePageTitleQuickLinks from './ReleasePageTitleQuickLinks';
+import ReleasePageTitleQuickLinks from './ReleasePageQuickLinks';
 
 interface Props {
   publication: ContentPublication;
@@ -33,12 +33,10 @@ const ReleasePageTitle = ({ publication, release }: Props) => {
       </div>
 
       {!isMobileMedia && (
-        <div className={styles.releasePageQuickLinks}>
-          <ReleasePageTitleQuickLinks
-            publication={publication}
-            release={release}
-          />
-        </div>
+        <ReleasePageTitleQuickLinks
+          publication={publication}
+          release={release}
+        />
       )}
     </div>
   );

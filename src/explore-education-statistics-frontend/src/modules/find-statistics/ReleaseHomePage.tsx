@@ -20,7 +20,7 @@ import PublicationSectionBlocks from '@frontend/modules/find-statistics/componen
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { Fragment } from 'react';
-import ReleasePageTitleQuickLinks from './components/ReleasePageTitleQuickLinks';
+import ReleasePageTitleQuickLinks from './components/ReleasePageQuickLinks';
 
 interface Props {
   homeContent: ReleaseVersionHomeContent;

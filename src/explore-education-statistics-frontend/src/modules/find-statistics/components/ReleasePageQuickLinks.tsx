@@ -5,8 +5,7 @@ import {
 import React from 'react';
 import Link from '@frontend/components/Link';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import { useMobileMedia } from '@common/hooks/useMedia';
-import styles from '@common/modules/release/components/ReleasePageTitleQuickLinks.module.scss';
+import styles from '@common/modules/release/components/ReleasePageQuickLinks.module.scss';
 
 interface Props {
   publicationSummary: PublicationSummary;
@@ -14,15 +13,13 @@ interface Props {
   showSubscriptionLink?: boolean;
 }
 
-const ReleasePageTitleQuickLinks = ({
+const ReleasePageQuickLinks = ({
   publicationSummary,
   releaseVersionSummary,
   showSubscriptionLink = true,
 }: Props) => {
-  const { isMedia: isMobileMedia } = useMobileMedia();
-
   return (
-    <>
+    <div className={styles.quickLinksContainer}>
       <h2 className={styles.quickLinksHeading} id="quick-links">
         Quick links
       </h2>
@@ -32,11 +29,7 @@ const ReleasePageTitleQuickLinks = ({
         data-testid="quick-links"
       >
         <ul
-          className={
-            isMobileMedia
-              ? 'govuk-list govuk-list--spaced govuk-!-font-size-16 govuk-!-margin-bottom-0'
-              : 'govuk-list govuk-list--spaced'
-          }
+          className={`${styles.quickLinks} govuk-list govuk-list--spaced govuk-!-margin-bottom-0`}
         >
           <li>
             <Link
@@ -84,8 +77,8 @@ const ReleasePageTitleQuickLinks = ({
           )}
         </ul>
       </nav>
-    </>
+    </div>
   );
 };
 
-export default ReleasePageTitleQuickLinks;
+export default ReleasePageQuickLinks;

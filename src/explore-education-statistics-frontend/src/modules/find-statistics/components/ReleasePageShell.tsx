@@ -22,7 +22,7 @@ import React, { ReactNode } from 'react';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageShell.module.scss';
 import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
-import ReleasePageTitleQuickLinks from './ReleasePageTitleQuickLinks';
+import ReleasePageTitleQuickLinks from './ReleasePageQuickLinks';
 
 interface Props {
   activePage: ReleasePageTabRouteKey;
@@ -65,12 +65,10 @@ const ReleasePageShell: NextPage<Props> = ({
             />
 
             {!isMobileMedia && (
-              <div className={styles.releasePageQuickLinks}>
-                <ReleasePageTitleQuickLinks
-                  publicationSummary={publicationSummary}
-                  releaseVersionSummary={releaseVersionSummary}
-                />
-              </div>
+              <ReleasePageTitleQuickLinks
+                publicationSummary={publicationSummary}
+                releaseVersionSummary={releaseVersionSummary}
+              />
             )}
           </div>
         </>

@@ -20,7 +20,7 @@ import ReleaseSummaryBlockMobile from '@common/modules/release/components/Releas
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import React, { Fragment, useEffect, useMemo } from 'react';
-import ReleasePageTitleQuickLinks from './ReleasePageTitleQuickLinks';
+import ReleasePageTitleQuickLinks from './ReleasePageQuickLinks';
 
 interface Props {
   transformFeaturedTableLinks?: (url: string, text: string) => void;
