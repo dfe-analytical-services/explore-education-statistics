@@ -18,6 +18,7 @@ interface Props {
   renderProducerLink: ReactNode;
   renderSubscribeLink?: ReactNode;
   renderUpdatesLink?: ReactNode;
+  quickLinks?: ReactNode;
   onShowReleaseTypeModal?: () => void;
 }
 
@@ -30,6 +31,7 @@ export default function ReleaseSummaryBlockMobile({
   renderProducerLink,
   renderSubscribeLink,
   renderUpdatesLink,
+  quickLinks,
   onShowReleaseTypeModal,
 }: Props) {
   return (
@@ -100,6 +102,8 @@ export default function ReleaseSummaryBlockMobile({
           />
         )}
       </div>
+
+      {quickLinks}
 
       {renderSubscribeLink && (
         <div className={styles.subscribeContainer}>{renderSubscribeLink}</div>
