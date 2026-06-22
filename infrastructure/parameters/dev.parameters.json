@@ -150,6 +150,9 @@
     },
     "sqlServerPublicNetworkAccess": {
       "value": "Enabled"
+    },
+    "tableToolSearchEndpoint": {
+      "value": "https://s101d01-ees-fa-nlsearch.azurewebsites.net/natural_language_search_function"
     }
   }
 }

@@ -733,6 +733,13 @@
         "description": "The name of the Azure AI data set search index used by the public frontend application"
       }
     },
+    "tableToolSearchEndpoint": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The endpoint of the Azure Function App used by the table tool search service"
+      }
+    },
     "publicDataDbExists": {
       "type": "bool",
       "defaultValue": true,
@@ -2320,6 +2327,7 @@
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
         "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
+        "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[parameters('tableToolSearchEndpoint')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
