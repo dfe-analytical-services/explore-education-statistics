@@ -434,6 +434,10 @@ describe('PreReleaseUserAccessForm', () => {
           'invited.prerelease.1@test.com',
           'invited.prerelease.2@test.com',
         ],
+        alreadyHasMorePowerfulRole: [
+          'morePowerfulRole.1@test.com',
+          'morePowerfulRole.2@test.com',
+        ],
         invitable: ['test1@test.com', 'test2@test.com', 'test3@test.com'],
       });
 
@@ -502,6 +506,20 @@ describe('PreReleaseUserAccessForm', () => {
       expect(invitedListItems[1]).toHaveTextContent(
         'invited.prerelease.2@test.com',
       );
+
+      const morePowerfulRoleList = modal.getByRole('list', {
+        name: 'Already has more powerful role',
+      });
+      const morePowerfulRoleListItems =
+        within(morePowerfulRoleList).getAllByRole('listitem');
+      expect(morePowerfulRoleListItems).toHaveLength(2);
+
+      expect(morePowerfulRoleListItems[0]).toHaveTextContent(
+        'morePowerfulRole.1@test.com',
+      );
+      expect(morePowerfulRoleListItems[1]).toHaveTextContent(
+        'morePowerfulRole.2@test.com',
+      );
     });
 
     test('cancelling the confirmation closes the modal', async () => {
@@ -526,6 +544,7 @@ describe('PreReleaseUserAccessForm', () => {
         invitable: ['test@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
+        alreadyHasMorePowerfulRole: [],
       });
 
       await user.click(
@@ -578,6 +597,7 @@ describe('PreReleaseUserAccessForm', () => {
         invitable: ['test@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
+        alreadyHasMorePowerfulRole: [],
       });
 
       await user.click(
@@ -619,6 +639,7 @@ describe('PreReleaseUserAccessForm', () => {
         invitable: ['test1@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
+        alreadyHasMorePowerfulRole: [],
       });
 
       await user.click(

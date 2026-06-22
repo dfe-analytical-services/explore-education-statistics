@@ -115,13 +115,20 @@ public class UserRoleService(
             {
                 return await GetIdentityUser(userId)
                     .OnSuccessCombineWith(_ => contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
-                    .OnSuccessDo(_ => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
+                    .OnSuccessDo(_ =>
+                        ValidatePublicationRoleCanBeAdded(userId: userId, publicationId: publicationId, role: role)
+                    )
                     .OnSuccessVoid(async tuple =>
                     {
                         var (user, publication) = tuple;
 
                         await contentDbContext.RequireTransaction(async () =>
                         {
+                            await RemoveAnyUserPreReleaseRolesForPublication(
+                                userId: userId,
+                                publicationId: publicationId
+                            );
+
                             var createdUserPublicationRole = await userPublicationRoleRepository.Create(
                                 userId: userId,
                                 publicationId: publication.Id,
@@ -187,6 +194,22 @@ public class UserRoleService(
                         return Unit.Instance;
                     });
             });
+
+    private async Task RemoveAnyUserPreReleaseRolesForPublication(Guid userId, Guid publicationId)
+    {
+        var userPreReleaseRolesForPublication = await userPreReleaseRoleRepository
+            .Query()
+            .WhereForUser(userId)
+            .WhereForPublication(publicationId)
+            .ToListAsync();
+
+        if (!userPreReleaseRolesForPublication.Any())
+        {
+            return;
+        }
+
+        await userPreReleaseRoleRepository.RemoveMany(userPreReleaseRolesForPublication);
+    }
 
     private async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(UserPublicationRole userPublicationRole)
     {
@@ -287,6 +310,8 @@ public class UserRoleService(
                     createdById: userService.GetUserId(),
                     cancellationToken: cancellationToken
                 );
+
+            await RemoveAnyUserPreReleaseRolesForPublication(userId: user.Id, publicationId: publicationId);
 
             var createdUserDrafterRole = await userPublicationRoleRepository.Create(
                 userId: user.Id,
