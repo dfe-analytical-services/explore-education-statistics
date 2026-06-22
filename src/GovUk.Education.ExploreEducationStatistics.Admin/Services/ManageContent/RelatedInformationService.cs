@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
@@ -30,7 +31,7 @@ public class RelatedInformationService(
     )
     {
         return persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -61,7 +62,7 @@ public class RelatedInformationService(
     )
     {
         return persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -91,7 +92,7 @@ public class RelatedInformationService(
     )
     {
         return persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {

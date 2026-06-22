@@ -1,50 +1,75 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-public class UpdateContactAuthorizationHandlerTests
+public abstract class UpdateContactAuthorizationHandlerTests
 {
-    [Fact]
-    public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithClaim()
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Publication _publication;
+
+    protected UpdateContactAuthorizationHandlerTests()
     {
-        await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdateContactRequirement>(
-            CreateHandler,
-            new Publication(),
-            UpdateAllPublications
-        );
+        _publication = _dataFixture.DefaultPublication();
     }
 
-    [Fact]
-    public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithPublicationOwner()
+    public class ClaimsTests : UpdateContactAuthorizationHandlerTests
     {
-        await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(CreateHandler, Owner);
+        [Fact]
+        public async Task SucceedsOnlyForValidClaims()
+        {
+            await AssertHandlerSucceedsWithCorrectClaims<UpdateContactRequirement, Publication>(
+                handler: BuildHandler(),
+                entity: _publication,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.UpdateAllPublications]
+            );
+        }
     }
 
-    private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+    public class PublicationRolesTests : UpdateContactAuthorizationHandlerTests
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            contentDbContext
-        );
+        [Fact]
+        public async Task SucceedsOnlyForValidPublicationRoles()
+        {
+            await AssertHandlerSucceedsForAnyValidPublicationRole<UpdateContactRequirement, Publication>(
+                handlerSupplier: BuildHandler,
+                entity: _publication,
+                publicationId: _publication.Id,
+                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+            );
+        }
+    }
 
-        return new UpdateContactAuthorizationHandler(
-            new AuthorizationHandlerService(
-                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: userReleaseRoleRepository,
-                userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+    private UpdateContactAuthorizationHandler BuildHandler(
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
+    {
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+        return new(authorizationHandlerService);
+    }
+
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    _publication.Id,
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }

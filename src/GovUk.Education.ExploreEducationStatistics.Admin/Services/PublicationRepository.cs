@@ -9,8 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class PublicationRepository(
     ContentDbContext context,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : Content.Model.Repository.PublicationRepository(context), IPublicationRepository
 {
     public IQueryable<Publication> QueryPublicationsForTheme(Guid? themeId = null)
@@ -39,36 +38,15 @@ public class PublicationRepository(
         var publicationIdsFromPublicationRolesQueryable = userPublicationRoleRepository
             .Query()
             .WhereForUser(userId)
-            .WhereRolesIn([PublicationRole.Owner, PublicationRole.Allower]);
-
-        var publicationIdsFromReleaseRolesQueryable = userReleaseRoleRepository
-            .Query()
-            .WhereForUser(userId)
-            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer);
+            .WhereRolesIn([PublicationRole.Drafter, PublicationRole.Approver]);
 
         if (themeId.HasValue)
         {
             publicationIdsFromPublicationRolesQueryable = publicationIdsFromPublicationRolesQueryable.Where(upr =>
                 upr.Publication.ThemeId == themeId.Value
             );
-
-            publicationIdsFromReleaseRolesQueryable = publicationIdsFromReleaseRolesQueryable.Where(urr =>
-                urr.ReleaseVersion.Release.Publication.ThemeId == themeId.Value
-            );
         }
 
-        var publicationIdsFromPublicationRoles = publicationIdsFromPublicationRolesQueryable.Select(upr =>
-            upr.PublicationId
-        );
-
-        var publicationIdsFromReleaseRoles = publicationIdsFromReleaseRolesQueryable.Select(urr =>
-            urr.ReleaseVersion.Release.PublicationId
-        );
-
-        var allDistinctPublicationIds = await publicationIdsFromPublicationRoles
-            .Union(publicationIdsFromReleaseRoles)
-            .ToListAsync();
-
-        return [.. allDistinctPublicationIds];
+        return [.. await publicationIdsFromPublicationRolesQueryable.Select(upr => upr.PublicationId).ToListAsync()];
     }
 }

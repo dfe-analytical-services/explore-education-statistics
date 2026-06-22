@@ -40,8 +40,7 @@ public class MethodologyService(
     IMethodologyCacheService methodologyCacheService,
     IRedirectsCacheService redirectsCacheService,
     IUserService userService,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : IMethodologyService
 {
     public async Task<Either<ActionResult, Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
@@ -138,7 +137,7 @@ public class MethodologyService(
 
     public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
         Guid publicationId,
-        bool isPrerelease = false
+        bool isPreRelease = false
     )
     {
         return await persistenceHelper
@@ -159,7 +158,7 @@ public class MethodologyService(
                     {
                         var methodologyVersion = publicationMethodology.Methodology.LatestVersion();
 
-                        if (isPrerelease && methodologyVersion.Status != MethodologyApprovalStatus.Approved)
+                        if (isPreRelease && methodologyVersion.Status != MethodologyApprovalStatus.Approved)
                         {
                             // Get latest approved version
                             if (methodologyVersion.PreviousVersion == null)
@@ -522,30 +521,19 @@ public class MethodologyService(
     {
         var userId = userService.GetUserId();
 
-        var directPublicationsWithApprovalRole = await userPublicationRoleRepository
+        var publicationIdsWithApprovalRole = await userPublicationRoleRepository
             .Query()
             .WhereForUser(userId)
-            .WhereRolesIn(PublicationRole.Allower)
+            .WhereRolesIn(PublicationRole.Approver)
             .Select(role => role.PublicationId)
             .ToListAsync();
-
-        var indirectPublicationsWithApprovalRole = await userReleaseRoleRepository
-            .Query()
-            .WhereForUser(userId)
-            .WhereRolesIn(ReleaseRole.Approver)
-            .Select(role => role.ReleaseVersion.Release.PublicationId)
-            .ToListAsync();
-
-        var publicationIdsForApproval = directPublicationsWithApprovalRole
-            .Concat(indirectPublicationsWithApprovalRole)
-            .Distinct();
 
         var methodologiesToApprove = await context
             .MethodologyVersions.Where(methodologyVersion =>
                 methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
                 && methodologyVersion.Methodology.Publications.Any(publicationMethodology =>
                     publicationMethodology.Owner
-                    && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)
+                    && publicationIdsWithApprovalRole.Contains(publicationMethodology.PublicationId)
                 )
             )
             .ToListAsync();

@@ -495,11 +495,9 @@ Backdate ${PUPIL_ABSENCE_METHODOLOGY_TITLE} published date
     ...    ${methodology_id}
     ...    ${published_override}
 
-Give Analyst1 Contributor access to ${RELEASE_1_NAME}
-    user gives release access to analyst
+Give Analyst1 Drafter access to ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user gives analyst publication drafter access
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    ...    ${PUPIL_ABSENCE_RELEASE_NAME}
-    ...    Contributor
     ...    EES-test.ANALYST1@education.gov.uk
 
 Create ${EXCLUSIONS_PUBLICATION_TITLE}
@@ -883,11 +881,9 @@ Backdate ${EXCLUSIONS_METHODOLOGY_TITLE} published date
     ...    ${methodology_id}
     ...    ${published_override}
 
-Give Analyst1 Contributor access to ${RELEASE_2_NAME}
-    user gives release access to analyst
+Give Analyst1 Drafter access to ${EXCLUSIONS_PUBLICATION_TITLE}
+    user gives analyst publication drafter access
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
-    ...    ${EXCLUSIONS_PUBLICATION_RELEASE_NAME}
-    ...    Contributor
     ...    EES-test.ANALYST1@education.gov.uk
 
 

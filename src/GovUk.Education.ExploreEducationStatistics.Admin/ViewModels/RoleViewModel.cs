@@ -1,10 +1,10 @@
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class RoleViewModel
+public record RoleViewModel
 {
-    public string Id { get; set; }
+    public required string Id { get; init; }
 
-    public string Name { get; set; }
+    public required string Name { get; init; }
 
-    public string NormalizedName { get; set; }
+    public required string NormalizedName { get; init; }
 }

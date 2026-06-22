@@ -55,7 +55,7 @@ public class ContentService : IContentService
         where T : ContentBlock
     {
         return await _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(releaseVersion => _contentSectionRepository.GetAllContentBlocks<T>(releaseVersion.Id));
     }
@@ -405,6 +405,7 @@ public class ContentService : IContentService
     )
     {
         return releaseVersions
+            .Include(rv => rv.Release)
             .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
                     .ThenInclude(block => block.Comments)

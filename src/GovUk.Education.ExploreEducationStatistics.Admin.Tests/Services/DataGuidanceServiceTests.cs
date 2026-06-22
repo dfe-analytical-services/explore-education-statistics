@@ -4,10 +4,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class DataGuidanceServiceTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     private static readonly List<DataGuidanceDataSetViewModel> DataGuidanceDataSets = new()
     {
         new DataGuidanceDataSetViewModel
@@ -43,7 +47,10 @@ public class DataGuidanceServiceTests
     [Fact]
     public async Task GetDataGuidance()
     {
-        var releaseVersion = new ReleaseVersion { DataGuidance = "Release guidance" };
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithDataGuidance("Release guidance")
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -114,12 +121,10 @@ public class DataGuidanceServiceTests
     [Fact]
     public async Task UpdateDataGuidance_NoDataSets()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            PreviousVersionId = null,
-            DataGuidance = "Release guidance",
-        };
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithDataGuidance("Release guidance")
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -173,20 +178,25 @@ public class DataGuidanceServiceTests
     [Fact]
     public async Task UpdateDataGuidance_DataSetNotAttachedToRelease()
     {
-        var release1 = new ReleaseVersion { Id = Guid.NewGuid(), DataGuidance = "Release 1 guidance" };
-
-        var release2 = new ReleaseVersion { Id = Guid.NewGuid(), DataGuidance = "Release 2 guidance" };
+        ReleaseVersion releaseVersion1 = _dataFixture
+            .DefaultReleaseVersion()
+            .WithDataGuidance("Release 1 guidance")
+            .WithRelease(_dataFixture.DefaultRelease());
+        ReleaseVersion releaseVersion2 = _dataFixture
+            .DefaultReleaseVersion()
+            .WithDataGuidance("Release 2 guidance")
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
-            ReleaseVersion = release1,
+            ReleaseVersion = releaseVersion1,
             File = new File { Filename = "file1.csv", Type = FileType.Data },
             Summary = "Data set 1 guidance",
         };
 
         var releaseFile2 = new ReleaseFile
         {
-            ReleaseVersion = release2,
+            ReleaseVersion = releaseVersion2,
             File = new File { Filename = "file2.csv", Type = FileType.Data },
             Summary = "Data set 2 guidance",
         };
@@ -195,7 +205,7 @@ public class DataGuidanceServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.ReleaseVersions.AddRange(release1, release2);
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2);
             contentDbContext.ReleaseFiles.AddRange(releaseFile1, releaseFile2);
             await contentDbContext.SaveChangesAsync();
         }
@@ -206,7 +216,7 @@ public class DataGuidanceServiceTests
 
             // Attempt to update data set 2 in a request for release 1 which it is not attached to
             var result = await service.UpdateDataGuidance(
-                release1.Id,
+                releaseVersion1.Id,
                 new DataGuidanceUpdateRequest
                 {
                     Content = "Updated release guidance",
@@ -224,18 +234,20 @@ public class DataGuidanceServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             // Assert no changes have been made to the release version or any of the data sets
-            var actualReleaseVersion = await contentDbContext.ReleaseVersions.FirstAsync(rv => rv.Id == release1.Id);
+            var actualReleaseVersion = await contentDbContext.ReleaseVersions.FirstAsync(rv =>
+                rv.Id == releaseVersion1.Id
+            );
 
             Assert.Equal("Release 1 guidance", actualReleaseVersion.DataGuidance);
 
             var actualReleaseFile1 = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
-                rf.ReleaseVersionId == release1.Id && rf.FileId == releaseFile1.FileId
+                rf.ReleaseVersionId == releaseVersion1.Id && rf.FileId == releaseFile1.FileId
             );
 
             Assert.Equal("Data set 1 guidance", actualReleaseFile1.Summary);
 
             var actualReleaseFile2 = await contentDbContext.ReleaseFiles.FirstAsync(rf =>
-                rf.ReleaseVersionId == release2.Id && rf.FileId == releaseFile2.FileId
+                rf.ReleaseVersionId == releaseVersion2.Id && rf.FileId == releaseFile2.FileId
             );
 
             Assert.Equal("Data set 2 guidance", actualReleaseFile2.Summary);
@@ -245,7 +257,10 @@ public class DataGuidanceServiceTests
     [Fact]
     public async Task UpdateDataGuidance_WithDataSets()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), DataGuidance = "Release guidance" };
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithDataGuidance("Release guidance")
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -331,19 +346,15 @@ public class DataGuidanceServiceTests
     [Fact]
     public async Task UpdateDataGuidance_WithDataSets_AmendedRelease()
     {
-        var releaseVersion1 = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            PreviousVersionId = null,
-            DataGuidance = "Version 1 release guidance",
-        };
-
-        var releaseVersion2 = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            PreviousVersionId = releaseVersion1.Id,
-            DataGuidance = "Version 2 release guidance",
-        };
+        ReleaseVersion releaseVersion1 = _dataFixture
+            .DefaultReleaseVersion()
+            .WithDataGuidance("Version 1 release guidance")
+            .WithRelease(_dataFixture.DefaultRelease());
+        ReleaseVersion releaseVersion2 = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPreviousVersionId(releaseVersion1.Id)
+            .WithDataGuidance("Version 2 release guidance")
+            .WithRelease(_dataFixture.DefaultRelease());
 
         var originalPublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 

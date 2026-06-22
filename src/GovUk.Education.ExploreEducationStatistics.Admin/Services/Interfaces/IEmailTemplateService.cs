@@ -9,26 +9,13 @@ public interface IEmailTemplateService
 {
     Either<ActionResult, Unit> SendInviteEmail(
         string email,
-        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo,
+        HashSet<(string PublicationTitle, string ReleaseTitle)> preReleaseRolesInfo,
         HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo
     );
 
     Either<ActionResult, Unit> SendPublicationRoleEmail(string email, string publicationTitle, PublicationRole role);
 
-    Either<ActionResult, Unit> SendReleaseRoleEmail(
-        string email,
-        string publicationTitle,
-        string releaseTitle,
-        Guid publicationId,
-        Guid releaseVersionId,
-        ReleaseRole role
-    );
-
-    Either<ActionResult, Unit> SendContributorInviteEmail(
-        string email,
-        string publicationTitle,
-        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo
-    );
+    Either<ActionResult, Unit> SendDrafterInviteEmail(string email, string publicationTitle);
 
     Either<ActionResult, Unit> SendPreReleaseInviteEmail(
         string email,

@@ -3,9 +3,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
@@ -15,7 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class DataGuidanceServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
+    private readonly ReleaseVersion _releaseVersion = new DataFixture()
+        .DefaultReleaseVersion()
+        .WithRelease(new DataFixture().DefaultRelease());
 
     [Fact]
     public async Task GetDataGuidance()

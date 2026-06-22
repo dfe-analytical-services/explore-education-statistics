@@ -121,7 +121,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_OriginalFileIsNotUsedByAnyDependentData()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -228,7 +228,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_NoReplacementDataPresent_ReplacementInvalid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -630,7 +630,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_SelectedFilterItemsNoLongerExistButSomeDo_ReplacementInvalid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -827,7 +827,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_AllOriginalFilterItemsNoLongerExist_ReplacementInvalid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -1022,7 +1022,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_NewFiltersIntroduced_ReplacementInvalid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -1240,7 +1240,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_ReplacementHasDifferentLocation_LocationMatchedByCode_ReplacementValid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -1495,7 +1495,7 @@ public class ReplacementPlanServiceTests
             .WithStatus(dataSetVersionStatus)
             .WithDataSet(dataSet);
 
-        Content.Model.ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -1646,7 +1646,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_AllReplacementDataPresent_ReplacementValid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -2196,7 +2196,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_CustomMapping_IndicatorMappedThatAppearsInDataBlockAndFootnote_ReplacementValid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -2485,7 +2485,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_CustomMapping_IndicatorUnmappedThatIsUsedInDataBlockAndFootnote_ReplacementInvalid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -2734,7 +2734,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_CustomMapping_LocationsMappedThatAppearsInDataBlock_ReplacementValid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 
@@ -3069,7 +3069,7 @@ public class ReplacementPlanServiceTests
     [Fact]
     public async Task GetReplacementPlan_CustomMapping_LocationUnmappedThatIsUsedInDataBlock_ReplacementInvalid()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
 
         var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
 

@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -20,11 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
 [Authorize]
 public class PermissionsController(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
+    ContentDbContext contentDbContext,
     IReleaseFileService releaseFileService,
     IUserService userService,
     IPreReleaseService preReleaseService,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : ControllerBase
 {
     [HttpGet("permissions/access")]
@@ -37,13 +38,13 @@ public class PermissionsController(
         // roles.  If they were to be given Approver permissions, we would therefore assume that they
         // should have Approver access to ALL Methodologies and Releases that are awaiting approval,
         // which would potentially be overwhelming.
-        var isApprover = !isBauUser && (await IsReleaseApprover() || await IsPublicationApprover());
+        var isApprover = !isBauUser && await IsPublicationApprover();
 
         return new GlobalPermissionsViewModel(
             CanAccessSystem: await userService.CheckCanAccessSystem().IsRight(),
             CanAccessAnalystPages: await userService.CheckCanAccessAnalystPages().IsRight(),
             CanAccessAllImports: await userService.CheckCanViewAllImports().IsRight(),
-            CanAccessPrereleasePages: await userService.CheckCanAccessPrereleasePages().IsRight(),
+            CanAccessPreReleasePages: await userService.CheckCanAccessPreReleasePages().IsRight(),
             CanManageAllTaxonomy: await userService.CheckCanManageAllTaxonomy().IsRight(),
             IsBauUser: isBauUser,
             IsApprover: isApprover
@@ -59,7 +60,11 @@ public class PermissionsController(
     [HttpGet("permissions/release/{releaseVersionId:guid}/update")]
     public Task<ActionResult<bool>> CanUpdateRelease(Guid releaseVersionId)
     {
-        return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, userService.CheckCanUpdateReleaseVersion);
+        return CheckPolicyAgainstEntity<ReleaseVersion>(
+            entityId: releaseVersionId,
+            policyCheck: userService.CheckCanUpdateReleaseVersion,
+            hydrateEntityFn: query => query.Include(rv => rv.Release)
+        );
     }
 
     public record ReleaseStatusPermissionsViewModel(
@@ -73,8 +78,9 @@ public class PermissionsController(
         Guid releaseVersionId
     )
     {
-        return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFound(rv => rv.Id == releaseVersionId)
             .OnSuccess(async releaseVersion =>
             {
                 var canMarkDraft = await userService.CheckCanMarkReleaseVersionAsDraft(releaseVersion);
@@ -103,16 +109,18 @@ public class PermissionsController(
     public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseVersionId)
     {
         return CheckPolicyAgainstEntity<ReleaseVersion>(
-            releaseVersionId,
-            userService.CheckCanMakeAmendmentOfReleaseVersion
+            entityId: releaseVersionId,
+            policyCheck: userService.CheckCanMakeAmendmentOfReleaseVersion,
+            hydrateEntityFn: query => query.Include(rv => rv.Release)
         );
     }
 
     [HttpGet("permissions/release/{releaseVersionId:guid}/prerelease/status")]
     public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseVersionId)
     {
-        return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFound(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewPreReleaseSummary)
             .OnSuccess(releaseVersion =>
                 preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTimeOffset.UtcNow)
@@ -140,8 +148,8 @@ public class PermissionsController(
         Guid methodologyVersionId
     )
     {
-        return await persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+        return await contentDbContext
+            .MethodologyVersions.SingleOrNotFound(mv => mv.Id == methodologyVersionId)
             .OnSuccess(async methodologyVersion =>
             {
                 var canMarkDraft = await userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion);
@@ -161,24 +169,16 @@ public class PermissionsController(
 
     private async Task<ActionResult<bool>> CheckPolicyAgainstEntity<TEntity>(
         Guid entityId,
-        Func<TEntity, Task<Either<ActionResult, TEntity>>> policyCheck
+        Func<TEntity, Task<Either<ActionResult, TEntity>>> policyCheck,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null
     )
         where TEntity : class
     {
         return await persistenceHelper
-            .CheckEntityExists<TEntity, Guid>(entityId)
+            .CheckEntityExists<TEntity, Guid>(entityId, hydrateEntityFn)
             .OnSuccess(policyCheck.Invoke)
             .OnSuccess(_ => new OkObjectResult(true))
             .OrElse(() => new OkObjectResult(false));
-    }
-
-    private async Task<bool> IsReleaseApprover()
-    {
-        return await userReleaseRoleRepository
-            .Query()
-            .WhereForUser(userService.GetUserId())
-            .WhereRolesIn(ReleaseRole.Approver)
-            .AnyAsync();
     }
 
     private async Task<bool> IsPublicationApprover()
@@ -186,7 +186,7 @@ public class PermissionsController(
         return await userPublicationRoleRepository
             .Query()
             .WhereForUser(userService.GetUserId())
-            .WhereRolesIn(PublicationRole.Allower)
+            .WhereRolesIn(PublicationRole.Approver)
             .AnyAsync();
     }
 }

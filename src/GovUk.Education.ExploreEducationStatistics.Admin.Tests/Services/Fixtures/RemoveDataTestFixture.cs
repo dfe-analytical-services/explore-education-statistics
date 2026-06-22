@@ -199,7 +199,7 @@ public class RemoveDataSetTestFixture
             .WithStatus(dataSetVersionStatus)
             .WithDataSet(TestDataSet)
             .Generate();
-        ReleaseVersion = dataFixture.DefaultReleaseVersion().Generate();
+        ReleaseVersion = dataFixture.DefaultReleaseVersion().WithRelease(dataFixture.DefaultRelease()).Generate();
 
         if (isPublished)
         {

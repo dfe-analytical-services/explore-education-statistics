@@ -127,7 +127,7 @@ public class ContentDbContext : DbContext
         ConfigurePermalink(modelBuilder);
         ConfigureUser(modelBuilder);
         ConfigureUserPublicationRole(modelBuilder);
-        ConfigureUserReleaseRole(modelBuilder);
+        ConfigureUserPreReleaseRole(modelBuilder);
         ConfigureGlossaryEntry(modelBuilder);
         ConfigureKeyStatisticsDataBlock(modelBuilder);
         ConfigureKeyStatisticsText(modelBuilder);
@@ -667,15 +667,12 @@ public class ContentDbContext : DbContext
             .HasConversion(new EnumToStringConverter<PublicationRole>())
             .HasMaxLength(20);
 
-        // This will be changed when we start introducing the use of the NEW publication roles in the
-        // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
-        // filter out any usage of the NEW roles.
-        var unusedRoles = new[] { PublicationRole.Approver, PublicationRole.Drafter };
+        var unusedRoles = new[] { PublicationRole.Allower, PublicationRole.Owner };
 
         modelBuilder.Entity<UserPublicationRole>().HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
-    private static void ConfigureUserReleaseRole(ModelBuilder modelBuilder)
+    private static void ConfigureUserPreReleaseRole(ModelBuilder modelBuilder)
     {
         modelBuilder
             .Entity<UserReleaseRole>()
@@ -697,6 +694,10 @@ public class ContentDbContext : DbContext
             .Property(r => r.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>())
             .HasMaxLength(20);
+
+        var unusedRoles = new[] { ReleaseRole.Contributor, ReleaseRole.Approver };
+
+        modelBuilder.Entity<UserReleaseRole>().HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)

@@ -63,7 +63,7 @@ public class CommentService : ICommentService
     )
     {
         return _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccessDo(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccessDo(() => CheckContentBlockExists(releaseVersionId, contentSectionId, contentBlockId))
             .OnSuccess(async () =>

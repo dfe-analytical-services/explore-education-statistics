@@ -31,7 +31,7 @@ public class ReleasePublishingFeedbackControllerTests(ReleasePublishingFeedbackC
         {
             Id = Guid.NewGuid(),
             EmailToken = Guid.NewGuid().ToString(),
-            UserPublicationRole = PublicationRole.Owner,
+            UserPublicationRole = PublicationRole.Drafter,
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1),
             ReleaseTitle = "Academic year 2022",
@@ -79,7 +79,7 @@ public class ReleasePublishingFeedbackControllerTests(ReleasePublishingFeedbackC
         {
             Id = Guid.NewGuid(),
             EmailToken = Guid.NewGuid().ToString(),
-            UserPublicationRole = PublicationRole.Owner,
+            UserPublicationRole = PublicationRole.Drafter,
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1),
             ReleaseTitle = "Academic year 2022",
@@ -123,7 +123,7 @@ public class ReleasePublishingFeedbackControllerTests(ReleasePublishingFeedbackC
         {
             Id = Guid.NewGuid(),
             EmailToken = Guid.NewGuid().ToString(),
-            UserPublicationRole = PublicationRole.Owner,
+            UserPublicationRole = PublicationRole.Drafter,
             ReleaseVersionId = Guid.NewGuid(),
             Created = DateTime.UtcNow.AddDays(-1),
             ReleaseTitle = "Academic year 2022",

@@ -1,126 +1,85 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
+public abstract class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
 {
-    private static readonly Guid UserId = Guid.NewGuid();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Publication _publication;
 
-    private static readonly Publication Publication = new() { Id = Guid.NewGuid() };
+    protected AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests()
+    {
+        _publication = _dataFixture.DefaultPublication();
+    }
 
-    private static readonly DataFixture DataFixture = new();
-
-    public class ClaimsTests
+    public class ClaimsTests : AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
     {
         [Fact]
-        public async Task UserWithCorrectClaimCanAdoptAnyMethodology()
+        public async Task SucceedsOnlyForValidClaims()
         {
-            await ForEachSecurityClaimAsync(async claim =>
-            {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-                var handler = SetupHandler(userPublicationRoleRepository.Object);
-
-                // Only the AdoptAnyMethodology claim should allow adopting a methodology for a publication.
-                var expectedToPassByClaimAlone = claim == AdoptAnyMethodology;
-
-                if (!expectedToPassByClaimAlone)
-                {
-                    userPublicationRoleRepository
-                        .Setup(s =>
-                            s.UserHasAnyRoleOnPublication(
-                                UserId,
-                                Publication.Id,
-                                ResourceRoleFilter.ActiveOnly,
-                                It.IsAny<CancellationToken>(),
-                                PublicationRole.Owner
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    AdoptMethodologyForSpecificPublicationRequirement,
-                    Publication
-                >(user, Publication);
-
-                await handler.HandleAsync(authContext);
-
-                VerifyAllMocks(userPublicationRoleRepository);
-
-                Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
-            });
+            // If the claims check fails, it will check the user's roles on the publication, but since we're testing claims here,
+            // we want that to fail too, to ensure the claim is what's allowing access. So we let the IAuthorizationHandlerService default
+            // to failing any role check, within the SetupHandler method.
+            await AssertHandlerSucceedsWithCorrectClaims<
+                AdoptMethodologyForSpecificPublicationRequirement,
+                Publication
+            >(
+                handler: BuildHandler(),
+                entity: _publication,
+                userId: _userId,
+                claimsExpectedToSucceed: [SecurityClaimTypes.AdoptAnyMethodology]
+            );
         }
     }
 
-    public class PublicationRoleTests
+    public class PublicationRolesTests : AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
     {
         [Fact]
-        public async Task PublicationOwnerCanAdoptAnyMethodology()
+        public async Task SucceedsOnlyForValidPublicationRoles()
         {
-            await ForEachPublicationRoleAsync(async publicationRole =>
-            {
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-
-                var handler = SetupHandler(userPublicationRoleRepository.Object);
-
-                var hasOwnerRole = publicationRole == PublicationRole.Owner;
-                userPublicationRoleRepository
-                    .Setup(s =>
-                        s.UserHasAnyRoleOnPublication(
-                            UserId,
-                            Publication.Id,
-                            ResourceRoleFilter.ActiveOnly,
-                            It.IsAny<CancellationToken>(),
-                            PublicationRole.Owner
-                        )
-                    )
-                    .ReturnsAsync(hasOwnerRole);
-
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
-
-                var authContext = CreateAuthorizationHandlerContext<
-                    AdoptMethodologyForSpecificPublicationRequirement,
-                    Publication
-                >(user, Publication);
-
-                await handler.HandleAsync(authContext);
-
-                VerifyAllMocks(userPublicationRoleRepository);
-
-                // As the user has Publication Owner role on the Publication they are allowed to adopt any methodology
-                Assert.Equal(hasOwnerRole, authContext.HasSucceeded);
-            });
+            await AssertHandlerSucceedsForAnyValidPublicationRole<
+                AdoptMethodologyForSpecificPublicationRequirement,
+                Publication
+            >(
+                handlerSupplier: BuildHandler,
+                entity: _publication,
+                publicationId: _publication.Id,
+                publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+            );
         }
     }
 
-    private static AdoptMethodologyForSpecificPublicationAuthorizationHandler SetupHandler(
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+    private AdoptMethodologyForSpecificPublicationAuthorizationHandler BuildHandler(
+        IAuthorizationHandlerService? authorizationHandlerService = null
     )
     {
-        return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
-            new AuthorizationHandlerService(
-                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
-                Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-                Mock.Of<IPreReleaseService>(Strict)
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+        return new(authorizationHandlerService);
+    }
+
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    _publication.Id,
+                    CollectionUtils.SetOf(PublicationRole.Drafter, PublicationRole.Approver)
+                )
             )
-        );
+            .ReturnsAsync(false);
+
+        return mock.Object;
     }
 }
