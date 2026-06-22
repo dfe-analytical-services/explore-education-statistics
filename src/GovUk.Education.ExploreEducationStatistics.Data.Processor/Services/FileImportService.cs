@@ -11,33 +11,21 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class FileImportService : IFileImportService
+public class FileImportService(
+    ILogger<FileImportService> logger,
+    IPrivateBlobStorageService privateBlobStorageService,
+    IDataImportService dataImportService,
+    IDataSetMappingService dataSetMappingService,
+    IImporterService importerService
+) : IFileImportService
 {
-    private readonly ILogger<FileImportService> _logger;
-    private readonly IPrivateBlobStorageService _privateBlobStorageService;
-    private readonly IDataImportService _dataImportService;
-    private readonly IImporterService _importerService;
-
-    public FileImportService(
-        ILogger<FileImportService> logger,
-        IPrivateBlobStorageService privateBlobStorageService,
-        IDataImportService dataImportService,
-        IImporterService importerService
-    )
-    {
-        _logger = logger;
-        _privateBlobStorageService = privateBlobStorageService;
-        _dataImportService = dataImportService;
-        _importerService = importerService;
-    }
-
     public async Task ImportObservations(DataImport import, StatisticsDbContext context)
     {
-        _logger.LogInformation("Importing Observations for {Filename}", import.File.Filename);
+        logger.LogInformation("Importing Observations for {Filename}", import.File.Filename);
 
         if (import.Status.IsFinished())
         {
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Import for {Filename} already finished with state {ImportStatus} - ignoring Observations",
                 import.File.Filename,
                 import.Status
@@ -48,22 +36,22 @@ public class FileImportService : IFileImportService
 
         if (import.Status == CANCELLING)
         {
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Import for {Filename} is {ImportStatus} - ignoring Observations and marking import as " + "CANCELLED",
                 import.File.Filename,
                 import.Status
             );
 
-            await _dataImportService.UpdateStatus(import.Id, CANCELLED, 100);
+            await dataImportService.UpdateStatus(import.Id, CANCELLED, 100);
             return;
         }
 
         var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
 
-        var datafileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
-        var metaFileStreamProvider = _privateBlobStorageService.GetMetadataFileStreamProvider(import);
+        var datafileStreamProvider = privateBlobStorageService.GetDataFileStreamProvider(import);
+        var metaFileStreamProvider = privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
-        await _importerService.ImportObservations(
+        await importerService.ImportObservations(
             import,
             datafileStreamProvider,
             metaFileStreamProvider,
@@ -74,18 +62,18 @@ public class FileImportService : IFileImportService
 
     public async Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context)
     {
-        var import = await _dataImportService.GetImport(importId);
+        var import = await dataImportService.GetImport(importId);
 
-        var datafileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
+        var datafileStreamProvider = privateBlobStorageService.GetDataFileStreamProvider(import);
 
-        await _importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, context);
+        await importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, context);
     }
 
     public async Task CompleteImport(DataImport import, StatisticsDbContext context)
     {
         if (import.Status.IsFinished())
         {
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Import for {Filename} is already finished in state {ImportStatus} - not attempting to "
                     + "mark as completed or failed",
                 import.File.Filename,
@@ -96,7 +84,7 @@ public class FileImportService : IFileImportService
 
         if (import.Status.IsAborting())
         {
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Import for {Filename} is trying to abort in "
                     + "state {ImportStatus} - not attempting to mark as completed or failed, but "
                     + "instead marking as {AbortedState}, the final state of the aborting process",
@@ -105,14 +93,14 @@ public class FileImportService : IFileImportService
                 import.Status.GetFinishingStateOfAbortProcess()
             );
 
-            await _dataImportService.UpdateStatus(import.Id, import.Status.GetFinishingStateOfAbortProcess(), 100);
+            await dataImportService.UpdateStatus(import.Id, import.Status.GetFinishingStateOfAbortProcess(), 100);
             return;
         }
 
         var observationCount = await context.Observation.CountAsync(o => o.SubjectId.Equals(import.SubjectId));
         if (observationCount != import.ExpectedImportedRows)
         {
-            await _dataImportService.FailImport(
+            await dataImportService.FailImport(
                 import.Id,
                 $"Number of observations inserted ({observationCount}) "
                     + $"does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry"
@@ -122,24 +110,24 @@ public class FileImportService : IFileImportService
 
         if (import.Errors.Count > 0)
         {
-            await _dataImportService.UpdateStatus(import.Id, FAILED, 100);
+            await dataImportService.UpdateStatus(import.Id, FAILED, 100);
             return;
         }
 
         await FinalImportTasks(import);
-        await _dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
+        await dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
     }
 
     private async Task FinalImportTasks(DataImport import)
     {
         try
         {
-            await _dataImportService.CreateInitialDataSetMappingIfReplacement(import.FileId);
-            await _dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+            await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
+            await dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
         }
         catch (Exception e)
         {
-            await _dataImportService.FailImport(import.Id, $"Failed to complete final import tasks. Exception: {e}");
+            await dataImportService.FailImport(import.Id, $"Failed to complete final import tasks. Exception: {e}");
             throw new Exception($"Failed to complete final import tasks\n{e}");
         }
     }
