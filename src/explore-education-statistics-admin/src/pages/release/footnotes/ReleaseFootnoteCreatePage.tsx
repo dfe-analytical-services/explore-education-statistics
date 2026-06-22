@@ -10,6 +10,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
 
 const ReleaseFootnoteCreatePage = ({
   match,
@@ -44,7 +45,10 @@ const ReleaseFootnoteCreatePage = ({
           <FootnoteForm
             footnoteMeta={footnoteMeta}
             onSubmit={async values => {
-              await footnoteService.createFootnote(releaseVersionId, values);
+              await footnoteService.createFootnote(
+                releaseVersionId,
+                footnoteToFlatFootnote(values, footnoteMeta),
+              );
               history.push(footnotesPath);
             }}
             cancelButton={

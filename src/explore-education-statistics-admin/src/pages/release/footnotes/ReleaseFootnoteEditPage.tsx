@@ -11,6 +11,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
 
 const ReleaseFootnoteEditPage = ({
   match,
@@ -56,7 +57,7 @@ const ReleaseFootnoteEditPage = ({
               await footnoteService.updateFootnote(
                 releaseVersionId,
                 footnoteId,
-                values,
+                footnoteToFlatFootnote(values, footnoteMeta),
               );
 
               history.push(footnotesPath);

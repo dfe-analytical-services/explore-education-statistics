@@ -338,8 +338,8 @@ public abstract class ReplacementViewModel
 public record ReplacementPlanMappingViewModel
 {
     public ReplacementPlanIndicatorsMappingViewModel Indicators { get; init; } = null!;
-
     public ReplacementPlanLocationMappingsViewModel Locations { get; init; } = null!;
+    public ReplacementPlanFilterMappingsViewModel Filters { get; init; } = null!;
 }
 
 public record ReplacementPlanIndicatorsMappingViewModel
@@ -361,9 +361,7 @@ public record ReplacementPlanIndicatorMappingViewModel
 public record ReplacementPlanIndicatorViewModel
 {
     public Guid Id { get; init; }
-
     public string Name { get; init; } = ""; // csv column name
-
     public string Label { get; init; } = "";
 }
 
@@ -388,4 +386,80 @@ public record ReplacementPlanLocationViewModel
     public Guid Id { get; init; }
     public string Code { get; init; } = "";
     public string Name { get; init; } = "";
+}
+
+// @MarkFix the big plan
+// 1. Remove FilterGroupFootnotes (don't allow FilterGroupFootnote creation (mostly FE I think, use FilterItemFootnotes instead), then migrate existing group footnotes to item footnotes, then remove group footnotes.
+// 2. Introduce Filters/FilterItems to DataSetMapping with automapping
+// 3. Add ability to update filter/filter item mappings (with restriction that items can only be mapped if parent filter is mapped)
+
+public record ReplacementPlanFilterMappingsViewModel
+{
+    // Key is original filter id
+    public Dictionary<Guid, ReplacementPlanFilterMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement filter id
+    public Dictionary<Guid, ReplacementPlanFilterViewModel> Candidates { get; init; } = new();
+}
+
+public record ReplacementPlanFilterMappingViewModel
+{
+    public ReplacementPlanFilterViewModel Source { get; init; } = null!;
+    public string Type { get; init; } = "";
+    public Guid? CandidateKey { get; init; } // replacement filter id
+
+    public ReplacementPlanFilterGroupMappingsViewModel FilterGroup { get; init; } = null!;
+}
+
+public record ReplacementPlanFilterViewModel
+{
+    public Guid Id { get; init; }
+    public string Label { get; init; } = "";
+    public string Name { get; init; } = ""; // csv column name
+}
+
+public record ReplacementPlanFilterGroupMappingsViewModel
+{
+    // Key is original filter item id
+    public Dictionary<Guid, ReplacementPlanFilterGroupMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement filter item id
+    public Dictionary<Guid, ReplacementPlanFilterGroupViewModel> Candidates { get; init; } = new();
+}
+
+public record ReplacementPlanFilterGroupMappingViewModel
+{
+    public ReplacementPlanFilterItemViewModel Source { get; init; } = null!;
+    public string Type { get; init; } = "";
+    public Guid? CandidateKey { get; init; } // replacement filter group id
+
+    public ReplacementPlanFilterItemMappingsViewModel FilterItem { get; init; } = null!;
+}
+
+public record ReplacementPlanFilterGroupViewModel
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+}
+
+public record ReplacementPlanFilterItemMappingsViewModel
+{
+    // Key is original filter item id
+    public Dictionary<Guid, ReplacementPlanFilterItemMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement filter item id
+    public Dictionary<Guid, ReplacementPlanFilterItemViewModel> Candidates { get; init; } = new();
+}
+
+public record ReplacementPlanFilterItemMappingViewModel
+{
+    public ReplacementPlanFilterItemViewModel Source { get; init; } = null!;
+    public string Type { get; init; } = "";
+    public Guid? CandidateKey { get; init; } // replacement filter item id
+}
+
+public record ReplacementPlanFilterItemViewModel
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
 }

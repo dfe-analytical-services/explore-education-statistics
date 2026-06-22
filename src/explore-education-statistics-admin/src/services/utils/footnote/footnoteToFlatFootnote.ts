@@ -1,6 +1,6 @@
-import { BaseFootnote } from '@admin/services/footnoteService';
+import { BaseFootnote, FootnoteMeta } from '@admin/services/footnoteService';
 
-interface FlatFootnote {
+export interface FlatFootnote {
   content: string;
   subjects: string[];
   indicatorGroups: string[];
@@ -10,15 +10,18 @@ interface FlatFootnote {
   filterItems: string[];
 }
 
-const footnoteToFlatFootnote = (footnote: BaseFootnote): FlatFootnote => {
+const footnoteToFlatFootnote = (
+  footnote: BaseFootnote,
+  footnoteMeta: FootnoteMeta,
+): FlatFootnote => {
   const flatFootnote: FlatFootnote = {
     ...footnote,
     subjects: [],
     indicators: [],
     indicatorGroups: [],
     filters: [],
-    filterItems: [],
     filterGroups: [],
+    filterItems: [],
   };
 
   Object.entries(footnote.subjects).forEach(([subjectId, subject]) => {
@@ -42,7 +45,12 @@ const footnoteToFlatFootnote = (footnote: BaseFootnote): FlatFootnote => {
           Object.entries(filter.filterGroups).forEach(
             ([filterGroupId, filterGroup]) => {
               if (filterGroup.selected) {
-                flatFootnote.filterGroups.push(filterGroupId);
+                // filter group footnotes don't exist - so add every single filter item for that group
+                flatFootnote.filterItems.push(
+                  ...footnoteMeta.subjects[subjectId].filters[filterId].options[
+                    filterGroupId
+                  ].options.map(filterItem => filterItem.value),
+                );
               } else {
                 flatFootnote.filterItems.push(...filterGroup.filterItems);
               }

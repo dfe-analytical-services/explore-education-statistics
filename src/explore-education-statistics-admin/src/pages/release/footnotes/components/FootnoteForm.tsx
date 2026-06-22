@@ -94,7 +94,7 @@ export default function FootnoteForm({
       filters,
       filterGroups,
       filterItems,
-    } = footnoteToFlatFootnote(values);
+    } = footnoteToFlatFootnote(values, footnoteMeta);
     const hasNoneSelected =
       [
         ...subjects,
@@ -161,7 +161,7 @@ export default function FootnoteForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      <Form id={id} onSubmit={handleSubmit}>
+      <Form id={id} onSubmit={baseFootnotes => handleSubmit(baseFootnotes)}>
         <p>
           Select which subjects, filters and indicators your footnote applies to
           and these will appear alongside the associated data in your published

@@ -1,5 +1,7 @@
 import client from '@admin/services/utils/service';
-import footnoteToFlatFootnote from './utils/footnote/footnoteToFlatFootnote';
+import footnoteToFlatFootnote, {
+  FlatFootnote,
+} from './utils/footnote/footnoteToFlatFootnote';
 
 export type SubjectSelectionType = 'NA' | 'All' | 'Specific';
 
@@ -87,21 +89,15 @@ const footnoteService = {
   getFootnote(releaseId: string, id: string): Promise<Footnote> {
     return client.get(`/releases/${releaseId}/footnotes/${id}`);
   },
-  createFootnote(releaseId: string, footnote: BaseFootnote): Promise<Footnote> {
-    return client.post(
-      `/releases/${releaseId}/footnotes`,
-      footnoteToFlatFootnote(footnote),
-    );
+  createFootnote(releaseId: string, footnote: FlatFootnote): Promise<Footnote> {
+    return client.post(`/releases/${releaseId}/footnotes`, footnote);
   },
   updateFootnote(
     releaseId: string,
     id: string,
-    footnote: BaseFootnote,
+    footnote: FlatFootnote,
   ): Promise<Footnote> {
-    return client.put(
-      `/releases/${releaseId}/footnotes/${id}`,
-      footnoteToFlatFootnote(footnote),
-    );
+    return client.put(`/releases/${releaseId}/footnotes/${id}`, footnote);
   },
   deleteFootnote(releaseId: string, id: string): Promise<void> {
     return client.delete(`/releases/${releaseId}/footnotes/${id}`);
