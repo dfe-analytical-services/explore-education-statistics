@@ -133,13 +133,10 @@ public class ReplacementServiceTests
             ReleaseVersion = releaseVersion,
         };
 
-        var dataSetMapping = new DataSetMapping
-        {
-            OriginalDataFileId = originalFile.Id,
-            ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
-            LocationMappings = new Dictionary<Guid, LocationMapping>(),
-        };
+        var dataSetMapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile);
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -503,13 +500,10 @@ public class ReplacementServiceTests
             contentDbContext.DataBlockVersions.Add(dataBlockVersion);
             contentDbContext.DataImports.Add(dataImport);
             contentDbContext.DataSetMappings.Add(
-                new DataSetMapping
-                {
-                    OriginalDataFileId = originalFile.Id,
-                    ReplacementDataFileId = replacementFile.Id,
-                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
-                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
-                }
+                _fixture
+                    .DefaultDataSetMapping()
+                    .WithOriginalDataFile(originalFile)
+                    .WithReplacementDataFile(replacementFile)
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -711,13 +705,10 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataImports.Add(replacementDataImport);
             contentDbContext.DataSetMappings.Add(
-                new DataSetMapping
-                {
-                    OriginalDataFileId = originalFile.Id,
-                    ReplacementDataFileId = replacementFile.Id,
-                    IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
-                    LocationMappings = new Dictionary<Guid, LocationMapping>(),
-                }
+                _fixture
+                    .DefaultDataSetMapping()
+                    .WithOriginalDataFile(originalFile)
+                    .WithReplacementDataFile(replacementFile)
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -1061,27 +1052,30 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var dataSetMapping = new DataSetMapping
-        {
-            OriginalDataFileId = originalFile.Id,
-            ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
-            {
+        var dataSetMapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile)
+            .WithIndicatorMappings(
+                new Dictionary<Guid, IndicatorMapping>
                 {
-                    originalIndicator.Id,
-                    CreateIndicatorMapping(
-                        originalIndicator,
-                        originalIndicatorGroup,
-                        replacementIndicator,
-                        replacementIndicatorGroup
-                    )
-                },
-            },
-            LocationMappings = new Dictionary<Guid, LocationMapping>
-            {
-                { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
-            },
-        };
+                    {
+                        originalIndicator.Id,
+                        CreateIndicatorMapping(
+                            originalIndicator,
+                            originalIndicatorGroup,
+                            replacementIndicator,
+                            replacementIndicatorGroup
+                        )
+                    },
+                }
+            )
+            .WithLocationMappings(
+                new Dictionary<Guid, LocationMapping>
+                {
+                    { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
+                }
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1584,27 +1578,30 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var dataSetMapping = new DataSetMapping
-        {
-            OriginalDataFileId = originalFile.Id,
-            ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
-            {
+        var dataSetMapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile)
+            .WithIndicatorMappings(
+                new Dictionary<Guid, IndicatorMapping>
                 {
-                    originalIndicator.Id,
-                    CreateIndicatorMapping(
-                        originalIndicator,
-                        originalIndicatorGroup,
-                        replacementIndicator,
-                        replacementIndicatorGroup
-                    )
-                },
-            },
-            LocationMappings = new Dictionary<Guid, LocationMapping>
-            {
-                { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
-            },
-        };
+                    {
+                        originalIndicator.Id,
+                        CreateIndicatorMapping(
+                            originalIndicator,
+                            originalIndicatorGroup,
+                            replacementIndicator,
+                            replacementIndicatorGroup
+                        )
+                    },
+                }
+            )
+            .WithLocationMappings(
+                new Dictionary<Guid, LocationMapping>
+                {
+                    { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
+                }
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -1944,27 +1941,30 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var dataSetMapping = new DataSetMapping
-        {
-            OriginalDataFileId = originalFile.Id,
-            ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
-            {
+        var dataSetMapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile)
+            .WithIndicatorMappings(
+                new Dictionary<Guid, IndicatorMapping>
                 {
-                    originalIndicator.Id,
-                    CreateIndicatorMapping(
-                        originalIndicator,
-                        originalIndicatorGroup,
-                        replacementIndicator,
-                        replacementIndicatorGroup
-                    )
-                },
-            },
-            LocationMappings = new Dictionary<Guid, LocationMapping>
-            {
-                { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
-            },
-        };
+                    {
+                        originalIndicator.Id,
+                        CreateIndicatorMapping(
+                            originalIndicator,
+                            originalIndicatorGroup,
+                            replacementIndicator,
+                            replacementIndicatorGroup
+                        )
+                    },
+                }
+            )
+            .WithLocationMappings(
+                new Dictionary<Guid, LocationMapping>
+                {
+                    { originalLocation.Id, CreateLocationMapping(originalLocation, replacementLocation) },
+                }
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -2219,24 +2219,24 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var dataSetMapping = new DataSetMapping
-        {
-            OriginalDataFileId = originalFile.Id,
-            ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
-            {
+        var dataSetMapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile)
+            .WithIndicatorMappings(
+                new Dictionary<Guid, IndicatorMapping>
                 {
-                    originalIndicator.Id,
-                    CreateIndicatorMapping(
-                        originalIndicator,
-                        originalIndicatorGroup,
-                        replacementIndicator,
-                        replacementIndicatorGroup
-                    )
-                },
-            },
-            LocationMappings = new Dictionary<Guid, LocationMapping>(),
-        };
+                    {
+                        originalIndicator.Id,
+                        CreateIndicatorMapping(
+                            originalIndicator,
+                            originalIndicatorGroup,
+                            replacementIndicator,
+                            replacementIndicatorGroup
+                        )
+                    },
+                }
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -2451,13 +2451,10 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var dataSetMapping = new DataSetMapping
-        {
-            OriginalDataFileId = originalFile.Id,
-            ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
-            LocationMappings = new Dictionary<Guid, LocationMapping>(),
-        };
+        var dataSetMapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2656,33 +2653,33 @@ public class ReplacementServiceTests
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
-        var dataSetMapping = new DataSetMapping
-        {
-            OriginalDataFileId = originalFile.Id,
-            ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
-            {
+        var dataSetMapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile)
+            .WithIndicatorMappings(
+                new Dictionary<Guid, IndicatorMapping>
                 {
-                    originalIndicatorA.Id,
-                    CreateIndicatorMapping(
-                        originalIndicatorA,
-                        originalGroups[0],
-                        replacementIndicatorA,
-                        replacementGroups[0]
-                    )
-                },
-                {
-                    originalIndicatorB.Id,
-                    CreateIndicatorMapping(
-                        originalIndicatorB,
-                        originalGroups[0],
-                        replacementIndicatorB,
-                        replacementGroups[0]
-                    )
-                },
-            },
-            LocationMappings = new Dictionary<Guid, LocationMapping>(),
-        };
+                    {
+                        originalIndicatorA.Id,
+                        CreateIndicatorMapping(
+                            originalIndicatorA,
+                            originalGroups[0],
+                            replacementIndicatorA,
+                            replacementGroups[0]
+                        )
+                    },
+                    {
+                        originalIndicatorB.Id,
+                        CreateIndicatorMapping(
+                            originalIndicatorB,
+                            originalGroups[0],
+                            replacementIndicatorB,
+                            replacementGroups[0]
+                        )
+                    },
+                }
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();

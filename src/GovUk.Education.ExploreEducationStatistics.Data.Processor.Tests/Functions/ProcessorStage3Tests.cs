@@ -170,6 +170,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -204,6 +206,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -382,6 +385,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -416,6 +421,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -513,6 +519,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -547,6 +555,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -659,6 +668,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -693,6 +704,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -794,6 +806,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -828,6 +842,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -950,6 +965,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -984,6 +1001,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -1089,6 +1107,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1123,6 +1143,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -1200,6 +1221,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1234,6 +1257,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -1351,6 +1375,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1385,6 +1411,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 
@@ -1521,6 +1548,8 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1555,6 +1584,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 

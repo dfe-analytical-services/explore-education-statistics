@@ -16,10 +16,6 @@ public interface IDataImportService
 
     Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
 
-    Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows);
-
-    Task CreateInitialDataSetMappingIfReplacement(Guid replacementFileId);
-
     Task Update(
         Guid id,
         int? expectedImportedRows = null,
@@ -28,4 +24,6 @@ public interface IDataImportService
         int? importedRows = null,
         int? lastProcessedRowIndex = null
     );
+
+    Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows);
 }

@@ -46,13 +46,14 @@ public class FileImportServiceTests
         };
 
         var dataImportService = new Mock<IDataImportService>(Strict);
-
         dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
         dataImportService
-            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
-            .Returns(Task.CompletedTask);
-        dataImportService
             .Setup(s => s.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value))
+            .Returns(Task.CompletedTask);
+
+        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
+        dataSetMappingService
+            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
             .Returns(Task.CompletedTask);
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -70,7 +71,10 @@ public class FileImportServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var service = BuildFileImportService(dataImportService: dataImportService.Object);
+            var service = BuildFileImportService(
+                dataImportService: dataImportService.Object,
+                dataSetMappingService: dataSetMappingService.Object
+            );
             await service.CompleteImport(import, statisticsDbContext);
         }
 
@@ -243,13 +247,15 @@ public class FileImportServiceTests
         IPrivateBlobStorageService privateBlobStorageService = null,
         IImporterService importerService = null,
         ILogger<FileImportService> logger = null,
-        IDataImportService dataImportService = null
+        IDataImportService dataImportService = null,
+        IDataSetMappingService dataSetMappingService = null
     )
     {
         return new FileImportService(
             logger ?? Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
+            dataSetMappingService ?? Mock.Of<IDataSetMappingService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict)
         );
     }
