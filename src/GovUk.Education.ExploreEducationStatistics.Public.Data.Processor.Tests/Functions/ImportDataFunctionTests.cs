@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;

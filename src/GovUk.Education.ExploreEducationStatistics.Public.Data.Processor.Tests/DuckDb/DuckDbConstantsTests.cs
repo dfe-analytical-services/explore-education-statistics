@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using DuckDB.NET.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;

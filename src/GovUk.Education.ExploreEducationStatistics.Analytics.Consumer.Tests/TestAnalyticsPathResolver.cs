@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests;
