@@ -19,6 +19,7 @@
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="Azure.Search.Documents" Version="12.0.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.0.0" />
     <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="7.0.3" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.26" />
@@ -40,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Common\GovUk.Education.ExploreEducationStatistics.Analytics.Common.csproj" />
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.DuckDb\GovUk.Education.ExploreEducationStatistics.Common.DuckDb.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
