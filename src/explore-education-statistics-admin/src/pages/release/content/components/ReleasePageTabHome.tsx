@@ -20,6 +20,7 @@ import ReleaseSummaryBlockMobile from '@common/modules/release/components/Releas
 import ReleaseWarningBlock from '@common/modules/release/components/ReleaseWarningBlock';
 import getListStringSeparator from '@common/utils/string/getListStringSeparator';
 import React, { Fragment, useEffect, useMemo } from 'react';
+import ReleasePageTitleQuickLinks from './ReleasePageTitleQuickLinks';
 
 interface Props {
   transformFeaturedTableLinks?: (url: string, text: string) => void;
@@ -147,6 +148,12 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
                     <VisuallyHidden>for {release.title}</VisuallyHidden>
                   </span>
                 ) : undefined
+              }
+              quickLinks={
+                <ReleasePageTitleQuickLinks
+                  publication={publication}
+                  release={release}
+                />
               }
               renderSubscribeLink={<span>Get email alerts</span>}
             />

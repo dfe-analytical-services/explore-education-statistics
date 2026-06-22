@@ -30,8 +30,6 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
         <ReleasePageTitle
           publicationSummary={publicationSummary}
           releaseTitle={latestReleaseVersion.title}
-          releaseVersionSummary={latestReleaseVersion}
-          publishingOrganisations={latestReleaseVersion.publishingOrganisations}
         />
       }
       width="wide"

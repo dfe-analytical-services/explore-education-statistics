@@ -6,7 +6,7 @@ import React from 'react';
 import Link from '@frontend/components/Link';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import styles from '@frontend/modules/find-statistics/components/ReleasePageTitleQuickLinks.module.scss';
+import styles from '@common/modules/release/components/ReleasePageTitleQuickLinks.module.scss';
 
 interface Props {
   publicationSummary: PublicationSummary;
@@ -20,6 +20,7 @@ const ReleasePageTitleQuickLinks = ({
   showSubscriptionLink = true,
 }: Props) => {
   const { isMedia: isMobileMedia } = useMobileMedia();
+
   return (
     <div className={isMobileMedia ? '' : 'govuk-grid-column-one-third'}>
       <h2 className={styles.quickLinksHeading} id="quick-links">
@@ -30,7 +31,9 @@ const ReleasePageTitleQuickLinks = ({
         aria-labelledby="quick-links"
         data-testid="quick-links"
       >
-        <ul className="govuk-list dfe-flex dfe-flex-direction--column dfe-gap-2 govuk-!-margin-0">
+        <ul
+          className={`${styles.quickLinks} govuk-list dfe-flex dfe-flex-direction--column dfe-gap-2`}
+        >
           <li>
             <Link
               to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
