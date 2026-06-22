@@ -65,10 +65,12 @@ const ReleasePageShell: NextPage<Props> = ({
             />
 
             {!isMobileMedia && (
-              <ReleasePageTitleQuickLinks
-                publicationSummary={publicationSummary}
-                releaseVersionSummary={releaseVersionSummary}
-              />
+              <div className={styles.releasePageQuickLinks}>
+                <ReleasePageTitleQuickLinks
+                  publicationSummary={publicationSummary}
+                  releaseVersionSummary={releaseVersionSummary}
+                />
+              </div>
             )}
           </div>
         </>

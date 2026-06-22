@@ -33,10 +33,12 @@ const ReleasePageTitle = ({ publication, release }: Props) => {
       </div>
 
       {!isMobileMedia && (
-        <ReleasePageTitleQuickLinks
-          publication={publication}
-          release={release}
-        />
+        <div className={styles.releasePageQuickLinks}>
+          <ReleasePageTitleQuickLinks
+            publication={publication}
+            release={release}
+          />
+        </div>
       )}
     </div>
   );

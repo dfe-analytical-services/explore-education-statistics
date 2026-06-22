@@ -22,7 +22,7 @@ const ReleasePageTitleQuickLinks = ({
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   return (
-    <div className={isMobileMedia ? '' : 'govuk-grid-column-one-third'}>
+    <>
       <h2 className={styles.quickLinksHeading} id="quick-links">
         Quick links
       </h2>
@@ -32,7 +32,11 @@ const ReleasePageTitleQuickLinks = ({
         data-testid="quick-links"
       >
         <ul
-          className={`${styles.quickLinks} govuk-list dfe-flex dfe-flex-direction--column dfe-gap-2`}
+          className={
+            isMobileMedia
+              ? 'govuk-list govuk-list--spaced govuk-!-font-size-16 govuk-!-margin-bottom-0'
+              : 'govuk-list govuk-list--spaced'
+          }
         >
           <li>
             <Link
@@ -48,7 +52,11 @@ const ReleasePageTitleQuickLinks = ({
               Download all data (ZIP)
             </Link>
           </li>
-          <li>
+          <li
+            className={
+              showSubscriptionLink ? undefined : 'govuk-!-margin-bottom-0'
+            }
+          >
             <Link
               to={
                 releaseVersionSummary.isLatestRelease
@@ -76,7 +84,7 @@ const ReleasePageTitleQuickLinks = ({
           )}
         </ul>
       </nav>
-    </div>
+    </>
   );
 };
 

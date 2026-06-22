@@ -63,47 +63,45 @@ const ReleasePageIntro = ({
       <div
         className={classNames([styles.container, 'govuk-!-margin-bottom-5'])}
       >
-        <div className={classNames([styles.container, 'dfe-flex-grow--1'])}>
-          {!supersededByPublication && (
-            <>
-              {releaseVersionSummary.isLatestRelease ? (
-                <Tag>Latest release</Tag>
-              ) : (
-                <>
-                  <Tag colour="orange">Not the latest release</Tag>
-                  <Link
-                    className="govuk-!-display-none-print"
-                    unvisited
-                    to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}`}
-                  >
-                    View latest release: {latestRelease.title}
-                  </Link>
-                </>
-              )}
-            </>
+        {!supersededByPublication && (
+          <>
+            {releaseVersionSummary.isLatestRelease ? (
+              <Tag>Latest release</Tag>
+            ) : (
+              <>
+                <Tag colour="orange">Not the latest release</Tag>
+                <Link
+                  className="govuk-!-display-none-print"
+                  unvisited
+                  to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}`}
+                >
+                  View latest release: {latestRelease.title}
+                </Link>
+              </>
+            )}
+          </>
+        )}
+
+        {releaseVersionSummary.isLatestRelease &&
+          isValidPartialDate(nextReleaseDate) && (
+            <p className="govuk-!-margin-bottom-0">
+              Next release{' '}
+              <time
+                className="govuk-!-font-weight-bold"
+                data-testid="Next release"
+              >
+                {formatPartialDate(nextReleaseDate)}
+              </time>
+            </p>
           )}
 
-          {releaseVersionSummary.isLatestRelease &&
-            isValidPartialDate(nextReleaseDate) && (
-              <p className="govuk-!-margin-bottom-0">
-                Next release{' '}
-                <time
-                  className="govuk-!-font-weight-bold"
-                  data-testid="Next release"
-                >
-                  {formatPartialDate(nextReleaseDate)}
-                </time>
-              </p>
-            )}
-
-          <Link
-            to={`/find-statistics/${publicationSummary.slug}/releases`}
-            className="govuk-!-display-none-print"
-            prefetch={false}
-          >
-            All releases in this series
-          </Link>
-        </div>
+        <Link
+          to={`/find-statistics/${publicationSummary.slug}/releases`}
+          className="govuk-!-display-none-print"
+          prefetch={false}
+        >
+          All releases in this series
+        </Link>
       </div>
 
       {!isMobileMedia && (

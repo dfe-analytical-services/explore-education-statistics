@@ -5,15 +5,10 @@
   margin-bottom: govuk-spacing(2);
 }
 
-.quickLinks {
-  @include govuk-font-size(16);
-  margin-bottom: govuk-spacing(0);
-}
-
 @include govuk-media-query($from: tablet) {
   .quickLinksHeading {
     @include govuk-font-size(24);
-    border-top: 3px solid #1d70b8;
+    border-top: 3px solid govuk-colour('blue');
     padding-top: 1rem;
   }
 

@@ -131,11 +131,13 @@ const ReleaseHomePage = ({
               ) : undefined
             }
             quickLinks={
-              <ReleasePageTitleQuickLinks
-                publicationSummary={publicationSummary}
-                releaseVersionSummary={releaseVersionSummary}
-                showSubscriptionLink={false}
-              />
+              <div>
+                <ReleasePageTitleQuickLinks
+                  publicationSummary={publicationSummary}
+                  releaseVersionSummary={releaseVersionSummary}
+                  showSubscriptionLink={false}
+                />
+              </div>
             }
             onShowReleaseTypeModal={() =>
               logEvent({

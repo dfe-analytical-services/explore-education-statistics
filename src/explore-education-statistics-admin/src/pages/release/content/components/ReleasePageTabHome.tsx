@@ -150,10 +150,13 @@ const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
                 ) : undefined
               }
               quickLinks={
-                <ReleasePageTitleQuickLinks
-                  publication={publication}
-                  release={release}
-                />
+                <div>
+                  <ReleasePageTitleQuickLinks
+                    publication={publication}
+                    release={release}
+                    showSubscriptionLink={false}
+                  />
+                </div>
               }
               renderSubscribeLink={<span>Get email alerts</span>}
             />
