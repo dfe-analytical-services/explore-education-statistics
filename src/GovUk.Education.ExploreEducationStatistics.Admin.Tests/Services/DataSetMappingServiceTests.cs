@@ -309,6 +309,9 @@ public class DataSetMappingServiceTests
         var originalIndicator3Id = Guid.NewGuid();
         var originalIndicator4Id = Guid.NewGuid();
 
+        var replacementIndicator4Id = Guid.NewGuid();
+        var replacementIndicator5Id = Guid.NewGuid();
+
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
         {
@@ -395,7 +398,7 @@ public class DataSetMappingServiceTests
             [
                 new UnmappedIndicator
                 {
-                    Id = Guid.NewGuid(),
+                    Id = replacementIndicator4Id,
                     Label = "Replacement indicator 4 - that will be mapped to Original indicator 1",
                     ColumnName = "replacement_indicator_4",
                     GroupId = Guid.NewGuid(),
@@ -403,7 +406,7 @@ public class DataSetMappingServiceTests
                 },
                 new UnmappedIndicator
                 {
-                    Id = Guid.NewGuid(),
+                    Id = replacementIndicator5Id,
                     Label = "Replacement indicator 5 - that will be mapped to Original indicator 2",
                     ColumnName = "replacement_indicator_5",
                     GroupId = Guid.NewGuid(),
@@ -441,17 +444,9 @@ public class DataSetMappingServiceTests
                     ReplacementDataFileId = replacementDataFileId,
                     Updates =
                     [
-                        new()
-                        {
-                            OriginalColumnName = "original_indicator_1",
-                            NewReplacementColumnName = "replacement_indicator_4",
-                        },
-                        new()
-                        {
-                            OriginalColumnName = "original_indicator_2",
-                            NewReplacementColumnName = "replacement_indicator_5",
-                        },
-                        new() { OriginalColumnName = "original_indicator_3", NewReplacementColumnName = null },
+                        new() { OriginalId = originalIndicator1Id, NewReplacementId = replacementIndicator4Id },
+                        new() { OriginalId = originalIndicator2Id, NewReplacementId = replacementIndicator5Id },
+                        new() { OriginalId = originalIndicator3Id, NewReplacementId = null },
                     ],
                 },
                 CancellationToken.None
@@ -703,6 +698,8 @@ public class DataSetMappingServiceTests
 
         var originalIndicator1Id = Guid.NewGuid();
 
+        var indicatorDoesNotExistId = Guid.NewGuid();
+
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
         {
@@ -727,6 +724,7 @@ public class DataSetMappingServiceTests
                     {
                         OriginalId = originalIndicator1Id,
                         OriginalColumnName = "original_indicator_1",
+                        ReplacementId = Guid.NewGuid(),
                         ReplacementColumnName = "replacement_indicator_already_mapped",
                     }
                 },
@@ -753,7 +751,7 @@ public class DataSetMappingServiceTests
                 {
                     OriginalDataFileId = originalDataFileId,
                     ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalColumnName = "does_not_exist", NewReplacementColumnName = null }],
+                    Updates = [new() { OriginalId = indicatorDoesNotExistId, NewReplacementId = null }],
                 },
                 CancellationToken.None
             );
@@ -763,9 +761,9 @@ public class DataSetMappingServiceTests
             Assert.Single(validationProblem.Errors);
 
             validationProblem.AssertHasError(
-                expectedPath: "Updates.OriginalColumnName",
-                expectedCode: "IndicatorMatchingOriginalColumnNameNotFound",
-                expectedMessage: $"Could not find indicator mapping matching original column name \"does_not_exist\""
+                expectedPath: "Updates.OriginalId",
+                expectedCode: "IndicatorMatchingOriginalIdNotFound",
+                expectedMessage: $"Could not find indicator mapping matching original id \"{indicatorDoesNotExistId}\""
             );
         }
     }
@@ -777,6 +775,8 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
+
+        var replacementIndicatorAlreadyMappedId = Guid.NewGuid();
 
         var releaseVersion = new Content.Model.ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -802,6 +802,7 @@ public class DataSetMappingServiceTests
                     {
                         OriginalId = originalIndicator1Id,
                         OriginalColumnName = "original_indicator_1",
+                        ReplacementId = replacementIndicatorAlreadyMappedId,
                         ReplacementColumnName = "replacement_indicator_already_mapped",
                     }
                 },
@@ -832,8 +833,8 @@ public class DataSetMappingServiceTests
                     [
                         new()
                         {
-                            OriginalColumnName = "original_indicator_1",
-                            NewReplacementColumnName = "replacement_indicator_already_mapped",
+                            OriginalId = originalIndicator1Id,
+                            NewReplacementId = replacementIndicatorAlreadyMappedId,
                         },
                     ],
                 },
@@ -845,9 +846,9 @@ public class DataSetMappingServiceTests
             Assert.Single(validationProblem.Errors);
 
             validationProblem.AssertHasError(
-                expectedPath: "Updates.NewReplacementColumnName",
-                expectedCode: "UnmappedIndicatorMatchingReplacementColumnNameNotFound",
-                expectedMessage: $"No available unmapped indicator matching replacement column name \"replacement_indicator_already_mapped\""
+                expectedPath: "Updates.NewReplacementId",
+                expectedCode: "UnmappedIndicatorMatchingReplacementIdNotFound",
+                expectedMessage: $"No available unmapped indicator matching replacement id \"{replacementIndicatorAlreadyMappedId}\""
             );
         }
     }

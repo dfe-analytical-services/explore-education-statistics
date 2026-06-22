@@ -3,7 +3,7 @@ import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 @export()
 type SearchServiceRole = 'Search Index Data Contributor' | 'Search Index Data Reader' | 'Search Service Contributor'
 
-@description('Specifies the name of the Search Service.')
+@description('Specifies the name of the Azure AI Search service.')
 param searchServiceName string
 
 @description('Specifies the ids of the service principals that are being assigned the role')
@@ -27,7 +27,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 }
 
 // Create the role assignment. Note that this is dependent on the deploying service principal having
-// "Microsoft.Authorization/roleAssignments/write" permissions on the Search Service via an appropriate
+// "Microsoft.Authorization/roleAssignments/write" permissions on the Azure AI Search service via an appropriate
 // role.
 resource searchServiceRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: searchService

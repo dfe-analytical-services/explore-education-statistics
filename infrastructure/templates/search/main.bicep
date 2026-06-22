@@ -41,6 +41,9 @@ param searchServiceNLSearchDatasetIndexName string = ''
 @description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
 param searchServiceSearchIndexerName string = ''
 
+@description('Indicates whether API keys are permitted for authentication to Azure AI Search in addition to role-based access control (RBAC). Disabling API keys forces all clients to use RBAC only.')
+param searchServiceLocalAuthEnabled bool = false
+
 @description('Controls the availability of semantic ranking for all indexes. Set to \'free\' for limited query volume on the free plan, \'standard\' for unlimited volume on the standard pricing plan, or \'disabled\' to turn it off.')
 @allowed([
   'disabled'
@@ -73,14 +76,11 @@ var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
   existingResources: {
-    adminApp: '${subscription}-as-ees-admin'
     logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
-    publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
     keyVault: '${subscription}-${abbreviations.keyVaultVaults}-ees-01'
     vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
     subnets: {
-      eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
       nlSearchFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch'
       nlSearchFunctionAppPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch-pep'
       searchDocsFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
@@ -100,29 +100,6 @@ module monitoringModule 'application/monitoring.bicep' = {
   }
 }
 
-// Provision the event messaging infrastructure utilised by EES for communication between services.
-// While not exclusively part of the Search service infrastructure, it is included here to support
-// other services that publish events but are not yet defined in Bicep such as the Admin App Service
-// and the Publisher Function App.
-// The Search Service relies on this infrastructure to subscribe to events.
-module eventMessagingModule '../common/application/eventMessaging.bicep' = {
-  name: 'eventMessagingModuleDeploy'
-  params: {
-    location: location
-    resourcePrefix: resourcePrefix
-    resourceNames: {
-      adminApp: resourceNames.existingResources.adminApp
-      alertsGroup: resourceNames.existingResources.alertsGroup
-      publisherFunction: resourceNames.existingResources.publisherFunction
-      vNet: resourceNames.existingResources.vNet
-      subnets: {
-        eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
-      }
-    }
-    tagValues: tagValues
-  }
-}
-
 module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = if (deployNaturalLanguageSearchFunctionApp) {
   name: 'nlSearchFunctionAppApplicationModuleDeploy'
   params: {
@@ -130,17 +107,7 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = if (d
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     functionAppExists: naturalLanguageSearchFunctionAppExists
-    functionAppFirewallRules: union(
-      [
-        {
-          cidr: 'AzureCloud'
-          tag: 'ServiceTag'
-          priority: 101
-          name: 'AzureCloud'
-        }
-      ],
-      maintenanceFirewallRules
-    )
+    functionAppFirewallRules: []
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
@@ -192,9 +159,6 @@ module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctio
     searchDocsFunctionAppStorageAccountName: searchDocsFunctionAppModule.outputs.functionAppStorageAccountName
     storageQueueNames: searchDocsFunctionAppModule.outputs.storageQueueNames
   }
-  dependsOn: [
-    eventMessagingModule
-  ]
 }
 
 module searchServiceModule 'application/searchService.bicep' = {
@@ -203,6 +167,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
+    searchServiceLocalAuthEnabled: searchServiceLocalAuthEnabled
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     semanticRankerAvailability: searchServiceSemanticRankerAvailability
     storageIpRules: maintenanceIpRanges

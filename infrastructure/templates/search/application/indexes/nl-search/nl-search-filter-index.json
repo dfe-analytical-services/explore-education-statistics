@@ -7,7 +7,7 @@
       "name": "filterGroupId",
       "type": "Edm.String",
       "searchable": false,
-      "filterable": false,
+      "filterable": true,
       "retrievable": true,
       "stored": true,
       "sortable": false,
@@ -29,6 +29,18 @@
     },
     {
       "name": "dataSetFileId",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "subjectId",
       "type": "Edm.String",
       "searchable": false,
       "filterable": true,
@@ -66,6 +78,18 @@
     },
     {
       "name": "publicationTitle",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "releaseVersionId",
       "type": "Edm.String",
       "searchable": false,
       "filterable": true,
@@ -163,6 +187,54 @@
       "key": false,
       "dimensions": 1536,
       "vectorSearchProfile": "nl-search-filter-index-vector-profile",
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_content_encoding",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_content_type",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_storage_name",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_storage_path",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
       "synonymMaps": []
     }
   ],

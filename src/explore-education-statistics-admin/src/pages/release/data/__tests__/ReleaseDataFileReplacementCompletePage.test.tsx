@@ -1,7 +1,7 @@
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
 import {
   releaseDataFileReplacementCompleteRoute,
-  ReleaseDataFileRouteParams,
+  ReleaseDataFileReplaceRouteParams,
 } from '@admin/routes/releaseRoutes';
 import _releaseDataFileService, {
   DataSetAccoutrements,
@@ -16,7 +16,7 @@ const releaseDataFileService = _releaseDataFileService as jest.Mocked<
   typeof _releaseDataFileService
 >;
 
-describe('ReleaseDataFilePage', () => {
+describe('ReleaseDataFileReplacementCompletePage', () => {
   const testAccoutrements: DataSetAccoutrements = {
     dataBlocks: [],
     footnotes: [],
@@ -48,7 +48,7 @@ describe('ReleaseDataFilePage', () => {
 
   async function renderPage(history: MemoryHistory = createMemoryHistory()) {
     history.push(
-      generatePath<ReleaseDataFileRouteParams>(
+      generatePath<ReleaseDataFileReplaceRouteParams>(
         releaseDataFileReplacementCompleteRoute.path,
         {
           publicationId: 'publication-1',

@@ -114,7 +114,7 @@
       "value": 2147483648
     },
     "maxStatsDbSizeBytes": {
-      "value": 644245094400
+      "value": 1099511627776
     },
     "dataFactoryConcurrency": {
       "value": 10
@@ -143,7 +143,13 @@
       "value": true
     },
     "datasetsSearchIndexName": {
-      "value": "natural-language-prototype-dataset-level"
+      "value": "nl-search-dataset-index"
+    },
+    "enhancedScreenerJourney": {
+      "value": true
+    },
+    "sqlServerPublicNetworkAccess": {
+      "value": "Enabled"
     }
   }
 }

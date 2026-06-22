@@ -24,10 +24,11 @@ describe('DataFilesReplacementTableRow', () => {
     metaFileId: '',
     userName: '',
     id: 'file-1',
-    replacedBy: 'file-1-replacement',
+    replacedByDataFileId: 'file-1-replacement',
     title: 'Test File',
     status: 'COMPLETE',
     fileSize: { size: 1000, unit: 'B' },
+    replacementInProgress: false,
     permissions: { canCancelImport: false },
   };
 
@@ -40,6 +41,7 @@ describe('DataFilesReplacementTableRow', () => {
     title: 'Test File',
     status: 'COMPLETE',
     fileSize: { size: 1000, unit: 'B' },
+    replacementInProgress: false,
     permissions: { canCancelImport: false },
   };
 
@@ -58,7 +60,10 @@ describe('DataFilesReplacementTableRow', () => {
       readyToPublish: false,
     },
     valid: true,
-    mapping: { indicators: { mappings: {}, candidates: {} } },
+    mapping: {
+      indicators: { mappings: {}, candidates: {} },
+      locations: { mappings: {}, candidates: {} },
+    },
   };
 
   const defaultPermissions = {
@@ -116,10 +121,14 @@ describe('DataFilesReplacementTableRow', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).getByRole('button', { name: 'Confirm replacement' }),
+      within(cells[3]).getByRole('button', {
+        name: 'Confirm replacement for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).getByRole('button', { name: 'Cancel replacement' }),
+      within(cells[3]).getByRole('button', {
+        name: 'Cancel replacement for Test File',
+      }),
     ).toBeInTheDocument();
   });
 
@@ -266,10 +275,14 @@ describe('DataFilesReplacementTableRow', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).getByRole('button', { name: 'Confirm replacement' }),
+      within(cells[3]).getByRole('button', {
+        name: 'Confirm replacement for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).getByRole('button', { name: 'Cancel replacement' }),
+      within(cells[3]).getByRole('button', {
+        name: 'Cancel replacement for Test File',
+      }),
     ).toBeInTheDocument();
   });
 
@@ -325,10 +338,14 @@ describe('DataFilesReplacementTableRow', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
+      within(cells[3]).queryByRole('button', {
+        name: 'Confirm replacement for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
+      within(cells[3]).queryByRole('button', {
+        name: 'Cancel replacement for Test File',
+      }),
     ).toBeInTheDocument();
   });
 
@@ -384,10 +401,14 @@ describe('DataFilesReplacementTableRow', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).getByRole('button', { name: 'Confirm replacement' }),
+      within(cells[3]).getByRole('button', {
+        name: 'Confirm replacement for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
-      within(cells[3]).getByRole('button', { name: 'Cancel replacement' }),
+      within(cells[3]).getByRole('button', {
+        name: 'Cancel replacement for Test File',
+      }),
     ).toBeInTheDocument();
   });
 });

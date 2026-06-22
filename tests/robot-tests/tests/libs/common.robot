@@ -25,6 +25,7 @@ ${timeout}                          %{TIMEOUT}
 ${implicit_wait}                    %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}    0
 ${log_network_traffic}              0
+${MODAL_SELECTOR}                   css:div[role='dialog']
 
 
 *** Keywords ***

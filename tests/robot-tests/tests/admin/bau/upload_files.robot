@@ -83,13 +83,12 @@ Continue the import
     user checks table cell contains    1    4    Delete files    testid:Data files table
 
 Change data file title
-    user clicks link containing text    Edit title
-
-    user waits until h2 is visible    Edit data file details
-    user clears element text    label:Title
-    user enters text into element    label:Title    Updated ${SUBJECT_NAME}
+    user clicks button containing text    Edit title
+    user waits until modal is visible    Edit title
+    user enters text into element    id:dataFileForm-title    Updated ${SUBJECT_NAME}
 
     user clicks button    Save changes
+    user waits until modal is not visible    Edit title
 
 Validate data file title has been updated
     user waits until h2 is visible    Uploaded data files

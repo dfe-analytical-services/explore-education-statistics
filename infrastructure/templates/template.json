@@ -752,6 +752,13 @@
         "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
       }
     },
+    "enhancedScreenerJourney": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether or not Admin supports the background screening process"
+      }
+    },
     "apiAppRegistrationClientId": {
       "type": "string",
       "metadata": {
@@ -792,6 +799,17 @@
       "metadata": {
         "description": "Additional CORS allowed origins for the public"
       }
+    },
+    "sqlServerPublicNetworkAccess": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Whether or not public access is enabled for the Azure SQL database servers"
+      },
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ]
     }
   },
   "variables": {
@@ -1233,6 +1251,8 @@
     "searchDocsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
     "searchDocsFunctionAppPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
     "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
+    "sqlServerPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sqlsvr-pep')]",
+    "sqlServerPrivateEndpointsSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('sqlServerPrivateEndpointsSubnetName'))]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "eventGridCustomTopicPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-evgt-pep')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
@@ -2001,7 +2021,7 @@
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api')]",
         "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
         "DataScreener__ScreenerStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('screenerStorageAccountConnectionStringSecret'), '2018-02-14').secretUriWithVersion, ')')]",
-        "DataScreener__EnhancedScreenerJourney": false,
+        "DataScreener__EnhancedScreenerJourney": "[parameters('enhancedScreenerJourney')]",
         "DataScreener__ScreenerProgressUpdateIntervalSeconds": 5,
         "DataScreener__ScreenerProgressUpdateFailureIntervalMinutes": 1440
       }
@@ -2518,7 +2538,8 @@
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
         "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
         "version": "12.0",
-        "minimalTlsVersion": "[parameters('minTlsVersion')]"
+        "minimalTlsVersion": "[parameters('minTlsVersion')]",
+        "publicNetworkAccess": "[parameters('sqlServerPublicNetworkAccess')]"
       },
       "resources": [
         {
@@ -2753,6 +2774,7 @@
     {
       "type": "Microsoft.Sql/servers/firewallRules",
       "name": "[concat(variables('coreSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "scale": null,
       "properties": {
@@ -2768,9 +2790,9 @@
       }
     },
     {
-      "condition": "[parameters('useSubnets')]",
       "name": "[concat(variables('coreSqlServerName'), '/', variables('sqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "properties": {
         "virtualNetworkSubnetId": "[variables('sqlAllowedSubnets')[copyIndex()].id]",
@@ -2794,7 +2816,8 @@
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
         "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
         "version": "12.0",
-        "minimalTlsVersion": "[parameters('minTlsVersion')]"
+        "minimalTlsVersion": "[parameters('minTlsVersion')]",
+        "publicNetworkAccess": "[parameters('sqlServerPublicNetworkAccess')]"
       },
       "resources": [
         {
@@ -2940,6 +2963,7 @@
     {
       "type": "Microsoft.Sql/servers/firewallRules",
       "name": "[concat(variables('publicSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "scale": null,
       "properties": {
@@ -2955,9 +2979,9 @@
       }
     },
     {
-      "condition": "[parameters('useSubnets')]",
       "name": "[concat(variables('publicSqlserverName'), '/', variables('publicSqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
       "properties": {
         "virtualNetworkSubnetId": "[variables('publicSqlAllowedSubnets')[copyIndex()].id]",
@@ -2970,6 +2994,107 @@
       "copy": {
         "name": "networkRuleLoop",
         "count": "[length(variables('publicSqlAllowedSubnets'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones",
+      "apiVersion": "2024-06-01",
+      "name": "privatelink.database.windows.net",
+      "location": "global"
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2024-06-01",
+      "name": "[concat('privatelink.database.windows.net/', variables('vNetName'), '-database-vnetlink')]",
+      "location": "global",
+      "properties": {
+        "registrationEnabled": true,
+        "virtualNetwork": {
+          "id": "[variables('vNetRef')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.database.windows.net')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2025-07-01",
+      "name": "[concat(variables('coreSqlServerName'), '-pep')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "subnet": {
+          "id": "[variables('sqlServerPrivateEndpointsSubnetRef')]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "[concat(variables('coreSqlServerName'), '-pep-conn')]",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+              "groupIds": [
+                "sqlServer"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2025-07-01",
+      "name": "[concat(variables('coreSqlServerName'), '-pep', '/default')]",
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "privatelink-database-windows-net",
+            "properties": {
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.database.windows.net')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', concat(variables('coreSqlServerName'), '-pep'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2025-07-01",
+      "name": "[concat(variables('publicSqlServerName'), '-pep')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "subnet": {
+          "id": "[variables('sqlServerPrivateEndpointsSubnetRef')]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "[concat(variables('publicSqlServerName'), '-pep-conn')]",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+              "groupIds": [
+                "sqlServer"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2025-07-01",
+      "name": "[concat(variables('publicSqlServerName'), '-pep', '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', concat(variables('publicSqlServerName'), '-pep'))]"
+      ],
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "privatelink-database-windows-net",
+            "properties": {
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.database.windows.net')]"
+            }
+          }
+        ]
       }
     },
     {
@@ -4079,6 +4204,12 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[variables('sqlServerPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.23.0/24"
+            }
           }
         ]
       }
@@ -4559,6 +4690,14 @@
           },
           "workspaceResourceId": {
             "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+          },
+          "teamsPowerAutomateWebhookUrl": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+              },
+              "secretName": "ees-alerts-teamswebhookurl"
+            }
           }
         }
       },

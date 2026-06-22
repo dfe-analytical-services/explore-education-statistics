@@ -1,4 +1,5 @@
 import ContentHtml from '@common/components/ContentHtml';
+import FeedbackSection from '@common/components/FeedbackSection';
 import ContactUsSection from '@common/modules/release/components/ReleaseContactUsSection';
 import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
@@ -31,13 +32,11 @@ const ReleaseHelpPage = ({
         publicationTitle={publicationSummary.title}
         publishingOrganisations={releaseVersionSummary.publishingOrganisations}
         sectionTitle="Get help by contacting us"
-        includeSectionBreak
       />
 
       <ReleasePageContentSection
         heading={releaseTypes[releaseVersionSummary.type]}
         id="release-type-section"
-        includeSectionBreak={hasPraSummary || hasRelatedInformation}
       >
         <ReleaseTypeSection
           publishingOrganisations={
@@ -52,7 +51,6 @@ const ReleaseHelpPage = ({
         <ReleasePageContentSection
           heading="Related information"
           id="related-information-section"
-          includeSectionBreak={hasPraSummary}
         >
           <ul
             className="govuk-list govuk-list--spaced"
@@ -72,11 +70,18 @@ const ReleaseHelpPage = ({
         <ReleasePageContentSection
           heading="Pre-release access list"
           id="pre-release-access-list-section"
-          includeSectionBreak={false}
         >
           <ContentHtml html={releaseVersionSummary.preReleaseAccessList} />
         </ReleasePageContentSection>
       )}
+
+      <ReleasePageContentSection
+        heading="Provide us with feedback"
+        id="feedback-section"
+        includeSectionBreak={false}
+      >
+        <FeedbackSection />
+      </ReleasePageContentSection>
     </>
   );
 };

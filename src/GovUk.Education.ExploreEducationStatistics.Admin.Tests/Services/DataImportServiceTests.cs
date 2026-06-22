@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -141,7 +142,7 @@ public class DataImportServiceTests
         {
             var service = BuildDataImportService(contentDbContext: contentDbContext);
 
-            var result = await service.HasIncompleteImports(releaseVersion1.Id);
+            var result = await service.HasIncompleteUploadsOrImports(releaseVersion1.Id);
             Assert.False(result);
         }
     }
@@ -183,8 +184,30 @@ public class DataImportServiceTests
         {
             var service = BuildDataImportService(contentDbContext: contentDbContext);
 
-            var result = await service.HasIncompleteImports(release1.Id);
+            var result = await service.HasIncompleteUploadsOrImports(release1.Id);
             Assert.False(result);
+        }
+    }
+
+    [Fact]
+    public async Task HasUploadPendingImport_ReleaseHasIncompleteImports()
+    {
+        var releaseVersion = new ReleaseVersion();
+        var upload = new DataSetUploadMockBuilder().WithReleaseVersionId(releaseVersion.Id).BuildScreenedEntity();
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.DataSetUploads.AddAsync(upload);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildDataImportService(contentDbContext: contentDbContext);
+
+            var result = await service.HasIncompleteUploadsOrImports(releaseVersion.Id);
+            Assert.True(result);
         }
     }
 
@@ -217,7 +240,7 @@ public class DataImportServiceTests
         {
             var service = BuildDataImportService(contentDbContext: contentDbContext);
 
-            var result = await service.HasIncompleteImports(releaseVersion.Id);
+            var result = await service.HasIncompleteUploadsOrImports(releaseVersion.Id);
             Assert.True(result);
         }
     }

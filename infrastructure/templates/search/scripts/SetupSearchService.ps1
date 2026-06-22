@@ -4,7 +4,7 @@ Configures Azure AI Search index, indexer and data source resources using the Az
 
 .DESCRIPTION
 Reads the JSON definition of an index from file, injects CORS settings into it, builds indexer and data source definitions 
-based on the provided parameters, and sends REST API requests to create or update the Search service resources.
+based on the provided parameters, and sends REST API requests to create or update the Azure AI Search service resources.
 #>
 param(
     [string[]] [Parameter(Mandatory=$true)] $indexCorsAllowedOrigins,

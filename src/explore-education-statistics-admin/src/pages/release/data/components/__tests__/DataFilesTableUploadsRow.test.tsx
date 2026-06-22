@@ -27,7 +27,7 @@ describe('DataFilesTableUploadsRow', () => {
       dataFileSize: '696 B',
       metaFileName: 'one-pass.meta.csv',
       metaFileSize: '210 B',
-      status: 'PendingImport',
+      screeningStatus: 'PendingImport',
       screenerResult: {
         overallResult: 'Passed',
         passed: true,
@@ -65,7 +65,7 @@ describe('DataFilesTableUploadsRow', () => {
       dataFileSize: '696 B',
       metaFileName: 'one-pass.meta.csv',
       metaFileSize: '210 B',
-      status: 'PendingImport',
+      screeningStatus: 'PendingImport',
       screenerResult: {
         overallResult: 'Passed',
         passed: true,
@@ -103,7 +103,7 @@ describe('DataFilesTableUploadsRow', () => {
       dataFileSize: '677 Kb',
       metaFileName: 'absence-fail.meta.csv',
       metaFileSize: '2 Kb',
-      status: 'FailedScreening',
+      screeningStatus: 'FailedScreening',
       screenerResult: {
         overallResult: 'Passed',
         passed: true,
@@ -143,7 +143,7 @@ describe('DataFilesTableUploadsRow', () => {
       dataFileSize: '696 B',
       metaFileName: 'one-pass.meta.csv',
       metaFileSize: '210 B',
-      status: 'Screening',
+      screeningStatus: 'Screening',
       created: new Date('2025-06-23T13:23:08.6258337'),
       uploadedBy: 'ees-test.bau1@education.gov.uk',
     },

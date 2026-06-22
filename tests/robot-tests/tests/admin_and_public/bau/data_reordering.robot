@@ -241,7 +241,7 @@ Confirm data replacement details on replacement page
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
     user checks headed table body row cell contains    Number of rows    1    100    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    13 Kb
-    user checks headed table body row cell contains    Data file import status    1    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Data file import status    1    Replacing    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Title    2    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv

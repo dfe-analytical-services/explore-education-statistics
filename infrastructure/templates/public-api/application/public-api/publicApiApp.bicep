@@ -33,7 +33,7 @@ param appInsightsConnectionString string
 @description('Resource limits and scaling configuration.')
 param resourceAndScalingConfig ContainerAppResourceConfig
 
-@description('Configuration settings for the Search service used to search publications.')
+@description('Configuration settings for the Azure AI Search service used to search publications.')
 param searchServiceConfig SearchServiceConfig
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')

@@ -840,7 +840,7 @@ public abstract class DataSetScreenerServiceTests
 
                 results.ForEach(result =>
                 {
-                    Assert.Equal(nameof(DataSetUploadScreeningStatus.ScreenerError), result.Status);
+                    Assert.Equal(nameof(DataSetUploadScreeningStatus.ScreenerError), result.ScreeningStatus);
                     Assert.NotNull(result.ScreenerResult);
                     Assert.Equal("Failed to retrieve progress updates", result.ScreenerResult.OverallResult);
                     Assert.Empty(result.ScreenerResult.TestResults);

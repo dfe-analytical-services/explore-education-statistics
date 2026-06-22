@@ -22,6 +22,9 @@
     },
     "slackAppToken": {
       "type": "securestring"
+    },
+    "teamsPowerAutomateWebhookUrl": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -75,35 +78,207 @@
         "activities": [
           {
             "name": "Rebuild indexes",
-            "type": "SqlServerStoredProcedure",
+            "type": "IfCondition",
             "dependsOn": [],
-            "policy": {
-              "timeout": "0.06:00:00",
-              "retry": 0,
-              "retryIntervalInSeconds": 30,
-              "secureOutput": false,
-              "secureInput": false
-            },
-            "userProperties": [],
             "typeProperties": {
-              "storedProcedureName": "[[dbo].[RebuildIndexes]",
-              "storedProcedureParameters": {
-                "Tables": {
-                  "value": {
-                    "value": "@pipeline().parameters.Tables",
-                    "type": "Expression"
+              "expression": {
+                "value": "@equals(pipeline().parameters.RunMode, 'Weekend')",
+                "type": "Expression"
+              },
+              "ifTrueActivities": [
+                {
+                  "name": "Rebuild indexes - weekend",
+                  "type": "SqlServerStoredProcedure",
+                  "dependsOn": [],
+                  "policy": {
+                    "timeout": "0.23:45:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
                   },
-                  "type": "String"
+                  "userProperties": [],
+                  "typeProperties": {
+                    "storedProcedureName": "[[dbo].[RebuildIndexes]",
+                    "storedProcedureParameters": {
+                      "Tables": {
+                        "value": {
+                          "value": "@pipeline().parameters.Tables",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      }
+                    }
+                  },
+                  "linkedServiceName": {
+                    "referenceName": "ls_sql_statistics",
+                    "type": "LinkedServiceReference"
+                  }
+                },
+                {
+                  "name": "Get reason for index rebuild failure - weekend",
+                  "type": "SetVariable",
+                  "dependsOn": [
+                    {
+                      "activity": "Rebuild indexes - weekend",
+                      "dependencyConditions": [
+                        "Failed"
+                      ]
+                    }
+                  ],
+                  "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "variableName": "storedProcedureActivityFailure",
+                    "value": {
+                      "value": "@coalesce(\n  activity('Rebuild indexes - weekend').error.errorCode,\n  activity('Rebuild indexes - weekend').error.message,\n  'Unknown'\n)",
+                      "type": "Expression"
+                    }
+                  }
+                },
+                {
+                  "name": "Get index rebuild failure message - weekend",
+                  "type": "SetVariable",
+                  "dependsOn": [
+                    {
+                      "activity": "Get reason for index rebuild failure - weekend",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ],
+                  "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "variableName": "storedProcedureActivityFailureMessage",
+                    "value": {
+                      "value": "@activity('Rebuild indexes - weekend').error.message",
+                      "type": "Expression"
+                    }
+                  }
+                },
+                {
+                  "name": "Fail Rebuild indexes - weekend",
+                  "type": "Fail",
+                  "dependsOn": [
+                    {
+                      "activity": "Get index rebuild failure message - weekend",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ],
+                  "typeProperties": {
+                    "message": "Weekend Index Rebuild failed",
+                    "errorCode": "500"
+                  }
                 }
-              }
-            },
-            "linkedServiceName": {
-              "referenceName": "ls_sql_statistics",
-              "type": "LinkedServiceReference"
+              ],
+              "ifFalseActivities": [
+                {
+                  "name": "Rebuild indexes - weekday",
+                  "type": "SqlServerStoredProcedure",
+                  "dependsOn": [],
+                  "policy": {
+                    "timeout": "0.09:30:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "storedProcedureName": "[[dbo].[RebuildIndexes]",
+                    "storedProcedureParameters": {
+                      "Tables": {
+                        "value": {
+                          "value": "@pipeline().parameters.Tables",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      }
+                    }
+                  },
+                  "linkedServiceName": {
+                    "referenceName": "ls_sql_statistics",
+                    "type": "LinkedServiceReference"
+                  }
+                },
+                {
+                  "name": "Get reason for index rebuild failure - weekday",
+                  "type": "SetVariable",
+                  "dependsOn": [
+                    {
+                      "activity": "Rebuild indexes - weekday",
+                      "dependencyConditions": [
+                        "Failed"
+                      ]
+                    }
+                  ],
+                  "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "variableName": "storedProcedureActivityFailure",
+                    "value": {
+                      "value": "@coalesce(\n  activity('Rebuild indexes - weekday').error.errorCode,\n  activity('Rebuild indexes - weekday').error.message,\n  'Unknown'\n)",
+                      "type": "Expression"
+                    }
+                  }
+                },
+                {
+                  "name": "Get index rebuild failure message - weekday",
+                  "type": "SetVariable",
+                  "dependsOn": [
+                    {
+                      "activity": "Get reason for index rebuild failure - weekday",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ],
+                  "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "variableName": "storedProcedureActivityFailureMessage",
+                    "value": {
+                      "value": "@activity('Rebuild indexes - weekday').error.message",
+                      "type": "Expression"
+                    }
+                  }
+                },
+                {
+                  "name": "Fail Rebuild indexes - weekday",
+                  "type": "Fail",
+                  "dependsOn": [
+                    {
+                      "activity": "Get index rebuild failure message - weekday",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ],
+                  "typeProperties": {
+                    "message": "Weekday Index Rebuild failed",
+                    "errorCode": "500"
+                  }
+                }
+              ]
             }
           },
           {
-            "name": "Report indexes rebuilt successfully",
+            "name": "Report reindex success",
             "type": "WebActivity",
             "dependsOn": [
               {
@@ -157,26 +332,70 @@
             }
           },
           {
-            "name": "Get reason for index rebuild failure",
-            "type": "SetVariable",
+            "name": "Report reindex success to Teams",
+            "type": "WebActivity",
             "dependsOn": [
               {
                 "activity": "Rebuild indexes",
                 "dependencyConditions": [
-                  "Failed"
+                  "Succeeded"
                 ]
               }
             ],
             "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
               "secureOutput": false,
-              "secureInput": false
+              "secureInput": true
             },
             "userProperties": [],
             "typeProperties": {
-              "variableName": "storedProcedureActivityFailure",
-              "value": {
-                "value": "@coalesce(\n  activity('Rebuild indexes').error.errorCode,\n  activity('Rebuild indexes').error.message,\n  'Unknown'\n)",
-                "type": "Expression"
+              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+              "method": "POST",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "type": "message",
+                "attachments": [
+                  {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": null,
+                    "content": {
+                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                      "type": "AdaptiveCard",
+                      "version": "1.2",
+                      "body": [
+                        {
+                          "type": "TextBlock",
+                          "text": "Data Factory Success! All fragmented indexes rebuilt.",
+                          "weight": "Bolder",
+                          "size": "Medium",
+                          "color": "good",
+                          "wrap": true
+                        },
+                        {
+                          "type": "FactSet",
+                          "facts": [
+                            {
+                              "title": "Data Factory",
+                              "value": "@{pipeline().DataFactory}"
+                            },
+                            {
+                              "title": "Pipeline",
+                              "value": "@{pipeline().Pipeline}"
+                            },
+                            {
+                              "title": "Duration",
+                              "value": "@{activity('Rebuild indexes').Duration}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
               }
             }
           },
@@ -186,9 +405,9 @@
             "type": "Switch",
             "dependsOn": [
               {
-                "activity": "Get reason for index rebuild failure",
+                "activity": "Rebuild indexes",
                 "dependencyConditions": [
-                  "Succeeded"
+                  "Failed"
                 ]
               }
             ],
@@ -264,7 +483,7 @@
                       }
                     },
                     {
-                      "name": "Report timeout handled successfully",
+                      "name": "Report successful timeout",
                       "description": "Messages Slack to inform that the timeout has been handled successfully",
                       "type": "WebActivity",
                       "dependsOn": [
@@ -324,7 +543,79 @@
                       }
                     },
                     {
-                      "name": "Report error when pausing resumable index rebuilds",
+                      "name": "Report successful timeout to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Kill index reorganizes after timeout",
+                          "dependencyConditions": [
+                            "Succeeded"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory timeout handled successfully.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "good",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
+                                      },
+                                      {
+                                        "title": "Details",
+                                        "value": "Any resumable index rebuilds have been paused.\nAny reorganizations have been killed."
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Report rebuild pause error",
                       "type": "WebActivity",
                       "dependsOn": [
                         {
@@ -383,7 +674,79 @@
                       }
                     },
                     {
-                      "name": "Report error when killing index reorganizations",
+                      "name": "Report rebuild pause error to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Pause resumable index rebuilds after timeout",
+                          "dependencyConditions": [
+                            "Failed"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory failure! Problem encountered when pausing resumable index rebuilds.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "warning",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
+                                      },
+                                      {
+                                        "title": "Activity",
+                                        "value": "@{activity('Pause resumable index rebuilds after timeout').Error.message}"
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Report index reorganization kill error",
                       "type": "WebActivity",
                       "dependsOn": [
                         {
@@ -440,6 +803,78 @@
                           ]
                         }
                       }
+                    },
+                    {
+                      "name": "Report index reorganization kill error to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Kill index reorganizes after timeout",
+                          "dependencyConditions": [
+                            "Failed"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory failure! Problem encountered when killing index reorganizations.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "warning",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
+                                      },
+                                      {
+                                        "title": "Activity",
+                                        "value": "@{activity('Kill index reorganizes after timeout').Error.message}"
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
                     }
                   ]
                 }
@@ -483,7 +918,7 @@
                             },
                             {
                               "title": "Error",
-                              "value": "@{activity('Rebuild indexes').Error.message}",
+                              "value": "@variables('storedProcedureActivityFailureMessage')",
                               "short": true
                             },
                             {
@@ -492,6 +927,71 @@
                               "short": true
                             }
                           ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "Report failure to Teams",
+                  "type": "WebActivity",
+                  "dependsOn": [],
+                  "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": true
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                    "method": "POST",
+                    "headers": {
+                      "Content-Type": "application/json"
+                    },
+                    "body": {
+                      "type": "message",
+                      "attachments": [
+                        {
+                          "contentType": "application/vnd.microsoft.card.adaptive",
+                          "contentUrl": null,
+                          "content": {
+                            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                            "type": "AdaptiveCard",
+                            "version": "1.2",
+                            "body": [
+                              {
+                                "type": "TextBlock",
+                                "text": "Data Factory Failure!",
+                                "weight": "Bolder",
+                                "size": "Medium",
+                                "color": "warning",
+                                "wrap": true
+                              },
+                              {
+                                "type": "FactSet",
+                                "facts": [
+                                  {
+                                    "title": "Data Factory",
+                                    "value": "@{pipeline().DataFactory}"
+                                  },
+                                  {
+                                    "title": "Pipeline",
+                                    "value": "@{pipeline().Pipeline}"
+                                  },
+                                  {
+                                    "title": "Error",
+                                    "value": "@variables('storedProcedureActivityFailureMessage')"
+                                  },
+                                  {
+                                    "title": "Duration",
+                                    "value": "@{activity('Rebuild indexes').Duration}"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
                         }
                       ]
                     }
@@ -505,11 +1005,18 @@
           "Tables": {
             "type": "string",
             "defaultValue": "[variables('fragmentationTables')]"
+          },
+          "RunMode": {
+            "type": "string",
+            "defaultValue": "Weekday"
           }
         },
         "variables": {
           "storedProcedureActivityFailure": {
-            "type": "String"
+            "type": "string"
+          },
+          "storedProcedureActivityFailureMessage": {
+            "type": "string"
           }
         },
         "annotations": [],
@@ -597,24 +1104,96 @@
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
                 "text": "Data Factory Success!",
-                "attachments": [{
-                  "color": "good",
-                  "fields": [{
-                    "title": "Data Factory",
-                    "value": "@{pipeline().DataFactory}",
-                    "short": true
-                  },
-                    {
-                      "title": "Pipeline",
-                      "value": "@{pipeline().Pipeline}",
-                      "short": true
-                    },
-                    {
-                      "title": "Duration",
-                      "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}",
-                      "short": true
-                    }]
-                }]
+                "attachments": [
+                  {
+                    "color": "good",
+                    "fields": [
+                      {
+                        "title": "Data Factory",
+                        "value": "@{pipeline().DataFactory}",
+                        "short": true
+                      },
+                      {
+                        "title": "Pipeline",
+                        "value": "@{pipeline().Pipeline}",
+                        "short": true
+                      },
+                      {
+                        "title": "Duration",
+                        "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}",
+                        "short": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Report success to Teams",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_remove_soft_deleted_subjects",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": true
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+              "method": "POST",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "type": "message",
+                "attachments": [
+                  {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": null,
+                    "content": {
+                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                      "type": "AdaptiveCard",
+                      "version": "1.2",
+                      "body": [
+                        {
+                          "type": "TextBlock",
+                          "text": "Data Factory Success!",
+                          "weight": "Bolder",
+                          "size": "Medium",
+                          "color": "good",
+                          "wrap": true
+                        },
+                        {
+                          "type": "FactSet",
+                          "facts": [
+                            {
+                              "title": "Data Factory",
+                              "value": "@{pipeline().DataFactory}"
+                            },
+                            {
+                              "title": "Pipeline",
+                              "value": "@{pipeline().Pipeline}"
+                            },
+                            {
+                              "title": "Duration",
+                              "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
               }
             }
           },
@@ -676,6 +1255,78 @@
                 ]
               }
             }
+          },
+          {
+            "name": "Report failure to Teams",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_remove_soft_deleted_subjects",
+                "dependencyConditions": [
+                  "Failed"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": true
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+              "method": "POST",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "type": "message",
+                "attachments": [
+                  {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": null,
+                    "content": {
+                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                      "type": "AdaptiveCard",
+                      "version": "1.2",
+                      "body": [
+                        {
+                          "type": "TextBlock",
+                          "text": "Data Factory Failure!",
+                          "weight": "Bolder",
+                          "size": "Medium",
+                          "color": "warning",
+                          "wrap": true
+                        },
+                        {
+                          "type": "FactSet",
+                          "facts": [
+                            {
+                              "title": "Data Factory",
+                              "value": "@{pipeline().DataFactory}"
+                            },
+                            {
+                              "title": "Pipeline",
+                              "value": "@{pipeline().Pipeline}"
+                            },
+                            {
+                              "title": "Error",
+                              "value": "@{activity('sp_remove_soft_deleted_subjects').Error.message}"
+                            },
+                            {
+                              "title": "Duration",
+                              "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
           }
         ],
         "parameters": {
@@ -726,8 +1377,12 @@
             "startTime": "2020-11-23T19:00:00",
             "timeZone": "GMT Standard Time",
             "schedule": {
-              "hours": [19],
-              "minutes": [0]
+              "hours": [
+                19
+              ],
+              "minutes": [
+                0
+              ]
             }
           }
         }
@@ -750,20 +1405,77 @@
               "type": "PipelineReference"
             },
             "parameters": {
-              "Tables": "[variables('fragmentationTables')]"
+              "Tables": "[variables('fragmentationTables')]",
+              "RunMode": "Weekday"
             }
           }
         ],
         "type": "ScheduleTrigger",
         "typeProperties": {
           "recurrence": {
-            "frequency": "Day",
+            "frequency": "Week",
             "interval": 1,
             "startTime": "2023-03-03T02:00:00",
             "timeZone": "GMT Standard Time",
             "schedule": {
-              "hours": [2],
-              "minutes": [0]
+              "hours": [
+                22
+              ],
+              "minutes": [
+                30
+              ],
+              "weekDays": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ]
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/pipelines/pl_rebuild_statistics_indexes')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/rebuild_indexes_weekend_trigger')]",
+      "type": "Microsoft.DataFactory/factories/triggers",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "annotations": [],
+        "runtimeState": "Stopped",
+        "pipelines": [
+          {
+            "pipelineReference": {
+              "referenceName": "pl_rebuild_statistics_indexes",
+              "type": "PipelineReference"
+            },
+            "parameters": {
+              "Tables": "[variables('fragmentationTables')]",
+              "RunMode": "Weekend"
+            }
+          }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+          "recurrence": {
+            "frequency": "Week",
+            "interval": 1,
+            "startTime": "2023-03-03T02:00:00",
+            "timeZone": "GMT Standard Time",
+            "schedule": {
+              "hours": [
+                22
+              ],
+              "minutes": [
+                30
+              ],
+              "weekDays": [
+                "Friday",
+                "Saturday"
+              ]
             }
           }
         }

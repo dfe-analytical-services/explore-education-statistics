@@ -847,16 +847,16 @@ public class SeedDataCommand : ICommand
                     ];
 
                     return $"""
-                    LEFT JOIN {LocationOptionsTable.TableName} AS {LocationOptionsTable.Alias(location)}
-                    ON {conditions.JoinToString(" AND ")}
-                    """;
+                        LEFT JOIN {LocationOptionsTable.TableName} AS {LocationOptionsTable.Alias(location)}
+                        ON {conditions.JoinToString(" AND ")}
+                        """;
                 }),
                 .. version.FilterMetas.Select(filter =>
                     $"""
-                    LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
-                    ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'
-                    AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.Column)}
-                    """
+                        LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
+                        ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'
+                        AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.Column)}
+                        """
                 ),
                 $"""
                     JOIN {TimePeriodsTable.TableName}

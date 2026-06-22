@@ -201,7 +201,7 @@ public class DataSetMappingService(
                                 == originalLocation.ToLocationAttribute().GetCodeOrFallback()
                         )
                         .ToList();
-                    replacementLocation = candidateReplacements.SingleOrDefault();
+                    replacementLocation = candidateReplacements.Count == 1 ? candidateReplacements[0] : null;
                 }
 
                 return new LocationMapping
@@ -254,7 +254,7 @@ public class DataSetMappingService(
             {
                 var updatedMappings = request
                     .Updates.Select(update =>
-                        UpdateIndicatorMapping(mapping, update.OriginalColumnName, update.NewReplacementColumnName)
+                        UpdateIndicatorMapping(mapping, update.OriginalId, update.NewReplacementId)
                     )
                     .ToList(); // cannot be async!
 
@@ -269,12 +269,12 @@ public class DataSetMappingService(
 
     private Either<ActionResult, IndicatorMapping> UpdateIndicatorMapping(
         DataSetMapping dataSetMapping,
-        string originalColumnName,
-        string? newReplacementColumnName = null
+        Guid originalId,
+        Guid? newReplacementId = null
     )
     {
         var indicatorMapping = dataSetMapping.IndicatorMappings.Values.SingleOrDefault(map =>
-            map.OriginalColumnName == originalColumnName
+            map.OriginalId == originalId
         );
         if (indicatorMapping == null)
         {
@@ -282,36 +282,31 @@ public class DataSetMappingService(
                 new ErrorViewModel
                 {
                     Path =
-                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.OriginalColumnName)}",
-                    Code = "IndicatorMatchingOriginalColumnNameNotFound",
-                    Message =
-                        $"Could not find indicator mapping matching original column name \"{originalColumnName}\"",
+                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.OriginalId)}",
+                    Code = "IndicatorMatchingOriginalIdNotFound",
+                    Message = $"Could not find indicator mapping matching original id \"{originalId}\"",
                 }
             );
         }
 
-        if (
-            indicatorMapping.ReplacementColumnName == newReplacementColumnName
-            && indicatorMapping.Status == MapStatus.ManuallySet
-        )
+        if (indicatorMapping.ReplacementId == newReplacementId && indicatorMapping.Status == MapStatus.ManuallySet)
         {
             return indicatorMapping; // it is already mapped, so can skip
         }
 
         var availableUnmappedIndicator = dataSetMapping.UnmappedReplacementIndicators.SingleOrDefault(
-            unmappedIndicator => unmappedIndicator.ColumnName == newReplacementColumnName
+            unmappedIndicator => unmappedIndicator.Id == newReplacementId
         );
 
-        if (newReplacementColumnName != null && availableUnmappedIndicator == null)
+        if (newReplacementId != null && availableUnmappedIndicator == null)
         {
             return ValidationResult(
                 new ErrorViewModel
                 {
                     Path =
-                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.NewReplacementColumnName)}",
-                    Code = "UnmappedIndicatorMatchingReplacementColumnNameNotFound",
-                    Message =
-                        $"No available unmapped indicator matching replacement column name \"{newReplacementColumnName}\"",
+                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(IndicatorMappingUpdateRequest.NewReplacementId)}",
+                    Code = "UnmappedIndicatorMatchingReplacementIdNotFound",
+                    Message = $"No available unmapped indicator matching replacement id \"{newReplacementId}\"",
                 }
             );
         }
@@ -323,10 +318,7 @@ public class DataSetMappingService(
             contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementIndicators).IsModified = true;
         }
 
-        if (
-            indicatorMapping.ReplacementId != null
-            && indicatorMapping.ReplacementColumnName != newReplacementColumnName
-        )
+        if (indicatorMapping.ReplacementId != null && indicatorMapping.ReplacementId != newReplacementId)
         {
             // We need to move the preexisting mapped indicator into UnmappedReplacementIndicators, as it will be overwritten
             var newlyUnmappedIndicator = new UnmappedIndicator
@@ -434,7 +426,7 @@ public class DataSetMappingService(
         if (
             newReplacementLocationId != null
             && availableUnmappedLocation != null
-            && availableUnmappedLocation!.GeographicLevel != locationMapping.OriginalGeographicLevel
+            && availableUnmappedLocation.GeographicLevel != locationMapping.OriginalGeographicLevel
         )
         {
             return ValidationResult(

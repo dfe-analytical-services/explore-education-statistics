@@ -6,24 +6,22 @@ import ImporterStatus, {
 } from '@admin/pages/release/data/components/ImporterStatus';
 import {
   releaseApiDataSetDetailsRoute,
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
   ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import {
   DataFile,
   DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
+import DataFilesTableRowReplaceModal from '@admin/pages/release/data/components/DataFilesTableRowReplaceModal';
+import DataFilesTableRowDeleteModal from '@admin/pages/release/data/components/DataFilesTableRowDeleteModal';
+import DataFilesTableRowEditTitleModal from '@admin/pages/release/data/components/DataFilesTableRowEditTitleModal';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import { generatePath } from 'react-router';
 import styles from './DataFilesTable.module.scss';
-import DeleteDataFileModal from './DeleteDataFileModal';
-import DataFileUploadForm from './DataFileUploadForm';
 
 interface Props {
   canUpdateRelease?: boolean;
@@ -31,6 +29,7 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmDelete: (deletedFileId: string) => void;
+  onEditFile: () => void;
   onReplaceFile: () => void;
   onStatusChange: (
     dataFile: DataFile,
@@ -43,11 +42,11 @@ export default function DataFilesTableRow({
   dataFile,
   publicationId,
   releaseVersionId,
+  onEditFile,
   onReplaceFile,
   onConfirmDelete,
   onStatusChange,
 }: Props) {
-  const [showReplacementModal, toggleReplacementModal] = useToggle(false);
   return (
     <tr key={dataFile.title}>
       <td data-testid={`${dataFile.title}-title`} className={styles.title}>
@@ -88,40 +87,18 @@ export default function DataFilesTableRow({
               <>
                 {dataFile.status === 'COMPLETE' && (
                   <>
-                    <Link
-                      to={generatePath<ReleaseDataFileRouteParams>(
-                        releaseDataFileRoute.path,
-                        {
-                          publicationId,
-                          releaseVersionId,
-                          fileId: dataFile.id,
-                        },
-                      )}
-                    >
-                      Edit title
-                      <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
-                    </Link>
-                    <Modal
-                      open={showReplacementModal}
-                      title="Replace data"
-                      triggerButton={
-                        <ButtonText onClick={toggleReplacementModal.on}>
-                          Replace data
-                          <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
-                        </ButtonText>
-                      }
-                    >
-                      <DataFileUploadForm
-                        isDataReplacement
-                        releaseVersionId={releaseVersionId}
-                        dataFileTitle={dataFile.title}
-                        onCancel={toggleReplacementModal.off}
-                        onSubmit={() => {
-                          toggleReplacementModal.off();
-                          onReplaceFile();
-                        }}
-                      />
-                    </Modal>
+                    <DataFilesTableRowEditTitleModal
+                      releaseVersionId={releaseVersionId}
+                      dataFileId={dataFile.id}
+                      dataFileTitle={dataFile.title}
+                      onConfirm={onEditFile}
+                    />
+                    <DataFilesTableRowReplaceModal
+                      releaseVersionId={releaseVersionId}
+                      dataFileId={dataFile.id}
+                      dataFileTitle={dataFile.title}
+                      onReplaceFile={onReplaceFile}
+                    />
                   </>
                 )}
                 {dataFile.publicApiDataSetId ? (
@@ -155,8 +132,9 @@ export default function DataFilesTableRow({
                     </p>
                   </Modal>
                 ) : (
-                  <DeleteDataFileModal
-                    dataFile={dataFile}
+                  <DataFilesTableRowDeleteModal
+                    dataFileId={dataFile.id}
+                    dataFileTitle={dataFile.title}
                     releaseVersionId={releaseVersionId}
                     onConfirm={() => onConfirmDelete(dataFile.id)}
                   />

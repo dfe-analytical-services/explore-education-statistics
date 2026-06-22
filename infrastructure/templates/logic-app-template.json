@@ -19,6 +19,9 @@
     },
     "workspaceResourceId": {
       "type": "string"
+    },
+    "teamsPowerAutomateWebhookUrl": {
+      "type": "securestring"
     }
   },
   "resources": [
@@ -31,12 +34,16 @@
         "state": "Enabled",
         "parameters": {
           "subscription": {
-              "type": "String",
-              "value": "[parameters('subscription')]"
+            "type": "String",
+            "value": "[parameters('subscription')]"
           },
           "resourceGroup": {
-              "type": "String",
-              "value": "[parameters('resourceGroup')]"
+            "type": "String",
+            "value": "[parameters('resourceGroup')]"
+          },
+          "teamsPowerAutomateWebhookUrl": {
+            "type": "SecureString",
+            "value": "[parameters('teamsPowerAutomateWebhookUrl')]"
           }
         },
         "definition": {
@@ -44,8 +51,8 @@
           "contentVersion": "1.0.0.0",
           "parameters": {
             "$connections": {
-                 "type": "Object",
-                "defaultValue": {}
+              "type": "Object",
+              "defaultValue": {}
             },
             "subscription": {
               "type": "string",
@@ -54,6 +61,9 @@
             "resourceGroup": {
               "type": "string",
               "defaultValue": ""
+            },
+            "teamsPowerAutomateWebhookUrl": {
+              "type": "securestring"
             }
           },
           "triggers": {
@@ -121,7 +131,7 @@
                             "alertTargetIDs": {
                               "type": "array",
                               "items": {
-                                  "type": "string"
+                                "type": "string"
                               }
                             },
                             "originAlertId": {
@@ -392,9 +402,9 @@
                             "short": true
                           },
                           {
-                              "title": "Window end",
-                              "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
-                              "short": true
+                            "title": "Window end",
+                            "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+                            "short": true
                           }
                         ]
                       }
@@ -406,6 +416,108 @@
                   }
                 },
                 "unsubscribe": {}
+              }
+            },
+            "Initialize alertRuleUrl variable": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "alertRuleUrl",
+                    "type": "string",
+                    "value": "@{concat('https://portal.azure.com.mcas.ms/#@platform.education.gov.uk/resource', first(split(triggerBody()?['data']?['essentials']?['alertTargetIDs'][0], '/providers/')), '/providers/microsoft.insights/metricAlerts/', triggerBody()?['data']?['essentials']?['alertRule'], '/overview')}"
+                  }
+                ]
+              },
+              "runAfter": {
+                "Initialize severity variable": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "HTTP_Teams": {
+              "type": "Http",
+              "inputs": {
+                "uri": "@parameters('teamsPowerAutomateWebhookUrl')",
+                "method": "POST",
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "body": {
+                  "type": "message",
+                  "attachments": [
+                    {
+                      "contentType": "application/vnd.microsoft.card.adaptive",
+                      "contentUrl": null,
+                      "content": {
+                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type": "AdaptiveCard",
+                        "version": "1.2",
+                        "body": [
+                          {
+                            "type": "TextBlock",
+                            "text": "@{concat('Alert ', triggerBody()?['data']?['essentials']?['alertRule'], ' ', toLower(variables('monitorCondition')), if(equals(variables('monitorCondition'), 'Resolved'), '', '!'))}",
+                            "weight": "Bolder",
+                            "size": "Medium",
+                            "color": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'good', if(or(equals(variables('severity'), 'Sev0'), equals(variables('severity'), 'Sev1')), 'attention', if(equals(variables('severity'), 'Sev2'), 'warning', 'good')))}"
+                          },
+                          {
+                            "type": "TextBlock",
+                            "text": "@{if(equals(variables('monitorCondition'), 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(variables('monitorCondition'), 'Resolved'), variables('withinThresholdMessage'), variables('outsideThresholdMessage'))}\n[Link to alert](@{variables('alertRuleUrl')})\n[Link to resource](https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]})",
+                            "wrap": true
+                          },
+                          {
+                            "type": "FactSet",
+                            "facts": [
+                              {
+                                "title": "Alert",
+                                "value": "@{triggerBody()?['data']?['essentials']?['alertRule']}"
+                              },
+                              {
+                                "title": "Severity",
+                                "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'Resolved', variables('severityDisplay'))}"
+                              },
+                              {
+                                "title": "@{variables('monitorCondition')} at",
+                                "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}"
+                              },
+                              {
+                                "title": "Window Start",
+                                "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'dd/MM/yyyy h:mm:sstt'))}"
+                              },
+                              {
+                                "title": "Window End",
+                                "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "runAfter": {
+                "Initialize monitorCondition variable": [
+                  "Succeeded"
+                ],
+                "Initialize severityDisplay variable": [
+                  "Succeeded"
+                ],
+                "Initialize withinThresholdMessage variable": [
+                  "Succeeded"
+                ],
+                "Initialize outsideThresholdMessage variable": [
+                  "Succeeded"
+                ],
+                "Initialize alertRuleUrl variable": [
+                  "Succeeded"
+                ]
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
               }
             }
           },
@@ -424,14 +536,14 @@
       "properties": {
         "logs": [
           {
-              "category": "WorkflowRuntime",
-              "enabled": true
+            "category": "WorkflowRuntime",
+            "enabled": true
           }
         ],
         "metrics": [
           {
-              "category": "AllMetrics",
-              "enabled": true
+            "category": "AllMetrics",
+            "enabled": true
           }
         ],
         "workspaceId": "[parameters('workspaceResourceId')]",

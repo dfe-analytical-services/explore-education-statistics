@@ -14,6 +14,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 const getImportStatusLabel = (
   statusCode: ImportStatusCode,
+  replacementInProgress: boolean,
 ): string | undefined => {
   switch (statusCode) {
     case 'NOT_FOUND':
@@ -27,7 +28,7 @@ const getImportStatusLabel = (
     case 'STAGE_3':
       return 'Importing';
     case 'COMPLETE':
-      return 'Complete';
+      return replacementInProgress ? 'Replacing' : 'Complete';
     case 'FAILED':
       return 'Failed';
     case 'CANCELLING':
@@ -41,6 +42,7 @@ const getImportStatusLabel = (
 
 const getImportStatusColour = (
   statusCode: ImportStatusCode,
+  replacementInProgress: boolean,
 ): TagProps['colour'] => {
   switch (statusCode) {
     case 'NOT_FOUND':
@@ -51,7 +53,7 @@ const getImportStatusColour = (
     case 'CANCELLING':
       return 'orange';
     case 'COMPLETE':
-      return 'green';
+      return replacementInProgress ? 'blue' : 'green';
     case 'FAILED':
     case 'CANCELLED':
       return 'red';
@@ -131,8 +133,16 @@ const ImporterStatus = ({
   return (
     <div className={className}>
       <div className="dfe-flex dfe-align-items--center">
-        <Tag colour={getImportStatusColour(currentStatus.status)}>
-          {getImportStatusLabel(currentStatus.status)}
+        <Tag
+          colour={getImportStatusColour(
+            currentStatus.status,
+            dataFile.replacementInProgress,
+          )}
+        >
+          {getImportStatusLabel(
+            currentStatus.status,
+            dataFile.replacementInProgress,
+          )}
         </Tag>
 
         {!hasTerminalStatus && (

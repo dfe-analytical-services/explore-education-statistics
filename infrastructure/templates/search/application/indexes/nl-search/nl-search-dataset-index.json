@@ -7,7 +7,7 @@
       "name": "fileId",
       "type": "Edm.String",
       "searchable": false,
-      "filterable": false,
+      "filterable": true,
       "retrievable": true,
       "stored": true,
       "sortable": false,
@@ -19,7 +19,19 @@
       "name": "dataSetFileId",
       "type": "Edm.String",
       "searchable": false,
-      "filterable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "subjectId",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": true,
       "retrievable": true,
       "stored": true,
       "sortable": false,
@@ -43,7 +55,7 @@
       "name": "fileSize",
       "type": "Edm.String",
       "searchable": false,
-      "filterable": true,
+      "filterable": false,
       "retrievable": true,
       "stored": true,
       "sortable": false,
@@ -55,7 +67,7 @@
       "name": "fileExtension",
       "type": "Edm.String",
       "searchable": false,
-      "filterable": true,
+      "filterable": false,
       "retrievable": true,
       "stored": true,
       "sortable": false,
@@ -153,6 +165,18 @@
     },
     {
       "name": "releaseId",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "releaseVersionId",
       "type": "Edm.String",
       "searchable": false,
       "filterable": true,
@@ -368,6 +392,54 @@
       "key": false,
       "analyzer": "standard.lucene",
       "synonymMaps": []
+    },
+    {
+      "name": "metadata_content_encoding",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_content_type",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_storage_name",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "metadata_storage_path",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": false,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
     }
   ],
   "scoringProfiles": [],
@@ -378,11 +450,7 @@
     {
       "name": "nl-search-dataset-suggester",
       "searchMode": "analyzingInfixMatching",
-      "sourceFields": [
-        "dataSetFileId",
-        "title",
-        "content"
-      ]
+      "sourceFields": ["dataSetFileId", "title", "content"]
     }
   ],
   "tokenFilters": [],

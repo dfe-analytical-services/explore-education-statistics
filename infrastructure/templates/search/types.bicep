@@ -1,14 +1,11 @@
 @export()
 type ResourceNames = {
   existingResources: {
-    adminApp: string
     logAnalyticsWorkspace: string
-    publisherFunction: string
     keyVault: string
     vNet: string
     alertsGroup: string
     subnets: {
-      eventGridCustomTopicPrivateEndpoints: string
       nlSearchFunctionApp: string
       nlSearchFunctionAppPrivateEndpoints: string
       searchDocsFunctionApp: string

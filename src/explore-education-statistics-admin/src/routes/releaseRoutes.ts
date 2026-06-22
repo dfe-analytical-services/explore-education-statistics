@@ -8,7 +8,6 @@ import ReleaseApiDataSetPreviewTokenLogPage from '@admin/pages/release/data/Rele
 import ReleaseApiDataSetVersionHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetVersionHistoryPage';
 import ReleaseApiDataSetChangelogPage from '@admin/pages/release/data/ReleaseApiDataSetChangelogPage';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
-import ReleaseDataFilePage from '@admin/pages/release/data/ReleaseDataFilePage';
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
 import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
@@ -35,10 +34,6 @@ export type ReleaseRouteParams = {
 
 export type ReleaseDataBlockRouteParams = ReleaseRouteParams & {
   dataBlockId: string;
-};
-
-export type ReleaseDataFileRouteParams = ReleaseRouteParams & {
-  fileId: string;
 };
 
 export type ReleaseAncillaryFileRouteParams = ReleaseRouteParams & {
@@ -99,12 +94,6 @@ export const releaseAncillaryFileRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/ancillary/:fileId',
   title: 'Ancillary file',
   component: ReleaseAncillaryFilePage,
-};
-
-export const releaseDataFileRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data/:fileId',
-  title: 'Data file',
-  component: ReleaseDataFilePage,
 };
 
 export const releaseDataFileReplaceRoute: ReleaseRouteProps = {

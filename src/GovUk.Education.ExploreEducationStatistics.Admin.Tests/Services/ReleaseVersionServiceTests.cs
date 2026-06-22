@@ -369,197 +369,24 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
-        public async Task ReplacementExists()
+        public async Task RemoveDataFiles_ImportInProgress_ReturnsExpectedValidationError()
         {
             ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
 
             Subject subject = _dataFixture.DefaultSubject();
 
-            Subject replacementSubject = _dataFixture.DefaultSubject();
-
             File file = _dataFixture.DefaultFile().WithSubjectId(subject.Id).WithType(FileType.Data);
-
-            File replacementFile = _dataFixture
-                .DefaultFile()
-                .WithSubjectId(replacementSubject.Id)
-                .WithType(FileType.Data)
-                .WithReplacing(file);
-
-            file.ReplacedBy = replacementFile;
 
             ReleaseFile releaseFile = _dataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFile(file);
-
-            ReleaseFile replacementReleaseFile = _dataFixture
-                .DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(replacementFile);
-
-            DataSetMapping mapping = new DataSetMapping
-            {
-                OriginalDataFileId = file.Id,
-                ReplacementDataFileId = replacementFile.Id,
-            };
-
-            DataSetMapping unrelatedMapping = new DataSetMapping
-            {
-                OriginalDataFileId = Guid.NewGuid(),
-                ReplacementDataFileId = Guid.NewGuid(),
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
-                contentDbContext.DataSetMappings.AddRange(mapping, unrelatedMapping);
-                await contentDbContext.SaveChangesAsync();
-
-                statisticsDbContext.Subject.AddRange(subject, replacementSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
-            var dataBlockService = new Mock<IDataBlockService>(Strict);
-            var dataImportService = new Mock<IDataImportService>(Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
-            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
-
-            privateCacheService
-                .Setup(service =>
-                    service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id))
-                )
-                .Returns(Task.CompletedTask);
-            privateCacheService
-                .Setup(service =>
-                    service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, replacementSubject.Id))
-                )
-                .Returns(Task.CompletedTask);
-
-            dataBlockService
-                .Setup(service =>
-                    service.GetDeletePlan(
-                        releaseVersion.Id,
-                        It.Is<Subject>(s => new[] { subject.Id, replacementSubject.Id }.Contains(s.Id))
-                    )
-                )
-                .ReturnsAsync(new DeleteDataBlockPlanViewModel());
-
-            dataBlockService
-                .Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
-                .ReturnsAsync(Unit.Instance);
-
-            dataImportService
-                .Setup(service => service.GetImport(It.IsIn(file.Id, replacementFile.Id)))
-                .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
-
-            footnoteRepository
-                .Setup(service => service.GetFootnotes(releaseVersion.Id, It.IsIn(subject.Id, replacementSubject.Id)))
-                .ReturnsAsync([]);
-
-            releaseDataFileService
-                .Setup(service => service.Delete(releaseVersion.Id, It.IsIn(file.Id, replacementFile.Id), false))
-                .ReturnsAsync(Unit.Instance);
-
-            releaseSubjectRepository
-                .Setup(service =>
-                    service.DeleteReleaseSubject(releaseVersion.Id, It.IsIn(subject.Id, replacementSubject.Id), true)
-                )
-                .Returns(Task.CompletedTask);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var releaseVersionService = BuildService(
-                    context,
-                    statisticsDbContext,
-                    privateCacheService: privateCacheService.Object,
-                    dataBlockService: dataBlockService.Object,
-                    dataImportService: dataImportService.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    releaseDataFileService: releaseDataFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object
-                );
-
-                var result = await releaseVersionService.RemoveDataFiles(
-                    releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id
-                );
-
-                VerifyAllMocks(
-                    privateCacheService,
-                    dataBlockService,
-                    dataImportService,
-                    footnoteRepository,
-                    releaseDataFileService,
-                    releaseSubjectRepository
-                );
-
-                dataBlockService.Verify(
-                    mock => mock.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()),
-                    Times.Exactly(2)
-                );
-
-                releaseDataFileService.Verify(
-                    mock => mock.Delete(releaseVersion.Id, It.IsIn(file.Id, replacementFile.Id), false),
-                    Times.Exactly(2)
-                );
-
-                releaseSubjectRepository.Verify(
-                    mock =>
-                        mock.DeleteReleaseSubject(releaseVersion.Id, It.IsIn(subject.Id, replacementSubject.Id), true),
-                    Times.Exactly(2)
-                );
-
-                result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                // Check the related DataSetMapping has been removed - the unrelated mapping should remain
-                var dbUnrelatedMapping = Assert.Single(context.DataSetMappings.ToList());
-                Assert.Equal(unrelatedMapping.OriginalDataFileId, dbUnrelatedMapping.OriginalDataFileId);
-            }
-        }
-
-        [Fact]
-        public async Task ReplacementFileImporting()
-        {
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
-
-            Subject subject = _dataFixture.DefaultSubject();
-
-            Subject replacementSubject = _dataFixture.DefaultSubject();
-
-            File file = _dataFixture.DefaultFile().WithSubjectId(subject.Id).WithType(FileType.Data);
-
-            File replacementFile = _dataFixture
-                .DefaultFile()
-                .WithSubjectId(replacementSubject.Id)
-                .WithType(FileType.Data)
-                .WithReplacing(file);
-
-            file.ReplacedBy = replacementFile;
-
-            ReleaseFile releaseFile = _dataFixture
-                .DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(file);
-
-            ReleaseFile replacementReleaseFile = _dataFixture
-                .DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion)
-                .WithFile(replacementFile);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(releaseFile, replacementReleaseFile);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -567,9 +394,6 @@ public abstract class ReleaseVersionServiceTests
 
             dataImportService
                 .Setup(service => service.GetImport(file.Id))
-                .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
-            dataImportService
-                .Setup(service => service.GetImport(replacementFile.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.STAGE_1 });
 
             await using var context = InMemoryApplicationDbContext(contentDbContextId);
@@ -621,7 +445,7 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
-        public async Task FileLinkedToPublicApiDataSetAndIsReplaced_ValidationProblem()
+        public async Task FileIsOriginalButAttemptedToCancelReplacement_ValidationProblem()
         {
             var contextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
@@ -633,7 +457,6 @@ public abstract class ReleaseVersionServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 replacedById: Guid.NewGuid(),
-                replacingId: null,
                 releaseVersionPublished: false
             );
 
@@ -651,7 +474,7 @@ public abstract class ReleaseVersionServiceTests
 
             validationProblem.AssertHasError(
                 expectedPath: null,
-                expectedCode: ValidationMessages.ReleaseFileMustBeOriginal.Code
+                expectedCode: ValidationMessages.CannotDeleteOriginalFileOfOngoingReplacement.Code
             );
         }
 

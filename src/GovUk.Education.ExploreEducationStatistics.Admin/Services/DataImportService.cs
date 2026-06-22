@@ -47,13 +47,19 @@ public class DataImportService(
         await dataImportRepository.DeleteByFileId(fileId);
     }
 
-    public async Task<bool> HasIncompleteImports(Guid releaseVersionId)
+    public async Task<bool> HasIncompleteUploadsOrImports(Guid releaseVersionId)
     {
-        return await contentDbContext
+        var hasAnyUploads = await contentDbContext
+            .DataSetUploads.AsQueryable()
+            .AnyAsync(dsu => dsu.ReleaseVersionId == releaseVersionId);
+
+        var hasAnyIncompleteImports = await contentDbContext
             .ReleaseFiles.AsQueryable()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Join(contentDbContext.DataImports, rf => rf.FileId, i => i.FileId, (file, import) => import)
             .AnyAsync(import => import.Status != DataImportStatus.COMPLETE);
+
+        return hasAnyUploads || hasAnyIncompleteImports;
     }
 
     public async Task<DataImportStatusViewModel> GetImportStatus(Guid fileId)

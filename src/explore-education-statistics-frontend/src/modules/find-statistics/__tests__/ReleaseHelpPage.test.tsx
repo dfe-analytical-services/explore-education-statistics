@@ -61,6 +61,10 @@ describe('ReleaseHelpPage', () => {
     const relatedInfoList = screen.getByTestId('related-information-list');
     const listItems = within(relatedInfoList).getAllByRole('listitem');
     expect(listItems).toHaveLength(2);
+
+    expect(
+      screen.getByRole('link', { name: 'feedback form (opens in new tab)' }),
+    ).toBeInTheDocument();
   });
 
   test('does not render related info section if no links', () => {

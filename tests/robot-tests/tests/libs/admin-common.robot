@@ -1024,5 +1024,6 @@ user checks pre-release access list on help and related information tab
     [Arguments]    @{access_list_content}
     user clicks link    Help and related information
     user waits until h2 is visible    Pre-release access list
+    user waits for caches to expire
     user checks section with ID contains elements and back to top link    pre-release-access-list-section
     ...    @{access_list_content}
