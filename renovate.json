@@ -53,13 +53,6 @@
       "schedule": ["every 3 months"]
     },
     {
-      "description": "Disable Swashbuckle.AspNetCore.* packages which requires Microsoft.OpenApi / .NET 10 update",
-      "matchDatasources": ["nuget"],
-      "matchPackageNames": ["Swashbuckle.AspNetCore","Swashbuckle.AspNetCore.Annotations", "Swashbuckle.AspNetCore.Cli", "Swashbuckle.AspNetCore.SwaggerGen"],
-      "matchCurrentVersion": "9.0.6",
-      "enabled": false
-    },
-    {
       "description": "Disable DuckDB.NET.Data.Full and InterpolatedSql.Dapper related to issue EES-6079",
       "matchDatasources": ["nuget"],
       "matchPackageNames": ["DuckDB.NET.Data.Full", "InterpolatedSql.Dapper"],

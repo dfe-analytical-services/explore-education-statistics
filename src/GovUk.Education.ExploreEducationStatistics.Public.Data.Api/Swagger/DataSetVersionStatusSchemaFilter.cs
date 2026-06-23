@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -19,7 +18,7 @@ public class DataSetVersionStatusSchemaFilter : ISchemaFilter
     {
         if (context.MemberInfo == null && context.Type == typeof(DataSetVersionStatus))
         {
-            schema.Type = "string";
+            schema.Type = JsonSchemaType.String;
 
             schema.Enum = EnumUtil
                 .GetEnums<DataSetVersionStatus>()

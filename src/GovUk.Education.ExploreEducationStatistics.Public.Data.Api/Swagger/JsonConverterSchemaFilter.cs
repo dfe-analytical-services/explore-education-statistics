@@ -4,8 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -100,14 +99,14 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         {
             hasEnumConverter = true;
 
-            propertySchema.Type = "string";
+            propertySchema.Type = JsonSchemaType.String;
             propertySchema.Enum = Enum.GetNames(enumType).Select(name => new OpenApiString(name)).ToList<IOpenApiAny>();
         }
         else if (converterBaseType == typeof(EnumToEnumLabelJsonConverter<>))
         {
             hasEnumConverter = true;
 
-            propertySchema.Type = "string";
+            propertySchema.Type = JsonSchemaType.String;
             propertySchema.Enum = Enum.GetValues(enumType)
                 .Cast<Enum>()
                 .Select(name => new OpenApiString(name.GetEnumLabel()))
@@ -117,7 +116,7 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         {
             hasEnumConverter = true;
 
-            propertySchema.Type = "string";
+            propertySchema.Type = JsonSchemaType.String;
             propertySchema.Enum = Enum.GetValues(enumType)
                 .Cast<Enum>()
                 .Select(name => new OpenApiString(name.GetEnumValue()))
