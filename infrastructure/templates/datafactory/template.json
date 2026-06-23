@@ -56,7 +56,7 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/refs/heads/EES-6963-stop-data-factoy-failure-activities-from-reporting-in-slack/infrastructure/templates/')]"
   },
   "resources": [
     {

@@ -1353,7 +1353,7 @@
         }
       ]
     },
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/refs/heads/EES-6963-stop-data-factoy-failure-activities-from-reporting-in-slack/infrastructure/templates/')]",
     "keyVaultCertificateUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba')]",
     "keyVaultCertificateUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('publicAppName'))]"

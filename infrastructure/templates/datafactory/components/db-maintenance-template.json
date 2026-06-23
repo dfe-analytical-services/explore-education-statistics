@@ -91,7 +91,7 @@
                   "type": "SqlServerStoredProcedure",
                   "dependsOn": [],
                   "policy": {
-                    "timeout": "0.23:45:00",
+                    "timeout": "0.00:00:10",
                     "retry": 0,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
@@ -161,22 +161,6 @@
                       "value": "@activity('Rebuild indexes - weekend').error.message",
                       "type": "Expression"
                     }
-                  }
-                },
-                {
-                  "name": "Fail Rebuild indexes - weekend",
-                  "type": "Fail",
-                  "dependsOn": [
-                    {
-                      "activity": "Get index rebuild failure message - weekend",
-                      "dependencyConditions": [
-                        "Succeeded"
-                      ]
-                    }
-                  ],
-                  "typeProperties": {
-                    "message": "Weekend Index Rebuild failed",
-                    "errorCode": "500"
                   }
                 }
               ],
@@ -257,157 +241,19 @@
                       "type": "Expression"
                     }
                   }
-                },
-                {
-                  "name": "Fail Rebuild indexes - weekday",
-                  "type": "Fail",
-                  "dependsOn": [
-                    {
-                      "activity": "Get index rebuild failure message - weekday",
-                      "dependencyConditions": [
-                        "Succeeded"
-                      ]
-                    }
-                  ],
-                  "typeProperties": {
-                    "message": "Weekday Index Rebuild failed",
-                    "errorCode": "500"
-                  }
                 }
               ]
             }
           },
           {
-            "name": "Report reindex success",
-            "type": "WebActivity",
-            "dependsOn": [
-              {
-                "activity": "Rebuild indexes",
-                "dependencyConditions": [
-                  "Succeeded"
-                ]
-              }
-            ],
-            "policy": {
-              "timeout": "0.00:10:00",
-              "retry": 0,
-              "retryIntervalInSeconds": 30,
-              "secureOutput": false,
-              "secureInput": false
-            },
-            "userProperties": [],
-            "typeProperties": {
-              "url": "https://slack.com/api/chat.postMessage",
-              "method": "POST",
-              "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
-              },
-              "body": {
-                "channel": "[parameters('slackAlertsChannel')]",
-                "text": "Data Factory Success! All fragmented indexes rebuilt.",
-                "attachments": [
-                  {
-                    "color": "good",
-                    "fields": [
-                      {
-                        "title": "Data Factory",
-                        "value": "@{pipeline().DataFactory}",
-                        "short": true
-                      },
-                      {
-                        "title": "Pipeline",
-                        "value": "@{pipeline().Pipeline}",
-                        "short": true
-                      },
-                      {
-                        "title": "Duration",
-                        "value": "@{activity('Rebuild indexes').Duration}",
-                        "short": true
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "name": "Report reindex success to Teams",
-            "type": "WebActivity",
-            "dependsOn": [
-              {
-                "activity": "Rebuild indexes",
-                "dependencyConditions": [
-                  "Succeeded"
-                ]
-              }
-            ],
-            "policy": {
-              "timeout": "0.00:10:00",
-              "retry": 0,
-              "retryIntervalInSeconds": 30,
-              "secureOutput": false,
-              "secureInput": true
-            },
-            "userProperties": [],
-            "typeProperties": {
-              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
-              "method": "POST",
-              "headers": {
-                "Content-Type": "application/json"
-              },
-              "body": {
-                "type": "message",
-                "attachments": [
-                  {
-                    "contentType": "application/vnd.microsoft.card.adaptive",
-                    "contentUrl": null,
-                    "content": {
-                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                      "type": "AdaptiveCard",
-                      "version": "1.2",
-                      "body": [
-                        {
-                          "type": "TextBlock",
-                          "text": "Data Factory Success! All fragmented indexes rebuilt.",
-                          "weight": "Bolder",
-                          "size": "Medium",
-                          "color": "good",
-                          "wrap": true
-                        },
-                        {
-                          "type": "FactSet",
-                          "facts": [
-                            {
-                              "title": "Data Factory",
-                              "value": "@{pipeline().DataFactory}"
-                            },
-                            {
-                              "title": "Pipeline",
-                              "value": "@{pipeline().Pipeline}"
-                            },
-                            {
-                              "title": "Duration",
-                              "value": "@{activity('Rebuild indexes').Duration}"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "name": "Choose how to handle rebuild indexes failure",
+            "name": "Check for rebuild indexes failure",
             "description": "This activity routes to the appropriate error handler based on the reason for the 'Rebuild indexes' activity's reason for failure",
             "type": "Switch",
             "dependsOn": [
               {
                 "activity": "Rebuild indexes",
                 "dependencyConditions": [
-                  "Failed"
+                  "Succeeded"
                 ]
               }
             ],
@@ -862,6 +708,133 @@
                                       {
                                         "title": "Activity",
                                         "value": "@{activity('Kill index reorganizes after timeout').Error.message}"
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "value": "",
+                  "activities": [
+                    {
+                      "name": "Report reindex success",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Rebuild indexes",
+                          "dependencyConditions": [
+                            "Succeeded"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": false
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "https://slack.com/api/chat.postMessage",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json",
+                          "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+                        },
+                        "body": {
+                          "channel": "[parameters('slackAlertsChannel')]",
+                          "text": "Data Factory Success! All fragmented indexes rebuilt.",
+                          "attachments": [
+                            {
+                              "color": "good",
+                              "fields": [
+                                {
+                                  "title": "Data Factory",
+                                  "value": "@{pipeline().DataFactory}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Pipeline",
+                                  "value": "@{pipeline().Pipeline}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Duration",
+                                  "value": "@{activity('Rebuild indexes').Duration}",
+                                  "short": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Report reindex success to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Rebuild indexes",
+                          "dependencyConditions": [
+                            "Succeeded"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory Success! All fragmented indexes rebuilt.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "good",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
                                       },
                                       {
                                         "title": "Duration",
