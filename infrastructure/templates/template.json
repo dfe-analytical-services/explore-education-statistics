@@ -754,7 +754,7 @@
     },
     "enhancedScreenerJourney": {
       "type": "bool",
-      "defaultValue": false,
+      "defaultValue": true,
       "metadata": {
         "description": "Whether or not Admin supports the background screening process"
       }
