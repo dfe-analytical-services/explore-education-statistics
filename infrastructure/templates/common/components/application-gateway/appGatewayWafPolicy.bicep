@@ -1,4 +1,4 @@
-import { AppGatewayFirewallPolicyCustomRule } from '../types.bicep'
+import { AppGatewayFirewallPolicyCustomRule } from 'types.bicep'
 
 @description('Specifies the location for all resources')
 param location string

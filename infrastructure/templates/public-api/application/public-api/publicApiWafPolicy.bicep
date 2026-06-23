@@ -15,7 +15,7 @@ param tagValues object
 
 var policyName = '${resourceNames.sharedResources.appGateway}-public-api-afwp'
 
-module wafPolicyModule '../../components/appGatewayWafPolicy.bicep' = {
+module wafPolicyModule '../../../common/components/application-gateway/appGatewayWafPolicy.bicep' = {
   name: 'wafPolicy'
   params: {
     name: policyName

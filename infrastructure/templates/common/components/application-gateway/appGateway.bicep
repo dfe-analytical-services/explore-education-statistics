@@ -1,13 +1,13 @@
-import { responseTimeConfig, dynamicTotalGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'
-import { staticAverageGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
-import { removeMultiple } from '../../common/functions.bicep'
+import { responseTimeConfig, dynamicTotalGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
+import { staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { removeMultiple } from '../../functions.bicep'
 
 import {
   AppGatewayBackend
   AppGatewayRewriteSet
   AppGatewayRoute
   AppGatewaySite
-} from '../types.bicep'
+} from 'types.bicep'
 
 @description('Name of the Key Vault name that the App Gateway will be permitted to get and list certificates from')
 param keyVaultName string
@@ -65,7 +65,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 }
 
 // Allow the managed identity to access certificates from Key Vault.
-module keyVaultSecretsUserRoleAssignmentModule '../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
+module keyVaultSecretsUserRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${appGatewayName}KeyVaultSecretsUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
@@ -74,7 +74,7 @@ module keyVaultSecretsUserRoleAssignmentModule '../../common/components/key-vaul
   }
 }
 
-module keyVaultCertificateUserRoleAssignmentModule '../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
+module keyVaultCertificateUserRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${appGatewayName}KeyVaultCertificateUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
@@ -104,7 +104,7 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
   zones: availabilityZones
 }]
 
-module pathRulesModule './appGatewayPathRules.bicep' = [for route in routes: {
+module pathRulesModule 'appGatewayPathRules.bicep' = [for route in routes: {
   name: '${route.name}-route-paths'
   params: {
     appGatewayName: appGatewayName
@@ -278,7 +278,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
   ]
 }
 
-module backendPoolsHealthAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
+module backendPoolsHealthAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
   name: '${appGatewayName}BackendHealthAlertModule'
   params: {
     resourceName: appGatewayName
@@ -299,7 +299,7 @@ module backendPoolsHealthAlert '../../common/components/alerts/staticMetricAlert
   ]
 }
 
-module responseTimeAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
   params: {
     resourceName: appGatewayName
@@ -316,7 +316,7 @@ module responseTimeAlert '../../common/components/alerts/dynamicMetricAlert.bice
   ]
 }
 
-module failedRequestsAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
+module failedRequestsAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
   name: '${appGatewayName}FailedRequestsDeploy'
   params: {
     resourceName: appGatewayName
@@ -341,7 +341,7 @@ module failedRequestsAlert '../../common/components/alerts/dynamicMetricAlert.bi
   ]
 }
 
-module responseStatusAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
+module responseStatusAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
   name: '${appGatewayName}ResponseStatusDeploy'
   params: {
     resourceName: appGatewayName
