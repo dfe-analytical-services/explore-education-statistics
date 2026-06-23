@@ -305,11 +305,11 @@ public abstract class UserManagementServiceTests
         {
             return
             [
-                .. userPreReleaseRoles.Select(urr => new UserPreReleaseRoleViewModel
+                .. userPreReleaseRoles.Select(uprr => new UserPreReleaseRoleViewModel
                 {
-                    Id = urr.Id,
-                    Publication = urr.ReleaseVersion.Release.Publication.Title,
-                    Release = urr.ReleaseVersion.Release.Title,
+                    Id = uprr.Id,
+                    Publication = uprr.ReleaseVersion.Release.Publication.Title,
+                    Release = uprr.ReleaseVersion.Release.Title,
                 }),
             ];
         }

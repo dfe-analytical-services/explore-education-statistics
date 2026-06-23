@@ -85,7 +85,7 @@ public class PreReleaseUserService(
                     await userPreReleaseRoleRepository
                         .Query(ResourceRoleFilter.All)
                         .WhereForReleaseVersion(releaseVersionId)
-                        .Select(urr => urr.User.Email)
+                        .Select(uprr => uprr.User.Email)
                         .Distinct()
                         .OrderBy(email => email)
                         .ToListAsync()
@@ -164,7 +164,7 @@ public class PreReleaseUserService(
                     .Query()
                     .AsNoTracking()
                     .WhereForUser(userId)
-                    .Include(urr => urr.ReleaseVersion)
+                    .Include(uprr => uprr.ReleaseVersion)
                         .ThenInclude(rv => rv.Release)
                             .ThenInclude(r => r.Publication)
                     .ToListAsync();

@@ -852,7 +852,9 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingRoles = await contentDbContext.UserPreReleaseRoles.Include(urr => urr.User).ToListAsync();
+                var remainingRoles = await contentDbContext
+                    .UserPreReleaseRoles.Include(uprr => uprr.User)
+                    .ToListAsync();
 
                 Assert.Equal(2, remainingRoles.Count);
 
@@ -904,7 +906,9 @@ public abstract class UserPreReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var remainingRoles = await contentDbContext.UserPreReleaseRoles.Include(urr => urr.User).ToListAsync();
+                var remainingRoles = await contentDbContext
+                    .UserPreReleaseRoles.Include(uprr => uprr.User)
+                    .ToListAsync();
 
                 Assert.Equal(2, remainingRoles.Count);
 

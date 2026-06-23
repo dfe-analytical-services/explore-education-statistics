@@ -101,8 +101,8 @@ public abstract class PreReleaseUserServiceTests
                 var users = result.AssertRight();
 
                 var expectedRoleEmailsOrderedByEmail = userPreReleaseRoles
-                    .Where(urr => urr.ReleaseVersion.Id == releaseVersion.Id)
-                    .Select(urr => urr.User.Email)
+                    .Where(uprr => uprr.ReleaseVersion.Id == releaseVersion.Id)
+                    .Select(uprr => uprr.User.Email)
                     .Order()
                     .ToList();
 

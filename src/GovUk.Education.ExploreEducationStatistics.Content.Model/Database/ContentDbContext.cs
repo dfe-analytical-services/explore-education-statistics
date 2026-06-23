@@ -662,7 +662,10 @@ public class ContentDbContext : DbContext
 
     private static void ConfigureUserPreReleaseRole(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<UserPreReleaseRole>().HasIndex(urr => new { urr.UserId, urr.ReleaseVersionId }).IsUnique();
+        modelBuilder
+            .Entity<UserPreReleaseRole>()
+            .HasIndex(uprr => new { uprr.UserId, uprr.ReleaseVersionId })
+            .IsUnique();
 
         modelBuilder
             .Entity<UserPreReleaseRole>()

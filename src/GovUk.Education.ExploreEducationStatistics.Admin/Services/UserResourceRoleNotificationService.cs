@@ -34,11 +34,11 @@ public class UserResourceRoleNotificationService(
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .WhereForUser(user.Id)
-            .Select(urr => new
+            .Select(uprr => new
             {
-                urr.Id,
-                PublicationTitle = urr.ReleaseVersion.Release.Publication.Title,
-                ReleaseTitle = urr.ReleaseVersion.Release.Title,
+                uprr.Id,
+                PublicationTitle = uprr.ReleaseVersion.Release.Publication.Title,
+                ReleaseTitle = uprr.ReleaseVersion.Release.Title,
             })
             .ToListAsync(cancellationToken);
 
@@ -55,7 +55,7 @@ public class UserResourceRoleNotificationService(
             .ToListAsync(cancellationToken);
 
         var preReleaseRolesInfo = pendingUserPreReleaseRoles
-            .Select(urr => (urr.PublicationTitle, urr.ReleaseTitle))
+            .Select(uprr => (uprr.PublicationTitle, uprr.ReleaseTitle))
             .ToHashSet();
 
         var publicationRolesInfo = pendingUserPublicationRoles
@@ -238,11 +238,11 @@ public class UserResourceRoleNotificationService(
         // unit tests because the in-memory provider does not support transactions.
         return await userPreReleaseRoleRepository
                 .Query(ResourceRoleFilter.AllButExpired)
-                .Include(urr => urr.User)
-                .Include(urr => urr.ReleaseVersion)
+                .Include(uprr => uprr.User)
+                .Include(uprr => uprr.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
                         .ThenInclude(r => r.Publication)
-                .SingleOrDefaultAsync(urr => urr.Id == userPreReleaseRoleId, cancellationToken)
+                .SingleOrDefaultAsync(uprr => uprr.Id == userPreReleaseRoleId, cancellationToken)
             ?? throw new KeyNotFoundException(
                 $"A non-expired pre-release role with ID {userPreReleaseRoleId} does not exist."
             );

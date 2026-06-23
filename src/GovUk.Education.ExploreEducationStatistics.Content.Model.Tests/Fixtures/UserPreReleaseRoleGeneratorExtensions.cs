@@ -61,48 +61,48 @@ public static class UserPreReleaseRoleGeneratorExtensions
 
     public static InstanceSetters<UserPreReleaseRole> SetDefaults(this InstanceSetters<UserPreReleaseRole> setters) =>
         setters
-            .SetDefault(urr => urr.Id)
-            .SetDefault(urr => urr.ReleaseVersionId)
-            .SetDefault(urr => urr.UserId)
-            .SetDefault(urr => urr.Created);
+            .SetDefault(uprr => uprr.Id)
+            .SetDefault(uprr => uprr.ReleaseVersionId)
+            .SetDefault(uprr => uprr.UserId)
+            .SetDefault(uprr => uprr.Created);
 
     public static InstanceSetters<UserPreReleaseRole> SetReleaseVersion(
         this InstanceSetters<UserPreReleaseRole> setters,
         ReleaseVersion releaseVersion
-    ) => setters.Set(urr => urr.ReleaseVersion, releaseVersion).SetReleaseVersionId(releaseVersion.Id);
+    ) => setters.Set(uprr => uprr.ReleaseVersion, releaseVersion).SetReleaseVersionId(releaseVersion.Id);
 
     public static InstanceSetters<UserPreReleaseRole> SetReleaseVersionId(
         this InstanceSetters<UserPreReleaseRole> setters,
         Guid releaseVersionId
-    ) => setters.Set(urr => urr.ReleaseVersionId, releaseVersionId);
+    ) => setters.Set(uprr => uprr.ReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<UserPreReleaseRole> SetUser(
         this InstanceSetters<UserPreReleaseRole> setters,
         User user
-    ) => setters.Set(urr => urr.User, user).SetUserId(user.Id);
+    ) => setters.Set(uprr => uprr.User, user).SetUserId(user.Id);
 
     public static InstanceSetters<UserPreReleaseRole> SetUserId(
         this InstanceSetters<UserPreReleaseRole> setters,
         Guid userId
-    ) => setters.Set(urr => urr.UserId, userId);
+    ) => setters.Set(uprr => uprr.UserId, userId);
 
     public static InstanceSetters<UserPreReleaseRole> SetCreated(
         this InstanceSetters<UserPreReleaseRole> setters,
         DateTime created
-    ) => setters.Set(urr => urr.Created, created);
+    ) => setters.Set(uprr => uprr.Created, created);
 
     public static InstanceSetters<UserPreReleaseRole> SetCreatedBy(
         this InstanceSetters<UserPreReleaseRole> setters,
         User createdBy
-    ) => setters.Set(urr => urr.CreatedBy, createdBy).SetCreatedById(createdBy.Id);
+    ) => setters.Set(uprr => uprr.CreatedBy, createdBy).SetCreatedById(createdBy.Id);
 
     public static InstanceSetters<UserPreReleaseRole> SetCreatedById(
         this InstanceSetters<UserPreReleaseRole> setters,
         Guid createdById
-    ) => setters.Set(urr => urr.CreatedById, createdById);
+    ) => setters.Set(uprr => uprr.CreatedById, createdById);
 
     public static InstanceSetters<UserPreReleaseRole> SetEmailSent(
         this InstanceSetters<UserPreReleaseRole> setters,
         DateTimeOffset emailSent
-    ) => setters.Set(urr => urr.EmailSent, emailSent);
+    ) => setters.Set(uprr => uprr.EmailSent, emailSent);
 }
