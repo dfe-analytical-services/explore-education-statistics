@@ -228,6 +228,7 @@ public class DataSetScreenerClientTests
             _mockHttp
                 .Expect(HttpMethod.Delete, $"{BaseUri.AbsoluteUri}/progress-and-completion-files")
                 .WithQueryString($"data_set_id={dataSetIds[0]}&data_set_id={dataSetIds[1]}")
+                .WithContent("{}")
                 .Respond(HttpStatusCode.NoContent);
 
             var dataSetScreenerClient = BuildService();

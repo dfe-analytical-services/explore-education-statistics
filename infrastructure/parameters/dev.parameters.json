@@ -145,9 +145,6 @@
     "datasetsSearchIndexName": {
       "value": "nl-search-dataset-index"
     },
-    "enhancedScreenerJourney": {
-      "value": true
-    },
     "sqlServerPublicNetworkAccess": {
       "value": "Enabled"
     }
