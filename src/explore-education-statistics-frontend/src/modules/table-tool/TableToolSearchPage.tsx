@@ -14,6 +14,7 @@ import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import SearchForm from '@frontend/components/SearchForm';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
+import ShortlistedSearchResultItem from '@frontend/modules/table-tool/components/ShortlistedSearchResultItem';
 import tableToolSearchService, {
   FatalError,
   PipelineStage,
@@ -240,34 +241,32 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
             />
 
             {currentStage === PipelineStage.STARTING && (
-              <InsetText>
-                <p>Analysing "{searchedTerm}"</p>
-              </InsetText>
+              <InsetText>Analysing "{searchedTerm}"</InsetText>
             )}
 
             {currentStage === PipelineStage.RETRIEVED &&
               pipelineData.retrievedData?.datasets && (
-                <ul className="govuk-list">
+                <ul className="govuk-list govuk-list--spaced">
                   {pipelineData.retrievedData.datasets.map(dataset => (
-                    <li key={dataset.title} className="dfe-flex">
-                      <p>{dataset.title}</p>
-                    </li>
+                    <ShortlistedSearchResultItem
+                      key={dataset.title}
+                      title={dataset.title}
+                      relevance={dataset.relevanceScore}
+                    />
                   ))}
                 </ul>
               )}
 
             {currentStage === PipelineStage.RERANKER &&
               pipelineData.rerankerData?.shortlistedDatasets && (
-                <ul className="govuk-list">
+                <ul className="govuk-list govuk-list--spaced">
                   {pipelineData.rerankerData.shortlistedDatasets.map(
                     dataset => (
-                      <li
-                        key={dataset.fileId}
-                        className="dfe-flex dfe-justify-between dfe-justify-content--space-between"
-                      >
-                        <p>{dataset.title}</p>
-                        <p>{dataset.relevanceScore} relevance</p>
-                      </li>
+                      <ShortlistedSearchResultItem
+                        key={dataset.title}
+                        title={dataset.title}
+                        relevance={dataset.relevanceScore}
+                      />
                     ),
                   )}
                 </ul>
@@ -275,7 +274,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
 
             {currentStage === PipelineStage.COMPLETE ? (
               // TODO EES-7213 render results
-              <ol>
+              <ul>
                 {finalDatasets.map(dataset => (
                   <li key={dataset.fileId}>
                     <h3 className="govuk-heading-s">{dataset.title}</h3>
@@ -284,7 +283,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                     </div>
                   </li>
                 ))}
-              </ol>
+              </ul>
             ) : (
               <LoadingSpinner text="Processing request" hideText size="lg" />
             )}

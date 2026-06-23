@@ -141,7 +141,7 @@ describe('TableToolSearchPage', () => {
     ).toBeInTheDocument();
     expect(screen.queryByText('Dataset A')).not.toBeInTheDocument();
     expect(screen.getByText('Dataset B')).toBeInTheDocument();
-    expect(screen.getByText('85.5 relevance')).toBeInTheDocument();
+    expect(screen.getByText('85.5% relevance')).toBeInTheDocument();
 
     await waitFor(() => {
       capturedOptions.onMessage({
