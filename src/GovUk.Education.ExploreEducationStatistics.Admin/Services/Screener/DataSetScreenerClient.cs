@@ -98,7 +98,15 @@ public class DataSetScreenerClient(
         dataSetIds.ForEach(dataSetId => query.Add("data_set_id", dataSetId.ToString()));
 
         var url = $"{httpClient.BaseAddress}/progress-and-completion-files?{query}";
-        var response = await httpClient.DeleteAsync(url, cancellationToken);
+
+        using var request = new HttpRequestMessage(HttpMethod.Delete, url);
+
+        // Add a dummy empty body to prevent Azure from rewriting the empty DELETE request into a
+        // request with the "Transfer-Encoding: chunked" header set, which the Azure Functions Host
+        // can't handle.
+        request.Content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+        using var response = await httpClient.SendAsync(request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
