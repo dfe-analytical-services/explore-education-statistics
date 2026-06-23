@@ -42,21 +42,21 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
         return await userPreReleaseRolesToCreate
             .ToAsyncEnumerable()
             .Where(
-                async (urr, ct) =>
+                async (uprr, ct) =>
                     !await UserHasPreReleaseRoleOnReleaseVersion(
-                        userId: urr.UserId,
-                        releaseVersionId: urr.ReleaseVersionId,
+                        userId: uprr.UserId,
+                        releaseVersionId: uprr.ReleaseVersionId,
                         resourceRoleFilter: ResourceRoleFilter.All,
                         cancellationToken: ct
                     )
             )
             .Select(
-                async (urr, ct) =>
+                async (uprr, ct) =>
                     await Create(
-                        userId: urr.UserId,
-                        releaseVersionId: urr.ReleaseVersionId,
-                        createdById: urr.CreatedById,
-                        createdDate: urr.CreatedDate,
+                        userId: uprr.UserId,
+                        releaseVersionId: uprr.ReleaseVersionId,
+                        createdById: uprr.CreatedById,
+                        createdDate: uprr.CreatedDate,
                         cancellationToken: ct
                     )
             )
@@ -69,7 +69,7 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
     )
     {
         return await Query(ResourceRoleFilter.All)
-            .SingleOrDefaultAsync(urr => urr.Id == userPreReleaseRoleId, cancellationToken);
+            .SingleOrDefaultAsync(uprr => uprr.Id == userPreReleaseRoleId, cancellationToken);
     }
 
     public async Task<UserPreReleaseRole?> GetByCompositeKey(

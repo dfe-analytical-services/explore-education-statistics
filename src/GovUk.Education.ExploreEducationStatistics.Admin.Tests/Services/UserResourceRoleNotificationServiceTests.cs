@@ -63,7 +63,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             var allUserPreReleaseRoles = preReleaseRolesForTargetUser.Concat(preReleaseRolesForOtherUser).ToList();
 
             var preReleaseRolesInfo = preReleaseRolesForTargetUser
-                .Select(urr => (urr.ReleaseVersion.Release.Publication.Title, urr.ReleaseVersion.Release.Title))
+                .Select(uprr => (uprr.ReleaseVersion.Release.Publication.Title, uprr.ReleaseVersion.Release.Title))
                 .ToHashSet();
 
             var publicationRolesInfo = publicationRolesForTargetUser
@@ -184,7 +184,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .GenerateList(3);
 
             var preReleaseRolesInfo = userPreReleaseRoles
-                .Select(urr => (urr.ReleaseVersion.Release.Publication.Title, urr.ReleaseVersion.Release.Title))
+                .Select(uprr => (uprr.ReleaseVersion.Release.Publication.Title, uprr.ReleaseVersion.Release.Title))
                 .ToHashSet();
 
             var publicationRolesInfo = userPublicationRoles
