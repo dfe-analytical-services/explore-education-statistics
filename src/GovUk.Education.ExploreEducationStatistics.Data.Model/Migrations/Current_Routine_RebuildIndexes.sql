@@ -115,7 +115,8 @@ BEGIN
                    JOIN sys.objects obj ON obj.object_id = ips.object_id
                    JOIN sys.schemas sch ON sch.schema_id = obj.schema_id
           WHERE ips.alloc_unit_type_desc = 'IN_ROW_DATA') AS Fragmented
-    ORDER BY Fragmented.HasPausedResumable DESC; -- Prefer to resume paused jobs first.
+    ORDER BY Fragmented.HasPausedResumable DESC, -- Prefer to resume paused jobs first.
+             Fragmented.FragPercent DESC; -- Then secondarily order by most fragmented first.
 
     ALTER TABLE #Stats
         ADD PRIMARY KEY (Id);
