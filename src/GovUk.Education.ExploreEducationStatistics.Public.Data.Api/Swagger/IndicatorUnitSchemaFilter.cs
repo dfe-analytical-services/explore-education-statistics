@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -12,7 +11,7 @@ public class IndicatorUnitSchemaFilter : ISchemaFilter
     {
         if (context.MemberInfo == null && context.Type == typeof(IndicatorUnit))
         {
-            schema.Type = "string";
+            schema.Type = JsonSchemaType.String;
             schema.Description = """
                 The recommended unit to format an indicator with.
 

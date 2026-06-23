@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;

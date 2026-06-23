@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -12,7 +11,7 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
     {
         if (context.MemberInfo == null && context.Type == typeof(GeographicLevel))
         {
-            schema.Type = "string";
+            schema.Type = JsonSchemaType.String;
             schema.Format = null;
 
             schema.Description = """

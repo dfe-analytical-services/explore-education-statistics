@@ -111,9 +111,9 @@
   <ItemGroup Label="Swagger / OpenAPI">
     <PackageVersion Include="MicroElements.Swashbuckle.FluentValidation" Version="7.0.3" />
     <PackageVersion Include="Namotion.Reflection" Version="3.4.3" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.6" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.6" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3" />
   </ItemGroup>
 
   <ItemGroup Label="Testing">

@@ -1,8 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
