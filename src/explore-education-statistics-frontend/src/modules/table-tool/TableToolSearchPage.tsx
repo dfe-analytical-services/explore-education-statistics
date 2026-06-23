@@ -4,6 +4,7 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import WarningMessage from '@common/components/WarningMessage';
+import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
 import logger from '@common/services/logger';
 import publicationService, {
   PublicationSummary,
@@ -157,10 +158,19 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
         { name: 'Table tool', link: `/data-tables/${publicationSummary.slug}` },
       ]}
       pageTitleComponent={
-        <ReleasePageTitle
-          publicationSummary={publicationSummary}
-          releaseTitle={latestReleaseVersion.title}
-        />
+        <>
+          <PublishingOrganisations
+            publishingOrganisations={
+              latestReleaseVersion.publishingOrganisations
+            }
+          />
+          <div className="dfe-flex govuk-!-margin-bottom-8">
+            <ReleasePageTitle
+              publicationSummary={publicationSummary}
+              releaseTitle={latestReleaseVersion.title}
+            />
+          </div>
+        </>
       }
       width="wide"
     >
