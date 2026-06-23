@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserPreReleaseRoleRepository
 {
-    Task<UserReleaseRole> Create(
+    Task<UserPreReleaseRole> Create(
         Guid userId,
         Guid releaseVersionId,
         Guid createdById,
@@ -15,14 +15,14 @@ public interface IUserPreReleaseRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    Task<List<UserReleaseRole>> CreateManyIfNotExists(
+    Task<List<UserPreReleaseRole>> CreateManyIfNotExists(
         HashSet<UserPreReleaseRoleCreateDto> userPreReleaseRolesToCreate,
         CancellationToken cancellationToken = default
     );
 
-    Task<UserReleaseRole?> GetById(Guid userPreReleaseRoleId, CancellationToken cancellationToken = default);
+    Task<UserPreReleaseRole?> GetById(Guid userPreReleaseRoleId, CancellationToken cancellationToken = default);
 
-    Task<UserReleaseRole?> GetByCompositeKey(
+    Task<UserPreReleaseRole?> GetByCompositeKey(
         Guid userId,
         Guid releaseVersionId,
         CancellationToken cancellationToken = default
@@ -34,13 +34,16 @@ public interface IUserPreReleaseRoleRepository
     /// </para>
     /// </summary>
     /// <param name="resourceRoleFilter">Filter resource roles by their status (see <see cref="ResourceRoleFilter"/>).</param>
-    IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
+    IQueryable<UserPreReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
 
     Task<bool> RemoveById(Guid userPreReleaseRoleId, CancellationToken cancellationToken = default);
 
     Task<bool> RemoveByCompositeKey(Guid userId, Guid releaseVersionId, CancellationToken cancellationToken = default);
 
-    Task RemoveMany(IEnumerable<UserReleaseRole> userPreReleaseRoleIds, CancellationToken cancellationToken = default);
+    Task RemoveMany(
+        IEnumerable<UserPreReleaseRole> userPreReleaseRoleIds,
+        CancellationToken cancellationToken = default
+    );
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 

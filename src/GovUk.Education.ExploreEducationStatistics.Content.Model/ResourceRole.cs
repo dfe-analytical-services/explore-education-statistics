@@ -3,8 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public abstract class ResourceRole<TRoleEnum, TResource>
-    where TRoleEnum : Enum
+public abstract class ResourceRole<TResource>
     where TResource : class
 {
     public Guid Id { get; set; }
@@ -18,8 +17,6 @@ public abstract class ResourceRole<TRoleEnum, TResource>
 
     [NotMapped]
     public Guid ResourceId { get; set; }
-
-    public required TRoleEnum Role { get; set; }
 
     public DateTimeOffset? EmailSent { get; set; }
 
