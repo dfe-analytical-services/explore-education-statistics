@@ -16,7 +16,7 @@ variables:
   - name: CI
     value: true
   - name: DotNetVersion
-    value: '8.0.x'
+    value: '10.0.x'
   - name: NodeVersion
     value: '22.22.0'
   - name: RubyVersion
