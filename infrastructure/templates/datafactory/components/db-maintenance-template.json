@@ -77,9 +77,77 @@
       "properties": {
         "activities": [
           {
+            "name": "Pause resumable index rebuilds first",
+            "description": "This activity pauses any ongoing RESUMABLE index REBUILDs before starting the main pipeline.",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[PauseResumableIndexRebuilds]",
+              "storedProcedureParameters": {
+                "Tables": {
+                  "value": "@pipeline().parameters.Tables",
+                  "type": "String"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_statistics",
+              "type": "LinkedServiceReference"
+            }
+          },
+          {
+            "name": "Kill index reorganizes first",
+            "description": "This activity kills any ongoing index REORGANIZEs before starting the main pipeline.",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [
+              {
+                "activity": "Pause resumable index rebuilds first",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[KillIndexReorganizations]",
+              "storedProcedureParameters": {
+                "Tables": {
+                  "value": "@pipeline().parameters.Tables",
+                  "type": "String"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_statistics",
+              "type": "LinkedServiceReference"
+            }
+          },
+          {
             "name": "Rebuild indexes",
             "type": "IfCondition",
-            "dependsOn": [],
+            "dependsOn": [
+              {
+                "activity": "Kill index reorganizes first",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
             "typeProperties": {
               "expression": {
                 "value": "@equals(pipeline().parameters.RunMode, 'Weekend')",
