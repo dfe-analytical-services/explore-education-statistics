@@ -840,14 +840,7 @@
                     {
                       "name": "Report reindex success",
                       "type": "WebActivity",
-                      "dependsOn": [
-                        {
-                          "activity": "Rebuild indexes",
-                          "dependencyConditions": [
-                            "Succeeded"
-                          ]
-                        }
-                      ],
+                      "dependsOn": [],
                       "policy": {
                         "timeout": "0.00:10:00",
                         "retry": 0,
@@ -894,14 +887,7 @@
                     {
                       "name": "Report reindex success to Teams",
                       "type": "WebActivity",
-                      "dependsOn": [
-                        {
-                          "activity": "Rebuild indexes",
-                          "dependencyConditions": [
-                            "Succeeded"
-                          ]
-                        }
-                      ],
+                      "dependsOn": [],
                       "policy": {
                         "timeout": "0.00:10:00",
                         "retry": 0,
