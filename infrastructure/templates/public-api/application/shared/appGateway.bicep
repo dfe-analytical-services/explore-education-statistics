@@ -3,8 +3,9 @@ import {
   AppGatewayRewriteSet
   AppGatewayRoute
   AppGatewaySite
-  ResourceNames
-} from '../../types.bicep'
+} from '../../../common/components/application-gateway/types.bicep'
+
+import { ResourceNames } from '../../types.bicep'
 
 @description('Common resource naming variables')
 param resourceNames ResourceNames
@@ -39,7 +40,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing 
   parent: vNet
 }
 
-module globalWafPolicyModule '../../components/appGatewayWafPolicy.bicep' = {
+module globalWafPolicyModule '../../../common/components/application-gateway/appGatewayWafPolicy.bicep' = {
   name: 'wafPolicy'
   params: {
     name: '${resourceNames.sharedResources.appGateway}-global-afwp'
@@ -48,7 +49,7 @@ module globalWafPolicyModule '../../components/appGatewayWafPolicy.bicep' = {
   }
 }
 
-module appGatewayModule '../../components/appGateway.bicep' = {
+module appGatewayModule '../../../common/components/application-gateway/appGateway.bicep' = {
   name: 'appGatewayDeploy'
   params: {
     location: location

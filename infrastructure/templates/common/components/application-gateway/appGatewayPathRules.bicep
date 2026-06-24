@@ -1,4 +1,4 @@
-import { AppGatewayPathRule } from '../types.bicep'
+import { AppGatewayPathRule } from 'types.bicep'
 
 @description('Name of the App Gateway')
 param appGatewayName string
