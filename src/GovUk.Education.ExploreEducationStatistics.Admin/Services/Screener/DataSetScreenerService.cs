@@ -202,7 +202,8 @@ public class DataSetScreenerService(
     )
     {
         return contentDbContext
-            .ReleaseVersions.SingleOrNotFound(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFound(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(() =>
                 contentDbContext.DataSetUploads.SingleOrNotFoundAsync(
