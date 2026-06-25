@@ -11,6 +11,8 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deployApplicationGateway
+    type: string
   - name: deployAlerts
     type: string
 
@@ -33,5 +35,6 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               publicSiteUrl='$(publicSiteUrl)' \
+              deployApplicationGateway=${{ parameters.deployApplicationGateway }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               resourceTags='$(resourceTags)'

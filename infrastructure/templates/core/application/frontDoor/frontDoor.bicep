@@ -40,7 +40,7 @@ var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}
 
 var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
 
-var certificateName = '${legacyResourcePrefix}as-ees-public-site-certificate'
+var certificateName = '${legacyResourcePrefix}-as-ees-public-site-certificate'
 
 var nextJsRuleSetName = 'nextjsruleset'
 

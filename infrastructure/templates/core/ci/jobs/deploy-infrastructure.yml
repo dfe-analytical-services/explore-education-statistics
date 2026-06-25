@@ -29,6 +29,7 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deployApplicationGateway: false
                 deployAlerts: false
 
             - template: ../tasks/deploy-bicep.yml
@@ -37,4 +38,5 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deployApplicationGateway: $(deployApplicationGateway)
                 deployAlerts: $(deployAlerts)

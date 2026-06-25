@@ -1,4 +1,13 @@
 @export()
+type AppGatewayFrontendConfig = {
+  @description('Name of the frontend config')
+  name: string
+
+  @description('Name of the public IP address to associate with this frontend config')
+  publicIpAddressName: string
+}
+
+@export()
 type AppGatewaySite = {
   @description('Name of the site')
   name: string
@@ -26,6 +35,9 @@ type AppGatewayBackend = {
 
   @description('Path that the health probe should periodically ping e.g. /')
   healthProbePath: string
+
+  @description('Additional health probe HTTP status codes that indicate success')
+  healthProbeAdditionalStatusCodeMatches: string[]?
 }
 
 @export()
@@ -40,7 +52,7 @@ type AppGatewayRoute = {
   defaultBackendName: string
 
   @description('A set of path rules to apply')
-  pathRules: AppGatewayPathRule[]
+  pathRules: AppGatewayPathRule[]?
 }
 
 @export()
