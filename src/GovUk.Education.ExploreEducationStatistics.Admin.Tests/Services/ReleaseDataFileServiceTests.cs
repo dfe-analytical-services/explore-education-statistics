@@ -1371,7 +1371,7 @@ public class ReleaseDataFileServiceTests
             Assert.Equal(originalReleaseFile.File.Id, files[0].Id);
             Assert.Equal("Test subject 1", files[0].Name);
             Assert.Equal("test-data-1.csv", files[0].FileName);
-            Assert.Equal(replacementFile.Id, files[0].ReplacedBy); //This is set on the published original release version as well as the amendment release version.
+            Assert.Equal(replacementFile.Id, files[0].ReplacedByDataFileId); //This is set on the published original release version as well as the amendment release version.
             Assert.Null(files[0].ReplacedByDataFile);
         }
     }
@@ -1482,7 +1482,7 @@ public class ReleaseDataFileServiceTests
             Assert.Equal(COMPLETE, dataFileInfo.Status);
             Assert.Equal(originalReleaseFile.PublicApiDataSetId, dataFileInfo.PublicApiDataSetId);
             Assert.Equal(originalReleaseFile.PublicApiDataSetVersionString, dataFileInfo.PublicApiDataSetVersion);
-            Assert.Equal(replacementFileId, dataFileInfo.ReplacedBy);
+            Assert.Equal(replacementFileId, dataFileInfo.ReplacedByDataFileId);
 
             var replacementDataFileInfo = dataFileInfo.ReplacedByDataFile;
             Assert.NotNull(replacementDataFileInfo);
@@ -1500,7 +1500,7 @@ public class ReleaseDataFileServiceTests
             Assert.Equal(STAGE_2, replacementDataFileInfo.Status);
             Assert.Null(replacementDataFileInfo.PublicApiDataSetId);
             Assert.Null(replacementDataFileInfo.PublicApiDataSetVersion);
-            Assert.Null(replacementDataFileInfo.ReplacedBy);
+            Assert.Null(replacementDataFileInfo.ReplacedByDataFileId);
         }
     }
 

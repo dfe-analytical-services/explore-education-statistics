@@ -15,7 +15,7 @@ public interface IDataImportService
 
     Task DeleteImport(Guid fileId);
 
-    Task<bool> HasIncompleteImports(Guid releaseVersionId);
+    Task<bool> HasIncompleteUploadsOrImports(Guid releaseVersionId);
 
     Task<DataImportStatusViewModel> GetImportStatus(Guid fileId);
 

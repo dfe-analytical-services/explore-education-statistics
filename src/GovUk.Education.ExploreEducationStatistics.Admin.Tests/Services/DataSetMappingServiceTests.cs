@@ -175,6 +175,19 @@ public class DataSetMappingServiceTests
             Indicators = [replacementIndicatorA4],
         };
 
+        var replacementLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.Country,
+            Country = new Country("E0200000", "England"),
+        };
+
+        var replacementLocationObservation = new Observation
+        {
+            SubjectId = replacementSubjectId,
+            Location = replacementLocation,
+        };
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
         {
@@ -183,6 +196,7 @@ public class DataSetMappingServiceTests
                 replacementIndicatorGroupA,
                 replacementIndicatorGroupB
             );
+            statisticsDbContext.Observation.Add(replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -272,7 +286,15 @@ public class DataSetMappingServiceTests
                 ],
             };
 
-            result.AssertDeepEqualTo(expectedMapping, ignoreProperties: [mapping => mapping.Id]);
+            result.AssertDeepEqualTo(
+                expectedMapping,
+                ignoreProperties:
+                [
+                    mapping => mapping.Id,
+                    mapping => mapping.LocationMappings,
+                    mapping => mapping.UnmappedReplacementLocations,
+                ]
+            );
         }
     }
 

@@ -44,7 +44,7 @@ export default function DataFilesReplacementTableRow({
   const { data: replacementDataFile, isLoading } = useQuery({
     ...releaseDataFileQueries.getDataFile(
       releaseVersionId,
-      dataFile.replacedBy ?? '',
+      dataFile.replacedByDataFileId ?? '',
     ),
     initialData: dataFile.replacedByDataFile,
   });
@@ -53,7 +53,7 @@ export default function DataFilesReplacementTableRow({
     ...dataFileReplacementQueries.getReplacementPlan(
       releaseVersionId,
       dataFile.id,
-      dataFile.replacedBy ?? '',
+      dataFile.replacedByDataFileId ?? '',
     ),
     enabled: fetchPlan,
   });
@@ -156,6 +156,7 @@ export default function DataFilesReplacementTableRow({
                 triggerButton={
                   <ButtonText variant="secondary">
                     Cancel replacement
+                    <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
                   </ButtonText>
                 }
                 onConfirm={async () => {
@@ -183,6 +184,7 @@ export default function DataFilesReplacementTableRow({
                 }}
               >
                 Confirm replacement
+                <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
               </ButtonText>
             )}
           </>

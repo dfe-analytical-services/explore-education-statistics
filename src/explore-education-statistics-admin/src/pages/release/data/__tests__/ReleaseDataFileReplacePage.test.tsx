@@ -68,6 +68,7 @@ describe('ReleaseDataFileReplacePage', () => {
     metaFileId: 'meta-1',
     userName: 'original@test.com',
     created: '2020-09-20T12:00:00',
+    replacementInProgress: false,
     permissions: {
       canCancelImport: false,
     },
@@ -87,6 +88,7 @@ describe('ReleaseDataFileReplacePage', () => {
     metaFileId: 'meta-2',
     userName: 'replacer@test.com',
     created: '2020-09-28T12:00:00',
+    replacementInProgress: false,
     permissions: {
       canCancelImport: false,
     },
@@ -163,7 +165,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders replacement and original data file details', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce(
       testReplacementFile,
@@ -252,7 +254,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders correct error state if unable to load replacement data file', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockRejectedValueOnce(
       new Error('Something went wrong'),
@@ -319,7 +321,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders valid replacement plan', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce(
       testReplacementFile,
@@ -376,7 +378,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders correct state if replacement file has not finished importing', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testReplacementFile,
@@ -430,7 +432,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders correct error state if unable to load replacement plan', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce(
       testReplacementFile,
@@ -480,7 +482,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('confirming replacement cancellation hides modal and calls service to delete replacement file', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce(
       testReplacementFile,
@@ -549,7 +551,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders confirmation modal when cancelling FAILED replacement', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testReplacementFile,
@@ -614,7 +616,7 @@ describe('ReleaseDataFileReplacePage', () => {
   test('renders confirmation modal when cancelling after replacement plan error', async () => {
     releaseDataFileService.getDataFile.mockResolvedValueOnce({
       ...testOriginalFile,
-      replacedBy: testReplacementFile.id,
+      replacedByDataFileId: testReplacementFile.id,
     });
     releaseDataFileService.getDataFile.mockResolvedValueOnce(
       testReplacementFile,

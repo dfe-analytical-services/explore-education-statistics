@@ -5,14 +5,21 @@ import ApiDataSetQuickStart from '@common/modules/data-catalogue/components/ApiD
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
+import WarningMessage from '@common/components/WarningMessage';
 
 interface Props {
-  id: string;
-  name: string;
-  version: string;
+  id: string | undefined;
+  name: string | undefined;
+  version: string | undefined;
 }
 
 export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
+  if (!id || !name || !version) {
+    return (
+      <WarningMessage>API data set is not currently available</WarningMessage>
+    );
+  }
+
   return (
     <DataSetFilePageSection heading={pageSections.api} id="api">
       <ChevronGrid>

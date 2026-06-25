@@ -172,10 +172,28 @@ public class ReplacementPlanServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Indicators = [new Indicator()],
+        };
+
+        var replacementLocationObservation = new Observation
+        {
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = new Location
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Country = new Country("E0200000", "England"),
+            },
+        };
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.IndicatorGroup.Add(replacementIndicatorGroup);
+            statisticsDbContext.Observation.Add(replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -307,6 +325,12 @@ public class ReplacementPlanServiceTests
             Location = originalLocation,
         };
 
+        var replacementObservationForLocation = new Observation
+        {
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthority, LocalAuthority = _derby },
+        };
+
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -395,7 +419,7 @@ public class ReplacementPlanServiceTests
                 footnoteForSubject
             );
             statisticsDbContext.Location.AddRange(originalLocation);
-            statisticsDbContext.Observation.AddRange(observationForOriginalLocation);
+            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, replacementObservationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -710,6 +734,13 @@ public class ReplacementPlanServiceTests
             Location = location,
         };
 
+        var replacementObservationForLocation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = location,
+        };
+
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -763,7 +794,7 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.Filter.AddRange(originalDefaultFilter, replacementDefaultFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
-            statisticsDbContext.Observation.AddRange(observationForLocation);
+            statisticsDbContext.Observation.AddRange(observationForLocation, replacementObservationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -898,6 +929,13 @@ public class ReplacementPlanServiceTests
             Location = location,
         };
 
+        var replacementLocationObservation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = location,
+        };
+
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -951,7 +989,7 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.Filter.AddRange(originalDefaultFilter, replacementDefaultFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
-            statisticsDbContext.Observation.AddRange(observationForLocation);
+            statisticsDbContext.Observation.AddRange(observationForLocation, replacementLocationObservation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1105,6 +1143,13 @@ public class ReplacementPlanServiceTests
             Location = location,
         };
 
+        var replacementObservationForLocation = new Observation
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Location = location,
+        };
+
         var timePeriod = new TimePeriodQuery
         {
             StartYear = 2019,
@@ -1162,7 +1207,7 @@ public class ReplacementPlanServiceTests
             );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
-            statisticsDbContext.Observation.AddRange(observationForLocation);
+            statisticsDbContext.Observation.AddRange(observationForLocation, replacementObservationForLocation);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1537,6 +1582,29 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             // because we're not adding a contentDbContext.DataSetMapping entry, one will be automatically generated
             await contentDbContext.SaveChangesAsync();
+        }
+
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            Subject = replacementReleaseSubject.Subject,
+            Indicators = [new Indicator()],
+        };
+
+        var replacementLocationObservation = new Observation
+        {
+            Subject = replacementReleaseSubject.Subject,
+            Location = new Location
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Country = new Country("E0200000", "England"),
+            },
+        };
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.IndicatorGroup.Add(replacementIndicatorGroup);
+            statisticsDbContext.Observation.Add(replacementLocationObservation);
+            await statisticsDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

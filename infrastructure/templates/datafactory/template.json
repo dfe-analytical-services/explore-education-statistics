@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters":{
+  "parameters": {
     "subscription": {
       "type": "string",
       "metadata": {
@@ -55,17 +55,17 @@
       }
     }
   },
-  "variables":{
+  "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
   },
-  "resources":[
+  "resources": [
     {
-      "name":"[parameters('dataFactoryName')]",
-      "apiVersion":"2018-06-01",
-      "type":"Microsoft.DataFactory/factories",
-      "location":"[resourceGroup().location]",
-      "identity":{
-        "type":"SystemAssigned"
+      "name": "[parameters('dataFactoryName')]",
+      "apiVersion": "2018-06-01",
+      "type": "Microsoft.DataFactory/factories",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
       },
       "properties": {},
       "dependsOn": []
@@ -96,6 +96,14 @@
                 "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               },
               "secretName": "ees-alerts-slackapptoken"
+            }
+          },
+          "teamsPowerAutomateWebhookUrl": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              },
+              "secretName": "ees-alerts-teamswebhookurl"
             }
           }
         }

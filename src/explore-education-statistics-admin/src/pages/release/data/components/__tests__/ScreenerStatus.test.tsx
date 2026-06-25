@@ -18,7 +18,7 @@ describe('ScreenerStatus', () => {
     dataFileSize: '200 B',
     metaFileName: 'meta.csv',
     metaFileSize: '100 B',
-    status: 'PendingReview',
+    screeningStatus: 'PendingReview',
     created: new Date(),
     uploadedBy: 'test@test.com',
   };
@@ -51,7 +51,7 @@ describe('ScreenerStatus', () => {
         releaseVersionId="release-1"
         dataSetUpload={{
           ...testDataSetUpload,
-          status: undefined,
+          screeningStatus: undefined,
         }}
       />,
     );
@@ -93,7 +93,7 @@ describe('ScreenerStatus', () => {
         releaseVersionId="release-1"
         dataSetUpload={{
           ...testDataSetUpload,
-          status: 'Screening',
+          screeningStatus: 'Screening',
         }}
       />,
     );
@@ -124,7 +124,7 @@ describe('ScreenerStatus', () => {
         releaseVersionId="release-1"
         dataSetUpload={{
           ...testDataSetUpload,
-          status: 'Screening',
+          screeningStatus: 'Screening',
         }}
       />,
     );
@@ -173,7 +173,7 @@ describe('ScreenerStatus', () => {
         releaseVersionId="release-1"
         dataSetUpload={{
           ...testDataSetUpload,
-          status: 'Screening',
+          screeningStatus: 'Screening',
         }}
         onStatusChange={onStatusChange}
       />,

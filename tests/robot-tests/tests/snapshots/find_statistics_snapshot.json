@@ -203,7 +203,7 @@
     "theme": "Pupils and schools"
   },
   {
-    "publication_summary": "Children and young people in England with an education, health and care plan (EHCP), including annual local authority activity on EHCP requests and assessment.",
+    "publication_summary": "Children and young people in England with an education, health and care plan (EHC), including annual local authority activity on EHC requests and assessments.",
     "publication_title": "Education, health and care plans",
     "published": "26 Jun 2025",
     "release_type": "Accredited official statistics",
@@ -294,6 +294,13 @@
     "theme": "Further education"
   },
   {
+    "publication_summary": "Earnings and employment of higher education graduates & postgraduates by subject studied and characteristics, using Longitudinal Education Outcomes (LEO) data.",
+    "publication_title": "Graduate labour market outcomes (LEO)",
+    "published": "26 Jun 2025",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
     "publication_summary": "Official statistics on labour market outcomes such as salaries and employment rates, for graduates, non-graduates and postgraduates.",
     "publication_title": "Graduate labour market statistics",
     "published": "5 Jun 2025",
@@ -369,13 +376,6 @@
     "published": "11 Dec 2025",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
-  },
-  {
-    "publication_summary": "Earnings and employment of higher education graduates & postgraduates by subject studied and characteristics, using Longitudinal Education Outcomes (LEO) data.",
-    "publication_title": "LEO Graduate and Postgraduate Outcomes",
-    "published": "26 Jun 2025",
-    "release_type": "Official statistics",
-    "theme": "Higher education"
   },
   {
     "publication_summary": "Employment and earnings outcomes of graduates by each higher education provider by sex and current region/subject studied/prior attainment.",
@@ -513,7 +513,7 @@
   {
     "publication_summary": "Preference data including applications and offers made for secondary and primary school entry each September, and the proportion which received preferred offers",
     "publication_title": "Primary and secondary school applications and offers",
-    "published": "12 Jun 2025",
+    "published": "18 Jun 2026",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },

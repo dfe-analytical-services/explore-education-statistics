@@ -1,0 +1,84 @@
+import {
+  PublicationSummary,
+  ReleaseVersionSummary,
+} from '@common/services/publicationService';
+import React from 'react';
+import Link from '@frontend/components/Link';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import styles from '@common/modules/release/components/ReleasePageQuickLinks.module.scss';
+
+interface Props {
+  publicationSummary: PublicationSummary;
+  releaseVersionSummary: ReleaseVersionSummary;
+  showSubscriptionLink?: boolean;
+}
+
+const ReleasePageQuickLinks = ({
+  publicationSummary,
+  releaseVersionSummary,
+  showSubscriptionLink = true,
+}: Props) => {
+  return (
+    <div className={styles.quickLinksContainer}>
+      <h2 className={styles.quickLinksHeading} id="quick-links">
+        Quick links
+      </h2>
+      <nav
+        role="navigation"
+        aria-labelledby="quick-links"
+        data-testid="quick-links"
+      >
+        <ul
+          className={`${styles.quickLinks} govuk-list govuk-list--spaced govuk-!-margin-bottom-0`}
+        >
+          <li>
+            <Link
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+              onClick={() => {
+                logEvent({
+                  category: 'Downloads',
+                  action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
+                });
+              }}
+              id="download-all-data-link"
+            >
+              Download all data (ZIP)
+            </Link>
+          </li>
+          <li
+            className={
+              showSubscriptionLink ? undefined : 'govuk-!-margin-bottom-0'
+            }
+          >
+            <Link
+              to={
+                releaseVersionSummary.isLatestRelease
+                  ? `/data-tables/${publicationSummary.slug}`
+                  : `/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}`
+              }
+            >
+              Create your own tables
+            </Link>
+          </li>
+          {showSubscriptionLink && (
+            <li>
+              <Link
+                to={`/subscriptions/new-subscription/${publicationSummary.slug}`}
+                onClick={() => {
+                  logEvent({
+                    category: 'Subscribe',
+                    action: 'Email subscription',
+                  });
+                }}
+              >
+                Get email alerts
+              </Link>
+            </li>
+          )}
+        </ul>
+      </nav>
+    </div>
+  );
+};
+
+export default ReleasePageQuickLinks;

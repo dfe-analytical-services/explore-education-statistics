@@ -66,11 +66,15 @@ export default function DataSetUploadSummaryList({
           // TODO EES-7139 - change status to be non-nullable when foreground
           // screening process is decommissioned.
         }
-        {dataSetUpload.status ? (
+        {dataSetUpload.screeningStatus ? (
           <Tag
-            colour={getDataSetUploadScreeningStatusColour(dataSetUpload.status)}
+            colour={getDataSetUploadScreeningStatusColour(
+              dataSetUpload.screeningStatus,
+            )}
           >
-            {getDataSetUploadScreeningStatusLabel(dataSetUpload.status)}
+            {getDataSetUploadScreeningStatusLabel(
+              dataSetUpload.screeningStatus,
+            )}
           </Tag>
         ) : (
           <Tag colour="blue">Uploading</Tag>

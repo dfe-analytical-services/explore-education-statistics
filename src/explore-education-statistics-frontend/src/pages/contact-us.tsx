@@ -1,3 +1,4 @@
+import FeedbackSection from '@common/components/FeedbackSection';
 import InsetText from '@common/components/InsetText';
 import {
   DfeOpeningHours,
@@ -81,6 +82,11 @@ function ContactPage() {
               </a>
               .
             </p>
+          </section>
+
+          <section className="govuk-section-break--xl">
+            <h2 className="govuk-heading-m">Provide us with feedback</h2>
+            <FeedbackSection />
           </section>
         </div>
       </div>

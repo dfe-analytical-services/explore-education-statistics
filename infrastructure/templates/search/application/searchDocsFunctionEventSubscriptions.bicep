@@ -1,3 +1,8 @@
+metadata description = '''
+Creates Event Grid subscriptions for the Search Docs Function App, for a defined set of topics provisioned by the Core infrastructure.
+ Each subscription delivers events to a storage queue within the Search Docs Function App storage account.
+'''
+
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { eventTopics } from '../../common/eventTopics.bicep'
 import { buildFullyQualifiedTopicName } from '../../common/functions.bicep'

@@ -1,10 +1,8 @@
-import { ResourceNames } from '../../types.bicep'
-
-@description('Specifies common resource naming variables.')
-param resourceNames ResourceNames
-
 @description('Specifies the location for all resources.')
 param location string
+
+@description('Specifies the name of the Application Gateway.')
+param appGatewayName string
 
 @description('Secret header value from FUAPI.')
 @secure()
@@ -13,10 +11,10 @@ param fuapiSecretValue string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var policyName = '${resourceNames.sharedResources.appGateway}-public-api-afwp'
+var policyName = '${appGatewayName}-public-api-afwp'
 
-module wafPolicyModule '../../components/appGatewayWafPolicy.bicep' = {
-  name: 'wafPolicy'
+module wafPolicyModule '../../../common/components/application-gateway/appGatewayWafPolicy.bicep' = {
+  name: 'publicApiWafPolicyDeploy'
   params: {
     name: policyName
     location: location

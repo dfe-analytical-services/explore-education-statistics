@@ -20,6 +20,7 @@ const baseDataFile: DataFile = {
   userName: 'user@example.com',
   created: '2024-06-01T12:00:00Z',
   status: 'COMPLETE',
+  replacementInProgress: false,
   permissions: {
     canCancelImport: true,
   },
@@ -38,7 +39,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: undefined,
-          replacedBy: undefined,
+          replacedByDataFileId: undefined,
         }}
         releaseVersionId="rel-1"
         onReplacementStatusChange={() => {}}
@@ -58,7 +59,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: undefined,
+          replacedByDataFileId: undefined,
         }}
         releaseVersionId="rel-1"
         onReplacementStatusChange={() => {}}
@@ -78,7 +79,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: 'file-2',
+          replacedByDataFileId: 'file-2',
         }}
         replacementDataFile={{
           ...baseDataFile,
@@ -104,7 +105,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: 'file-2',
+          replacedByDataFileId: 'file-2',
         }}
         replacementDataFile={{
           ...baseDataFile,
@@ -130,7 +131,7 @@ describe('DataFileDetailsTable - replacementFileHasApi logic', () => {
         dataFile={{
           ...baseDataFile,
           publicApiDataSetId: 'api-1-draft',
-          replacedBy: 'file-2',
+          replacedByDataFileId: 'file-2',
         }}
         replacementDataFile={{
           ...baseDataFile,

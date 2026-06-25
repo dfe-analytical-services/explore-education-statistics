@@ -19,7 +19,11 @@ public record DataFileInfo : FileInfo
 
     public int? Rows { get; set; }
 
-    public Guid? ReplacedBy { get; set; }
+    public Guid? ReplacedByDataSetUploadId { get; set; }
+
+    public Guid? ReplacedByDataFileId { get; set; }
+
+    public bool ReplacementInProgress => ReplacedByDataSetUploadId != null || ReplacedByDataFileId != null;
 
     public ReplacementDataFileInfo? ReplacedByDataFile { get; set; }
 
@@ -41,7 +45,12 @@ public record DataFileInfo : FileInfo
     public DataFileInfo() { }
 
     [SetsRequiredMembers]
-    public DataFileInfo(ReleaseFile releaseFile, DataImport dataImport, DataFilePermissions permissions)
+    public DataFileInfo(
+        ReleaseFile releaseFile,
+        DataImport dataImport,
+        DataSetUpload? replacingDataSetUpload,
+        DataFilePermissions permissions
+    )
     {
         Id = releaseFile.FileId;
         FileName = releaseFile.File.Filename;
@@ -49,8 +58,9 @@ public record DataFileInfo : FileInfo
         Size = releaseFile.File.DisplaySize();
         MetaFileId = dataImport.MetaFile.Id;
         MetaFileName = dataImport.MetaFile.Filename;
-        ReplacedBy = releaseFile.File.ReplacedById;
+        ReplacedByDataFileId = releaseFile.File.ReplacedById;
         ReplacedByDataFile = null;
+        ReplacedByDataSetUploadId = replacingDataSetUpload?.Id;
         Rows = dataImport.TotalRows;
         UserName = releaseFile.File.CreatedBy?.Email ?? "";
         Status = dataImport.Status;
@@ -70,10 +80,11 @@ public record ReplacementDataFileInfo : DataFileInfo
     public ReplacementDataFileInfo(
         ReleaseFile releaseFile,
         DataImport dataImport,
+        DataSetUpload? replacingDataSetUpload,
         DataFilePermissions permissions,
         bool hasValidReplacementPlan
     )
-        : base(releaseFile, dataImport, permissions)
+        : base(releaseFile, dataImport, replacingDataSetUpload, permissions)
     {
         HasValidReplacementPlan = hasValidReplacementPlan;
     }

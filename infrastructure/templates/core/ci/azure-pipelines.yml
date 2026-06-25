@@ -12,6 +12,20 @@ trigger:
 pr: none
 
 parameters:
+  - name: deployApplicationGateway
+    displayName: Does Application Gateway need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No  
+  - name: deployAlerts
+    displayName: Do the Azure Monitor alerts need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
   - name: forceDeployToEnvironment
     displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
     type: string
@@ -21,13 +35,6 @@ parameters:
       - test
       - preprod
     default: none
-  - name: deployAlerts
-    displayName: Do the Azure Monitor alerts need creating or updating?
-    type: string
-    values:
-      - Yes
-      - No
-    default: No
 
 variables:
   - group: Common
@@ -43,6 +50,8 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
+  - name: deployApplicationGateway
+    value: ${{ iif(eq(parameters.deployApplicationGateway, 'Yes'), true, false) }}
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
 

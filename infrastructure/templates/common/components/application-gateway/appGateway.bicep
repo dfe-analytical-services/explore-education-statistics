@@ -1,13 +1,14 @@
-import { responseTimeConfig, dynamicTotalGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'
-import { staticAverageGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
-import { removeMultiple } from '../../common/functions.bicep'
+import { responseTimeConfig, dynamicTotalGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
+import { staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { removeMultiple } from '../../functions.bicep'
 
 import {
+  AppGatewayFrontendConfig
   AppGatewayBackend
   AppGatewayRewriteSet
   AppGatewayRoute
   AppGatewaySite
-} from '../types.bicep'
+} from 'types.bicep'
 
 @description('Name of the Key Vault name that the App Gateway will be permitted to get and list certificates from')
 param keyVaultName string
@@ -23,6 +24,9 @@ param appGatewayName string = ''
 
 @description('Name of the user-assigned managed identity for the App Gateway')
 param managedIdentityName string = ''
+
+@description('Frontend and public IP address configuration')
+param frontendConfig AppGatewayFrontendConfig
 
 @description('Sites that the App Gateway can accept traffic from')
 param sites AppGatewaySite[]
@@ -65,7 +69,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 }
 
 // Allow the managed identity to access certificates from Key Vault.
-module keyVaultSecretsUserRoleAssignmentModule '../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
+module keyVaultSecretsUserRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${appGatewayName}KeyVaultSecretsUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
@@ -74,7 +78,7 @@ module keyVaultSecretsUserRoleAssignmentModule '../../common/components/key-vaul
   }
 }
 
-module keyVaultCertificateUserRoleAssignmentModule '../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
+module keyVaultCertificateUserRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${appGatewayName}KeyVaultCertificateUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
@@ -85,9 +89,9 @@ module keyVaultCertificateUserRoleAssignmentModule '../../common/components/key-
 
 var invalidDomainLabelCharacters = ['.', '-']
 
-// Create public IP addresses for every site we will expose through this App Gateway.
-resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for site in sites: {
-  name: '${site.name}-pip'
+// Create a public IP address for the frontend config for this App Gateway.
+resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
+  name: frontendConfig.publicIpAddressName
   location: location
   sku: {
     name: 'Standard'
@@ -97,22 +101,24 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
     dnsSettings: {
-      domainNameLabel: removeMultiple(site.fqdn, invalidDomainLabelCharacters)
-      fqdn: '${removeMultiple(site.fqdn, invalidDomainLabelCharacters)}.${location}.cloudapp.azure.com'
+      domainNameLabel: removeMultiple(sites[0].fqdn, invalidDomainLabelCharacters)
+      fqdn: '${removeMultiple(sites[0].fqdn, invalidDomainLabelCharacters)}.${location}.cloudapp.azure.com'
     }
   }
   zones: availabilityZones
-}]
+}
 
-module pathRulesModule './appGatewayPathRules.bicep' = [for route in routes: {
+var routesWithPathRules = filter(routes, route => route.?pathRules != null && length(route.pathRules!) > 0)
+
+module pathRulesModule 'appGatewayPathRules.bicep' = [for route in routesWithPathRules: {
   name: '${route.name}-route-paths'
   params: {
     appGatewayName: appGatewayName
-    pathRules: route.pathRules
+    pathRules: route.pathRules!
   }
 }]
 
-var allPathRules = flatten(map(routes, route => route.pathRules))
+var allPathRules = flatten(map(routesWithPathRules, route => route.pathRules!))
 
 var allRedirectRules = filter(allPathRules, rule => rule.type == 'redirect')
 
@@ -150,12 +156,12 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
         keyVaultSecretId: 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/${site.certificateName}'
       }
     }]
-    frontendIPConfigurations: [for site in sites: {
-      name: '${site.name}-public-frontend-ip-config'
+    frontendIPConfigurations: [{
+      name: frontendConfig.name
       properties: {
         privateIPAllocationMethod: 'Dynamic'
         publicIPAddress: {
-          id: resourceId('Microsoft.Network/publicIPAddresses', '${site.name}-pip')
+          id: resourceId('Microsoft.Network/publicIPAddresses', frontendConfig.publicIpAddressName)
         }
       }
     }]
@@ -194,7 +200,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
       name: '${site.name}-https-443-listener'
       properties: {
         frontendIPConfiguration: {
-          id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', appGatewayName, '${site.name}-public-frontend-ip-config')
+          id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', appGatewayName, frontendConfig.name)
         }
         frontendPort: {
           id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', appGatewayName, 'port443')
@@ -213,17 +219,23 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
     requestRoutingRules: [for (route, index) in routes: {
       name: '${route.name}-rule'
       properties: {
-        ruleType: 'PathBasedRouting'
+        ruleType: route.?pathRules != null && length(route.pathRules!) > 0 ? 'PathBasedRouting' : 'Basic'
         priority: index + 1
         httpListener: {
           id: resourceId('Microsoft.Network/applicationGateways/httpListeners', appGatewayName, '${route.siteName}-https-443-listener')
         }
-        urlPathMap: {
+        backendAddressPool: route.?pathRules == null || length(route.pathRules!) == 0 ? {
+          id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', appGatewayName, '${route.defaultBackendName}-backend-pool')
+        } : null
+        backendHttpSettings: route.?pathRules == null || length(route.pathRules!) == 0 ? {
+          id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', appGatewayName, '${route.defaultBackendName}-backend')
+        } : null
+        urlPathMap: route.?pathRules != null && length(route.pathRules!) > 0 ? {
           id: resourceId('Microsoft.Network/applicationGateways/urlPathMaps', appGatewayName, '${route.name}-url-path-map')
-        }
+        } : null
       }
     }]
-    urlPathMaps: [for (route, index) in routes: {
+    urlPathMaps: [for (route, index) in routesWithPathRules: {
       name: '${route.name}-url-path-map'
       properties: {
         defaultBackendAddressPool: {
@@ -253,7 +265,9 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
         unhealthyThreshold: 3
         pickHostNameFromBackendHttpSettings: true
         minServers: 0
-        match: {}
+        match: {
+          statusCodes: concat(['200-399'], backend.?healthProbeAdditionalStatusCodeMatches ?? [])
+        }
       }
     }]
     rewriteRuleSets: [for rewriteSet in rewrites: {
@@ -278,7 +292,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
   ]
 }
 
-module backendPoolsHealthAlert '../../common/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
+module backendPoolsHealthAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
   name: '${appGatewayName}BackendHealthAlertModule'
   params: {
     resourceName: appGatewayName
@@ -299,7 +313,7 @@ module backendPoolsHealthAlert '../../common/components/alerts/staticMetricAlert
   ]
 }
 
-module responseTimeAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
   params: {
     resourceName: appGatewayName
@@ -316,7 +330,7 @@ module responseTimeAlert '../../common/components/alerts/dynamicMetricAlert.bice
   ]
 }
 
-module failedRequestsAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
+module failedRequestsAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
   name: '${appGatewayName}FailedRequestsDeploy'
   params: {
     resourceName: appGatewayName
@@ -341,7 +355,7 @@ module failedRequestsAlert '../../common/components/alerts/dynamicMetricAlert.bi
   ]
 }
 
-module responseStatusAlert '../../common/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
+module responseStatusAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
   name: '${appGatewayName}ResponseStatusDeploy'
   params: {
     resourceName: appGatewayName

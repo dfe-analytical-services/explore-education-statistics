@@ -99,12 +99,7 @@
       "value": 4294967296
     },
     "maxStatsDbSizeBytes": {
-      "value": 2748779069440
-    },
-    "additionalPublicAllowedOrigins": {
-      "value": [
-        "https://afd.explore-education-statistics.service.gov.uk"
-      ]
+      "value": 3298534883328
     }
   }
 }

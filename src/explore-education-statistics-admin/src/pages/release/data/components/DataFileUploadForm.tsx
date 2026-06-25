@@ -127,6 +127,7 @@ interface Props {
   isDataReplacement?: boolean;
   releaseVersionId: string;
   dataFileTitle?: string;
+  hideFormFields?: boolean;
   onSubmit: () => void;
   onCancel?: () => void;
 }
@@ -136,6 +137,7 @@ export default function DataFileUploadForm({
   isDataReplacement = false,
   releaseVersionId,
   dataFileTitle,
+  hideFormFields = false,
   onSubmit,
   onCancel,
 }: Props) {
@@ -267,6 +269,7 @@ export default function DataFileUploadForm({
       initialValues={defaultInitialValues}
       resetAfterSubmit
       validationSchema={validationSchema}
+      enableReinitialize
     >
       {({ formState, reset, getValues, watch }) => {
         const uploadType = getValues('uploadType');
@@ -289,93 +292,103 @@ export default function DataFileUploadForm({
               {formState.isSubmitting && (
                 <LoadingSpinner text="Uploading files" overlay />
               )}
-              {!isDataReplacement && uploadType !== 'bulkZip' && (
+              {!hideFormFields && (
                 <>
-                  <FormFieldTextInput<DataFileUploadFormValues>
-                    name="title"
-                    label="Data file title"
-                    className="govuk-!-width-two-thirds"
-                    maxLength={titleMaxLength}
-                    onBlur={() => {
-                      toggleReplacementWarning(
-                        dataSetFileTitles.includes(title),
-                      );
-                    }}
-                  />
-                  {showReplacementWarning && (
-                    <WarningMessage>
-                      Using this title will trigger a data replacement on the
-                      matching file.
-                    </WarningMessage>
+                  {!isDataReplacement && uploadType !== 'bulkZip' && (
+                    <>
+                      <FormFieldTextInput<DataFileUploadFormValues>
+                        name="title"
+                        label="Data file title"
+                        className="govuk-!-width-two-thirds"
+                        maxLength={titleMaxLength}
+                        onBlur={() => {
+                          toggleReplacementWarning(
+                            dataSetFileTitles.includes(title),
+                          );
+                        }}
+                        disabled={hideFormFields}
+                      />
+                      {showReplacementWarning && (
+                        <WarningMessage>
+                          Using this title will trigger a data replacement on
+                          the matching file.
+                        </WarningMessage>
+                      )}
+                    </>
                   )}
+
+                  <FormFieldRadioGroup<DataFileUploadFormValues>
+                    name="uploadType"
+                    legend="Choose upload method"
+                    hint={`Filenames must be under ${MAX_FILENAME_SIZE} characters in length`}
+                    order={[]}
+                    options={[
+                      {
+                        label: 'CSV files',
+                        value: 'csv',
+                        conditional: (
+                          <>
+                            <FormFieldFileInput<DataFileUploadFormValues>
+                              name="dataFile"
+                              label="Upload data file"
+                              accept=".csv"
+                              disabled={hideFormFields}
+                            />
+
+                            <FormFieldFileInput<DataFileUploadFormValues>
+                              name="metadataFile"
+                              label="Upload metadata file"
+                              accept=".csv"
+                              disabled={hideFormFields}
+                            />
+                          </>
+                        ),
+                      },
+                      {
+                        label: 'ZIP file',
+                        hint: 'Recommended for larger data files',
+                        value: 'zip',
+                        conditional: (
+                          <FormFieldFileInput<DataFileUploadFormValues>
+                            hint="Must contain both the data and metadata CSV files"
+                            name="zipFile"
+                            label="Upload ZIP file"
+                            accept=".zip"
+                            disabled={hideFormFields}
+                          />
+                        ),
+                      },
+                      ...(!isDataReplacement
+                        ? [
+                            {
+                              label: 'Bulk ZIP upload',
+                              hint: 'To import multiple data files at once',
+                              value: 'bulkZip',
+                              conditional: (
+                                <FormFieldFileInput<DataFileUploadFormValues>
+                                  hint="Must contain dataset_names.csv and pairs of csv/meta.csv data files"
+                                  name="bulkZipFile"
+                                  label="Upload bulk ZIP file"
+                                  accept=".zip"
+                                  disabled={hideFormFields}
+                                />
+                              ),
+                            },
+                          ]
+                        : []),
+                    ]}
+                    onChange={event => {
+                      setSelectedFileType(event.target.value as FileType);
+                    }}
+                    disabled={hideFormFields}
+                  />
                 </>
               )}
-
-              <FormFieldRadioGroup<DataFileUploadFormValues>
-                name="uploadType"
-                legend="Choose upload method"
-                hint={`Filenames must be under ${MAX_FILENAME_SIZE} characters in length`}
-                order={[]}
-                options={[
-                  {
-                    label: 'CSV files',
-                    value: 'csv',
-                    conditional: (
-                      <>
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="dataFile"
-                          label="Upload data file"
-                          accept=".csv"
-                        />
-
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="metadataFile"
-                          label="Upload metadata file"
-                          accept=".csv"
-                        />
-                      </>
-                    ),
-                  },
-                  {
-                    label: 'ZIP file',
-                    hint: 'Recommended for larger data files',
-                    value: 'zip',
-                    conditional: (
-                      <FormFieldFileInput<DataFileUploadFormValues>
-                        hint="Must contain both the data and metadata CSV files"
-                        name="zipFile"
-                        label="Upload ZIP file"
-                        accept=".zip"
-                      />
-                    ),
-                  },
-                  ...(!isDataReplacement
-                    ? [
-                        {
-                          label: 'Bulk ZIP upload',
-                          hint: 'To import multiple data files at once',
-                          value: 'bulkZip',
-                          conditional: (
-                            <FormFieldFileInput<DataFileUploadFormValues>
-                              hint="Must contain dataset_names.csv and pairs of csv/meta.csv data files"
-                              name="bulkZipFile"
-                              label="Upload bulk ZIP file"
-                              accept=".zip"
-                            />
-                          ),
-                        },
-                      ]
-                    : []),
-                ]}
-                onChange={event => {
-                  setSelectedFileType(event.target.value as FileType);
-                }}
-              />
 
               <ButtonGroup>
                 <Button
                   type="submit"
-                  disabled={formState.isSubmitting}
+                  disabled={formState.isSubmitting || hideFormFields}
                   testId={
                     isDataReplacement
                       ? 'upload-replacement-files-button'

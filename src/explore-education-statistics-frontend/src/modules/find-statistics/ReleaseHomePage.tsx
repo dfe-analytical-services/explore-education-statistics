@@ -20,6 +20,7 @@ import PublicationSectionBlocks from '@frontend/modules/find-statistics/componen
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { Fragment } from 'react';
+import ReleasePageTitleQuickLinks from './components/ReleasePageQuickLinks';
 
 interface Props {
   homeContent: ReleaseVersionHomeContent;
@@ -128,6 +129,15 @@ const ReleaseHomePage = ({
                   </VisuallyHidden>
                 </Link>
               ) : undefined
+            }
+            quickLinks={
+              <div>
+                <ReleasePageTitleQuickLinks
+                  publicationSummary={publicationSummary}
+                  releaseVersionSummary={releaseVersionSummary}
+                  showSubscriptionLink={false}
+                />
+              </div>
             }
             onShowReleaseTypeModal={() =>
               logEvent({
