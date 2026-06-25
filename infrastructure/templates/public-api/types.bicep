@@ -36,13 +36,11 @@ type ResourceNames = {
     keyVault: string
     logAnalyticsWorkspace: string
     publisherFunction: string
-    publicSiteAppService: string
     subnets: {
       dataProcessor: string
       dataProcessorPrivateEndpoints: string
       containerAppEnvironment: string
       psqlFlexibleServer: string
-      appGateway: string
       adminApp: string
       publisherFunction: string
       storagePrivateEndpoints: string
@@ -50,8 +48,6 @@ type ResourceNames = {
     vNet: string
   }
   sharedResources: {
-    appGateway: string
-    appGatewayIdentity: string
     containerAppEnvironment: string
     logAnalyticsWorkspace: string
     postgreSqlFlexibleServer: string

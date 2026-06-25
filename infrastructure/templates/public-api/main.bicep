@@ -120,11 +120,7 @@ param publicUrls {
   contentApi: string
   publicSite: string
   publicApi: string
-  publicApiAppGateway: string
 }
-
-@description('FQDN of the service hosting the public site, rather than the public URL as used by custom domains.')
-param publicSiteInternalServiceFqdn string = ''
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
@@ -208,11 +204,9 @@ var resourceNames = {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-log'
     publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
-    publicSiteAppService: '${legacyResourcePrefix}-as-ees-public-site'
     subnets: {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
       publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'
-      appGateway: '${commonResourcePrefix}-snet-${abbreviations.networkApplicationGateways}-01'
       containerAppEnvironment: '${commonResourcePrefix}-snet-${abbreviations.appManagedEnvironments}-01'
       dataProcessor: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor'
       dataProcessorPrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor-pep'
@@ -222,8 +216,6 @@ var resourceNames = {
     vNet: '${legacyResourcePrefix}-vnet-ees'
   }
   sharedResources: {
-    appGateway: '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'
-    appGatewayIdentity: '${commonResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
@@ -415,22 +407,6 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
   params: {
     appSku: docsAppSku
     resourceNames: resourceNames
-    tagValues: tagValues
-  }
-}
-
-// Create an Application Gateway to serve public traffic for the Public API Container App.
-module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp && deployDocsSite) {
-  name: 'appGatewayModuleDeploy'
-  params: {
-    location: location
-    subscription: subscription
-    resourceNames: resourceNames
-    publicApiAppGatewayFqdn: publicUrls.publicApiAppGateway
-    publicApiPublicUrl: publicUrls.publicApi
-    publicSiteFqdn: replace(publicUrls.publicSite, 'https://', '')
-    publicSiteInternalServiceFqdn: publicSiteInternalServiceFqdn
-    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }

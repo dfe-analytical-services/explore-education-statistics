@@ -7,7 +7,6 @@ param publicUrls = {
   contentApi: 'https://cont.pre-production.explore-education-statistics.service.gov.uk'
   publicSite: 'https://pre-production.explore-education-statistics.service.gov.uk'
   publicApi: 'https://pp-api.education.gov.uk/statistics-preprod'
-  publicApiAppGateway: 'https://pre-production.statistics.api.education.gov.uk'
 }
 
 // PostgreSQL Database Params
@@ -46,5 +45,3 @@ param enableSwagger = true
 param deployPsqlBackupVaultRoleAssignment = true
 
 param deployPsqlBackupVaultRegistration = true
-
-param publicSiteInternalServiceFqdn = 's101p02-ees-fde-euhyh8d6cdeagqdu.a02.azurefd.net'
