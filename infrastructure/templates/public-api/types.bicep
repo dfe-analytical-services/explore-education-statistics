@@ -36,6 +36,7 @@ type ResourceNames = {
     keyVault: string
     logAnalyticsWorkspace: string
     publisherFunction: string
+    publicSiteAppService: string
     subnets: {
       dataProcessor: string
       dataProcessorPrivateEndpoints: string

@@ -123,6 +123,9 @@ param publicUrls {
   publicApiAppGateway: string
 }
 
+@description('FQDN of the service hosting the public site, rather than the public URL as used by custom domains.')
+param publicSiteInternalServiceFqdn string = ''
+
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
 
@@ -205,6 +208,7 @@ var resourceNames = {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-log'
     publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
+    publicSiteAppService: '${legacyResourcePrefix}-as-ees-public-site'
     subnets: {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
       publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'
@@ -415,115 +419,17 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
   }
 }
 
-var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
-
-resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
-}
-
-module publicApiWafPolicyModule 'application/public-api/publicApiWafPolicy.bicep' = {
-  name: 'publicApiWafPolicyModuleDeploy'
-  params: {
-    location: location
-    resourceNames: resourceNames
-    fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
-    tagValues: tagValues
-  }
-}
-
 // Create an Application Gateway to serve public traffic for the Public API Container App.
 module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp && deployDocsSite) {
   name: 'appGatewayModuleDeploy'
   params: {
     location: location
+    subscription: subscription
     resourceNames: resourceNames
-    sites: [
-      {
-        name: publicApiResourcePrefix
-        certificateName: '${publicApiResourcePrefix}-certificate'
-        fqdn: replace(publicUrls.publicApiAppGateway, 'https://', '')
-        wafPolicyName: publicApiWafPolicyModule.outputs.name
-      }
-    ]
-    backends: [
-      {
-        name: resourceNames.publicApi.apiApp
-        fqdn: apiAppModule.outputs.containerAppFqdn
-        healthProbePath: apiAppModule.outputs.healthProbePath
-      }
-      {
-        name: resourceNames.publicApi.docsApp
-        fqdn: docsModule.outputs.appFqdn
-        healthProbePath: docsModule.outputs.healthProbePath
-      }
-    ]
-    routes: [
-      {
-        name: publicApiResourcePrefix
-        siteName: publicApiResourcePrefix
-        defaultBackendName: resourceNames.publicApi.apiApp
-        pathRules: [
-          {
-            name: 'docs-backend'
-            paths: ['/docs/*']
-            type: 'backend'
-            backendName: resourceNames.publicApi.docsApp
-            rewriteSetName: docsRewriteSetName
-          }
-          {
-            // Redirect non-rooted URL (has no trailing slash) to the
-            // rooted URL so that relative links in the docs site
-            // can resolve correctly.
-            name: 'docs-root-redirect'
-            paths: ['/docs']
-            type: 'redirect'
-            redirectUrl: '${publicUrls.publicApi}/docs/'
-            redirectType: 'Permanent'
-            includePath: false
-          }
-        ]
-      }
-    ]
-    rewrites: [
-      {
-        name: docsRewriteSetName
-        rules: [
-          {
-            name: 'trim-docs-path-prefix'
-            conditions: [
-              {
-                variable: 'var_uri_path'
-                pattern: '^/docs/(.*)'
-                ignoreCase: true
-              }
-            ]
-            actionSet: {
-              urlConfiguration: {
-                modifiedPath: '/{var_uri_path_1}'
-              }
-            }
-          }
-          {
-            name: 'replace-docs-backend-fqdn-with-public-docs-url'
-            conditions: [
-              {
-                variable: 'http_resp_Location'
-                pattern: 'https://${docsModule.outputs.appFqdn}/(.*)'
-                ignoreCase: true
-              }
-            ]
-            actionSet: {
-              responseHeaderConfigurations: [
-                {
-                  headerName: 'Location'
-                  headerValue: '${publicUrls.publicApi}/docs/{http_resp_Location_1}'
-                }
-              ]
-            }
-          }
-        ]
-      }
-    ]
+    publicApiAppGatewayFqdn: publicUrls.publicApiAppGateway
+    publicApiPublicUrl: publicUrls.publicApi
+    publicSiteFqdn: replace(publicUrls.publicSite, 'https://', '')
+    publicSiteInternalServiceFqdn: publicSiteInternalServiceFqdn
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
@@ -575,17 +481,18 @@ output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-d
 output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 
 output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor
-  ? dataProcessorModule.outputs.managedIdentityClientId
+  ? dataProcessorModule!.outputs.managedIdentityClientId
   : ''
 
-output dataProcessorFunctionAppUrl string = deployDataProcessor ? dataProcessorModule.outputs.url : ''
-output dataProcessorFunctionAppStagingUrl string = deployDataProcessor ? dataProcessorModule.outputs.stagingUrl : ''
+output dataProcessorFunctionAppUrl string = deployDataProcessor ? dataProcessorModule!.outputs.url : ''
+output dataProcessorFunctionAppStagingUrl string = deployDataProcessor ? dataProcessorModule!.outputs.stagingUrl : ''
 
 output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
-  ? dataProcessorModule.outputs.publicApiDataFileShareMountPath
+  ? dataProcessorModule!.outputs.publicApiDataFileShareMountPath
   : ''
 
 output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
 output keyVaultName string = resourceNames.existingResources.keyVault
 
 output enableThemeDeletion bool = enableThemeDeletion
+

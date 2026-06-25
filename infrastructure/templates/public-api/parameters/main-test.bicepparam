@@ -17,3 +17,5 @@ param enableThemeDeletion = false
 param deployPsqlBackupVaultRoleAssignment = true
 
 param deployPsqlBackupVaultRegistration = true
+
+param publicSiteInternalServiceFqdn = 's101t01-ees-fde-dscafufydubae2fg.a02.azurefd.net'

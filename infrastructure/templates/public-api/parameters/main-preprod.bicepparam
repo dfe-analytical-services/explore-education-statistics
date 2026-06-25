@@ -46,3 +46,5 @@ param enableSwagger = true
 param deployPsqlBackupVaultRoleAssignment = true
 
 param deployPsqlBackupVaultRegistration = true
+
+param publicSiteInternalServiceFqdn = 's101p02-ees-fde-euhyh8d6cdeagqdu.a02.azurefd.net'
