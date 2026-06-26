@@ -8,7 +8,7 @@
   gap: govuk-spacing(4);
   margin-bottom: govuk-spacing(6);
   padding: govuk-spacing(2);
-  background-color: $dfe-govuk-rebrand-light-blue-background-colour;
+  background-color: govuk-colour('blue', $variant: 'tint-95');
 }
 
 .innerWrap {

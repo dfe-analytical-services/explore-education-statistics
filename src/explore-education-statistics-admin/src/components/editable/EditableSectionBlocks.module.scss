@@ -2,7 +2,7 @@
 
 .draggable {
   background: #fff;
-  border: 2px solid $govuk-border-colour;
+  border: 2px solid govuk-functional-colour(border);
   border-bottom: 0;
   max-height: 15rem;
   min-height: 60px;

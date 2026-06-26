@@ -27,6 +27,6 @@
   }
 
   li a:hover {
-    border-bottom: 0.3rem solid $govuk-link-hover-colour;
+    border-bottom: 0.3rem solid govuk-functional-colour(link-hover);
   }
 }

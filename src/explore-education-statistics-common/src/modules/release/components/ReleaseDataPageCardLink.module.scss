@@ -24,7 +24,7 @@
   gap: govuk-spacing(2);
   padding: govuk-spacing(4);
   position: relative;
-  background-color: $dfe-govuk-rebrand-light-blue-background-colour;
+  background-color: govuk-colour('blue', $variant: 'tint-95');
 
   > * {
     margin-bottom: 0;
@@ -43,6 +43,6 @@
   }
 
   a:hover::before {
-    box-shadow: 0 0 0 1px $dfe-govuk-rebrand-border-colour-on-blue-tint-95 inset;
+    box-shadow: 0 0 0 1px govuk-colour('blue', $variant: 'tint-50') inset;
   }
 }

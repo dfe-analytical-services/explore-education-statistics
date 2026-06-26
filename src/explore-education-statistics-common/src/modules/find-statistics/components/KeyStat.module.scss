@@ -31,13 +31,13 @@
 
 /* stylelint-disable max-nesting-depth */
 .guidanceTitle {
-  background: $dfe-govuk-rebrand-light-blue-background-colour;
+  background: govuk-colour('blue', $variant: 'tint-95');
   margin: 0;
   padding: 0;
   position: relative;
   text-align: left;
   width: 100%;
-  border: 1px solid $dfe-govuk-rebrand-border-colour-on-blue-tint-95;
+  border: 1px solid govuk-colour('blue', $variant: 'tint-50');
   align-self: start;
 
   :global(.govuk-details__summary) {

@@ -2,7 +2,7 @@
 
 .preview {
   background: govuk-colour('black', $variant: 'tint-95');
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
   margin-bottom: govuk-spacing(4);
   padding: govuk-spacing(4);
 

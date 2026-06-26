@@ -15,7 +15,7 @@
 
   &:focus,
   &.focused {
-    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline: govuk-functional-colour(focus) solid $govuk-focus-width;
   }
 }
 
