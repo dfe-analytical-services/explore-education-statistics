@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .container {
   position: relative;
@@ -16,8 +16,8 @@
 }
 
 .pre {
-  background: govuk-colour('light-grey');
-  border: 1px solid govuk-colour('mid-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
+  border: 1px solid govuk-colour('black', $variant: 'tint-80');
   padding: 2px !important;
 
   &:focus-within {

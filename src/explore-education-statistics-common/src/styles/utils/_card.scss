@@ -1,3 +1,5 @@
+@use 'govuk-frontend/base' as *;
+
 .dfe-card__container {
   display: flex;
   @include govuk-media-query($until: tablet) {
@@ -10,7 +12,7 @@
 }
 
 .dfe-card {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   border-bottom: 4px solid $govuk-brand-colour;
   display: flex;
   flex-direction: column;

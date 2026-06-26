@@ -4,10 +4,7 @@ import React from 'react';
 class Document extends BaseDocument {
   render() {
     return (
-      <Html
-        lang="en"
-        className="govuk-template govuk-template--rebranded app-html-class"
-      >
+      <Html lang="en" className="govuk-template app-html-class">
         <Head>
           <link
             rel="icon"

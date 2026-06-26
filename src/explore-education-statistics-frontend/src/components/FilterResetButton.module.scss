@@ -1,9 +1,9 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .button {
   align-items: center;
-  background: govuk-colour('light-grey');
-  border: 1px solid govuk-colour('mid-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
+  border: 1px solid govuk-colour('black', $variant: 'tint-80');
   border-radius: 6px;
   box-shadow: none;
   display: flex;

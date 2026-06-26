@@ -1,9 +1,9 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 // Match the key width with the data set step column width.
 $summary-list-width: 80;
-$key-width-tablet: 33.3 / $summary-list-width * 100;
-$key-width-desktop: 25 / $summary-list-width * 100;
+$key-width-tablet: calc(33.3 / $summary-list-width * 100);
+$key-width-desktop: calc(25 / $summary-list-width * 100);
 
 .container {
   @include govuk-media-query($from: tablet) {

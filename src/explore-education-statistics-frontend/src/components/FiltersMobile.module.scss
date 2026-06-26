@@ -1,11 +1,11 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .container {
   padding: 70px govuk-spacing(6) govuk-spacing(6);
 }
 
 .header {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   border: $govuk-focus-width solid transparent;
   border-bottom: 1px solid $govuk-border-colour;
   display: flex;

@@ -1,9 +1,10 @@
-@import '~govuk-frontend/dist/govuk/base';
-@import '~govuk-frontend/dist/govuk/core/lists';
-@import '~govuk-frontend/dist/govuk/core/section-break';
-@import '~govuk-frontend/dist/govuk/core/typography';
-@import '~govuk-frontend/dist/govuk/core/links';
-@import '~govuk-frontend/dist/govuk/helpers/typography';
+@use 'govuk-frontend/base' as *;
+@use 'govuk-frontend/core/lists' as *;
+@use 'govuk-frontend/core/section-break' as *;
+@use 'govuk-frontend/core/typography' as *;
+@use 'govuk-frontend/core/links' as *;
+@use 'govuk-frontend/helpers/typography' as *;
+@use 'govuk-frontend/components/inset-text' as *;
 
 body {
   @extend %govuk-body-m;
@@ -65,7 +66,7 @@ h4 {
 }
 
 h5 {
-  @include govuk-text-colour;
+  color: govuk-functional-color(text);
   @include govuk-font($size: 16, $weight: bold);
   margin-top: 0;
   @include govuk-responsive-margin(4, 'bottom');
@@ -95,7 +96,7 @@ p pre,
 }
 
 code {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   // Slightly darker than govuk red for
   // AAA contrast with background.
   color: #d13118;
