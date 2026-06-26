@@ -22,20 +22,6 @@
   },
   "packageRules": [
     {
-      "matchDatasources": ["npm"],
-      "groupName": "Minor frontend dependencies",
-      "matchUpdateTypes": ["minor", "patch"],
-      "schedule": ["every month"],
-      "enabled": true
-    },
-    {
-      "matchDatasources": ["npm"],
-      "groupName": "Major frontend dependencies",
-      "matchUpdateTypes": ["major"],
-      "schedule": ["every 3 months"],
-      "enabled": true
-    },
-    {
       "matchDatasources": ["nuget"],
       "matchUpdateTypes": ["patch"],
       "automerge": true
@@ -110,27 +96,26 @@
     },
     {
       "matchDatasources": ["pypi"],
-      "groupName": "Python dependencies",
       "enabled": false
     },
     {
       "matchDatasources": ["docker"],
-      "groupName": "Docker image updates",
       "enabled": false
     },
     {
       "matchDatasources": ["dotnet-version"],
-      "groupName": ".NET version",
+      "enabled": false
+    },
+    {
+      "matchDatasources": ["npm"],
       "enabled": false
     },
     {
       "matchPackageNames": ["node"],
-      "groupName": "Node version",
       "enabled": false
     },
     {
       "matchDatasources": ["ruby-version"],
-      "groupName": "Ruby version",
       "enabled": false
     },
     {
@@ -139,8 +124,6 @@
     },
     {
       "matchDatasources": ["azure-bicep-resource"],
-      "groupName": "Azure Bicep resources",
-      "description": "Prevent unofficial resource versions being suggested",
       "enabled": false
     }
   ]
