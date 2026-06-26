@@ -95,7 +95,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                     subjectId: releaseSubject.SubjectId
                 );
 
-                var filterItems = await _filterItemRepository.GetFilterItemsFromObservations(observations);
+                var filterItems = await _filterItemRepository.GetFilterItems(query.GetFilterItemIds());
                 var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                     filterItems,
                     releaseFile.FilterSequence

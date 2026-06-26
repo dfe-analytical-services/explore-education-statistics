@@ -113,14 +113,8 @@ public class FilterItemRepository(
         );
     }
 
-    public async Task<IList<FilterItem>> GetFilterItemsFromObservations(IEnumerable<Observation> observations)
+    public async Task<IList<FilterItem>> GetFilterItems(IEnumerable<Guid> filterItemIds)
     {
-        var filterItemIds = observations
-            .SelectMany(observation => observation.FilterItems)
-            .Select(ofi => ofi.FilterItemId)
-            .Distinct()
-            .ToList();
-
         return await statisticsDbContext
             .FilterItem.AsNoTracking()
             .Include(fi => fi.FilterGroup)
