@@ -129,7 +129,7 @@ public class PublicationService(
 
     public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
         Guid publicationId,
-        PublicationSaveRequest updatedPublication
+        PublicationSaveRequest updatePublicationRequest
     )
     {
         return await persistenceHelper
@@ -137,7 +137,7 @@ public class PublicationService(
             .OnSuccess(userService.CheckCanUpdatePublicationSummary)
             .OnSuccessDo(async publication =>
             {
-                if (publication.Title != updatedPublication.Title)
+                if (publication.Title != updatePublicationRequest.Title)
                 {
                     return await userService.CheckCanUpdatePublication();
                 }
@@ -146,7 +146,7 @@ public class PublicationService(
             })
             .OnSuccessDo(async publication =>
             {
-                if (publication.SupersededById != updatedPublication.SupersededById)
+                if (publication.SupersededById != updatePublicationRequest.SupersededById)
                 {
                     return await userService.CheckCanUpdatePublication();
                 }
@@ -155,16 +155,16 @@ public class PublicationService(
             })
             .OnSuccessDo(async publication =>
             {
-                if (publication.ThemeId != updatedPublication.ThemeId)
+                if (publication.ThemeId != updatePublicationRequest.ThemeId)
                 {
-                    return await ValidateSelectedTheme(updatedPublication.ThemeId);
+                    return await ValidateSelectedTheme(updatePublicationRequest.ThemeId);
                 }
 
                 return Unit.Instance;
             })
             .OnSuccessDo(async publication =>
             {
-                if (publication.ThemeId != updatedPublication.ThemeId)
+                if (publication.ThemeId != updatePublicationRequest.ThemeId)
                 {
                     return await userService.CheckCanUpdatePublication();
                 }
@@ -178,20 +178,20 @@ public class PublicationService(
                 var previousSummary = publication.Summary;
                 var previousSupersededById = publication.SupersededById;
 
-                var titleChanged = previousTitle != updatedPublication.Title;
-                var slugChanged = previousSlug != updatedPublication.Slug;
-                var summaryChanged = previousSummary != updatedPublication.Summary;
+                var titleChanged = previousTitle != updatePublicationRequest.Title;
+                var slugChanged = previousSlug != updatePublicationRequest.Slug;
+                var summaryChanged = previousSummary != updatePublicationRequest.Summary;
 
                 if (slugChanged)
                 {
-                    var slugValidation = await ValidatePublicationSlug(updatedPublication.Slug, publication.Id);
+                    var slugValidation = await ValidatePublicationSlug(updatePublicationRequest.Slug, publication.Id);
 
                     if (slugValidation.IsLeft)
                     {
                         return new Either<ActionResult, PublicationViewModel>(slugValidation.Left);
                     }
 
-                    publication.Slug = updatedPublication.Slug;
+                    publication.Slug = updatePublicationRequest.Slug;
 
                     if (
                         publication.Live
@@ -211,7 +211,7 @@ public class PublicationService(
 
                     // If there is an existing redirects for the new slug, they're redundant. Remove them
                     var redundantRedirects = await context
-                        .PublicationRedirects.Where(pr => pr.Slug == updatedPublication.Slug)
+                        .PublicationRedirects.Where(pr => pr.Slug == updatePublicationRequest.Slug)
                         .ToListAsync();
                     if (redundantRedirects.Count > 0)
                     {
@@ -219,11 +219,11 @@ public class PublicationService(
                     }
                 }
 
-                publication.Title = updatedPublication.Title;
-                publication.Summary = updatedPublication.Summary;
-                publication.ThemeId = updatedPublication.ThemeId;
+                publication.Title = updatePublicationRequest.Title;
+                publication.Summary = updatePublicationRequest.Summary;
+                publication.ThemeId = updatePublicationRequest.ThemeId;
                 publication.Updated = DateTime.UtcNow;
-                publication.SupersededById = updatedPublication.SupersededById;
+                publication.SupersededById = updatePublicationRequest.SupersededById;
 
                 context.Publications.Update(publication);
 
@@ -693,12 +693,23 @@ public class PublicationService(
         if (
             publicationId != null
             && context.PublicationMethodologies.Any(pm => pm.Publication.Id == publicationId && pm.Owner)
-        // Strictly, we should also check whether the owned methodology inherits the publication slug - we don't
-        // need to validate the new slug against methodologies if it isn't changing the methodology slug - but
-        // this check is expensive and an unlikely edge case, so doesn't seem worth it.
         )
         {
-            var methodologySlugValidation = await methodologyService.ValidateMethodologySlug(newSlug);
+            var currentOwnedMethodologySlug = context
+                .PublicationMethodologies.Where(pm => pm.PublicationId == publicationId && pm.Owner)
+                .Select(pm =>
+                    (
+                        pm.Methodology.LatestPublishedVersion != null
+                        && pm.Methodology.LatestPublishedVersion.AlternativeSlug != null
+                    )
+                        ? pm.Methodology.LatestPublishedVersion.AlternativeSlug
+                        : pm.Methodology.OwningPublicationSlug
+                )
+                .Single();
+            var methodologySlugValidation = await methodologyService.ValidateMethodologySlug(
+                newSlug,
+                currentOwnedMethodologySlug
+            );
             if (methodologySlugValidation.IsLeft)
             {
                 return methodologySlugValidation.Left;
