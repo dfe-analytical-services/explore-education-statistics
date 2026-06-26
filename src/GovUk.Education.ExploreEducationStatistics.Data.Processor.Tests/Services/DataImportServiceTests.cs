@@ -1,19 +1,25 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
@@ -207,21 +213,21 @@ public class DataImportServiceTests
             .DefaultObservation()
             .WithSubject(subject)
             .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
-            .WithTimePeriod(2000, TimeIdentifier.April)
+            .WithTimePeriod(2000, April)
             .Generate();
 
         var observation2 = _fixture
             .DefaultObservation()
             .WithSubject(subject)
             .WithLocation(new Location { GeographicLevel = GeographicLevel.LocalAuthority })
-            .WithTimePeriod(2001, TimeIdentifier.May)
+            .WithTimePeriod(2001, May)
             .Generate();
 
         var observation3 = _fixture
             .DefaultObservation()
             .WithSubject(subject)
             .WithLocation(new Location { GeographicLevel = GeographicLevel.Region })
-            .WithTimePeriod(2002, TimeIdentifier.June)
+            .WithTimePeriod(2002, June)
             .Generate();
 
         var filter = new Filter
@@ -285,9 +291,9 @@ public class DataImportServiceTests
             Assert.Equal(totalRows, meta.NumDataFileRows);
 
             Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
-            Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);
+            Assert.Equal(April, meta.TimePeriodRange.Start.TimeIdentifier);
             Assert.Equal("2002", meta.TimePeriodRange.End.Period);
-            Assert.Equal(TimeIdentifier.June, meta.TimePeriodRange.End.TimeIdentifier);
+            Assert.Equal(June, meta.TimePeriodRange.End.TimeIdentifier);
 
             var dbFilter = Assert.Single(meta.Filters);
             Assert.Equal(filter.Id, dbFilter.Id);
@@ -611,6 +617,6 @@ public class DataImportServiceTests
             statisticsDbContextId ?? Guid.NewGuid().ToString()
         );
 
-        return new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>(MockBehavior.Strict));
+        return new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>(Strict));
     }
 }
