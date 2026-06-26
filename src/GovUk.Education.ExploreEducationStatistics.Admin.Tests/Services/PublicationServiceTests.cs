@@ -1186,7 +1186,7 @@ public class PublicationServiceTests
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
             methodologyService
-                .Setup(mock => mock.ValidateMethodologySlug("new-title", null, null))
+                .Setup(mock => mock.ValidateMethodologySlug("new-title", "old-title", null))
                 .ReturnsAsync(Unit.Instance);
 
             methodologyService
@@ -1678,7 +1678,7 @@ public class PublicationServiceTests
             Owner = true,
         };
 
-        var otherMethodology = new Methodology { OwningPublicationSlug = "already-used-methodology" };
+        var otherMethodology = new Methodology { OwningPublicationSlug = "already-used-by-methodology" };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -1694,7 +1694,7 @@ public class PublicationServiceTests
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
             methodologyService
-                .Setup(mock => mock.ValidateMethodologySlug("already-used-by-methodology", null, null))
+                .Setup(mock => mock.ValidateMethodologySlug("already-used-by-methodology", "test-publication", null))
                 .ReturnsAsync(ValidationUtils.ValidationActionResult(MethodologySlugNotUnique));
 
             var publicationService = BuildPublicationService(context, methodologyService: methodologyService.Object);
@@ -1724,6 +1724,131 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+    }
+
+    [Fact]
+    public async Task UpdatePublication_MethodologyOwnedByLivePublicationAlreadyHasNewPublicationSlug_Success()
+    {
+        var theme = new Theme { Title = "Theme title" };
+        var latestPublishedReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var publication = new Publication
+        {
+            Id = Guid.NewGuid(),
+            Title = "Test publication",
+            Slug = "test-publication",
+            Summary = "",
+            Theme = theme,
+            LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id,
+            LatestPublishedReleaseVersion = latestPublishedReleaseVersion,
+        };
+        var latestPublishedMethodologyVersion = new MethodologyVersion
+        {
+            Id = Guid.NewGuid(),
+            AlternativeSlug = "already-used-by-methodology",
+        };
+        var methodology = new Methodology
+        {
+            OwningPublicationSlug = "test-publication",
+            LatestPublishedVersionId = latestPublishedMethodologyVersion.Id,
+            LatestPublishedVersion = latestPublishedMethodologyVersion,
+            Versions = [latestPublishedMethodologyVersion],
+        };
+        var publicationMethodology = new PublicationMethodology
+        {
+            Publication = publication,
+            Methodology = methodology,
+            Owner = true,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.PublicationMethodologies.Add(publicationMethodology);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+
+            methodologyService
+                .Setup(mock =>
+                    mock.ValidateMethodologySlug("already-used-by-methodology", "already-used-by-methodology", null)
+                )
+                .ReturnsAsync(Unit.Instance);
+            methodologyService
+                .Setup(mock =>
+                    mock.PublicationTitleOrSlugChanged(
+                        publication.Id,
+                        "test-publication",
+                        "Already used by methodology",
+                        "already-used-by-methodology"
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+            methodologyCacheService
+                .Setup(mock => mock.UpdateSummariesTree())
+                .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>([]));
+
+            var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
+            redirectsCacheService
+                .Setup(mock => mock.UpdateRedirects())
+                .ReturnsAsync(
+                    new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []
+                    )
+                );
+
+            var publicationService = BuildPublicationService(
+                context,
+                methodologyService: methodologyService.Object,
+                methodologyCacheService: methodologyCacheService.Object,
+                redirectsCacheService: redirectsCacheService.Object
+            );
+
+            var result = await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest { Title = "Already used by methodology", ThemeId = theme.Id }
+            );
+
+            var publicationViewModel = result.AssertRight();
+
+            Assert.Equal(publication.Id, publicationViewModel.Id);
+            Assert.Equal("Already used by methodology", publicationViewModel.Title);
+            Assert.Equal("already-used-by-methodology", publicationViewModel.Slug);
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var dbPublication = context.Publications.Single(p => p.Id == publication.Id);
+            Assert.Equal("Already used by methodology", dbPublication.Title);
+            Assert.Equal("already-used-by-methodology", dbPublication.Slug);
+
+            var publicationRedirect = context.PublicationRedirects.Single();
+            Assert.Equal(publication.Id, publicationRedirect.PublicationId);
+            Assert.Equal("test-publication", publicationRedirect.Slug);
+
+            // methodologyService.PublicationTitleOrSlugChanged handles the updating of methodology and methodology
+            // redirects, and we mocked that, so no point checking the db for those things
+        }
+
+        AssertOnPublicationChangedEventRaised(
+            new Publication
+            {
+                Id = publication.Id,
+                Title = "Already used by methodology",
+                Slug = "already-used-by-methodology",
+                Summary = "",
+                SupersededById = null,
+            }
+        );
+        _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
     }
 
     [Fact]

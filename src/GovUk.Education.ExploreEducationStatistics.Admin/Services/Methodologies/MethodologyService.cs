@@ -585,6 +585,7 @@ public class MethodologyService(
         if (slugChanged)
         {
             var latestPublishedVersion = ownedMethodology.LatestPublishedVersion;
+            var latestVersion = ownedMethodology.LatestVersion();
 
             // If the LatestPublishedVersion inherits the publication slug, it needs a redirect
             if (latestPublishedVersion is { AlternativeSlug: null })
@@ -611,7 +612,6 @@ public class MethodologyService(
                 // a redirect for originalSlug / LatestPublishedRelease - and create a new inactive
                 // redirect for the unpublished amendment from updatedSlug. We need this redirect for when
                 // the amendment is published and the new AlternativeSlug goes live.
-                var latestVersion = ownedMethodology.LatestVersion();
                 if (latestVersion.Id != latestPublishedVersion.Id && latestVersion.AlternativeSlug != null)
                 {
                     var unpublishedAmendmentRedirectsToRemove = await context
@@ -632,6 +632,13 @@ public class MethodologyService(
                     };
                     context.MethodologyRedirects.Add(unpublishedAmendmentRedirect);
                 }
+            }
+
+            // if AlternativeSlug matches updatedSlug, it is redundant, so set it to null
+            // any redirects should remain, as the methodology slug hasn't changed
+            if (latestVersion.AlternativeSlug == updatedSlug)
+            {
+                latestVersion.AlternativeSlug = null; // @MarkFix write tests for this
             }
         }
 

@@ -21,7 +21,7 @@ public interface IPublicationService
 
     Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
         Guid publicationId,
-        PublicationSaveRequest updatedPublication
+        PublicationSaveRequest updatePublicationRequest
     );
 
     Task<Either<ActionResult, PublicationViewModel>> GetPublication(

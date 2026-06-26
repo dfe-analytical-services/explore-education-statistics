@@ -3889,7 +3889,7 @@ public class MethodologyServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
+            var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
                 .Setup(mock => mock.UpdateRedirects())
                 .ReturnsAsync(
