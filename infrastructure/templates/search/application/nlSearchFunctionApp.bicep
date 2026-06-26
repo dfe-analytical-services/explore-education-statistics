@@ -17,16 +17,6 @@ param searchServiceNLSearchFilterIndexName string
 @description('Name of the \'Natural language search dataset\' index in Azure AI Search.')
 param searchServiceNLSearchDatasetIndexName string
 
-@description('Name of the Search storage account.')
-param searchStorageAccountName string
-
-@description('The connection string to the Search storage account.')
-@secure()
-param searchStorageAccountConnectionStringSecretName string
-
-@description('Name of the storage container in the Search storage account that stores the locations dictionary.')
-param locationsDictionaryContainerName string
-
 @description('The IP address ranges that can access the Natural Language Search Function App storage account.')
 param storageFirewallRules IpRange[]
 
@@ -64,20 +54,6 @@ resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-0
 resource nlSearchFunctionAppPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
   name: resourceNames.existingResources.subnets.nlSearchFunctionAppPrivateEndpoints
   parent: vNet
-}
-
-resource searchStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: searchStorageAccountName
-}
-
-resource searchBlobStorage 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' existing = {
-  name: 'default'
-  parent: searchStorageAccount
-}
-
-resource locationsDictionaryContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
-  parent: searchBlobStorage
-  name: locationsDictionaryContainerName
 }
 
 resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
@@ -126,14 +102,6 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
       {
         name: 'AZURE_OPENAI_API_VERSION'
         value: '2024-10-21'
-      }
-      {
-        name: 'LOCATIONS_DICT_CONTAINER_NAME'
-        value: locationsDictionaryContainer.name
-      }
-      {
-        name: 'SEARCH_STORAGE_CONN_STRING'
-        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName})'
       }
     ]
     functionAppExists: functionAppExists
