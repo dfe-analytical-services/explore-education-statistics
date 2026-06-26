@@ -110,9 +110,6 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = if (d
     functionAppFirewallRules: []
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceName: searchServiceModule.outputs.searchServiceName
-    searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
-    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
-    locationsDictionaryContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.nlSearchLocationsDictionary
     searchServiceNLSearchFilterIndexName: searchServiceNLSearchFilterIndexName
     searchServiceNLSearchDatasetIndexName: searchServiceNLSearchDatasetIndexName
     storageFirewallRules: maintenanceIpRanges
