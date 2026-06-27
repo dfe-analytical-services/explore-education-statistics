@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="CliFx" Version="2.3.6" />
     <PackageReference Include="CliWrap" Version="3.10.1" />
-    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Dapper" Version="2.1.79" />
     <PackageReference Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
