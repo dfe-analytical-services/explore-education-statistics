@@ -2,7 +2,6 @@
 using System.Net;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
@@ -16,10 +15,6 @@ public class DataSetScreenerClientTests
 {
     private static readonly Uri BaseUri = new("http://localhost/api");
     private readonly MockHttpMessageHandler _mockHttp;
-    private readonly JsonSerializerOptions _requestSerializerOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case-sensitive.
-    };
 
     protected DataSetScreenerClientTests()
     {
@@ -31,11 +26,15 @@ public class DataSetScreenerClientTests
         [Fact]
         public async Task AuthenticationManagerCalled()
         {
-            var responseBody = new DataSetScreenerResponse { OverallResult = "Failed", TestResults = [] };
+            Guid[] dataSetIds = [Guid.NewGuid()];
 
             _mockHttp
-                .Expect(HttpMethod.Post, $"{BaseUri.AbsoluteUri}/screen")
-                .Respond(HttpStatusCode.Accepted, "application/json", JsonSerializer.Serialize(responseBody));
+                .Expect(HttpMethod.Get, $"{BaseUri.AbsoluteUri}/progress?data_set_id={dataSetIds[0]}")
+                .Respond(
+                    HttpStatusCode.OK,
+                    "application/json",
+                    JsonSerializer.Serialize(Array.Empty<DataSetScreenerProgressResponse>())
+                );
 
             var authenticationManager = new Mock<IHttpClientAzureAuthenticationManager<DataScreenerOptions>>(
                 MockBehavior.Strict
@@ -47,72 +46,12 @@ public class DataSetScreenerClientTests
 
             var dataSetScreenerClient = BuildService(azureAuthenticationManager: authenticationManager.Object);
 
-            await dataSetScreenerClient.ScreenDataSet(
-                new DataSetScreenerRequest
-                {
-                    DataFileName = "",
-                    DataFilePath = "",
-                    MetaFileName = "",
-                    MetaFilePath = "",
-                    StorageContainerName = "",
-                },
-                CancellationToken.None
-            );
+            await dataSetScreenerClient.GetScreenerProgress(dataSetIds, CancellationToken.None);
 
             authenticationManager.Verify(
                 m => m.AddAuthentication(It.IsAny<HttpClient>(), It.IsAny<CancellationToken>()),
                 Times.Once
             );
-        }
-    }
-
-    public class ScreenDataSetTests : DataSetScreenerClientTests
-    {
-        [Fact]
-        public async Task Success()
-        {
-            var request = new DataSetScreenerRequest
-            {
-                DataFileName = "data-file-name",
-                DataFilePath = "data-file-path",
-                MetaFileName = "meta-file-name",
-                MetaFilePath = "meta-file-path",
-                StorageContainerName = "storage-container-name",
-            };
-
-            var responseBody = new DataSetScreenerResponse
-            {
-                OverallResult = "Failed",
-                TestResults =
-                [
-                    new DataScreenerTestResult
-                    {
-                        Stage = "PreScreening1",
-                        Result = TestResult.WARNING,
-                        Notes = "Some notes",
-                        TestFunctionName = "Test 1",
-                    },
-                    new DataScreenerTestResult
-                    {
-                        Stage = "Passed",
-                        Result = TestResult.PASS,
-                        TestFunctionName = "Test 2",
-                    },
-                ],
-            };
-
-            _mockHttp
-                .Expect(HttpMethod.Post, $"{BaseUri.AbsoluteUri}/screen")
-                .WithJsonContent(request, _requestSerializerOptions)
-                .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(responseBody));
-
-            var dataSetScreenerClient = BuildService();
-
-            var response = await dataSetScreenerClient.ScreenDataSet(request, CancellationToken.None);
-
-            _mockHttp.VerifyNoOutstandingExpectation();
-
-            Assert.Equivalent(responseBody, response);
         }
     }
 

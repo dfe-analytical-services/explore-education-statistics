@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -19,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using DataSet = GovUk.Education.ExploreEducationStatistics.Admin.Models.DataSet;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
@@ -37,7 +35,6 @@ public class DataSetFileStorage(
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
     IDataSetService dataSetService,
-    IOptions<DataScreenerOptions> screenerOptions,
     TimeProvider timeProvider,
     ILogger<DataSetFileStorage> logger
 ) : IDataSetFileStorage
@@ -103,12 +100,8 @@ public class DataSetFileStorage(
             ScreeningStatus = DataSetUploadScreeningStatus.Screening,
             UploadedBy = userService.GetProfileFromClaims().Email.ToLower(),
             ReplacingFileId = dataSet.ReplacingFile?.Id,
-            ScreenerProgress = screenerOptions.Value.EnhancedScreenerJourney
-                ? new DataSetScreenerProgress { Stage = "Started" }
-                : null,
-            ScreenerProgressLastUpdated = screenerOptions.Value.EnhancedScreenerJourney
-                ? timeProvider.GetUtcNow()
-                : null,
+            ScreenerProgress = new DataSetScreenerProgress { Stage = "Started" },
+            ScreenerProgressLastUpdated = timeProvider.GetUtcNow(),
         };
     }
 
@@ -206,61 +199,6 @@ public class DataSetFileStorage(
         await contentDbContext.SaveChangesAsync(cancellationToken);
 
         return dataSetUpload;
-    }
-
-    public async Task UpdateDataSetUpload(
-        Guid dataSetUploadId,
-        DataSetScreenerResponse? screenerResult,
-        CancellationToken cancellationToken
-    )
-    {
-        var upload = await contentDbContext.DataSetUploads.SingleAsync(
-            upload => upload.Id == dataSetUploadId,
-            cancellationToken
-        );
-
-        if (screenerResult is null)
-        {
-            upload.ScreeningStatus = DataSetUploadScreeningStatus.ScreenerError;
-
-            upload.ScreenerProgress = new DataSetScreenerProgress
-            {
-                Completed = true,
-                Passed = false,
-                PercentageComplete = 100,
-                Stage = "Screener error",
-            };
-        }
-        else
-        {
-            upload.ScreenerResult = screenerResult;
-
-            var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
-            var hasFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
-
-            if (hasFailures)
-            {
-                upload.ScreeningStatus = DataSetUploadScreeningStatus.FailedScreening;
-            }
-            else if (hasWarnings)
-            {
-                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingReview;
-            }
-            else
-            {
-                upload.ScreeningStatus = DataSetUploadScreeningStatus.PendingImport;
-            }
-
-            upload.ScreenerProgress = new DataSetScreenerProgress
-            {
-                Completed = true,
-                Passed = !hasFailures,
-                PercentageComplete = 100,
-                Stage = "Complete",
-            };
-        }
-
-        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(

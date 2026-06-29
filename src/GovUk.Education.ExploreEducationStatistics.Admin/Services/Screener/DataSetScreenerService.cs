@@ -33,14 +33,6 @@ public class DataSetScreenerService(
 {
     public const string StartScreeningQueue = "start-screening";
 
-    public Task<DataSetScreenerResponse> ScreenDataSet(
-        DataSetScreenerRequest dataSetScreenerRequest,
-        CancellationToken cancellationToken
-    )
-    {
-        return dataSetScreenerClient.ScreenDataSet(dataSetScreenerRequest, cancellationToken);
-    }
-
     public async Task StartScreening(
         DataSetStartScreeningRequest dataSetScreenRequest,
         CancellationToken cancellationToken

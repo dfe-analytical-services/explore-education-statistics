@@ -41,7 +41,7 @@ public abstract partial class BlobStorageService(
     IBlobSasService blobSasService
 ) : IBlobStorageService
 {
-    private static readonly TimeSpan DownloadTokenExpiryDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan DefaultDownloadTokenExpiryDuration = TimeSpan.FromMinutes(5);
 
     protected BlobStorageService(
         string connectionString,
@@ -448,7 +448,8 @@ public abstract partial class BlobStorageService(
         IBlobContainer container,
         string filename,
         string path,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken,
+        TimeSpan? expiryDuration = null
     )
     {
         return await blobSasService.CreateBlobDownloadToken(
@@ -456,7 +457,7 @@ public abstract partial class BlobStorageService(
             container: container,
             filename: filename,
             path: path,
-            expiryDuration: DownloadTokenExpiryDuration,
+            expiryDuration: expiryDuration ?? DefaultDownloadTokenExpiryDuration,
             cancellationToken: cancellationToken
         );
     }

@@ -47,12 +47,6 @@ public interface IDataSetFileStorage
         CancellationToken cancellationToken
     );
 
-    Task UpdateDataSetUpload(
-        Guid dataSetUploadId,
-        DataSetScreenerResponse? screenerResult,
-        CancellationToken cancellationToken
-    );
-
     /// <summary>
     /// Create, or overwrite an existing data set record in the database with a new one.
     /// </summary>

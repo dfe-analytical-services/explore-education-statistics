@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -42,79 +41,7 @@ public class DataSetFileStorageTests
     private readonly User _user = new DataFixture().DefaultUser().WithId(Guid.NewGuid());
 
     [Fact]
-    public async Task UploadDataSetsToTemporaryStorage_ReturnsUploadDetails()
-    {
-        // Arrange
-        var dataSetName = "Test Data Set";
-
-        var dataSetFile = await new DataSetFileBuilder().Build(FileType.Data);
-        var metaSetFile = await new DataSetFileBuilder().Build(FileType.Metadata);
-
-        var dataSet = new DataSet
-        {
-            Title = dataSetName,
-            DataFile = dataSetFile,
-            MetaFile = metaSetFile,
-        };
-
-        await using var contentDbContext = InMemoryApplicationDbContext();
-        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-        var userService = new Mock<IUserService>(Strict);
-
-        privateBlobStorageService
-            .Setup(mock =>
-                mock.UploadStream(
-                    It.IsAny<IBlobContainer>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Stream>(),
-                    It.IsAny<string>(),
-                    ContentEncodings.Gzip,
-                    It.IsAny<CancellationToken>()
-                )
-            )
-            .Returns(Task.CompletedTask);
-
-        userService
-            .Setup(mock => mock.GetProfileFromClaims())
-            .Returns(new UserProfileFromClaims(_user.Email, "Test", "Test"));
-
-        var service = SetupReleaseDataFileService(
-            contentDbContext: contentDbContext,
-            privateBlobStorageService: privateBlobStorageService.Object,
-            userService: userService.Object
-        );
-
-        // Act
-        var result = await service.UploadDataSetsToTemporaryStorage(
-            Guid.NewGuid(),
-            [dataSet],
-            cancellationToken: CancellationToken.None
-        );
-
-        // Assert
-        privateBlobStorageService.Verify();
-
-        var uploadDetails = Assert.Single(result);
-        Assert.Equal(dataSetName, uploadDetails.DataSetTitle);
-        Assert.NotEqual(Guid.Empty, uploadDetails.DataFileId);
-        Assert.Equal("test-data.csv", uploadDetails.DataFileName);
-        Assert.Equal(434, uploadDetails.DataFileSizeInBytes);
-        Assert.NotEqual(Guid.Empty, uploadDetails.MetaFileId);
-        Assert.Equal("test-data.meta.csv", uploadDetails.MetaFileName);
-        Assert.Equal(157, uploadDetails.MetaFileSizeInBytes);
-        Assert.Equal(DataSetUploadScreeningStatus.Screening, uploadDetails.ScreeningStatus);
-        Assert.Equal(_user.Email.ToLower(), uploadDetails.UploadedBy);
-        Assert.Null(uploadDetails.ReplacingFileId);
-
-        // Assert that with the "enhanced user journey" flag set to false, no screener
-        // progress is recorded yet.
-        Assert.Null(uploadDetails.ScreenerProgress);
-        Assert.Null(uploadDetails.ScreenerProgressLastChecked);
-        Assert.Null(uploadDetails.ScreenerProgressLastUpdated);
-    }
-
-    [Fact]
-    public async Task UploadDataSetsToTemporaryStorage_EnhancedScreenerJourney_ReturnsUploadDetailsAndScreenerProgress()
+    public async Task UploadDataSetsToTemporaryStorage_ReturnsUploadDetailsAndScreenerProgress()
     {
         var utcNow = DateTimeOffset.UtcNow;
 
@@ -156,7 +83,6 @@ public class DataSetFileStorageTests
             contentDbContext: contentDbContext,
             privateBlobStorageService: privateBlobStorageService.Object,
             userService: userService.Object,
-            screenerOptions: new DataScreenerOptions { EnhancedScreenerJourney = true },
             timeProvider: new FakeTimeProvider(startDateTime: utcNow)
         );
 
@@ -304,140 +230,6 @@ public class DataSetFileStorageTests
 
             Assert.NotNull(upload);
             Assert.Equivalent(newDataSetUpload, upload);
-        }
-    }
-
-    [Fact]
-    public async Task UpdateDataSetUpload_UploadNotFound_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        await using var contentDbContext = InMemoryApplicationDbContext();
-        var service = SetupReleaseDataFileService(contentDbContext);
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await service.UpdateDataSetUpload(
-                Guid.NewGuid(),
-                screenerResult: null!,
-                cancellationToken: CancellationToken.None
-            )
-        );
-
-        Assert.Equal("Sequence contains no elements", exception.Message);
-    }
-
-    [Fact]
-    public async Task UpdateDataSetUpload_ResultIsNull_UpdatesUploadState()
-    {
-        // Arrange
-        var builder = new DataSetUploadMockBuilder();
-        var dataSetUpload = builder.BuildInitialEntity();
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.DataSetUploads.Add(dataSetUpload);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var service = SetupReleaseDataFileService(contentDbContext);
-
-            // Act
-            await service.UpdateDataSetUpload(
-                dataSetUpload.Id,
-                dataSetUpload.ScreenerResult!,
-                cancellationToken: CancellationToken.None
-            );
-
-            // Act
-            await service.UpdateDataSetUpload(
-                dataSetUpload.Id,
-                screenerResult: null!,
-                cancellationToken: CancellationToken.None
-            );
-
-            // Assert
-            var result = await contentDbContext.DataSetUploads.FindAsync(dataSetUpload.Id);
-
-            Assert.NotNull(result);
-            Assert.Equal(DataSetUploadScreeningStatus.ScreenerError, result.ScreeningStatus);
-            Assert.Null(result.ScreenerResult);
-
-            Assert.NotNull(result.ScreenerProgress);
-            Assert.NotNull(result.ScreenerProgress);
-            Assert.Equal(100, result.ScreenerProgress.PercentageComplete);
-            Assert.False(result.ScreenerProgress.Passed);
-            Assert.True(result.ScreenerProgress.Completed);
-            Assert.Equal("Screener error", result.ScreenerProgress.Stage);
-        }
-    }
-
-    [Theory]
-    [InlineData(TestResult.PASS)]
-    [InlineData(TestResult.WARNING)]
-    [InlineData(TestResult.FAIL)]
-    public async Task UpdateDataSetUpload_WithTestResult_UpdatesStatusCorrectly(TestResult testResult)
-    {
-        // Arrange
-        var builder = new DataSetUploadMockBuilder();
-
-        var dataSetUpload = testResult switch
-        {
-            TestResult.PASS => builder.BuildScreenedEntity(),
-            TestResult.WARNING => builder.WithWarningTests().BuildScreenedEntity(),
-            TestResult.FAIL => builder.WithFailingTests().BuildScreenedEntity(),
-            _ => throw new ArgumentOutOfRangeException(nameof(testResult)),
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.DataSetUploads.Add(dataSetUpload);
-            await contentDbContext.SaveChangesAsync();
-
-            var service = SetupReleaseDataFileService(contentDbContext);
-
-            // Act
-            await service.UpdateDataSetUpload(
-                dataSetUpload.Id,
-                dataSetUpload.ScreenerResult!,
-                cancellationToken: CancellationToken.None
-            );
-        }
-
-        // Assert
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var updatedDataSetUpload = await contentDbContext.DataSetUploads.FindAsync(dataSetUpload.Id);
-
-            Assert.NotNull(updatedDataSetUpload);
-
-            Assert.NotNull(updatedDataSetUpload.ScreenerProgress);
-            Assert.Equal(100, updatedDataSetUpload.ScreenerProgress.PercentageComplete);
-            Assert.True(updatedDataSetUpload.ScreenerProgress.Completed);
-            Assert.Equal("Complete", updatedDataSetUpload.ScreenerProgress.Stage);
-
-            switch (testResult)
-            {
-                case TestResult.PASS:
-                    Assert.Equal(DataSetUploadScreeningStatus.PendingImport, updatedDataSetUpload.ScreeningStatus);
-                    Assert.True(updatedDataSetUpload.ScreenerProgress.Passed);
-                    break;
-                case TestResult.WARNING:
-                    Assert.Equal(DataSetUploadScreeningStatus.PendingReview, updatedDataSetUpload.ScreeningStatus);
-                    Assert.True(updatedDataSetUpload.ScreenerProgress.Passed);
-                    break;
-                case TestResult.FAIL:
-                    Assert.Equal(DataSetUploadScreeningStatus.FailedScreening, updatedDataSetUpload.ScreeningStatus);
-                    Assert.False(updatedDataSetUpload.ScreenerProgress.Passed);
-                    break;
-            }
-
-            Assert.Equivalent(dataSetUpload.ScreenerResult, updatedDataSetUpload.ScreenerResult);
         }
     }
 
@@ -733,7 +525,6 @@ public class DataSetFileStorageTests
         IUserService? userService = null,
         IDataSetVersionService? dataSetVersionService = null,
         IDataSetService? dataSetService = null,
-        DataScreenerOptions? screenerOptions = null,
         TimeProvider? timeProvider = null,
         bool addDefaultUser = true
     )
@@ -754,7 +545,6 @@ public class DataSetFileStorageTests
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             dataSetService ?? Mock.Of<IDataSetService>(Strict),
-            (screenerOptions ?? new DataScreenerOptions()).ToOptionsWrapper(),
             timeProvider ?? TimeProvider.System,
             Mock.Of<ILogger<DataSetFileStorage>>(Strict)
         );
