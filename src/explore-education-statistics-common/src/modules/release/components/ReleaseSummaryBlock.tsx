@@ -109,7 +109,7 @@ export default function ReleaseSummaryBlock({
 
           <ListItem term="Published">
             {releaseDate ? (
-              <FormattedDate>{parseISO(releaseDate)}</FormattedDate>
+              <FormattedDate usingUkTime>{parseISO(releaseDate)}</FormattedDate>
             ) : (
               <p className="govuk-!-margin-bottom-0">TBA</p>
             )}
@@ -118,7 +118,9 @@ export default function ReleaseSummaryBlock({
           {(isEditing || lastUpdated) && (
             <ListItem term="Last updated">
               {lastUpdated ? (
-                <FormattedDate>{parseISO(lastUpdated)}</FormattedDate>
+                <FormattedDate usingUkTime>
+                  {parseISO(lastUpdated)}
+                </FormattedDate>
               ) : (
                 <p className="govuk-!-margin-bottom-0">TBA</p>
               )}
