@@ -21,11 +21,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -41,7 +39,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -64,6 +61,7 @@ using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -89,8 +87,10 @@ using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Con
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
+using DataSet = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet;
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using EducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Admin.Services.EducationInNumbersService;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
@@ -102,6 +102,7 @@ using IEducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Ad
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
+using IndicatorMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseDataContentService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.IReleaseDataContentService;
@@ -117,6 +118,7 @@ using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Serv
 using ReleaseDataContentService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.ReleaseDataContentService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionService;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -131,10 +133,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     {
         // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
         var publicDataDbExists = configuration.GetValue<bool>("PublicDataDbExists");
-
-        var enhancedScreenerJourney = configuration
-            .GetRequiredSection(DataScreenerOptions.Section)
-            .GetValue<bool>(nameof(DataScreenerOptions.EnhancedScreenerJourney));
 
         services.AddHealthChecks();
 
@@ -386,7 +384,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             configuration.GetSection(OpenIdConnectSpaClientOptions.Section)
         );
         services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-        services.Configure<DataScreenerOptions>(configuration.GetRequiredSection(DataScreenerOptions.Section));
 
         StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -423,25 +420,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
         services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
-
-        services.AddScoped<IDataSetScreenerClient, DataSetScreenerClient>();
-        services.AddScoped<IDataSetScreenerService, DataSetScreenerService>();
-        services.AddKeyedSingleton<IQueueServiceClient>(
-            serviceKey: nameof(DataSetScreenerService),
-            implementationFactory: (serviceProvider, _) =>
-            {
-                var screenerOptions = serviceProvider.GetRequiredService<IOptions<DataScreenerOptions>>();
-                return screenerOptions.Value.EnhancedScreenerJourney
-                    ? new QueueServiceClient(screenerOptions.Value.ScreenerStorage)
-                    : new NoOpQueueServiceClient();
-            }
-        );
-
-        if (enhancedScreenerJourney)
-        {
-            services.AddSingleton<Func<TimeSpan, IPeriodicTimer>>(period => new PeriodicTimerDelegate(period));
-            services.AddHostedService<DataSetScreenerProgressUpdaterJob>();
-        }
 
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
@@ -528,14 +506,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         }
 
         services.AddEventGridClient(configuration);
-
-        services.AddHttpClient<IDataSetScreenerClient, DataSetScreenerClient>(
-            (provider, httpClient) =>
-            {
-                var options = provider.GetRequiredService<IOptions<DataScreenerOptions>>();
-                httpClient.BaseAddress = new Uri(options.Value.Url);
-            }
-        );
 
         if (publicDataDbExists)
         {
@@ -710,6 +680,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IAuthorizationHandlerService, AuthorizationHandlerService>();
         services.AddSingleton<DateTimeProvider>();
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<Func<TimeSpan, IPeriodicTimer>>(period => new PeriodicTimerDelegate(period));
 
         // This service allows a set of users to be pre-invited to the service on startup.
         if (hostEnvironment.IsDevelopment())
@@ -730,6 +701,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddSingleton<IPublisherClient, PublisherClient>(_ => new PublisherClient(
             configuration.GetRequiredValue("PublisherStorage")
         ));
+
+        /*
+         * Screener
+         */
+        services.AddScreener(configuration);
 
         /*
          * Swagger
@@ -957,16 +933,13 @@ internal class NoOpProcessorClient : IProcessorClient
 
 internal class NoOpDataSetVersionService : IDataSetVersionService
 {
-    public Task<Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListLiveVersions(
-        Guid dataSetId,
-        int page,
-        int pageSize,
-        CancellationToken cancellationToken = default
-    )
+    public Task<
+        Either<ActionResult, Common.ViewModels.PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>
+    > ListLiveVersions(Guid dataSetId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(
-            new Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>(
-                PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10)
+            new Either<ActionResult, Common.ViewModels.PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>(
+                Common.ViewModels.PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>.Paginate([], 1, 10)
             )
         );
     }
@@ -1139,15 +1112,15 @@ internal class NoOpMappingTypesRepository : IMappingTypesRepository
 internal class NoOpReleasePublishingValidator : IReleasePublishingValidator
 {
     public Task<bool> IsMissingUpdatedApiDataSet(
-        Content.Model.ReleaseVersion releaseVersion,
-        IList<Content.Model.File> dataFileUploads,
+        ReleaseVersion releaseVersion,
+        IList<File> dataFileUploads,
         CancellationToken cancellationToken = default
     ) => Task.FromResult(false);
 }
 
 internal class NoOpPublicDataSetRepository : IPublicDataSetRepository
 {
-    public Task<Public.Data.Model.DataSet> GetDataSet(Guid dataSetId, CancellationToken cancellationToken = default) =>
+    public Task<DataSet> GetDataSet(Guid dataSetId, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
 
     public Task<IndicatorMeta?> GetIndicatorMeta(
@@ -1165,32 +1138,10 @@ internal class NoOpPublicDataApiClient : IPublicDataApiClient
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
-    public Task<Either<ActionResult, Public.Data.ViewModels.DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
+    public Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
         Guid dataSetId,
         string dataSetVersion,
         string queryBody,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
-}
-
-internal class NoOpQueueServiceClient : IQueueServiceClient
-{
-    public Task SendMessagesAsJson<T>(
-        string queueName,
-        IReadOnlyList<T> messages,
-        CancellationToken cancellationToken = default
-    )
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task SendMessageAsJson<T>(string queueName, T message, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task SendMessage(string queueName, string message, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
 }

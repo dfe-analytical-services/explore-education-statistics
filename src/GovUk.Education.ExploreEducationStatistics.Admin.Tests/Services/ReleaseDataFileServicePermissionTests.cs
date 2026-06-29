@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -8,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Scree
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -257,8 +255,7 @@ public class ReleaseDataFileServicePermissionTests
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
             dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(MockBehavior.Strict),
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
-            mapper ?? Mock.Of<IMapper>(MockBehavior.Strict),
-            new DataScreenerOptions().ToOptionsWrapper()
+            mapper ?? Mock.Of<IMapper>(MockBehavior.Strict)
         );
     }
 

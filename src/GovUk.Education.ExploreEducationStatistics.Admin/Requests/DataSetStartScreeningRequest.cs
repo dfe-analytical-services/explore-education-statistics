@@ -7,9 +7,6 @@ public class DataSetStartScreeningRequest
     [JsonPropertyName("data_set_id")]
     public Guid DataSetId { get; set; }
 
-    [JsonPropertyName("storage_container_name")]
-    public required string StorageContainerName { get; set; }
-
     [JsonPropertyName("data_file_name")]
     public required string DataFileName { get; set; }
 
