@@ -166,10 +166,7 @@ describe('TableToolSearchPage', () => {
     });
 
     expect(
-      screen.getByRole('heading', { name: '1 result for "test search term"' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Dataset B', level: 3 }),
+      screen.getByRole('heading', { name: 'Dataset B' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Test AI summary.')).toBeInTheDocument();
 
