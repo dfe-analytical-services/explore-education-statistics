@@ -30,7 +30,6 @@ public class ReplacementPlanService(
     IDataSetVersionService dataSetVersionService,
     ITimePeriodService timePeriodService,
     IUserService userService,
-    IDataSetMappingService dataSetMappingService,
     IDataSetVersionMappingService apiDataSetVersionMappingService,
     IReleaseFileRepository releaseFileRepository
 ) : IReplacementPlanService
@@ -54,16 +53,12 @@ public class ReplacementPlanService(
                 )
             )
             .OnSuccess(async releaseFiles =>
-            {
-                var originalReleaseFile = releaseFiles.originalReleaseFile;
-                var replacementReleaseFile = releaseFiles.replacementReleaseFile;
-
-                return await GenerateReplacementPlan(
-                    originalReleaseFile: originalReleaseFile,
-                    replacementReleaseFile: replacementReleaseFile,
+                await GenerateReplacementPlan(
+                    originalReleaseFile: releaseFiles.originalReleaseFile,
+                    replacementReleaseFile: releaseFiles.replacementReleaseFile,
                     cancellationToken: cancellationToken
-                );
-            });
+                )
+            );
     }
 
     private async Task<ReplaceApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(
@@ -126,11 +121,10 @@ public class ReplacementPlanService(
 
                 var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
 
-                var mapping = await dataSetMappingService.GetOrCreateMapping(
-                    originalDataFileId: originalReleaseFile.FileId,
-                    replacementDataFileId: replacementReleaseFile.FileId,
-                    originalSubjectId: originalSubjectId,
-                    replacementSubjectId: replacementSubjectId,
+                var mapping = await contentDbContext.DataSetMappings.SingleAsync(
+                    map =>
+                        map.OriginalDataFileId == originalReleaseFile.FileId
+                        && map.ReplacementDataFileId == replacementReleaseFile.FileId,
                     cancellationToken
                 );
 
@@ -153,65 +147,95 @@ public class ReplacementPlanService(
                     ? null
                     : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
 
+                var indicatorMappings = mapping.IndicatorMappings.Values.ToDictionary(
+                    map => map.OriginalId,
+                    map => new ReplacementPlanIndicatorMappingViewModel
+                    {
+                        Source = new ReplacementPlanIndicatorViewModel
+                        {
+                            Id = map.OriginalId,
+                            Name = map.OriginalColumnName,
+                            Label = map.OriginalLabel,
+                        },
+                        Type = map.Status.ToString(),
+                        CandidateKey = map.ReplacementId,
+                    }
+                );
+                var indicatorCandidates = mapping // candidates are all possible replacement indicators
+                    .IndicatorMappings.Values.Where(indMap => indMap.ReplacementId != null)
+                    .Select(indMap => new
+                    {
+                        Id = indMap.ReplacementId!.Value,
+                        ColumnName = indMap.ReplacementColumnName!,
+                        Label = indMap.ReplacementLabel!,
+                    })
+                    .Concat(
+                        mapping.UnmappedReplacementIndicators.Select(i => new
+                        {
+                            i.Id,
+                            i.ColumnName,
+                            i.Label,
+                        })
+                    )
+                    .ToDictionary(
+                        i => i.Id,
+                        i => new ReplacementPlanIndicatorViewModel
+                        {
+                            Id = i.Id,
+                            Name = i.ColumnName,
+                            Label = i.Label,
+                        }
+                    );
+                var locationMappings = mapping.LocationMappings.Values.ToDictionary(
+                    map => map.OriginalId,
+                    map => new ReplacementPlanLocationMappingViewModel
+                    {
+                        Source = new ReplacementPlanLocationViewModel
+                        {
+                            Id = map.OriginalId,
+                            Code = map.OriginalCode,
+                            Name = map.OriginalName,
+                        },
+                        Type = map.Status.ToString(),
+                        CandidateKey = map.ReplacementId,
+                    }
+                );
+                var locationCandidates = mapping // candidates are all possible replacement locations
+                    .LocationMappings.Values.Where(l => l.ReplacementId != null)
+                    .Select(l => new
+                    {
+                        Id = l.ReplacementId!.Value,
+                        Code = l.ReplacementCode!,
+                        Name = l.ReplacementName!,
+                    })
+                    .Concat(
+                        mapping.UnmappedReplacementLocations.Select(l => new
+                        {
+                            l.Id,
+                            l.Code,
+                            l.Name,
+                        })
+                    )
+                    .ToDictionary(
+                        l => l.Id,
+                        l => new ReplacementPlanLocationViewModel
+                        {
+                            Id = l.Id,
+                            Code = l.Code,
+                            Name = l.Name,
+                        }
+                    );
                 var mappingPlan = new ReplacementPlanMappingViewModel
                 {
                     Indicators = new ReplacementPlanIndicatorsMappingViewModel
                     {
-                        Mappings = mapping.IndicatorMappings.Values.ToDictionary(
-                            map => map.OriginalId,
-                            map => new ReplacementPlanIndicatorMappingViewModel
-                            {
-                                Source = new ReplacementPlanIndicatorViewModel
-                                {
-                                    Id = map.OriginalId,
-                                    Name = map.OriginalColumnName,
-                                    Label = map.OriginalLabel,
-                                },
-                                Type = map.Status.ToString(),
-                                CandidateKey = map.ReplacementId,
-                            }
-                        ),
-                        Candidates = statisticsDbContext
-                            .Indicator.Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
-                            .ToDictionary(
-                                i => i.Id,
-                                i => new ReplacementPlanIndicatorViewModel
-                                {
-                                    Id = i.Id,
-                                    Name = i.Name,
-                                    Label = i.Label,
-                                }
-                            ),
+                        Mappings = indicatorMappings,
+                        Candidates = indicatorCandidates,
                     },
                     Locations = new ReplacementPlanLocationMappingsViewModel
                     {
-                        Mappings = mapping.LocationMappings.Values.ToDictionary(
-                            map => map.OriginalId,
-                            map => new ReplacementPlanLocationMappingViewModel
-                            {
-                                Source = new ReplacementPlanLocationViewModel
-                                {
-                                    Id = map.OriginalId,
-                                    Code = map.OriginalCode,
-                                    Name = map.OriginalName,
-                                },
-                                Type = map.Status.ToString(),
-                                CandidateKey = map.ReplacementId,
-                            }
-                        ),
-                        Candidates = statisticsDbContext
-                            .Observation.Where(o => o.SubjectId == replacementSubjectId)
-                            .Select(o => o.Location)
-                            .Distinct()
-                            .ToDictionary(
-                                l => l.Id,
-                                l => new ReplacementPlanLocationViewModel
-                                {
-                                    Id = l.Id,
-                                    Code = l.ToLocationAttribute().GetCodeOrFallback(),
-                                    Name = l.ToLocationAttribute().Name ?? "",
-                                }
-                            ),
+                        Mappings = locationMappings,
+                        Candidates = locationCandidates,
                     },
                 };
 
