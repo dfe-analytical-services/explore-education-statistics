@@ -168,14 +168,30 @@ const tableToolSearchService = {
 
           if (!msg.data) return;
 
-          retryCount = 0;
+          let parsed: unknown;
+          try {
+            parsed = JSON.parse(msg.data);
+          } catch (err) {
+            logger.error(err);
+            return;
+          }
+
+          // Handle errors that are passed as message data
+          if (
+            parsed &&
+            typeof parsed === 'object' &&
+            'error' in parsed &&
+            typeof parsed.error === 'string'
+          ) {
+            throw new FatalError(parsed.error);
+          }
 
           try {
-            const parsed: TtSearchStreamMessage = JSON.parse(msg.data);
-            if (parsed.stage === 'pipeline complete') {
+            const message = parsed as TtSearchStreamMessage;
+            if (message.stage === 'pipeline complete') {
               isComplete = true;
             }
-            options.onMessage(parsed);
+            options.onMessage(message);
           } catch (err) {
             logger.error(err);
           }
