@@ -21,8 +21,10 @@ public record DataSetMapping
     public List<UnmappedIndicator> UnmappedReplacementIndicators { get; init; } = [];
 
     public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
-
     public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
+
+    public Dictionary<Guid, FilterMapping> FilterMappings { get; init; } = null!;
+    public List<UnmappedFilter> UnmappedReplacementFilters { get; init; } = [];
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -91,6 +93,27 @@ public record DataSetMapping
                         ?? new List<UnmappedLocation>(),
                     ValueComparer.CreateDefault<List<UnmappedLocation>>(false)
                 );
+
+            builder
+                .Property(x => x.FilterMappings)
+                .HasConversion(
+                    locationMappings => JsonSerializer.Serialize(locationMappings, JsonOptions),
+                    locMappingString =>
+                        JsonSerializer.Deserialize<Dictionary<Guid, FilterMapping>>(locMappingString, JsonOptions)
+                        ?? new Dictionary<Guid, FilterMapping>(),
+                    ValueComparer.CreateDefault<Dictionary<Guid, FilterMapping>>(false)
+                )
+                .HasColumnType("nvarchar(max)");
+
+            builder
+                .Property(x => x.UnmappedReplacementFilters)
+                .HasConversion(
+                    unmappedFilters => JsonSerializer.Serialize(unmappedFilters, JsonOptions),
+                    unmappedFiltersString =>
+                        JsonSerializer.Deserialize<List<UnmappedFilter>>(unmappedFiltersString, JsonOptions)
+                        ?? new List<UnmappedFilter>(),
+                    ValueComparer.CreateDefault<List<UnmappedFilter>>(false)
+                );
         }
     }
 }
@@ -150,3 +173,77 @@ public record LocationMapping
 
     public MapStatus Status { get; set; }
 }
+
+public record UnmappedFilter
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+    public string ColumnName { get; set; } = "";
+
+    // All child groups of an unmapped filter must also be unmapped
+    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
+}
+
+public record UnmappedFilterGroup
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+
+    // All child items of an unmapped group must also be unmapped
+    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
+}
+
+public record UnmappedFilterItem
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+}
+
+public record FilterMapping
+{
+    public Guid OriginalId { get; set; }
+    public string OriginalLabel { get; set; } = "";
+    public string OriginalColumnName { get; set; } = "";
+
+    public Guid? ReplacementId { get; set; }
+    public string? ReplacementLabel { get; set; } = "";
+    public string? ReplacementColumnName { get; set; } = "";
+
+    public Dictionary<Guid, FilterGroupMapping> FilterGroupMappings { get; set; } = [];
+    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
+
+    public MapStatus Status { get; set; }
+}
+
+public record FilterGroupMapping
+{
+    public Guid OriginalId { get; set; }
+    public string OriginalLabel { get; set; } = "";
+
+    public Guid? ReplacementId { get; set; }
+    public string? ReplacementLabel { get; set; } = "";
+
+    public Dictionary<Guid, FilterItemMapping> FilterItemMappings { get; set; } = [];
+    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
+
+    public MapStatus Status { get; set; }
+}
+
+public record FilterItemMapping
+{
+    public Guid OriginalId { get; set; }
+    public string OriginalLabel { get; set; } = "";
+
+    public Guid? ReplacementId { get; set; }
+    public string? ReplacementLabel { get; set; } = "";
+
+    public MapStatus Status { get; set; }
+}
+
+// @MarkFix add automapping of filters when first generating a DataSetMapping
+// @MarkFix code to generate replacement plan from filter mappings
+// @MarkFix code to complete replacement based on filter mappings
+// @MarkFix add tests for automapping filters
+// @MarkFix add tests for replacement plan generation
+// @MarkFix add tests for completing replacement
+// @MarkFix initialise existing DataSetMappings that don't have FilterMappings set with migration endpoint? or just delete any DataSetMappings to speed up development?
