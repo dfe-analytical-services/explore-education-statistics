@@ -25,7 +25,7 @@ jobs:
         run: sudo ethtool -K eth0 tx off rx off
 
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup python
         uses: actions/setup-python@v6
@@ -77,7 +77,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ env.GH_TOKEN }}
 
