@@ -2,6 +2,9 @@ import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
 import { ResourceNames } from '../types.bicep'
 
+@description('The URL of the Data API.')
+param dataApiUrl string
+
 @description('The IP address ranges that can access the Natural Language Search Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
 
@@ -102,6 +105,10 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
       {
         name: 'AZURE_OPENAI_API_VERSION'
         value: '2024-10-21'
+      }
+      {
+        name: 'EES_URL_API_DATA'
+        value: dataApiUrl
       }
     ]
     functionAppExists: functionAppExists

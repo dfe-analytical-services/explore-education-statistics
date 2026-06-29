@@ -4,4 +4,5 @@ using '../main.bicep'
 param environmentName = 'Pre-Production'
 
 param contentApiUrl = 'https://cont.pre-production.explore-education-statistics.service.gov.uk'
+param dataApiUrl = 'https://data.pre-production.explore-education-statistics.service.gov.uk'
 param searchServiceSemanticRankerAvailability = 'free'
