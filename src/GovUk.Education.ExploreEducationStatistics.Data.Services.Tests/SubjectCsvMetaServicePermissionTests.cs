@@ -37,7 +37,7 @@ public class SubjectCsvMetaServicePermissionTests
 
                 var query = new FullTableQuery { SubjectId = SubjectId };
 
-                return await service.GetSubjectCsvMeta(ReleaseSubject, query, new List<Observation>());
+                return await service.GetSubjectCsvMeta(ReleaseSubject, query);
             });
     }
 

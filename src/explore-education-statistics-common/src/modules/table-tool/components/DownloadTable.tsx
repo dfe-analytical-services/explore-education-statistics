@@ -12,7 +12,6 @@ import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import copyElementToClipboard from '@common/utils/copyElementToClipboard';
 import React, { createElement, RefObject } from 'react';
-import WarningMessage from '@common/components/WarningMessage';
 
 export type FileFormat = 'ods' | 'csv';
 
@@ -61,16 +60,19 @@ const DownloadTable = ({
 
   const options = [
     {
-      label: 'Table in ODS format (spreadsheet, with title and footnotes)',
-      value: 'ods',
-    },
-    {
       label: 'Table in CSV format (flat file, with location codes)',
       value: 'csv',
     },
   ];
 
   const isCroppedTable = fullTable && fullTable.subjectMeta.isCroppedTable;
+
+  if (!isCroppedTable) {
+    options.push({
+      label: 'Table in ODS format (spreadsheet, with title and footnotes)',
+      value: 'ods',
+    });
+  }
 
   return (
     <FormProvider
@@ -85,72 +87,59 @@ const DownloadTable = ({
     >
       {({ formState }) => {
         return (
-          <>
-            <Form
-              id="downloadTableForm"
-              onSubmit={async ({ fileFormat }) => {
-                // TODO EES-5852 analytics for table tool/permalink csv/ods downloads
-                await onSubmit?.(fileFormat);
+          <Form
+            id="downloadTableForm"
+            onSubmit={async ({ fileFormat }) => {
+              // TODO EES-5852 analytics for table tool/permalink csv/ods downloads
+              onSubmit?.(fileFormat);
 
-                if (fileFormat === 'csv') {
-                  await handleCsvDownload();
-                } else {
-                  await handleOdsDownload();
-                }
-              }}
-            >
-              <>
-                {createElement(
-                  headingTag,
-                  {
-                    className: `govuk-heading-${headingSize}`,
-                  },
-                  'Download Table',
-                )}
-                {!isCroppedTable && (
-                  <FormFieldRadioGroup<FormValues>
-                    legend="Select a file format to download:"
-                    legendSize="s"
-                    legendWeight="regular"
-                    name="fileFormat"
-                    small
-                    order={[]}
-                    options={options}
-                  />
-                )}
-                <ButtonGroup>
-                  {!isCroppedTable && (
-                    <Button type="submit" disabled={formState.isSubmitting}>
-                      Download table
-                    </Button>
-                  )}
-                  <Button
-                    variant="secondary"
-                    onClick={() => copyElementToClipboard(tableRef)}
-                  >
-                    Copy table to clipboard
-                  </Button>
-                  <LoadingSpinner
-                    alert
-                    className="govuk-!-margin-left-2"
-                    inline
-                    hideText
-                    loading={formState.isSubmitting}
-                    size="md"
-                    text="Preparing download"
-                  />
-                </ButtonGroup>
-              </>
-            </Form>
-
-            {isCroppedTable && (
-              <WarningMessage>
-                The selections used to generate this table returned too many
-                rows to generate a file download. The full set of relevant data
-                can be downloaded from the publication linked to below.
-              </WarningMessage>
-            )}
-          </>
+              if (fileFormat === 'csv') {
+                await handleCsvDownload();
+              } else {
+                handleOdsDownload();
+              }
+            }}
+          >
+            <>
+              {createElement(
+                headingTag,
+                {
+                  className: `govuk-heading-${headingSize}`,
+                },
+                'Download Table',
+              )}
+              <FormFieldRadioGroup<FormValues>
+                legend="Select a file format to download full results given by your selection:"
+                legendSize="s"
+                hint="The ODS download option is currently unavailable for large selections"
+                legendWeight="regular"
+                name="fileFormat"
+                small
+                order={[]}
+                options={options}
+              />
+              <ButtonGroup>
+                <Button type="submit" disabled={formState.isSubmitting}>
+                  Download table
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => copyElementToClipboard(tableRef)}
+                >
+                  Copy table to clipboard
+                </Button>
+                <LoadingSpinner
+                  alert
+                  className="govuk-!-margin-left-2"
+                  inline
+                  hideText
+                  loading={formState.isSubmitting}
+                  size="md"
+                  text="Preparing download"
+                />
+              </ButtonGroup>
+            </>
+          </Form>
         );
       }}
     </FormProvider>
