@@ -123,6 +123,7 @@ public enum MapStatus
     Unset,
     ManuallySet, // user manually mapped this (whether to another Id or nothing)
     AutoSet, // automatically mapped when the initial mapping was created
+    ParentNotMapped,
 }
 
 public record UnmappedIndicator
