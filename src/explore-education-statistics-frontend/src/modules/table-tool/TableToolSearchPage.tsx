@@ -2,6 +2,7 @@ import Details from '@common/components/Details';
 import ErrorMessage from '@common/components/ErrorMessage';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import PageNav from '@common/components/PageNav';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import WarningMessage from '@common/components/WarningMessage';
 import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
@@ -15,6 +16,7 @@ import Page from '@frontend/components/Page';
 import SearchForm from '@frontend/components/SearchForm';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
 import ShortlistedSearchResultItem from '@frontend/modules/table-tool/components/ShortlistedSearchResultItem';
+import TableToolSearchFinalResult from '@frontend/modules/table-tool/components/TableToolSearchFinalResult';
 import tableToolSearchService, {
   FatalError,
   PipelineStage,
@@ -25,7 +27,7 @@ import tableToolSearchService, {
   TtSearchStreamMessage,
 } from '@frontend/services/tableToolSearchService';
 import { GetServerSideProps, NextPage } from 'next';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 export interface TableToolSearchPageProps {
   latestReleaseVersion: ReleaseVersionSummary;
@@ -147,10 +149,6 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
     ? pipelineData.finalData.datasets
     : [];
 
-  const resultsTitle = `${finalDatasets.length} result${
-    finalDatasets.length !== 1 ? 's' : ''
-  } for "${searchedTerm}"`;
-
   return (
     <Page
       title={`Search statistics - ${publicationSummary.title}`}
@@ -205,89 +203,107 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
               you find something specific
             </p>
           </Details>
-
-          {error && <ErrorMessage announceError>{error}</ErrorMessage>}
         </div>
       </div>
 
       <div
-        className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-4"
+        className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-8"
         id="searchResults"
       >
-        {hasNoResults && !error && (
-          <div role="alert" className="govuk-grid-column-two-thirds">
-            <WarningMessage>
-              We couldn't find any results for your search. <br />
-              Please make sure your query is relevant to{' '}
-              {publicationSummary.title}
-            </WarningMessage>
-          </div>
-        )}
-
-        {currentStage && !hasNoResults && !error && (
+        {error ? (
           <div className="govuk-grid-column-two-thirds">
-            <h2 className="govuk-heading-m">
-              {currentStage === PipelineStage.COMPLETE
-                ? resultsTitle
-                : PipelineStageLabels[currentStage]}
-            </h2>
-
-            <ScreenReaderMessage
-              message={
-                currentStage === PipelineStage.COMPLETE
-                  ? resultsTitle
-                  : PipelineStageLabels[currentStage]
-              }
-            />
-
-            {currentStage === PipelineStage.STARTING && (
-              <InsetText>Analysing "{searchedTerm}"</InsetText>
-            )}
-
-            {currentStage === PipelineStage.RETRIEVED &&
-              pipelineData.retrievedData?.datasets && (
-                <ul className="govuk-list govuk-list--spaced">
-                  {pipelineData.retrievedData.datasets.map(dataset => (
-                    <ShortlistedSearchResultItem
-                      key={dataset.title}
-                      title={dataset.title}
-                      relevance={dataset.relevanceScore}
-                    />
-                  ))}
-                </ul>
-              )}
-
-            {currentStage === PipelineStage.RERANKER &&
-              pipelineData.rerankerData?.shortlistedDatasets && (
-                <ul className="govuk-list govuk-list--spaced">
-                  {pipelineData.rerankerData.shortlistedDatasets.map(
-                    dataset => (
-                      <ShortlistedSearchResultItem
-                        key={dataset.title}
-                        title={dataset.title}
-                        relevance={dataset.relevanceScore}
-                      />
-                    ),
-                  )}
-                </ul>
-              )}
-
-            {currentStage === PipelineStage.COMPLETE ? (
-              // TODO EES-7213 render results
-              <ul>
-                {finalDatasets.map(dataset => (
-                  <li key={dataset.fileId}>
-                    <h3 className="govuk-heading-s">{dataset.title}</h3>
-                    <div>
-                      <p className="govuk-body">{dataset.aiSummary}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <LoadingSpinner text="Processing request" hideText size="lg" />
-            )}
+            <ErrorMessage announceError>{error}</ErrorMessage>
           </div>
+        ) : (
+          <>
+            {hasNoResults && (
+              <div role="alert" className="govuk-grid-column-two-thirds">
+                <WarningMessage>
+                  We couldn't find any results for your search. <br />
+                  Please make sure your query is relevant to{' '}
+                  {publicationSummary.title}
+                </WarningMessage>
+              </div>
+            )}
+
+            {currentStage && !hasNoResults && (
+              <ScreenReaderMessage
+                message={PipelineStageLabels[currentStage]}
+              />
+            )}
+
+            {currentStage &&
+              currentStage !== PipelineStage.COMPLETE &&
+              !hasNoResults && (
+                <div className="govuk-grid-column-two-thirds">
+                  <h2 className="govuk-heading-m">
+                    {PipelineStageLabels[currentStage]}
+                  </h2>
+
+                  {currentStage === PipelineStage.STARTING && (
+                    <InsetText>Analysing "{searchedTerm}"</InsetText>
+                  )}
+
+                  {currentStage === PipelineStage.RETRIEVED &&
+                    pipelineData.retrievedData?.datasets && (
+                      <ul className="govuk-list govuk-list--spaced">
+                        {pipelineData.retrievedData.datasets.map(dataset => (
+                          <ShortlistedSearchResultItem
+                            key={dataset.title}
+                            title={dataset.title}
+                            relevance={dataset.relevanceScore}
+                          />
+                        ))}
+                      </ul>
+                    )}
+
+                  {currentStage === PipelineStage.RERANKER &&
+                    pipelineData.rerankerData?.shortlistedDatasets && (
+                      <ul className="govuk-list govuk-list--spaced">
+                        {pipelineData.rerankerData.shortlistedDatasets.map(
+                          dataset => (
+                            <ShortlistedSearchResultItem
+                              key={dataset.title}
+                              title={dataset.title}
+                              relevance={dataset.relevanceScore}
+                            />
+                          ),
+                        )}
+                      </ul>
+                    )}
+
+                  <LoadingSpinner
+                    text="Processing request"
+                    hideText
+                    size="lg"
+                  />
+                </div>
+              )}
+
+            {currentStage === PipelineStage.COMPLETE &&
+              finalDatasets.length &&
+              !error && (
+                <>
+                  <PageNav
+                    items={finalDatasets.map(dataset => ({
+                      id: `result-${dataset.fileId}`,
+                      text: dataset.title,
+                    }))}
+                    heading="Search results"
+                  />
+                  <div className="govuk-grid-column-two-thirds">
+                    <ul className="govuk-list">
+                      {finalDatasets.map(dataset => (
+                        <TableToolSearchFinalResult
+                          key={dataset.fileId}
+                          dataset={dataset}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+          </>
         )}
       </div>
     </Page>
