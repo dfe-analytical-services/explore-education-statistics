@@ -85,14 +85,16 @@ export default function PublicationPublishedReleasesTable({
                   </td>
                   <td>
                     {release.publishedDisplayDate && (
-                      <FormattedDate>
+                      <FormattedDate usingUkTime>
                         {release.publishedDisplayDate}
                       </FormattedDate>
                     )}
                   </td>
                   <td>
                     {release.lastPublished && (
-                      <FormattedDate>{release.lastPublished}</FormattedDate>
+                      <FormattedDate usingUkTime>
+                        {release.lastPublished}
+                      </FormattedDate>
                     )}
                   </td>
                   <td>
