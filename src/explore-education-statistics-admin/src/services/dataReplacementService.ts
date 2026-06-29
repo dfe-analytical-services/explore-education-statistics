@@ -119,7 +119,7 @@ export interface ApiDataSetVersionPlan {
   valid: boolean;
 }
 
-type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet';
+type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet' | 'ParentNotMapped';
 
 export interface ReplacementMapping<TSource> {
   type: MappingType;
