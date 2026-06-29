@@ -301,13 +301,6 @@
     "theme": "Higher education"
   },
   {
-    "publication_summary": "Official statistics on labour market outcomes such as salaries and employment rates, for graduates, non-graduates and postgraduates.",
-    "publication_title": "Graduate labour market statistics",
-    "published": "5 Jun 2025",
-    "release_type": "Official statistics in development",
-    "theme": "Higher education"
-  },
-  {
     "publication_summary": "English-dom first degree entrants at UK HE from 2016/17-21/22 by level 2 & 3 attainment, proportion of entrants in 2016/17-17/18 completing degree in 5 years",
     "publication_title": "Higher Education Entrants and Qualifiers by their Level 2 and 3 Attainment",
     "published": "25 Apr 2024",
@@ -376,13 +369,6 @@
     "published": "11 Dec 2025",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
-  },
-  {
-    "publication_summary": "Employment and earnings outcomes of graduates by each higher education provider by sex and current region/subject studied/prior attainment.",
-    "publication_title": "LEO Graduate outcomes provider level data",
-    "published": "26 Jun 2025",
-    "release_type": "Official statistics",
-    "theme": "Higher education"
   },
   {
     "publication_summary": "Official data on the number of laptops and tablets dispatched to help providers during the COVID-19 pandemic. Breakdowns by local authority and academy trust.",
@@ -616,7 +602,7 @@
     "theme": "Teachers and school workforce"
   },
   {
-    "publication_summary": "Data on numbers and types of schools that the Department for Education (DfE) considers to be underperforming on the basis of their Ofsted inspections.",
+    "publication_summary": "Information on the eligibility criteria for targeted RISE intervention and data on the characteristics and performance of pupils in RISE schools.",
     "publication_title": "Schools eligible for RISE intervention",
     "published": "9 Sep 2025",
     "release_type": "Ad hoc statistics",
