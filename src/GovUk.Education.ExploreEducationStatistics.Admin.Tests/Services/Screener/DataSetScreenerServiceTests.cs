@@ -577,7 +577,9 @@ public abstract class DataSetScreenerServiceTests
         public async Task DataSetWithScreenerProgress_ProgressUpdatesReturned()
         {
             // Arrange
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
@@ -647,7 +649,9 @@ public abstract class DataSetScreenerServiceTests
         public async Task DataSetBeingScreened_NoProgressUpdatesYet_NullProgressUpdateReturned()
         {
             // Arrange
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()

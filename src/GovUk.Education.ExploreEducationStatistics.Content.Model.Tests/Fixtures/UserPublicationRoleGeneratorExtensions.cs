@@ -79,7 +79,8 @@ public static class UserPublicationRoleGeneratorExtensions
             .SetDefault(upr => upr.Id)
             .SetDefault(upr => upr.PublicationId)
             .SetDefault(upr => upr.UserId)
-            .SetDefault(upr => upr.Created);
+            .SetDefault(upr => upr.Created)
+            .Set(upr => upr.Role, PublicationRole.Drafter);
 
     public static InstanceSetters<UserPublicationRole> SetPublication(
         this InstanceSetters<UserPublicationRole> setters,

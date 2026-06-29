@@ -1,8 +1,10 @@
 import { PublicationSummaryPreview } from '@common/services/publicationService';
 import { IdTitlePair } from '@admin/services/types/common';
-import { Role, ResourceRoles, User } from '@admin/services/userService';
+import { UserWithRoles } from '@admin/services/types/userWithRoles';
+import { Role } from '@admin/services/user-management/globalRolesService';
+import { PublicationRole } from '@admin/services/types/PublicationRole';
 
-export const testUser: User = {
+export const testUser: UserWithRoles = {
   id: 'user-1-id',
   name: 'Florian Schneider',
   email: 'test@test.com',
@@ -11,30 +13,24 @@ export const testUser: User = {
     {
       id: 'pr-id-1',
       publication: 'Publication 1',
-      role: 'Allower',
-      userName: 'Analyst1 User1',
-      email: 'analyst1@example.com',
+      role: PublicationRole.Approver,
     },
     {
       id: 'pr-id-2',
       publication: 'Publication 2',
-      role: 'Owner',
-      userName: 'Analyst2 User2',
-      email: 'analyst2@example.com',
+      role: PublicationRole.Drafter,
     },
   ],
-  userReleaseRoles: [
+  userPreReleaseRoles: [
     {
       id: 'rr-id-1',
       publication: 'Publication 1',
       release: 'Release 2',
-      role: 'Contributor',
     },
     {
       id: 'rr-id-2',
       publication: 'Publication 2',
       release: 'Release 2',
-      role: 'Approver',
     },
   ],
 };
@@ -90,11 +86,6 @@ export const testRoles: Role[] = [
     normalizedName: 'Role 2 normalized name',
   },
 ];
-
-export const testResourceRoles: ResourceRoles = {
-  Publication: ['Allower', 'Owner'],
-  Release: ['Approver', 'Contributor', 'PrereleaseViewer'],
-};
 
 export const testReleases: IdTitlePair[] = [
   {

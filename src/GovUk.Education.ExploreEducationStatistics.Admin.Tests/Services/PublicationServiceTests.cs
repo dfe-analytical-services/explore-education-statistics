@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -233,19 +232,19 @@ public class PublicationServiceTests
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication1)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication2)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication3)
                     .Generate()
             );
@@ -306,19 +305,19 @@ public class PublicationServiceTests
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication3)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication1)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication2)
                     .Generate()
             );
@@ -376,19 +375,19 @@ public class PublicationServiceTests
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication1)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication2)
                     .Generate(),
                 _dataFixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
+                    .WithRole(PublicationRole.Drafter)
                     .WithPublication(publication3)
                     .Generate()
             );
@@ -535,14 +534,7 @@ public class PublicationServiceTests
                 .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanUpdateContact))
                 .ReturnsAsync(true);
             userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
-                            tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor
-                        ),
-                        CanUpdateSpecificReleaseRole
-                    )
-                )
+                .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanUpdateDrafters))
                 .ReturnsAsync(false);
             userService
                 .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanViewReleaseTeamAccess))
@@ -565,7 +557,7 @@ public class PublicationServiceTests
             Assert.False(result.Permissions.CanManageExternalMethodology);
             Assert.True(result.Permissions.CanManageReleaseSeries);
             Assert.True(result.Permissions.CanUpdateContact);
-            Assert.False(result.Permissions.CanUpdateContributorReleaseRole);
+            Assert.False(result.Permissions.CanUpdateDrafters);
         }
     }
 
@@ -2344,7 +2336,7 @@ public class PublicationServiceTests
             Assert.True(releaseVersion.Permissions!.CanDeleteReleaseVersion);
             Assert.True(releaseVersion.Permissions!.CanUpdateRelease);
             Assert.True(releaseVersion.Permissions!.CanUpdateReleaseVersion);
-            Assert.True(releaseVersion.Permissions!.CanAddPrereleaseUsers);
+            Assert.True(releaseVersion.Permissions!.CanAddPreReleaseUsers);
             Assert.True(releaseVersion.Permissions!.CanMakeAmendmentOfReleaseVersion);
         }
     }
@@ -3221,13 +3213,15 @@ public class PublicationServiceTests
 
     private static PublicationRepository CreatePublicationRepository(ContentDbContext context)
     {
-        var (userPublicationRoleRepository, userReleaseRoleRepository) = RoleRepositoryFactory.BuildRoleRepositories(
-            context
+        var publicationRoleChangesHelper = new PublicationRoleChangesHelper();
+
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(
+            contentDbContext: context,
+            publicationRoleChangesHelper: publicationRoleChangesHelper
         );
 
         return new PublicationRepository(
             context: context,
-            userReleaseRoleRepository: userReleaseRoleRepository,
             userPublicationRoleRepository: userPublicationRoleRepository
         );
     }

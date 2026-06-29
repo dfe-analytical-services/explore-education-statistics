@@ -2,23 +2,25 @@ import PublicationAccessForm from '@admin/pages/users/components/PublicationAcce
 import {
   testUser,
   testPublicationSummaries,
-  testResourceRoles,
 } from '@admin/pages/users/__data__/testUserData';
-import _userService from '@admin/services/userService';
+import _publicationRolesService from '@admin/services/user-management/publicationRolesService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import { PublicationRole } from '@admin/services/types/PublicationRole';
 
-jest.mock('@admin/services/userService');
-const userService = _userService as jest.Mocked<typeof _userService>;
+jest.mock('@admin/services/user-management/publicationRolesService');
+
+const publicationRolesService = _publicationRolesService as jest.Mocked<
+  typeof _publicationRolesService
+>;
 
 describe('PublicationAccessForm', () => {
   test('renders the form', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        publicationRoles={testResourceRoles.Publication}
         user={testUser}
         onUpdate={noop}
       />,
@@ -34,8 +36,8 @@ describe('PublicationAccessForm', () => {
     const roleSelect = screen.getByLabelText('Publication role');
     const roles = within(roleSelect).getAllByRole('option');
     expect(roles).toHaveLength(2);
-    expect(roles[0]).toHaveTextContent('Approver');
-    expect(roles[1]).toHaveTextContent('Owner');
+    expect(roles[0]).toHaveTextContent(PublicationRole.Approver);
+    expect(roles[1]).toHaveTextContent(PublicationRole.Drafter);
 
     expect(
       screen.getByRole('button', { name: 'Add publication access' }),
@@ -48,7 +50,6 @@ describe('PublicationAccessForm', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        publicationRoles={testResourceRoles.Publication}
         user={testUser}
         onUpdate={handleUpdate}
       />,
@@ -58,10 +59,10 @@ describe('PublicationAccessForm', () => {
       'Publication 1',
     ]);
     await user.selectOptions(screen.getByLabelText('Publication role'), [
-      'Approver',
+      PublicationRole.Approver,
     ]);
 
-    expect(userService.addUserPublicationRole).not.toHaveBeenCalled();
+    expect(publicationRolesService.addPublicationRole).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
     await user.click(
@@ -69,14 +70,16 @@ describe('PublicationAccessForm', () => {
     );
 
     await waitFor(() => {
-      expect(userService.addUserPublicationRole).toHaveBeenCalledTimes(1);
+      expect(publicationRolesService.addPublicationRole).toHaveBeenCalledTimes(
+        1,
+      );
     });
 
-    expect(userService.addUserPublicationRole).toHaveBeenCalledWith(
+    expect(publicationRolesService.addPublicationRole).toHaveBeenCalledWith(
       'user-1-id',
       {
         publicationId: 'publication-1-id',
-        publicationRole: 'Allower',
+        publicationRole: PublicationRole.Approver,
       },
     );
     expect(handleUpdate).toHaveBeenCalledTimes(1);
@@ -88,7 +91,6 @@ describe('PublicationAccessForm', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        publicationRoles={testResourceRoles.Publication}
         user={testUser}
         onUpdate={handleUpdate}
       />,
@@ -96,25 +98,22 @@ describe('PublicationAccessForm', () => {
 
     const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
 
-    expect(userService.removeUserPublicationRole).not.toHaveBeenCalled();
+    expect(
+      publicationRolesService.removeUserPublicationRole,
+    ).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
     await user.click(removeButtons[0]);
 
     await waitFor(() => {
-      expect(userService.removeUserPublicationRole).toHaveBeenCalledTimes(1);
+      expect(
+        publicationRolesService.removeUserPublicationRole,
+      ).toHaveBeenCalledTimes(1);
     });
 
-    expect(userService.removeUserPublicationRole).toHaveBeenCalledWith(
-      'user-1-id',
-      {
-        id: 'pr-id-1',
-        publication: 'Publication 1',
-        role: 'Allower',
-        userName: 'Analyst1 User1',
-        email: 'analyst1@example.com',
-      },
-    );
+    expect(
+      publicationRolesService.removeUserPublicationRole,
+    ).toHaveBeenCalledWith('pr-id-1');
     expect(handleUpdate).toHaveBeenCalledTimes(1);
   });
 
@@ -122,7 +121,6 @@ describe('PublicationAccessForm', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        publicationRoles={testResourceRoles.Publication}
         user={testUser}
         onUpdate={noop}
       />,
@@ -131,6 +129,8 @@ describe('PublicationAccessForm', () => {
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(3);
     expect(within(rows[1]).getByText('Publication 1')).toBeInTheDocument();
-    expect(within(rows[1]).getByText('Approver')).toBeInTheDocument();
+    expect(
+      within(rows[1]).getByText(PublicationRole.Approver),
+    ).toBeInTheDocument();
   });
 });

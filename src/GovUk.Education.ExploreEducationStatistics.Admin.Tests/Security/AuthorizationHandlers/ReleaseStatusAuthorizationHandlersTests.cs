@@ -2,639 +2,493 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using Microsoft.AspNetCore.Authorization;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ReleaseStatusAuthorizationHandlersTests
+public abstract class ReleaseStatusAuthorizationHandlersTests
 {
-    private static readonly DataFixture _fixture = new();
+    private readonly DataFixture _dataFixture = new();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly ReleaseVersion _draftReleaseVersion;
+    private readonly ReleaseVersion _approvedReleaseVersion;
+    private readonly ReleaseVersion _publishedReleaseVersion;
 
-    public class MarkReleaseAsDraftAuthorizationHandlerTests
+    protected ReleaseStatusAuthorizationHandlersTests()
     {
-        [Fact]
-        public async Task ClaimSuccess_MarkAllReleasesAsDraft_ReleaseUnpublished()
-        {
-            await AssertClaimSucceedsWhenReleaseUnpublished<MarkReleaseAsDraftRequirement>(
-                CreateHandler,
-                MarkAllReleasesAsDraft
-            );
-        }
+        _draftReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        [Fact]
-        public async Task AllClaimsFail_ReleasePublishing()
-        {
-            await AssertAllClaimsFailWhenReleasePublishing<MarkReleaseAsDraftRequirement>(CreateHandler);
-        }
+        _approvedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        [Fact]
-        public async Task AllClaimsFail_ReleasePublished()
-        {
-            await AssertAllClaimsFailWhenReleasePublished<MarkReleaseAsDraftRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task ReleaseRoleSuccess_EditorOrApprover_ReleaseUnpublished()
-        {
-            await GetEnums<ReleaseApprovalStatus>()
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                    releaseStatusRepository
-                        .Setup(s =>
-                            s.GetAllByOverallStage(
-                                releaseVersion.Id,
-                                ReleasePublishingStatusOverallStage.Started,
-                                ReleasePublishingStatusOverallStage.Complete
-                            )
-                        )
-                        .ReturnsAsync([]);
-
-                    // Assert that a user who has the "Contributor" or "Approver"
-                    // role on a Release can update its status if it is not Approved
-                    if (status != ReleaseApprovalStatus.Approved)
-                    {
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsDraftRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            ReleaseRole.Contributor,
-                            ReleaseRole.Approver
-                        );
-                    }
-                    else
-                    {
-                        // Assert that a user who has the "Approver" role on a
-                        // Release can update its status if it is Approved
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsDraftRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            ReleaseRole.Approver
-                        );
-                    }
-                });
-        }
-
-        [Fact]
-        public async Task PublicationRoleSuccess_Owner_ReleaseUnpublished()
-        {
-            await GetEnums<ReleaseApprovalStatus>()
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                    releaseStatusRepository
-                        .Setup(s =>
-                            s.GetAllByOverallStage(
-                                releaseVersion.Id,
-                                ReleasePublishingStatusOverallStage.Started,
-                                ReleasePublishingStatusOverallStage.Complete
-                            )
-                        )
-                        .ReturnsAsync([]);
-
-                    // Assert that a User who has the Publication Owner or Approver role
-                    // on a Release can mark its status as Draft if it is not yet Approved.
-                    if (status != ReleaseApprovalStatus.Approved)
-                    {
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsDraftRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            Owner,
-                            Allower
-                        );
-                    }
-                    else
-                    {
-                        // Assert that a User who has the Publication Approver role on a
-                        // Release can mark its status as draft if it is currently Approved
-                        // but not yet published, just as a Release Approver can.
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsDraftRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            Allower
-                        );
-                    }
-                });
-        }
-
-        [Fact]
-        public async Task AllRolesFail_ReleasePublishing()
-        {
-            await AssertAllRolesFailWhenReleasePublishing<MarkReleaseAsDraftRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task AllRolesFail_ReleasePublished()
-        {
-            await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsDraftRequirement>(CreateHandler);
-        }
-
-        private static MarkReleaseAsDraftAuthorizationHandler CreateHandler(
-            ContentDbContext context,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository
-        )
-        {
-            var (userPublicationRoleRepository, userReleaseRoleRepository) =
-                RoleRepositoryFactory.BuildRoleRepositories(context);
-
-            return new MarkReleaseAsDraftAuthorizationHandler(
-                releasePublishingStatusRepository: releasePublishingStatusRepository,
-                new AuthorizationHandlerService(
-                    releaseVersionRepository: new ReleaseVersionRepository(context),
-                    userPublicationRoleRepository: userPublicationRoleRepository,
-                    userReleaseRoleRepository: userReleaseRoleRepository,
-                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)
-                )
-            );
-        }
+        _publishedReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+            .WithPublished(DateTimeOffset.UtcNow)
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
     }
 
-    public class MarkReleaseAsHigherLevelReviewAuthorizationHandlerTests
+    public class MarkReleaseAsDraftAuthorizationHandlerTests : ReleaseStatusAuthorizationHandlersTests
     {
-        [Fact]
-        public async Task ClaimSuccess_SubmitAllReleasesToHigherReview_ReleaseUnpublished()
+        public class ClaimsTests : MarkReleaseAsDraftAuthorizationHandlerTests
         {
-            await AssertClaimSucceedsWhenReleaseUnpublished<MarkReleaseAsHigherLevelReviewRequirement>(
-                CreateHandler,
-                SubmitAllReleasesToHigherReview
-            );
-        }
+            [Fact]
+            public async Task ReleaseVersionPublished_FailsForAllClaims()
+            {
+                await AssertHandlerFailsForAllClaims<MarkReleaseAsDraftRequirement, ReleaseVersion>(
+                    handler: BuildHandler(),
+                    entity: _publishedReleaseVersion,
+                    userId: _userId
+                );
+            }
 
-        [Fact]
-        public async Task AllClaimsFail_ReleasePublishing()
-        {
-            await AssertAllClaimsFailWhenReleasePublishing<MarkReleaseAsHigherLevelReviewRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task AllClaimsFail_ReleasePublished()
-        {
-            await AssertAllClaimsFailWhenReleasePublished<MarkReleaseAsHigherLevelReviewRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task ReleaseRoleSuccess_EditorOrApprover_ReleaseUnpublished()
-        {
-            await GetEnums<ReleaseApprovalStatus>()
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                    releaseStatusRepository
-                        .Setup(s =>
-                            s.GetAllByOverallStage(
-                                releaseVersion.Id,
+            [Fact]
+            public async Task ReleaseVersionPublishing_FailsForAllClaims()
+            {
+                var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(
+                    MockBehavior.Strict
+                );
+                releasePublishingStatusRepository
+                    .Setup(s =>
+                        s.GetAllByOverallStage(
+                            _draftReleaseVersion.Id,
+                            new ReleasePublishingStatusOverallStage[]
+                            {
                                 ReleasePublishingStatusOverallStage.Started,
-                                ReleasePublishingStatusOverallStage.Complete
-                            )
+                                ReleasePublishingStatusOverallStage.Complete,
+                            }
                         )
-                        .ReturnsAsync([]);
+                    )
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
-                    // Assert that a user who has the "Contributor" or "Approver"
-                    // role on a Release can update its status if it is not Approved
-                    if (status != ReleaseApprovalStatus.Approved)
-                    {
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            ReleaseRole.Contributor,
-                            ReleaseRole.Approver
-                        );
-                    }
-                    else
-                    {
-                        // Assert that a user who has the "Approver" role on a
-                        // Release can update its status if it is Approved
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            ReleaseRole.Approver
-                        );
-                    }
-                });
+                await AssertHandlerFailsForAllClaims<MarkReleaseAsDraftRequirement, ReleaseVersion>(
+                    handler: BuildHandler(releasePublishingStatusRepository.Object),
+                    entity: _draftReleaseVersion,
+                    userId: _userId
+                );
+            }
+
+            [Fact]
+            public async Task UnpublishedReleaseVersion_SucceedsOnlyForValidClaims()
+            {
+                await AssertHandlerSucceedsWithCorrectClaims<MarkReleaseAsDraftRequirement, ReleaseVersion>(
+                    handler: BuildHandler(),
+                    entity: _draftReleaseVersion,
+                    userId: _userId,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.MarkAllReleasesAsDraft]
+                );
+            }
         }
 
-        [Fact]
-        public async Task PublicationRoleSuccess_Owner_ReleaseUnpublished()
+        public class PublicationRolesTests : MarkReleaseAsDraftAuthorizationHandlerTests
         {
-            await GetEnums<ReleaseApprovalStatus>()
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+            [Fact]
+            public async Task ReleaseVersionPublished_FailsWithoutCheckingRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
 
-                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+                await AssertHandlerFailsWithoutCheckingRoles<MarkReleaseAsDraftRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _publishedReleaseVersion
+                );
+            }
 
-                    releaseStatusRepository
-                        .Setup(s =>
-                            s.GetAllByOverallStage(
-                                releaseVersion.Id,
+            [Fact]
+            public async Task ReleaseVersionPublishing_FailsWithoutCheckingRoles()
+            {
+                var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(
+                    MockBehavior.Strict
+                );
+                releasePublishingStatusRepository
+                    .Setup(s =>
+                        s.GetAllByOverallStage(
+                            _draftReleaseVersion.Id,
+                            new ReleasePublishingStatusOverallStage[]
+                            {
                                 ReleasePublishingStatusOverallStage.Started,
-                                ReleasePublishingStatusOverallStage.Complete
-                            )
+                                ReleasePublishingStatusOverallStage.Complete,
+                            }
                         )
-                        .ReturnsAsync([]);
+                    )
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
-                    // Assert that a User who has the Publication Owner or Approver role on a
-                    // Release can mark it for higher review if it is not Approved
-                    if (status != ReleaseApprovalStatus.Approved)
-                    {
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            Owner,
-                            Allower
-                        );
-                    }
-                    else
-                    {
-                        // Assert that a User who has the Publication Approver role on a
-                        // Release can mark it for higher review even if it is not Approved
-                        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context => CreateHandler(context, releaseStatusRepository.Object),
-                            releaseVersion,
-                            Allower
-                        );
-                    }
-                });
-        }
-
-        [Fact]
-        public async Task AllRolesFail_ReleasePublishing()
-        {
-            await AssertAllRolesFailWhenReleasePublishing<MarkReleaseAsHigherLevelReviewRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task AllRolesFail_ReleasePublished()
-        {
-            await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsHigherLevelReviewRequirement>(CreateHandler);
-        }
-
-        private static MarkReleaseAsHigherLevelReviewAuthorizationHandler CreateHandler(
-            ContentDbContext context,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository
-        )
-        {
-            var (userPublicationRoleRepository, userReleaseRoleRepository) =
-                RoleRepositoryFactory.BuildRoleRepositories(context);
-
-            return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-                releasePublishingStatusRepository: releasePublishingStatusRepository,
-                new AuthorizationHandlerService(
-                    releaseVersionRepository: new ReleaseVersionRepository(context),
-                    userPublicationRoleRepository: userPublicationRoleRepository,
-                    userReleaseRoleRepository: userReleaseRoleRepository,
-                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)
-                )
-            );
-        }
-    }
-
-    public class MarkReleaseAsApprovedAuthorizationHandlerTests
-    {
-        [Fact]
-        public async Task ClaimSuccess_ApproveAllReleases_ReleaseUnpublished()
-        {
-            await AssertClaimSucceedsWhenReleaseUnpublished<MarkReleaseAsApprovedRequirement>(
-                CreateHandler,
-                ApproveAllReleases
-            );
-        }
-
-        [Fact]
-        public async Task AllClaimsFail_ReleasePublishing()
-        {
-            await AssertAllClaimsFailWhenReleasePublishing<MarkReleaseAsApprovedRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task AllClaimsFail_ReleasePublished()
-        {
-            await AssertAllClaimsFailWhenReleasePublished<MarkReleaseAsApprovedRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task ReleaseRoleSuccess_Approver_ReleaseUnpublished()
-        {
-            await GetEnums<ReleaseApprovalStatus>()
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                    releaseStatusRepository
-                        .Setup(s =>
-                            s.GetAllByOverallStage(
-                                releaseVersion.Id,
-                                ReleasePublishingStatusOverallStage.Started,
-                                ReleasePublishingStatusOverallStage.Complete
-                            )
-                        )
-                        .ReturnsAsync([]);
-
-                    // Assert that a user who has the "Approver" role on a
-                    // Release can update its status if it is Approved
-                    await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsApprovedRequirement>(
-                        context => CreateHandler(context, releaseStatusRepository.Object),
-                        releaseVersion,
-                        ReleaseRole.Approver
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    BuildHandler(
+                        releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                        authorizationHandlerService: authorizationHandlerService
                     );
-                });
+
+                await AssertHandlerFailsWithoutCheckingRoles<MarkReleaseAsDraftRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _draftReleaseVersion
+                );
+            }
+
+            [Fact]
+            public async Task UnpublishedDraftReleaseVersion_SucceedsOnlyForValidPublicationRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerSucceedsForAnyValidPublicationRole<MarkReleaseAsDraftRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _draftReleaseVersion,
+                    publicationId: _draftReleaseVersion.Release.PublicationId,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+                );
+            }
+
+            [Fact]
+            public async Task UnpublishedApprovedReleaseVersion_SucceedsOnlyForValidPublicationRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    BuildHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerSucceedsForAnyValidPublicationRole<MarkReleaseAsDraftRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _approvedReleaseVersion,
+                    publicationId: _approvedReleaseVersion.Release.PublicationId,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Approver]
+                );
+            }
         }
 
-        [Fact]
-        public async Task PublicationRoleSuccess_Approver_ReleaseUnpublished()
-        {
-            await GetEnums<ReleaseApprovalStatus>()
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                {
-                    ReleaseVersion releaseVersion = _fixture
-                        .DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-                    var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                    releaseStatusRepository
-                        .Setup(s =>
-                            s.GetAllByOverallStage(
-                                releaseVersion.Id,
-                                ReleasePublishingStatusOverallStage.Started,
-                                ReleasePublishingStatusOverallStage.Complete
-                            )
-                        )
-                        .ReturnsAsync([]);
-
-                    // Assert that a user who has the "Approver" role on the
-                    // Publication for the Release can update its status
-                    await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsApprovedRequirement>(
-                        context => CreateHandler(context, releaseStatusRepository.Object),
-                        releaseVersion,
-                        Allower
-                    );
-                });
-        }
-
-        [Fact]
-        public async Task AllRolesFail_ReleasePublishing()
-        {
-            await AssertAllRolesFailWhenReleasePublishing<MarkReleaseAsApprovedRequirement>(CreateHandler);
-        }
-
-        [Fact]
-        public async Task AllRolesFail_ReleasePublished()
-        {
-            await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsApprovedRequirement>(CreateHandler);
-        }
-
-        private static MarkReleaseAsApprovedAuthorizationHandler CreateHandler(
-            ContentDbContext context,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository
+        private MarkReleaseAsDraftAuthorizationHandler BuildHandler(
+            IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
+            IAuthorizationHandlerService? authorizationHandlerService = null
         )
         {
-            var (userPublicationRoleRepository, userReleaseRoleRepository) =
-                RoleRepositoryFactory.BuildRoleRepositories(context);
+            releasePublishingStatusRepository ??= CreateDefaultReleasePublishingStatusRepository();
+            authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
 
-            return new MarkReleaseAsApprovedAuthorizationHandler(
-                releasePublishingStatusRepository: releasePublishingStatusRepository,
-                new AuthorizationHandlerService(
-                    releaseVersionRepository: new ReleaseVersionRepository(context),
-                    userPublicationRoleRepository: userPublicationRoleRepository,
-                    userReleaseRoleRepository: userReleaseRoleRepository,
-                    preReleaseService: Mock.Of<IPreReleaseService>(Strict)
-                )
-            );
+            return new(releasePublishingStatusRepository, authorizationHandlerService);
         }
     }
 
-    private static async Task AssertClaimSucceedsWhenReleaseUnpublished<TRequirement>(
-        Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier,
-        params SecurityClaimTypes[] claims
-    )
-        where TRequirement : IAuthorizationRequirement
+    public class MarkReleaseAsHigherLevelReviewAuthorizationHandlerTests : ReleaseStatusAuthorizationHandlersTests
     {
-        await GetEnums<ReleaseApprovalStatus>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async status =>
+        public class ClaimsTests : MarkReleaseAsHigherLevelReviewAuthorizationHandlerTests
+        {
+            [Fact]
+            public async Task ReleaseVersionPublished_FailsForAllClaims()
             {
-                ReleaseVersion releaseVersion = _fixture
-                    .DefaultReleaseVersion()
-                    .WithApprovalStatus(status)
-                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+                await AssertHandlerFailsForAllClaims<MarkReleaseAsHigherLevelReviewRequirement, ReleaseVersion>(
+                    handler: SetupHandler(),
+                    entity: _publishedReleaseVersion,
+                    userId: _userId
+                );
+            }
 
-                var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                releaseStatusRepository
+            [Fact]
+            public async Task ReleaseVersionPublishing_FailsForAllClaims()
+            {
+                var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(
+                    MockBehavior.Strict
+                );
+                releasePublishingStatusRepository
                     .Setup(s =>
                         s.GetAllByOverallStage(
-                            releaseVersion.Id,
-                            ReleasePublishingStatusOverallStage.Started,
-                            ReleasePublishingStatusOverallStage.Complete
+                            _draftReleaseVersion.Id,
+                            new ReleasePublishingStatusOverallStage[]
+                            {
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete,
+                            }
                         )
                     )
-                    .ReturnsAsync([]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
-                // Assert that users with the specified claims can update the
-                // Release status if it has not started publishing
-                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(
-                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
-                    releaseVersion,
-                    claims
+                await AssertHandlerFailsForAllClaims<MarkReleaseAsHigherLevelReviewRequirement, ReleaseVersion>(
+                    handler: SetupHandler(releasePublishingStatusRepository.Object),
+                    entity: _draftReleaseVersion,
+                    userId: _userId
                 );
-            });
+            }
+
+            [Fact]
+            public async Task UnpublishedReleaseVersion_SucceedsOnlyForValidClaims()
+            {
+                await AssertHandlerSucceedsWithCorrectClaims<MarkReleaseAsHigherLevelReviewRequirement, ReleaseVersion>(
+                    handler: SetupHandler(),
+                    entity: _draftReleaseVersion,
+                    userId: _userId,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.SubmitAllReleasesToHigherReview]
+                );
+            }
+        }
+
+        public class PublicationRolesTests : MarkReleaseAsHigherLevelReviewAuthorizationHandlerTests
+        {
+            [Fact]
+            public async Task ReleaseVersionPublished_FailsWithoutCheckingRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerFailsWithoutCheckingRoles<MarkReleaseAsHigherLevelReviewRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _publishedReleaseVersion
+                );
+            }
+
+            [Fact]
+            public async Task ReleaseVersionPublishing_FailsWithoutCheckingRoles()
+            {
+                var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(
+                    MockBehavior.Strict
+                );
+                releasePublishingStatusRepository
+                    .Setup(s =>
+                        s.GetAllByOverallStage(
+                            _draftReleaseVersion.Id,
+                            new ReleasePublishingStatusOverallStage[]
+                            {
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete,
+                            }
+                        )
+                    )
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
+
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(
+                        releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                        authorizationHandlerService: authorizationHandlerService
+                    );
+
+                await AssertHandlerFailsWithoutCheckingRoles<MarkReleaseAsHigherLevelReviewRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _draftReleaseVersion
+                );
+            }
+
+            [Fact]
+            public async Task UnpublishedDraftReleaseVersion_SucceedsOnlyForValidPublicationRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerSucceedsForAnyValidPublicationRole<
+                    MarkReleaseAsHigherLevelReviewRequirement,
+                    ReleaseVersion
+                >(
+                    handlerSupplier: handlerSuppler,
+                    entity: _draftReleaseVersion,
+                    publicationId: _draftReleaseVersion.Release.PublicationId,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Drafter, PublicationRole.Approver]
+                );
+            }
+
+            [Fact]
+            public async Task UnpublishedApprovedReleaseVersion_SucceedsOnlyForValidPublicationRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerSucceedsForAnyValidPublicationRole<
+                    MarkReleaseAsHigherLevelReviewRequirement,
+                    ReleaseVersion
+                >(
+                    handlerSupplier: handlerSuppler,
+                    entity: _approvedReleaseVersion,
+                    publicationId: _approvedReleaseVersion.Release.PublicationId,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Approver]
+                );
+            }
+        }
+
+        private MarkReleaseAsHigherLevelReviewAuthorizationHandler SetupHandler(
+            IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
+            IAuthorizationHandlerService? authorizationHandlerService = null
+        )
+        {
+            releasePublishingStatusRepository ??= CreateDefaultReleasePublishingStatusRepository();
+            authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+            return new(releasePublishingStatusRepository, authorizationHandlerService);
+        }
     }
 
-    private static async Task AssertAllClaimsFailWhenReleasePublishing<TRequirement>(
-        Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier
-    )
-        where TRequirement : IAuthorizationRequirement
+    public class MarkReleaseAsApprovedAuthorizationHandlerTests : ReleaseStatusAuthorizationHandlersTests
     {
-        await GetEnums<ReleaseApprovalStatus>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async status =>
+        public class ClaimsTests : MarkReleaseAsApprovedAuthorizationHandlerTests
+        {
+            [Fact]
+            public async Task ReleaseVersionPublished_FailsForAllClaims()
             {
-                ReleaseVersion releaseVersion = _fixture
-                    .DefaultReleaseVersion()
-                    .WithApprovalStatus(status)
-                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+                await AssertHandlerFailsForAllClaims<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
+                    handler: SetupHandler(),
+                    entity: _publishedReleaseVersion,
+                    userId: _userId
+                );
+            }
 
-                var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                releaseStatusRepository
+            [Fact]
+            public async Task ReleaseVersionPublishing_FailsForAllClaims()
+            {
+                var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(
+                    MockBehavior.Strict
+                );
+                releasePublishingStatusRepository
                     .Setup(s =>
                         s.GetAllByOverallStage(
-                            releaseVersion.Id,
-                            ReleasePublishingStatusOverallStage.Started,
-                            ReleasePublishingStatusOverallStage.Complete
+                            _draftReleaseVersion.Id,
+                            new ReleasePublishingStatusOverallStage[]
+                            {
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete,
+                            }
                         )
                     )
-                    .ReturnsAsync([new()]);
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
 
-                // Assert that no users can update a Release status once it has started publishing
-                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(
-                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
-                    releaseVersion
+                await AssertHandlerFailsForAllClaims<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
+                    handler: SetupHandler(releasePublishingStatusRepository.Object),
+                    entity: _draftReleaseVersion,
+                    userId: _userId
                 );
-            });
+            }
+
+            [Fact]
+            public async Task UnpublishedReleaseVersion_SucceedsOnlyForValidClaims()
+            {
+                await AssertHandlerSucceedsWithCorrectClaims<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
+                    handler: SetupHandler(),
+                    entity: _draftReleaseVersion,
+                    userId: _userId,
+                    claimsExpectedToSucceed: [SecurityClaimTypes.ApproveAllReleases]
+                );
+            }
+        }
+
+        public class PublicationRolesTests : MarkReleaseAsApprovedAuthorizationHandlerTests
+        {
+            [Fact]
+            public async Task ReleaseVersionPublished_FailsWithoutCheckingRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerFailsWithoutCheckingRoles<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _publishedReleaseVersion
+                );
+            }
+
+            [Fact]
+            public async Task ReleaseVersionPublishing_FailsWithoutCheckingRoles()
+            {
+                var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(
+                    MockBehavior.Strict
+                );
+                releasePublishingStatusRepository
+                    .Setup(s =>
+                        s.GetAllByOverallStage(
+                            _draftReleaseVersion.Id,
+                            new ReleasePublishingStatusOverallStage[]
+                            {
+                                ReleasePublishingStatusOverallStage.Started,
+                                ReleasePublishingStatusOverallStage.Complete,
+                            }
+                        )
+                    )
+                    .ReturnsAsync([new ReleasePublishingStatus()]);
+
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(
+                        releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                        authorizationHandlerService: authorizationHandlerService
+                    );
+
+                await AssertHandlerFailsWithoutCheckingRoles<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _draftReleaseVersion
+                );
+            }
+
+            [Fact]
+            public async Task UnpublishedDraftReleaseVersion_SucceedsOnlyForValidPublicationRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerSucceedsForAnyValidPublicationRole<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _draftReleaseVersion,
+                    publicationId: _draftReleaseVersion.Release.PublicationId,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Approver]
+                );
+            }
+
+            [Fact]
+            public async Task UnpublishedApprovedReleaseVersion_SucceedsOnlyForValidPublicationRoles()
+            {
+                var handlerSuppler = (IAuthorizationHandlerService authorizationHandlerService) =>
+                    SetupHandler(authorizationHandlerService: authorizationHandlerService);
+
+                await AssertHandlerSucceedsForAnyValidPublicationRole<MarkReleaseAsApprovedRequirement, ReleaseVersion>(
+                    handlerSupplier: handlerSuppler,
+                    entity: _approvedReleaseVersion,
+                    publicationId: _approvedReleaseVersion.Release.PublicationId,
+                    publicationRolesExpectedToSucceed: [PublicationRole.Approver]
+                );
+            }
+        }
+
+        private MarkReleaseAsApprovedAuthorizationHandler SetupHandler(
+            IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
+            IAuthorizationHandlerService? authorizationHandlerService = null
+        )
+        {
+            releasePublishingStatusRepository ??= CreateDefaultReleasePublishingStatusRepository();
+            authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+            return new(releasePublishingStatusRepository, authorizationHandlerService);
+        }
     }
 
-    private static async Task AssertAllClaimsFailWhenReleasePublished<TRequirement>(
-        Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier
-    )
-        where TRequirement : IAuthorizationRequirement
+    private IReleasePublishingStatusRepository CreateDefaultReleasePublishingStatusRepository()
     {
-        await GetEnums<ReleaseApprovalStatus>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async status =>
-            {
-                ReleaseVersion releaseVersion = _fixture
-                    .DefaultReleaseVersion()
-                    .WithApprovalStatus(status)
-                    .WithPublished(DateTimeOffset.UtcNow)
-                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+        var mock = new Mock<IReleasePublishingStatusRepository>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.GetAllByOverallStage(
+                    It.IsAny<Guid>(),
+                    new ReleasePublishingStatusOverallStage[]
+                    {
+                        ReleasePublishingStatusOverallStage.Started,
+                        ReleasePublishingStatusOverallStage.Complete,
+                    }
+                )
+            )
+            .ReturnsAsync([]);
 
-                var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                releaseStatusRepository
-                    .Setup(s =>
-                        s.GetAllByOverallStage(
-                            releaseVersion.Id,
-                            ReleasePublishingStatusOverallStage.Started,
-                            ReleasePublishingStatusOverallStage.Complete
-                        )
-                    )
-                    .ReturnsAsync([]);
-
-                // Assert that no users can update a Release status once it has been published
-                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(
-                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
-                    releaseVersion
-                );
-            });
+        return mock.Object;
     }
 
-    private static async Task AssertAllRolesFailWhenReleasePublishing<TRequirement>(
-        Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier
-    )
-        where TRequirement : IAuthorizationRequirement
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
     {
-        await GetEnums<ReleaseApprovalStatus>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async status =>
-            {
-                ReleaseVersion releaseVersion = _fixture
-                    .DefaultReleaseVersion()
-                    .WithApprovalStatus(status)
-                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s =>
+                s.UserHasAnyPublicationRoleOnPublication(
+                    _userId,
+                    It.IsAny<Guid>(),
+                    It.IsAny<HashSet<PublicationRole>>()
+                )
+            )
+            .ReturnsAsync(false);
 
-                var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                releaseStatusRepository
-                    .Setup(s =>
-                        s.GetAllByOverallStage(
-                            releaseVersion.Id,
-                            ReleasePublishingStatusOverallStage.Started,
-                            ReleasePublishingStatusOverallStage.Complete
-                        )
-                    )
-                    .ReturnsAsync([new()]);
-
-                // Assert that no user release roles allow updating a Release status once it has started publishing
-                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
-                    releaseVersion
-                );
-
-                // Assert that no user publication roles allow updating a Release status once it has started publishing
-                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(
-                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
-                    releaseVersion
-                );
-            });
-    }
-
-    private static async Task AssertAllRolesFailWhenReleasePublished<TRequirement>(
-        Func<ContentDbContext, IReleasePublishingStatusRepository, IAuthorizationHandler> authorizationHandlerSupplier
-    )
-        where TRequirement : IAuthorizationRequirement
-    {
-        await GetEnums<ReleaseApprovalStatus>()
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async status =>
-            {
-                ReleaseVersion releaseVersion = _fixture
-                    .DefaultReleaseVersion()
-                    .WithApprovalStatus(status)
-                    .WithPublished(DateTimeOffset.UtcNow)
-                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-                var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-
-                releaseStatusRepository
-                    .Setup(s =>
-                        s.GetAllByOverallStage(
-                            releaseVersion.Id,
-                            ReleasePublishingStatusOverallStage.Started,
-                            ReleasePublishingStatusOverallStage.Complete
-                        )
-                    )
-                    .ReturnsAsync([]);
-
-                // Assert that no user release roles allow updating a Release status once it has been published
-                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
-                    releaseVersion
-                );
-
-                // Assert that no user publication roles allow updating a Release status once it has started publishing
-                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(
-                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
-                    releaseVersion
-                );
-            });
+        return mock.Object;
     }
 }

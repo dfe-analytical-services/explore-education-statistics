@@ -63,7 +63,7 @@ public class ReleaseImageService : IReleaseImageService
     public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid releaseVersionId, IFormFile formFile)
     {
         return _persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async () => await _fileValidatorService.ValidateFileForUpload(formFile, Image))
             .OnSuccess(async () => await Upload(releaseVersionId, Image, formFile))

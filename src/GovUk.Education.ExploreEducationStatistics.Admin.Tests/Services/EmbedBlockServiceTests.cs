@@ -5,9 +5,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -19,7 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class EmbedBlockServiceTests
 {
-    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
+    private readonly ReleaseVersion _releaseVersion = new DataFixture()
+        .DefaultReleaseVersion()
+        .WithRelease(new DataFixture().DefaultRelease());
 
     [Fact]
     public async Task Create()

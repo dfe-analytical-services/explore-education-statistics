@@ -29,6 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class ReleaseImageServiceTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     private readonly User _user = new DataFixture().DefaultUser().WithId(Guid.NewGuid());
 
     [Fact]
@@ -183,7 +185,7 @@ public class ReleaseImageServiceTests
     {
         const string filename = "image.png";
 
-        var releaseVersion = new ReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
 

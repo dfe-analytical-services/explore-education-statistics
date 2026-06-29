@@ -1,13 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "dependencyDashboard": true,
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "timezone": "Europe/London",
   "recreateWhen": "never",
   "azure-pipelines": {
-    "enabled": false
-  },
-  "python": {
     "enabled": false
   },
   "ignoreDeps": ["Mime-Detective"],
@@ -22,18 +19,8 @@
   },
   "packageRules": [
     {
-      "matchDatasources": ["npm"],
-      "groupName": "Minor frontend dependencies",
-      "matchUpdateTypes": ["minor", "patch"],
-      "schedule": ["every month"],
-      "enabled": true
-    },
-    {
-      "matchDatasources": ["npm"],
-      "groupName": "Major frontend dependencies",
-      "matchUpdateTypes": ["major"],
-      "schedule": ["every 3 months"],
-      "enabled": true
+      "matchCategories": ["python"],
+      "enabled": false
     },
     {
       "matchDatasources": ["nuget"],
@@ -55,7 +42,12 @@
     {
       "description": "Disable Swashbuckle.AspNetCore.* packages which requires Microsoft.OpenApi / .NET 10 update",
       "matchDatasources": ["nuget"],
-      "matchPackageNames": ["Swashbuckle.AspNetCore","Swashbuckle.AspNetCore.Annotations", "Swashbuckle.AspNetCore.Cli", "Swashbuckle.AspNetCore.SwaggerGen"],
+      "matchPackageNames": [
+        "Swashbuckle.AspNetCore",
+        "Swashbuckle.AspNetCore.Annotations",
+        "Swashbuckle.AspNetCore.Cli",
+        "Swashbuckle.AspNetCore.SwaggerGen"
+      ],
       "matchCurrentVersion": "9.0.6",
       "enabled": false
     },
@@ -86,51 +78,54 @@
     {
       "description": "Disable Microsoft.ApplicationInsights.* - EES-7198 to update",
       "matchDatasources": ["nuget"],
-      "matchPackageNames": ["Microsoft.ApplicationInsights", "Microsoft.ApplicationInsights.AspNetCore", "Microsoft.ApplicationInsights.WorkerService"],
+      "matchPackageNames": [
+        "Microsoft.ApplicationInsights",
+        "Microsoft.ApplicationInsights.AspNetCore",
+        "Microsoft.ApplicationInsights.WorkerService"
+      ],
       "enabled": false
     },
     {
       "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
-      "matchPackagePrefixes": [
-        "Microsoft.AspNetCore",
-        "Microsoft.EntityFrameworkCore",
-        "Microsoft.Extensions",
-        "Moq.EntityFrameworkCore",
-        "MockQueryable.EntityFrameworkCore",
-        "MockQueryable.Moq",
-        "Npgsql.EntityFrameworkCore.PostgreSQL",
-        "Thinktecture.EntityFrameworkCore",
-        "linq2db.EntityFrameworkCore",
-        "Asp.Versioning.Mvc",
-        "Asp.Versioning.Mvc.ApiExplorer"
-      ],
       "matchUpdateTypes": ["major"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": [
+        "Microsoft.AspNetCore{/,}**",
+        "Microsoft.EntityFrameworkCore{/,}**",
+        "Microsoft.Extensions{/,}**",
+        "Moq.EntityFrameworkCore{/,}**",
+        "MockQueryable.EntityFrameworkCore{/,}**",
+        "MockQueryable.Moq{/,}**",
+        "Npgsql.EntityFrameworkCore.PostgreSQL{/,}**",
+        "Thinktecture.EntityFrameworkCore{/,}**",
+        "linq2db.EntityFrameworkCore{/,}**",
+        "Asp.Versioning.Mvc{/,}**",
+        "Asp.Versioning.Mvc.ApiExplorer{/,}**"
+      ]
     },
     {
       "matchDatasources": ["pypi"],
-      "groupName": "Python dependencies",
       "enabled": false
     },
     {
       "matchDatasources": ["docker"],
-      "groupName": "Docker image updates",
       "enabled": false
     },
     {
       "matchDatasources": ["dotnet-version"],
-      "groupName": ".NET version",
+      "enabled": false
+    },
+    {
+      "matchDatasources": ["npm"],
       "enabled": false
     },
     {
       "matchPackageNames": ["node"],
-      "groupName": "Node version",
       "enabled": false
     },
     {
       "matchDatasources": ["ruby-version"],
-      "groupName": "Ruby version",
       "enabled": false
     },
     {
@@ -139,8 +134,6 @@
     },
     {
       "matchDatasources": ["azure-bicep-resource"],
-      "groupName": "Azure Bicep resources",
-      "description": "Prevent unofficial resource versions being suggested",
       "enabled": false
     }
   ]

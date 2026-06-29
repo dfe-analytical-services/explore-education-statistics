@@ -56,7 +56,7 @@ public class ReleaseVersionService(
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
-    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     ILogger<ReleaseVersionService> logger
@@ -73,10 +73,9 @@ public class ReleaseVersionService(
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
-                var prereleaseRolesAdded = await userReleaseRoleRepository
+                var prereleaseRolesAdded = await userPreReleaseRoleRepository
                     .Query(ResourceRoleFilter.AllButExpired)
                     .WhereForReleaseVersion(releaseVersionId)
-                    .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .AnyAsync();
 
                 var publishingOrganisations = releaseVersion
@@ -98,7 +97,8 @@ public class ReleaseVersionService(
     )
     {
         return await context
-            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanDeleteReleaseVersion)
             .OnSuccess(_ =>
             {
@@ -116,10 +116,8 @@ public class ReleaseVersionService(
     )
     {
         return context
-            .ReleaseVersions.SingleOrNotFoundAsync(
-                releaseVersion => releaseVersion.Id == releaseVersionId,
-                cancellationToken
-            )
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanDeleteReleaseVersion)
             .OnSuccess(releaseVersion =>
                 DoDeleteReleaseVersion(
@@ -138,6 +136,7 @@ public class ReleaseVersionService(
     {
         return context
             .ReleaseVersions.IgnoreQueryFilters()
+            .Include(rv => rv.Release)
             .SingleOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
             .OnSuccessDo(userService.CheckCanDeleteTestReleaseVersion)
             .OnSuccessDo(async releaseVersion =>
@@ -278,15 +277,12 @@ public class ReleaseVersionService(
     {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
-        var releaseRoleIdsToRemove = (
-            await userReleaseRoleRepository
-                .Query(ResourceRoleFilter.All)
-                .WhereForReleaseVersion(releaseVersion.Id)
-                .Select(urr => urr.Id)
-                .ToListAsync(cancellationToken)
-        ).ToHashSet();
+        var preReleaseRolesToRemove = await userPreReleaseRoleRepository
+            .Query(ResourceRoleFilter.All)
+            .WhereForReleaseVersion(releaseVersion.Id)
+            .ToListAsync(cancellationToken);
 
-        await userReleaseRoleRepository.RemoveMany(releaseRoleIdsToRemove, cancellationToken);
+        await userPreReleaseRoleRepository.RemoveMany(preReleaseRolesToRemove, cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -358,7 +354,7 @@ public class ReleaseVersionService(
     )
     {
         return persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(mapper.Map<ReleasePublicationStatusViewModel>);
     }
@@ -408,10 +404,8 @@ public class ReleaseVersionService(
         CancellationToken cancellationToken = default
     ) =>
         await context
-            .ReleaseVersions.SingleOrNotFoundAsync(
-                rv => rv.Id == releaseVersionId,
-                cancellationToken: cancellationToken
-            )
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanUpdateReleaseVersion)
             .OnSuccessVoid(async rv =>
             {
@@ -507,30 +501,19 @@ public class ReleaseVersionService(
     {
         var userId = userService.GetUserId();
 
-        var directReleaseVersionsWithApprovalRole = await userReleaseRoleRepository
+        var allReleaseVersionIdsUserIsAnApproverFor = await userPublicationRoleRepository
             .Query()
             .WhereForUser(userId)
-            .WhereRolesIn(ReleaseRole.Approver)
-            .Select(urr => urr.ReleaseVersionId)
-            .ToListAsync();
-
-        var indirectReleaseVersionsWithApprovalRole = await userPublicationRoleRepository
-            .Query()
-            .WhereForUser(userId)
-            .WhereRolesIn(PublicationRole.Allower)
+            .WhereRolesIn(PublicationRole.Approver)
             .SelectMany(upr => upr.Publication.Releases.SelectMany(r => r.Versions.Select(rv => rv.Id)))
             .ToListAsync();
-
-        var releaseVersionIdsForApproval = directReleaseVersionsWithApprovalRole
-            .Concat(indirectReleaseVersionsWithApprovalRole)
-            .Distinct();
 
         var releaseVersionsForApproval = await context
             .ReleaseVersions.Include(releaseVersion => releaseVersion.Release)
                 .ThenInclude(release => release.Publication)
             .Where(releaseVersion =>
                 releaseVersion.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
-                && releaseVersionIdsForApproval.Contains(releaseVersion.Id)
+                && allReleaseVersionIdsUserIsAnApproverFor.Contains(releaseVersion.Id)
             )
             .ToListAsync();
 
@@ -596,7 +579,8 @@ public class ReleaseVersionService(
     )
     {
         return await context
-            .ReleaseVersions.FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccessCombineWith(releaseFile =>
@@ -677,7 +661,8 @@ public class ReleaseVersionService(
     public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
     {
         return await context
-            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
             .OnSuccessDo(ValidateDataFilesStatusForDeletion)
@@ -739,7 +724,7 @@ public class ReleaseVersionService(
     )
     {
         return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
             {

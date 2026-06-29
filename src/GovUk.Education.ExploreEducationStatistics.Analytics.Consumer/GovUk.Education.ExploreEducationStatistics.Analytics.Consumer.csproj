@@ -8,13 +8,14 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
+    <PackageReference Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.51.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.7" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.50.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />
-    <PackageReference Include="System.Text.Json" Version="10.0.6" />
+    <PackageReference Include="System.Text.Json" Version="10.0.9" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -42,7 +43,6 @@
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.DuckDb\GovUk.Education.ExploreEducationStatistics.Common.DuckDb.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
   </ItemGroup>
 </Project>

@@ -1,10 +1,8 @@
 import PublicationContactPage from '@admin/pages/publication/PublicationContactPage';
-import PublicationManageReleaseContributorsPage from '@admin/pages/publication/PublicationManageReleaseContributorsPage';
 import PublicationDetailsPage from '@admin/pages/publication/PublicationDetailsPage';
 import PublicationAdoptMethodologyPage from '@admin/pages/publication/PublicationAdoptMethodologyPage';
 import PublicationExternalMethodologyPage from '@admin/pages/publication/PublicationExternalMethodologyPage';
 import PublicationMethodologiesPage from '@admin/pages/publication/PublicationMethodologiesPage';
-import PublicationInviteUsersPage from '@admin/pages/publication/PublicationInviteUsersPage';
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
 import PublicationReleaseSeriesPage from '@admin/pages/publication/PublicationReleaseSeriesPage';
 import PublicationCreateReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationCreateReleaseSeriesLegacyLinkPage';
@@ -23,12 +21,6 @@ export type PublicationEditReleaseSeriesLegacyLinkRouteParams = {
 
 export type PublicationTeamRouteParams = {
   publicationId: string;
-  releaseVersionId?: string;
-};
-
-export type PublicationManageTeamRouteParams = {
-  publicationId: string;
-  releaseVersionId: string;
 };
 
 export interface PublicationRouteProps extends RouteProps {
@@ -73,22 +65,9 @@ export const publicationContactRoute: PublicationRouteProps = {
 };
 
 export const publicationTeamAccessRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/team/:releaseVersionId?',
+  path: '/publication/:publicationId/team',
   title: 'Team access',
   component: PublicationTeamAccessPage,
-};
-
-export const publicationManageReleaseContributorsPageRoute: PublicationRouteProps =
-  {
-    path: '/publication/:publicationId/team/:releaseVersionId/manage-contributors',
-    title: 'Add contributors',
-    component: PublicationManageReleaseContributorsPage,
-  };
-
-export const publicationInviteUsersPageRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/team/:releaseVersionId/invite-users',
-  title: 'Invite users',
-  component: PublicationInviteUsersPage,
 };
 
 export const publicationReleaseSeriesRoute: PublicationRouteProps = {

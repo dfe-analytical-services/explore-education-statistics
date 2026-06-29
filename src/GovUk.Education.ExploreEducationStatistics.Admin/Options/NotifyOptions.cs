@@ -10,11 +10,9 @@ public class NotifyOptions
 
     public string PublicationRoleTemplateId { get; set; } = string.Empty;
 
-    public string ReleaseRoleTemplateId { get; set; } = string.Empty;
+    public string DrafterTemplateId { get; set; } = string.Empty;
 
     public string PreReleaseTemplateId { get; set; } = string.Empty;
-
-    public string ContributorTemplateId { get; set; } = string.Empty;
 
     public string ReleaseHigherReviewersTemplateId { get; set; } = string.Empty;
 

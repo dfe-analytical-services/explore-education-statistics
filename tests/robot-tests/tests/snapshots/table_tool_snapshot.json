@@ -35,6 +35,7 @@
       "Longer term destinations",
       "NEET age 16 to 24",
       "Participation in education, training and employment age 16 to 18",
+      "Participation in education, training and employment age 16 to 21",
       "Participation in education, training and NEET age 16 to 17 by local authority",
       "Progression to higher education or training",
       "September Guarantee: offers of education and training for young people age 16 and 17"
@@ -82,10 +83,10 @@
   {
     "publications": [
       "Foundation year participation, provision and outcomes at HE providers",
+      "Graduate labour market outcomes (LEO)",
       "Graduate labour market statistics",
       "Higher Education Entrants and Qualifiers by their Level 2 and 3 Attainment",
       "Higher Level Learners in England",
-      "LEO Graduate and Postgraduate Outcomes",
       "Participation measures in higher education",
       "UK revenue from education related exports and transnational education activity",
       "Widening participation in higher education"
@@ -107,6 +108,7 @@
       "Education, health and care plans",
       "Elective home education",
       "Estimate of additional children claiming Free School Meals following expansion of eligibility",
+      "Home to school transport: LA data collection",
       "Local authority school places scorecards",
       "National pupil projections",
       "National Tutoring Programme",

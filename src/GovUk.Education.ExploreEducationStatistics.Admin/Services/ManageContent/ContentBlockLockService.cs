@@ -120,6 +120,7 @@ public class ContentBlockLockService(
             q =>
                 q.Include(block => block.ContentSection)
                     .Include(contentBlock => contentBlock.ReleaseVersion)
+                        .ThenInclude(releaseVersion => releaseVersion.Release)
                     .Include(block => block.LockedBy)
         );
     }

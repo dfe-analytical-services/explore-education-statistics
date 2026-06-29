@@ -1,0 +1,56 @@
+#nullable enable
+using System.Security.Claims;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
+using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public abstract class ViewSpecificReleaseVersionAuthorizationHandlerTests
+{
+    private readonly DataFixture _dataFixture = new();
+    private readonly ReleaseVersion _releaseVersion;
+
+    protected ViewSpecificReleaseVersionAuthorizationHandlerTests()
+    {
+        _releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+    }
+
+    public class MiscellaneousTests : ViewSpecificReleaseVersionAuthorizationHandlerTests
+    {
+        [Fact]
+        public async Task SucceedsIfReleaseVersionIsViewableByUser()
+        {
+            await AssertHandlerSucceedsIfReleaseVersionIsViewableByUser<ViewReleaseVersionRequirement, ReleaseVersion>(
+                handlerSupplier: BuildHandler,
+                entity: _releaseVersion,
+                releaseVersion: _releaseVersion
+            );
+        }
+    }
+
+    private ViewSpecificReleaseVersionAuthorizationHandler BuildHandler(
+        IAuthorizationHandlerService? authorizationHandlerService = null
+    )
+    {
+        authorizationHandlerService ??= CreateDefaultAuthorizationHandlerService();
+
+        return new(authorizationHandlerService);
+    }
+
+    private IAuthorizationHandlerService CreateDefaultAuthorizationHandlerService()
+    {
+        var mock = new Mock<IAuthorizationHandlerService>(MockBehavior.Strict);
+        mock.Setup(s => s.IsReleaseVersionViewableByUser(_releaseVersion, It.IsAny<ClaimsPrincipal>()))
+            .ReturnsAsync(false);
+
+        return mock.Object;
+    }
+}

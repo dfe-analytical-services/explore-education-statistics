@@ -77,9 +77,77 @@
       "properties": {
         "activities": [
           {
+            "name": "Pause resumable index rebuilds first",
+            "description": "This activity pauses any ongoing RESUMABLE index REBUILDs before starting the main pipeline.",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[PauseResumableIndexRebuilds]",
+              "storedProcedureParameters": {
+                "Tables": {
+                  "value": "@pipeline().parameters.Tables",
+                  "type": "String"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_statistics",
+              "type": "LinkedServiceReference"
+            }
+          },
+          {
+            "name": "Kill index reorganizes first",
+            "description": "This activity kills any ongoing index REORGANIZEs before starting the main pipeline.",
+            "type": "SqlServerStoredProcedure",
+            "dependsOn": [
+              {
+                "activity": "Pause resumable index rebuilds first",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.00:10:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "storedProcedureName": "[[dbo].[KillIndexReorganizations]",
+              "storedProcedureParameters": {
+                "Tables": {
+                  "value": "@pipeline().parameters.Tables",
+                  "type": "String"
+                }
+              }
+            },
+            "linkedServiceName": {
+              "referenceName": "ls_sql_statistics",
+              "type": "LinkedServiceReference"
+            }
+          },
+          {
             "name": "Rebuild indexes",
             "type": "IfCondition",
-            "dependsOn": [],
+            "dependsOn": [
+              {
+                "activity": "Kill index reorganizes first",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
             "typeProperties": {
               "expression": {
                 "value": "@equals(pipeline().parameters.RunMode, 'Weekend')",
@@ -104,6 +172,27 @@
                       "Tables": {
                         "value": {
                           "value": "@pipeline().parameters.Tables",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "StopInMinutes": {
+                        "value": {
+                          "value": "@pipeline().parameters.StoredProcedureStopInMinutes",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "FragmentationThresholdReorganize": {
+                        "value": {
+                          "value": "@pipeline().parameters.FragmentationThresholdReorganize",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "FragmentationThresholdRebuild": {
+                        "value": {
+                          "value": "@pipeline().parameters.FragmentationThresholdRebuild",
                           "type": "Expression"
                         },
                         "type": "String"
@@ -162,22 +251,6 @@
                       "type": "Expression"
                     }
                   }
-                },
-                {
-                  "name": "Fail Rebuild indexes - weekend",
-                  "type": "Fail",
-                  "dependsOn": [
-                    {
-                      "activity": "Get index rebuild failure message - weekend",
-                      "dependencyConditions": [
-                        "Succeeded"
-                      ]
-                    }
-                  ],
-                  "typeProperties": {
-                    "message": "Weekend Index Rebuild failed",
-                    "errorCode": "500"
-                  }
                 }
               ],
               "ifFalseActivities": [
@@ -199,6 +272,27 @@
                       "Tables": {
                         "value": {
                           "value": "@pipeline().parameters.Tables",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "StopInMinutes": {
+                        "value": {
+                          "value": "@pipeline().parameters.StoredProcedureStopInMinutes",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "FragmentationThresholdReorganize": {
+                        "value": {
+                          "value": "@pipeline().parameters.FragmentationThresholdReorganize",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "FragmentationThresholdRebuild": {
+                        "value": {
+                          "value": "@pipeline().parameters.FragmentationThresholdRebuild",
                           "type": "Expression"
                         },
                         "type": "String"
@@ -257,157 +351,19 @@
                       "type": "Expression"
                     }
                   }
-                },
-                {
-                  "name": "Fail Rebuild indexes - weekday",
-                  "type": "Fail",
-                  "dependsOn": [
-                    {
-                      "activity": "Get index rebuild failure message - weekday",
-                      "dependencyConditions": [
-                        "Succeeded"
-                      ]
-                    }
-                  ],
-                  "typeProperties": {
-                    "message": "Weekday Index Rebuild failed",
-                    "errorCode": "500"
-                  }
                 }
               ]
             }
           },
           {
-            "name": "Report reindex success",
-            "type": "WebActivity",
-            "dependsOn": [
-              {
-                "activity": "Rebuild indexes",
-                "dependencyConditions": [
-                  "Succeeded"
-                ]
-              }
-            ],
-            "policy": {
-              "timeout": "0.00:10:00",
-              "retry": 0,
-              "retryIntervalInSeconds": 30,
-              "secureOutput": false,
-              "secureInput": false
-            },
-            "userProperties": [],
-            "typeProperties": {
-              "url": "https://slack.com/api/chat.postMessage",
-              "method": "POST",
-              "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
-              },
-              "body": {
-                "channel": "[parameters('slackAlertsChannel')]",
-                "text": "Data Factory Success! All fragmented indexes rebuilt.",
-                "attachments": [
-                  {
-                    "color": "good",
-                    "fields": [
-                      {
-                        "title": "Data Factory",
-                        "value": "@{pipeline().DataFactory}",
-                        "short": true
-                      },
-                      {
-                        "title": "Pipeline",
-                        "value": "@{pipeline().Pipeline}",
-                        "short": true
-                      },
-                      {
-                        "title": "Duration",
-                        "value": "@{activity('Rebuild indexes').Duration}",
-                        "short": true
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "name": "Report reindex success to Teams",
-            "type": "WebActivity",
-            "dependsOn": [
-              {
-                "activity": "Rebuild indexes",
-                "dependencyConditions": [
-                  "Succeeded"
-                ]
-              }
-            ],
-            "policy": {
-              "timeout": "0.00:10:00",
-              "retry": 0,
-              "retryIntervalInSeconds": 30,
-              "secureOutput": false,
-              "secureInput": true
-            },
-            "userProperties": [],
-            "typeProperties": {
-              "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
-              "method": "POST",
-              "headers": {
-                "Content-Type": "application/json"
-              },
-              "body": {
-                "type": "message",
-                "attachments": [
-                  {
-                    "contentType": "application/vnd.microsoft.card.adaptive",
-                    "contentUrl": null,
-                    "content": {
-                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                      "type": "AdaptiveCard",
-                      "version": "1.2",
-                      "body": [
-                        {
-                          "type": "TextBlock",
-                          "text": "Data Factory Success! All fragmented indexes rebuilt.",
-                          "weight": "Bolder",
-                          "size": "Medium",
-                          "color": "good",
-                          "wrap": true
-                        },
-                        {
-                          "type": "FactSet",
-                          "facts": [
-                            {
-                              "title": "Data Factory",
-                              "value": "@{pipeline().DataFactory}"
-                            },
-                            {
-                              "title": "Pipeline",
-                              "value": "@{pipeline().Pipeline}"
-                            },
-                            {
-                              "title": "Duration",
-                              "value": "@{activity('Rebuild indexes').Duration}"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "name": "Choose how to handle rebuild indexes failure",
+            "name": "Check for rebuild indexes failure",
             "description": "This activity routes to the appropriate error handler based on the reason for the 'Rebuild indexes' activity's reason for failure",
             "type": "Switch",
             "dependsOn": [
               {
                 "activity": "Rebuild indexes",
                 "dependencyConditions": [
-                  "Failed"
+                  "Succeeded"
                 ]
               }
             ],
@@ -877,6 +833,119 @@
                       }
                     }
                   ]
+                },
+                {
+                  "value": "No failures",
+                  "activities": [
+                    {
+                      "name": "Report reindex success",
+                      "type": "WebActivity",
+                      "dependsOn": [],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": false
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "https://slack.com/api/chat.postMessage",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json",
+                          "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+                        },
+                        "body": {
+                          "channel": "[parameters('slackAlertsChannel')]",
+                          "text": "Data Factory Success! All fragmented indexes rebuilt.",
+                          "attachments": [
+                            {
+                              "color": "good",
+                              "fields": [
+                                {
+                                  "title": "Data Factory",
+                                  "value": "@{pipeline().DataFactory}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Pipeline",
+                                  "value": "@{pipeline().Pipeline}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Duration",
+                                  "value": "@{activity('Rebuild indexes').Duration}",
+                                  "short": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Report reindex success to Teams",
+                      "type": "WebActivity",
+                      "dependsOn": [],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": true
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "url": "[parameters('teamsPowerAutomateWebhookUrl')]",
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        },
+                        "body": {
+                          "type": "message",
+                          "attachments": [
+                            {
+                              "contentType": "application/vnd.microsoft.card.adaptive",
+                              "contentUrl": null,
+                              "content": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "type": "AdaptiveCard",
+                                "version": "1.2",
+                                "body": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Data Factory Success! All fragmented indexes rebuilt.",
+                                    "weight": "Bolder",
+                                    "size": "Medium",
+                                    "color": "good",
+                                    "wrap": true
+                                  },
+                                  {
+                                    "type": "FactSet",
+                                    "facts": [
+                                      {
+                                        "title": "Data Factory",
+                                        "value": "@{pipeline().DataFactory}"
+                                      },
+                                      {
+                                        "title": "Pipeline",
+                                        "value": "@{pipeline().Pipeline}"
+                                      },
+                                      {
+                                        "title": "Duration",
+                                        "value": "@{activity('Rebuild indexes').Duration}"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
                 }
               ],
               "defaultActivities": [
@@ -1006,6 +1075,18 @@
             "type": "string",
             "defaultValue": "[variables('fragmentationTables')]"
           },
+          "StoredProcedureStopInMinutes": {
+            "type": "string",
+            "defaultValue": "600"
+          },
+          "FragmentationThresholdReorganize": {
+            "type": "string",
+            "defaultValue": "10"
+          },
+          "FragmentationThresholdRebuild": {
+            "type": "string",
+            "defaultValue": "30"
+          },
           "RunMode": {
             "type": "string",
             "defaultValue": "Weekday"
@@ -1013,10 +1094,12 @@
         },
         "variables": {
           "storedProcedureActivityFailure": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "No failures"
           },
           "storedProcedureActivityFailureMessage": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "No failures"
           }
         },
         "annotations": [],
@@ -1406,6 +1489,7 @@
             },
             "parameters": {
               "Tables": "[variables('fragmentationTables')]",
+              "StoredProcedureStopInMinutes": "570",
               "RunMode": "Weekday"
             }
           }
@@ -1454,6 +1538,7 @@
             },
             "parameters": {
               "Tables": "[variables('fragmentationTables')]",
+              "StoredProcedureStopInMinutes": "1425",
               "RunMode": "Weekend"
             }
           }

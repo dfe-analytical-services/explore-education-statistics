@@ -77,7 +77,11 @@ public class RelatedInformationServiceTests
     public async Task UpdateRelatedInformation()
     {
         // Arrange
-        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelatedInformation(Links).Generate();
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .WithRelatedInformation(Links)
+            .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 

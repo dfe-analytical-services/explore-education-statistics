@@ -10,7 +10,7 @@ param siteHostName string
 @description('Name of the certificate.')
 param certificateName string
 
-var keyVaultName = '${legacyResourcePrefix}kv-ees-01'
+var keyVaultName = '${legacyResourcePrefix}-kv-ees-01'
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorName

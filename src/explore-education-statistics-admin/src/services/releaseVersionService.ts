@@ -13,7 +13,7 @@ import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
 export interface ReleaseVersionPermissions {
-  canAddPrereleaseUsers: boolean;
+  canAddPreReleaseUsers: boolean;
   canUpdateRelease: boolean;
   canViewReleaseVersion: boolean;
   canUpdateReleaseVersion: boolean;

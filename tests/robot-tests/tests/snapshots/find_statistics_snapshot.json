@@ -205,7 +205,7 @@
   {
     "publication_summary": "Children and young people in England with an education, health and care plan (EHC), including annual local authority activity on EHC requests and assessments.",
     "publication_title": "Education, health and care plans",
-    "published": "26 Jun 2025",
+    "published": "25 Jun 2026",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
@@ -294,6 +294,13 @@
     "theme": "Further education"
   },
   {
+    "publication_summary": "Earnings and employment of higher education graduates & postgraduates by subject studied and characteristics, using Longitudinal Education Outcomes (LEO) data.",
+    "publication_title": "Graduate labour market outcomes (LEO)",
+    "published": "25 Jun 2026",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
     "publication_summary": "Official statistics on labour market outcomes such as salaries and employment rates, for graduates, non-graduates and postgraduates.",
     "publication_title": "Graduate labour market statistics",
     "published": "5 Jun 2025",
@@ -317,8 +324,8 @@
   {
     "publication_summary": "Annual numbers of pupils and learners using home to school transport split by school type, eligibility and mode of transport, collected from local authorities.",
     "publication_title": "Home to school transport: LA data collection",
-    "published": "28 Oct 2025",
-    "release_type": "Ad hoc statistics",
+    "published": "25 Jun 2026",
+    "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
   {
@@ -371,13 +378,6 @@
     "theme": "Finance and funding"
   },
   {
-    "publication_summary": "Earnings and employment of higher education graduates & postgraduates by subject studied and characteristics, using Longitudinal Education Outcomes (LEO) data.",
-    "publication_title": "LEO Graduate and Postgraduate Outcomes",
-    "published": "26 Jun 2025",
-    "release_type": "Official statistics",
-    "theme": "Higher education"
-  },
-  {
     "publication_summary": "Employment and earnings outcomes of graduates by each higher education provider by sex and current region/subject studied/prior attainment.",
     "publication_title": "LEO Graduate outcomes provider level data",
     "published": "26 Jun 2025",
@@ -401,7 +401,7 @@
   {
     "publication_summary": "School Places scorecard for local authorities in England. School places delivered, planned and needed, pupil forecasting accuracy, cost of school places.",
     "publication_title": "Local authority school places scorecards",
-    "published": "26 Jun 2025",
+    "published": "25 Jun 2026",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -483,6 +483,13 @@
     "theme": "Destination of pupils and students"
   },
   {
+    "publication_summary": "Participation in education and apprenticeships from DfE administrative data. It also includes NEET estimates from the LFS to give a full picture of activity.",
+    "publication_title": "Participation in education, training and employment age 16 to 21",
+    "published": "25 Jun 2026",
+    "release_type": "Accredited official statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
     "publication_summary": "Higher Education initial entrants and estimated percentages of participation. Annual statistics that include student characteristics and provider type.",
     "publication_title": "Participation measures in higher education",
     "published": "29 Jan 2026",
@@ -541,7 +548,7 @@
   {
     "publication_summary": "Fortnightly data on pupil attendance, including by reason, phase and geography.",
     "publication_title": "Pupil attendance in schools",
-    "published": "11 Jun 2026",
+    "published": "25 Jun 2026",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },

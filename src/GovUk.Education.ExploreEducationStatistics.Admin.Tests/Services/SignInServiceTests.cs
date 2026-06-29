@@ -24,8 +24,6 @@ public class SignInServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    private static readonly Guid CreatedById = Guid.NewGuid();
-
     [Fact]
     public async Task RegisterOrSignIn_InvitedUser_ActivatesNewUser()
     {
@@ -46,25 +44,6 @@ public class SignInServiceTests
                     NormalizedName = "ROLE",
                 }
             );
-
-        var userReleaseRoles = _dataFixture
-            .DefaultUserReleaseRole()
-            .WithUser(invitedUser)
-            .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
-            .WithCreatedById(CreatedById)
-            .ForIndex(0, s => s.SetRole(ReleaseRole.Contributor))
-            .ForIndex(1, s => s.SetRole(ReleaseRole.Approver))
-            .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
-            .GenerateList(3);
-
-        var userPublicationRoles = _dataFixture
-            .DefaultUserPublicationRole()
-            .WithUser(invitedUser)
-            .WithPublication(_dataFixture.DefaultPublication())
-            .WithCreatedById(CreatedById)
-            .ForIndex(0, s => s.SetRole(PublicationRole.Owner))
-            .ForIndex(1, s => s.SetRole(PublicationRole.Allower))
-            .GenerateList(2);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -292,8 +271,8 @@ public class SignInServiceTests
             .Setup(mock => mock.FindByEmailAsync(userWithExpiredInvite.Email))
             .ReturnsAsync((ApplicationUser?)null);
 
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        userReleaseRoleRepository
+        var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+        userPreReleaseRoleRepository
             .Setup(mock => mock.RemoveForUser(userWithExpiredInvite.Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
@@ -310,7 +289,7 @@ public class SignInServiceTests
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userService: userService.Object,
                 userManager: userManager.Object,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
 
@@ -322,7 +301,7 @@ public class SignInServiceTests
             Assert.Null(signInResponse.UserProfile);
         }
 
-        VerifyAllMocks(userService, userManager, userReleaseRoleRepository, userPublicationRoleRepository);
+        VerifyAllMocks(userService, userManager, userPreReleaseRoleRepository, userPublicationRoleRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -421,7 +400,7 @@ public class SignInServiceTests
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         UserManager<ApplicationUser>? userManager = null,
         ContentDbContext? contentDbContext = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
@@ -434,7 +413,8 @@ public class SignInServiceTests
             usersAndRolesDbContext: usersAndRolesDbContext,
             userManager: userManager ?? MockUserManager().Object,
             contentDbContext: contentDbContext,
-            userReleaseRoleRepository: userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPreReleaseRoleRepository: userPreReleaseRoleRepository
+                ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userPublicationRoleRepository: userPublicationRoleRepository
                 ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );
