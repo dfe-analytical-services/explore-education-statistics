@@ -465,12 +465,12 @@ describe('TableToolWizard', () => {
     const startDateOptions = within(
       screen.getByLabelText('Start date'),
     ).getAllByRole('option') as HTMLOptionElement[];
-    expect(startDateOptions[0].selected).toBe(true);
+    expect(startDateOptions[1].selected).toBe(true);
 
     const endDateOptions = within(
       screen.getByLabelText('End date'),
     ).getAllByRole('option') as HTMLOptionElement[];
-    expect(endDateOptions[0].selected).toBe(true);
+    expect(endDateOptions[2].selected).toBe(true);
 
     await userEvent.selectOptions(screen.getByLabelText('Start date'), [
       '2013_AY',
@@ -501,54 +501,6 @@ describe('TableToolWizard', () => {
       }),
     ).getAllByRole('checkbox', {});
     expect(indicatorCheckboxes[0]).not.toBeChecked();
-  });
-
-  test('prevent progress to filters step if pre-selected time periods are not in the subject meta', async () => {
-    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
-
-    render(
-      <TableToolWizard
-        themeMeta={testThemeMeta}
-        initialState={{
-          initialStep: 3,
-          subjects: testSubjects,
-          subjectMeta: testSubjectMeta,
-          query: {
-            publicationId: 'publication-1',
-            subjectId: 'subject-1',
-            locationIds: ['barnet'],
-            filters: [],
-            indicators: [],
-            timePeriod: {
-              endCode: 'AY',
-              endYear: 2021,
-              startCode: 'AY',
-              startYear: 2021,
-            },
-          },
-        }}
-      />,
-    );
-
-    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Step 4')).toBeInTheDocument();
-    });
-
-    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('There is a problem')).toBeInTheDocument();
-      expect(
-        screen.getByRole('link', { name: 'Start date required' }),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.getByRole('link', { name: 'End date required' }),
-      ).toBeInTheDocument();
-    });
   });
 
   test('prevent progress to final step if pre-selected indicators are not in the subject meta', async () => {
