@@ -293,11 +293,66 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                   />
                   <div className="govuk-grid-column-two-thirds">
                     <ul className="govuk-list">
-                      {finalDatasets.map(dataset => (
+                      {finalDatasets.map((dataset, index) => (
                         <TableToolSearchFinalResult
                           key={dataset.fileId}
                           dataset={dataset}
                           releaseVersionId={latestReleaseVersion.id}
+                          testQuery={
+                            index % 2 === 0
+                              ? {
+                                  subjectId:
+                                    '821750f6-939f-4f60-20d4-08dec542d092',
+                                  locationIds: [
+                                    'a455a027-e635-4e90-a0b8-08dec542d106',
+                                    'a2857282-154f-44cb-a0bb-08dec542d106',
+                                  ],
+                                  timePeriod: {
+                                    startYear: 2014,
+                                    startCode: 'AY',
+                                    endYear: 2016,
+                                    endCode: 'AY',
+                                  },
+                                  filters: [],
+                                  filterHierarchiesOptions: {},
+                                  indicators: [
+                                    '4f9f7d79-c3a5-459c-a0b5-08dec542d106',
+                                    '1bd72149-5230-40ab-a0ac-08dec542d106',
+                                    '0e74dcb9-9c90-4747-a0a4-08dec542d106',
+                                    '922db259-ddcc-4a64-a09d-08dec542d106',
+                                  ],
+                                }
+                              : {
+                                  subjectId:
+                                    '10308fbb-da53-4eae-20d2-08dec542d092',
+                                  locationIds: [
+                                    'dd13fe4c-d79d-4412-778c-08dec542d100',
+                                    '3bbe6385-e5fc-4867-77d7-08dec542d100',
+                                    'bd0133ed-6e3a-4f15-77ce-08dec542d100',
+                                    '01c13f50-725d-4e33-77ca-08dec542d100',
+                                  ],
+                                  timePeriod: {
+                                    startYear: 2014,
+                                    startCode: 'AY',
+                                    endYear: 2016,
+                                    endCode: 'AY',
+                                  },
+                                  filters: [
+                                    '04739429-a265-4f28-80a5-4a6fc96bc29e',
+                                    'f6968c07-3256-41e9-a420-c6a35d78eaa9',
+                                    'e5936411-6c33-46e4-b247-5d0a8059835f',
+                                    '24b99a48-5448-4aba-a7c4-a1408cbbc1af',
+                                  ],
+                                  indicators: [
+                                    '6543f18b-c9fd-4866-776e-08dec542d100',
+                                    'dfbc7a76-1a0a-4649-7775-08dec542d100',
+                                    '32a616ef-6ade-4514-7781-08dec542d100',
+                                    'f2bab6fb-38c5-47f2-776d-08dec542d100',
+                                    'd5034dd2-8b52-4a84-777d-08dec542d100',
+                                    '370436e9-5880-444d-777f-08dec542d100',
+                                  ],
+                                }
+                          }
                         />
                       ))}
                     </ul>
