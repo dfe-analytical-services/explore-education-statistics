@@ -208,29 +208,34 @@ public abstract class PreReleaseUserServiceTests
             var activeUsersWithPublicationRole = _dataFixture.DefaultUser().GenerateList(2);
             var activeUsersWithPreReleaseRole = _dataFixture.DefaultUser().GenerateList(2);
             var activeUsersWithNoRole = _dataFixture.DefaultUser().GenerateList(2);
+            var softDeletedUsersWithNoRole = _dataFixture.DefaultSoftDeletedUser().GenerateList(2);
+            var expiredUsersWithNoRole = _dataFixture.DefaultUserWithExpiredInvite().GenerateList(2);
 
-            var usersWithPendingInviteAndPublicationRoleByEmail = usersWithPendingInviteAndPublicationRole.ToDictionary(
-                u => u.Email
-            );
-            var usersWithPendingInviteAndPreReleaseRoleByEmail = usersWithPendingInviteAndPreReleaseRole.ToDictionary(
-                u => u.Email
-            );
-            var usersWithPendingInviteAndNoRoleEmail = usersWithPendingInviteAndNoRole.ToDictionary(u => u.Email);
-            var activeUsersWithPublicationRoleByEmail = activeUsersWithPublicationRole.ToDictionary(u => u.Email);
-            var activeUsersWithPreReleaseRoleByEmail = activeUsersWithPreReleaseRole.ToDictionary(u => u.Email);
-            var activeUsersWithNoRoleEmail = activeUsersWithNoRole.ToDictionary(u => u.Email);
-
-            var allExistingUsersByEmail = usersWithPendingInviteAndPublicationRole
+            var allExistingUsers = usersWithPendingInviteAndPublicationRole
                 .Concat(usersWithPendingInviteAndPreReleaseRole)
                 .Concat(usersWithPendingInviteAndNoRole)
                 .Concat(activeUsersWithPublicationRole)
                 .Concat(activeUsersWithPreReleaseRole)
                 .Concat(activeUsersWithNoRole)
-                .ToDictionary(u => u.Email);
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole)
+                .ToHashSet();
 
-            var allEmails = ListOf("new.user.1@test.com", "new.user.2@test.com")
-                .Concat(allExistingUsersByEmail.Keys)
-                .ToList();
+            var existingUsersWithPublicationRole = usersWithPendingInviteAndPublicationRole.Concat(
+                activeUsersWithPublicationRole
+            );
+            var existingUsersWithoutPublicationRole = allExistingUsers.Except(existingUsersWithPublicationRole);
+            var existingUsersWithPreReleaseRole = usersWithPendingInviteAndPreReleaseRole.Concat(
+                activeUsersWithPreReleaseRole
+            );
+            var existingUsersWithoutAnyRole = usersWithPendingInviteAndNoRole
+                .Concat(activeUsersWithNoRole)
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole);
+
+            var newEmails = ListOf("new.user.1@test.com", "new.user.2@test.com");
+
+            var allEmails = newEmails.Concat(allExistingUsers.Select(eu => eu.Email)).ToList();
 
             var request = new PreReleaseUserInviteRequest { Emails = allEmails };
 
@@ -243,69 +248,44 @@ public abstract class PreReleaseUserServiceTests
             }
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+
+            foreach (var existingUser in allExistingUsers)
             {
-                if (allExistingUsersByEmail.TryGetValue(email, out var user))
-                {
-                    userRepository
-                        .Setup(mock => mock.FindUserByEmail(email, It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(user);
-
-                    continue;
-                }
-
                 userRepository
-                    .Setup(mock => mock.FindUserByEmail(email, It.IsAny<CancellationToken>()))
+                    .Setup(mock => mock.FindUserByEmail(existingUser.Email, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(existingUser);
+            }
+
+            foreach (var newEmail in newEmails)
+            {
+                userRepository
+                    .Setup(mock => mock.FindUserByEmail(newEmail, It.IsAny<CancellationToken>()))
                     .ReturnsAsync((User?)null);
             }
 
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            foreach (var existingUserWithPublicationRole in existingUsersWithPublicationRole)
             {
-                if (!allExistingUsersByEmail.ContainsKey(email))
-                {
-                    continue;
-                }
-
-                if (
-                    usersWithPendingInviteAndPublicationRoleByEmail.TryGetValue(email, out var _)
-                    || activeUsersWithPublicationRoleByEmail.TryGetValue(email, out _)
-                )
-                {
-                    continue;
-                }
-
-                if (
-                    usersWithPendingInviteAndPreReleaseRoleByEmail.TryGetValue(email, out var user)
-                    || activeUsersWithPreReleaseRoleByEmail.TryGetValue(email, out user)
-                )
-                {
-                    userPreReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasPreReleaseRoleOnReleaseVersion(
-                                user.Id,
-                                releaseVersion.Id,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
-                        )
-                        .ReturnsAsync(true);
-
-                    continue;
-                }
-
-                var userWithoutRole = usersWithPendingInviteAndNoRoleEmail.TryGetValue(
-                    email,
-                    out var userWithPendingInvite
-                )
-                    ? userWithPendingInvite
-                    : activeUsersWithNoRoleEmail[email];
-
-                userPreReleaseRoleRepository
+                userPublicationRoleRepository
                     .Setup(mock =>
-                        mock.UserHasPreReleaseRoleOnReleaseVersion(
-                            userWithoutRole.Id,
-                            releaseVersion.Id,
+                        mock.UserHasAnyRoleOnPublication(
+                            existingUserWithPublicationRole.Id,
+                            releaseVersion.Release.PublicationId,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(true);
+            }
+
+            foreach (var existingUserWithoutPublicationRole in existingUsersWithoutPublicationRole)
+            {
+                userPublicationRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            existingUserWithoutPublicationRole.Id,
+                            releaseVersion.Release.PublicationId,
                             ResourceRoleFilter.AllButExpired,
                             It.IsAny<CancellationToken>()
                         )
@@ -313,40 +293,27 @@ public abstract class PreReleaseUserServiceTests
                     .ReturnsAsync(false);
             }
 
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            foreach (var existingUserWithPreReleaseRole in existingUsersWithPreReleaseRole)
             {
-                if (!allExistingUsersByEmail.ContainsKey(email))
-                {
-                    continue;
-                }
-
-                if (
-                    usersWithPendingInviteAndPublicationRoleByEmail.TryGetValue(email, out var user)
-                    || activeUsersWithPublicationRoleByEmail.TryGetValue(email, out user)
-                )
-                {
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                user.Id,
-                                releaseVersion.Release.PublicationId,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
-                        )
-                        .ReturnsAsync(true);
-
-                    continue;
-                }
-
-                var userWithoutPublicationRole = allExistingUsersByEmail[email];
-
-                userPublicationRoleRepository
+                userPreReleaseRoleRepository
                     .Setup(mock =>
-                        mock.UserHasAnyRoleOnPublication(
-                            userWithoutPublicationRole.Id,
-                            releaseVersion.Release.PublicationId,
+                        mock.UserHasPreReleaseRoleOnReleaseVersion(
+                            existingUserWithPreReleaseRole.Id,
+                            releaseVersion.Id,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(true);
+            }
+
+            foreach (var existingUserWithoutAnyRole in existingUsersWithoutAnyRole)
+            {
+                userPreReleaseRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasPreReleaseRoleOnReleaseVersion(
+                            existingUserWithoutAnyRole.Id,
+                            releaseVersion.Id,
                             ResourceRoleFilter.AllButExpired,
                             It.IsAny<CancellationToken>()
                         )
@@ -368,26 +335,16 @@ public abstract class PreReleaseUserServiceTests
                 var plan = result.AssertRight();
 
                 Assert.Equal(2, plan.AlreadyAccepted.Count);
-                Assert.Equal(activeUsersWithPreReleaseRole[0].Email, plan.AlreadyAccepted[0]);
-                Assert.Equal(activeUsersWithPreReleaseRole[1].Email, plan.AlreadyAccepted[1]);
+                Assert.Equal(activeUsersWithPreReleaseRole.Select(u => u.Email), plan.AlreadyAccepted);
 
                 Assert.Equal(2, plan.AlreadyInvited.Count);
-                Assert.Equal(usersWithPendingInviteAndPreReleaseRole[0].Email, plan.AlreadyInvited[0]);
-                Assert.Equal(usersWithPendingInviteAndPreReleaseRole[1].Email, plan.AlreadyInvited[1]);
+                Assert.Equal(usersWithPendingInviteAndPreReleaseRole.Select(u => u.Email), plan.AlreadyInvited);
 
                 Assert.Equal(4, plan.AlreadyHasMorePowerfulRole.Count);
-                Assert.Equal(usersWithPendingInviteAndPublicationRole[0].Email, plan.AlreadyHasMorePowerfulRole[0]);
-                Assert.Equal(usersWithPendingInviteAndPublicationRole[1].Email, plan.AlreadyHasMorePowerfulRole[1]);
-                Assert.Equal(activeUsersWithPublicationRole[0].Email, plan.AlreadyHasMorePowerfulRole[2]);
-                Assert.Equal(activeUsersWithPublicationRole[1].Email, plan.AlreadyHasMorePowerfulRole[3]);
+                Assert.Equal(existingUsersWithPublicationRole.Select(u => u.Email), plan.AlreadyHasMorePowerfulRole);
 
-                Assert.Equal(6, plan.Invitable.Count);
-                Assert.Equal("new.user.1@test.com", plan.Invitable[0]);
-                Assert.Equal("new.user.2@test.com", plan.Invitable[1]);
-                Assert.Equal(usersWithPendingInviteAndNoRole[0].Email, plan.Invitable[2]);
-                Assert.Equal(usersWithPendingInviteAndNoRole[1].Email, plan.Invitable[3]);
-                Assert.Equal(activeUsersWithNoRole[0].Email, plan.Invitable[4]);
-                Assert.Equal(activeUsersWithNoRole[1].Email, plan.Invitable[5]);
+                Assert.Equal(10, plan.Invitable.Count);
+                Assert.Equal(newEmails.Concat(existingUsersWithoutAnyRole.Select(u => u.Email)), plan.Invitable);
             }
 
             MockUtils.VerifyAllMocks(userRepository, userPreReleaseRoleRepository, userPublicationRoleRepository);
@@ -482,67 +439,58 @@ public abstract class PreReleaseUserServiceTests
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-            var usersWithPendingInvitesAndExistingPreReleaseRoleByEmail = _dataFixture
-                .DefaultUserWithPendingInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var newEmails = ListOf("new.user.1@test.com", "new.user.2@test.com");
 
-            var usersWithPendingInvitesAndExistingPublicationRoleByEmail = _dataFixture
-                .DefaultUserWithPendingInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var newUserIdEmailPairs = newEmails.Select(e => (Id: Guid.NewGuid(), Email: e)).ToList();
 
-            var usersWithExistingPreReleaseRoleByEmail = _dataFixture
-                .DefaultUser()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var usersWithPendingInviteAndPublicationRole = _dataFixture.DefaultUserWithPendingInvite().GenerateList(2);
+            var usersWithPendingInviteAndPreReleaseRole = _dataFixture.DefaultUserWithPendingInvite().GenerateList(2);
+            var usersWithPendingInviteAndNoRole = _dataFixture.DefaultUserWithPendingInvite().GenerateList(2);
+            var activeUsersWithPublicationRole = _dataFixture.DefaultUser().GenerateList(2);
+            var activeUsersWithPreReleaseRole = _dataFixture.DefaultUser().GenerateList(2);
+            var activeUsersWithNoRole = _dataFixture.DefaultUser().GenerateList(2);
+            var softDeletedUsersWithNoRole = _dataFixture.DefaultSoftDeletedUser().GenerateList(2);
+            var expiredUsersWithNoRole = _dataFixture.DefaultUserWithExpiredInvite().GenerateList(2);
 
-            var usersWithExistingPublicationRoleByEmail = _dataFixture
-                .DefaultUser()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var allExistingUsers = usersWithPendingInviteAndPublicationRole
+                .Concat(usersWithPendingInviteAndPreReleaseRole)
+                .Concat(usersWithPendingInviteAndNoRole)
+                .Concat(activeUsersWithPublicationRole)
+                .Concat(activeUsersWithPreReleaseRole)
+                .Concat(activeUsersWithNoRole)
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole)
+                .ToHashSet();
 
-            var activeUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultUser()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var usersThatNeedCreatingOrRecreatingIdEmailPairs = usersWithPendingInviteAndNoRole
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole)
+                .Select(u => (u.Id, u.Email))
+                .Concat(newUserIdEmailPairs)
+                .ToList();
+            var existingUsersWithPublicationRole = usersWithPendingInviteAndPublicationRole.Concat(
+                activeUsersWithPublicationRole
+            );
+            var existingUsersWithoutPublicationRole = allExistingUsers.Except(existingUsersWithPublicationRole);
+            var existingUsersWithPreReleaseRole = usersWithPendingInviteAndPreReleaseRole.Concat(
+                activeUsersWithPreReleaseRole
+            );
+            var existingUsersWithoutAnyRole = usersWithPendingInviteAndNoRole
+                .Concat(activeUsersWithNoRole)
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole);
+            var userIdsThatRequireAPreReleaseRoleAdding = usersWithPendingInviteAndNoRole
+                .Concat(activeUsersWithNoRole)
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole)
+                .Select(u => u.Id)
+                .Concat(newUserIdEmailPairs.Select(pair => pair.Id));
 
-            var pendingInviteUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultUserWithPendingInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var allEmails = newEmails.Concat(allExistingUsers.Select(eu => eu.Email)).ToList();
 
-            var softDeletedUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultSoftDeletedUser()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
-
-            var expiredInviteUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultUserWithExpiredInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
-
-            var newUserIdsByEmail = ListOf<(Guid Id, string Email)>(
-                    (Guid.NewGuid(), "new.user.1@test.com"),
-                    (Guid.NewGuid(), "new.user.2@test.com")
-                )
-                .ToDictionary(t => t.Email, t => t.Id);
-
-            var existingUsersByEmail = usersWithPendingInvitesAndExistingPreReleaseRoleByEmail
-                .Concat(usersWithPendingInvitesAndExistingPublicationRoleByEmail)
-                .Concat(usersWithExistingPreReleaseRoleByEmail)
-                .Concat(usersWithExistingPublicationRoleByEmail)
-                .Concat(activeUsersWithNoRolesOrInvitesByEmail)
-                .Concat(pendingInviteUsersWithNoRolesOrInvitesByEmail)
-                .Concat(softDeletedUsersWithNoRolesOrInvitesByEmail)
-                .Concat(expiredInviteUsersWithNoRolesOrInvitesByEmail)
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-            var allEmails = existingUsersByEmail.Values.Select(u => u.Email).Concat(newUserIdsByEmail.Keys).ToList();
-
-            var applicationUsersById = activeUsersWithNoRolesOrInvitesByEmail
-                .Values.Select(u => new ApplicationUser { Id = u.Id.ToString(), Email = u.Email })
-                .ToDictionary(au => au.Id);
+            var activeApplicationUsersWithNoRole = activeUsersWithNoRole
+                .Select(u => new ApplicationUser { Id = u.Id.ToString(), Email = u.Email })
+                .ToList();
 
             var request = new PreReleaseUserInviteRequest { Emails = allEmails };
 
@@ -551,7 +499,7 @@ public abstract class PreReleaseUserServiceTests
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                usersAndRolesDbContext.Users.AddRange(applicationUsersById.Values);
+                usersAndRolesDbContext.Users.AddRange(activeApplicationUsersWithNoRole);
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
@@ -561,60 +509,49 @@ public abstract class PreReleaseUserServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var createUserPreReleaseRoleFunc = (string email) =>
-                _dataFixture
-                    .DefaultUserPreReleaseRole()
-                    .WithUserId(
-                        existingUsersByEmail.TryGetValue(email, out var user) ? user.Id : newUserIdsByEmail[email]
-                    )
-                    .WithReleaseVersion(releaseVersion)
-                    .Generate();
-
-            var createdUserPreReleaseRolesByEmail = new Dictionary<string, UserPreReleaseRole>();
+            var createdUserPreReleaseRoles = new List<UserPreReleaseRole>();
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(
+                MockBehavior.Strict
+            );
+            var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
+
+            foreach (var existingUser in allExistingUsers)
             {
-                if (existingUsersByEmail.TryGetValue(email, out var existingUser))
-                {
-                    userRepository
-                        .Setup(mock => mock.FindUserByEmail(email, It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(existingUser);
-                }
-                else
-                {
-                    userRepository
-                        .Setup(mock => mock.FindUserByEmail(email, It.IsAny<CancellationToken>()))
-                        .ReturnsAsync((User?)null);
-                }
-
-                if (
-                    usersWithExistingPreReleaseRoleByEmail.ContainsKey(email)
-                    || usersWithPendingInvitesAndExistingPreReleaseRoleByEmail.ContainsKey(email)
-                    || usersWithExistingPublicationRoleByEmail.ContainsKey(email)
-                    || usersWithPendingInvitesAndExistingPublicationRoleByEmail.ContainsKey(email)
-                )
-                {
-                    continue;
-                }
-
-                if (activeUsersWithNoRolesOrInvitesByEmail.TryGetValue(email, out var activeUser))
-                {
-                    userRepository
-                        .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(activeUser);
-
-                    continue;
-                }
-
                 userRepository
-                    .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
+                    .Setup(mock => mock.FindUserByEmail(existingUser.Email, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(existingUser);
+            }
+
+            foreach (var newEmail in newEmails)
+            {
+                userRepository
+                    .Setup(mock => mock.FindUserByEmail(newEmail, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync((User?)null);
+            }
+
+            foreach (var activeUserWithNoRole in activeUsersWithNoRole)
+            {
+                userRepository
+                    .Setup(mock =>
+                        mock.FindActiveUserByEmail(activeUserWithNoRole.Email, It.IsAny<CancellationToken>())
+                    )
+                    .ReturnsAsync(activeUserWithNoRole);
+            }
+
+            foreach (var (Id, Email) in usersThatNeedCreatingOrRecreatingIdEmailPairs)
+            {
+                userRepository
+                    .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
                     .ReturnsAsync((User?)null);
 
                 userRepository
                     .Setup(mock =>
                         mock.CreateOrUpdate(
-                            email,
+                            Email,
                             GlobalRoles.Role.PrereleaseUser,
                             _userId,
                             null,
@@ -624,127 +561,95 @@ public abstract class PreReleaseUserServiceTests
                     .ReturnsAsync(
                         _dataFixture
                             .DefaultUserWithPendingInvite()
-                            .WithId(
-                                existingUsersByEmail.TryGetValue(email, out var user)
-                                    ? user.Id
-                                    : newUserIdsByEmail[email]
-                            )
-                            .WithEmail(email)
+                            .WithId(Id)
+                            .WithEmail(Email)
                             .WithRoleId(GlobalRoles.Role.PrereleaseUser.GetEnumValue())
                             .WithCreatedById(_userId)
                             .WithCreated(DateTimeOffset.UtcNow)
                     );
             }
 
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            foreach (var existingUserWithPublicationRole in existingUsersWithPublicationRole)
             {
-                if (
-                    usersWithExistingPublicationRoleByEmail.TryGetValue(email, out var user)
-                    || usersWithPendingInvitesAndExistingPublicationRoleByEmail.TryGetValue(email, out user)
-                )
-                {
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                user.Id,
-                                releaseVersion.Release.PublicationId,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
+                userPublicationRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            existingUserWithPublicationRole.Id,
+                            releaseVersion.Release.PublicationId,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
                         )
-                        .ReturnsAsync(true);
-
-                    continue;
-                }
-
-                if (existingUsersByEmail.TryGetValue(email, out var existingUser))
-                {
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                existingUser.Id,
-                                releaseVersion.Release.PublicationId,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
+                    )
+                    .ReturnsAsync(true);
             }
 
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            foreach (var existingUserWithoutPublicationRole in existingUsersWithoutPublicationRole)
             {
-                if (
-                    usersWithExistingPublicationRoleByEmail.TryGetValue(email, out var _)
-                    || usersWithPendingInvitesAndExistingPublicationRoleByEmail.TryGetValue(email, out _)
-                )
-                {
-                    continue;
-                }
-
-                if (
-                    usersWithExistingPreReleaseRoleByEmail.TryGetValue(email, out var user)
-                    || usersWithPendingInvitesAndExistingPreReleaseRoleByEmail.TryGetValue(email, out user)
-                )
-                {
-                    userPreReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasPreReleaseRoleOnReleaseVersion(
-                                user.Id,
-                                releaseVersion.Id,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
+                userPublicationRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            existingUserWithoutPublicationRole.Id,
+                            releaseVersion.Release.PublicationId,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
                         )
-                        .ReturnsAsync(true);
+                    )
+                    .ReturnsAsync(false);
+            }
 
-                    continue;
-                }
-
-                if (existingUsersByEmail.TryGetValue(email, out var existingUser))
-                {
-                    userPreReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasPreReleaseRoleOnReleaseVersion(
-                                existingUser.Id,
-                                releaseVersion.Id,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
-
-                var createdUserPreReleaseRole = createUserPreReleaseRoleFunc(email);
-                createdUserPreReleaseRolesByEmail.Add(email, createdUserPreReleaseRole);
-
-                var userId = existingUser?.Id ?? newUserIdsByEmail[email];
+            foreach (var existingUserWithPreReleaseRole in existingUsersWithPreReleaseRole)
+            {
                 userPreReleaseRoleRepository
                     .Setup(mock =>
-                        mock.Create(userId, releaseVersion.Id, _userId, default, It.IsAny<CancellationToken>())
+                        mock.UserHasPreReleaseRoleOnReleaseVersion(
+                            existingUserWithPreReleaseRole.Id,
+                            releaseVersion.Id,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(true);
+            }
+
+            foreach (var existingUserWithoutAnyRole in existingUsersWithoutAnyRole)
+            {
+                userPreReleaseRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasPreReleaseRoleOnReleaseVersion(
+                            existingUserWithoutAnyRole.Id,
+                            releaseVersion.Id,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(false);
+            }
+
+            foreach (var userIdThatRequiresAPreReleaseRoleAdding in userIdsThatRequireAPreReleaseRoleAdding)
+            {
+                var createdUserPreReleaseRole = _dataFixture
+                    .DefaultUserPreReleaseRole()
+                    .WithUserId(userIdThatRequiresAPreReleaseRoleAdding)
+                    .WithReleaseVersion(releaseVersion)
+                    .Generate();
+
+                createdUserPreReleaseRoles.Add(createdUserPreReleaseRole);
+
+                userPreReleaseRoleRepository
+                    .Setup(mock =>
+                        mock.Create(
+                            userIdThatRequiresAPreReleaseRoleAdding,
+                            releaseVersion.Id,
+                            _userId,
+                            default,
+                            It.IsAny<CancellationToken>()
+                        )
                     )
                     .ReturnsAsync(createdUserPreReleaseRole);
             }
 
-            var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(
-                MockBehavior.Strict
-            );
-            foreach (var email in allEmails)
+            foreach (var createdUserPreReleaseRole in createdUserPreReleaseRoles)
             {
-                if (
-                    usersWithExistingPreReleaseRoleByEmail.ContainsKey(email)
-                    || usersWithPendingInvitesAndExistingPreReleaseRoleByEmail.ContainsKey(email)
-                    || usersWithExistingPublicationRoleByEmail.ContainsKey(email)
-                    || usersWithPendingInvitesAndExistingPublicationRoleByEmail.ContainsKey(email)
-                )
-                {
-                    continue;
-                }
-
-                var createdUserPreReleaseRole = createdUserPreReleaseRolesByEmail[email];
-
                 userResourceRoleNotificationService
                     .Setup(mock =>
                         mock.NotifyUserOfNewPreReleaseRole(createdUserPreReleaseRole.Id, It.IsAny<CancellationToken>())
@@ -752,13 +657,12 @@ public abstract class PreReleaseUserServiceTests
                     .Returns(Task.CompletedTask);
             }
 
-            var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
-            foreach (var user in activeUsersWithNoRolesOrInvitesByEmail.Values)
+            foreach (var activeApplicationUserWithNoRole in activeApplicationUsersWithNoRole)
             {
                 globalRoleService
                     .Setup(mock =>
                         mock.UpgradeToGlobalRoleIfRequired(
-                            ItIsApplicationUser(applicationUsersById[user.Id.ToString()]),
+                            ItIsApplicationUser(activeApplicationUserWithNoRole),
                             RoleNames.PrereleaseUser
                         )
                     )
@@ -787,16 +691,16 @@ public abstract class PreReleaseUserServiceTests
 
                 var expectedEmails = new[]
                 {
-                    activeUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    activeUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    pendingInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    pendingInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    softDeletedUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    softDeletedUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    expiredInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    expiredInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    newUserIdsByEmail.ElementAt(0).Key,
-                    newUserIdsByEmail.ElementAt(1).Key,
+                    usersWithPendingInviteAndNoRole.ElementAt(0).Email,
+                    usersWithPendingInviteAndNoRole.ElementAt(1).Email,
+                    activeUsersWithNoRole.ElementAt(0).Email,
+                    activeUsersWithNoRole.ElementAt(1).Email,
+                    softDeletedUsersWithNoRole.ElementAt(0).Email,
+                    softDeletedUsersWithNoRole.ElementAt(1).Email,
+                    expiredUsersWithNoRole.ElementAt(0).Email,
+                    expiredUsersWithNoRole.ElementAt(1).Email,
+                    newUserIdEmailPairs.ElementAt(0).Email,
+                    newUserIdEmailPairs.ElementAt(1).Email,
                 };
 
                 var preReleaseEmails = preReleaseUsers.Select(u => u.Email).ToList();
@@ -822,64 +726,58 @@ public abstract class PreReleaseUserServiceTests
                 .WithApprovalStatus(ReleaseApprovalStatus.Draft)
                 .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-            var usersWithPendingInvitesAndExistingRoleByEmail = _dataFixture
-                .DefaultUserWithPendingInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var newEmails = ListOf("new.user.1@test.com", "new.user.2@test.com");
 
-            var usersWithPendingInvitesAndExistingPublicationRoleByEmail = _dataFixture
-                .DefaultUserWithPendingInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var newUserIdEmailPairs = newEmails.Select(e => (Id: Guid.NewGuid(), Email: e)).ToList();
 
-            var usersWithExistingRoleByEmail = _dataFixture.DefaultUser().GenerateList(2).ToDictionary(u => u.Email);
+            var usersWithPendingInviteAndPublicationRole = _dataFixture.DefaultUserWithPendingInvite().GenerateList(2);
+            var usersWithPendingInviteAndPreReleaseRole = _dataFixture.DefaultUserWithPendingInvite().GenerateList(2);
+            var usersWithPendingInviteAndNoRole = _dataFixture.DefaultUserWithPendingInvite().GenerateList(2);
+            var activeUsersWithPublicationRole = _dataFixture.DefaultUser().GenerateList(2);
+            var activeUsersWithPreReleaseRole = _dataFixture.DefaultUser().GenerateList(2);
+            var activeUsersWithNoRole = _dataFixture.DefaultUser().GenerateList(2);
+            var softDeletedUsersWithNoRole = _dataFixture.DefaultSoftDeletedUser().GenerateList(2);
+            var expiredUsersWithNoRole = _dataFixture.DefaultUserWithExpiredInvite().GenerateList(2);
 
-            var usersWithExistingPublicationRoleByEmail = _dataFixture
-                .DefaultUser()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var allExistingUsers = usersWithPendingInviteAndPublicationRole
+                .Concat(usersWithPendingInviteAndPreReleaseRole)
+                .Concat(usersWithPendingInviteAndNoRole)
+                .Concat(activeUsersWithPublicationRole)
+                .Concat(activeUsersWithPreReleaseRole)
+                .Concat(activeUsersWithNoRole)
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole)
+                .ToHashSet();
 
-            var activeUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultUser()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var usersThatNeedCreatingOrRecreatingIdEmailPairs = usersWithPendingInviteAndNoRole
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole)
+                .Select(u => (u.Id, u.Email))
+                .Concat(newUserIdEmailPairs)
+                .ToList();
+            var existingUsersWithPublicationRole = usersWithPendingInviteAndPublicationRole.Concat(
+                activeUsersWithPublicationRole
+            );
+            var existingUsersWithoutPublicationRole = allExistingUsers.Except(existingUsersWithPublicationRole);
+            var existingUsersWithPreReleaseRole = usersWithPendingInviteAndPreReleaseRole.Concat(
+                activeUsersWithPreReleaseRole
+            );
+            var existingUsersWithoutAnyRole = usersWithPendingInviteAndNoRole
+                .Concat(activeUsersWithNoRole)
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole);
+            var userIdsThatRequireAPreReleaseRoleAdding = usersWithPendingInviteAndNoRole
+                .Concat(activeUsersWithNoRole)
+                .Concat(softDeletedUsersWithNoRole)
+                .Concat(expiredUsersWithNoRole)
+                .Select(u => u.Id)
+                .Concat(newUserIdEmailPairs.Select(pair => pair.Id));
 
-            var pendingInviteUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultUserWithPendingInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
+            var allEmails = newEmails.Concat(allExistingUsers.Select(eu => eu.Email)).ToList();
 
-            var softDeletedUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultSoftDeletedUser()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
-
-            var expiredInviteUsersWithNoRolesOrInvitesByEmail = _dataFixture
-                .DefaultUserWithExpiredInvite()
-                .GenerateList(2)
-                .ToDictionary(u => u.Email);
-
-            var newUserIdsByEmail = ListOf<(Guid Id, string Email)>(
-                    (Guid.NewGuid(), "new.user.1@test.com"),
-                    (Guid.NewGuid(), "new.user.2@test.com")
-                )
-                .ToDictionary(t => t.Email, t => t.Id);
-
-            var existingUsersByEmail = usersWithPendingInvitesAndExistingRoleByEmail
-                .Concat(usersWithPendingInvitesAndExistingPublicationRoleByEmail)
-                .Concat(usersWithExistingRoleByEmail)
-                .Concat(usersWithExistingPublicationRoleByEmail)
-                .Concat(activeUsersWithNoRolesOrInvitesByEmail)
-                .Concat(pendingInviteUsersWithNoRolesOrInvitesByEmail)
-                .Concat(softDeletedUsersWithNoRolesOrInvitesByEmail)
-                .Concat(expiredInviteUsersWithNoRolesOrInvitesByEmail)
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-            var allEmails = existingUsersByEmail.Values.Select(u => u.Email).Concat(newUserIdsByEmail.Keys).ToList();
-
-            var applicationUsersById = activeUsersWithNoRolesOrInvitesByEmail
-                .Values.Select(u => new ApplicationUser { Id = u.Id.ToString(), Email = u.Email })
-                .ToDictionary(au => au.Id);
+            var activeApplicationUsersWithNoRole = activeUsersWithNoRole
+                .Select(u => new ApplicationUser { Id = u.Id.ToString(), Email = u.Email })
+                .ToList();
 
             var request = new PreReleaseUserInviteRequest { Emails = allEmails };
 
@@ -888,7 +786,7 @@ public abstract class PreReleaseUserServiceTests
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                usersAndRolesDbContext.Users.AddRange(applicationUsersById.Values);
+                usersAndRolesDbContext.Users.AddRange(activeApplicationUsersWithNoRole);
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
@@ -898,49 +796,49 @@ public abstract class PreReleaseUserServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var createdUserPreReleaseRoles = new List<UserPreReleaseRole>();
+
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(
+                MockBehavior.Strict
+            );
+            var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
+
+            foreach (var existingUser in allExistingUsers)
             {
-                if (existingUsersByEmail.TryGetValue(email, out var existingUser))
-                {
-                    userRepository
-                        .Setup(mock => mock.FindUserByEmail(email, It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(existingUser);
-                }
-                else
-                {
-                    userRepository
-                        .Setup(mock => mock.FindUserByEmail(email, It.IsAny<CancellationToken>()))
-                        .ReturnsAsync((User?)null);
-                }
-
-                if (
-                    usersWithExistingRoleByEmail.ContainsKey(email)
-                    || usersWithPendingInvitesAndExistingRoleByEmail.ContainsKey(email)
-                    || usersWithExistingPublicationRoleByEmail.ContainsKey(email)
-                    || usersWithPendingInvitesAndExistingPublicationRoleByEmail.ContainsKey(email)
-                )
-                {
-                    continue;
-                }
-
-                if (activeUsersWithNoRolesOrInvitesByEmail.TryGetValue(email, out var activeUser))
-                {
-                    userRepository
-                        .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(activeUser);
-
-                    continue;
-                }
-
                 userRepository
-                    .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
+                    .Setup(mock => mock.FindUserByEmail(existingUser.Email, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(existingUser);
+            }
+
+            foreach (var newEmail in newEmails)
+            {
+                userRepository
+                    .Setup(mock => mock.FindUserByEmail(newEmail, It.IsAny<CancellationToken>()))
+                    .ReturnsAsync((User?)null);
+            }
+
+            foreach (var activeUserWithNoRole in activeUsersWithNoRole)
+            {
+                userRepository
+                    .Setup(mock =>
+                        mock.FindActiveUserByEmail(activeUserWithNoRole.Email, It.IsAny<CancellationToken>())
+                    )
+                    .ReturnsAsync(activeUserWithNoRole);
+            }
+
+            foreach (var (Id, Email) in usersThatNeedCreatingOrRecreatingIdEmailPairs)
+            {
+                userRepository
+                    .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
                     .ReturnsAsync((User?)null);
 
                 userRepository
                     .Setup(mock =>
                         mock.CreateOrUpdate(
-                            email,
+                            Email,
                             GlobalRoles.Role.PrereleaseUser,
                             _userId,
                             null,
@@ -950,126 +848,99 @@ public abstract class PreReleaseUserServiceTests
                     .ReturnsAsync(
                         _dataFixture
                             .DefaultUserWithPendingInvite()
-                            .WithId(
-                                existingUsersByEmail.TryGetValue(email, out var user)
-                                    ? user.Id
-                                    : newUserIdsByEmail[email]
-                            )
-                            .WithEmail(email)
+                            .WithId(Id)
+                            .WithEmail(Email)
                             .WithRoleId(GlobalRoles.Role.PrereleaseUser.GetEnumValue())
                             .WithCreatedById(_userId)
                             .WithCreated(DateTimeOffset.UtcNow)
                     );
             }
 
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            foreach (var existingUserWithPublicationRole in existingUsersWithPublicationRole)
             {
-                if (
-                    usersWithExistingPublicationRoleByEmail.TryGetValue(email, out var user)
-                    || usersWithPendingInvitesAndExistingPublicationRoleByEmail.TryGetValue(email, out user)
-                )
-                {
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                user.Id,
-                                releaseVersion.Release.PublicationId,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
+                userPublicationRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            existingUserWithPublicationRole.Id,
+                            releaseVersion.Release.PublicationId,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
                         )
-                        .ReturnsAsync(true);
-
-                    continue;
-                }
-
-                if (existingUsersByEmail.TryGetValue(email, out var existingUser))
-                {
-                    userPublicationRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasAnyRoleOnPublication(
-                                existingUser.Id,
-                                releaseVersion.Release.PublicationId,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
+                    )
+                    .ReturnsAsync(true);
             }
 
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
-            foreach (var email in allEmails)
+            foreach (var existingUserWithoutPublicationRole in existingUsersWithoutPublicationRole)
             {
-                if (
-                    usersWithExistingPublicationRoleByEmail.TryGetValue(email, out var _)
-                    || usersWithPendingInvitesAndExistingPublicationRoleByEmail.TryGetValue(email, out _)
-                )
-                {
-                    continue;
-                }
-
-                if (
-                    usersWithExistingRoleByEmail.TryGetValue(email, out var user)
-                    || usersWithPendingInvitesAndExistingRoleByEmail.TryGetValue(email, out user)
-                )
-                {
-                    userPreReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasPreReleaseRoleOnReleaseVersion(
-                                user.Id,
-                                releaseVersion.Id,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
+                userPublicationRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            existingUserWithoutPublicationRole.Id,
+                            releaseVersion.Release.PublicationId,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
                         )
-                        .ReturnsAsync(true);
+                    )
+                    .ReturnsAsync(false);
+            }
 
-                    continue;
-                }
-
-                if (existingUsersByEmail.TryGetValue(email, out var existingUser))
-                {
-                    userPreReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.UserHasPreReleaseRoleOnReleaseVersion(
-                                existingUser.Id,
-                                releaseVersion.Id,
-                                ResourceRoleFilter.AllButExpired,
-                                It.IsAny<CancellationToken>()
-                            )
-                        )
-                        .ReturnsAsync(false);
-                }
-
-                var userId = existingUser?.Id ?? newUserIdsByEmail[email];
+            foreach (var existingUserWithPreReleaseRole in existingUsersWithPreReleaseRole)
+            {
                 userPreReleaseRoleRepository
                     .Setup(mock =>
-                        mock.Create(userId, releaseVersion.Id, _userId, default, It.IsAny<CancellationToken>())
+                        mock.UserHasPreReleaseRoleOnReleaseVersion(
+                            existingUserWithPreReleaseRole.Id,
+                            releaseVersion.Id,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
+                        )
                     )
-                    .ReturnsAsync(
-                        _dataFixture
-                            .DefaultUserPreReleaseRole()
-                            .WithUser(_dataFixture.DefaultUser())
-                            .WithReleaseVersion(
-                                _dataFixture
-                                    .DefaultReleaseVersion()
-                                    .WithRelease(
-                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
-                                    )
-                            )
-                            .Generate()
-                    );
+                    .ReturnsAsync(true);
             }
 
-            var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
-            foreach (var user in activeUsersWithNoRolesOrInvitesByEmail.Values)
+            foreach (var existingUserWithoutAnyRole in existingUsersWithoutAnyRole)
+            {
+                userPreReleaseRoleRepository
+                    .Setup(mock =>
+                        mock.UserHasPreReleaseRoleOnReleaseVersion(
+                            existingUserWithoutAnyRole.Id,
+                            releaseVersion.Id,
+                            ResourceRoleFilter.AllButExpired,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(false);
+            }
+
+            foreach (var userIdThatRequiresAPreReleaseRoleAdding in userIdsThatRequireAPreReleaseRoleAdding)
+            {
+                var createdUserPreReleaseRole = _dataFixture
+                    .DefaultUserPreReleaseRole()
+                    .WithUserId(userIdThatRequiresAPreReleaseRoleAdding)
+                    .WithReleaseVersion(releaseVersion)
+                    .Generate();
+
+                createdUserPreReleaseRoles.Add(createdUserPreReleaseRole);
+
+                userPreReleaseRoleRepository
+                    .Setup(mock =>
+                        mock.Create(
+                            userIdThatRequiresAPreReleaseRoleAdding,
+                            releaseVersion.Id,
+                            _userId,
+                            default,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(createdUserPreReleaseRole);
+            }
+
+            foreach (var activeApplicationUserWithNoRole in activeApplicationUsersWithNoRole)
             {
                 globalRoleService
                     .Setup(mock =>
                         mock.UpgradeToGlobalRoleIfRequired(
-                            ItIsApplicationUser(applicationUsersById[user.Id.ToString()]),
+                            ItIsApplicationUser(activeApplicationUserWithNoRole),
                             RoleNames.PrereleaseUser
                         )
                     )
@@ -1097,16 +968,16 @@ public abstract class PreReleaseUserServiceTests
 
                 var expectedEmails = new[]
                 {
-                    activeUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    activeUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    pendingInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    pendingInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    softDeletedUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    softDeletedUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    expiredInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(0).Value.Email,
-                    expiredInviteUsersWithNoRolesOrInvitesByEmail.ElementAt(1).Value.Email,
-                    newUserIdsByEmail.ElementAt(0).Key,
-                    newUserIdsByEmail.ElementAt(1).Key,
+                    usersWithPendingInviteAndNoRole.ElementAt(0).Email,
+                    usersWithPendingInviteAndNoRole.ElementAt(1).Email,
+                    activeUsersWithNoRole.ElementAt(0).Email,
+                    activeUsersWithNoRole.ElementAt(1).Email,
+                    softDeletedUsersWithNoRole.ElementAt(0).Email,
+                    softDeletedUsersWithNoRole.ElementAt(1).Email,
+                    expiredUsersWithNoRole.ElementAt(0).Email,
+                    expiredUsersWithNoRole.ElementAt(1).Email,
+                    newUserIdEmailPairs.ElementAt(0).Email,
+                    newUserIdEmailPairs.ElementAt(1).Email,
                 };
 
                 var preReleaseEmails = preReleaseUsers.Select(u => u.Email).ToList();

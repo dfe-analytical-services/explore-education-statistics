@@ -19,10 +19,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPreReleaseRoleRepository;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using UserPreReleaseRoleCreateDto = GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPreReleaseRoleRepository.UserPreReleaseRoleCreateDto;
+using UserPublicationRoleCreateDto = GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository.UserPublicationRoleCreateDto;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
