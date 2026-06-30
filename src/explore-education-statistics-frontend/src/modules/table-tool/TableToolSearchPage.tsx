@@ -297,6 +297,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                         <TableToolSearchFinalResult
                           key={dataset.fileId}
                           dataset={dataset}
+                          releaseVersionId={latestReleaseVersion.id}
                         />
                       ))}
                     </ul>
