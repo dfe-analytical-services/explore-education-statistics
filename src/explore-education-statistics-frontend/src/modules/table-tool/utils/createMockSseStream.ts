@@ -38,7 +38,7 @@ export default function createMockSseStream({
         controller.enqueue(
           encoder.encode(formatSse({ stage: 'starting pipeline' })),
         );
-        await delay(1000);
+        await delay(100);
 
         // Stage 2: Retrieved
         controller.enqueue(
@@ -62,7 +62,7 @@ export default function createMockSseStream({
             }),
           ),
         );
-        await delay(3000);
+        await delay(300);
 
         // Stage 3: Reranker
         controller.enqueue(
@@ -92,7 +92,7 @@ export default function createMockSseStream({
             }),
           ),
         );
-        await delay(8000);
+        await delay(800);
 
         // Stage 4: Complete
         controller.enqueue(
@@ -117,6 +117,22 @@ export default function createMockSseStream({
                     aiSummary:
                       'This data is relevant because This dataset provides local authority level data on reasons for pupil absence, including holidays, with weekly time frames that cover the last 4 weeks, making it directly relevant to the query for Sheffield.\n It contains information about Daily and weekly local authority, regional and national reasons for pupil attendance and absence. Figures are provided for state-funded primary, secondary and special schools.',
                     title: 'Reasons for absence and attendance',
+                  },
+                  {
+                    fileId: '10308fbb-da53-4eae-20d2-08dec542d092',
+                    filters: ['lorem'],
+                    indicators: ['lorem'],
+                    geographicLevels: {
+                      'Local authority': [
+                        {
+                          id: 'bbe3cafc-2c62-42d6-4919-08d93bbc8641',
+                          label: 'Sheffield',
+                          value: 'E08000019',
+                        },
+                      ],
+                    },
+                    aiSummary: 'Mock AI summary',
+                    title: 'Other final result',
                   },
                 ],
                 token_usage: 3766,

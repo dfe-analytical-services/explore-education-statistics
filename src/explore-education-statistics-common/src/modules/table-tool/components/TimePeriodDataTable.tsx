@@ -15,6 +15,7 @@ import ButtonText from '@common/components/ButtonText';
 import downloadService from '@common/services/downloadService';
 
 interface Props {
+  capMaxHeight?: boolean;
   captionTitle?: string;
   dataBlockId?: string;
   footnotesClassName?: string;
@@ -30,6 +31,7 @@ interface Props {
 }
 
 const TimePeriodDataTable = ({
+  capMaxHeight,
   captionTitle,
   dataBlockId,
   footnotesClassName,
@@ -110,6 +112,7 @@ const TimePeriodDataTable = ({
           />
         )}
         <FixedMultiHeaderDataTable
+          capMaxHeight={capMaxHeight}
           caption={
             <DataTableCaption
               title={captionTitle}

@@ -1,12 +1,13 @@
-import FigureFootnotes from '@common/components/FigureFootnotes';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { OmitStrict } from '@common/types';
-import React, { ReactNode, Ref, useEffect, useRef } from 'react';
-import DataSymbolsModal from '@common/components/DataSymbolsModal';
+import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
+import DataSymbolsModal from '@common/components/DataSymbolsModal';
+import FigureFootnotes from '@common/components/FigureFootnotes';
 import Modal from '@common/components/Modal';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import BackToTopLink from '@common/components/BackToTopLink';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { OmitStrict } from '@common/types';
+import classNames from 'classnames';
+import { ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
@@ -14,6 +15,7 @@ const mobileWidth = 1024;
 
 interface Props
   extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy' | 'ref'> {
+  capMaxHeight?: boolean;
   caption: ReactNode;
   captionId: string;
   captionTitle?: string;
@@ -32,6 +34,7 @@ const FixedMultiHeaderDataTable = (props: Props) => {
   const { ref, ...tableProps } = props;
 
   const {
+    capMaxHeight,
     caption,
     captionId,
     captionTitle,
@@ -47,9 +50,15 @@ const FixedMultiHeaderDataTable = (props: Props) => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const mainTableRef = useRef<HTMLTableElement>(null);
+  const fullScreenTableRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
     const listener = () => {
+      const removeTransform = (element: HTMLTableCellElement) => {
+        // eslint-disable-next-line no-param-reassign
+        element.style.transform = '';
+      };
+
       if (
         containerRef.current &&
         mainTableRef.current &&
@@ -57,24 +66,33 @@ const FixedMultiHeaderDataTable = (props: Props) => {
       ) {
         mainTableRef.current
           .querySelectorAll<HTMLTableCellElement>('thead td')
-          .forEach(el => {
-            // eslint-disable-next-line no-param-reassign
-            el.style.transform = '';
-          });
+          .forEach(removeTransform);
 
         mainTableRef.current
           .querySelectorAll<HTMLTableCellElement>('thead th')
-          .forEach(el => {
-            // eslint-disable-next-line no-param-reassign
-            el.style.transform = '';
-          });
+          .forEach(removeTransform);
 
         mainTableRef.current
           .querySelectorAll<HTMLTableCellElement>('tbody th')
-          .forEach(el => {
-            // eslint-disable-next-line no-param-reassign
-            el.style.transform = '';
-          });
+          .forEach(removeTransform);
+      }
+
+      if (
+        containerRef.current &&
+        fullScreenTableRef.current &&
+        window.innerWidth <= mobileWidth
+      ) {
+        fullScreenTableRef.current
+          .querySelectorAll<HTMLTableCellElement>('thead td')
+          .forEach(removeTransform);
+
+        fullScreenTableRef.current
+          .querySelectorAll<HTMLTableCellElement>('thead th')
+          .forEach(removeTransform);
+
+        fullScreenTableRef.current
+          .querySelectorAll<HTMLTableCellElement>('tbody th')
+          .forEach(removeTransform);
       }
     };
 
@@ -92,7 +110,10 @@ const FixedMultiHeaderDataTable = (props: Props) => {
       <div
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
-        className={styles.container}
+        className={classNames(
+          styles.container,
+          capMaxHeight && styles.capMaxHeight,
+        )}
         ref={containerRef}
         role="region"
         onScroll={event => {
@@ -114,6 +135,29 @@ const FixedMultiHeaderDataTable = (props: Props) => {
               });
 
             mainTableRef.current
+              .querySelectorAll<HTMLTableCellElement>('tbody th')
+              .forEach(el => {
+                // eslint-disable-next-line no-param-reassign
+                el.style.transform = `translate(${scrollLeft}px, 0)`;
+              });
+          }
+
+          if (fullScreenTableRef.current && window.innerWidth >= mobileWidth) {
+            fullScreenTableRef.current
+              .querySelectorAll<HTMLTableCellElement>('thead td')
+              .forEach(el => {
+                // eslint-disable-next-line no-param-reassign
+                el.style.transform = `translate(${scrollLeft}px, ${scrollTop}px)`;
+              });
+
+            fullScreenTableRef.current
+              .querySelectorAll<HTMLTableCellElement>('thead th')
+              .forEach(el => {
+                // eslint-disable-next-line no-param-reassign
+                el.style.transform = `translate(0, ${scrollTop}px)`;
+              });
+
+            fullScreenTableRef.current
               .querySelectorAll<HTMLTableCellElement>('tbody th')
               .forEach(el => {
                 // eslint-disable-next-line no-param-reassign
@@ -145,7 +189,7 @@ const FixedMultiHeaderDataTable = (props: Props) => {
         <MultiHeaderTable
           {...props}
           ariaLabelledBy={`modal-${captionId}`}
-          ref={mainTableRef}
+          ref={fullScreenTableRef}
         />
       </Modal>
       <p>

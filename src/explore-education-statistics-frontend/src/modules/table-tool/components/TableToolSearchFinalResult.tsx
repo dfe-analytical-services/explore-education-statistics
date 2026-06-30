@@ -8,10 +8,12 @@ import { useQuery } from '@tanstack/react-query';
 
 interface TableToolSearchFinalResultProps {
   dataset: FinalDataset;
+  releaseVersionId: string;
 }
 
 const TableToolSearchFinalResult = ({
   dataset,
+  releaseVersionId,
 }: TableToolSearchFinalResultProps) => {
   // Hardcoded query from seed data.
   // To swap out for dataset data later on.
@@ -45,9 +47,8 @@ const TableToolSearchFinalResult = ({
     ],
   } as FullTableQuery;
 
-  const { data, isError, isFetching, isLoading } = useQuery({
-    ...tableBuilderQueries.getFullTable(query),
-    keepPreviousData: true,
+  const { data, isError, isLoading } = useQuery({
+    ...tableBuilderQueries.getFullTable(query, releaseVersionId),
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
@@ -58,7 +59,7 @@ const TableToolSearchFinalResult = ({
     <li
       key={dataset.fileId}
       id={`result-${dataset.fileId}`}
-      className="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4"
+      className="govuk-!-margin-bottom-6 govuk-!-padding-bottom-6 dfe-border-bottom"
     >
       <h2 className="govuk-heading-m govuk-!-margin-bottom-2">
         {dataset.title}
@@ -67,16 +68,15 @@ const TableToolSearchFinalResult = ({
       <h3 className="govuk-heading-s govuk-!-margin-top-4">Relevance</h3>
       <p className="govuk-body">{dataset.aiSummary}</p>
 
-      <LoadingSpinner
-        loading={isLoading || isFetching}
-        className="govuk-!-margin-top-4"
-      >
+      <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
         {isError && <p>Error loading table.</p>}
         {table && tableHeaders && (
           <TimePeriodDataTable
+            capMaxHeight
             footnotesClassName="govuk-!-width-two-thirds"
             fullTable={table}
             query={query}
+            releaseVersionId={releaseVersionId}
             tableHeadersConfig={tableHeaders}
           />
         )}
