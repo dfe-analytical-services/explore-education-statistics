@@ -135,7 +135,7 @@ module appGatewayModule '../../../common/components/application-gateway/appGatew
         name: '${publicSiteAppServiceName}-backend'
         fqdn: publicSiteInternalServiceFqdn
         healthProbePath: '/api/health'
-        healthProbeAdditionalStatusCodeMatches: ['405']
+        intervalSeconds: 60
       }
     ]
     routes: [
