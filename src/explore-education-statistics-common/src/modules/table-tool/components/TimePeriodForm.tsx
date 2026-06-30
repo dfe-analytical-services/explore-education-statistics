@@ -77,15 +77,23 @@ const TimePeriodForm = ({
   };
 
   const initialFormValues = useMemo<FormValues>(() => {
+    if (!options || options.length === 0) {
+      return {
+        start: '',
+        end: '',
+      };
+    }
+
     const { startYear, startCode, endYear, endCode } = initialValues;
 
-    const defaultTimePeriod =
-      options.length === 1 ? `${options[0].year}_${options[0].code}` : '';
-
     const start =
-      startYear && startCode ? `${startYear}_${startCode}` : defaultTimePeriod;
+      startYear && startCode
+        ? `${startYear}_${startCode}`
+        : `${options[0].year}_${options[0].code}`;
     const end =
-      endYear && endCode ? `${endYear}_${endCode}` : defaultTimePeriod;
+      endYear && endCode
+        ? `${endYear}_${endCode}`
+        : `${options.at(-1)?.year}_${options.at(-1)?.code}`;
 
     return {
       start,
