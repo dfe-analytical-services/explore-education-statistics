@@ -19,9 +19,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using UserPreReleaseRoleCreateDto = GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPreReleaseRoleRepository.UserPreReleaseRoleCreateDto;
+using UserPublicationRoleCreateDto = GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository.UserPublicationRoleCreateDto;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -209,10 +210,12 @@ public class UserManagementService(
                     return ValidationActionResult(InvalidUserRole);
                 }
 
+                var createdById = userService.GetUserId();
+
                 var user = await userRepository.CreateOrUpdate(
                     email: request.Email,
                     roleId: request.RoleId,
-                    createdById: userService.GetUserId(),
+                    createdById: createdById,
                     createdDate: request.CreatedDate
                 );
 
@@ -221,31 +224,46 @@ public class UserManagementService(
                 await userPreReleaseRoleRepository.RemoveForUser(user.Id);
                 await userPublicationRoleRepository.RemoveForUser(user.Id);
 
-                foreach (var userPreReleaseRole in request.UserPreReleaseRoles)
-                {
-                    var latestReleaseVersion = await contentDbContext
-                        .ReleaseVersions.LatestReleaseVersion(releaseId: userPreReleaseRole.ReleaseId)
-                        .SingleAsync();
-
-                    await userPreReleaseRoleRepository.Create(
-                        userId: user.Id,
-                        releaseVersionId: latestReleaseVersion!.Id,
-                        createdById: userService.GetUserId(),
-                        createdDate: request.CreatedDate ?? default
+                var preReleaseRoleLatestReleaseVersionDetails = await request
+                    .UserPreReleaseRoles.Select(role => role.ReleaseId)
+                    .Distinct()
+                    .SelectAsync(releaseId =>
+                        contentDbContext
+                            .ReleaseVersions.LatestReleaseVersion(releaseId)
+                            .Select(rv => new { rv!.Release.PublicationId, ReleaseVersionId = rv.Id })
+                            .SingleAsync()
                     );
-                }
 
-                var userPublicationRolesToCreate = request
+                var publicationRolePublicationIds = request
+                    .UserPublicationRoles.Select(upr => upr.PublicationId)
+                    .Distinct()
+                    .ToHashSet();
+
+                // Don't create pre-release roles for releases that the user already has a publication role invite for,
+                // as publication roles grant access to all releases of a publication, and are more powerful;
+                var preReleaseRolesToCreate = preReleaseRoleLatestReleaseVersionDetails
+                    .Where(details => !publicationRolePublicationIds.Contains(details.PublicationId))
+                    .Select(details => new UserPreReleaseRoleCreateDto(
+                        UserId: user.Id,
+                        ReleaseVersionId: details.ReleaseVersionId,
+                        CreatedById: createdById,
+                        CreatedDate: request.CreatedDate ?? default
+                    ))
+                    .ToHashSet();
+
+                var publicationRolesToCreate = request
                     .UserPublicationRoles.Select(userPublicationRole => new UserPublicationRoleCreateDto(
                         UserId: user.Id,
                         PublicationId: userPublicationRole.PublicationId,
                         Role: userPublicationRole.PublicationRole,
                         CreatedDate: request.CreatedDate ?? default,
-                        CreatedById: userService.GetUserId()
+                        CreatedById: createdById
                     ))
                     .ToHashSet();
 
-                await userPublicationRoleRepository.CreateManyIfNotExists(userPublicationRolesToCreate);
+                await userPreReleaseRoleRepository.CreateManyIfNotExists(preReleaseRolesToCreate);
+
+                await userPublicationRoleRepository.CreateManyIfNotExists(publicationRolesToCreate);
 
                 await userResourceRoleNotificationService.NotifyUserOfInvite(user.Id);
 

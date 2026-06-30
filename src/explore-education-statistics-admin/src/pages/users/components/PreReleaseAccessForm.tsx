@@ -19,6 +19,8 @@ const addPreReleaseFormErrorMappings = [
     target: 'releaseId',
     messages: {
       UserAlreadyHasResourceRole: 'The user already has this pre-release role',
+      UserAlreadyHasMorePowerfulRole:
+        'This user already has more powerful permissions than a pre-release user',
     },
   }),
 ];
