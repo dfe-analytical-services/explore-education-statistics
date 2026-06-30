@@ -180,7 +180,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -543,7 +542,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -726,7 +724,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
                     apiDataSetVersionMappingService: apiDataSetVersionMappingService.Object
@@ -1143,7 +1140,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object,
                     releaseFileRepository: releaseFileRepository.Object
                 )
@@ -1675,7 +1671,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2038,7 +2033,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2304,7 +2298,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2506,7 +2499,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2733,7 +2725,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    filterRepository: filterRepository,
                     timePeriodService: timePeriodService.Object
                 )
             );
@@ -2814,7 +2805,6 @@ public class ReplacementServiceTests
     private static ReplacementPlanService BuildReplacementPlanService(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
-        IFilterRepository? filterRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
         IDataSetVersionMappingService? apiDataSetVersionMappingService = null,
@@ -2824,8 +2814,6 @@ public class ReplacementServiceTests
         var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
-            statisticsDbContext,
-            filterRepository ?? Mock.Of<IFilterRepository>(Strict),
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),

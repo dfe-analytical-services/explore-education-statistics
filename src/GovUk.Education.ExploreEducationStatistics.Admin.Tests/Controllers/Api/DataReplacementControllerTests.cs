@@ -38,7 +38,7 @@ public abstract class DataReplacementControllerTests
                     new DataBlockReplacementPlanViewModel(
                         id: Guid.NewGuid(),
                         name: "my data block",
-                        originalFilters: new Dictionary<Guid, FilterReplacementViewModel>
+                        filters: new Dictionary<Guid, FilterReplacementViewModel>
                         {
                             {
                                 Guid.NewGuid(),
@@ -54,6 +54,7 @@ public abstract class DataReplacementControllerTests
                                             new FilterGroupReplacementViewModel(
                                                 id: Guid.NewGuid(),
                                                 label: "filter group replacement label",
+                                                target: Guid.NewGuid(),
                                                 filters:
                                                 [
                                                     new FilterItemReplacementViewModel(
@@ -83,7 +84,7 @@ public abstract class DataReplacementControllerTests
                 ReplacementSubjectId = Guid.NewGuid(),
                 Mapping = new ReplacementPlanMappingViewModel
                 {
-                    Indicators = new ReplacementPlanIndicatorsMappingViewModel
+                    Indicators = new ReplacementPlanIndicatorMappingsViewModel
                     {
                         Mappings = new Dictionary<Guid, ReplacementPlanIndicatorMappingViewModel>
                         {

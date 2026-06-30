@@ -2659,7 +2659,7 @@ public class ReplacementPlanServiceTests
             Assert.False(footnoteForIndicatorPlan.Valid);
 
             var indicatorMappingPlan = replacementPlan.Mapping.Indicators;
-            Assert.Equivalent(new[] { originalIndicatorA.Id }, indicatorMappingPlan.Mappings.Keys); // @MarkFix add this test elsewhere
+            Assert.Equivalent(new[] { originalIndicatorA.Id }, indicatorMappingPlan.Mappings.Keys);
             var indicatorMapping = Assert.Single(indicatorMappingPlan.Mappings.Values);
             Assert.Equal(
                 new ReplacementPlanIndicatorMappingViewModel
@@ -3341,8 +3341,6 @@ public class ReplacementPlanServiceTests
         var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
-            statisticsDbContext,
-            new FilterRepository(statisticsDbContext),
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
