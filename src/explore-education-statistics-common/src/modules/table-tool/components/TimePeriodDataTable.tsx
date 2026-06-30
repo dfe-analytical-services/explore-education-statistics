@@ -18,6 +18,8 @@ interface Props {
   capMaxHeight?: boolean;
   captionTitle?: string;
   dataBlockId?: string;
+  defaultCaptionId?: string;
+  defaultFootnotesId?: string;
   footnotesClassName?: string;
   footnotesHeadingHiddenText?: string;
   fullTable: FullTable;
@@ -34,6 +36,8 @@ const TimePeriodDataTable = ({
   capMaxHeight,
   captionTitle,
   dataBlockId,
+  defaultCaptionId = 'dataTableCaption',
+  defaultFootnotesId = 'dataTableFootnotes',
   footnotesClassName,
   footnotesHeadingHiddenText,
   fullTable,
@@ -66,7 +70,7 @@ const TimePeriodDataTable = ({
 
     const captionId = dataBlockId
       ? `dataTableCaption-${dataBlockId}`
-      : 'dataTableCaption';
+      : defaultCaptionId;
 
     const coalescedReleaseVersionId =
       releaseVersionId ?? query?.releaseVersionId;
@@ -127,7 +131,7 @@ const TimePeriodDataTable = ({
           footnotesId={
             dataBlockId
               ? `dataTableFootnotes-${dataBlockId}`
-              : 'dataTableFootnotes'
+              : defaultFootnotesId
           }
           footnotesHeadingHiddenText={footnotesHeadingHiddenText}
           ref={dataTableRef}
