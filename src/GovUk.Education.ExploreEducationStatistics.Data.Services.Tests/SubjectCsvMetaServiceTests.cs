@@ -170,10 +170,12 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList(),
+                Filters = [.. filter0Items.Concat(filter1Items).Concat(filter2Items).Select(fi => fi.Id)],
+                LocationIds = [.. locations.Select(l => l.Id)],
+                Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -297,10 +299,21 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
+                Filters = new[]
+                {
+                    filter0Items[0],
+                    filter0Items[1],
+                    filter1Items[0],
+                    filter1Items[1],
+                    filter2Items[0],
+                    filter2Items[1],
+                }
+                    .Select(fi => fi.Id)
+                    .ToList(),
                 Indicators = indicators.Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -404,7 +417,7 @@ public class SubjectCsvMetaServiceTests
                 Indicators = indicators[1..2].Concat(indicators[4..6]).Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -486,7 +499,7 @@ public class SubjectCsvMetaServiceTests
                 Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid()),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -572,10 +585,11 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
+                LocationIds = new List<Guid> { locations[0].Id, locations[3].Id },
                 Indicators = indicators.Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -646,7 +660,7 @@ public class SubjectCsvMetaServiceTests
 
             var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, new List<Observation>());
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -763,10 +777,11 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList(),
+                Filters = [.. filterItems.Select(fi => fi.Id)],
+                Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -941,10 +956,11 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList(),
+                Filters = [.. filter0Items.Concat(filter1Items).Concat(filter2Items).Select(fi => fi.Id)],
+                Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1065,10 +1081,11 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = ListOf(indicators[1].Id, indicators[3].Id),
+                Filters = [.. filterItems.Select(fi => fi.Id)],
+                Indicators = [.. ListOf(indicators[1].Id, indicators[3].Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1178,10 +1195,11 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid()),
+                Filters = [.. filterItems.Select(fi => fi.Id)],
+                Indicators = [.. ListOf(Guid.NewGuid(), Guid.NewGuid())],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1290,10 +1308,11 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id),
+                Filters = [.. filterItems.Select(fi => fi.Id)],
+                Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1438,10 +1457,11 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList(),
+                Filters = [.. filterItems.Select(fi => fi.Id)],
+                Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1527,10 +1547,12 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList(),
+                Filters = [.. filterItems.Select(fi => fi.Id)],
+                LocationIds = [.. observations.Select(o => o.Location.Id)],
+                Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             var viewModel = result.AssertRight();
 
@@ -1643,10 +1665,12 @@ public class SubjectCsvMetaServiceTests
             var query = new FullTableQuery
             {
                 SubjectId = releaseSubject.SubjectId,
-                Indicators = indicators.Select(i => i.Id).ToList(),
+                Filters = [.. filterItems.Select(fi => fi.Id)],
+                LocationIds = [.. observations.Select(o => o.Location.Id)],
+                Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
