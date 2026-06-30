@@ -38,6 +38,9 @@ type AppGatewayBackend = {
 
   @description('Additional health probe HTTP status codes that indicate success')
   healthProbeAdditionalStatusCodeMatches: string[]?
+
+  @description('Interval in seconds that the health probe is called. Defaults to 30 seconds if not set.')
+  intervalSeconds: int?
 }
 
 @export()
