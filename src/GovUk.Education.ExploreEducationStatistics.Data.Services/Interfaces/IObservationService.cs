@@ -8,10 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 public interface IObservationService
 {
     /// <summary>
-    /// Finds <see cref="Observation">Observation rows</see> that match the given
-    /// <see cref="FullTableQuery">Observation query</see> and stores the matching row Ids in the
-    /// <see cref="MatchedObservation">#MatchedObservation temporary table.</see>
-    /// This method then returns the query to select those matching Ids from the temporary table. This query can
+    /// Finds <see cref="Observation" /> rows that match the given
+    /// <see cref="FullTableQuery" /> and stores the matching row Ids in the
+    /// <see cref="MatchedObservation" /> temporary table.
+    /// This method then returns the query to select those matching IDs from the temporary table. This query can
     /// be used by client code to then quickly select against the matched Observations by making use of the
     /// populated temporary table results.
     ///

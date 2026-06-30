@@ -49,7 +49,6 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
     public async Task<Either<ActionResult, SubjectCsvMetaViewModel>> GetSubjectCsvMeta(
         ReleaseSubject releaseSubject,
         FullTableQuery query,
-        IList<Observation> observations,
         CancellationToken cancellationToken = default
     )
     {
@@ -58,8 +57,8 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             .OnSuccess(() => GetCsvStream(releaseSubject, cancellationToken))
             .OnSuccess(async csvStream =>
             {
-                var locations = GetLocations(observations);
-                var filters = await GetFilters(observations);
+                var locations = GetLocations([.. query.LocationIds]);
+                var filters = await GetFilters([.. query.GetFilterItemIds()]);
                 var indicators = await GetIndicators(query);
                 var headers = csvStream is not null
                     ? await ListCsvHeaders(csvStream, filters, indicators)
@@ -158,18 +157,17 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
         return filteredHeaders;
     }
 
-    private static Dictionary<Guid, Dictionary<string, string>> GetLocations(IEnumerable<Observation> observations)
+    private Dictionary<Guid, Dictionary<string, string>> GetLocations(HashSet<Guid> locationIds)
     {
-        return observations
-            .Select(observation => observation.Location)
-            .Distinct()
-            .ToDictionary(location => location.Id, location => location.GetCsvValues());
+        var locations = _statisticsDbContext
+            .Location.AsNoTracking()
+            .Where(location => locationIds.Contains(location.Id));
+        return locations.ToDictionary(location => location.Id, location => location.GetCsvValues());
     }
 
-    private async Task<Dictionary<string, FilterCsvMetaViewModel>> GetFilters(IEnumerable<Observation> observations)
+    private async Task<Dictionary<string, FilterCsvMetaViewModel>> GetFilters(HashSet<Guid> filterItemIds)
     {
-        var filterItems = await _filterItemRepository.GetFilterItemsFromObservations(observations);
-
+        var filterItems = await _filterItemRepository.GetFilterItems(filterItemIds);
         return FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems);
     }
 

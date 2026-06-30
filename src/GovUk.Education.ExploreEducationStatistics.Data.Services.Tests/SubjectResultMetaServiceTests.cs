@@ -121,7 +121,7 @@ public class SubjectResultMetaServiceTests
 
         boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>())).Returns([]);
 
-        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations)).ReturnsAsync([]);
+        filterItemRepository.Setup(s => s.GetFilterItems(query.GetFilterItemIds())).ReturnsAsync([]);
 
         locationService
             .Setup(s =>
@@ -286,7 +286,7 @@ public class SubjectResultMetaServiceTests
             )
             .Returns(new List<BoundaryLevel> { _countriesBoundaryLevel, _regionsBoundaryLevel });
 
-        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations)).ReturnsAsync([]);
+        filterItemRepository.Setup(s => s.GetFilterItems(query.GetFilterItemIds())).ReturnsAsync([]);
 
         footnoteRepository
             .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
