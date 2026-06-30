@@ -57,8 +57,8 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             .OnSuccess(() => GetCsvStream(releaseSubject, cancellationToken))
             .OnSuccess(async csvStream =>
             {
-                var locations = GetLocations(query.LocationIds.Distinct());
-                var filters = await GetFilters(query.GetFilterItemIds().Distinct());
+                var locations = GetLocations([.. query.LocationIds]);
+                var filters = await GetFilters([.. query.GetFilterItemIds()]);
                 var indicators = await GetIndicators(query);
                 var headers = csvStream is not null
                     ? await ListCsvHeaders(csvStream, filters, indicators)
@@ -157,17 +157,15 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
         return filteredHeaders;
     }
 
-    private Dictionary<Guid, Dictionary<string, string>> GetLocations(IEnumerable<Guid> locationIds)
+    private Dictionary<Guid, Dictionary<string, string>> GetLocations(HashSet<Guid> locationIds)
     {
-        var distinctLocationIds = locationIds.Distinct().ToList();
-
         var locations = _statisticsDbContext
             .Location.AsNoTracking()
-            .Where(location => distinctLocationIds.Contains(location.Id));
+            .Where(location => locationIds.Contains(location.Id));
         return locations.ToDictionary(location => location.Id, location => location.GetCsvValues());
     }
 
-    private async Task<Dictionary<string, FilterCsvMetaViewModel>> GetFilters(IEnumerable<Guid> filterItemIds)
+    private async Task<Dictionary<string, FilterCsvMetaViewModel>> GetFilters(HashSet<Guid> filterItemIds)
     {
         var filterItems = await _filterItemRepository.GetFilterItems(filterItemIds);
         return FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems);
