@@ -9,7 +9,7 @@ import tableToolSearchService, {
   PipelineStage,
   SearchStreamOptions,
 } from '@frontend/services/tableToolSearchService';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 
 jest.mock('@frontend/services/tableToolSearchService', () => {
   const actual = jest.requireActual(
@@ -89,15 +89,16 @@ describe('TableToolSearchPage', () => {
       expect.anything(),
     );
 
-    await waitFor(() => {
+    act(() => {
       capturedOptions.onMessage({ stage: PipelineStage.STARTING });
     });
+
     expect(
       screen.getByText('Analysing "test search term"'),
     ).toBeInTheDocument();
     expect(screen.getByText('Processing request')).toBeInTheDocument();
 
-    await waitFor(() => {
+    act(() => {
       capturedOptions.onMessage({
         stage: PipelineStage.RETRIEVED,
         data: {
@@ -112,13 +113,14 @@ describe('TableToolSearchPage', () => {
         },
       });
     });
+
     expect(
       screen.getByText('Identify relevant information from data sets'),
     ).toBeInTheDocument();
     expect(screen.getByText('Dataset A')).toBeInTheDocument();
     expect(screen.getByText('Dataset B')).toBeInTheDocument();
 
-    await waitFor(() => {
+    act(() => {
       capturedOptions.onMessage({
         stage: PipelineStage.RERANKER,
         data: {
@@ -136,6 +138,7 @@ describe('TableToolSearchPage', () => {
         },
       });
     });
+
     expect(
       screen.getByText('Choosing the most relevant data sets'),
     ).toBeInTheDocument();
@@ -143,7 +146,7 @@ describe('TableToolSearchPage', () => {
     expect(screen.getByText('Dataset B')).toBeInTheDocument();
     expect(screen.getByText('85.5% relevance')).toBeInTheDocument();
 
-    await waitFor(() => {
+    act(() => {
       capturedOptions.onMessage({
         stage: PipelineStage.COMPLETE,
         data: {
@@ -193,7 +196,7 @@ describe('TableToolSearchPage', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Search' }));
 
-    await waitFor(() => {
+    act(() => {
       capturedOptions.onMessage({
         stage: PipelineStage.RETRIEVED,
         data: { datasets: [] },
