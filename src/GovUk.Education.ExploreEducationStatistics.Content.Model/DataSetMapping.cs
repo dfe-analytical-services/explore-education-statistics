@@ -241,7 +241,6 @@ public record FilterItemMapping
     public MapStatus Status { get; set; }
 }
 
-// @MarkFix add automapping of filters when first generating a DataSetMapping
 // @MarkFix code to generate replacement plan from filter mappings
 // @MarkFix code to complete replacement based on filter mappings
 // @MarkFix add tests for automapping filters

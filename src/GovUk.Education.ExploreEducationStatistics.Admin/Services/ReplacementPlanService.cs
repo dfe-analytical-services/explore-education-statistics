@@ -12,20 +12,18 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FilterMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.FilterMapping;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReplacementPlanService(
     ContentDbContext contentDbContext,
-    StatisticsDbContext statisticsDbContext,
-    IFilterRepository filterRepository,
     IFootnoteRepository footnoteRepository,
     IDataSetVersionService dataSetVersionService,
     ITimePeriodService timePeriodService,
@@ -147,97 +145,7 @@ public class ReplacementPlanService(
                     ? null
                     : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
 
-                var indicatorMappings = mapping.IndicatorMappings.Values.ToDictionary(
-                    map => map.OriginalId,
-                    map => new ReplacementPlanIndicatorMappingViewModel
-                    {
-                        Source = new ReplacementPlanIndicatorViewModel
-                        {
-                            Id = map.OriginalId,
-                            Name = map.OriginalColumnName,
-                            Label = map.OriginalLabel,
-                        },
-                        Type = map.Status.ToString(),
-                        CandidateKey = map.ReplacementId,
-                    }
-                );
-                var indicatorCandidates = mapping // candidates are all possible replacement indicators
-                    .IndicatorMappings.Values.Where(indMap => indMap.ReplacementId != null)
-                    .Select(indMap => new
-                    {
-                        Id = indMap.ReplacementId!.Value,
-                        ColumnName = indMap.ReplacementColumnName!,
-                        Label = indMap.ReplacementLabel!,
-                    })
-                    .Concat(
-                        mapping.UnmappedReplacementIndicators.Select(i => new
-                        {
-                            i.Id,
-                            i.ColumnName,
-                            i.Label,
-                        })
-                    )
-                    .ToDictionary(
-                        i => i.Id,
-                        i => new ReplacementPlanIndicatorViewModel
-                        {
-                            Id = i.Id,
-                            Name = i.ColumnName,
-                            Label = i.Label,
-                        }
-                    );
-                var locationMappings = mapping.LocationMappings.Values.ToDictionary(
-                    map => map.OriginalId,
-                    map => new ReplacementPlanLocationMappingViewModel
-                    {
-                        Source = new ReplacementPlanLocationViewModel
-                        {
-                            Id = map.OriginalId,
-                            Code = map.OriginalCode,
-                            Name = map.OriginalName,
-                        },
-                        Type = map.Status.ToString(),
-                        CandidateKey = map.ReplacementId,
-                    }
-                );
-                var locationCandidates = mapping // candidates are all possible replacement locations
-                    .LocationMappings.Values.Where(l => l.ReplacementId != null)
-                    .Select(l => new
-                    {
-                        Id = l.ReplacementId!.Value,
-                        Code = l.ReplacementCode!,
-                        Name = l.ReplacementName!,
-                    })
-                    .Concat(
-                        mapping.UnmappedReplacementLocations.Select(l => new
-                        {
-                            l.Id,
-                            l.Code,
-                            l.Name,
-                        })
-                    )
-                    .ToDictionary(
-                        l => l.Id,
-                        l => new ReplacementPlanLocationViewModel
-                        {
-                            Id = l.Id,
-                            Code = l.Code,
-                            Name = l.Name,
-                        }
-                    );
-                var mappingPlan = new ReplacementPlanMappingViewModel
-                {
-                    Indicators = new ReplacementPlanIndicatorsMappingViewModel
-                    {
-                        Mappings = indicatorMappings,
-                        Candidates = indicatorCandidates,
-                    },
-                    Locations = new ReplacementPlanLocationMappingsViewModel
-                    {
-                        Mappings = locationMappings,
-                        Candidates = locationCandidates,
-                    },
-                };
+                var mappingPlan = GenerateMappingViewModel(mapping);
 
                 return new DataReplacementPlanViewModel
                 {
@@ -288,16 +196,12 @@ public class ReplacementPlanService(
 
     private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
     {
-        var filtersIncludingItems = await filterRepository.GetFiltersIncludingItems(subjectId);
-
-        var filters = filtersIncludingItems.ToDictionary(filter => filter.Name, filter => filter);
-
         var timePeriods = await timePeriodService.GetTimePeriods(subjectId);
 
         // We don't need to include data about locations or indicators here - DataSetMapping contains the data we require to
         // validate the replacement
 
-        return new ReplacementSubjectMeta { Filters = filters, TimePeriods = timePeriods };
+        return new ReplacementSubjectMeta { TimePeriods = timePeriods };
     }
 
     private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(
@@ -314,8 +218,7 @@ public class ReplacementPlanService(
             .Where(dataBlock => dataBlock.Query.SubjectId == subjectId)
             .Select(dataBlock =>
             {
-                var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
-                var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
+                var existingFilters = ValidateFiltersForDataBlock(dataBlock.Query.GetFilterItemIds(), mapping);
                 var indicatorGroups = CreateIndicatorGroupReplacementViewModel(dataBlock.Query.Indicators, mapping);
                 var locations = ValidateLocationsForDataBlock(dataBlock.Query.LocationIds, mapping);
                 var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
@@ -324,7 +227,6 @@ public class ReplacementPlanService(
                     dataBlock.Id,
                     dataBlock.Name,
                     existingFilters,
-                    newlyIntroducedFilters,
                     indicatorGroups,
                     locations,
                     timePeriods
@@ -350,9 +252,9 @@ public class ReplacementPlanService(
         DataSetMapping mapping
     )
     {
-        var filters = ValidateFiltersForFootnote(footnote, replacementSubjectMeta);
-        var filterGroups = ValidateFilterGroupsForFootnote(footnote, replacementSubjectMeta);
-        var filterItems = ValidateFilterItemsForFootnote(footnote, replacementSubjectMeta);
+        var filters = ValidateFiltersForFootnote(footnote, mapping);
+        var filterGroups = ValidateFilterGroupsForFootnote(footnote, mapping);
+        var filterItems = ValidateFilterItemsForFootnote(footnote, mapping);
         var indicatorGroups = CreateIndicatorGroupReplacementViewModel(
             footnote.Indicators.Select(indFootnote => indFootnote.IndicatorId),
             mapping
@@ -370,153 +272,132 @@ public class ReplacementPlanService(
 
     private static List<FootnoteFilterReplacementViewModel> ValidateFiltersForFootnote(
         Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta
+        DataSetMapping mapping
     )
     {
-        return footnote
-            .Filters.Select(filterFootnote => filterFootnote.Filter)
-            .OrderBy(filter => filter.Label, LabelComparer)
-            .Select(filter => new FootnoteFilterReplacementViewModel(
-                id: filter.Id,
-                label: filter.Label,
-                target: FindReplacementFilter(replacementSubjectMeta, filter.Name)?.Id
+        var footnoteFilterIds = footnote.Filters.Select(f => f.FilterId).ToHashSet();
+
+        return mapping
+            .FilterMappings.Values.Where(filterMap => footnoteFilterIds.Contains(filterMap.OriginalId))
+            .Select(filterMap => new FootnoteFilterReplacementViewModel(
+                id: filterMap.OriginalId,
+                label: filterMap.OriginalLabel,
+                target: filterMap.ReplacementId
             ))
+            .OrderBy(f => f.Label, LabelComparer)
             .ToList();
     }
 
     private static List<FootnoteFilterGroupReplacementViewModel> ValidateFilterGroupsForFootnote(
         Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta
+        DataSetMapping mapping
     )
     {
-        return footnote
-            .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-            .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
-            .Select(filterGroup => new FootnoteFilterGroupReplacementViewModel(
-                id: filterGroup.Id,
-                label: filterGroup.Label,
-                filterId: filterGroup.FilterId,
-                filterLabel: filterGroup.Filter.Label,
-                target: FindReplacementFilterGroup(
-                    replacementSubjectMeta,
-                    filterGroup.Filter.Name,
-                    filterGroup.Label
-                )?.Id
+        var footnoteFilterGroupIds = footnote.FilterGroups.Select(g => g.FilterGroupId).ToHashSet();
+        return mapping
+            .FilterMappings.Values.SelectMany(
+                filterMap => filterMap.FilterGroupMappings.Values,
+                (filterMap, groupMap) =>
+                    new
+                    {
+                        FilterId = filterMap.OriginalId,
+                        FilterLabel = filterMap.OriginalLabel,
+                        Group = groupMap,
+                    }
+            )
+            .Where(pair => footnoteFilterGroupIds.Contains(pair.Group.OriginalId))
+            .Select(pair => new FootnoteFilterGroupReplacementViewModel(
+                id: pair.Group.OriginalId,
+                label: pair.Group.OriginalLabel,
+                filterId: pair.FilterId,
+                filterLabel: pair.FilterLabel,
+                target: pair.Group.ReplacementId
             ))
+            .OrderBy(f => f.Label, LabelComparer)
             .ToList();
     }
 
     private static List<FootnoteFilterItemReplacementViewModel> ValidateFilterItemsForFootnote(
         Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta
+        DataSetMapping mapping
     )
     {
-        return footnote
-            .FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItem)
-            .OrderBy(filterItem => filterItem.Label, LabelComparer)
-            .Select(filterItem => new FootnoteFilterItemReplacementViewModel(
-                id: filterItem.Id,
-                label: filterItem.Label,
-                filterId: filterItem.FilterGroup.FilterId,
-                filterLabel: filterItem.FilterGroup.Filter.Label,
-                filterGroupId: filterItem.FilterGroupId,
-                filterGroupLabel: filterItem.FilterGroup.Label,
-                target: FindReplacementFilterItem(
-                    replacementSubjectMeta,
-                    filterItem.FilterGroup.Filter.Name,
-                    filterItem.FilterGroup.Label,
-                    filterItem.Label
-                )?.Id
+        var footnoteFilterItemIds = footnote.FilterItems.Select(f => f.FilterItemId).ToHashSet();
+        return mapping
+            .FilterMappings.Values.SelectMany(
+                filterMap => filterMap.FilterGroupMappings.Values,
+                (filterMap, groupMap) => new { Filter = filterMap, FilterGroup = groupMap }
+            )
+            .SelectMany(
+                x => x.FilterGroup.FilterItemMappings.Values,
+                (x, itemMap) =>
+                    new
+                    {
+                        x.Filter,
+                        x.FilterGroup,
+                        FilterItem = itemMap,
+                    }
+            )
+            .Where(x => footnoteFilterItemIds.Contains(x.FilterItem.OriginalId))
+            .Select(x => new FootnoteFilterItemReplacementViewModel(
+                id: x.FilterItem.OriginalId,
+                label: x.FilterItem.OriginalLabel,
+                filterId: x.Filter.OriginalId,
+                filterLabel: x.Filter.OriginalLabel,
+                filterGroupId: x.FilterGroup.OriginalId,
+                filterGroupLabel: x.FilterGroup.OriginalLabel,
+                target: x.FilterItem.ReplacementId
             ))
-            .ToList();
+            .ToList(); // @MarkFix you finished here!!!! you didn't read through this to ensure it is correct
     }
 
-    private List<FilterReplacementViewModel> FindNewlyIntroducedFiltersForDataBlock(
-        DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta
+    private static Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
+        List<Guid> dataBlockFilterItemIds,
+        DataSetMapping mapping
     )
     {
-        var existingFilterItemIds = dataBlock.Query.GetFilterItemIds();
-
-        var existingFilterNames = statisticsDbContext
-            .FilterItem.AsQueryable()
-            .Where(fi => existingFilterItemIds.Contains(fi.Id))
-            .Select(fi => fi.FilterGroup.Filter)
-            .Select(f => f.Name)
-            .Distinct()
-            .ToList();
-
-        return replacementSubjectMeta
-            .Filters.Select(d => d.Value)
-            .ToList()
-            .Where(f => !existingFilterNames.Contains(f.Name))
-            .Select(CreateNewlyIntroducedFilterReplacementViewModel)
-            .ToList();
-    }
-
-    private static FilterReplacementViewModel CreateNewlyIntroducedFilterReplacementViewModel(Filter filter)
-    {
-        var filterGroupReplacementViewModels = filter
-            .FilterGroups.Select(fg => new FilterGroupReplacementViewModel(
-                fg.Id,
-                fg.Label,
-                fg.FilterItems.Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null))
-            ))
-            .ToDictionary(f => f.Id);
-
-        return new FilterReplacementViewModel(
-            filter.Id,
-            target: null, // null because this a new filter, therefore not replacing any existing filter
-            filter.Label,
-            filter.Name,
-            filterGroupReplacementViewModels
-        );
-    }
-
-    private Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
-        DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta
-    )
-    {
-        return statisticsDbContext
-            .FilterItem.AsQueryable()
-            .Where(filterItem => dataBlock.Query.GetFilterItemIds().Contains(filterItem.Id))
-            .Include(filterItem => filterItem.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
-            .ToList()
-            .GroupBy(filterItem => filterItem.FilterGroup.Filter)
-            .OrderBy(filter => filter.Key.Label, LabelComparer)
+        return mapping
+            .FilterMappings.Values.Where(filterMap =>
+                filterMap
+                    .FilterGroupMappings.Values.SelectMany(groupMap => groupMap.FilterItemMappings.Values)
+                    .Select(item => item.OriginalId)
+                    .Any(dataBlockFilterItemIds.Contains)
+            )
             .ToDictionary(
-                filter => filter.Key.Id,
-                filter =>
-                {
-                    return new FilterReplacementViewModel(
-                        id: filter.Key.Id,
-                        target: FindReplacementFilter(replacementSubjectMeta, filter.Key.Name)?.Id,
-                        name: filter.Key.Name,
-                        label: filter.Key.Label,
-                        groups: filter
-                            .GroupBy(filterItem => filterItem.FilterGroup)
-                            .OrderBy(group => group.Key.Label, LabelComparer)
-                            .ToDictionary(
-                                group => group.Key.Id,
-                                group =>
-                                    ValidateFilterGroupForReplacement(
-                                        new FilterGroup
-                                        {
-                                            Id = group.Key.Id,
-                                            Label = group.Key.Label,
-                                            FilterItems = group.Key.FilterItems.Intersect(filter).ToList(),
-                                        },
-                                        replacementSubjectMeta
+                filterMap => filterMap.OriginalId,
+                filterMap => new FilterReplacementViewModel(
+                    id: filterMap.OriginalId,
+                    name: filterMap.OriginalColumnName,
+                    label: filterMap.OriginalLabel,
+                    target: filterMap.ReplacementId,
+                    groups: filterMap
+                        .FilterGroupMappings.Values.Where(groupMap =>
+                            groupMap
+                                .FilterItemMappings.Values.Select(item => item.OriginalId)
+                                .Any(dataBlockFilterItemIds.Contains)
+                        )
+                        .ToDictionary(
+                            groupMap => groupMap.OriginalId,
+                            groupMap => new FilterGroupReplacementViewModel(
+                                id: groupMap.OriginalId,
+                                label: groupMap.OriginalLabel,
+                                target: groupMap.ReplacementId,
+                                filters: groupMap
+                                    .FilterItemMappings.Values.Where(itemMap =>
+                                        dataBlockFilterItemIds.Contains(itemMap.OriginalId)
                                     )
+                                    .Select(itemMap => new FilterItemReplacementViewModel(
+                                        id: itemMap.OriginalId,
+                                        label: itemMap.OriginalLabel,
+                                        target: itemMap.ReplacementId
+                                    ))
                             )
-                    );
-                }
+                        )
+                )
             );
     }
 
-    private Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
+    private static Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
         List<Guid> dataBlockLocationIds,
         DataSetMapping mapping
     )
@@ -569,37 +450,6 @@ public class ReplacementPlanService(
             year: year,
             code: code,
             valid: replacementSubjectMeta.TimePeriods.Contains((year, code))
-        );
-    }
-
-    private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(
-        FilterGroup filterGroup,
-        ReplacementSubjectMeta replacementSubjectMeta
-    )
-    {
-        return new FilterGroupReplacementViewModel(
-            id: filterGroup.Id,
-            label: filterGroup.Label,
-            filters: filterGroup
-                .FilterItems.Select(item => ValidateFilterItemForReplacement(item, replacementSubjectMeta))
-                .OrderBy(item => item.Label, LabelComparer)
-        );
-    }
-
-    private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(
-        FilterItem filterItem,
-        ReplacementSubjectMeta replacementSubjectMeta
-    )
-    {
-        return new FilterItemReplacementViewModel(
-            id: filterItem.Id,
-            label: filterItem.Label,
-            target: FindReplacementFilterItem(
-                replacementSubjectMeta,
-                filterItem.FilterGroup.Filter.Name,
-                filterItem.FilterGroup.Label,
-                filterItem.Label
-            )?.Id
         );
     }
 
@@ -657,7 +507,209 @@ public class ReplacementPlanService(
 
     private class ReplacementSubjectMeta
     {
-        public Dictionary<string, Filter> Filters { get; set; } = new();
+        public Dictionary<string, Filter> Filters { get; set; } = new(); // @MarkFix remove
         public IList<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; } = null!;
+    }
+
+    private static ReplacementPlanMappingViewModel GenerateMappingViewModel(DataSetMapping mapping)
+    {
+        var indicatorMappings = mapping.IndicatorMappings.Values.ToDictionary(
+            map => map.OriginalId,
+            map => new ReplacementPlanIndicatorMappingViewModel
+            {
+                Source = new ReplacementPlanIndicatorViewModel
+                {
+                    Id = map.OriginalId,
+                    Name = map.OriginalColumnName,
+                    Label = map.OriginalLabel,
+                },
+                Type = map.Status.ToString(),
+                CandidateKey = map.ReplacementId,
+            }
+        );
+        var indicatorCandidates = mapping // candidates are all possible replacement indicators
+            .IndicatorMappings.Values.Where(indMap => indMap.ReplacementId != null)
+            .Select(indMap => new
+            {
+                Id = indMap.ReplacementId!.Value,
+                ColumnName = indMap.ReplacementColumnName!,
+                Label = indMap.ReplacementLabel!,
+            })
+            .Concat(
+                mapping.UnmappedReplacementIndicators.Select(i => new
+                {
+                    i.Id,
+                    i.ColumnName,
+                    i.Label,
+                })
+            )
+            .ToDictionary(
+                i => i.Id,
+                i => new ReplacementPlanIndicatorViewModel
+                {
+                    Id = i.Id,
+                    Name = i.ColumnName,
+                    Label = i.Label,
+                }
+            );
+        var locationMappings = mapping.LocationMappings.Values.ToDictionary(
+            map => map.OriginalId,
+            map => new ReplacementPlanLocationMappingViewModel
+            {
+                Source = new ReplacementPlanLocationViewModel
+                {
+                    Id = map.OriginalId,
+                    Code = map.OriginalCode,
+                    Name = map.OriginalName,
+                },
+                Type = map.Status.ToString(),
+                CandidateKey = map.ReplacementId,
+            }
+        );
+        var locationCandidates = mapping // candidates are all possible replacement locations
+            .LocationMappings.Values.Where(l => l.ReplacementId != null)
+            .Select(l => new
+            {
+                Id = l.ReplacementId!.Value,
+                Code = l.ReplacementCode!,
+                Name = l.ReplacementName!,
+            })
+            .Concat(
+                mapping.UnmappedReplacementLocations.Select(l => new
+                {
+                    l.Id,
+                    l.Code,
+                    l.Name,
+                })
+            )
+            .ToDictionary(
+                l => l.Id,
+                l => new ReplacementPlanLocationViewModel
+                {
+                    Id = l.Id,
+                    Code = l.Code,
+                    Name = l.Name,
+                }
+            );
+
+        var filterMappings = mapping.FilterMappings.Values.ToDictionary(
+            f => f.OriginalId,
+            f => new ReplacementPlanFilterMappingViewModel
+            {
+                Source = new ReplacementPlanFilterViewModel
+                {
+                    Id = f.OriginalId,
+                    Name = f.OriginalColumnName,
+                    Label = f.OriginalLabel,
+                },
+                CandidateKey = f.ReplacementId,
+                Type = f.Status.ToString(),
+                FilterGroups = GenerateFilterGroupMappingsViewModel(f),
+            }
+        );
+
+        var filterCandidates = mapping
+            .FilterMappings.Values.Where(filterMap => filterMap.ReplacementId != null)
+            .Select(filterMap => new
+            {
+                Id = filterMap.ReplacementId!.Value,
+                Label = filterMap.ReplacementLabel!,
+                Name = filterMap.ReplacementColumnName!,
+            })
+            .Concat(
+                mapping.UnmappedReplacementFilters.Select(unmappedFilter => new
+                {
+                    unmappedFilter.Id,
+                    unmappedFilter.Label,
+                    Name = unmappedFilter.ColumnName,
+                })
+            )
+            .ToDictionary(
+                x => x.Id,
+                x => new ReplacementPlanFilterViewModel
+                {
+                    Id = x.Id,
+                    Label = x.Label,
+                    Name = x.Name,
+                }
+            );
+
+        return new ReplacementPlanMappingViewModel
+        {
+            Indicators = new ReplacementPlanIndicatorsMappingViewModel
+            {
+                Mappings = indicatorMappings,
+                Candidates = indicatorCandidates,
+            },
+            Locations = new ReplacementPlanLocationMappingsViewModel
+            {
+                Mappings = locationMappings,
+                Candidates = locationCandidates,
+            },
+            Filters = new ReplacementPlanFilterMappingsViewModel
+            {
+                Mappings = filterMappings,
+                Candidates = filterCandidates,
+            },
+        };
+    }
+
+    private static ReplacementPlanFilterGroupMappingsViewModel GenerateFilterGroupMappingsViewModel(
+        Content.Model.FilterMapping filterMapping
+    )
+    {
+        return new ReplacementPlanFilterGroupMappingsViewModel
+        {
+            Mappings = filterMapping.FilterGroupMappings.Values.ToDictionary(
+                g => g.OriginalId,
+                g => new ReplacementPlanFilterGroupMappingViewModel
+                {
+                    Source = new ReplacementPlanFilterGroupViewModel { Id = g.OriginalId, Label = g.OriginalLabel },
+                    CandidateKey = g.ReplacementId,
+                    Type = g.Status.ToString(),
+                    FilterItems = GenerateFilterItemMappingsViewModel(g),
+                }
+            ),
+            Candidates = filterMapping
+                .FilterGroupMappings.Values.Where(f => f.ReplacementId != null)
+                .Select(groupMap => new { Id = groupMap.ReplacementId!.Value, Label = groupMap.ReplacementLabel! })
+                .Concat(
+                    filterMapping.UnmappedReplacementFilterGroups.Select(unmappedGroup => new
+                    {
+                        unmappedGroup.Id,
+                        unmappedGroup.Label,
+                    })
+                )
+                .ToDictionary(x => x.Id, x => new ReplacementPlanFilterGroupViewModel { Id = x.Id, Label = x.Label }),
+        };
+    }
+
+    private static ReplacementPlanFilterItemMappingsViewModel GenerateFilterItemMappingsViewModel(
+        FilterGroupMapping groupMapping
+    )
+    {
+        return new ReplacementPlanFilterItemMappingsViewModel
+        {
+            Mappings = groupMapping.FilterItemMappings.Values.ToDictionary(
+                i => i.OriginalId,
+                i => new ReplacementPlanFilterItemMappingViewModel
+                {
+                    Source = new ReplacementPlanFilterItemViewModel { Id = i.OriginalId, Label = i.OriginalLabel },
+                    CandidateKey = i.ReplacementId,
+                    Type = i.Status.ToString(),
+                }
+            ),
+            Candidates = groupMapping
+                .FilterItemMappings.Values.Where(itemMap => itemMap.ReplacementId != null)
+                .Select(itemMap => new { Id = itemMap.ReplacementId!.Value, Label = itemMap.ReplacementLabel! })
+                .Concat(
+                    groupMapping.UnmappedReplacementFilterItems.Select(unmappedItem => new
+                    {
+                        unmappedItem.Id,
+                        unmappedItem.Label,
+                    })
+                )
+                .ToDictionary(x => x.Id, x => new ReplacementPlanFilterItemViewModel { Id = x.Id, Label = x.Label }),
+        };
     }
 }

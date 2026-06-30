@@ -38,7 +38,7 @@ public abstract class DataReplacementControllerTests
                     new DataBlockReplacementPlanViewModel(
                         id: Guid.NewGuid(),
                         name: "my data block",
-                        originalFilters: new Dictionary<Guid, FilterReplacementViewModel>
+                        filters: new Dictionary<Guid, FilterReplacementViewModel>
                         {
                             {
                                 Guid.NewGuid(),

@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
@@ -39,38 +38,27 @@ public class DataReplacementPlanViewModel
     }
 }
 
-public class DataBlockReplacementPlanViewModel
+public class DataBlockReplacementPlanViewModel(
+    Guid id,
+    string name,
+    Dictionary<Guid, FilterReplacementViewModel>? filters = null,
+    Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicators = null,
+    Dictionary<string, LocationReplacementViewModel>? locations = null,
+    TimePeriodRangeReplacementViewModel? timePeriods = null
+)
 {
-    public Guid Id { get; }
-    public string Name { get; }
-    public Dictionary<Guid, FilterReplacementViewModel> Filters { get; }
-    private List<FilterReplacementViewModel> NewlyIntroducedFilters { get; }
-    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; }
-    public Dictionary<string, LocationReplacementViewModel> Locations { get; } // Key is GeographicLevel
-    public TimePeriodRangeReplacementViewModel? TimePeriods { get; }
-
-    public DataBlockReplacementPlanViewModel(
-        Guid id,
-        string name,
-        Dictionary<Guid, FilterReplacementViewModel>? originalFilters = null,
-        List<FilterReplacementViewModel>? newlyIntroducedFilters = null,
-        Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicators = null,
-        Dictionary<string, LocationReplacementViewModel>? locations = null,
-        TimePeriodRangeReplacementViewModel? timePeriods = null
-    )
-    {
-        Id = id;
-        Name = name;
-        Filters = originalFilters ?? new Dictionary<Guid, FilterReplacementViewModel>();
-        NewlyIntroducedFilters = newlyIntroducedFilters ?? new List<FilterReplacementViewModel>();
-        IndicatorGroups = indicators ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
-        Locations = locations ?? new Dictionary<string, LocationReplacementViewModel>();
-        TimePeriods = timePeriods;
-    }
+    public Guid Id { get; } = id;
+    public string Name { get; } = name;
+    public Dictionary<Guid, FilterReplacementViewModel> Filters { get; } =
+        filters ?? new Dictionary<Guid, FilterReplacementViewModel>();
+    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; } =
+        indicators ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
+    public Dictionary<string, LocationReplacementViewModel> Locations { get; } =
+        locations ?? new Dictionary<string, LocationReplacementViewModel>(); // Key is GeographicLevel
+    public TimePeriodRangeReplacementViewModel? TimePeriods { get; } = timePeriods;
 
     public bool Valid =>
-        NewlyIntroducedFilters.IsNullOrEmpty()
-        && Filters.All(model => model.Value.Valid)
+        Filters.All(model => model.Value.Valid)
         && IndicatorGroups.All(model => model.Value.Valid)
         && Locations.Values.All(model => model.Valid)
         && (TimePeriods?.Valid ?? true);
@@ -81,31 +69,25 @@ public class DataBlockReplacementPlanViewModel
     }
 }
 
-public class FootnoteReplacementPlanViewModel
+public class FootnoteReplacementPlanViewModel(
+    Guid id,
+    string content,
+    IEnumerable<FootnoteFilterReplacementViewModel>? filters = null,
+    IEnumerable<FootnoteFilterGroupReplacementViewModel>? filterGroups = null,
+    IEnumerable<FootnoteFilterItemReplacementViewModel>? filterItems = null,
+    Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicatorGroups = null
+)
 {
-    public Guid Id { get; }
-    public string Content { get; }
-    public IEnumerable<FootnoteFilterReplacementViewModel> Filters { get; }
-    public IEnumerable<FootnoteFilterGroupReplacementViewModel> FilterGroups { get; }
-    public IEnumerable<FootnoteFilterItemReplacementViewModel> FilterItems { get; }
-    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; }
-
-    public FootnoteReplacementPlanViewModel(
-        Guid id,
-        string content,
-        IEnumerable<FootnoteFilterReplacementViewModel>? filters = null,
-        IEnumerable<FootnoteFilterGroupReplacementViewModel>? filterGroups = null,
-        IEnumerable<FootnoteFilterItemReplacementViewModel>? filterItems = null,
-        Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicatorGroups = null
-    )
-    {
-        Id = id;
-        Content = content;
-        Filters = filters ?? new List<FootnoteFilterReplacementViewModel>();
-        FilterGroups = filterGroups ?? new List<FootnoteFilterGroupReplacementViewModel>();
-        FilterItems = filterItems ?? new List<FootnoteFilterItemReplacementViewModel>();
-        IndicatorGroups = indicatorGroups ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
-    }
+    public Guid Id { get; } = id;
+    public string Content { get; } = content;
+    public IEnumerable<FootnoteFilterReplacementViewModel> Filters { get; } =
+        filters ?? new List<FootnoteFilterReplacementViewModel>();
+    public IEnumerable<FootnoteFilterGroupReplacementViewModel> FilterGroups { get; } =
+        filterGroups ?? new List<FootnoteFilterGroupReplacementViewModel>();
+    public IEnumerable<FootnoteFilterItemReplacementViewModel> FilterItems { get; } =
+        filterItems ?? new List<FootnoteFilterItemReplacementViewModel>();
+    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; } =
+        indicatorGroups ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
 
     public bool Valid =>
         Filters.All(model => model.Valid)
@@ -119,54 +101,35 @@ public class FootnoteReplacementPlanViewModel
     }
 }
 
-public class FootnoteFilterReplacementViewModel : TargetableReplacementViewModel
+public class FootnoteFilterReplacementViewModel(Guid id, string label, Guid? target)
+    : TargetableReplacementViewModel(id, label, target);
+
+public class FootnoteFilterGroupReplacementViewModel(
+    Guid id,
+    string label,
+    Guid? target,
+    Guid filterId,
+    string filterLabel
+) : TargetableReplacementViewModel(id, label, target)
 {
-    public FootnoteFilterReplacementViewModel(Guid id, string label, Guid? target)
-        : base(id, label, target) { }
+    public Guid FilterId { get; } = filterId;
+    public string FilterLabel { get; } = filterLabel;
 }
 
-public class FootnoteFilterGroupReplacementViewModel : TargetableReplacementViewModel
+public class FootnoteFilterItemReplacementViewModel(
+    Guid id,
+    string label,
+    Guid? target,
+    Guid filterGroupId,
+    string filterGroupLabel,
+    Guid filterId,
+    string filterLabel
+) : TargetableReplacementViewModel(id, label, target)
 {
-    public Guid FilterId { get; }
-    public string FilterLabel { get; }
-
-    public FootnoteFilterGroupReplacementViewModel(
-        Guid id,
-        string label,
-        Guid? target,
-        Guid filterId,
-        string filterLabel
-    )
-        : base(id, label, target)
-    {
-        FilterId = filterId;
-        FilterLabel = filterLabel;
-    }
-}
-
-public class FootnoteFilterItemReplacementViewModel : TargetableReplacementViewModel
-{
-    public Guid FilterGroupId { get; }
-    public string FilterGroupLabel { get; }
-    public Guid FilterId { get; }
-    public string FilterLabel { get; }
-
-    public FootnoteFilterItemReplacementViewModel(
-        Guid id,
-        string label,
-        Guid? target,
-        Guid filterGroupId,
-        string filterGroupLabel,
-        Guid filterId,
-        string filterLabel
-    )
-        : base(id, label, target)
-    {
-        FilterGroupId = filterGroupId;
-        FilterGroupLabel = filterGroupLabel;
-        FilterId = filterId;
-        FilterLabel = filterLabel;
-    }
+    public Guid FilterGroupId { get; } = filterGroupId;
+    public string FilterGroupLabel { get; } = filterGroupLabel;
+    public Guid FilterId { get; } = filterId;
+    public string FilterLabel { get; } = filterLabel;
 }
 
 public class FilterReplacementViewModel(
@@ -183,40 +146,31 @@ public class FilterReplacementViewModel(
     public string Name { get; } = name;
     public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; } = groups;
 
-    public bool Valid => Groups.All(group => group.Value.Valid);
+    public bool Valid => Target.HasValue && Groups.All(group => group.Value.Valid);
 }
 
-public class FilterGroupReplacementViewModel
+public class FilterGroupReplacementViewModel(
+    Guid id,
+    string label,
+    Guid? target,
+    IEnumerable<FilterItemReplacementViewModel> filters
+)
 {
-    public Guid Id { get; }
-    public string Label { get; }
-    public IEnumerable<FilterItemReplacementViewModel> Filters { get; }
+    public Guid Id { get; } = id;
+    public string Label { get; } = label;
+    public Guid? Target { get; } = target;
+    public IEnumerable<FilterItemReplacementViewModel> Filters { get; } = filters; // @MarkFix rename to Items
 
-    public bool Valid => Filters.All(filter => filter.Valid);
-
-    public FilterGroupReplacementViewModel(Guid id, string label, IEnumerable<FilterItemReplacementViewModel> filters)
-    {
-        Id = id;
-        Label = label;
-        Filters = filters;
-    }
+    public bool Valid => Target.HasValue && Filters.All(filter => filter.Valid);
 }
 
-public class FilterItemReplacementViewModel : TargetableReplacementViewModel
-{
-    public FilterItemReplacementViewModel(Guid id, string label, Guid? target)
-        : base(id, label, target) { }
-}
+public class FilterItemReplacementViewModel(Guid id, string label, Guid? target)
+    : TargetableReplacementViewModel(id, label, target);
 
-public class IndicatorReplacementViewModel : TargetableReplacementViewModel
+public class IndicatorReplacementViewModel(Guid id, string label, Guid? target, string name)
+    : TargetableReplacementViewModel(id, label, target)
 {
-    public string Name { get; }
-
-    public IndicatorReplacementViewModel(Guid id, string label, Guid? target, string name)
-        : base(id, label, target)
-    {
-        Name = name; // csv column name
-    }
+    public string Name { get; } = name; // csv column name
 }
 
 public class IndicatorGroupReplacementViewModel
@@ -396,7 +350,7 @@ public record ReplacementPlanFilterMappingsViewModel
     public Dictionary<Guid, ReplacementPlanFilterMappingViewModel> Mappings { get; init; } = new();
 
     // Key is replacement filter id
-    public Dictionary<Guid, ReplacementPlanFilterViewModel> Candidates { get; init; } = new();
+    public Dictionary<Guid, ReplacementPlanFilterViewModel> Candidates { get; init; } = new(); // @MarkFix this needs to contain all groups and items too
 }
 
 public record ReplacementPlanFilterMappingViewModel
@@ -405,7 +359,7 @@ public record ReplacementPlanFilterMappingViewModel
     public string Type { get; init; } = "";
     public Guid? CandidateKey { get; init; } // replacement filter id
 
-    public ReplacementPlanFilterGroupMappingsViewModel FilterGroup { get; init; } = null!;
+    public ReplacementPlanFilterGroupMappingsViewModel FilterGroups { get; init; } = null!;
 }
 
 public record ReplacementPlanFilterViewModel
@@ -426,11 +380,11 @@ public record ReplacementPlanFilterGroupMappingsViewModel
 
 public record ReplacementPlanFilterGroupMappingViewModel
 {
-    public ReplacementPlanFilterItemViewModel Source { get; init; } = null!;
+    public ReplacementPlanFilterGroupViewModel Source { get; init; } = null!;
     public string Type { get; init; } = "";
     public Guid? CandidateKey { get; init; } // replacement filter group id
 
-    public ReplacementPlanFilterItemMappingsViewModel FilterItem { get; init; } = null!;
+    public ReplacementPlanFilterItemMappingsViewModel FilterItems { get; init; } = null!;
 }
 
 public record ReplacementPlanFilterGroupViewModel
