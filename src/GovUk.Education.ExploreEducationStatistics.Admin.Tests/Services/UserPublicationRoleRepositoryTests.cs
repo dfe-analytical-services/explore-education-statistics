@@ -688,8 +688,7 @@ public abstract class UserPublicationRoleRepositoryTests
 
                 var result = await repository.GetByCompositeKey(
                     userId: userPublicationRole.UserId,
-                    publicationId: userPublicationRole.PublicationId,
-                    role: userPublicationRole.Role
+                    publicationId: userPublicationRole.PublicationId
                 );
 
                 Assert.NotNull(result);
@@ -708,11 +707,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             var repository = CreateRepository();
 
-            var result = await repository.GetByCompositeKey(
-                userId: Guid.NewGuid(),
-                publicationId: Guid.NewGuid(),
-                role: PublicationRole.Drafter
-            );
+            var result = await repository.GetByCompositeKey(userId: Guid.NewGuid(), publicationId: Guid.NewGuid());
 
             Assert.Null(result);
         }
