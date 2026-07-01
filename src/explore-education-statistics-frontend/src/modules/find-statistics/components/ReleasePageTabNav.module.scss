@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .nav {
   @include govuk-media-query($from: tablet) {
@@ -15,7 +15,7 @@
 
 .navList {
   list-style: none;
-  border-bottom: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid govuk-functional-colour(border);
   padding: govuk-spacing(2) 0;
   margin: 0 0 govuk-spacing(2);
 
@@ -43,7 +43,7 @@
   margin: 0 0 govuk-spacing(3);
   border-left-width: 5px;
   text-decoration: none;
-  color: $govuk-link-colour;
+  color: govuk-functional-colour(link);
 
   @include govuk-media-query($from: tablet) {
     margin: 0;
@@ -72,14 +72,14 @@
 
   &:hover:not(:focus) {
     text-decoration: underline;
-    color: $govuk-link-hover-colour;
+    color: govuk-functional-colour(link-hover);
   }
 
   &:visited:not(:focus) {
-    color: $govuk-link-colour;
+    color: govuk-functional-colour(link);
   }
 
   &:focus {
-    color: $govuk-focus-text-colour;
+    color: govuk-functional-colour(focus-text);
   }
 }

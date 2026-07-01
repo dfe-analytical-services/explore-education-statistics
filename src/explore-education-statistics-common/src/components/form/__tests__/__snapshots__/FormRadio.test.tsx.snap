@@ -71,7 +71,7 @@ exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
     Test radio
   </label>
   <div id="test-radio-item-hint"
-       class="govuk-hint govuk-radios__hint"
+       class="govuk-hint govuk-radios__hint govuk-!-font-size-16"
   >
     Click me to proceed
   </div>

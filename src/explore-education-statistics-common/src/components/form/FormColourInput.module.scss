@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .button {
   align-items: center;
@@ -10,7 +10,7 @@
   padding: 0;
 
   &:focus {
-    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline: govuk-functional-colour(focus) solid $govuk-focus-width;
   }
 }
 
@@ -23,7 +23,7 @@
   padding: govuk-spacing(1);
 
   &:focus {
-    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline: govuk-functional-colour(focus) solid $govuk-focus-width;
   }
 }
 

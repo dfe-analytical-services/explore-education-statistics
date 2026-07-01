@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .tile {
-  background: $govuk-brand-colour;
+  background: govuk-functional-colour(brand);
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -17,7 +17,7 @@
 
   @media print {
     background: none;
-    border-left: 4px solid $govuk-brand-colour;
+    border-left: 4px solid govuk-functional-colour(brand);
   }
 
   > * {

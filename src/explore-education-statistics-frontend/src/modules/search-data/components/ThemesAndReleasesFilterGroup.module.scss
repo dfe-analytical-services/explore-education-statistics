@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .expandedThemeContainer {
-  border-left: 4px solid govuk-colour('mid-grey');
+  border-left: 4px solid govuk-colour('black', $variant: 'tint-80');
   padding: 0 0 govuk-spacing(0) govuk-spacing(4);
   margin-bottom: govuk-spacing(2);
   margin-top: govuk-spacing(1);

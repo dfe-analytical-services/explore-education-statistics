@@ -1,17 +1,17 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .dfe-border {
-  border: 1px solid govuk-colour('mid-grey');
+  border: 1px solid govuk-colour('black', $variant: 'tint-80');
 }
 
 .dfe-border-bottom {
-  border-bottom: 1px solid govuk-colour('mid-grey');
+  border-bottom: 1px solid govuk-colour('black', $variant: 'tint-80');
 }
 
 .dfe-border-top {
-  border-top: 1px solid govuk-colour('mid-grey');
+  border-top: 1px solid govuk-colour('black', $variant: 'tint-80');
 }
 
 .dfe-border-right {
-  border-right: 1px solid govuk-colour('mid-grey');
+  border-right: 1px solid govuk-colour('black', $variant: 'tint-80');
 }

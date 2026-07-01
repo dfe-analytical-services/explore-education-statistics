@@ -58,7 +58,6 @@ const LocationFiltersForm = ({
         label: opt.label,
         value: opt.id ?? '',
         hint: `URN: ${opt.value}`,
-        hintSmall: true,
       }));
     }
     return opts.flatMap(group => {
@@ -73,7 +72,6 @@ const LocationFiltersForm = ({
           label: opt.label,
           value: opt.id ?? '',
           hint: `URN: ${opt.value}; ${level}`,
-          hintSmall: true,
         })) ?? []
       );
     });

@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .buttonContainer {
   display: flex;
@@ -8,8 +8,8 @@
 .button {
   $button-margin: govuk-spacing(2);
 
-  background: govuk-colour('light-grey');
-  border: 1px solid govuk-colour('mid-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
+  border: 1px solid govuk-colour('black', $variant: 'tint-80');
   cursor: pointer;
   display: flex;
   flex-basis: calc(50% - #{$button-margin});
@@ -34,11 +34,11 @@
   &:hover,
   &:focus,
   &[aria-pressed='true'] {
-    background-color: govuk-colour('light-blue');
+    background-color: govuk-colour('blue', $variant: 'tint-25');
     border-color: transparent;
     box-shadow:
       0 0,
-      0 4px $govuk-focus-text-colour;
+      0 4px govuk-functional-colour(focus-text);
     color: #fff;
   }
 

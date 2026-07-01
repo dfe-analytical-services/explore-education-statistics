@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .navigation {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   display: block;
   margin-bottom: govuk-spacing(8);
   margin-top: govuk-spacing(6);
@@ -27,6 +27,6 @@
   }
 
   li a:hover {
-    border-bottom: 0.3rem solid $govuk-link-hover-colour;
+    border-bottom: 0.3rem solid govuk-functional-colour(link-hover);
   }
 }

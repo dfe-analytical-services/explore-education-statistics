@@ -161,7 +161,7 @@ const PublicationForm = ({
                   <p>
                     <a
                       href={`#${formId}-publications`}
-                      className="govuk-!-margin-top-3 govuk-!-font-size-14"
+                      className="govuk-!-margin-top-3 govuk-!-font-size-16"
                     >
                       Skip to search results
                     </a>
@@ -212,7 +212,6 @@ const PublicationForm = ({
                         hint: searchTerm
                           ? getThemeForPublication(publication.id)
                           : '',
-                        hintSmall: true,
                         label: publication.title,
                         value: publication.id,
                       }),

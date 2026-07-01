@@ -1,9 +1,10 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use 'sass:map';
 
 .copyLink {
   margin-bottom: govuk-spacing(4);
 
   @include govuk-media-query($from: desktop) {
-    min-width: map-get($govuk-breakpoints, 'tablet');
+    min-width: map.get($govuk-breakpoints, 'tablet');
   }
 }

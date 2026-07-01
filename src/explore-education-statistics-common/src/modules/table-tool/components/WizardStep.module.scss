@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .step {
   &.stepHidden {
@@ -24,7 +24,7 @@
 }
 
 .content {
-  border-bottom: 2px solid govuk-colour('light-grey');
+  border-bottom: 2px solid govuk-colour('black', $variant: 'tint-95');
   position: relative;
 
   @include govuk-media-query($until: tablet) {

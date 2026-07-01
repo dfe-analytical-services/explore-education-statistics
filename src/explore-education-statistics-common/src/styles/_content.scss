@@ -1,5 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
-
+@use '~govuk-frontend/dist/govuk/base' as *;
 // Styles related to dynamic HTML content (from CKEditor)
 
 .dfe-content {

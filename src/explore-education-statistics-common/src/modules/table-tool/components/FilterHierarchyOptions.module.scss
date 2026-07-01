@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .option {
   display: block;
@@ -9,7 +9,7 @@
   }
 
   &__expanded {
-    background: govuk-colour('light-grey');
+    background: govuk-colour('black', $variant: 'tint-95');
   }
 
   &__expanded:not(:last-child) {
