@@ -25,7 +25,6 @@ export interface FormRadioProps {
   divider?: string;
   hiddenConditional?: boolean;
   hint?: string | ReactNode;
-  hintSmall?: boolean;
   inlineHint?: boolean;
   id: string;
   inputRef?: Ref<HTMLInputElement>;
@@ -47,7 +46,6 @@ const FormRadio = ({
   divider,
   hiddenConditional,
   hint,
-  hintSmall = false,
   id,
   inlineHint,
   inputRef,
@@ -109,9 +107,9 @@ const FormRadio = ({
         {hint && (
           <div
             id={`${id}-item-hint`}
-            className={classNames('govuk-hint govuk-radios__hint', {
-              'govuk-!-font-size-16': hintSmall,
-            })}
+            className={classNames(
+              'govuk-hint govuk-radios__hint govuk-!-font-size-16',
+            )}
           >
             {hint}
           </div>

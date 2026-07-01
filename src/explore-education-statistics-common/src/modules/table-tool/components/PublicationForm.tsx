@@ -212,7 +212,6 @@ const PublicationForm = ({
                         hint: searchTerm
                           ? getThemeForPublication(publication.id)
                           : '',
-                        hintSmall: true,
                         label: publication.title,
                         value: publication.id,
                       }),
