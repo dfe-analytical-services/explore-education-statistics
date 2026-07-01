@@ -658,10 +658,6 @@ public class ContentDbContext : DbContext
             .Property(upr => upr.Role)
             .HasConversion(new EnumToStringConverter<PublicationRole>())
             .HasMaxLength(20);
-
-        var unusedRoles = new[] { PublicationRole.Allower, PublicationRole.Owner };
-
-        modelBuilder.Entity<UserPublicationRole>().HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
     private static void ConfigureUserPreReleaseRole(ModelBuilder modelBuilder)
@@ -678,10 +674,6 @@ public class ContentDbContext : DbContext
             .Property(r => r.Role)
             .HasConversion(new EnumToStringConverter<ReleaseRole>())
             .HasMaxLength(20);
-
-        var unusedRoles = new[] { ReleaseRole.Contributor, ReleaseRole.Approver };
-
-        modelBuilder.Entity<UserReleaseRole>().HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)
