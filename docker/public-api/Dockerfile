@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /App
 ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 8080
