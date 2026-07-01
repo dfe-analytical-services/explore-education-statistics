@@ -134,14 +134,12 @@ public class UserPublicationRoleRepository(
     public async Task<UserPublicationRole?> GetByCompositeKey(
         Guid userId,
         Guid publicationId,
-        PublicationRole role,
         CancellationToken cancellationToken = default
     )
     {
         return await Query(ResourceRoleFilter.All)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
-            .WhereRolesIn(role)
             .SingleOrDefaultAsync(cancellationToken);
     }
 
@@ -179,14 +177,12 @@ public class UserPublicationRoleRepository(
     public async Task<bool> RemoveByCompositeKey(
         Guid userId,
         Guid publicationId,
-        PublicationRole role,
         CancellationToken cancellationToken = default
     )
     {
         var userPublicationRole = await GetByCompositeKey(
             userId: userId,
             publicationId: publicationId,
-            role: role,
             cancellationToken: cancellationToken
         );
 
