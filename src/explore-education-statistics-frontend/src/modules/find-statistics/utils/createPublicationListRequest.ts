@@ -1,4 +1,3 @@
-import { odata } from '@azure/search-documents';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
 import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -26,22 +25,12 @@ export default function createPublicationListRequest(
 
   const orderBy = getSortParam(sortBy);
 
-  let filter: string | undefined;
-  if (releaseType && themeId) {
-    filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
-  } else if (releaseType) {
-    filter = odata`releaseType eq ${releaseType}`;
-  } else if (themeId) {
-    filter = odata`themeId eq ${themeId}`;
-  }
-
   const minSearchCharacters = 3;
   const search =
     searchParam && searchParam.length >= minSearchCharacters ? searchParam : '';
 
   return omitBy(
     {
-      filter,
       page: parseNumber(query.page) ?? 1,
       releaseType,
       search,
@@ -58,18 +47,8 @@ export function createPublicationSuggestRequest(
 ): AzurePublicationListRequest {
   const { releaseType, themeId } = getParamsFromQuery(query);
 
-  let filter: string | undefined;
-  if (releaseType && themeId) {
-    filter = odata`releaseType eq ${releaseType} and themeId eq ${themeId}`;
-  } else if (releaseType) {
-    filter = odata`releaseType eq ${releaseType}`;
-  } else if (themeId) {
-    filter = odata`themeId eq ${themeId}`;
-  }
-
   return omitBy(
     {
-      filter,
       releaseType,
       search: searchTerm,
       themeId,
