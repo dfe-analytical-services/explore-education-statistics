@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interface
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -93,7 +94,7 @@ public class PublicationSubscriptionFunctions(
                         { "publication_name", subscription.Entity.Title },
                         {
                             "unsubscribe_link",
-                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription?token={unsubscribeToken}"
                         },
                     };
 
@@ -130,7 +131,7 @@ public class PublicationSubscriptionFunctions(
                         { "publication_name", req.Title },
                         {
                             "verification_link",
-                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
+                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription?token={activationCode}"
                         },
                     };
 
@@ -180,12 +181,14 @@ public class PublicationSubscriptionFunctions(
     public async Task<IActionResult> Unsubscribe(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
             FunctionContext context,
+        HttpRequest request,
         string publicationId,
         string token
     )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
+        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
         var email = tokenService.GetEmailFromToken(token);
         if (email is null)
         {
@@ -245,12 +248,14 @@ public class PublicationSubscriptionFunctions(
             Route = "publication/{publicationId}/verify-subscription/{token}"
         )]
             FunctionContext context,
+        HttpRequest request,
         Guid publicationId,
         string token
     )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
+        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
         var email = tokenService.GetEmailFromToken(token);
 
         if (email == null)
@@ -302,7 +307,7 @@ public class PublicationSubscriptionFunctions(
             { "publication_name", newSubscription.Title },
             {
                 "unsubscribe_link",
-                $"{_appOptions.PublicAppUrl}/subscriptions/{newSubscription.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appOptions.PublicAppUrl}/subscriptions/{newSubscription.Slug}/confirm-unsubscription?token={unsubscribeToken}"
             },
         };
 

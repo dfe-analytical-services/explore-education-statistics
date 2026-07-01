@@ -71,10 +71,12 @@ public class ApiSubscriptionFunctions(
         )]
             HttpRequest request,
         Guid dataSetId,
-        string token,
+        string token, // TODO (EES-7105): Remove token from route and use query string instead
         CancellationToken cancellationToken
     )
     {
+        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
+
         try
         {
             return await apiSubscriptionService
@@ -97,10 +99,12 @@ public class ApiSubscriptionFunctions(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe/{token}")]
             HttpRequest request,
         Guid dataSetId,
-        string token,
+        string token, // TODO (EES-7105): Remove token from route and use query string instead
         CancellationToken cancellationToken
     )
     {
+        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
+
         try
         {
             return await apiSubscriptionService

@@ -97,7 +97,7 @@ public class ReleaseNotifier(
             { "release_link", $"{_appOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}" },
             {
                 "unsubscribe_link",
-                $"{_appOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription?token={unsubscribeToken}"
             },
         };
 
@@ -128,7 +128,7 @@ public class ReleaseNotifier(
             { "release_link", $"{_appOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}" },
             {
                 "unsubscribe_link",
-                $"{_appOptions.PublicAppUrl}/subscriptions/{supersededPublication.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appOptions.PublicAppUrl}/subscriptions/{supersededPublication.Slug}/confirm-unsubscription?token={unsubscribeToken}"
             },
             { "superseded_publication_title", supersededPublication.Title },
         };
