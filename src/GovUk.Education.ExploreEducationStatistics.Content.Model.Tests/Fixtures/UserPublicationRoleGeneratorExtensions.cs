@@ -56,7 +56,7 @@ public static class UserPublicationRoleGeneratorExtensions
 
     public static Generator<UserPublicationRole> WithCreated(
         this Generator<UserPublicationRole> generator,
-        DateTime created
+        DateTimeOffset created
     ) => generator.ForInstance(s => s.SetCreated(created));
 
     public static Generator<UserPublicationRole> WithCreatedBy(
@@ -79,7 +79,6 @@ public static class UserPublicationRoleGeneratorExtensions
             .SetDefault(upr => upr.Id)
             .SetDefault(upr => upr.PublicationId)
             .SetDefault(upr => upr.UserId)
-            .SetDefault(upr => upr.Created)
             .Set(upr => upr.Role, PublicationRole.Drafter);
 
     public static InstanceSetters<UserPublicationRole> SetPublication(
@@ -109,7 +108,7 @@ public static class UserPublicationRoleGeneratorExtensions
 
     public static InstanceSetters<UserPublicationRole> SetCreated(
         this InstanceSetters<UserPublicationRole> setters,
-        DateTime created
+        DateTimeOffset created
     ) => setters.Set(upr => upr.Created, created);
 
     public static InstanceSetters<UserPublicationRole> SetCreatedBy(

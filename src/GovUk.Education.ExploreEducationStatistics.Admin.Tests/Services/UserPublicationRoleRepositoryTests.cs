@@ -195,8 +195,8 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task ManyRoles_IgnoresRolesThatAlreadyExist()
         {
-            var existingRoleCreatedDate = DateTime.UtcNow.AddDays(-2);
-            var newRolesCreatedDate = DateTime.UtcNow;
+            var existingRoleCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
+            var newRolesCreatedDate = DateTimeOffset.UtcNow;
             User createdBy = _fixture.DefaultUser();
 
             // Test across multiple User/Publication combinations
@@ -313,7 +313,12 @@ public abstract class UserPublicationRoleRepositoryTests
                     .Select(upr => (upr.UserId, upr.PublicationId, upr.Role, upr.Created))
                     .ToHashSet();
 
-                var expected = new HashSet<(Guid UserId, Guid PublicationId, PublicationRole Role, DateTime Created)>
+                var expected = new HashSet<(
+                    Guid UserId,
+                    Guid PublicationId,
+                    PublicationRole Role,
+                    DateTimeOffset Created
+                )>
                 {
                     // New roles
                     (user1.Id, publication3.Id, PublicationRole.Drafter, newRolesCreatedDate),

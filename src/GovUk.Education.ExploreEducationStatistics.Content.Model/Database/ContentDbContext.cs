@@ -644,11 +644,6 @@ public class ContentDbContext : DbContext
 
         modelBuilder
             .Entity<UserPublicationRole>()
-            .Property(upr => upr.Created)
-            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        modelBuilder
-            .Entity<UserPublicationRole>()
             .HasOne(upr => upr.CreatedBy)
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
@@ -666,11 +661,6 @@ public class ContentDbContext : DbContext
             .Entity<UserPreReleaseRole>()
             .HasIndex(uprr => new { uprr.UserId, uprr.ReleaseVersionId })
             .IsUnique();
-
-        modelBuilder
-            .Entity<UserPreReleaseRole>()
-            .Property(userReleaseRole => userReleaseRole.Created)
-            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<UserPreReleaseRole>()
