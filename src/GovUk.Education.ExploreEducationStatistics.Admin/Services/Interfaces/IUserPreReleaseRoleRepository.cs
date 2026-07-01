@@ -11,7 +11,7 @@ public interface IUserPreReleaseRoleRepository
         Guid userId,
         Guid releaseVersionId,
         Guid createdById,
-        DateTime? createdDate = null,
+        DateTimeOffset createdDate = default,
         CancellationToken cancellationToken = default
     );
 

@@ -14,17 +14,15 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
         Guid userId,
         Guid releaseVersionId,
         Guid createdById,
-        DateTime? createdDate = null,
+        DateTimeOffset createdDate = default,
         CancellationToken cancellationToken = default
     )
     {
-        createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
-
         var newUserPreReleaseRole = new UserPreReleaseRole
         {
             UserId = userId,
             ReleaseVersionId = releaseVersionId,
-            Created = createdDate!.Value,
+            Created = createdDate,
             CreatedById = createdById,
         };
 
@@ -215,6 +213,6 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
         Guid UserId,
         Guid ReleaseVersionId,
         Guid CreatedById,
-        DateTime? CreatedDate = null
+        DateTimeOffset CreatedDate = default
     );
 }

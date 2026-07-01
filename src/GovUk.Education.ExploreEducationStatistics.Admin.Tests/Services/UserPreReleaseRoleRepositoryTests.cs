@@ -145,8 +145,8 @@ public abstract class UserPreReleaseRoleRepositoryTests
         [Fact]
         public async Task ManyRoles_IgnoresRolesThatAlreadyExist()
         {
-            var existingRoleCreatedDate = DateTime.UtcNow.AddDays(-2);
-            var newRolesCreatedDate = DateTime.UtcNow;
+            var existingRoleCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
+            var newRolesCreatedDate = DateTimeOffset.UtcNow;
             User createdBy = _fixture.DefaultUser();
 
             // Test across multiple User/Publication combinations
@@ -264,7 +264,7 @@ public abstract class UserPreReleaseRoleRepositoryTests
                     .Select(uprr => (uprr.UserId, uprr.ReleaseVersionId, uprr.Created))
                     .ToHashSet();
 
-                var expectedPreReleaseRoles = new HashSet<(Guid UserId, Guid PublicationId, DateTime Created)>
+                var expectedPreReleaseRoles = new HashSet<(Guid UserId, Guid PublicationId, DateTimeOffset Created)>
                 {
                     // Existing roles
                     (user1.Id, releaseVersion1.Id, existingRoleCreatedDate),

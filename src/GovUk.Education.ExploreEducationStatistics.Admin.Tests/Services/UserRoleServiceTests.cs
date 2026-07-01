@@ -106,7 +106,7 @@ public abstract class UserRoleServiceTests
                         publication.Id,
                         PublicationRole.Approver,
                         _user.Id,
-                        null,
+                        default,
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -196,7 +196,7 @@ public abstract class UserRoleServiceTests
                         It.IsAny<Guid>(),
                         It.IsAny<PublicationRole>(),
                         It.IsAny<Guid>(),
-                        It.IsAny<DateTime?>(),
+                        It.IsAny<DateTimeOffset>(),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Never
@@ -261,7 +261,7 @@ public abstract class UserRoleServiceTests
                         It.IsAny<Guid>(),
                         It.IsAny<PublicationRole>(),
                         It.IsAny<Guid>(),
-                        It.IsAny<DateTime?>(),
+                        It.IsAny<DateTimeOffset>(),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Never
@@ -326,7 +326,7 @@ public abstract class UserRoleServiceTests
                         It.IsAny<Guid>(),
                         It.IsAny<PublicationRole>(),
                         It.IsAny<Guid>(),
-                        It.IsAny<DateTime?>(),
+                        It.IsAny<DateTimeOffset>(),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Never
@@ -458,7 +458,7 @@ public abstract class UserRoleServiceTests
                         publication.Id,
                         PublicationRole.Drafter,
                         _user.Id,
-                        null,
+                        default,
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -628,7 +628,7 @@ public abstract class UserRoleServiceTests
                         publication.Id,
                         PublicationRole.Drafter,
                         _user.Id,
-                        null,
+                        default,
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -701,7 +701,7 @@ public abstract class UserRoleServiceTests
                         publication.Id,
                         PublicationRole.Drafter,
                         _user.Id,
-                        null,
+                        default,
                         It.IsAny<CancellationToken>()
                     )
                 )

@@ -1,9 +1,10 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations.Schema;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public abstract class ResourceRole<TResource>
+public abstract class ResourceRole<TResource> : ICreatedTimestamp<DateTimeOffset>
     where TResource : class
 {
     public Guid Id { get; set; }
@@ -24,5 +25,5 @@ public abstract class ResourceRole<TResource>
 
     public User CreatedBy { get; set; } = null!;
 
-    public required DateTime Created { get; set; }
+    public DateTimeOffset Created { get; set; }
 }

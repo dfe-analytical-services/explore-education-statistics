@@ -33,7 +33,11 @@ public abstract class UserManagementServiceTests
 
     private static readonly Guid CreatedById = Guid.NewGuid();
 
-    public static readonly TheoryData<DateTime?> InviteUserOptionalCreatedDates = [null, DateTime.UtcNow.AddDays(-5)];
+    public static readonly TheoryData<DateTimeOffset?> InviteUserOptionalCreatedDates =
+    [
+        null,
+        DateTime.UtcNow.AddDays(-5),
+    ];
 
     public class GetUserTests : UserManagementServiceTests
     {
@@ -364,7 +368,7 @@ public abstract class UserManagementServiceTests
     {
         [Theory]
         [MemberData(nameof(InviteUserOptionalCreatedDates))]
-        public async Task Success(DateTime? createdDate)
+        public async Task Success(DateTimeOffset? createdDate)
         {
             var email = "test@test.com";
 
@@ -428,7 +432,7 @@ public abstract class UserManagementServiceTests
                         userToCreate.Id,
                         releaseVersion.Id,
                         CreatedById,
-                        createdDate,
+                        createdDate ?? default,
                         It.IsAny<CancellationToken>()
                     )
                 )
@@ -449,7 +453,7 @@ public abstract class UserManagementServiceTests
                                 && upr.Role == publicationRole
                                 && createdDate.HasValue
                                     ? upr.CreatedDate == createdDate
-                                    : Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
+                                    : Math.Abs((upr.CreatedDate - DateTime.UtcNow).Milliseconds)
                                         <= AssertExtensions.TimeWithinMillis
                                         && upr.CreatedById == CreatedById
                             )
@@ -594,12 +598,24 @@ public abstract class UserManagementServiceTests
                 .Returns(Task.CompletedTask);
             userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.Create(userToCreate.Id, releaseVersion1.Id, CreatedById, null, It.IsAny<CancellationToken>())
+                    mock.Create(
+                        userToCreate.Id,
+                        releaseVersion1.Id,
+                        CreatedById,
+                        default,
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ReturnsAsync(It.IsAny<UserPreReleaseRole>());
             userPreReleaseRoleRepository
                 .Setup(mock =>
-                    mock.Create(userToCreate.Id, releaseVersion2.Id, CreatedById, null, It.IsAny<CancellationToken>())
+                    mock.Create(
+                        userToCreate.Id,
+                        releaseVersion2.Id,
+                        CreatedById,
+                        default,
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ReturnsAsync(It.IsAny<UserPreReleaseRole>());
 
@@ -616,13 +632,13 @@ public abstract class UserManagementServiceTests
                             && l.Any(upr =>
                                 upr.PublicationId == publications[2].Id
                                 && upr.Role == publicationRole1
-                                && Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
+                                && Math.Abs((upr.CreatedDate - DateTime.UtcNow).Milliseconds)
                                     <= AssertExtensions.TimeWithinMillis
                             )
                             && l.Any(upr =>
                                 upr.PublicationId == publications[3].Id
                                 && upr.Role == publicationRole2
-                                && Math.Abs((upr.CreatedDate!.Value - DateTime.UtcNow).Milliseconds)
+                                && Math.Abs((upr.CreatedDate - DateTime.UtcNow).Milliseconds)
                                     <= AssertExtensions.TimeWithinMillis
                             )
                         ),

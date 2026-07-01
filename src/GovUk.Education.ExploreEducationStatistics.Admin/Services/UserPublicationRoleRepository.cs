@@ -20,12 +20,10 @@ public class UserPublicationRoleRepository(
         Guid publicationId,
         PublicationRole role,
         Guid createdById,
-        DateTime? createdDate = null,
+        DateTimeOffset createdDate = default,
         CancellationToken cancellationToken = default
     )
     {
-        createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
-
         var existingUserPublicationRole = await Query(ResourceRoleFilter.All)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
@@ -65,7 +63,7 @@ public class UserPublicationRoleRepository(
             UserId = userId,
             PublicationId = publicationId,
             Role = publicationRoleToCreate.Value,
-            Created = createdDate!.Value,
+            Created = createdDate,
             CreatedById = createdById,
         };
 
@@ -271,6 +269,6 @@ public class UserPublicationRoleRepository(
         Guid PublicationId,
         PublicationRole Role,
         Guid CreatedById,
-        DateTime? CreatedDate = null
+        DateTimeOffset CreatedDate = default
     );
 }
