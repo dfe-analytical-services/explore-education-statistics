@@ -157,15 +157,6 @@ module.exports = webpackEnv => {
           loader: require.resolve(preProcessor),
           options: {
             sourceMap: true,
-            sassOptions: loaderContext => {
-              const { resourcePath } = loaderContext;
-              return {
-                quietDeps: true,
-                silenceDeprecations: resourcePath.includes('node_modules')
-                  ? ['import']
-                  : [],
-              };
-            },
           },
         },
       );
