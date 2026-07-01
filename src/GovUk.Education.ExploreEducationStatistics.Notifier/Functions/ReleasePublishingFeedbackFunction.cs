@@ -82,18 +82,6 @@ public class ReleasePublishingFeedbackFunction(
         {
             PublicationRole.Drafter => "a drafter",
             PublicationRole.Approver => "an approver",
-
-            // Note that this function should never be invoked for PublicationRole.Allower
-            // or PublicationRole.Owner, because these OLD permissions system roles should no longer be being used.
-            PublicationRole.Owner => throw new ArgumentException(
-                $"{nameof(ReleasePublishingFeedbackFunction)} should not "
-                    + $"have been called for {nameof(PublicationRole.Owner)}"
-            ),
-            PublicationRole.Allower => throw new ArgumentException(
-                $"{nameof(ReleasePublishingFeedbackFunction)} should not "
-                    + $"have been called for {nameof(PublicationRole.Allower)}"
-            ),
-
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null),
         };
     }
