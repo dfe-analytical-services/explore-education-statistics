@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -84,7 +85,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                         AssertEmailTemplateValues(
                             d,
                             "Test Publication Title 1",
-                            "https://localhost:3000/subscriptions/test-publication-slug-1/confirm-subscription/activation-code-1",
+                            "https://localhost:3000/subscriptions/test-publication-slug-1/confirm-subscription?token=activation-code-1",
                             null
                         )
                     )
@@ -158,7 +159,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                         AssertEmailTemplateValues(
                             d,
                             "Test Publication Title 2",
-                            "https://localhost:3000/subscriptions/test-publication-slug-2/confirm-subscription/activation-code-2",
+                            "https://localhost:3000/subscriptions/test-publication-slug-2/confirm-subscription?token=activation-code-2",
                             null
                         )
                     )
@@ -234,7 +235,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                             d,
                             "Test Publication Title 3",
                             null,
-                            "https://localhost:3000/subscriptions/test-publication-slug-3/confirm-unsubscription/activation-code-3"
+                            "https://localhost:3000/subscriptions/test-publication-slug-3/confirm-unsubscription?token=activation-code-3"
                         )
                     )
                 ),
@@ -463,12 +464,11 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
             emailService: emailService.Object
         );
 
+        var request = new DefaultHttpContext().Request;
+        request.QueryString = QueryString.Create("token", "verification-code-4");
+
         // Act
-        var result = await notifierFunction.VerifySubscription(
-            new TestFunctionContext(),
-            publicationId,
-            "verification-code-4"
-        );
+        var result = await notifierFunction.VerifySubscription(new TestFunctionContext(), request, publicationId, "");
 
         // Assert
         Assert.IsType<OkObjectResult>(result);
@@ -483,7 +483,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                             d,
                             "Test Publication Title 4",
                             null,
-                            "https://localhost:3000/subscriptions/test-publication-slug-4/confirm-unsubscription/unsubscription-code-4"
+                            "https://localhost:3000/subscriptions/test-publication-slug-4/confirm-unsubscription?token=unsubscription-code-4"
                         )
                     )
                 ),
@@ -549,11 +549,15 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 emailService: emailService.Object
             );
 
+            var request = new DefaultHttpContext().Request;
+            request.QueryString = QueryString.Create("token", "unsubscription-code-5");
+
             // Act
             var result = await notifierFunction.Unsubscribe(
                 new TestFunctionContext(),
+                request,
                 publicationId.ToString(),
-                "unsubscription-code-5"
+                ""
             );
 
             var okResult = Assert.IsAssignableFrom<OkObjectResult>(result);

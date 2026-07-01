@@ -24,13 +24,14 @@ const apiNotificationService = {
     token: string,
   ): Promise<ApiSubscription> {
     return notificationApi.post<ApiSubscription>(
-      `public-api/${dataSetId}/verify-subscription/${token}`,
+      `public-api/${dataSetId}/verify-subscription`,
+      { params: { token } },
     );
   },
   confirmUnsubscription(dataSetId: string, token: string): Promise<void> {
-    return notificationApi.delete(
-      `public-api/${dataSetId}/unsubscribe/${token}`,
-    );
+    return notificationApi.delete(`public-api/${dataSetId}/unsubscribe`, {
+      params: { token },
+    });
   },
 };
 export default apiNotificationService;

@@ -25,13 +25,17 @@ const notificationService = {
     token: string,
   ): Promise<Subscription | undefined> {
     return notificationApi
-      .get<Subscription>(`publication/${id}/verify-subscription/${token}`)
+      .get<Subscription>(`publication/${id}/verify-subscription`, {
+        params: { token },
+      })
       .catch(() => {
         return undefined;
       });
   },
   confirmUnsubscription(id: string, token: string): Promise<Subscription> {
-    return notificationApi.get(`publication/${id}/unsubscribe/${token}`);
+    return notificationApi.get(`publication/${id}/unsubscribe`, {
+      params: { token },
+    });
   },
 };
 export default notificationService;

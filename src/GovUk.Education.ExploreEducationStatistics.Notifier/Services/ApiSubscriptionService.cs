@@ -277,7 +277,7 @@ internal class ApiSubscriptionService(
     {
         var token = tokenService.GenerateToken(subscription.RowKey, subscription.Expiry!.Value.UtcDateTime);
         var verificationUrl =
-            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-subscription/{token}";
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-subscription?token={token}";
         var personalisation = new Dictionary<string, dynamic>
         {
             { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
@@ -295,7 +295,7 @@ internal class ApiSubscriptionService(
     {
         var token = tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
         var unsubscribeUrl =
-            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{token}";
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription?token={token}";
         var personalisation = new Dictionary<string, dynamic>
         {
             { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },
@@ -369,7 +369,7 @@ internal class ApiSubscriptionService(
         var token = tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
         var dataSetUrl = $"{_publicAppUrl}/data-catalogue/data-set/{dataSetFileId}";
         var unsubscribeUrl =
-            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription/{token}";
+            $"{_publicAppUrl}/api-subscriptions/{subscription.PartitionKey}/confirm-unsubscription?token={token}";
         var personalisation = new Dictionary<string, dynamic>
         {
             { NotifierEmailTemplateFields.DataSetTitle, subscription.DataSetTitle },

@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Validators;
 using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Moq;
@@ -44,7 +45,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                             AssertEmailTemplateValues(
                                 personalisation,
                                 DataSetTitle,
-                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription/"
+                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription?token="
                             )
                         ),
                         null,
@@ -283,7 +284,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                             AssertEmailTemplateValues(
                                 personalisation,
                                 DataSetTitle,
-                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/"
+                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription?token="
                             )
                         ),
                         null,
@@ -419,11 +420,13 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         private async Task<IActionResult> VerifySubscription(Guid dataSetId, string token)
         {
             var functions = GetRequiredService<ApiSubscriptionFunctions>();
+            var request = new DefaultHttpContext().Request;
+            request.QueryString = QueryString.Create("token", token);
 
             return await functions.VerifySubscription(
-                request: null!,
+                request: request,
                 dataSetId: dataSetId,
-                token: token,
+                token: "",
                 cancellationToken: CancellationToken.None
             );
         }
@@ -545,11 +548,13 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         private async Task<IActionResult> Unsubscribe(Guid dataSetId, string token)
         {
             var functions = GetRequiredService<ApiSubscriptionFunctions>();
+            var request = new DefaultHttpContext().Request;
+            request.QueryString = QueryString.Create("token", token);
 
             return await functions.Unsubscribe(
-                request: null!,
+                request: request,
                 dataSetId: dataSetId,
-                token: token,
+                token: "",
                 cancellationToken: CancellationToken.None
             );
         }
@@ -597,7 +602,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                                 DataSetTitle,
                                 $"{GetAppOptions().PublicAppUrl}/data-catalogue/data-set/{_dataSetFileId}",
                                 version,
-                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/"
+                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription?token="
                             )
                         ),
                         null,
@@ -841,5 +846,5 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         return tokenService.GetEmailFromToken(unsubscribeToken);
     }
 
-    private static string ExtractToken(string subscriptionLink) => subscriptionLink.Split("/").Last();
+    private static string ExtractToken(string subscriptionLink) => subscriptionLink.Split("?token=").Last();
 }
