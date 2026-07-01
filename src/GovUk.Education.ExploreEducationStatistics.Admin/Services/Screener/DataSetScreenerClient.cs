@@ -23,26 +23,6 @@ public class DataSetScreenerClient(
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // API is case-sensitive
     };
 
-    public async Task<DataSetScreenerResponse> ScreenDataSet(
-        DataSetScreenerRequest dataSetScreenerRequest,
-        CancellationToken cancellationToken
-    )
-    {
-        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
-
-        var json = JsonSerializer.Serialize(dataSetScreenerRequest, _jsonSerializerOptions);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        // TODO (EES-6301): Add cancellation token handling logic to terminate Azure Function processes
-        var response = await httpClient.PostAsync($"{httpClient.BaseAddress}/screen", content, CancellationToken.None);
-
-        return response.IsSuccessStatusCode
-            ? (await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken))!
-            : throw new DataScreenerException(
-                $"External data screening process failed with status code {response.StatusCode}."
-            );
-    }
-
     public async Task<List<DataSetScreenerProgressResponse>> GetScreenerProgress(
         IList<Guid> dataSetIds,
         CancellationToken cancellationToken

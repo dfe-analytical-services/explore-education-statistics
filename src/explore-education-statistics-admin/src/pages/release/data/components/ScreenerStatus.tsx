@@ -128,33 +128,23 @@ export default function ScreenerStatus({
 
   const [cancelInterval] = useInterval(fetchStatus, 5000);
 
-  // TODO EES-7139 - change status to be non-nullable when foreground screening process
-  // is decommissioned.
   useMounted(() => {
-    if (
-      dataSetUpload.screeningStatus &&
-      !terminalScreeningStatuses.includes(dataSetUpload.screeningStatus)
-    ) {
+    if (!terminalScreeningStatuses.includes(dataSetUpload.screeningStatus)) {
       fetchStatus();
     }
   });
 
   useEffect(() => {
-    if (
-      currentStatus.status &&
-      terminalScreeningStatuses.includes(currentStatus.status)
-    ) {
+    if (terminalScreeningStatuses.includes(currentStatus.status)) {
       cancelInterval();
     }
   }, [cancelInterval, currentStatus]);
 
-  const hasTerminalStatus =
-    currentStatus.status &&
-    terminalScreeningStatuses.includes(currentStatus.status);
+  const hasTerminalStatus = terminalScreeningStatuses.includes(
+    currentStatus.status,
+  );
 
-  // TODO EES-7139 - remove handling for null status once the foreground screening
-  // process has been decommissioned.
-  return currentStatus.status ? (
+  return (
     <>
       <Tag colour={getDataSetUploadScreeningStatusColour(currentStatus.status)}>
         {getDataSetUploadScreeningStatusLabel(currentStatus.status)}
@@ -173,7 +163,5 @@ export default function ScreenerStatus({
         />
       )}
     </>
-  ) : (
-    <Tag colour="blue">Screening</Tag>
   );
 }

@@ -23,8 +23,6 @@ interface ReplacementDataFileInfo extends DataFileInfo {
   hasValidReplacementPlan?: boolean;
 }
 
-// TODO EES-7139 - change status to be non-nullable when foreground screening process
-// is decommissioned.
 export interface DataSetUpload {
   id: string;
   dataSetTitle: string;
@@ -32,8 +30,8 @@ export interface DataSetUpload {
   dataFileSize: string;
   metaFileName: string;
   metaFileSize: string;
-  screeningStatus?: DataSetUploadScreeningStatus;
-  screenerResult?: ScreenerResult; // Nullable if screening fails
+  screeningStatus: DataSetUploadScreeningStatus;
+  screenerResult?: ScreenerResult; // Nullable if screening has not yet completed.
   created: Date;
   uploadedBy: string;
   publicApiCompatible?: boolean;
@@ -133,10 +131,8 @@ export type DataSetUploadScreeningStatus =
 
 export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
 
-// TODO EES-7139 - change status to be non-nullable when foreground screening process
-// is decommissioned.
 export interface DataSetScreenerProgress {
-  status?: DataSetUploadScreeningStatus;
+  status: DataSetUploadScreeningStatus;
   percentageComplete: number;
   stage: string;
   completed: boolean;

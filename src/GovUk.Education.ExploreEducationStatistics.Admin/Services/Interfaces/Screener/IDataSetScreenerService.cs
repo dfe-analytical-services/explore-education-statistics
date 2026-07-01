@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Responses.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
@@ -16,11 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
 /// </summary>
 public interface IDataSetScreenerService
 {
-    Task<DataSetScreenerResponse> ScreenDataSet(
-        DataSetScreenerRequest dataSetScreenerRequest,
-        CancellationToken cancellationToken
-    );
-
     Task StartScreening(DataSetStartScreeningRequest dataSetScreenRequest, CancellationToken cancellationToken);
 
     /// <summary>

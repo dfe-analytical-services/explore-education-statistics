@@ -1,6 +1,5 @@
 #nullable enable
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -1983,8 +1982,7 @@ public class ReleaseDataFileServiceTests
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
             dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(Strict),
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),
-            mapper ?? Mock.Of<IMapper>(Strict),
-            new DataScreenerOptions().ToOptionsWrapper()
+            mapper ?? Mock.Of<IMapper>(Strict)
         );
     }
 }

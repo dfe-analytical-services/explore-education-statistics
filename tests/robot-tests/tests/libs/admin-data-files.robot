@@ -289,10 +289,8 @@ user waits for screening to complete
     [Arguments]
     ...    ${SUBJECT_NAME}
 
-    IF    "%{BACKGROUND_SCREENING}" == "True"
-        user waits until subject has status    ${SUBJECT_NAME}    Screening
-        user waits until page contains element    testid:${SUBJECT_NAME}-screener-progress-bar
-        user waits until page does not contain element    testid:${SUBJECT_NAME}-screener-progress-bar
-        ...    wait=%{WAIT_DATA_FILE_SCREEN}
-        user waits until page finishes loading
-    END
+    user waits until subject has status    ${SUBJECT_NAME}    Screening
+    user waits until page contains element    testid:${SUBJECT_NAME}-screener-progress-bar
+    user waits until page does not contain element    testid:${SUBJECT_NAME}-screener-progress-bar
+    ...    wait=%{WAIT_DATA_FILE_SCREEN}
+    user waits until page finishes loading

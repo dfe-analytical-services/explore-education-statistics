@@ -120,6 +120,7 @@ public static class MockBlobStorageServiceExtensions
         string filename,
         string path,
         string contentType,
+        TimeSpan? expiryDuration = null,
         CancellationToken cancellationToken = default
     )
         where T : class, IBlobStorageService
@@ -133,7 +134,7 @@ public static class MockBlobStorageServiceExtensions
         );
 
         return service
-            .Setup(s => s.GetBlobDownloadToken(container, filename, path, cancellationToken))
+            .Setup(s => s.GetBlobDownloadToken(container, filename, path, cancellationToken, expiryDuration))
             .ReturnsAsync(new Either<ActionResult, BlobDownloadToken>(token));
     }
 
@@ -142,12 +143,13 @@ public static class MockBlobStorageServiceExtensions
         IBlobContainer container,
         string filename,
         string path,
+        TimeSpan? expiryDuration = null,
         CancellationToken cancellationToken = default
     )
         where T : class, IBlobStorageService
     {
         return service
-            .Setup(s => s.GetBlobDownloadToken(container, filename, path, cancellationToken))
+            .Setup(s => s.GetBlobDownloadToken(container, filename, path, cancellationToken, expiryDuration))
             .ReturnsAsync(new Either<ActionResult, BlobDownloadToken>(new NotFoundResult()));
     }
 

@@ -62,23 +62,13 @@ export default function DataSetUploadSummaryList({
         {dataSetUpload.dataFileSize}
       </SummaryListItem>
       <SummaryListItem term="Status">
-        {
-          // TODO EES-7139 - change status to be non-nullable when foreground
-          // screening process is decommissioned.
-        }
-        {dataSetUpload.screeningStatus ? (
-          <Tag
-            colour={getDataSetUploadScreeningStatusColour(
-              dataSetUpload.screeningStatus,
-            )}
-          >
-            {getDataSetUploadScreeningStatusLabel(
-              dataSetUpload.screeningStatus,
-            )}
-          </Tag>
-        ) : (
-          <Tag colour="blue">Uploading</Tag>
-        )}
+        <Tag
+          colour={getDataSetUploadScreeningStatusColour(
+            dataSetUpload.screeningStatus,
+          )}
+        >
+          {getDataSetUploadScreeningStatusLabel(dataSetUpload.screeningStatus)}
+        </Tag>
       </SummaryListItem>{' '}
       <SummaryListItem term="Uploaded by">
         <a href={uploadedByUrl}>{dataSetUpload.uploadedBy}</a>
