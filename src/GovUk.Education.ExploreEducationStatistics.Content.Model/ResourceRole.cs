@@ -20,9 +20,9 @@ public abstract class ResourceRole<TResource>
 
     public DateTimeOffset? EmailSent { get; set; }
 
-    public Guid? CreatedById { get; set; }
+    public required Guid CreatedById { get; set; }
 
-    public User? CreatedBy { get; set; }
+    public User CreatedBy { get; set; } = null!;
 
     public required DateTime Created { get; set; }
 }
