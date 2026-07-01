@@ -190,7 +190,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
         protocol: 'Https'
         cookieBasedAffinity: 'Disabled'
         pickHostNameFromBackendAddress: true
-        requestTimeout: 20
+        requestTimeout: backend.?requestTimeout ?? 30
         probe: {
           id: resourceId('Microsoft.Network/applicationGateways/probes', appGatewayName, '${backend.name}-health-probe')
         }
