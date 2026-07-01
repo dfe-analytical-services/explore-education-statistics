@@ -76,6 +76,7 @@ module globalWafPolicyModule '../../../common/components/application-gateway/app
   params: {
     name: '${appGatewayName}-global-afwp'
     location: location
+    mode: 'Detection'
     tagValues: tagValues
   }
 }

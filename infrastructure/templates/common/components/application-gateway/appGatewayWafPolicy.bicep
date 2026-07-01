@@ -29,6 +29,13 @@ param managedRuleSets {
 @description('A set of custom rules to include alongside the managed rulesets')
 param customRules AppGatewayFirewallPolicyCustomRule[] = []
 
+@description('The mode of the policy')
+@allowed([
+  'Detection'
+  'Prevention'
+])
+param mode string = 'Prevention'
+
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -41,7 +48,7 @@ resource policy 'Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolic
       maxRequestBodySizeInKb: 128
       fileUploadLimitInMb: 100
       state: 'Enabled'
-      mode: 'Prevention'
+      mode: mode
       requestBodyInspectLimitInKB: 128
       fileUploadEnforcement: true
       requestBodyEnforcement: true
