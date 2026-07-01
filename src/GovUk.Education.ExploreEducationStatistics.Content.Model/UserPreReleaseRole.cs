@@ -1,7 +1,7 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class UserReleaseRole : ResourceRole<ReleaseRole, ReleaseVersion>
+public class UserPreReleaseRole : ResourceRole<ReleaseVersion>
 {
     public ReleaseVersion ReleaseVersion
     {

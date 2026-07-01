@@ -63,7 +63,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             var allUserPreReleaseRoles = preReleaseRolesForTargetUser.Concat(preReleaseRolesForOtherUser).ToList();
 
             var preReleaseRolesInfo = preReleaseRolesForTargetUser
-                .Select(urr => (urr.ReleaseVersion.Release.Publication.Title, urr.ReleaseVersion.Release.Title))
+                .Select(uprr => (uprr.ReleaseVersion.Release.Publication.Title, uprr.ReleaseVersion.Release.Title))
                 .ToHashSet();
 
             var publicationRolesInfo = publicationRolesForTargetUser
@@ -184,7 +184,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .GenerateList(3);
 
             var preReleaseRolesInfo = userPreReleaseRoles
-                .Select(urr => (urr.ReleaseVersion.Release.Publication.Title, urr.ReleaseVersion.Release.Title))
+                .Select(uprr => (uprr.ReleaseVersion.Release.Publication.Title, uprr.ReleaseVersion.Release.Title))
                 .ToHashSet();
 
             var publicationRolesInfo = userPublicationRoles
@@ -464,7 +464,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         {
             var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser()) // Active user
                 .WithReleaseVersion(
@@ -524,7 +524,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         {
             var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUserWithPendingInvite()) // Inactive user
                 .WithReleaseVersion(
@@ -584,7 +584,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         {
             var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            UserReleaseRole userPreReleaseRole = _dataFixture
+            UserPreReleaseRole userPreReleaseRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser()) // Active user
                 .WithReleaseVersion(
