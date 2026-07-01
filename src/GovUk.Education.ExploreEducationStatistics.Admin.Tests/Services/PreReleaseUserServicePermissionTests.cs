@@ -150,7 +150,7 @@ public class PreReleaseUserServicePermissionTests
     {
         User user = _dataFixture.DefaultUser();
 
-        UserReleaseRole userPreReleaseRole = _dataFixture
+        UserPreReleaseRole userPreReleaseRole = _dataFixture
             .DefaultUserPreReleaseRole()
             .WithReleaseVersion(_releaseVersion)
             .WithUser(user);
@@ -186,7 +186,7 @@ public class PreReleaseUserServicePermissionTests
     [Fact]
     public async Task RemoveUserReleaseRole()
     {
-        UserReleaseRole userPreReleaseRole = _dataFixture
+        UserPreReleaseRole userPreReleaseRole = _dataFixture
             .DefaultUserPreReleaseRole()
             .WithReleaseVersion(_releaseVersion)
             .WithUser(_dataFixture.DefaultUser());

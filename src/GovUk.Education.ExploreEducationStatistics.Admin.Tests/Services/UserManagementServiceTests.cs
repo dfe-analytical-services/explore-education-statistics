@@ -300,16 +300,16 @@ public abstract class UserManagementServiceTests
         }
 
         private static List<UserPreReleaseRoleViewModel> CreateUserPreReleaseRoleViewModels(
-            List<UserReleaseRole> userPreReleaseRoles
+            List<UserPreReleaseRole> userPreReleaseRoles
         )
         {
             return
             [
-                .. userPreReleaseRoles.Select(urr => new UserPreReleaseRoleViewModel
+                .. userPreReleaseRoles.Select(uprr => new UserPreReleaseRoleViewModel
                 {
-                    Id = urr.Id,
-                    Publication = urr.ReleaseVersion.Release.Publication.Title,
-                    Release = urr.ReleaseVersion.Release.Title,
+                    Id = uprr.Id,
+                    Publication = uprr.ReleaseVersion.Release.Publication.Title,
+                    Release = uprr.ReleaseVersion.Release.Title,
                 }),
             ];
         }
@@ -432,7 +432,7 @@ public abstract class UserManagementServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(It.IsAny<UserReleaseRole>());
+                .ReturnsAsync(It.IsAny<UserPreReleaseRole>());
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
@@ -596,12 +596,12 @@ public abstract class UserManagementServiceTests
                 .Setup(mock =>
                     mock.Create(userToCreate.Id, releaseVersion1.Id, CreatedById, null, It.IsAny<CancellationToken>())
                 )
-                .ReturnsAsync(It.IsAny<UserReleaseRole>());
+                .ReturnsAsync(It.IsAny<UserPreReleaseRole>());
             userPreReleaseRoleRepository
                 .Setup(mock =>
                     mock.Create(userToCreate.Id, releaseVersion2.Id, CreatedById, null, It.IsAny<CancellationToken>())
                 )
-                .ReturnsAsync(It.IsAny<UserReleaseRole>());
+                .ReturnsAsync(It.IsAny<UserPreReleaseRole>());
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository

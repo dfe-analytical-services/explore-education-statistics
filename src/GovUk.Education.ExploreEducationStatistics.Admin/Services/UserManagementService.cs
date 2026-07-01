@@ -161,11 +161,11 @@ public class UserManagementService(
                             var userPreReleaseRoles = await userPreReleaseRoleRepository
                                 .Query(ResourceRoleFilter.PendingOnly)
                                 .WhereForUser(pendingUserInvite.UserId)
-                                .Select(urr => new UserPreReleaseRoleViewModel
+                                .Select(uprr => new UserPreReleaseRoleViewModel
                                 {
-                                    Id = urr.Id,
-                                    Publication = urr.ReleaseVersion.Release.Publication.Title,
-                                    Release = urr.ReleaseVersion.Release.Title,
+                                    Id = uprr.Id,
+                                    Publication = uprr.ReleaseVersion.Release.Publication.Title,
+                                    Release = uprr.ReleaseVersion.Release.Title,
                                 })
                                 .ToListAsync(cancellationToken);
 
