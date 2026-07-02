@@ -179,16 +179,15 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe")]
             FunctionContext context,
         HttpRequest request,
-        string publicationId,
-        string token
+        string publicationId
     )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
+        var token = request.Query["token"].ToString();
         var email = tokenService.GetEmailFromToken(token);
         if (email is null)
         {
@@ -242,20 +241,15 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.VerifySubscription)]
     public async Task<IActionResult> VerifySubscription(
-        [HttpTrigger(
-            AuthorizationLevel.Anonymous,
-            "get",
-            Route = "publication/{publicationId}/verify-subscription/{token}"
-        )]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/verify-subscription")]
             FunctionContext context,
         HttpRequest request,
-        Guid publicationId,
-        string token
+        Guid publicationId
     )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
+        var token = request.Query["token"].ToString();
         var email = tokenService.GetEmailFromToken(token);
 
         if (email == null)

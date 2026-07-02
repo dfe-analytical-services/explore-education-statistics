@@ -64,18 +64,13 @@ public class ApiSubscriptionFunctions(
 
     [Function(FunctionNames.VerifySubscription)]
     public async Task<IActionResult> VerifySubscription(
-        [HttpTrigger(
-            AuthorizationLevel.Anonymous,
-            "post",
-            Route = "public-api/{dataSetId:guid}/verify-subscription/{token}"
-        )]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/{dataSetId:guid}/verify-subscription")]
             HttpRequest request,
         Guid dataSetId,
-        string token, // TODO (EES-7105): Remove token from route and use query string instead
         CancellationToken cancellationToken
     )
     {
-        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
+        var token = request.Query["token"].ToString();
 
         try
         {
@@ -96,14 +91,13 @@ public class ApiSubscriptionFunctions(
 
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe")]
             HttpRequest request,
         Guid dataSetId,
-        string token, // TODO (EES-7105): Remove token from route and use query string instead
         CancellationToken cancellationToken
     )
     {
-        token = string.IsNullOrWhiteSpace(token) ? request.Query["token"].ToString() : token;
+        var token = request.Query["token"].ToString();
 
         try
         {

@@ -426,7 +426,6 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             return await functions.VerifySubscription(
                 request: request,
                 dataSetId: dataSetId,
-                token: "",
                 cancellationToken: CancellationToken.None
             );
         }
@@ -554,7 +553,6 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             return await functions.Unsubscribe(
                 request: request,
                 dataSetId: dataSetId,
-                token: "",
                 cancellationToken: CancellationToken.None
             );
         }

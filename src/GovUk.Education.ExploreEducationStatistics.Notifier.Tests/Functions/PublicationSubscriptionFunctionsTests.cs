@@ -468,7 +468,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         request.QueryString = QueryString.Create("token", "verification-code-4");
 
         // Act
-        var result = await notifierFunction.VerifySubscription(new TestFunctionContext(), request, publicationId, "");
+        var result = await notifierFunction.VerifySubscription(new TestFunctionContext(), request, publicationId);
 
         // Assert
         Assert.IsType<OkObjectResult>(result);
@@ -556,8 +556,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
             var result = await notifierFunction.Unsubscribe(
                 new TestFunctionContext(),
                 request,
-                publicationId.ToString(),
-                ""
+                publicationId.ToString()
             );
 
             var okResult = Assert.IsAssignableFrom<OkObjectResult>(result);
