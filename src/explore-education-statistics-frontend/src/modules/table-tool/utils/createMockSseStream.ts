@@ -62,7 +62,7 @@ export default function createMockSseStream({
             }),
           ),
         );
-        await delay(300);
+        await delay(500);
 
         // Stage 3: Reranker
         controller.enqueue(
@@ -92,7 +92,7 @@ export default function createMockSseStream({
             }),
           ),
         );
-        await delay(800);
+        await delay(1200);
 
         // Stage 4: Complete
         controller.enqueue(
@@ -152,7 +152,7 @@ export default function createMockSseStream({
                         year: '2026',
                       },
                     },
-                    title: 'Other final result',
+                    title: 'Test final result',
                   },
                 ],
                 token_usage: {

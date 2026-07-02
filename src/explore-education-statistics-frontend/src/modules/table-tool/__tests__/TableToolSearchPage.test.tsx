@@ -3,6 +3,7 @@ import {
   testPublicationSummary,
   testReleaseVersionSummary,
 } from '@frontend/modules/find-statistics/__tests__/__data__/testReleaseData';
+import { testFinalResult } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
 import TableToolSearchPage from '@frontend/modules/table-tool/TableToolSearchPage';
 import tableToolSearchService, {
   FatalError,
@@ -150,17 +151,12 @@ describe('TableToolSearchPage', () => {
       capturedOptions.onMessage({
         stage: PipelineStage.COMPLETE,
         data: {
-          datasets: [
-            {
-              fileId: 'file-1',
-              title: 'Dataset B',
-              aiSummary: 'Test AI summary.',
-              filters: [],
-              indicators: [],
-              geographicLevels: {},
-            },
-          ],
-          token_usage: 100,
+          datasets: [testFinalResult],
+          token_usage: {
+            input: 100,
+            output: 100,
+          },
+          cost: 0.4,
         },
       });
     });
@@ -168,7 +164,9 @@ describe('TableToolSearchPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Dataset B' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Test AI summary.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Test AI relevance summary explanation.'),
+    ).toBeInTheDocument();
 
     expect(screen.queryByText('Processing request')).not.toBeInTheDocument();
   });

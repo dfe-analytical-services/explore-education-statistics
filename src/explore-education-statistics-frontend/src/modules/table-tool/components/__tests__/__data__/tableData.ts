@@ -8,6 +8,7 @@ import { SelectedPublication } from '@common/modules/table-tool/types/selectedPu
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableDataQuery } from '@common/services/tableBuilderService';
+import { FinalDataset } from '@frontend/services/tableToolSearchService';
 
 export const testQuery: TableDataQuery = {
   publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
@@ -261,4 +262,17 @@ export const testPublicationMethodologyList = {
       slug: 'm1',
     },
   ],
+};
+
+export const testFinalResult: FinalDataset = {
+  fileId: 'test-file-id',
+  title: 'Test dataset title',
+  aiSummary: 'Test AI relevance summary explanation.',
+  filters: [],
+  geographicLevels: {},
+  timePeriod: {
+    start: { code: 'AY', year: '2014' },
+    end: { code: 'AY', year: '2016' },
+  },
+  indicators: [],
 };
