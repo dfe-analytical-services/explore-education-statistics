@@ -18,7 +18,7 @@ export interface FilterReplacement extends TargetReplacement {
 }
 
 export interface FilterGroupReplacement extends TargetReplacement {
-  filters: FilterItemReplacement[];
+  items: FilterItemReplacement[];
 }
 
 export type FilterItemReplacement = TargetReplacement;

@@ -365,7 +365,7 @@ public class ReplacementPlanService(
                                 id: groupMap.OriginalId,
                                 label: groupMap.OriginalLabel,
                                 target: groupMap.ReplacementId,
-                                filters: groupMap
+                                items: groupMap
                                     .FilterItemMappings.Values.Where(itemMap =>
                                         dataBlockFilterItemIds.Contains(itemMap.OriginalId)
                                     )

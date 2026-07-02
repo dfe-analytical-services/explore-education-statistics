@@ -21,10 +21,8 @@ public class DataReplacementPlanViewModel
         && Footnotes.All(info => info.Valid)
         && (ApiDataSetVersionPlan?.Valid ?? true);
 
-    /**
-     * Trimmed down version of the data replacement plan that
-     * only shows full replacement details for invalid items.
-     */
+    // Trimmed down version of the data replacement plan that
+    // only shows full replacement details for invalid items.
     public DataReplacementPlanViewModel ToSummary()
     {
         return new DataReplacementPlanViewModel
@@ -154,15 +152,15 @@ public class FilterGroupReplacementViewModel(
     Guid id,
     string label,
     Guid? target,
-    IEnumerable<FilterItemReplacementViewModel> filters
+    IEnumerable<FilterItemReplacementViewModel> items
 )
 {
     public Guid Id { get; } = id;
     public string Label { get; } = label;
     public Guid? Target { get; } = target;
-    public IEnumerable<FilterItemReplacementViewModel> Filters { get; } = filters; // @MarkFix rename to Items
+    public IEnumerable<FilterItemReplacementViewModel> Items { get; } = items; // @MarkFix rename to Items
 
-    public bool Valid => Target.HasValue && Filters.All(filter => filter.Valid);
+    public bool Valid => Target.HasValue && Items.All(filter => filter.Valid);
 }
 
 public class FilterItemReplacementViewModel(Guid id, string label, Guid? target)

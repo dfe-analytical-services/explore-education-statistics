@@ -160,7 +160,7 @@ public class ReplacementService(
             .Filters.Where(plan => plan.Value.Target != null)
             .ToDictionary(plan => plan.Value.Id, plan => plan.Value.Target!.Value);
         var filterItemTargets = replacementPlan
-            .Filters.SelectMany(filter => filter.Value.Groups.SelectMany(group => group.Value.Filters))
+            .Filters.SelectMany(filter => filter.Value.Groups.SelectMany(group => group.Value.Items))
             .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
         var indicatorTargets = replacementPlan
             .IndicatorGroups.SelectMany(group => group.Value.Indicators)

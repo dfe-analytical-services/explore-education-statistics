@@ -507,9 +507,9 @@ public class ReplacementPlanServiceTests
             Assert.Equal(originalFilterGroup.Label, dataBlockFilterGroupPlan.Value.Label);
             Assert.False(dataBlockFilterGroupPlan.Value.Valid);
 
-            Assert.Single(dataBlockFilterGroupPlan.Value.Filters);
+            Assert.Single(dataBlockFilterGroupPlan.Value.Items);
 
-            var dataBlockFilterItemPlan = dataBlockFilterGroupPlan.Value.Filters.First();
+            var dataBlockFilterItemPlan = dataBlockFilterGroupPlan.Value.Items.First();
 
             Assert.Equal(originalFilterItem.Id, dataBlockFilterItemPlan.Id);
             Assert.Equal(originalFilterItem.Label, dataBlockFilterItemPlan.Label);
@@ -1852,10 +1852,10 @@ public class ReplacementPlanServiceTests
             Assert.Equal(originalDefaultFilterGroup.Id, dataBlockDefaultFilterGroupPlan.Key);
             Assert.Equal(originalDefaultFilterGroup.Id, dataBlockDefaultFilterGroupPlan.Value.Id);
             Assert.Equal(originalDefaultFilterGroup.Label, dataBlockDefaultFilterGroupPlan.Value.Label);
-            Assert.Single(dataBlockDefaultFilterGroupPlan.Value.Filters);
+            Assert.Single(dataBlockDefaultFilterGroupPlan.Value.Items);
             Assert.True(dataBlockDefaultFilterGroupPlan.Value.Valid);
 
-            var dataBlockDefaultFilterItemPlan = dataBlockDefaultFilterGroupPlan.Value.Filters.First();
+            var dataBlockDefaultFilterItemPlan = dataBlockDefaultFilterGroupPlan.Value.Items.First();
 
             Assert.Equal(originalDefaultFilterItem.Id, dataBlockDefaultFilterItemPlan.Id);
             Assert.Equal(originalDefaultFilterItem.Label, dataBlockDefaultFilterItemPlan.Label);
@@ -1885,7 +1885,7 @@ public class ReplacementPlanServiceTests
                 originalIndividualSchoolTypeFilterGroup.Label,
                 dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Label
             );
-            Assert.Single(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters);
+            Assert.Single(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Items);
             Assert.True(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Valid);
 
             var dataBlockCombinedSchoolTypeFilterGroupPlan = dataBlockSchoolTypeFilterPlan.Value.Groups.First(g =>
@@ -1897,11 +1897,11 @@ public class ReplacementPlanServiceTests
                 originalCombinedSchoolTypeFilterGroup.Label,
                 dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Label
             );
-            Assert.Single(dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Filters);
+            Assert.Single(dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Items);
             Assert.True(dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Valid);
 
             var dataBlockPrimarySchoolsFilterItemPlan =
-                dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters.First();
+                dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Items.First();
 
             Assert.Equal(originalPrimarySchoolsFilterItem.Id, dataBlockPrimarySchoolsFilterItemPlan.Id);
             Assert.Equal(originalPrimarySchoolsFilterItem.Label, dataBlockPrimarySchoolsFilterItemPlan.Label);

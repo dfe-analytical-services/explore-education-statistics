@@ -55,7 +55,7 @@ public abstract class DataReplacementControllerTests
                                                 id: Guid.NewGuid(),
                                                 label: "filter group replacement label",
                                                 target: Guid.NewGuid(),
-                                                filters:
+                                                items:
                                                 [
                                                     new FilterItemReplacementViewModel(
                                                         id: Guid.NewGuid(),
