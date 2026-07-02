@@ -31,6 +31,7 @@ public class PreReleaseUserService(
     IUserService userService,
     IUserRepository userRepository,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     IReleaseVersionRepository releaseVersionRepository,
     IGlobalRoleService globalRoleService
 ) : IPreReleaseUserService
@@ -103,11 +104,12 @@ public class PreReleaseUserService(
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccessDo(userService.CheckCanAssignPreReleaseContactsToReleaseVersion)
-            .OnSuccess<ActionResult, ReleaseVersion, PreReleaseUserInvitePlan>(async _ =>
+            .OnSuccess<ActionResult, ReleaseVersion, PreReleaseUserInvitePlan>(async releaseVersion =>
             {
                 var invitable = new List<string>();
                 var alreadyAccepted = new List<string>();
                 var alreadyInvited = new List<string>();
+                var alreadyHasMorePowerfulRole = new List<string>();
 
                 foreach (var email in request.Emails)
                 {
@@ -119,9 +121,21 @@ public class PreReleaseUserService(
                         continue;
                     }
 
+                    var userAlreadyHasMorePowerfulRole =
+                        await CheckUserAlreadyHasMorePowerfulRoleThanPreReleaseOnReleaseVersion(
+                            userId: existingUser.Id,
+                            releaseVersion: releaseVersion
+                        );
+
+                    if (userAlreadyHasMorePowerfulRole)
+                    {
+                        alreadyHasMorePowerfulRole.Add(email);
+                        continue;
+                    }
+
                     var userAlreadyHasPreReleaseRole = await CheckUserAlreadyHasPreReleaseRoleOnReleaseVersion(
                         userId: existingUser.Id,
-                        releaseVersionId: releaseVersionId
+                        releaseVersionId: releaseVersion.Id
                     );
 
                     if (!userAlreadyHasPreReleaseRole)
@@ -149,6 +163,7 @@ public class PreReleaseUserService(
                     Invitable = invitable,
                     AlreadyAccepted = alreadyAccepted,
                     AlreadyInvited = alreadyInvited,
+                    AlreadyHasMorePowerfulRole = alreadyHasMorePowerfulRole,
                 };
             });
     }
@@ -225,7 +240,7 @@ public class PreReleaseUserService(
             .OnSuccess(tuple => (ReleaseVersion: tuple.Item1, User: tuple.Item2))
             .OnSuccessDo(tuple => userService.CheckCanAssignPreReleaseContactsToReleaseVersion(tuple.ReleaseVersion!))
             .OnSuccessDo(tuple =>
-                ValidatePreReleaseRoleCanBeAdded(userId: userId, releaseVersionId: tuple.ReleaseVersion!.Id)
+                ValidatePreReleaseRoleCanBeAdded(userId: userId, releaseVersion: tuple.ReleaseVersion!)
             )
             .OnSuccessVoid(tuple => GrantPreReleaseAccess(tuple.ReleaseVersion!, tuple.User));
     }
@@ -331,11 +346,19 @@ public class PreReleaseUserService(
                 }
             });
 
-    private async Task<Either<ActionResult, Unit>> ValidatePreReleaseRoleCanBeAdded(Guid userId, Guid releaseVersionId)
+    private async Task<Either<ActionResult, Unit>> ValidatePreReleaseRoleCanBeAdded(
+        Guid userId,
+        ReleaseVersion releaseVersion
+    )
     {
-        if (await CheckUserAlreadyHasPreReleaseRoleOnReleaseVersion(userId, releaseVersionId))
+        if (await CheckUserAlreadyHasPreReleaseRoleOnReleaseVersion(userId, releaseVersion.Id))
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
+        }
+
+        if (await CheckUserAlreadyHasMorePowerfulRoleThanPreReleaseOnReleaseVersion(userId, releaseVersion))
+        {
+            return ValidationActionResult(UserAlreadyHasMorePowerfulRole);
         }
 
         return Unit.Instance;
@@ -343,9 +366,19 @@ public class PreReleaseUserService(
 
     private async Task<bool> CheckUserAlreadyHasPreReleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
         await userPreReleaseRoleRepository.UserHasPreReleaseRoleOnReleaseVersion(
-            userId,
-            releaseVersionId,
-            ResourceRoleFilter.AllButExpired
+            userId: userId,
+            releaseVersionId: releaseVersionId,
+            resourceRoleFilter: ResourceRoleFilter.AllButExpired
+        );
+
+    private async Task<bool> CheckUserAlreadyHasMorePowerfulRoleThanPreReleaseOnReleaseVersion(
+        Guid userId,
+        ReleaseVersion releaseVersion
+    ) =>
+        await userPublicationRoleRepository.UserHasAnyRoleOnPublication(
+            userId: userId,
+            publicationId: releaseVersion.Release.PublicationId,
+            resourceRoleFilter: ResourceRoleFilter.AllButExpired
         );
 
     private async Task<Either<ActionResult, UserPreReleaseRole>> CheckUserPreReleaseRoleExists(

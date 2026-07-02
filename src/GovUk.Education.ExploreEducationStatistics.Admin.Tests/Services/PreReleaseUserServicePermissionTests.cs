@@ -224,6 +224,7 @@ public class PreReleaseUserServicePermissionTests
         IUserService? userService = null,
         IUserRepository? userRepository = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IGlobalRoleService? globalRoleService = null
     )
@@ -236,6 +237,7 @@ public class PreReleaseUserServicePermissionTests
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
             globalRoleService ?? Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
         );
