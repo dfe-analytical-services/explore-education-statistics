@@ -758,7 +758,7 @@ describe('redirectPages', () => {
       redirectService.list.mockResolvedValue(testRedirects);
       await runMiddleware(
         redirectPages,
-        'https://my-env/subscriptions/release-name/confirm-subscription?token=AbC',
+        'https://my-env/subscriptions/release-name/confirm-subscription/AbC',
       );
 
       expect(redirectSpy).not.toHaveBeenCalled();
@@ -769,7 +769,7 @@ describe('redirectPages', () => {
       redirectService.list.mockResolvedValue(testRedirects);
       await runMiddleware(
         redirectPages,
-        'https://my-env/subscriptions/release-name/confirm-unsubscription?token=AbC',
+        'https://my-env/subscriptions/release-name/confirm-unsubscription/AbC',
       );
 
       expect(redirectSpy).not.toHaveBeenCalled();
@@ -780,7 +780,7 @@ describe('redirectPages', () => {
       redirectService.list.mockResolvedValue(testRedirects);
       await runMiddleware(
         redirectPages,
-        'https://my-env/api-subscriptions/release-name/confirm-subscription?token=AbC',
+        'https://my-env/api-subscriptions/release-name/confirm-subscription/AbC',
       );
 
       expect(redirectSpy).not.toHaveBeenCalled();
@@ -791,7 +791,7 @@ describe('redirectPages', () => {
       redirectService.list.mockResolvedValue(testRedirects);
       await runMiddleware(
         redirectPages,
-        'https://my-env/api-subscriptions/release-name/confirm-unsubscription?token=AbC',
+        'https://my-env/api-subscriptions/release-name/confirm-unsubscription/AbC',
       );
 
       expect(redirectSpy).not.toHaveBeenCalled();
