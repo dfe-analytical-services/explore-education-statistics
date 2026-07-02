@@ -48,6 +48,16 @@ export interface FinalDataset {
   fileId: string;
   filters: string[];
   geographicLevels: Dictionary<GeographicLevelItem[]>;
+  timePeriod: {
+    start: {
+      code: string;
+      year: string;
+    };
+    end: {
+      code: string;
+      year: string;
+    };
+  };
   indicators: string[];
   title: string;
 }
@@ -78,7 +88,11 @@ export interface StageComplete {
   stage: typeof PipelineStage.COMPLETE;
   data: {
     datasets: FinalDataset[];
-    token_usage: number;
+    token_usage: {
+      input: number;
+      output: number;
+    };
+    cost: number;
   };
 }
 

@@ -116,6 +116,16 @@ export default function createMockSseStream({
                     },
                     aiSummary:
                       'This data is relevant because This dataset provides local authority level data on reasons for pupil absence, including holidays, with weekly time frames that cover the last 4 weeks, making it directly relevant to the query for Sheffield.\n It contains information about Daily and weekly local authority, regional and national reasons for pupil attendance and absence. Figures are provided for state-funded primary, secondary and special schools.',
+                    timePeriod: {
+                      start: {
+                        code: 'W17',
+                        year: '2026',
+                      },
+                      end: {
+                        code: 'W20',
+                        year: '2026',
+                      },
+                    },
                     title: 'Reasons for absence and attendance',
                   },
                   {
@@ -132,10 +142,24 @@ export default function createMockSseStream({
                       ],
                     },
                     aiSummary: 'Mock AI summary',
+                    timePeriod: {
+                      start: {
+                        code: 'W17',
+                        year: '2026',
+                      },
+                      end: {
+                        code: 'W20',
+                        year: '2026',
+                      },
+                    },
                     title: 'Other final result',
                   },
                 ],
-                token_usage: 3766,
+                token_usage: {
+                  input: 3766,
+                  output: 3800,
+                },
+                cost: 0.004,
               },
             }),
           ),
