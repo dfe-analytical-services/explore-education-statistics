@@ -2527,16 +2527,16 @@ public class ReplacementServiceTests
             // 'Filter a' should be the only filter in the sequence
             var filterA = Assert.Single(updatedSequence);
             Assert.Equal(replacementFilters[0].Id, filterA.Id);
-            var filterAGroups = filterA.ChildSequence;
+            var filterAGroups = filterA.FilterGroupSequence;
 
             // 'Group a' should be the only group in the sequence
             var filterAGroupA = Assert.Single(filterAGroups);
             Assert.Equal(replacementFilters[0].FilterGroups[0].Id, filterAGroupA.Id);
 
             // 'Group a' should still have two filter items in the same order as the original sequence
-            Assert.Equal(2, filterAGroupA.ChildSequence.Count);
-            Assert.Equal(replacementFilters[0].FilterGroups[0].FilterItems[1].Id, filterAGroupA.ChildSequence[0]);
-            Assert.Equal(replacementFilters[0].FilterGroups[0].FilterItems[0].Id, filterAGroupA.ChildSequence[1]);
+            Assert.Equal(2, filterAGroupA.FilterItemSequence.Count);
+            Assert.Equal(replacementFilters[0].FilterGroups[0].FilterItems[1].Id, filterAGroupA.FilterItemSequence[0]);
+            Assert.Equal(replacementFilters[0].FilterGroups[0].FilterItems[0].Id, filterAGroupA.FilterItemSequence[1]);
         }
     }
 

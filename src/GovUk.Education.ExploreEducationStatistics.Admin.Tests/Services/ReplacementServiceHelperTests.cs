@@ -1,6 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using LinqToDB;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -243,9 +244,8 @@ public class ReplacementServiceHelperTests
         };
 
         var updatedSequence = ReplacementServiceHelper.ReplaceFilterSequence(
-            originalFilters: originalFilters,
-            replacementFilters: replacementFilters,
-            originalReleaseFile
+            originalReleaseFile.FilterSequence,
+            new DataSetMapping() // @MarkFix
         );
 
         // Verify the updated sequence of filters
@@ -256,22 +256,22 @@ public class ReplacementServiceHelperTests
         // 'Filter c' was first in the original sequence and is identical in the replacement subject so it should be first
         var filterC = updatedSequence[0];
         Assert.Equal(replacementFilters[3].Id, filterC.Id);
-        Assert.Empty(filterC.ChildSequence);
+        Assert.Empty(filterC.FilterGroupSequence);
 
         // 'Filter a' should be next in the sequence
         var filterA = updatedSequence[1];
         Assert.Equal(replacementFilters[0].Id, filterA.Id);
 
-        var filterAGroups = filterA.ChildSequence;
+        var filterAGroups = filterA.FilterGroupSequence;
         Assert.Equal(5, filterAGroups.Count);
 
         // 'Group c' was first in the original sequence and is untouched in the replacement subject so it should be first
         var filterAGroupC = filterAGroups[0];
         Assert.Equal(replacementFilters[0].FilterGroups[4].Id, filterAGroupC.Id);
-        Assert.Equal(3, filterAGroupC.ChildSequence.Count);
-        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[2].Id, filterAGroupC.ChildSequence[0]);
-        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[0].Id, filterAGroupC.ChildSequence[1]);
-        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[1].Id, filterAGroupC.ChildSequence[2]);
+        Assert.Equal(3, filterAGroupC.FilterItemSequence.Count);
+        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[2].Id, filterAGroupC.FilterItemSequence[0]);
+        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[0].Id, filterAGroupC.FilterItemSequence[1]);
+        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[1].Id, filterAGroupC.FilterItemSequence[2]);
 
         // 'Group a' would've been the next group but has been removed
 
@@ -279,35 +279,35 @@ public class ReplacementServiceHelperTests
         // Check 'Item e' was removed and both 'Item j' and 'Item k' have been appended in order
         var filterAGroupB = filterAGroups[1];
         Assert.Equal(replacementFilters[0].FilterGroups[3].Id, filterAGroupB.Id);
-        Assert.Equal(4, filterAGroupB.ChildSequence.Count);
+        Assert.Equal(4, filterAGroupB.FilterItemSequence.Count);
         // 'Item f' is first from the original sequence
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[3].Id, filterAGroupB.ChildSequence[0]);
+        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[3].Id, filterAGroupB.FilterItemSequence[0]);
         // 'Item d' is second from the original sequence
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[0].Id, filterAGroupB.ChildSequence[1]);
+        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[0].Id, filterAGroupB.FilterItemSequence[1]);
         // 'Item j' is appended first alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[2].Id, filterAGroupB.ChildSequence[2]);
+        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[2].Id, filterAGroupB.FilterItemSequence[2]);
         // 'Item k' is appended second alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[1].Id, filterAGroupB.ChildSequence[3]);
+        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[1].Id, filterAGroupB.FilterItemSequence[3]);
 
         // Group 'Total' is new so it should be appended first and its filter items should be ordered by label
         var filterAGroupTotal = filterAGroups[2];
         Assert.Equal(replacementFilters[0].FilterGroups[1].Id, filterAGroupTotal.Id);
         // Item 'Total' should be first
-        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[1].Id, filterAGroupTotal.ChildSequence[0]);
+        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[1].Id, filterAGroupTotal.FilterItemSequence[0]);
         // 'Item l' should be second alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[2].Id, filterAGroupTotal.ChildSequence[1]);
+        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[2].Id, filterAGroupTotal.FilterItemSequence[1]);
         // 'Item m' should be third alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[0].Id, filterAGroupTotal.ChildSequence[2]);
+        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[0].Id, filterAGroupTotal.FilterItemSequence[2]);
 
         // 'Group d' is new so it should be appended in order and its filter items should be ordered by label
         var filterAGroupD = filterAGroups[3];
         Assert.Equal(replacementFilters[0].FilterGroups[2].Id, filterAGroupD.Id);
-        Assert.Empty(filterAGroupD.ChildSequence);
+        Assert.Empty(filterAGroupD.FilterItemSequence);
 
         // 'Group e' is new so it should be appended in order
         var filterAGroupE = filterAGroups[4];
         Assert.Equal(replacementFilters[0].FilterGroups[0].Id, filterAGroupE.Id);
-        Assert.Empty(filterAGroupE.ChildSequence);
+        Assert.Empty(filterAGroupE.FilterItemSequence);
 
         // 'Filter b' would've been the next filter but has been removed
 
@@ -315,34 +315,34 @@ public class ReplacementServiceHelperTests
         var filterD = updatedSequence[2];
         Assert.Equal(replacementFilters[2].Id, filterD.Id);
 
-        var filterDGroups = filterD.ChildSequence;
+        var filterDGroups = filterD.FilterGroupSequence;
         Assert.Equal(3, filterDGroups.Count);
 
         // Group 'Total' should be first and its filter items should be ordered by label
         var filterDGroupTotal = filterDGroups[0];
         Assert.Equal(replacementFilters[2].FilterGroups[1].Id, filterDGroupTotal.Id);
-        Assert.Equal(3, filterDGroupTotal.ChildSequence.Count);
+        Assert.Equal(3, filterDGroupTotal.FilterItemSequence.Count);
         // Item 'Total' should be first
-        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[1].Id, filterDGroupTotal.ChildSequence[0]);
+        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[1].Id, filterDGroupTotal.FilterItemSequence[0]);
         // 'Item n' should be second alphabetically
-        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[2].Id, filterDGroupTotal.ChildSequence[1]);
+        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[2].Id, filterDGroupTotal.FilterItemSequence[1]);
         // 'Item o' should be third alphabetically
-        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[0].Id, filterDGroupTotal.ChildSequence[2]);
+        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[0].Id, filterDGroupTotal.FilterItemSequence[2]);
 
         // 'Group f' should be second alphabetically
         var filterDGroupF = filterDGroups[1];
         Assert.Equal(replacementFilters[2].FilterGroups[2].Id, filterDGroupF.Id);
-        Assert.Empty(filterDGroupF.ChildSequence);
+        Assert.Empty(filterDGroupF.FilterItemSequence);
 
         // 'Group g' should be third alphabetically
         var filterDGroupG = filterDGroups[2];
         Assert.Equal(replacementFilters[2].FilterGroups[0].Id, filterDGroupG.Id);
-        Assert.Empty(filterDGroupG.ChildSequence);
+        Assert.Empty(filterDGroupG.FilterItemSequence);
 
         // 'Filter e' is new so it should be appended in order
         var filterE = updatedSequence[3];
         Assert.Equal(replacementFilters[1].Id, filterE.Id);
-        Assert.Empty(filterE.ChildSequence);
+        Assert.Empty(filterE.FilterGroupSequence);
     }
 
     [Fact]

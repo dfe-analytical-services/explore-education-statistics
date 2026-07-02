@@ -120,10 +120,7 @@ public class ReplacementService(
                     && mapping.ReplacementDataFileId == replacementReleaseFile.FileId
                 );
 
-                replacementReleaseFile.FilterSequence = await ReplaceFilterSequence(
-                    originalReleaseFile,
-                    replacementReleaseFile
-                );
+                replacementReleaseFile.FilterSequence = ReplaceFilterSequence(originalReleaseFile, mapping);
                 replacementReleaseFile.IndicatorSequence = ReplaceIndicatorSequence(originalReleaseFile, mapping);
                 replacementReleaseFile.Summary = originalReleaseFile.Summary; // Set Data guidance
 
@@ -642,9 +639,9 @@ public class ReplacementService(
         );
     }
 
-    private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(
+    private static List<FilterSequenceEntry>? ReplaceFilterSequence(
         ReleaseFile originalReleaseFile,
-        ReleaseFile replacementReleaseFile
+        DataSetMapping mapping
     )
     {
         // If the sequence is null then leave it so we continue to fallback to ordering by label alphabetically
@@ -653,17 +650,9 @@ public class ReplacementService(
             return null;
         }
 
-        var originalFilters = await filterRepository.GetFiltersIncludingItems(
-            originalReleaseFile.File.SubjectId!.Value
-        );
-        var replacementFilters = await filterRepository.GetFiltersIncludingItems(
-            replacementReleaseFile.File.SubjectId!.Value
-        );
-
         return ReplacementServiceHelper.ReplaceFilterSequence(
-            originalFilters: originalFilters,
-            replacementFilters: replacementFilters,
-            originalReleaseFile
+            originalSequence: originalReleaseFile.FilterSequence,
+            mapping: mapping
         );
     }
 
