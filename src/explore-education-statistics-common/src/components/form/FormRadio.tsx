@@ -107,9 +107,7 @@ const FormRadio = ({
         {hint && (
           <div
             id={`${id}-item-hint`}
-            className={classNames(
-              'govuk-hint govuk-radios__hint govuk-!-font-size-16',
-            )}
+            className="govuk-hint govuk-radios__hint govuk-!-font-size-16"
           >
             {hint}
           </div>

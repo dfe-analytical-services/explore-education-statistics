@@ -96,9 +96,7 @@ const FormCheckbox = ({
         {hint && (
           <div
             id={`${id}-item-hint`}
-            className={classNames(
-              'govuk-hint govuk-checkboxes__hint govuk-!-font-size-16',
-            )}
+            className="govuk-hint govuk-checkboxes__hint govuk-!-font-size-16"
           >
             {hint}
           </div>
