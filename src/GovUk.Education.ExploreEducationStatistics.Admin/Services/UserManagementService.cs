@@ -219,11 +219,6 @@ public class UserManagementService(
                     createdDate: request.CreatedDate
                 );
 
-                // Clear out any pre-existing Release Roles or Publication Roles prior to adding
-                // new ones.
-                await userPreReleaseRoleRepository.RemoveForUser(user.Id);
-                await userPublicationRoleRepository.RemoveForUser(user.Id);
-
                 var preReleaseRoleLatestReleaseVersionDetails = await request
                     .UserPreReleaseRoles.Select(role => role.ReleaseId)
                     .Distinct()
@@ -277,15 +272,8 @@ public class UserManagementService(
             .CheckCanManageAllUsers()
             .OnSuccess(async () => await GetPendingUserInvite(email))
             .OnSuccessVoid(async invitedUser =>
-            {
-                await contentDbContext.RequireTransaction(async () =>
-                {
-                    await userPreReleaseRoleRepository.RemoveForUser(invitedUser.Id);
-                    await userPublicationRoleRepository.RemoveForUser(invitedUser.Id);
-
-                    await userRepository.SoftDeleteUser(invitedUser.Id, userService.GetUserId());
-                });
-            });
+                await userRepository.SoftDeleteUser(invitedUser.Id, userService.GetUserId())
+            );
     }
 
     public async Task<Either<ActionResult, Unit>> UpdateUserGlobalRole(string userId, string roleId)
@@ -308,9 +296,6 @@ public class UserManagementService(
                 await contentDbContext.RequireTransaction(async () =>
                 {
                     await userManager.DeleteAsync(identityUser);
-
-                    await userPreReleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
-                    await userPublicationRoleRepository.RemoveForUser(activeInternalUser.Id);
 
                     await userRepository.SoftDeleteUser(activeInternalUser.Id, userService.GetUserId());
                 });

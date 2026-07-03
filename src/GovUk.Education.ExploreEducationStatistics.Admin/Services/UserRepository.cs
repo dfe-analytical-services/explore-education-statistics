@@ -10,7 +10,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
+public class UserRepository(
+    ContentDbContext contentDbContext,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository
+) : IUserRepository
 {
     public async Task<User?> FindPendingUserInviteByEmail(string email, CancellationToken cancellationToken = default)
     {
@@ -97,8 +101,9 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
             throw new ArgumentException($"{nameof(User)} created date cannot be a future date.");
         }
 
-        var existingUser = await contentDbContext.Users.SingleOrDefaultAsync(i =>
-            i.Email.ToLower().Equals(normalizedEmail)
+        var existingUser = await contentDbContext.Users.SingleOrDefaultAsync(
+            i => i.Email.ToLower().Equals(normalizedEmail),
+            cancellationToken: cancellationToken
         );
 
         return existingUser is null
@@ -118,19 +123,25 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
             );
     }
 
-    public async Task SoftDeleteUser(Guid activeUserId, Guid deletedById, CancellationToken cancellationToken = default)
+    public async Task SoftDeleteUser(Guid userId, Guid deletedById, CancellationToken cancellationToken = default)
     {
         var activeUser =
-            await FindUserById(activeUserId, cancellationToken)
+            await FindUserById(userId, cancellationToken)
             ?? throw new InvalidOperationException(
                 "Cannot soft delete a user that is already soft deleted, or does not exist."
             );
 
-        activeUser.Active = false;
-        activeUser.SoftDeleted = DateTime.UtcNow;
-        activeUser.DeletedById = deletedById;
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            await userPreReleaseRoleRepository.RemoveForUser(userId, cancellationToken);
+            await userPublicationRoleRepository.RemoveForUser(userId, cancellationToken);
 
-        await contentDbContext.SaveChangesAsync(cancellationToken);
+            activeUser.Active = false;
+            activeUser.SoftDeleted = DateTime.UtcNow;
+            activeUser.DeletedById = deletedById;
+
+            await contentDbContext.SaveChangesAsync(cancellationToken);
+        });
     }
 
     private async Task<User> CreateNewUser(
@@ -166,29 +177,39 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
         CancellationToken cancellationToken
     )
     {
-        return existingUser.Active ? throw new InvalidOperationException("Cannot update a user that is active.")
-            : existingUser.SoftDeleted.HasValue
-                ? await ResetSoftDeletedUser(
+        if (existingUser.Active)
+        {
+            throw new InvalidOperationException("Cannot update a user that is active.");
+        }
+
+        return await contentDbContext.RequireTransaction(async () =>
+        {
+            await userPreReleaseRoleRepository.RemoveForUser(existingUser.Id);
+            await userPublicationRoleRepository.RemoveForUser(existingUser.Id);
+
+            return existingUser.SoftDeleted.HasValue
+                    ? await ResetSoftDeletedUser(
+                        user: existingUser,
+                        createdById: createdById,
+                        createdDate: createdDate,
+                        roleId: roleId,
+                        cancellationToken: cancellationToken
+                    )
+                : existingUser.IsInviteExpired()
+                    ? await ResetExpiredUserInvite(
+                        user: existingUser,
+                        createdById: createdById,
+                        createdDate: createdDate,
+                        roleId: roleId,
+                        cancellationToken: cancellationToken
+                    )
+                : await ResetPendingUserInvite(
                     user: existingUser,
-                    createdById: createdById,
-                    createdDate: createdDate,
                     roleId: roleId,
-                    cancellationToken: cancellationToken
-                )
-            : existingUser.IsInviteExpired()
-                ? await ResetExpiredUserInvite(
-                    user: existingUser,
-                    createdById: createdById,
                     createdDate: createdDate,
-                    roleId: roleId,
                     cancellationToken: cancellationToken
-                )
-            : await ResetPendingUserInvite(
-                user: existingUser,
-                roleId: roleId,
-                createdDate: createdDate,
-                cancellationToken: cancellationToken
-            );
+                );
+        });
     }
 
     private async Task<User> ResetPendingUserInvite(

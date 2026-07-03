@@ -1,14 +1,17 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -646,12 +649,28 @@ public abstract class UserRepositoryTests
             Assert.Null(user.SoftDeleted);
             Assert.Null(user.DeletedById);
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 await repository.SoftDeleteUser(user.Id, deletedById);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -680,12 +699,28 @@ public abstract class UserRepositoryTests
             // Ensure initial state is correct
             Assert.True(user.IsInvitePending());
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 await repository.SoftDeleteUser(user.Id, deletedById);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -714,12 +749,28 @@ public abstract class UserRepositoryTests
             // Ensure initial state is correct
             Assert.True(user.IsInviteExpired());
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 await repository.SoftDeleteUser(user.Id, deletedById);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -837,9 +888,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -862,6 +927,8 @@ public abstract class UserRepositoryTests
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
                 Assert.Equal(newCreatedDate, result.Created);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -898,9 +965,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -911,6 +992,8 @@ public abstract class UserRepositoryTests
 
                 Assert.Equal(newCreatedDate, result.Created);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -936,9 +1019,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -948,6 +1045,8 @@ public abstract class UserRepositoryTests
 
                 result.Created.AssertUtcNow();
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -990,9 +1089,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -1015,6 +1128,8 @@ public abstract class UserRepositoryTests
                 Assert.Equal(newCreatedById, result.CreatedById);
                 Assert.Equal(newCreatedDate, result.Created);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1051,9 +1166,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -1064,6 +1193,8 @@ public abstract class UserRepositoryTests
 
                 Assert.Equal(newCreatedDate, result.Created);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1087,9 +1218,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -1099,6 +1244,8 @@ public abstract class UserRepositoryTests
 
                 result.Created.AssertUtcNow();
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1143,9 +1290,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -1168,6 +1329,8 @@ public abstract class UserRepositoryTests
                 Assert.Null(result.FirstName);
                 Assert.Null(result.LastName);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1204,9 +1367,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -1217,6 +1394,8 @@ public abstract class UserRepositoryTests
 
                 Assert.Equal(newCreatedDate, result.Created);
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1242,9 +1421,23 @@ public abstract class UserRepositoryTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(MockBehavior.Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository
+                .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = BuildRepository(contentDbContext);
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                );
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -1254,6 +1447,8 @@ public abstract class UserRepositoryTests
 
                 result.Created.AssertUtcNow();
             }
+
+            MockUtils.VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1401,8 +1596,18 @@ public abstract class UserRepositoryTests
         }
     }
 
-    private static UserRepository BuildRepository(ContentDbContext contentDbContext)
+    private static UserRepository BuildRepository(
+        ContentDbContext contentDbContext,
+        IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+    )
     {
-        return new(contentDbContext);
+        return new(
+            contentDbContext: contentDbContext,
+            userPreReleaseRoleRepository: userPreReleaseRoleRepository
+                ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
+            userPublicationRoleRepository: userPublicationRoleRepository
+                ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict)
+        );
     }
 }
