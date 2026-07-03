@@ -636,6 +636,10 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<User>().HasOne(e => e.Role).WithMany().OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+        modelBuilder
+            .Entity<User>()
+            .ToTable(t => t.HasCheckConstraint("CK_Users_Active_SoftDeleted", "[Active] = 0 OR [SoftDeleted] IS NULL"));
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
