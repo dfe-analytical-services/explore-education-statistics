@@ -249,4 +249,88 @@ public abstract class TimePeriodServiceTests
             }
         }
     }
+
+    public class GetTimePeriodRangeTests : TimePeriodServiceTests
+    {
+        [Fact]
+        public void AcademicYearRange_IncludesAllYearsInRange()
+        {
+            List<Observation> observations =
+            [
+                new() { Year = 2024, TimeIdentifier = AcademicYear },
+                new() { Year = 2026, TimeIdentifier = AcademicYear },
+            ];
+
+            using var statisticsDbContext = InMemoryStatisticsDbContext();
+            var service = new TimePeriodService(statisticsDbContext);
+            var result = service.GetTimePeriodRange(observations);
+
+            Assert.Equal(3, result.Count);
+            Assert.Equal((2024, AcademicYear), result[0]);
+            Assert.Equal((2025, AcademicYear), result[1]);
+            Assert.Equal((2026, AcademicYear), result[2]);
+        }
+
+        [Fact]
+        public void TermRange_ExcludesTermsNotInObservations()
+        {
+            List<Observation> observations =
+            [
+                new() { Year = 2025, TimeIdentifier = AutumnTerm },
+                new() { Year = 2025, TimeIdentifier = SummerTerm },
+            ];
+
+            using var statisticsDbContext = InMemoryStatisticsDbContext();
+            var service = new TimePeriodService(statisticsDbContext);
+            var result = service.GetTimePeriodRange(observations);
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal((2025, AutumnTerm), result[0]);
+            Assert.Equal((2025, SummerTerm), result[1]);
+        }
+
+        [Fact]
+        public void TermRangeIncludesAutumnSpringTerm_IncludesAutumnSpringTermInResult()
+        {
+            List<Observation> observations =
+            [
+                new() { Year = 2025, TimeIdentifier = AutumnTerm },
+                new() { Year = 2025, TimeIdentifier = SpringTerm },
+                new() { Year = 2025, TimeIdentifier = AutumnSpringTerm },
+                new() { Year = 2025, TimeIdentifier = SummerTerm },
+            ];
+
+            using var statisticsDbContext = InMemoryStatisticsDbContext();
+            var service = new TimePeriodService(statisticsDbContext);
+            var result = service.GetTimePeriodRange(observations);
+
+            Assert.Equal(4, result.Count);
+            Assert.Equal((2025, AutumnTerm), result[0]);
+            Assert.Equal((2025, SpringTerm), result[1]);
+            Assert.Equal((2025, AutumnSpringTerm), result[2]);
+            Assert.Equal((2025, SummerTerm), result[3]);
+        }
+
+        [Fact]
+        public void TermRangeSpansMultipleYears_ExcludesTermsNotInObservations()
+        {
+            List<Observation> observations =
+            [
+                new() { Year = 2024, TimeIdentifier = AutumnTerm },
+                new() { Year = 2024, TimeIdentifier = SummerTerm },
+                new() { Year = 2025, TimeIdentifier = AutumnTerm },
+                new() { Year = 2025, TimeIdentifier = SummerTerm },
+            ];
+
+            using var statisticsDbContext = InMemoryStatisticsDbContext();
+            var service = new TimePeriodService(statisticsDbContext);
+            var result = service.GetTimePeriodRange(observations);
+
+            Assert.Equal(4, result.Count);
+            Assert.Equal((2024, AutumnTerm), result[0]);
+            Assert.Equal((2024, SummerTerm), result[1]);
+            Assert.Equal((2025, AutumnTerm), result[2]);
+            Assert.Equal((2025, SummerTerm), result[3]);
+        }
+    }
 }
