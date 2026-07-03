@@ -64,17 +64,14 @@ public class ApiSubscriptionFunctions(
 
     [Function(FunctionNames.VerifySubscription)]
     public async Task<IActionResult> VerifySubscription(
-        [HttpTrigger(
-            AuthorizationLevel.Anonymous,
-            "post",
-            Route = "public-api/{dataSetId:guid}/verify-subscription/{token}"
-        )]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/{dataSetId:guid}/verify-subscription")]
             HttpRequest request,
         Guid dataSetId,
-        string token,
         CancellationToken cancellationToken
     )
     {
+        var token = request.Query["token"].ToString();
+
         try
         {
             return await apiSubscriptionService
@@ -94,13 +91,14 @@ public class ApiSubscriptionFunctions(
 
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe")]
             HttpRequest request,
         Guid dataSetId,
-        string token,
         CancellationToken cancellationToken
     )
     {
+        var token = request.Query["token"].ToString();
+
         try
         {
             return await apiSubscriptionService
