@@ -135,7 +135,7 @@ module appGatewayModule '../../../common/components/application-gateway/appGatew
       {
         name: '${publicSiteAppServiceName}-backend'
         fqdn: publicSiteInternalServiceFqdn
-        healthProbePath: '/api/health'
+        healthProbePath: '/health'
         intervalSeconds: 60
         requestTimeout: 220 // Timeout set to just under Azure's standard App Service timeout of 3.8 minutes.
       }
