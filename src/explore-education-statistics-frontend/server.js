@@ -75,6 +75,15 @@ async function startServer() {
 
   const server = express();
 
+  server.head('/health', (req, res) => {
+    return res.status(200);
+  });
+
+  server.get('/health', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=30');
+    return res.status(200).send('OK');
+  });
+
   function replaceLastOccurrence(input, pattern, replacement) {
     if (!input || !input.endsWith(pattern)) {
       return input;
