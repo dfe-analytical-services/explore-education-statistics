@@ -1,0 +1,223 @@
+﻿@use '~govuk-frontend/dist/govuk/base' as *;
+
+// Legacy 5.x styles to add back header text and menus
+// mostly copied from the original govuk v5 library, with the rebrand overrides directly applied
+// some refactoring to fit with stylelint rules
+$govuk-header-vertical-spacing-value: 2;
+$govuk-header-border-width: govuk-spacing(2);
+$govuk-header-border-color: govuk-functional-colour(brand);
+$govuk-header-link-underline-thickness: 3px;
+$govuk-header-border-color: govuk-functional-colour(brand);
+$govuk-header-nav-item-border-color: #2e3133;
+$govuk-header-link-active: #1d8feb;
+
+.govuk-header__container {
+  @include govuk-clearfix;
+  position: relative;
+  margin-bottom: 0;
+  padding-top: 0;
+  border-bottom: 0;
+}
+
+.govuk-header__link {
+  // Avoid using the `govuk-link-common` mixin because the links in the header
+  // get a special treatment, because:
+  //
+  // - underlines are only visible on hover
+  // - all links get a 3px underline regardless of text size, as there are
+  //   multiple grouped elements close to one another and having slightly
+  //   different underline widths looks unbalanced
+  @include govuk-link-style-inverse;
+
+  text-decoration: none;
+}
+
+.govuk-header__link:hover {
+  @include govuk-link-style-inverse;
+
+  text-decoration: underline;
+  text-decoration-thickness: $govuk-header-link-underline-thickness;
+
+  @if $govuk-link-underline-offset {
+    text-underline-offset: $govuk-link-underline-offset;
+  }
+}
+
+.govuk-header__link:focus {
+  @include govuk-link-style-inverse;
+  @include govuk-focused-text;
+}
+
+.govuk-header__logo {
+  @include govuk-responsive-margin(
+    $govuk-header-vertical-spacing-value,
+    'bottom'
+  );
+
+  @include govuk-media-query($from: desktop) {
+    width: 33.33%;
+    padding-right: $govuk-gutter-half;
+    float: left;
+    vertical-align: top;
+
+    // Reset float when logo is the last child, without a navigation
+    &:last-child {
+      width: auto;
+      padding-right: 0;
+      float: none;
+    }
+  }
+
+  // Apply margins to internal elements to emulate padding
+  margin-bottom: 0;
+
+  // Magic numbers, set padding to vertically centre align the logo
+  padding-top: 16px;
+  // 12px (14 - rebrand bottomof 2px)
+  padding-bottom: 12px;
+}
+
+.govuk-header__service-name {
+  display: inline-block;
+  @include govuk-font-size($size: 24);
+  @include govuk-typography-weight-bold;
+
+  // Apply margins to internal elements to emulate padding
+  margin-bottom: govuk-spacing(3);
+
+  @include govuk-media-query($from: desktop) {
+    // Magic number to align service name baseline with the GOV.UK logo
+    $service-name-offset: 4px;
+
+    margin: (govuk-spacing(3) + $service-name-offset) 0
+      (govuk-spacing(3) - $service-name-offset);
+  }
+}
+
+.govuk-header__logo,
+.govuk-header__content {
+  box-sizing: border-box;
+}
+
+.govuk-header__content {
+  @include govuk-media-query($from: desktop) {
+    width: 66.66%;
+    padding-left: $govuk-gutter-half;
+    float: left;
+  }
+}
+
+.govuk-header__service-name + .govuk-header__navigation {
+  @include govuk-media-query($from: desktop) {
+    // If there's both a service name and navigation,
+    // remove the extra padding between them on desktop
+    padding-top: 0;
+
+    // Restore the full bottom padding as the navigation isn't standalone
+    padding-bottom: govuk-spacing(3);
+  }
+}
+
+.govuk-header__navigation-list {
+  // Reset user-agent default list styles
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &[hidden] {
+    display: none;
+  }
+
+  @include govuk-media-query($from: mobile, $until: desktop) {
+    padding-bottom: govuk-spacing(3);
+  }
+}
+
+.govuk-header__navigation--end {
+  @include govuk-media-query($from: desktop) {
+    margin: 0;
+    padding: govuk-spacing(1) 0;
+    text-align: right;
+  }
+}
+
+.govuk-header__navigation-item {
+  padding: govuk-spacing(2) 0;
+  border-bottom: 1px solid $govuk-header-nav-item-border-color;
+
+  @include govuk-media-query($from: desktop) {
+    display: inline-block;
+    margin-right: govuk-spacing(3);
+    padding: govuk-spacing(1) 0;
+    border: 0;
+  }
+
+  a {
+    @include govuk-font-size($size: 16);
+    @include govuk-typography-weight-bold;
+    white-space: nowrap;
+  }
+
+  // Increase top padding of nav items...
+  padding-top: govuk-spacing(3);
+
+  // ...except on desktop
+  @include govuk-media-query($from: desktop) {
+    padding-top: govuk-spacing(1);
+  }
+
+  // Change the dividing line colour between mobile nav items
+  border-bottom-color: govuk-colour('white');
+
+  // Reduce default weight of links so that we can use bold for active ones
+  a {
+    @include govuk-typography-weight-regular;
+  }
+}
+
+.govuk-header__navigation-item--active a {
+  @include govuk-typography-weight-bold;
+
+  &:link,
+  &:hover,
+  &:visited {
+    color: inherit;
+  }
+
+  // When printing, use the normal blue as this contrasts better with the
+  // white printing header
+  @include govuk-media-query($media-type: print) {
+    color: govuk-functional-colour(brand);
+  }
+
+  // When focussed, the text colour needs to be darker to ensure that colour
+  // contrast is still acceptable
+  &:focus {
+    color: govuk-functional-colour(focus);
+  }
+}
+
+.govuk-header__navigation-item:last-child {
+  margin-right: 0;
+  border-bottom: 0;
+}
+
+@include govuk-media-query($media-type: print) {
+  .govuk-header {
+    border-bottom-width: 0;
+    color: govuk-colour('black');
+    background: transparent;
+  }
+
+  .govuk-header__link {
+    &:link,
+    &:visited {
+      color: govuk-colour('black');
+    }
+
+    // Do not append link href to GOV.UK link when printing (e.g. '(/)')
+    &::after {
+      display: none;
+    }
+  }
+}

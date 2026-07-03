@@ -1,10 +1,10 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .item {
   // Can automatically figure this out with CSS instead of having to
   // manually apply `govuk-task-list__item--with-link`.
   &:has(a, button):hover {
-    background: govuk-colour('light-grey');
+    background: govuk-colour('black', $variant: 'tint-95');
   }
 }
 

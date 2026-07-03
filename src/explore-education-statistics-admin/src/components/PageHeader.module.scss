@@ -1,4 +1,5 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use 'sass:list';
 
 // Setting page header colours based on environment
 $envs: (
@@ -8,12 +9,12 @@ $envs: (
     'Local development',
   ),
   dev: (
-    govuk-colour('light-green'),
+    govuk-colour('green', $variant: 'tint-25'),
     govuk-colour('white'),
     'Development',
   ),
   test: (
-    govuk-colour('light-pink'),
+    govuk-colour('magenta', $variant: 'tint-50'),
     govuk-colour('black'),
     'Test',
   ),
@@ -30,9 +31,9 @@ $envs: (
 );
 
 @each $env, $item in $envs {
-  $colour: nth($item, 1);
-  $text-colour: nth($item, 2);
-  $title: nth($item, 3);
+  $colour: list.nth($item, 1);
+  $text-colour: list.nth($item, 2);
+  $title: list.nth($item, 3);
 
   .dfeEnv--#{$env} {
     :global(.govuk-header__container) {

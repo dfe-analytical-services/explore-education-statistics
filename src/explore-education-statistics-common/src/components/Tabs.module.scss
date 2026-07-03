@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .tabs {
   @media print {
@@ -18,6 +18,6 @@
 
 .singleTab {
   @include govuk-media-query($from: tablet) {
-    border-top: 1px solid govuk-colour('mid-grey');
+    border-top: 1px solid govuk-colour('black', $variant: 'tint-80');
   }
 }

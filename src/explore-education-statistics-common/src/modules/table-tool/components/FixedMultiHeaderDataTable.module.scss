@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .figure {
   margin: 0;
@@ -28,7 +28,7 @@
 
   &:focus {
     box-shadow: 0 0 0 4px;
-    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline: govuk-functional-colour(focus) solid $govuk-focus-width;
     outline-offset: 4px;
   }
 }

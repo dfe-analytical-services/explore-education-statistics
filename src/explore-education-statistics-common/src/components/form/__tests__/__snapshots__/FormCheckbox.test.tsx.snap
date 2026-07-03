@@ -71,7 +71,7 @@ exports[`FormCheckbox renders correctly when \`hint\` is provided 1`] = `
     Test checkbox
   </label>
   <div id="test-checkbox-item-hint"
-       class="govuk-hint govuk-checkboxes__hint"
+       class="govuk-hint govuk-checkboxes__hint govuk-!-font-size-16"
   >
     Click me to proceed
   </div>

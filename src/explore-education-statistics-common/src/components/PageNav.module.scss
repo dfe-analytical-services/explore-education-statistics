@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .navContainer {
   @include govuk-media-query($from: tablet) {
@@ -23,7 +23,7 @@
   &::before {
     content: '—';
     margin-left: -#{govuk-spacing(4)};
-    color: govuk-colour('dark-grey');
+    color: govuk-colour('black', $variant: 'tint-25');
   }
 }
 

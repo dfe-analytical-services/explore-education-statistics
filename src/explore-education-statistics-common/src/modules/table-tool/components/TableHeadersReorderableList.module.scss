@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .focusContainer {
   outline: 0;
@@ -7,7 +7,7 @@
 .list {
   margin-top: govuk-spacing(2);
   max-height: 40vh;
-  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline: $govuk-focus-width solid govuk-functional-colour(focus);
   outline-offset: 0;
   overflow: auto;
 

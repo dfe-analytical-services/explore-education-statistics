@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .button {
-  background: $govuk-brand-colour;
+  background: govuk-functional-colour(brand);
   border: 2px solid transparent;
   box-sizing: border-box;
   color: govuk-colour('white');
@@ -13,7 +13,7 @@
 
   &:focus {
     box-shadow: inset 0 0 0 4px govuk-colour('black');
-    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline: govuk-functional-colour(focus) solid $govuk-focus-width;
   }
 }
 
