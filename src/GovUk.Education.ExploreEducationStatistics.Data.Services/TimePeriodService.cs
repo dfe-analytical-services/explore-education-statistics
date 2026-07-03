@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +42,25 @@ public class TimePeriodService : ITimePeriodService
         var start = timePeriods.First();
         var end = timePeriods.Last();
 
-        return TimePeriodUtil.GetTimePeriodRange(start, end);
+        var range = TimePeriodUtil.GetTimePeriodRange(start, end);
+
+        if (!start.TimeIdentifier.IsTerm() || !end.TimeIdentifier.IsTerm())
+        {
+            return range;
+        }
+
+        // For a range of academic terms, only return the terms that are present in the observation data.
+        // This avoids warning users in the 'Explore data' step of Table Tool that
+        // 'Some rows and columns are not shown in this table as the data does not exist in the underlying file'
+        // when the full range of term identifiers is not expected to have data.
+        //
+        // For example, given a range from '2025/26 Autumn term' to '2025/26 Summer term', the generated range is:
+        // '2025/26 Autumn term', '2025/26 Spring term', '2025/26 Autumn and spring term', and '2025/26 Summer term'.
+        //
+        // If observation data only exists for '2025/26 Autumn term' and '2025/26 Summer term', excluding the missing
+        // intermediate terms prevents the unnecessary warning.
+        var timePeriodsSet = timePeriods.ToHashSet();
+        return range.Where(timePeriodsSet.Contains).ToList();
     }
 
     public async Task<TimePeriodLabels> GetTimePeriodLabels(Guid subjectId)
