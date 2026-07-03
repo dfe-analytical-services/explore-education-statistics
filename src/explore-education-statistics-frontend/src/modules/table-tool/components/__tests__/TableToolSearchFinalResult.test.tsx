@@ -1,78 +1,15 @@
 import render from '@common-test/render';
-import _tableBuilderService, {
-  TableDataResponse,
-} from '@common/services/tableBuilderService';
+import _tableBuilderService from '@common/services/tableBuilderService';
 import TableToolSearchFinalResult from '@frontend/modules/table-tool/components/TableToolSearchFinalResult';
 import { screen } from '@testing-library/react';
 import React from 'react';
-import { testFinalResult } from './__data__/tableData';
+import { testFinalResult, testTableDataResponse } from './__data__/tableData';
 
 jest.mock('@common/services/tableBuilderService');
 
 const tableBuilderService = jest.mocked(_tableBuilderService);
 
 describe('TableToolSearchFinalResult', () => {
-  const testTableDataResponse: TableDataResponse = {
-    subjectMeta: {
-      publicationName: 'Test publication',
-      subjectName: 'Test subject',
-      dataSetFileId: 'file-id',
-      geoJsonAvailable: false,
-      isCroppedTable: false,
-      filters: {
-        Filter1: {
-          legend: 'Filter 1',
-          name: 'filter1',
-          options: {
-            FilterGroup1: {
-              id: 'filter-group-1',
-              label: 'Filter group 1',
-              options: [
-                {
-                  label: 'Filter 1',
-                  value: 'filter-1',
-                },
-              ],
-              order: 0,
-            },
-          },
-          order: 0,
-        },
-      },
-      locations: {
-        country: [
-          {
-            id: 'england-id',
-            label: 'England',
-            value: 'england',
-          },
-        ],
-      },
-      timePeriodRange: [{ code: 'AY', label: '2020/21', year: 2020 }],
-      indicators: [
-        {
-          label: 'Number of applications received',
-          name: 'applications_received',
-          unit: '',
-          value: 'indicator-1',
-        },
-      ],
-      boundaryLevels: [],
-      footnotes: [],
-    },
-    results: [
-      {
-        filters: ['filter-1'],
-        geographicLevel: 'country',
-        locationId: 'england-id',
-        timePeriod: '2020_AY',
-        measures: {
-          'indicator-1': '608180',
-        },
-      },
-    ],
-  };
-
   test('renders dataset details correctly', async () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
 
@@ -112,10 +49,8 @@ describe('TableToolSearchFinalResult', () => {
 
     expect(await screen.findByRole('table')).toBeInTheDocument();
     expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
-      /Indicator 1/,
+      /Number of applications received/,
     );
-    expect(screen.getByText('Filter 1')).toBeInTheDocument();
-    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(/England/);
   });
 
   test('renders error message when table query fails', async () => {

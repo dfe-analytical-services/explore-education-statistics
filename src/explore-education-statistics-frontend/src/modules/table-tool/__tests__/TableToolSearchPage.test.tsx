@@ -3,8 +3,12 @@ import {
   testPublicationSummary,
   testReleaseVersionSummary,
 } from '@frontend/modules/find-statistics/__tests__/__data__/testReleaseData';
-import { testFinalResult } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
+import {
+  testFinalResult,
+  testTableDataResponse,
+} from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
 import TableToolSearchPage from '@frontend/modules/table-tool/TableToolSearchPage';
+import _tableBuilderService from '@common/services/tableBuilderService';
 import tableToolSearchService, {
   FatalError,
   PipelineStage,
@@ -25,12 +29,16 @@ jest.mock('@frontend/services/tableToolSearchService', () => {
   };
 });
 
+jest.mock('@common/services/tableBuilderService');
+
 const mockPostSearchStream =
   tableToolSearchService.postSearchStream as jest.Mock;
+const tableBuilderService = jest.mocked(_tableBuilderService);
 
 describe('TableToolSearchPage', () => {
   beforeEach(() => {
     mockPostSearchStream.mockClear();
+    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
   });
 
   test('renders the page correctly with search form', () => {
@@ -85,7 +93,7 @@ describe('TableToolSearchPage', () => {
     expect(mockPostSearchStream).toHaveBeenCalledWith(
       {
         userQuery: 'test search term',
-        publicationId: '96f418e7-3ddb-4a8c-60dc-08deb7f1c424',
+        publicationId: 'a91d9e05-be82-474c-85ae-4913158406d0',
       },
       expect.anything(),
     );
@@ -162,7 +170,7 @@ describe('TableToolSearchPage', () => {
     });
 
     expect(
-      screen.getByRole('heading', { name: 'Dataset B' }),
+      screen.getByRole('heading', { name: 'Test dataset title' }),
     ).toBeInTheDocument();
     expect(
       screen.getByText('Test AI relevance summary explanation.'),

@@ -29,7 +29,7 @@ export default function createMockSseStream({
         }
 
         if (testErrorType === 'retriable') {
-          // Simulates the Wi-Fi dropping or Azure timing out mid-stream.
+          // Simulates internet connection failure or other temporary failure.
           controller.close();
           return;
         }

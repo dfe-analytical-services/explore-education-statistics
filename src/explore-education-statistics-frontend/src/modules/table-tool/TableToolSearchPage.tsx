@@ -21,10 +21,10 @@ import tableToolSearchService, {
   FatalError,
   PipelineStage,
   PipelineStageLabels,
+  PipelineStageType,
   StageComplete,
   StageReranker,
   StageRetrieved,
-  TtSearchStreamMessage,
 } from '@frontend/services/tableToolSearchService';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRef, useState } from 'react';
@@ -35,7 +35,7 @@ export interface TableToolSearchPageProps {
 }
 
 export interface SearchPipelineData {
-  currentStage: TtSearchStreamMessage['stage'] | null;
+  currentStage: PipelineStageType | null;
   retrievedData: StageRetrieved['data'] | null;
   rerankerData: StageReranker['data'] | null;
   finalData: StageComplete['data'] | null;
@@ -67,7 +67,10 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
     }
     abortControllerRef.current = new AbortController();
 
-    setPipelineData(initialPipelineData);
+    setPipelineData({
+      ...initialPipelineData,
+      currentStage: PipelineStage.CONNECTING,
+    });
     setSearchedTerm(searchTerm.trim());
     setError(null);
 
@@ -76,7 +79,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
         {
           userQuery: searchTerm.trim(),
           publicationId:
-            '96f418e7-3ddb-4a8c-60dc-08deb7f1c424' || publicationSummary.id, // hardcoding for now
+            'a91d9e05-be82-474c-85ae-4913158406d0' || publicationSummary.id, // hardcoding for now
         },
         {
           signal: abortControllerRef.current.signal,
@@ -136,18 +139,14 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
     }
   };
 
+  const { currentStage, retrievedData, rerankerData, finalData } = pipelineData;
+
   const hasNoResults =
-    (pipelineData.retrievedData &&
-      pipelineData.retrievedData.datasets.length === 0) ||
-    (pipelineData.rerankerData &&
-      pipelineData.rerankerData.shortlistedDatasets.length === 0) ||
-    (pipelineData.finalData && pipelineData.finalData.datasets.length === 0);
+    (retrievedData && retrievedData.datasets.length === 0) ||
+    (rerankerData && rerankerData.shortlistedDatasets.length === 0) ||
+    (finalData && finalData.datasets.length === 0);
 
-  const { currentStage } = pipelineData;
-
-  const finalDatasets = pipelineData.finalData
-    ? pipelineData.finalData.datasets
-    : [];
+  const searchFinished = currentStage === PipelineStage.COMPLETE;
 
   return (
     <Page
@@ -215,96 +214,96 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
             <ErrorMessage announceError>{error}</ErrorMessage>
           </div>
         ) : (
-          <>
-            {hasNoResults && (
-              <div role="alert" className="govuk-grid-column-two-thirds">
-                <WarningMessage>
-                  We couldn't find any results for your search. <br />
-                  Please make sure your query is relevant to{' '}
-                  {publicationSummary.title}
-                </WarningMessage>
-              </div>
-            )}
+          currentStage && (
+            <>
+              {hasNoResults ? (
+                <div role="alert" className="govuk-grid-column-two-thirds">
+                  <WarningMessage>
+                    We couldn't find any results for your search. <br />
+                    Please make sure your query is relevant to{' '}
+                    {publicationSummary.title}
+                  </WarningMessage>
+                </div>
+              ) : (
+                <>
+                  <ScreenReaderMessage
+                    message={PipelineStageLabels[currentStage]}
+                  />
 
-            {currentStage && !hasNoResults && (
-              <ScreenReaderMessage
-                message={PipelineStageLabels[currentStage]}
-              />
-            )}
+                  {!searchFinished && (
+                    <div className="govuk-grid-column-two-thirds">
+                      <h2 className="govuk-heading-m">
+                        {PipelineStageLabels[currentStage]}
+                      </h2>
 
-            {currentStage &&
-              currentStage !== PipelineStage.COMPLETE &&
-              !hasNoResults && (
-                <div className="govuk-grid-column-two-thirds">
-                  <h2 className="govuk-heading-m">
-                    {PipelineStageLabels[currentStage]}
-                  </h2>
+                      {currentStage === PipelineStage.STARTING && (
+                        <InsetText>Analysing "{searchedTerm}"</InsetText>
+                      )}
 
-                  {currentStage === PipelineStage.STARTING && (
-                    <InsetText>Analysing "{searchedTerm}"</InsetText>
+                      {currentStage === PipelineStage.RETRIEVED &&
+                        pipelineData.retrievedData?.datasets && (
+                          <ul className="govuk-list govuk-list--spaced">
+                            {pipelineData.retrievedData.datasets.map(
+                              dataset => (
+                                <TableToolSearchShortlistedResult
+                                  key={dataset.title}
+                                  title={dataset.title}
+                                  relevance={dataset.relevanceScore}
+                                />
+                              ),
+                            )}
+                          </ul>
+                        )}
+
+                      {currentStage === PipelineStage.RERANKER &&
+                        pipelineData.rerankerData?.shortlistedDatasets && (
+                          <ul className="govuk-list govuk-list--spaced">
+                            {pipelineData.rerankerData.shortlistedDatasets.map(
+                              dataset => (
+                                <TableToolSearchShortlistedResult
+                                  key={dataset.title}
+                                  title={dataset.title}
+                                  relevance={dataset.relevanceScore}
+                                />
+                              ),
+                            )}
+                          </ul>
+                        )}
+
+                      <LoadingSpinner
+                        text="Processing request"
+                        hideText
+                        size="lg"
+                      />
+                    </div>
                   )}
 
-                  {currentStage === PipelineStage.RETRIEVED &&
-                    pipelineData.retrievedData?.datasets && (
-                      <ul className="govuk-list govuk-list--spaced">
-                        {pipelineData.retrievedData.datasets.map(dataset => (
-                          <TableToolSearchShortlistedResult
-                            key={dataset.title}
-                            title={dataset.title}
-                            relevance={dataset.relevanceScore}
-                          />
-                        ))}
-                      </ul>
-                    )}
-
-                  {currentStage === PipelineStage.RERANKER &&
-                    pipelineData.rerankerData?.shortlistedDatasets && (
-                      <ul className="govuk-list govuk-list--spaced">
-                        {pipelineData.rerankerData.shortlistedDatasets.map(
-                          dataset => (
-                            <TableToolSearchShortlistedResult
-                              key={dataset.title}
-                              title={dataset.title}
-                              relevance={dataset.relevanceScore}
+                  {searchFinished && finalData && (
+                    <>
+                      <PageNav
+                        items={finalData.datasets.map(dataset => ({
+                          id: `result-${dataset.fileId}`,
+                          text: dataset.title,
+                        }))}
+                        heading="Search results"
+                      />
+                      <div className="govuk-grid-column-two-thirds">
+                        <ul className="govuk-list">
+                          {finalData.datasets.map(dataset => (
+                            <TableToolSearchFinalResult
+                              key={dataset.fileId}
+                              dataset={dataset}
+                              releaseVersionId={latestReleaseVersion.id}
                             />
-                          ),
-                        )}
-                      </ul>
-                    )}
-
-                  <LoadingSpinner
-                    text="Processing request"
-                    hideText
-                    size="lg"
-                  />
-                </div>
-              )}
-
-            {currentStage === PipelineStage.COMPLETE &&
-              finalDatasets.length &&
-              !error && (
-                <>
-                  <PageNav
-                    items={finalDatasets.map(dataset => ({
-                      id: `result-${dataset.fileId}`,
-                      text: dataset.title,
-                    }))}
-                    heading="Search results"
-                  />
-                  <div className="govuk-grid-column-two-thirds">
-                    <ul className="govuk-list">
-                      {finalDatasets.map(dataset => (
-                        <TableToolSearchFinalResult
-                          key={dataset.fileId}
-                          dataset={dataset}
-                          releaseVersionId={latestReleaseVersion.id}
-                        />
-                      ))}
-                    </ul>
-                  </div>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
-          </>
+            </>
+          )
         )}
       </div>
     </Page>

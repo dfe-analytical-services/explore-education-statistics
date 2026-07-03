@@ -7,7 +7,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
-import { ReactNode, Ref, useEffect, useRef } from 'react';
+import React, { ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 

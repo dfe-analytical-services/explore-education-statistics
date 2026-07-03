@@ -7,6 +7,7 @@ import {
 } from '@microsoft/fetch-event-source';
 
 export const PipelineStage = {
+  CONNECTING: 'connecting',
   STARTING: 'starting pipeline',
   RETRIEVED: 'retrieved datasets',
   RERANKER: 'reranker complete',
@@ -17,6 +18,7 @@ export type PipelineStageType =
   (typeof PipelineStage)[keyof typeof PipelineStage];
 
 export const PipelineStageLabels: Record<PipelineStageType, string> = {
+  [PipelineStage.CONNECTING]: 'Connecting',
   [PipelineStage.STARTING]: 'Understanding your question',
   [PipelineStage.RETRIEVED]: 'Identify relevant information from data sets',
   [PipelineStage.RERANKER]: 'Choosing the most relevant data sets',

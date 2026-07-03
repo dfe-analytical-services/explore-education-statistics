@@ -1,9 +1,11 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import Link from '@frontend/components/Link';
 import { FinalDataset } from '@frontend/services/tableToolSearchService';
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 interface TableToolSearchFinalResultProps {
   dataset: FinalDataset;
@@ -75,6 +77,11 @@ const TableToolSearchFinalResult = ({
 
   const { table, tableHeaders } = data ?? {};
 
+  const generatedCaption = useMemo<string>(
+    () => (table?.subjectMeta ? generateTableTitle(table.subjectMeta) : ''),
+    [table?.subjectMeta],
+  );
+
   return (
     <li
       key={dataset.fileId}
@@ -93,6 +100,7 @@ const TableToolSearchFinalResult = ({
         {table && tableHeaders && (
           <TimePeriodDataTable
             capMaxHeight
+            captionTitle={generatedCaption}
             defaultCaptionId={`dataTableCaption-${dataset.fileId}`}
             defaultFootnotesId={`dataTableFootnotes-${dataset.fileId}`}
             fullTable={table}
