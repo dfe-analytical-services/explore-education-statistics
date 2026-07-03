@@ -654,7 +654,7 @@ public class ReplacementServiceHelperTests
                     },
                 ],
             },
-            // Group c will be added in replacements - we skip it to check it gets appended after Group d, not alphabetically ordered
+            // No Group c here, as it will be added in replacements - we check it gets appended after Group d, not alphabetically ordered
             new()
             {
                 Id = Guid.NewGuid(),
@@ -1057,6 +1057,153 @@ public class ReplacementServiceHelperTests
 
         var indicatorAId = Assert.Single(groupD.ChildSequence);
         Assert.Equal(replacementGroups[2].Indicators[0].Id, indicatorAId);
+    }
+
+    [Fact]
+    public void ReplaceIndicatorSequence_MappedToNewGroupWithDifferentLabel_Success()
+    {
+        var originalGroupAId = Guid.NewGuid();
+        var originalGroups = new List<IndicatorGroup>
+        {
+            new()
+            {
+                Id = originalGroupAId,
+                Label = "Group a",
+                Indicators =
+                [
+                    new Indicator
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "indicator_a",
+                        Label = "Indicator A",
+                        IndicatorGroupId = originalGroupAId,
+                    },
+                    new Indicator
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "indicator_b",
+                        Label = "Indicator B",
+                        IndicatorGroupId = originalGroupAId,
+                    },
+                ],
+            },
+        };
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            IndicatorSequence =
+            [
+                new IndicatorGroupSequenceEntry(
+                    Id: originalGroupAId, // Group a
+                    ChildSequence:
+                    [
+                        originalGroups[0].Indicators[1].Id, // indicator b
+                        originalGroups[0].Indicators[0].Id, // indicator a
+                    ]
+                ),
+            ],
+        };
+
+        var replacementGroupAId = Guid.NewGuid();
+        var replacementGroupBId = Guid.NewGuid();
+        var replacementGroups = new List<IndicatorGroup>
+        {
+            new()
+            {
+                Id = replacementGroupAId,
+                Label = "Group a",
+                Indicators =
+                [
+                    new Indicator
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "indicator_a",
+                        Label = "Indicator A",
+                        IndicatorGroupId = replacementGroupAId,
+                    },
+                ],
+            },
+            new() // 'Group b' is a new group
+            {
+                Id = replacementGroupBId,
+                Label = "Group b",
+                Indicators =
+                [
+                    new Indicator
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "indicator_b",
+                        Label = "Indicator B",
+                        IndicatorGroupId = replacementGroupBId,
+                    },
+                ],
+            },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = Guid.NewGuid(),
+            ReplacementDataFileId = Guid.NewGuid(),
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    // "Indicator A" mapped to "Indicator A"
+                    // original/replacement have matching group label
+                    originalGroups[0].Indicators[0].Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalGroups[0].Indicators[0].Id,
+                        OriginalLabel = originalGroups[0].Indicators[0].Label,
+                        OriginalGroupId = originalGroups[0].Id,
+                        OriginalGroupLabel = originalGroups[0].Label,
+                        ReplacementId = replacementGroups[0].Indicators[0].Id,
+                        ReplacementLabel = replacementGroups[0].Indicators[0].Label,
+                        ReplacementGroupId = replacementGroups[0].Id,
+                        ReplacementGroupLabel = replacementGroups[0].Label,
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    // "Indicator B" mapped to "Indicator B"
+                    // original/replacement have different group label!
+                    originalGroups[0].Indicators[1].Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalGroups[0].Indicators[1].Id,
+                        OriginalLabel = originalGroups[0].Indicators[1].Label,
+                        OriginalGroupId = originalGroups[0].Id,
+                        OriginalGroupLabel = originalGroups[0].Label,
+                        ReplacementId = replacementGroups[1].Indicators[0].Id,
+                        ReplacementLabel = replacementGroups[1].Indicators[0].Label,
+                        ReplacementGroupId = replacementGroups[1].Id,
+                        ReplacementGroupLabel = replacementGroups[1].Label,
+                        Status = MapStatus.ManuallySet,
+                    }
+                },
+            },
+            UnmappedReplacementIndicators = [],
+        };
+
+        var updatedSequence = ReplacementServiceHelper.ReplaceIndicatorSequence(
+            mapping: mapping,
+            originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
+            replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
+            originalReleaseFile.IndicatorSequence
+        );
+
+        Assert.NotNull(updatedSequence);
+
+        Assert.Equal(2, updatedSequence.Count);
+        var groupA = updatedSequence[0];
+        var groupB = updatedSequence[1];
+        Assert.Equal(replacementGroups[0].Id, groupA.Id);
+        Assert.Equal(replacementGroups[1].Id, groupB.Id);
+
+        var indicatorAId = Assert.Single(groupA.ChildSequence);
+        Assert.Equal(replacementGroups[0].Indicators[0].Id, indicatorAId);
+
+        var indicatorBId = Assert.Single(groupB.ChildSequence);
+        Assert.Equal(replacementGroups[1].Indicators[0].Id, indicatorBId);
     }
 
     private static DataSetMapping GenerateMapping(

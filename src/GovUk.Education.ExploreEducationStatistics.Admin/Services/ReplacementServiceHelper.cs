@@ -282,7 +282,7 @@ public abstract class ReplacementServiceHelper
                 map.ReplacementGroupId is not null
                 && !groupIdsInReplacementSequence.Contains(map.ReplacementGroupId.Value)
             )
-            .GroupBy(map => new { GroupId = map.OriginalGroupId, GroupLabel = map.OriginalGroupLabel })
+            .GroupBy(map => new { GroupId = map.ReplacementGroupId!.Value, GroupLabel = map.ReplacementGroupLabel! })
             .OrderBy(group => group.Key.GroupLabel)
             .ToList();
 
