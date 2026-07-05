@@ -1081,11 +1081,11 @@
           },
           "FragmentationThresholdReorganize": {
             "type": "string",
-            "defaultValue": "10"
+            "defaultValue": "5"
           },
           "FragmentationThresholdRebuild": {
             "type": "string",
-            "defaultValue": "10"
+            "defaultValue": "30"
           },
           "RunMode": {
             "type": "string",
