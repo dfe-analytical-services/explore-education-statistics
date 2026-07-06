@@ -18,7 +18,6 @@
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Queues" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" />
