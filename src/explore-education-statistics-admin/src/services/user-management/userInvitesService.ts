@@ -38,7 +38,9 @@ const userInvitesService: UserInvitesService = {
   },
 
   cancelInvite(email: string): Promise<boolean> {
-    return client.delete(`/user-invites/${email}`);
+    return client.delete(`/user-invites`, {
+      params: { email },
+    });
   },
 };
 
