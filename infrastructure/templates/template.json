@@ -2282,7 +2282,6 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
           "preWarmedInstanceCount": 1,
-          "nodeVersion": "16-lts",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
