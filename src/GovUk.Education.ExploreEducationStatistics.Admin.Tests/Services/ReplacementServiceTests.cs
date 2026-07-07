@@ -175,7 +175,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFIx
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
@@ -537,7 +537,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFix
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
@@ -718,7 +718,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //'filterRepository: filterRepository, // @MarkFix
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
@@ -1132,7 +1132,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFix
                 privateBlobCacheService: privateBlobCacheService.Object,
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
@@ -1663,7 +1663,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFix
                 privateBlobCacheService: privateBlobCacheService.Object,
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
@@ -2025,7 +2025,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFix
                 privateBlobCacheService: privateBlobCacheService.Object,
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
@@ -2290,7 +2290,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFix
                 privateBlobCacheService: privateBlobCacheService.Object,
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
@@ -2493,7 +2493,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFix
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
@@ -2719,7 +2719,7 @@ public class ReplacementServiceTests
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                filterRepository: filterRepository,
+                //filterRepository: filterRepository, // @MarkFix
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
@@ -2826,7 +2826,6 @@ public class ReplacementServiceTests
     private static ReplacementService BuildReplacementService(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
-        IFilterRepository? filterRepository = null,
         IReleaseVersionService? releaseVersionService = null,
         IReleaseFileRepository? releaseFileRepository = null,
         IReplacementPlanService? replacementPlanService = null,
@@ -2837,7 +2836,6 @@ public class ReplacementServiceTests
         return new ReplacementService(
             contentDbContext,
             statisticsDbContext,
-            filterRepository ?? new FilterRepository(statisticsDbContext),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),

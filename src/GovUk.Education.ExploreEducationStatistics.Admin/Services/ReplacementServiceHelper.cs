@@ -9,7 +9,7 @@ public abstract class ReplacementServiceHelper
 {
     private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
-    public static List<FilterSequenceEntry>? ReplaceFilterSequence(
+    public static List<FilterSequenceEntry> ReplaceFilterSequence(
         List<FilterSequenceEntry> originalSequence,
         DataSetMapping mapping
     )

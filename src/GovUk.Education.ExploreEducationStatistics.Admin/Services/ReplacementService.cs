@@ -25,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReplacementService(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
-    IFilterRepository filterRepository,
     IReleaseVersionService releaseVersionService,
     IReleaseFileRepository releaseFileRepository,
     IReplacementPlanService replacementPlanService,

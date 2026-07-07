@@ -28,6 +28,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using FilterMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.FilterMapping;
 using IndicatorMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.IndicatorMapping;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 
@@ -252,22 +253,25 @@ public class ReplacementPlanServiceTests
 
         var originalFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Original Test filter item" };
 
-        var replacementFilterItem = new FilterItem { Label = "Replacement Test filter item" };
+        var replacementFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Replacement Test filter item" };
 
         var originalFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Original Default group",
             FilterItems = new List<FilterItem> { originalFilterItem },
         };
 
         var replacementFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Replacement Default group",
             FilterItems = new List<FilterItem> { replacementFilterItem },
         };
 
         var originalFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Original Test filter",
             Name = "original_test_filter",
             Subject = originalReleaseSubject.Subject,
@@ -276,6 +280,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Replacement Test filter",
             Name = "replacement_test_filter",
             Subject = replacementReleaseSubject.Subject,
@@ -380,6 +385,61 @@ public class ReplacementPlanServiceTests
             .DefaultDataSetMapping()
             .WithOriginalDataFileId(originalReleaseFile.FileId)
             .WithReplacementDataFileId(replacementReleaseFile.FileId)
+            .WithFilterMappings(
+                new Dictionary<Guid, FilterMapping>
+                {
+                    {
+                        originalFilter.Id,
+                        CreateFilterMapping(
+                            original: originalFilter,
+                            filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                            {
+                                {
+                                    originalFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalFilterItem.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalFilterItem.Id,
+                                                    OriginalLabel = originalFilterItem.Label,
+                                                }
+                                            },
+                                        }
+                                    )
+                                },
+                            }
+                        )
+                    },
+                }
+            )
+            .WithUnmappedReplacementFilters([
+                new UnmappedFilter
+                {
+                    Id = replacementFilter.Id,
+                    ColumnName = replacementFilter.Name,
+                    Label = replacementFilter.Label,
+                    UnmappedReplacementFilterGroups =
+                    [
+                        new UnmappedFilterGroup
+                        {
+                            Id = replacementFilterGroup.Id,
+                            Label = replacementFilterGroup.Label,
+                            UnmappedReplacementFilterItems =
+                            [
+                                new UnmappedFilterItem
+                                {
+                                    Id = replacementFilterItem.Id,
+                                    Label = replacementFilterItem.Label,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ])
             .WithIndicatorMappings(
                 new Dictionary<Guid, IndicatorMapping>
                 {
@@ -731,22 +791,25 @@ public class ReplacementPlanServiceTests
 
         var originalDefaultFilterItem2 = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item 2" };
 
-        var replacementDefaultFilterItem = new FilterItem { Label = "Test filter item" };
+        var replacementDefaultFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item" };
 
         var originalDefaultFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { originalDefaultFilterItem, originalDefaultFilterItem2 },
         };
 
         var replacementDefaultFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { replacementDefaultFilterItem },
         };
 
         var originalDefaultFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = originalReleaseSubject.Subject,
@@ -755,6 +818,7 @@ public class ReplacementPlanServiceTests
 
         var replacementDefaultFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = replacementReleaseSubject.Subject,
@@ -770,12 +834,14 @@ public class ReplacementPlanServiceTests
 
         var replacementIndicator = new Indicator
         {
+            Id = Guid.NewGuid(),
             Label = "Indicator - not changing",
             Name = "indicator_not_changing",
         };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -783,6 +849,7 @@ public class ReplacementPlanServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
@@ -823,6 +890,73 @@ public class ReplacementPlanServiceTests
             ReleaseVersion = releaseVersion,
         };
 
+        var mapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFile(originalFile)
+            .WithReplacementDataFile(replacementFile)
+            .WithFilterMappings(
+                new Dictionary<Guid, FilterMapping>
+                {
+                    {
+                        originalDefaultFilter.Id,
+                        CreateFilterMapping(
+                            original: originalDefaultFilter,
+                            replacement: replacementDefaultFilter,
+                            filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                            {
+                                {
+                                    originalDefaultFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalDefaultFilterGroup,
+                                        replacement: replacementDefaultFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalDefaultFilterItem.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalDefaultFilterItem.Id,
+                                                    OriginalLabel = originalDefaultFilterItem.Label,
+                                                    ReplacementId = replacementDefaultFilterItem.Id,
+                                                    ReplacementLabel = replacementDefaultFilterItem.Label,
+                                                    Status = MapStatus.AutoSet,
+                                                }
+                                            },
+                                            {
+                                                originalDefaultFilterItem2.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalDefaultFilterItem2.Id,
+                                                    OriginalLabel = originalDefaultFilterItem2.Label,
+                                                    Status = MapStatus.Unset,
+                                                }
+                                            },
+                                        },
+                                        status: MapStatus.AutoSet
+                                    )
+                                },
+                            },
+                            status: MapStatus.AutoSet
+                        )
+                    },
+                }
+            )
+            .WithIndicatorMappings(
+                new Dictionary<Guid, IndicatorMapping>
+                {
+                    {
+                        originalIndicator.Id,
+                        CreateIndicatorMapping(
+                            original: originalIndicator,
+                            originalGroup: originalIndicatorGroup,
+                            replacement: replacementIndicator,
+                            replacementGroup: replacementIndicatorGroup,
+                            status: MapStatus.AutoSet
+                        )
+                    },
+                }
+            );
+
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
             .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
@@ -843,12 +977,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            contentDbContext.DataSetMappings.Add(
-                _fixture
-                    .DefaultDataSetMapping()
-                    .WithOriginalDataFile(originalFile)
-                    .WithReplacementDataFile(replacementFile)
-            );
+            contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -911,6 +1040,7 @@ public class ReplacementPlanServiceTests
 
         var replacementFile = new File
         {
+            Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
@@ -918,28 +1048,45 @@ public class ReplacementPlanServiceTests
 
         originalFile.ReplacedBy = replacementFile;
 
-        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = originalFile,
+            FileId = originalFile.Id,
+        };
 
-        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = replacementFile,
+            FileId = replacementFile.Id,
+        };
 
         var originalDefaultFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item" };
 
-        var replacementDefaultFilterItem = new FilterItem { Label = "Test filter item - changing!" };
+        var replacementDefaultFilterItem = new FilterItem
+        {
+            Id = Guid.NewGuid(),
+            Label = "Test filter item - changing!",
+        };
 
         var originalDefaultFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { originalDefaultFilterItem },
         };
 
         var replacementDefaultFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { replacementDefaultFilterItem },
         };
 
         var originalDefaultFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = originalReleaseSubject.Subject,
@@ -948,6 +1095,7 @@ public class ReplacementPlanServiceTests
 
         var replacementDefaultFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = replacementReleaseSubject.Subject,
@@ -963,12 +1111,14 @@ public class ReplacementPlanServiceTests
 
         var replacementIndicator = new Indicator
         {
+            Id = Guid.NewGuid(),
             Label = "Indicator - not changing",
             Name = "indicator_not_changing",
         };
 
         var originalIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = originalReleaseSubject.Subject,
             Indicators = new List<Indicator> { originalIndicator },
@@ -976,10 +1126,65 @@ public class ReplacementPlanServiceTests
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             Subject = replacementReleaseSubject.Subject,
             Indicators = new List<Indicator> { replacementIndicator },
         };
+
+        var mapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFileId(originalReleaseFile.FileId)
+            .WithReplacementDataFileId(replacementReleaseFile.FileId)
+            .WithFilterMappings(
+                new Dictionary<Guid, FilterMapping>
+                {
+                    {
+                        originalDefaultFilter.Id,
+                        CreateFilterMapping(
+                            original: originalDefaultFilter,
+                            replacement: replacementDefaultFilter,
+                            filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                            {
+                                {
+                                    originalDefaultFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalDefaultFilterGroup,
+                                        replacement: replacementDefaultFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalDefaultFilterItem.Id,
+                                                new FilterItemMapping { OriginalId = originalDefaultFilterItem.Id }
+                                            },
+                                        },
+                                        unmappedReplacementFilterItems:
+                                        [
+                                            new UnmappedFilterItem { Id = replacementDefaultFilterItem.Id },
+                                        ]
+                                    )
+                                },
+                            }
+                        )
+                    },
+                }
+            )
+            .WithIndicatorMappings(
+                new Dictionary<Guid, IndicatorMapping>
+                {
+                    {
+                        originalIndicator.Id,
+                        new IndicatorMapping
+                        {
+                            OriginalId = originalIndicator.Id,
+                            OriginalGroupId = originalIndicatorGroup.Id,
+                            ReplacementId = replacementIndicator.Id,
+                            ReplacementGroupId = replacementIndicatorGroup.Id,
+                        }
+                    },
+                }
+            )
+            .Generate();
 
         var location = new Location
         {
@@ -1036,12 +1241,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.DataBlocks.AddRange(dataBlock);
-            contentDbContext.DataSetMappings.Add(
-                _fixture
-                    .DefaultDataSetMapping()
-                    .WithOriginalDataFileId(originalReleaseFile.FileId)
-                    .WithReplacementDataFileId(replacementReleaseFile.FileId)
-            );
+            contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1050,222 +1250,6 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.Filter.AddRange(originalDefaultFilter, replacementDefaultFilter);
-            statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(location);
-            statisticsDbContext.Observation.AddRange(observationForLocation);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var replacementPlanService = BuildReplacementPlanService(
-                contentDbContext,
-                statisticsDbContext,
-                timePeriodService: timePeriodService.Object,
-                releaseFileRepository: releaseFileRepository.Object
-            );
-
-            var result = await replacementPlanService.GetReplacementPlan(
-                releaseVersionId: releaseVersion.Id,
-                originalFileId: originalFile.Id
-            );
-
-            VerifyAllMocks(timePeriodService, releaseFileRepository);
-
-            var replacementPlan = result.AssertRight();
-            Assert.False(replacementPlan.Valid);
-
-            Assert.Single(replacementPlan.DataBlocks);
-            var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.False(dataBlockPlan.Valid);
-        }
-    }
-
-    [Fact]
-    public async Task GetReplacementPlan_NewFiltersIntroduced_ReplacementInvalid()
-    {
-        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
-
-        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
-
-        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(statsReleaseVersion)
-            .WithSubjects(_fixture.DefaultSubject().Generate(2))
-            .GenerateTuple2();
-
-        var originalFile = new File
-        {
-            Id = Guid.NewGuid(),
-            Type = FileType.Data,
-            SubjectId = originalReleaseSubject.SubjectId,
-        };
-
-        var replacementFile = new File
-        {
-            Type = FileType.Data,
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Replacing = originalFile,
-        };
-
-        originalFile.ReplacedBy = replacementFile;
-
-        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
-
-        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
-
-        var originalDefaultFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item" };
-
-        var replacementDefaultFilterItem = new FilterItem { Label = "Test filter item" };
-
-        var replacementNewlyIntroducedFiltersFilterItem = new FilterItem
-        {
-            Label = "Filter item for newly introduced Filter",
-        };
-
-        var originalDefaultFilterGroup = new FilterGroup
-        {
-            Label = "Default group - not changing",
-            FilterItems = new List<FilterItem> { originalDefaultFilterItem },
-        };
-
-        var replacementDefaultFilterGroup = new FilterGroup
-        {
-            Label = "Default group - not changing",
-            FilterItems = new List<FilterItem> { replacementDefaultFilterItem },
-        };
-
-        var replacementNewlyIntroducedFilterGroup = new FilterGroup
-        {
-            Label = "Newly introduced filter group",
-            FilterItems = new List<FilterItem> { replacementNewlyIntroducedFiltersFilterItem },
-        };
-
-        var originalDefaultFilter = new Filter
-        {
-            Label = "Test filter 1 - not changing",
-            Name = "test_filter_1_not_changing",
-            Subject = originalReleaseSubject.Subject,
-            FilterGroups = new List<FilterGroup> { originalDefaultFilterGroup },
-        };
-
-        var replacementDefaultFilter = new Filter
-        {
-            Label = "Test filter 1 - not changing",
-            Name = "test_filter_1_not_changing",
-            Subject = replacementReleaseSubject.Subject,
-            FilterGroups = new List<FilterGroup> { replacementDefaultFilterGroup },
-        };
-
-        var replacementNewlyIntroducedFilter = new Filter
-        {
-            Label = "Newly introduced filter",
-            Name = "newly_introduced_filter",
-            Subject = replacementReleaseSubject.Subject,
-            FilterGroups = new List<FilterGroup> { replacementNewlyIntroducedFilterGroup },
-        };
-
-        var originalIndicator = new Indicator
-        {
-            Id = Guid.NewGuid(),
-            Label = "Indicator - not changing",
-            Name = "indicator_not_changing",
-        };
-
-        var replacementIndicator = new Indicator
-        {
-            Label = "Indicator - not changing",
-            Name = "indicator_not_changing",
-        };
-
-        var originalIndicatorGroup = new IndicatorGroup
-        {
-            Label = "Default group - not changing",
-            Subject = originalReleaseSubject.Subject,
-            Indicators = new List<Indicator> { originalIndicator },
-        };
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            Label = "Default group - not changing",
-            Subject = replacementReleaseSubject.Subject,
-            Indicators = new List<Indicator> { replacementIndicator },
-        };
-
-        var location = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.Country,
-            Country = _england,
-        };
-        var observationForLocation = new Observation
-        {
-            Id = Guid.NewGuid(),
-            SubjectId = originalReleaseSubject.SubjectId,
-            Location = location,
-        };
-
-        var timePeriod = new TimePeriodQuery
-        {
-            StartYear = 2019,
-            StartCode = CalendarYear,
-            EndYear = 2020,
-            EndCode = CalendarYear,
-        };
-
-        var dataBlock = new DataBlock
-        {
-            Name = "Test DataBlock",
-            Query = new FullTableQuery
-            {
-                SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] { originalDefaultFilterItem.Id },
-                Indicators = new[] { originalIndicator.Id },
-                LocationIds = ListOf(location.Id),
-                TimePeriod = timePeriod,
-            },
-            ReleaseVersion = releaseVersion,
-        };
-
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
-        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
-        releaseFileRepository
-            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
-            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlocks.AddRange(dataBlock);
-            contentDbContext.DataSetMappings.Add(
-                _fixture
-                    .DefaultDataSetMapping()
-                    .WithOriginalDataFileId(originalReleaseFile.FileId)
-                    .WithReplacementDataFileId(replacementReleaseFile.FileId)
-            );
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
-            statisticsDbContext.Filter.AddRange(
-                originalDefaultFilter,
-                replacementDefaultFilter,
-                replacementNewlyIntroducedFilter
-            );
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
             statisticsDbContext.Observation.AddRange(observationForLocation);
@@ -1515,53 +1499,65 @@ public class ReplacementPlanServiceTests
             Label = "Primary and secondary schools",
         };
 
-        var replacementDefaultFilterItem = new FilterItem { Label = "Test filter item - not changing" };
+        var replacementDefaultFilterItem = new FilterItem
+        {
+            Id = Guid.NewGuid(),
+            Label = "Test filter item - not changing",
+        };
 
-        var replacementPrimarySchoolsFilterItem = new FilterItem { Label = "Primary schools" };
+        var replacementPrimarySchoolsFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Primary schools" };
 
         var replacementPrimaryAndSecondarySchoolsFilterItem = new FilterItem
         {
+            Id = Guid.NewGuid(),
             Label = "Primary and secondary schools",
         };
 
         var originalDefaultFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { originalDefaultFilterItem },
         };
 
         var originalIndividualSchoolTypeFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Individual",
             FilterItems = new List<FilterItem> { originalPrimarySchoolsFilterItem },
         };
 
         var originalCombinedSchoolTypeFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Combined",
             FilterItems = new List<FilterItem> { originalPrimaryAndSecondarySchoolsFilterItem },
         };
 
         var replacementDefaultFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { replacementDefaultFilterItem },
         };
 
         var replacementIndividualSchoolTypeFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Individual",
             FilterItems = new List<FilterItem> { replacementPrimarySchoolsFilterItem },
         };
 
         var replacementCombinedSchoolTypeFilterGroup = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Combined",
             FilterItems = new List<FilterItem> { replacementPrimaryAndSecondarySchoolsFilterItem },
         };
 
         var originalDefaultFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = originalReleaseSubject.Subject,
@@ -1570,6 +1566,7 @@ public class ReplacementPlanServiceTests
 
         var originalSchoolTypeFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "School type",
             Name = "school_type",
             Subject = originalReleaseSubject.Subject,
@@ -1582,6 +1579,7 @@ public class ReplacementPlanServiceTests
 
         var replacementDefaultFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = replacementReleaseSubject.Subject,
@@ -1590,6 +1588,7 @@ public class ReplacementPlanServiceTests
 
         var replacementSchoolTypeFilter = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "School type",
             Name = "school_type",
             Subject = replacementReleaseSubject.Subject,
@@ -1720,6 +1719,88 @@ public class ReplacementPlanServiceTests
             .DefaultDataSetMapping()
             .WithOriginalDataFileId(originalReleaseFile.FileId)
             .WithReplacementDataFileId(replacementReleaseFile.FileId)
+            .WithFilterMappings(
+                new Dictionary<Guid, FilterMapping>
+                {
+                    {
+                        originalDefaultFilter.Id,
+                        CreateFilterMapping(
+                            original: originalDefaultFilter,
+                            replacement: replacementDefaultFilter,
+                            filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                            {
+                                {
+                                    originalDefaultFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalDefaultFilterGroup,
+                                        replacement: replacementDefaultFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalDefaultFilterItem.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalDefaultFilterItem.Id,
+                                                    OriginalLabel = originalDefaultFilterItem.Label,
+                                                    ReplacementId = replacementDefaultFilterItem.Id,
+                                                }
+                                            },
+                                        }
+                                    )
+                                },
+                            }
+                        )
+                    },
+                    {
+                        originalSchoolTypeFilter.Id,
+                        CreateFilterMapping(
+                            original: originalSchoolTypeFilter,
+                            replacement: replacementSchoolTypeFilter,
+                            filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                            {
+                                {
+                                    originalIndividualSchoolTypeFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalIndividualSchoolTypeFilterGroup,
+                                        replacement: originalIndividualSchoolTypeFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalPrimarySchoolsFilterItem.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalPrimarySchoolsFilterItem.Id,
+                                                    OriginalLabel = originalPrimarySchoolsFilterItem.Label,
+                                                    ReplacementId = replacementPrimarySchoolsFilterItem.Id,
+                                                }
+                                            },
+                                        }
+                                    )
+                                },
+                                {
+                                    originalCombinedSchoolTypeFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalCombinedSchoolTypeFilterGroup,
+                                        replacement: replacementCombinedSchoolTypeFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalPrimaryAndSecondarySchoolsFilterItem.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalPrimaryAndSecondarySchoolsFilterItem.Id,
+                                                    OriginalLabel = originalPrimaryAndSecondarySchoolsFilterItem.Label,
+                                                    ReplacementId = replacementPrimaryAndSecondarySchoolsFilterItem.Id,
+                                                }
+                                            },
+                                        }
+                                    )
+                                },
+                            }
+                        )
+                    },
+                }
+            )
             .WithIndicatorMappings(
                 new Dictionary<Guid, IndicatorMapping>
                 {
@@ -3350,12 +3431,54 @@ public class ReplacementPlanServiceTests
         );
     }
 
+    private static FilterMapping CreateFilterMapping(
+        Filter original,
+        Filter? replacement = null,
+        Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
+        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
+        MapStatus status = MapStatus.Unset
+    )
+    {
+        return new FilterMapping
+        {
+            OriginalId = original.Id,
+            OriginalColumnName = original.Name,
+            OriginalLabel = original.Label,
+            ReplacementId = replacement?.Id,
+            ReplacementColumnName = replacement?.Name,
+            ReplacementLabel = replacement?.Label,
+            FilterGroupMappings = filterGroupMappings ?? [],
+            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
+            Status = status,
+        };
+    }
+
+    private static FilterGroupMapping CreateFilterGroupMapping(
+        FilterGroup original,
+        FilterGroup? replacement = null,
+        Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
+        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
+        MapStatus status = MapStatus.Unset
+    )
+    {
+        return new FilterGroupMapping
+        {
+            OriginalId = original.Id,
+            OriginalLabel = original.Label,
+            ReplacementId = replacement?.Id,
+            ReplacementLabel = replacement?.Label,
+            FilterItemMappings = filterItemMappings ?? [],
+            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
+            Status = status,
+        };
+    }
+
     private static IndicatorMapping CreateIndicatorMapping(
         Indicator original,
         IndicatorGroup originalGroup,
         Indicator? replacement = null,
         IndicatorGroup? replacementGroup = null,
-        MapStatus mapStatus = MapStatus.Unset
+        MapStatus status = MapStatus.Unset
     )
     {
         return new IndicatorMapping
@@ -3370,7 +3493,7 @@ public class ReplacementPlanServiceTests
             ReplacementLabel = replacement?.Label,
             ReplacementGroupId = replacementGroup?.Id,
             ReplacementGroupLabel = replacementGroup?.Label,
-            Status = mapStatus,
+            Status = status,
         };
     }
 
