@@ -26,8 +26,8 @@ public class UserInvitesController(IUserManagementService userManagementService)
         return await userManagementService.InviteUser(request).HandleFailuresOrOk();
     }
 
-    [HttpDelete("user-invites/{email}")]
-    public async Task<ActionResult> CancelUserInvite(string email)
+    [HttpDelete("user-invites")]
+    public async Task<ActionResult> CancelUserInvite([FromQuery] string email)
     {
         return await userManagementService.CancelInvite(email).HandleFailuresOrNoContent();
     }
