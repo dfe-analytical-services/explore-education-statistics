@@ -135,16 +135,6 @@ public class UserManagementServicePermissionTests
 
                 userService.Setup(mock => mock.GetUserId()).Returns(CreatedById);
 
-                var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
-                userPreReleaseRoleRepository
-                    .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
-                    .Returns(Task.CompletedTask);
-
-                var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-                userPublicationRoleRepository
-                    .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
-                    .Returns(Task.CompletedTask);
-
                 var userRepository = new Mock<IUserRepository>(Strict);
                 userRepository
                     .Setup(mock => mock.FindActiveUserByEmail(user.Email, It.IsAny<CancellationToken>()))
@@ -163,19 +153,12 @@ public class UserManagementServicePermissionTests
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userService: userService.Object,
                     userRepository: userRepository.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userManager: userManager.Object
                 );
 
                 var result = await service.DeleteUser(user.Email);
 
-                VerifyAllMocks(
-                    userRepository,
-                    userPublicationRoleRepository,
-                    userPreReleaseRoleRepository,
-                    userManager
-                );
+                VerifyAllMocks(userRepository, userManager);
 
                 return result;
             });
