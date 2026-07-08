@@ -431,9 +431,6 @@ public abstract class UserManagementServiceTests
 
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
             userPreReleaseRoleRepository
-                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-            userPreReleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
                         It.Is<HashSet<UserPreReleaseRoleCreateDto>>(l =>
@@ -454,9 +451,6 @@ public abstract class UserManagementServiceTests
                 .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
@@ -616,9 +610,6 @@ public abstract class UserManagementServiceTests
                 .ReturnsAsync(userToCreate);
 
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
-            userPreReleaseRoleRepository
-                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
             // Should only try to create pre-release roles for releases 1 and 2, as releases 3 and 4 belong to
             // publications 3 and 4 which are already having more powerful publication roles created for them.
             userPreReleaseRoleRepository
@@ -644,9 +635,6 @@ public abstract class UserManagementServiceTests
                 .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock => mock.RemoveForUser(userToCreate.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
@@ -784,16 +772,6 @@ public abstract class UserManagementServiceTests
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
-            userPreReleaseRoleRepository
-                .Setup(mock => mock.RemoveForUser(userToCancelInvitesFor.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock => mock.RemoveForUser(userToCancelInvitesFor.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
                 .Setup(mock =>
@@ -812,8 +790,6 @@ public abstract class UserManagementServiceTests
                 var service = SetupService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object
                 );
 
@@ -822,7 +798,7 @@ public abstract class UserManagementServiceTests
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userPreReleaseRoleRepository, userPublicationRoleRepository, userRepository);
+            VerifyAllMocks(userRepository);
         }
 
         [Fact]
@@ -877,31 +853,19 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.SoftDeleteUser(internalUser.Id, CreatedById, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
-            userPreReleaseRoleRepository
-                .Setup(mock => mock.RemoveForUser(internalUser.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(mock => mock.RemoveForUser(internalUser.Id, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var service = SetupService(
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userManager: userManager.Object,
-                    userRepository: userRepository.Object,
-                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepository.Object
+                    userRepository: userRepository.Object
                 );
 
                 var result = await service.DeleteUser(internalUser.Email);
                 result.AssertRight();
             }
 
-            VerifyAllMocks(userManager, userRepository, userPreReleaseRoleRepository, userPublicationRoleRepository);
+            VerifyAllMocks(userManager, userRepository);
         }
 
         [Fact]
