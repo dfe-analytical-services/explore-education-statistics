@@ -172,11 +172,9 @@ public class ReplacementServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var filterRepository = new FilterRepository(statisticsDbContext);
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                //filterRepository: filterRepository, // @MarkFIx
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
@@ -534,11 +532,9 @@ public class ReplacementServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var filterRepository = new FilterRepository(statisticsDbContext);
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                //filterRepository: filterRepository, // @MarkFix
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
@@ -715,11 +711,9 @@ public class ReplacementServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var filterRepository = new FilterRepository(statisticsDbContext);
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                //'filterRepository: filterRepository, // @MarkFix
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(
@@ -2551,11 +2545,9 @@ public class ReplacementServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var filterRepository = new FilterRepository(statisticsDbContext);
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                //filterRepository: filterRepository, // @MarkFix
                 privateBlobCacheService: privateBlobCacheService.Object,
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
@@ -3041,11 +3033,9 @@ public class ReplacementServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var filterRepository = new FilterRepository(statisticsDbContext);
             var replacementService = BuildReplacementService(
                 contentDbContext,
                 statisticsDbContext,
-                //filterRepository: filterRepository, // @MarkFix
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
                 replacementPlanService: BuildReplacementPlanService(

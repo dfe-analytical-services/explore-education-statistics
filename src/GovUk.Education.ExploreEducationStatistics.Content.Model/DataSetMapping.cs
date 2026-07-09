@@ -207,8 +207,8 @@ public record FilterMapping
     public string OriginalColumnName { get; set; } = "";
 
     public Guid? ReplacementId { get; set; }
-    public string? ReplacementLabel { get; set; } = "";
-    public string? ReplacementColumnName { get; set; } = "";
+    public string? ReplacementLabel { get; set; }
+    public string? ReplacementColumnName { get; set; }
 
     public Dictionary<Guid, FilterGroupMapping> FilterGroupMappings { get; set; } = [];
     public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
@@ -222,7 +222,7 @@ public record FilterGroupMapping
     public string OriginalLabel { get; set; } = "";
 
     public Guid? ReplacementId { get; set; }
-    public string? ReplacementLabel { get; set; } = "";
+    public string? ReplacementLabel { get; set; }
 
     public Dictionary<Guid, FilterItemMapping> FilterItemMappings { get; set; } = [];
     public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
@@ -236,7 +236,7 @@ public record FilterItemMapping
     public string OriginalLabel { get; set; } = "";
 
     public Guid? ReplacementId { get; set; }
-    public string? ReplacementLabel { get; set; } = "";
+    public string? ReplacementLabel { get; set; }
 
     public MapStatus Status { get; set; }
 }
