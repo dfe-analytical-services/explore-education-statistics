@@ -1,9 +1,11 @@
 import ErrorMessage from '@common/components/ErrorMessage';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import { ReleaseVersionSummary } from '@common/services/publicationService';
+import { FullTableQuery } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import styles from '@frontend/modules/table-tool/components/TableToolSearchFinalResult.module.scss';
 import { encodeFullTableQueryToParams } from '@frontend/modules/table-tool/utils/fullTableQueryTranscode';
@@ -16,55 +18,38 @@ interface TableToolSearchFinalResultProps {
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
+const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
+  const {
+    timePeriod: { start, end },
+    filters,
+    indicators,
+    geographicLevels,
+  } = dataset;
+  return {
+    subjectId: '2dc0f701-dbe6-44bc-4772-08debbdc36fb', // TODO replace with subjectId when available
+    locationIds: Object.values(geographicLevels).flatMap(locations =>
+      locations.map(location => location.id),
+    ),
+    timePeriod:
+      start.year && end.year
+        ? {
+            startYear: parseInt(start.year, 10),
+            startCode: start.code,
+            endYear: parseInt(end.year, 10),
+            endCode: end.code,
+          }
+        : undefined,
+    filters: filters.map(filter => filter.id),
+    indicators: indicators.map(indicator => indicator.id),
+  };
+};
+
 const TableToolSearchFinalResult = ({
   dataset,
   releaseVersionSummary,
 }: TableToolSearchFinalResultProps) => {
-  // Use test data for now, implement when backend provides required data
-  const fullTableQuery =
-    dataset.title === 'Test final result'
-      ? {
-          subjectId: '821750f6-939f-4f60-20d4-08dec542d092',
-          locationIds: [
-            'a455a027-e635-4e90-a0b8-08dec542d106',
-            'a2857282-154f-44cb-a0bb-08dec542d106',
-          ],
-          timePeriod: {
-            startYear: 2014,
-            startCode: 'AY',
-            endYear: 2016,
-            endCode: 'AY',
-          },
-          filters: [],
-          filterHierarchiesOptions: {},
-          indicators: [
-            '4f9f7d79-c3a5-459c-a0b5-08dec542d106',
-            '1bd72149-5230-40ab-a0ac-08dec542d106',
-            '0e74dcb9-9c90-4747-a0a4-08dec542d106',
-            '922db259-ddcc-4a64-a09d-08dec542d106',
-          ],
-        }
-      : {
-          subjectId: '2dc0f701-dbe6-44bc-4772-08debbdc36fb',
-          locationIds: ['376f9a26-dc39-4db3-bb19-0549e59d322a'],
-          timePeriod: {
-            startYear: 2024,
-            startCode: 'AY',
-            endYear: 2024,
-            endCode: 'AY',
-          },
-          filters: [
-            '9d5df94e-67b1-4535-a753-4fc7ba0e589b',
-            '373dad8a-a916-464e-8824-c2c68691a4b3',
-            '24784681-ee31-4cf9-a38e-096d679747b4',
-            '82a5fc83-99f5-494e-b7be-97559cfa2c1c',
-          ],
-          filterHierarchiesOptions: {},
-          indicators: [
-            '1a01f5af-049b-4877-2fc6-08debbdc383d',
-            '1ca177aa-4fca-4493-2fc3-08debbdc383d',
-          ],
-        };
+  const fullTableQuery = generateQueryFromResult(dataset);
+
   const { data, isError, isLoading } = useQuery({
     ...tableBuilderQueries.getFullTable(
       fullTableQuery,
@@ -91,7 +76,7 @@ const TableToolSearchFinalResult = ({
         {dataset.title}
       </h2>
       <Link to={`/data-catalogue/data-set/${dataset.fileId}`}>
-        View this data set
+        View this data set <VisuallyHidden> - {dataset.title}</VisuallyHidden>
       </Link>
       <h3 className="govuk-heading-s govuk-!-margin-top-4">Relevance</h3>
       <p className="govuk-body">{dataset.aiSummary}</p>
@@ -111,7 +96,8 @@ const TableToolSearchFinalResult = ({
                   releaseVersionSummary.slug
                 }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
               >
-                View and edit this table
+                View and edit this table{' '}
+                <VisuallyHidden> - {dataset.title}</VisuallyHidden>
               </Link>
             </div>
             <TimePeriodDataTable
