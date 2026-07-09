@@ -19,6 +19,8 @@ import {
   AxisGroupBy,
   AxisType,
   ChartDefinition,
+  ChartDefinitionAxis,
+  ChartType,
   ReferenceLine,
   ReferenceLineStyle,
   TickConfig,
@@ -50,16 +52,21 @@ import React, {
   useRef,
 } from 'react';
 import { ObjectSchema } from 'yup';
+import {
+  Control,
+  FieldValues,
+  useFieldArray,
+  UseFormReturn,
+} from 'react-hook-form';
 
 interface FormReferenceLine extends ReferenceLine {
   otherAxisPositionType?: OtherAxisPositionType;
 }
 
-export interface ChartAxisConfigurationFormValues
-  extends OmitStrict<
-    AxisConfiguration,
-    'dataSets' | 'type' | 'label' | 'referenceLines'
-  > {
+export interface ChartAxisConfigurationFormValues extends OmitStrict<
+  AxisConfiguration,
+  'dataSets' | 'type' | 'label' | 'referenceLines'
+> {
   labelText?: string;
   labelWidth?: number | null;
   referenceLines?: FormReferenceLine[];
@@ -78,6 +85,40 @@ interface Props {
   onChange: (configuration: AxisConfiguration) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
+
+const ReferenceLinesComponent = ({
+  axisDefinition,
+  chartType,
+  dataSetCategories,
+  referenceLines,
+  control,
+  onSubmit,
+}: {
+  axisDefinition: ChartDefinitionAxis | undefined;
+  chartType: ChartType;
+  dataSetCategories: DataSetCategory[];
+  referenceLines: FormReferenceLine[];
+  control: Control<ChartAxisConfigurationFormValues>;
+  onSubmit: (referenceLines: FormReferenceLine[]) => void;
+}) => {
+  const { replace } = useFieldArray<ChartAxisConfigurationFormValues>({
+    control,
+    name: 'referenceLines',
+  });
+
+  return (
+    <ChartReferenceLinesConfiguration
+      axisDefinition={axisDefinition}
+      chartType={chartType}
+      dataSetCategories={dataSetCategories}
+      referenceLines={referenceLines ?? []}
+      onSubmit={updatedReferenceLines => {
+        replace(updatedReferenceLines);
+        onSubmit(updatedReferenceLines);
+      }}
+    />
+  );
+};
 
 const ChartAxisConfiguration = ({
   axesConfiguration,
@@ -543,7 +584,7 @@ const ChartAxisConfiguration = ({
       initialValues={initialAxisConfiguration.current}
       validationSchema={validationSchema}
     >
-      {({ formState, setValue, watch }) => {
+      {({ formState, setValue, watch, control }) => {
         const values = watch();
 
         return (
@@ -744,15 +785,16 @@ const ChartAxisConfiguration = ({
               </div>
             </div>
             {capabilities.hasReferenceLines && (
-              <ChartReferenceLinesConfiguration
-                axisDefinition={axisDefinition}
-                chartType={chartType.current}
-                dataSetCategories={dataSetCategories}
+              <ReferenceLinesComponent
                 referenceLines={
                   initialAxisConfiguration.current.referenceLines ?? []
                 }
+                control={control}
+                axisDefinition={axisDefinition}
+                chartType={chartType.current}
+                dataSetCategories={dataSetCategories}
                 onSubmit={updatedReferenceLines => {
-                  setValue('referenceLines' as const, updatedReferenceLines);
+                  // setValue('referenceLines' as const, updatedReferenceLines);
                   handleFormChange({
                     ...axisConfiguration,
                     referenceLines: updatedReferenceLines,
