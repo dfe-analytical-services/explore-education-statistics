@@ -103,8 +103,22 @@ export default function createMockSseStream({
                 datasets: [
                   {
                     fileId: '688db31c-66bd-4dbd-b73c-08dec0963904',
-                    filters: ['Legacy family holiday (f)'],
-                    indicators: ['Percent of sessions'],
+                    filters: [
+                      {
+                        id: '6fe1e32e-ec17-478b-904d-11c121f6817b',
+                        label: 'State-funded AP school',
+                      },
+                      {
+                        id: '1736fa44-d7af-421c-91a1-69c3b3aed8d9',
+                        label: 'State-funded secondary',
+                      },
+                    ],
+                    indicators: [
+                      {
+                        id: 'ad93c0c6-6485-4817-2fc5-08debbdc383d',
+                        label: 'Headcount',
+                      },
+                    ],
                     geographicLevels: {
                       'Local authority': [
                         {
@@ -130,8 +144,18 @@ export default function createMockSseStream({
                   },
                   {
                     fileId: '10308fbb-da53-4eae-20d2-08dec542d092',
-                    filters: ['lorem'],
-                    indicators: ['lorem'],
+                    filters: [
+                      {
+                        id: 'filter-id',
+                        label: 'filter label',
+                      },
+                    ],
+                    indicators: [
+                      {
+                        id: 'indicator-id',
+                        label: 'indicator label',
+                      },
+                    ],
                     geographicLevels: {
                       'Local authority': [
                         {

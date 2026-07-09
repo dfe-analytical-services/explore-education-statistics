@@ -1,0 +1,14 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.previewNotice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: govuk-spacing(4);
+  flex-wrap: wrap;
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(6);
+  border: 1px solid govuk-functional-colour('surface-border');
+  background-color: govuk-functional-colour('surface-background');
+  color: govuk-functional-colour('surface-text');
+}

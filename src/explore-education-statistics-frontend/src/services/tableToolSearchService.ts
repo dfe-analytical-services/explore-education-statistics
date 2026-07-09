@@ -45,11 +45,17 @@ export interface GeographicLevelItem {
   value: string;
 }
 
+export interface FilterIndicatorItem {
+  id: string;
+  label: string;
+}
+
 export interface FinalDataset {
   aiSummary: string;
   fileId: string;
-  filters: string[];
+  filters: FilterIndicatorItem[];
   geographicLevels: Dictionary<GeographicLevelItem[]>;
+  indicators: FilterIndicatorItem[];
   timePeriod: {
     start: {
       code: string;
@@ -60,7 +66,6 @@ export interface FinalDataset {
       year: string;
     };
   };
-  indicators: string[];
   title: string;
 }
 
