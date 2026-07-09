@@ -89,7 +89,7 @@ public class ReplacementServiceHelperTests
                                         new UnmappedFilterItem
                                         {
                                             Id = replacementIndicatorA1CId,
-                                            Label = "Indicator A1c",
+                                            Label = "Indicator A1C",
                                         },
                                     ],
                                 }
@@ -199,7 +199,7 @@ public class ReplacementServiceHelperTests
                             Label = "Group C1",
                             UnmappedReplacementFilterItems =
                             [
-                                new UnmappedFilterItem { Id = replacementIndicatorC1AId, Label = "Indicator C1a" },
+                                new UnmappedFilterItem { Id = replacementIndicatorC1AId, Label = "Indicator C1A" },
                             ],
                         },
                     ],
@@ -1194,6 +1194,48 @@ public class ReplacementServiceHelperTests
             ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = indicatorsMappings,
             UnmappedReplacementIndicators = unmappedReplacementIndicators,
+        };
+    }
+
+    private static FilterMapping CreateFilterMapping(
+        Filter original,
+        Filter? replacement = null,
+        Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
+        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
+        MapStatus status = MapStatus.Unset
+    )
+    {
+        return new FilterMapping
+        {
+            OriginalId = original.Id,
+            OriginalColumnName = original.Name,
+            OriginalLabel = original.Label,
+            ReplacementId = replacement?.Id,
+            ReplacementColumnName = replacement?.Name,
+            ReplacementLabel = replacement?.Label,
+            FilterGroupMappings = filterGroupMappings ?? [],
+            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
+            Status = status,
+        };
+    }
+
+    private static FilterGroupMapping CreateFilterGroupMapping(
+        FilterGroup original,
+        FilterGroup? replacement = null,
+        Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
+        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
+        MapStatus status = MapStatus.Unset
+    )
+    {
+        return new FilterGroupMapping
+        {
+            OriginalId = original.Id,
+            OriginalLabel = original.Label,
+            ReplacementId = replacement?.Id,
+            ReplacementLabel = replacement?.Label,
+            FilterItemMappings = filterItemMappings ?? [],
+            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
+            Status = status,
         };
     }
 }
