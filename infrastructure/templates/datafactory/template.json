@@ -15,7 +15,7 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "publisherAppName": {
+    "coreSqlServerName": {
       "type": "string"
     },
     "dataFactoryName": {
@@ -86,6 +86,9 @@
           },
           "keyVaultName": {
             "value": "[parameters('keyVaultName')]"
+          },
+          "coreSqlServerName": {
+            "value": "[parameters('coreSqlServerName')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"
