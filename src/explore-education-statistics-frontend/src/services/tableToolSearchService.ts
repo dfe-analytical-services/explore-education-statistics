@@ -7,6 +7,7 @@ import {
 } from '@microsoft/fetch-event-source';
 
 export const PipelineStage = {
+  CONNECTING: 'connecting',
   STARTING: 'starting pipeline',
   RETRIEVED: 'retrieved datasets',
   RERANKER: 'reranker complete',
@@ -17,6 +18,7 @@ export type PipelineStageType =
   (typeof PipelineStage)[keyof typeof PipelineStage];
 
 export const PipelineStageLabels: Record<PipelineStageType, string> = {
+  [PipelineStage.CONNECTING]: 'Connecting',
   [PipelineStage.STARTING]: 'Understanding your question',
   [PipelineStage.RETRIEVED]: 'Identify relevant information from data sets',
   [PipelineStage.RERANKER]: 'Choosing the most relevant data sets',
@@ -48,6 +50,16 @@ export interface FinalDataset {
   fileId: string;
   filters: string[];
   geographicLevels: Dictionary<GeographicLevelItem[]>;
+  timePeriod: {
+    start: {
+      code: string;
+      year: string;
+    };
+    end: {
+      code: string;
+      year: string;
+    };
+  };
   indicators: string[];
   title: string;
 }
@@ -78,7 +90,11 @@ export interface StageComplete {
   stage: typeof PipelineStage.COMPLETE;
   data: {
     datasets: FinalDataset[];
-    token_usage: number;
+    token_usage: {
+      input: number;
+      output: number;
+    };
+    cost: number;
   };
 }
 

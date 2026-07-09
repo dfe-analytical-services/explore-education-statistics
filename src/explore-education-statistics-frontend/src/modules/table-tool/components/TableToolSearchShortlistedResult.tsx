@@ -1,4 +1,4 @@
-import styles from '@frontend/modules/table-tool/components/ShortlistedSearchResultItem.module.scss';
+import styles from '@frontend/modules/table-tool/components/TableToolSearchShortlistedResult.module.scss';
 import React from 'react';
 
 interface Props {

@@ -15,8 +15,11 @@ import ButtonText from '@common/components/ButtonText';
 import downloadService from '@common/services/downloadService';
 
 interface Props {
+  capMaxHeight?: boolean;
   captionTitle?: string;
   dataBlockId?: string;
+  defaultCaptionId?: string;
+  defaultFootnotesId?: string;
   footnotesClassName?: string;
   footnotesHeadingHiddenText?: string;
   fullTable: FullTable;
@@ -30,8 +33,11 @@ interface Props {
 }
 
 const TimePeriodDataTable = ({
+  capMaxHeight,
   captionTitle,
   dataBlockId,
+  defaultCaptionId = 'dataTableCaption',
+  defaultFootnotesId = 'dataTableFootnotes',
   footnotesClassName,
   footnotesHeadingHiddenText,
   fullTable,
@@ -64,7 +70,7 @@ const TimePeriodDataTable = ({
 
     const captionId = dataBlockId
       ? `dataTableCaption-${dataBlockId}`
-      : 'dataTableCaption';
+      : defaultCaptionId;
 
     const coalescedReleaseVersionId =
       releaseVersionId ?? query?.releaseVersionId;
@@ -110,6 +116,7 @@ const TimePeriodDataTable = ({
           />
         )}
         <FixedMultiHeaderDataTable
+          capMaxHeight={capMaxHeight}
           caption={
             <DataTableCaption
               title={captionTitle}
@@ -124,7 +131,7 @@ const TimePeriodDataTable = ({
           footnotesId={
             dataBlockId
               ? `dataTableFootnotes-${dataBlockId}`
-              : 'dataTableFootnotes'
+              : defaultFootnotesId
           }
           footnotesHeadingHiddenText={footnotesHeadingHiddenText}
           ref={dataTableRef}
