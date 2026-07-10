@@ -1,6 +1,6 @@
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagger;
@@ -43,12 +43,9 @@ public class VersionedPathsDocumentFilterTests
                     new OpenApiPathItem
                     {
                         Parameters = [new OpenApiParameter { Name = "version" }],
-                        Operations =
+                        Operations = new Dictionary<HttpMethod, OpenApiOperation>
                         {
-                            {
-                                OperationType.Get,
-                                new OpenApiOperation { Parameters = [new OpenApiParameter { Name = "version" }] }
-                            },
+                            [HttpMethod.Get] = new() { Parameters = [new OpenApiParameter { Name = "version" }] },
                         },
                     }
                 },
@@ -57,18 +54,15 @@ public class VersionedPathsDocumentFilterTests
                     new OpenApiPathItem
                     {
                         Parameters = [new OpenApiParameter { Name = "version" }, new OpenApiParameter { Name = "id" }],
-                        Operations =
+                        Operations = new Dictionary<HttpMethod, OpenApiOperation>
                         {
+                            [HttpMethod.Get] = new()
                             {
-                                OperationType.Get,
-                                new OpenApiOperation
-                                {
-                                    Parameters =
-                                    [
-                                        new OpenApiParameter { Name = "version" },
-                                        new OpenApiParameter { Name = "id" },
-                                    ],
-                                }
+                                Parameters =
+                                [
+                                    new OpenApiParameter { Name = "version" },
+                                    new OpenApiParameter { Name = "id" },
+                                ],
                             },
                         },
                     }
@@ -85,16 +79,25 @@ public class VersionedPathsDocumentFilterTests
 
         var endpoint1Paths = document.Paths["/v1/endpoint-1"];
 
+        Assert.NotNull(endpoint1Paths.Parameters);
         Assert.Empty(endpoint1Paths.Parameters);
-        Assert.Empty(endpoint1Paths.Operations[OperationType.Get].Parameters);
+
+        Assert.NotNull(endpoint1Paths.Operations);
+        var endpoint1GetOperationParameters = endpoint1Paths.Operations[HttpMethod.Get].Parameters;
+        Assert.NotNull(endpoint1GetOperationParameters);
+        Assert.Empty(endpoint1GetOperationParameters);
 
         var endpoint2Paths = document.Paths["/v1/endpoint-2/{id}"];
 
+        Assert.NotNull(endpoint2Paths.Parameters);
         Assert.Single(endpoint2Paths.Parameters);
         Assert.Equal("id", endpoint2Paths.Parameters[0].Name);
 
-        Assert.Single(endpoint2Paths.Operations[OperationType.Get].Parameters);
-        Assert.Equal("id", endpoint2Paths.Parameters[0].Name);
+        Assert.NotNull(endpoint2Paths.Operations);
+        var endpoint2GetOperationParameters = endpoint2Paths.Operations[HttpMethod.Get].Parameters;
+        Assert.NotNull(endpoint2GetOperationParameters);
+        Assert.Single(endpoint2GetOperationParameters);
+        Assert.Equal("id", endpoint2GetOperationParameters[0].Name);
     }
 
     private static DocumentFilterContext CreateDocumentFilterContext()

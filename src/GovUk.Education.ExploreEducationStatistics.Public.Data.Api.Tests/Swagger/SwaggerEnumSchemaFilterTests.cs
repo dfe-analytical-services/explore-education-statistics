@@ -5,8 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagger;
@@ -26,9 +25,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var allOf = Assert.Single(schema.Properties[nameof(TestClass.Ref)].AllOf);
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.Ref));
+        var allOfRef = GetAllOfSchemaReference(propertySchema);
 
-        Assert.Equal(nameof(TestEnum), allOf.Reference.Id);
+        Assert.Equal(nameof(TestEnum), allOfRef.Reference.Id);
     }
 
     [Fact]
@@ -47,7 +47,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        Assert.Equal(nameof(TestEnum), schema.Properties[nameof(TestClass.RefList)].Items.Reference.Id);
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.RefList));
+        var itemsRef = GetItemsSchemaReference(propertySchema);
+
+        Assert.Equal(nameof(TestEnum), itemsRef.Reference.Id);
     }
 
     [Fact]
@@ -55,11 +58,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties[nameof(TestClass.String)].Enum.Cast<OpenApiString>().ToList();
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.String));
+        var stringValues = GetSchemaEnumValues<string>(propertySchema);
 
-        Assert.Equal(2, enums.Count);
-        Assert.Equal(TestEnum.Sample1.ToString(), enums[0].Value);
-        Assert.Equal(TestEnum.Sample2.ToString(), enums[1].Value);
+        Assert.Equal([nameof(TestEnum.Sample1), nameof(TestEnum.Sample2)], stringValues);
     }
 
     [Fact]
@@ -78,11 +80,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties[nameof(TestClass.StringList)].Items.Enum.Cast<OpenApiString>().ToList();
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.StringList));
+        var stringValues = GetSchemaEnumValues<string>(propertySchema.Items);
 
-        Assert.Equal(2, enums.Count);
-        Assert.Equal(TestEnum.Sample1.ToString(), enums[0].Value);
-        Assert.Equal(TestEnum.Sample2.ToString(), enums[1].Value);
+        Assert.Equal([nameof(TestEnum.Sample1), nameof(TestEnum.Sample2)], stringValues);
     }
 
     [Fact]
@@ -90,11 +91,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties[nameof(TestClass.Int)].Enum.Cast<OpenApiInteger>().ToList();
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.Int));
+        var intValues = GetSchemaEnumValues<int>(propertySchema);
 
-        Assert.Equal(2, enums.Count);
-        Assert.Equal((int)TestEnum.Sample1, enums[0].Value);
-        Assert.Equal((int)TestEnum.Sample2, enums[1].Value);
+        Assert.Equal([(int)TestEnum.Sample1, (int)TestEnum.Sample2], intValues);
     }
 
     [Fact]
@@ -102,11 +102,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties[nameof(TestClass.EnumLabel)].Enum.Cast<OpenApiString>().ToList();
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.EnumLabel));
+        var stringValues = GetSchemaEnumValues<string>(propertySchema);
 
-        Assert.Equal(2, enums.Count);
-        Assert.Equal(TestEnum.Sample1.GetEnumLabel(), enums[0].Value);
-        Assert.Equal(TestEnum.Sample2.GetEnumLabel(), enums[1].Value);
+        Assert.Equal([TestEnum.Sample1.GetEnumLabel(), TestEnum.Sample2.GetEnumLabel()], stringValues);
     }
 
     [Fact]
@@ -114,11 +113,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties[nameof(TestClass.EnumValue)].Enum.Cast<OpenApiString>().ToList();
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.EnumValue));
+        var stringValues = GetSchemaEnumValues<string>(propertySchema);
 
-        Assert.Equal(2, enums.Count);
-        Assert.Equal(TestEnum.Sample1.GetEnumValue(), enums[0].Value);
-        Assert.Equal(TestEnum.Sample2.GetEnumValue(), enums[1].Value);
+        Assert.Equal([TestEnum.Sample1.GetEnumValue(), TestEnum.Sample2.GetEnumValue()], stringValues);
     }
 
     [Fact]
@@ -126,11 +124,10 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties[nameof(TestClass.Schema)].Enum.Cast<OpenApiString>().ToList();
+        var propertySchema = GetPropertySchema(schema, nameof(TestClass.Schema));
+        var stringValues = GetSchemaEnumValues<string>(propertySchema);
 
-        Assert.Equal(2, enums.Count);
-        Assert.Equal(TestEnum.Sample1.ToString(), enums[0].Value);
-        Assert.Equal(TestEnum.Sample2.ToString(), enums[1].Value);
+        Assert.Equal([nameof(TestEnum.Sample1), nameof(TestEnum.Sample2)], stringValues);
     }
 
     [Fact]
@@ -145,15 +142,12 @@ public class SwaggerEnumSchemaFilterTests
 
         var schema = _schemaRepository.Schemas[nameof(TestClassWithGeographicLevel)];
 
-        var enums = schema
-            .Properties[nameof(TestClassWithGeographicLevel.GeographicLevel)]
-            .Enum.Cast<OpenApiString>()
-            .Select(e => e.Value)
-            .ToList();
+        var propertySchema = GetPropertySchema(schema, nameof(TestClassWithGeographicLevel.GeographicLevel));
+        var stringValues = GetSchemaEnumValues<string>(propertySchema);
 
         var geographicLevels = EnumUtil.GetEnumValues<GeographicLevel>();
 
-        Assert.Equal(enums.Order(), geographicLevels.Order());
+        Assert.Equal(stringValues.Order(), geographicLevels.Order());
     }
 
     [Fact]
@@ -162,7 +156,7 @@ public class SwaggerEnumSchemaFilterTests
         Assert.Throws<InvalidOperationException>(GenerateInvalidSchema);
     }
 
-    private OpenApiSchema GenerateSchema()
+    private IOpenApiSchema GenerateSchema()
     {
         var schemaGenerator = BuildSchemaGenerator();
 
@@ -172,7 +166,7 @@ public class SwaggerEnumSchemaFilterTests
         return _schemaRepository.Schemas[nameof(TestClass)];
     }
 
-    private OpenApiSchema GenerateInvalidSchema()
+    private IOpenApiSchema GenerateInvalidSchema()
     {
         var schemaGenerator = BuildSchemaGenerator();
 
@@ -187,6 +181,34 @@ public class SwaggerEnumSchemaFilterTests
             _schemaGeneratorOptions,
             new JsonSerializerDataContractResolver(new JsonSerializerOptions())
         );
+    }
+
+    private static IOpenApiSchema GetPropertySchema(IOpenApiSchema schema, string name)
+    {
+        Assert.NotNull(schema.Properties);
+        Assert.True(schema.Properties.TryGetValue(name, out var property), $"Schema has no property '{name}'.");
+        return property;
+    }
+
+    private static OpenApiSchemaReference GetAllOfSchemaReference(IOpenApiSchema? schema)
+    {
+        Assert.NotNull(schema);
+        Assert.NotNull(schema.AllOf);
+        return Assert.IsType<OpenApiSchemaReference>(Assert.Single(schema.AllOf));
+    }
+
+    private static OpenApiSchemaReference GetItemsSchemaReference(IOpenApiSchema? schema)
+    {
+        Assert.NotNull(schema);
+        Assert.NotNull(schema.Items);
+        return Assert.IsType<OpenApiSchemaReference>(schema.Items);
+    }
+
+    private static IReadOnlyList<T> GetSchemaEnumValues<T>(IOpenApiSchema? schema)
+    {
+        Assert.NotNull(schema);
+        Assert.NotNull(schema.Enum);
+        return [.. schema.Enum.Select(e => e.GetValue<T>())];
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter<TestEnum>))]

@@ -1,22 +1,26 @@
+using System.Text.Json.Nodes;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 public class TimeIdentifierSchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.MemberInfo == null && context.Type == typeof(TimeIdentifier))
+        if (
+            context.MemberInfo == null
+            && context.Type == typeof(TimeIdentifier)
+            && schema is OpenApiSchema openApiSchema
+        )
         {
-            schema.Type = "string";
-            schema.Format = null;
+            openApiSchema.Type = JsonSchemaType.String;
+            openApiSchema.Format = null;
 
-            schema.Description = """
+            openApiSchema.Description = """
                 The code identifying the time period's type.
 
                 The allowed values are:
@@ -40,12 +44,12 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
                 - `M1 - M12` - month 1 to 12
                 """;
 
-            schema.Example = new OpenApiString("CY");
+            openApiSchema.Example = JsonValue.Create("CY");
 
-            schema.Enum = TimeIdentifierUtils
+            openApiSchema.Enum = TimeIdentifierUtils
                 .Codes.NaturalOrder()
-                .Select(code => new OpenApiString(code))
-                .ToList<IOpenApiAny>();
+                .Select(JsonNode (code) => JsonValue.Create(code))
+                .ToList();
         }
     }
 }
