@@ -67,7 +67,7 @@ export interface FinalDataset extends DatasetResultBase {
   geographicLevels: Dictionary<GeographicLevelItem[]>;
   indicators: FilterIndicatorItem[];
   relevanceReason: string;
-  timePeriod: {
+  timePeriod?: {
     start: {
       code: string;
       year: string;

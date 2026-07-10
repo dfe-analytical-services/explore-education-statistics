@@ -20,7 +20,7 @@ interface TableToolSearchFinalResultProps {
 
 const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
   const {
-    timePeriod: { start, end },
+    timePeriod: { start, end } = {},
     filters,
     indicators,
     geographicLevels,
@@ -32,7 +32,7 @@ const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
       locations.map(location => location.id),
     ),
     timePeriod:
-      start.year && end.year
+      start?.year && end?.year
         ? {
             startYear: parseInt(start.year, 10),
             startCode: start.code,
