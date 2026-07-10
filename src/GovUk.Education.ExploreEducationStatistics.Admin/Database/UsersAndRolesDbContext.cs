@@ -42,13 +42,10 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder
-            .Entity<IdentityRole>()
-            .HasData(CreateRole(Role.BauUser), CreateRole(Role.Analyst), CreateRole(Role.PrereleaseUser));
+        modelBuilder.Entity<IdentityRole>().HasData(CreateRole(Role.BauUser), CreateRole(Role.StandardUser));
 
         var bauRoleId = Role.BauUser.GetEnumValue();
-        var analystRoleId = Role.Analyst.GetEnumValue();
-        var preReleaseRoleId = Role.PrereleaseUser.GetEnumValue();
+        var standardUserRoleId = Role.StandardUser.GetEnumValue();
 
         // Note that when amending this list of Claims to add or remove Claims from a given Role,
         // we also need to check to see if updates need to be addressed in ClaimsPrincipalUtils as well.
@@ -121,35 +118,21 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
                 new IdentityRoleClaim<string>
                 {
                     Id = -13,
-                    RoleId = analystRoleId,
+                    RoleId = standardUserRoleId,
                     ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>
                 {
                     Id = -14,
-                    RoleId = analystRoleId,
+                    RoleId = standardUserRoleId,
                     ClaimType = SecurityClaimTypes.AnalystPagesAccessGranted.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>
                 {
-                    Id = -15,
-                    RoleId = preReleaseRoleId,
-                    ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
-                    Id = -16,
-                    RoleId = preReleaseRoleId,
-                    ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
                     Id = -17,
-                    RoleId = analystRoleId,
+                    RoleId = standardUserRoleId,
                     ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                     ClaimValue = "",
                 },
@@ -165,20 +148,6 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
                     Id = -19,
                     RoleId = bauRoleId,
                     ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
-                    Id = -20,
-                    RoleId = bauRoleId,
-                    ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
-                    Id = -21,
-                    RoleId = analystRoleId,
-                    ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
                     ClaimValue = "",
                 },
                 new IdentityRoleClaim<string>

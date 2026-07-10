@@ -48,11 +48,6 @@ public enum SecurityClaimTypes
     CancelAllFileImports,
 
     /**
-     * Pre Release management
-     */
-    CanViewPrereleaseContacts,
-
-    /**
      * Taxonomy management
      */
     ManageAllTaxonomy,
