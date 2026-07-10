@@ -26,7 +26,7 @@ describe('TableToolSearchFinalResult', () => {
 
     expect(
       screen.getByRole('link', { name: /View this data set/ }),
-    ).toHaveAttribute('href', '/data-catalogue/data-set/test-file-id');
+    ).toHaveAttribute('href', '/data-catalogue/data-set/test-data-set-file-id');
 
     expect(
       screen.getByRole('heading', { name: 'Relevance' }),
@@ -56,7 +56,7 @@ describe('TableToolSearchFinalResult', () => {
       screen.getByRole('link', { name: /View and edit this table/ }),
     ).toHaveAttribute(
       'href',
-      '/data-tables/publication-slug/release-slug?fromSearch&sub=2dc0f701dbe644bc477208debbdc36fb&tp=2014%7CAY%7C2016%7CAY',
+      '/data-tables/publication-slug/release-slug?fromSearch&sub=testsubjectid&tp=2014%7CAY%7C2016%7CAY',
     );
   });
 

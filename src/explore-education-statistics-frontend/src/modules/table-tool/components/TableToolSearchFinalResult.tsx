@@ -24,9 +24,10 @@ const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
     filters,
     indicators,
     geographicLevels,
+    subjectId,
   } = dataset;
   return {
-    subjectId: '2dc0f701-dbe6-44bc-4772-08debbdc36fb', // TODO replace with subjectId when available
+    subjectId,
     locationIds: Object.values(geographicLevels).flatMap(locations =>
       locations.map(location => location.id),
     ),
@@ -75,11 +76,11 @@ const TableToolSearchFinalResult = ({
       <h2 className="govuk-heading-m govuk-!-margin-bottom-2">
         {dataset.title}
       </h2>
-      <Link to={`/data-catalogue/data-set/${dataset.fileId}`}>
+      <Link to={`/data-catalogue/data-set/${dataset.dataSetFileId}`}>
         View this data set <VisuallyHidden> - {dataset.title}</VisuallyHidden>
       </Link>
       <h3 className="govuk-heading-s govuk-!-margin-top-4">Relevance</h3>
-      <p className="govuk-body">{dataset.aiSummary}</p>
+      <p className="govuk-body">{dataset.relevanceReason}</p>
 
       <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
         {isError && <ErrorMessage>Error loading table preview.</ErrorMessage>}
