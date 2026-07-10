@@ -168,15 +168,15 @@ dotnet nuget add source https://nuget.pkg.github.com/<OWNER>/index.json -n <NAME
 - Replace `<PATH>` with the path to your *local* NuGet.Config file (see warning below)
 
 > [!WARNING]
-> Ensure `PATH` is specified with the full path to your local configuration file, otherwise the command 
-will default to the project-level NuGet.Config file, which is source controlled - PATs should 
-NEVER be source controlled. On Windows, this is typically located at: `C:/Users/<WINDOWS_USER>/AppData/Roaming/NuGet/NuGet.Config`.
-Further information about NuGet configuration files, including use on various operating systems, can be 
-found in [the Microsoft documentation](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#config-file-locations-and-uses).
+> Ensure `PATH` is specified with the full path to your local configuration file, otherwise the command
+> will default to the project-level NuGet.Config file, which is source controlled - PATs should
+> NEVER be source controlled. On Windows, this is typically located at: `C:/Users/<WINDOWS_USER>/AppData/Roaming/NuGet/NuGet.Config`.
+> Further information about NuGet configuration files, including use on various operating systems, can be
+> found in [the Microsoft documentation](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#config-file-locations-and-uses).
 
 > [!NOTE]
-> If using a non-Windows machine, you may need to include the `--store-password-in-clear-text` option to the 
-above command, as encryption is only supported on Windows.
+> If using a non-Windows machine, you may need to include the `--store-password-in-clear-text` option to the
+> above command, as encryption is only supported on Windows.
 
 
 ### Set up the database and storage emulator hosts
@@ -193,8 +193,8 @@ Add the following to your `hosts` file:
 
 ### Add the local site domain to hosts file
 
-> This step is only required if you are using Keycloak as the identity provider, or if you are using 
-a custom identity provider and prefer to use a 'nicer' URL instead of http://localhost.
+> This step is only required if you are using Keycloak as the identity provider, or if you are using
+> a custom identity provider and prefer to use a 'nicer' URL instead of http://localhost.
 
 Add the following to your `hosts` file:
 
@@ -241,39 +241,67 @@ The service can be started against a set of non-existent database. If no pre-exi
    ```
 
 2. Create empty `content` and `statistics` databases.
+
 3. Perform a one-off creation of database logins and users. Using Azure Data Studio or similar, 
    connect to these new databases and run:
-   ```sql
-   -- Against the `master` database
-   CREATE LOGIN [adminapp] WITH PASSWORD = 'Your_Password123';
-   CREATE LOGIN [importer] WITH PASSWORD = 'Your_Password123';
-   CREATE LOGIN [publisher] WITH PASSWORD = 'Your_Password123';
-   CREATE LOGIN [notifier] WITH PASSWORD = 'Your_Password123';
-   CREATE LOGIN [content] WITH PASSWORD = 'Your_Password123';
-   CREATE LOGIN [data] WITH PASSWORD = 'Your_Password123';
-   CREATE LOGIN [public_data_processor] WITH PASSWORD = 'Your_Password123';
+   1. Against the "master" database
 
-   -- Against the `content` database
-   CREATE USER [adminapp] FROM LOGIN [adminapp];
-   ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
-   ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
-   ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
-   ALTER ROLE [db_securityadmin] add member [adminapp];
-   GRANT ALTER ANY USER TO [adminapp];
+      Create logins for different components of the service, substituting appropriate passwords as required:
+        
+      ```sql
+      CREATE LOGIN [adminapp] WITH PASSWORD = 'Your_Password123';
+      CREATE LOGIN [importer] WITH PASSWORD = 'Your_Password123';
+      CREATE LOGIN [publisher] WITH PASSWORD = 'Your_Password123';
+      CREATE LOGIN [notifier] WITH PASSWORD = 'Your_Password123';
+      CREATE LOGIN [content] WITH PASSWORD = 'Your_Password123';
+      CREATE LOGIN [data] WITH PASSWORD = 'Your_Password123';
+      CREATE LOGIN [public_data_processor] WITH PASSWORD = 'Your_Password123';
+      CREATE LOGIN [datafactory] WITH PASSWORD = 'Your_Password123';
+      ```
+        
+      Give the "datafactory" user the ability to read DMV tables and to kill reindexing initiated by other sessions.
+      This is necessary to perform here rather than in migrations as it affects the master database rather than an
+      application database:
+        
+      ```sql
+      -- 
+      GRANT VIEW SERVER STATE TO [datafactory];
+      GRANT ALTER ANY CONNECTION TO [datafactory];
+      ```
+    
+   2. Against the "content" database
+    
+      Create the contained "adminapp" user and give it permissions required to run migrations and control user roles and permissions:
+    
+      ```sql
+      CREATE USER [adminapp] FROM LOGIN [adminapp];
+      ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
+      ALTER ROLE [db_securityadmin] add member [adminapp];
+      GRANT ALTER ANY USER TO [adminapp];
+      ```
+    
+   3. Against the "statistics" database
+    
+      Create the contained "adminapp" user and give it permissions required to run migrations and control user roles and
+      permissions:
 
-   -- Against the `statistics` database
-   CREATE USER [adminapp] FROM LOGIN [adminapp];
-   ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
-   ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
-   ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
-   ALTER ROLE [db_securityadmin] add member [adminapp];
-   GRANT ALTER ANY USER TO [adminapp];
-   GRANT EXECUTE ON TYPE::IdListGuidType TO [adminapp];
-   GRANT EXECUTE ON OBJECT::FilteredFootnotes TO [adminapp];
-   GRANT SELECT ON OBJECT::geojson TO [adminapp];
-   ```
-   This will create contained users for the `content` and `statistics` databases as well as allowing 
-   the `adminapp` user  to manage the permissions of the contained users.
+      ```sql
+      CREATE USER [adminapp] FROM LOGIN [adminapp];
+      ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
+      ALTER ROLE [db_securityadmin] add member [adminapp];
+      GRANT ALTER ANY USER TO [adminapp];
+      ```
+
+      Create the contained "datafactory" user:
+
+      ```sql
+      CREATE USER [datafactory] FROM LOGIN [datafactory];
+      ```
+
 4. Start the Admin project and this will configure the contained users' permissions via database migrations. 
    The other projects will then be able to be started, using their own contained users to connect to the databases. 
 
@@ -372,8 +400,8 @@ excluded from Git.
 You can use [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Keycloak.json) 
 as a template for how the configuration should be structured.
 
-> Note that it must have Implicit Flow enabled and be using the OpenID Connect protocol. It must be set to issue 
-ID Tokens.
+> Note that it must have Implicit Flow enabled and be using the OpenID Connect protocol. It must be set to issue
+> ID Tokens.
 
 If you wish, you can explicitly choose which config to load using the `IdpConfig` environment variable:
 
@@ -402,8 +430,8 @@ now be in both Keycloak and in the SQL Server database.
 
 #### Bootstrapping different Identity Provider users
 
-> Shared test credentials are available to team members for use during development and testing. This step is 
-only required for creating *additional* users, or for non-team members within the open source community to create initial users.
+> Shared test credentials are available to team members for use during development and testing. This step is
+> only required for creating *additional* users, or for non-team members within the open source community to create initial users.
 
 If you are using your own IdP config (via `appsettings.Idp.json`), you can bootstrap users who you want to
 have access to the system straight away by creating a `appsettings.IdpBootstrapUsers.json`, which is excluded from Git.
@@ -465,10 +493,10 @@ Examples:
   pnpm start publicData
   ```
 
-> If running the `start` script for the first time, and using the seed data downloaded for the recommended 
-database setup, you may encounter an SQL error implying a login failure due to the server being in "script 
-upgrade mode", this is due to the data still being processed by SQL Server. Depending on the size of the 
-data, this may take a minute or two to complete, after which the `start` script can be re-ran.
+> If running the `start` script for the first time, and using the seed data downloaded for the recommended
+> database setup, you may encounter an SQL error implying a login failure due to the server being in "script
+> upgrade mode", this is due to the data still being processed by SQL Server. Depending on the size of the
+> data, this may take a minute or two to complete, after which the `start` script can be re-ran.
 
 The frontend applications can be accessed via:
 
