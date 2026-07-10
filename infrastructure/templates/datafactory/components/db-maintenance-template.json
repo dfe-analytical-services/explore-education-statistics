@@ -14,6 +14,12 @@
         "description": "The name of the key vault"
       }
     },
+    "coreSqlServerName": {
+      "type": "string",
+      "metadata": {
+        "description": "Core Azure SQL server name"
+      }
+    },
     "slackAlertsChannel": {
       "type": "string",
       "metadata": {
@@ -29,12 +35,59 @@
   },
   "variables": {
     "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
+    "coreSqlServerPrivateEndpointName": "[concat(parameters('coreSqlServerName'), '-pep')]",
+    "coreSqlServerPrivateEndpointId": "[concat('Microsoft.DataFactory/factories/', variables('coreSqlServerPrivateEndpointName'))]",
     "fragmentationTables": "Observation,ObservationFilterItem",
     "removeSoftDeletedSubjectsObservationLimit": "20000000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "500000",
     "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "500000"
   },
   "resources": [
+    {
+      "name": "[concat(parameters('factoryName'), '/default')]",
+      "type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+      "apiVersion": "2018-06-01",
+      "properties": {}
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/vnetIntegrationRuntime')]",
+      "type": "Microsoft.DataFactory/factories/integrationRuntimes",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "type": "Managed",
+        "typeProperties": {
+          "computeProperties": {
+            "location": "[resourceGroup().location]",
+            "dataFlowProperties": {
+              "computeType": "General",
+              "coreCount": 8,
+              "timeToLive": 10,
+              "cleanup": false
+            }
+          }
+        },
+        "managedVirtualNetwork": {
+          "type": "ManagedVirtualNetworkReference",
+          "referenceName": "default"
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/default/', variables('coreSqlServerPrivateEndpointName'))]",
+      "type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "privateLinkResourceId": "[resourceId('Microsoft.Sql/servers', parameters('coreSqlServerName'))]",
+        "groupId": "sqlServer",
+        "fqdns": "[createArray(concat(parameters('coreSqlServerName'), '.database.windows.net'))]"
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+      ]
+    },
     {
       "name": "[concat(parameters('factoryName'), '/ls_sql_statistics')]",
       "type": "Microsoft.DataFactory/factories/linkedServices",
@@ -51,10 +104,43 @@
             },
             "secretName": "ees-sql-admin-datafactory-connectionstring"
           }
+        },
+        "connectVia": {
+          "referenceName": "vnetIntegrationRuntime",
+          "type": "IntegrationRuntimeReference"
         }
       },
       "dependsOn": [
         "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/ds_sql_statistics')]",
+      "type": "Microsoft.DataFactory/factories/datasets",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "linkedServiceName": {
+          "referenceName": "ls_sql_statistics",
+          "type": "LinkedServiceReference"
+        },
+        "parameters": {
+          "cw_table": {
+            "type": "String"
+          }
+        },
+        "annotations": [],
+        "type": "AzureSqlTable",
+        "schema": [],
+        "typeProperties": {
+          "schema": "dbo",
+          "table": {
+            "value": "@dataset().cw_table",
+            "type": "Expression"
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
       ]
     },
     {

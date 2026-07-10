@@ -4227,8 +4227,8 @@
           "environment": {
             "value": "[parameters('environment')]"
           },
-          "publisherAppName": {
-            "value": "[variables('publisherAppName')]"
+          "coreSqlServerName": {
+            "value": "[variables('coreSqlServerName')]"
           },
           "dataFactoryName": {
             "value": "[variables('dataFactoryName')]"
@@ -4252,8 +4252,6 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
         "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
       ]
