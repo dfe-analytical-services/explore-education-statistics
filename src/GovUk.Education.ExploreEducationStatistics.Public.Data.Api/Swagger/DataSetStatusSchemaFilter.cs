@@ -1,7 +1,7 @@
+using System.Text.Json.Nodes;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -15,17 +15,21 @@ public class DataSetStatusSchemaFilter : ISchemaFilter
         DataSetStatus.Withdrawn,
     ];
 
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.MemberInfo == null && context.Type == typeof(DataSetStatus))
+        if (
+            context.MemberInfo == null
+            && context.Type == typeof(DataSetStatus)
+            && schema is OpenApiSchema openApiSchema
+        )
         {
-            schema.Type = "string";
+            openApiSchema.Type = JsonSchemaType.String;
 
-            schema.Enum = EnumUtil
+            openApiSchema.Enum = EnumUtil
                 .GetEnums<DataSetStatus>()
                 .Where(_publicStatuses.Contains)
-                .Select(e => new OpenApiString(e.ToString()))
-                .ToList<IOpenApiAny>();
+                .Select(JsonNode (dataSetStatus) => JsonValue.Create(dataSetStatus.ToString()))
+                .ToList();
         }
     }
 }
