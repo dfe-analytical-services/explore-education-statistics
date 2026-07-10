@@ -23,8 +23,8 @@ public record DataSetMapping
     public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
     public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
 
-    public Dictionary<Guid, FilterMapping> FilterMappings { get; init; } = null!;
-    public List<UnmappedFilter> UnmappedReplacementFilters { get; init; } = [];
+    public Dictionary<Guid, FilterMapping> FilterMappings { get; set; } = null!; // EES-7370 Change set -> init
+    public List<UnmappedFilter> UnmappedReplacementFilters { get; set; } = []; // EES-7370 Change set -> init
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
