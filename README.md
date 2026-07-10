@@ -260,11 +260,13 @@ The service can be started against a set of non-existent database. If no pre-exi
       ```
         
       Give the "datafactory" user the ability to read DMV tables and to kill reindexing initiated by other sessions.
+      This only needs to be applied to non-Azure SQL database servers. Azure SQL equivalent permissions are
+      conditionally applied by automatic database migrations.
+
       This is necessary to perform here rather than in migrations as it affects the master database rather than an
       application database:
         
       ```sql
-      -- 
       GRANT VIEW SERVER STATE TO [datafactory];
       GRANT ALTER ANY CONNECTION TO [datafactory];
       ```
