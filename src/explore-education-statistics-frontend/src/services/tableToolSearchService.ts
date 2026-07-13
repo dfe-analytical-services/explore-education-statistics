@@ -99,10 +99,7 @@ export interface StageComplete {
 }
 
 export type TtSearchStreamMessage =
-  | StageStarting
-  | StageRetrieved
-  | StageReranker
-  | StageComplete;
+  StageStarting | StageRetrieved | StageReranker | StageComplete;
 
 export interface TableToolSearchListRequest {
   userQuery: string;

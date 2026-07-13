@@ -3,9 +3,7 @@ import { IdTitlePair } from '@admin/services/types/common';
 import { PublicationSummaryPreview } from '@common/services/publicationService';
 
 export type MethodologyApprovalStatus =
-  | 'Draft'
-  | 'HigherLevelReview'
-  | 'Approved';
+  'Draft' | 'HigherLevelReview' | 'Approved';
 export type MethodologyPublishingStrategy = 'WithRelease' | 'Immediately';
 
 export type UpdateMethodology = {

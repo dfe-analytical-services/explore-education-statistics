@@ -18,8 +18,10 @@ import React, {
 import styles from './EditableAccordion.module.scss';
 import { EditableAccordionSectionProps } from './EditableAccordionSection';
 
-export interface EditableAccordionProps
-  extends OmitStrict<AccordionProps, 'openAll'> {
+export interface EditableAccordionProps extends OmitStrict<
+  AccordionProps,
+  'openAll'
+> {
   sectionName?: string;
   onAddSection: () => void;
   onReorder: (sectionIds: string[]) => void;

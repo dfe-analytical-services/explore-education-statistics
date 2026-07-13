@@ -183,8 +183,9 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
 
       const publicationSlug = themes
         .find(theme => theme.id === publicationThemeId)
-        ?.publications?.find(publication => publication.id === publicationId)
-        ?.slug;
+        ?.publications?.find(
+          publication => publication.id === publicationId,
+        )?.slug;
 
       const newParams = await getUpdatedQueryParams({
         filterType: 'publicationId',

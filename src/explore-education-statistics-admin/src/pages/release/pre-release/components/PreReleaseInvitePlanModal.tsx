@@ -43,7 +43,9 @@ export default function PreReleaseInvitePlanModal({
           </WarningMessage>
           <div className={styles.invitesOverflow}>
             <ul className="govuk-!-margin-2" data-testid="invitableList">
-              {invitePlan.invitable?.map(email => <li key={email}>{email}</li>)}
+              {invitePlan.invitable?.map(email => (
+                <li key={email}>{email}</li>
+              ))}
             </ul>
           </div>
         </>

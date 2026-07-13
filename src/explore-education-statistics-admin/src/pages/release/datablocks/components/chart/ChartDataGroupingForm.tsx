@@ -323,16 +323,16 @@ export default function ChartDataGroupingForm({
               onSubmit={() => {
                 const copiedCustomGroups: CustomDataGroup[] =
                   values.type === 'CopyCustom'
-                    ? dataSetsWithCustomGroupsOptions.find(
+                    ? (dataSetsWithCustomGroupsOptions.find(
                         grouping => grouping.value === values.copyCustomGroups,
-                      )?.dataGrouping.customGroups ?? []
+                      )?.dataGrouping.customGroups ?? [])
                     : [];
 
                 const updatedGrouping: DataGroupingConfig = {
                   customGroups:
                     values.type === 'CopyCustom'
                       ? copiedCustomGroups
-                      : values.customGroups ?? [],
+                      : (values.customGroups ?? []),
                   type: values.type === 'CopyCustom' ? 'Custom' : values.type,
                 };
 

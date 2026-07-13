@@ -45,9 +45,8 @@ const PreReleaseTableToolPage = ({
       ]);
 
       if (dataBlockId) {
-        const { table, query } = await dataBlockService.getDataBlock(
-          dataBlockId,
-        );
+        const { table, query } =
+          await dataBlockService.getDataBlock(dataBlockId);
 
         const [subjectMeta, tableData] = await Promise.all([
           tableBuilderService.getSubjectMeta(query.subjectId, releaseVersionId),

@@ -26,13 +26,11 @@ export default class PreviewTokenDateHelper {
   }
 
   public setDateRangeBasedOnPresets(datePresetSpan: number): DateRange {
-    if (
-      !(
-        Number.isInteger(datePresetSpan) &&
-        datePresetSpan > 0 &&
-        datePresetSpan < 8
-      )
-    ) {
+    if (!(
+      Number.isInteger(datePresetSpan) &&
+      datePresetSpan > 0 &&
+      datePresetSpan < 8
+    )) {
       throw new Error(
         `The number of days (${datePresetSpan}) selected is not allowed, please select between 1 to 7 days.`,
       );

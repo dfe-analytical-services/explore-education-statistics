@@ -11,8 +11,7 @@ export interface MergedFootnoteFilterReplacement extends TargetReplacement {
   isAllSelected: boolean;
 }
 
-export interface MergedFootnoteFilterGroupReplacement
-  extends TargetReplacement {
+export interface MergedFootnoteFilterGroupReplacement extends TargetReplacement {
   filters: FilterItemReplacement[];
   isAllSelected: boolean;
 }

@@ -25,11 +25,10 @@ import FormCheckbox, {
 import styles from './FormCheckboxGroup.module.scss';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 
-export interface CheckboxOption
-  extends PartialBy<
-    OmitStrict<FormCheckboxProps, 'name' | 'checked' | 'onChange' | 'value'>,
-    'id'
-  > {
+export interface CheckboxOption extends PartialBy<
+  OmitStrict<FormCheckboxProps, 'name' | 'checked' | 'onChange' | 'value'>,
+  'id'
+> {
   value: string;
 }
 

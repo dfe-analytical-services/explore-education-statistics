@@ -68,9 +68,8 @@ const PreReleasePageContainer = ({
         return undefined;
       }
 
-      const preReleaseSummary = await preReleaseService.getPreReleaseSummary(
-        releaseVersionId,
-      );
+      const preReleaseSummary =
+        await preReleaseService.getPreReleaseSummary(releaseVersionId);
       return {
         preReleaseWindowStatus,
         preReleaseSummary,

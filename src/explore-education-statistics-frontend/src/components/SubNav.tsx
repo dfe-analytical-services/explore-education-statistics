@@ -9,8 +9,7 @@ interface Props {
   headingVisible?: boolean;
   items: NavItem[];
   widthClassName?:
-    | 'govuk-grid-column-one-quarter'
-    | 'govuk-grid-column-one-third';
+    'govuk-grid-column-one-quarter' | 'govuk-grid-column-one-third';
 }
 
 export default function SubNav({

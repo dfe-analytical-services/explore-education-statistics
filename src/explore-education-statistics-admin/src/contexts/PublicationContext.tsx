@@ -12,8 +12,7 @@ const PublicationContext = createContext<
 
 interface PublicationContextProviderProps {
   children:
-    | ReactNode
-    | ((state: AsyncHandledRetryState<Publication>) => ReactNode);
+    ReactNode | ((state: AsyncHandledRetryState<Publication>) => ReactNode);
   publicationId: string;
 }
 

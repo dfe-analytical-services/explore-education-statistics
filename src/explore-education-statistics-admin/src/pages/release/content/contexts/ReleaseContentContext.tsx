@@ -43,8 +43,7 @@ export const releaseReducer: ImmerReducer<
     sectionId: string;
   }): ContentSection<EditableBlock> | undefined {
     const matchingSection = draft.release[sectionKey] as
-      | ContentSection<EditableBlock>
-      | ContentSection<EditableBlock>[];
+      ContentSection<EditableBlock> | ContentSection<EditableBlock>[];
 
     if (!matchingSection) {
       throw new Error(

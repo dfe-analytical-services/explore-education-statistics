@@ -20,6 +20,4 @@ export interface PageFeedbackViewModel {
 }
 
 export type PageFeedbackResponse =
-  | 'Useful'
-  | 'NotUseful'
-  | 'ProblemEncountered';
+  'Useful' | 'NotUseful' | 'ProblemEncountered';

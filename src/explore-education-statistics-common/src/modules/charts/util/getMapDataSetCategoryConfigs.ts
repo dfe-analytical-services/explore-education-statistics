@@ -23,8 +23,7 @@ export interface MapDataSetCategoryConfig extends DataSetCategoryConfig {
   dataGrouping: DataGroupingConfig;
 }
 
-interface GetMapDataSetCategoryConfigsOptions
-  extends GetDataSetCategoryConfigsOptions {
+interface GetMapDataSetCategoryConfigsOptions extends GetDataSetCategoryConfigsOptions {
   dataSetConfigs?: MapDataSetConfig[];
   /**
    * Data classification and data groups are now in `dataSetConfigs`

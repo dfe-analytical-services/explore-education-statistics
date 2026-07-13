@@ -13,8 +13,10 @@ import React, {
   useCallback,
 } from 'react';
 
-export interface FormBaseInputProps
-  extends Pick<FormLabelProps, 'hideLabel' | 'label' | 'labelSize'> {
+export interface FormBaseInputProps extends Pick<
+  FormLabelProps,
+  'hideLabel' | 'label' | 'labelSize'
+> {
   addOn?: ReactNode;
   addOnContainerClassName?: string;
   announceError?: boolean;

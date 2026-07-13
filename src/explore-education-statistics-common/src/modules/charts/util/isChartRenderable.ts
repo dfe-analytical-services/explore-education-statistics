@@ -11,9 +11,9 @@ export default function isChartRenderable(props: RenderableChart): boolean {
 
   return Boolean(
     props.type &&
-      props.axes?.major?.dataSets.length &&
-      props.data &&
-      props.meta,
+    props.axes?.major?.dataSets.length &&
+    props.data &&
+    props.meta,
   );
 }
 

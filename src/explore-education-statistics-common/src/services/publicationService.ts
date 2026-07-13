@@ -160,8 +160,9 @@ export interface ReleaseVersionHomeSection<BlockType> {
   content: BlockType[];
 }
 
-export interface ReleaseVersionHomeContentSection<BlockType>
-  extends ReleaseVersionHomeSection<BlockType> {
+export interface ReleaseVersionHomeContentSection<
+  BlockType,
+> extends ReleaseVersionHomeSection<BlockType> {
   heading: string;
 }
 
@@ -199,9 +200,7 @@ export interface EmbedBlockViewModel {
 }
 
 export type BlockViewModel =
-  | HtmlBlockViewModel
-  | DataBlockViewModel
-  | EmbedBlockViewModel;
+  HtmlBlockViewModel | DataBlockViewModel | EmbedBlockViewModel;
 
 export interface ReleaseVersionHomeContent<
   HtmlBlockType extends HtmlBlockViewModel = HtmlBlockViewModel,
@@ -285,8 +284,7 @@ export interface PublicationReleaseListItem {
 }
 
 export type PublicationReleaseSeriesItem =
-  | PublicationLegacyReleaseListItem
-  | PublicationReleaseListItem;
+  PublicationLegacyReleaseListItem | PublicationReleaseListItem;
 
 export interface ReleaseSummary {
   id: string;

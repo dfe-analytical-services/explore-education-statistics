@@ -21,8 +21,7 @@ const NotificationHubContext = createContext<
 
 interface NotificationHubContextProviderProps {
   children:
-    | ReactNode
-    | ((value: HubState<NotificationHub> | undefined) => ReactNode);
+    ReactNode | ((value: HubState<NotificationHub> | undefined) => ReactNode);
 }
 
 export function NotificationHubContextProvider({

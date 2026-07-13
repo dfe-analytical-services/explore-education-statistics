@@ -16,9 +16,8 @@ export interface ServerValidationError {
   code?: string;
 }
 
-export type FieldName<FormValues> = FormValues extends Record<string, unknown>
-  ? Path<FormValues>
-  : string;
+export type FieldName<FormValues> =
+  FormValues extends Record<string, unknown> ? Path<FormValues> : string;
 
 export type FieldMessageMapper<FormValues = unknown> = (
   error: ServerValidationError,

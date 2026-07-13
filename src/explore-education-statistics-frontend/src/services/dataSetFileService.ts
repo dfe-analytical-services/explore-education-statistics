@@ -106,10 +106,7 @@ export interface DataSetFileApi {
 }
 
 export type DataSetFileSortParam =
-  | 'published'
-  | 'title'
-  | 'relevance'
-  | 'natural';
+  'published' | 'title' | 'relevance' | 'natural';
 
 export type DataSetType = 'all' | 'api';
 

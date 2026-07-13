@@ -89,7 +89,7 @@
       "eslint"
     ],
     "*.{scss,css}": [
-      "stylelint"
+      "stylelint --allow-empty-input"
     ],
     "*.{js,jsx,ts,tsx,css,scss,html}": [
       "prettier --write"

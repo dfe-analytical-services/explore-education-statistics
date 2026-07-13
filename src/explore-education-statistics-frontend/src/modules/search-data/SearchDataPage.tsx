@@ -170,8 +170,8 @@ const SearchDataPage: NextPage = () => {
     : [];
 
   const allPublications = publicationTree.flatMap(theme => theme.publications);
-  const selectedPublications = allPublications.filter(
-    publication => publicationIds?.includes(publication.id),
+  const selectedPublications = allPublications.filter(publication =>
+    publicationIds?.includes(publication.id),
   );
 
   const isFilteredByDataSetType =
@@ -305,9 +305,7 @@ const SearchDataPage: NextPage = () => {
     if (multiValueFilters.includes(filterType)) {
       // Safely grab the current query param and ensure it's an array.
       const currentParam = router.query[filterType] as
-        | string
-        | string[]
-        | undefined;
+        string | string[] | undefined;
       const currentValues = getAsArray(currentParam) ?? [];
 
       let updatedValues: string[];
