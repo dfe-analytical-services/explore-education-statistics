@@ -317,6 +317,7 @@ export function chartBuilderReducer(
           ...(draft?.definition?.legend.defaults ?? {}),
           ...draft.legend,
           ...action.payload,
+          // Due to update in react-hook-form this is required to unfreeze items in array
         };
 
         break;

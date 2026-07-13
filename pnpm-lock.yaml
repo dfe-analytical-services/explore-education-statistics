@@ -213,8 +213,8 @@ importers:
         specifier: 19.2.7
         version: 19.2.7(react@19.2.7)
       react-hook-form:
-        specifier: ^7.81.0
-        version: 7.81.0(react@19.2.7)
+        specifier: 7.52.2
+        version: 7.52.2(react@19.2.7)
       react-idle-timer:
         specifier: ^4.6.4
         version: 4.6.4(prop-types@15.8.1)(react-dom@19.2.7)(react@19.2.7)
@@ -509,7 +509,7 @@ importers:
         version: 18.0.1(@types/react@19.2.17)(react-dom@19.2.7)(react@19.2.7)
       '@hookform/resolvers':
         specifier: 3.1.1
-        version: 3.1.1(react-hook-form@7.81.0)
+        version: 3.1.1(react-hook-form@7.52.2)
       '@lukemorales/query-key-factory':
         specifier: 1.3.4
         version: 1.3.4(@tanstack/query-core@4.41.1)(@tanstack/react-query@4.42.0)
@@ -586,8 +586,8 @@ importers:
         specifier: ^0.21.0
         version: 0.21.0(react@19.2.7)
       react-hook-form:
-        specifier: 7.81.0
-        version: 7.81.0(react@19.2.7)
+        specifier: 7.52.2
+        version: 7.52.2(react@19.2.7)
       react-lazyload:
         specifier: 3.2.1
         version: 3.2.1(react-dom@19.2.7)(react@19.2.7)
@@ -5045,12 +5045,12 @@ packages:
       - '@types/react'
     dev: false
 
-  /@hookform/resolvers@3.1.1(react-hook-form@7.81.0):
+  /@hookform/resolvers@3.1.1(react-hook-form@7.52.2):
     resolution: {integrity: sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
-      react-hook-form: 7.81.0(react@19.2.7)
+      react-hook-form: 7.52.2(react@19.2.7)
     dev: false
 
   /@humanwhocodes/config-array@0.13.0:
@@ -17927,8 +17927,8 @@ packages:
       react: 19.2.7
     dev: false
 
-  /react-hook-form@7.81.0(react@19.2.7):
-    resolution: {integrity: sha512-ocbmr2p5KBMoAfj4WCUvped33lVi1Kd5DuDUvQDnB6VEAacOjPI/jMbtDdbhco4y9ct4xUuCmMY0b/C9L0QHjw==}
+  /react-hook-form@7.52.2(react@19.2.7):
+    resolution: {integrity: sha512-pqfPEbERnxxiNMPd0bzmt1tuaPcVccywFDpyk2uV5xCIBphHV5T8SVnX9/o3kplPE1zzKt77+YIoq+EMwJp56A==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
