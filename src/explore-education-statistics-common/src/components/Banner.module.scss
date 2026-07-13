@@ -1,8 +1,8 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use 'govuk-frontend/dist/govuk/base' as *;
 
 .container {
-  background: govuk-tint($govuk-brand-colour, 95%);
-  border-bottom: 1px solid govuk-tint($govuk-brand-colour, 50%);
+  background: govuk-functional-colour('template-background');
+  border-bottom: 1px solid govuk-functional-colour('surface-border');
   padding: govuk-spacing(2) 0;
 }
 

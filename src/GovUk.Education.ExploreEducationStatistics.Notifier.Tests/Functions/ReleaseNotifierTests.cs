@@ -680,7 +680,7 @@ public class ReleaseNotifierTests
         Assert.Equal(releaseName, values["release_name"]);
         Assert.Equal($"{AppOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}", values["release_link"]);
         Assert.Equal(
-            $"{AppOptions.PublicAppUrl}/subscriptions/{unsubPubSlug}/confirm-unsubscription/{unsubToken}",
+            $"{AppOptions.PublicAppUrl}/subscriptions/{unsubPubSlug}/confirm-unsubscription?token={unsubToken}",
             values["unsubscribe_link"]
         );
 

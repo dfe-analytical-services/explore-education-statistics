@@ -27,6 +27,12 @@ param certificateType FrontDoorCertificateType = 'BringYourOwn'
 @description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
 param certificateName string?
 
+@description('The path to a healthcheck endpoint in the origin.')
+param healthProbePath string?
+
+@description('Choose whether or not to deploy health probes. Best practice is to enable them only when there is more than 1 origin in an origin group.')
+param deployHealthProbes bool = false
+
 @description('Optional names of rulesets to attach to routes.')
 param ruleSetNames string[]
 
@@ -86,12 +92,12 @@ resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
       successfulSamplesRequired: 3
       additionalLatencyInMilliseconds: 50
     }
-    healthProbeSettings: {
-      probePath: '/api/health'
+    healthProbeSettings: deployHealthProbes ? {
+      probePath: healthProbePath
       probeRequestType: 'HEAD'
       probeProtocol: 'Https'
       probeIntervalInSeconds: 100
-    }
+    } : null
     sessionAffinityState: 'Disabled'
   }
 }

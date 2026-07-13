@@ -41,7 +41,10 @@ export default function ReleaseNote({
         />
       ) : (
         <>
-          <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+          <FormattedDate
+            className="govuk-body govuk-!-font-weight-bold"
+            usingUkTime
+          >
             {releaseNote.on}
           </FormattedDate>
           <p>{releaseNote.reason}</p>

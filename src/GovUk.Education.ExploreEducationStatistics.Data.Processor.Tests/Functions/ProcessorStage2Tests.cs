@@ -232,6 +232,8 @@ public class ProcessorStage2Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var guidGenerator = new SequentialGuidGenerator();
 
         var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
@@ -254,6 +256,7 @@ public class ProcessorStage2Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 

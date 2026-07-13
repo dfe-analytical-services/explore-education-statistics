@@ -33,14 +33,6 @@ public class DataSetScreenerService(
 {
     public const string StartScreeningQueue = "start-screening";
 
-    public Task<DataSetScreenerResponse> ScreenDataSet(
-        DataSetScreenerRequest dataSetScreenerRequest,
-        CancellationToken cancellationToken
-    )
-    {
-        return dataSetScreenerClient.ScreenDataSet(dataSetScreenerRequest, cancellationToken);
-    }
-
     public async Task StartScreening(
         DataSetStartScreeningRequest dataSetScreenRequest,
         CancellationToken cancellationToken
@@ -202,7 +194,8 @@ public class DataSetScreenerService(
     )
     {
         return contentDbContext
-            .ReleaseVersions.SingleOrNotFound(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFound(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(() =>
                 contentDbContext.DataSetUploads.SingleOrNotFoundAsync(

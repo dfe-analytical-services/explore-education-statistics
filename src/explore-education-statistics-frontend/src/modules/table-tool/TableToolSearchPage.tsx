@@ -1,4 +1,12 @@
 import Details from '@common/components/Details';
+import ErrorMessage from '@common/components/ErrorMessage';
+import InsetText from '@common/components/InsetText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import PageNav from '@common/components/PageNav';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
+import WarningMessage from '@common/components/WarningMessage';
+import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
+import logger from '@common/services/logger';
 import publicationService, {
   PublicationSummary,
   ReleaseVersionSummary,
@@ -7,18 +15,139 @@ import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import SearchForm from '@frontend/components/SearchForm';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
+import TableToolSearchFinalResult from '@frontend/modules/table-tool/components/TableToolSearchFinalResult';
+import TableToolSearchShortlistedResult from '@frontend/modules/table-tool/components/TableToolSearchShortlistedResult';
+import tableToolSearchService, {
+  FatalError,
+  PipelineStage,
+  PipelineStageLabels,
+  PipelineStageType,
+  StageComplete,
+  StageReranker,
+  StageRetrieved,
+} from '@frontend/services/tableToolSearchService';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
+import { useRef, useState } from 'react';
 
 export interface TableToolSearchPageProps {
   latestReleaseVersion: ReleaseVersionSummary;
   publicationSummary: PublicationSummary;
 }
 
+export interface SearchPipelineData {
+  currentStage: PipelineStageType | null;
+  retrievedData: StageRetrieved['data'] | null;
+  rerankerData: StageReranker['data'] | null;
+  finalData: StageComplete['data'] | null;
+}
+
+const initialPipelineData: SearchPipelineData = {
+  currentStage: null,
+  retrievedData: null,
+  rerankerData: null,
+  finalData: null,
+};
+
 const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
   latestReleaseVersion,
   publicationSummary,
 }) => {
+  const [searchedTerm, setSearchedTerm] = useState<string | null>(null);
+  const [pipelineData, setPipelineData] =
+    useState<SearchPipelineData>(initialPipelineData);
+  const [error, setError] = useState<string | null>(null);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const handleSearchSubmit = async (searchTerm: string) => {
+    if (!searchTerm.trim() || searchedTerm === searchTerm.trim()) return;
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    setPipelineData({
+      ...initialPipelineData,
+      currentStage: PipelineStage.CONNECTING,
+    });
+    setSearchedTerm(searchTerm.trim());
+    setError(null);
+
+    try {
+      await tableToolSearchService.postSearchStream(
+        {
+          userQuery: searchTerm.trim(),
+          publicationId:
+            'a91d9e05-be82-474c-85ae-4913158406d0' || publicationSummary.id, // hardcoding for now
+        },
+        {
+          signal: abortControllerRef.current.signal,
+          onMessage: message => {
+            setPipelineData(prev => {
+              const updatedState = { ...prev, currentStage: message.stage };
+
+              switch (message.stage) {
+                case PipelineStage.RETRIEVED:
+                  updatedState.retrievedData = message.data;
+                  break;
+                case PipelineStage.RERANKER:
+                  updatedState.rerankerData = message.data;
+                  break;
+                case PipelineStage.COMPLETE:
+                  updatedState.finalData = message.data;
+                  break;
+                case PipelineStage.STARTING:
+                  break;
+                default:
+                  return updatedState;
+              }
+
+              return updatedState;
+            });
+
+            // Abort early if there are no results.
+            if (
+              (message.stage === PipelineStage.RETRIEVED &&
+                message.data.datasets.length === 0) ||
+              (message.stage === PipelineStage.RERANKER &&
+                message.data.shortlistedDatasets.length === 0)
+            ) {
+              abortControllerRef.current?.abort();
+            }
+          },
+          onRetriableError: errorMessage => {
+            setError(errorMessage);
+          },
+        },
+      );
+    } catch (err) {
+      // Ignore user-triggered aborts
+      if (err instanceof Error && err.name === 'AbortError') return;
+
+      logger.error(err);
+
+      if (err instanceof FatalError) {
+        setError(`Search failed: ${err.message}. Please try again later.`);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(
+          'An unexpected system error occurred. Please try again later.',
+        );
+      }
+    }
+  };
+
+  const { currentStage, retrievedData, rerankerData, finalData } = pipelineData;
+
+  const hasNoResults =
+    (retrievedData && retrievedData.datasets.length === 0) ||
+    (rerankerData && rerankerData.shortlistedDatasets.length === 0) ||
+    (finalData && finalData.datasets.length === 0);
+
+  const searchFinished = currentStage === PipelineStage.COMPLETE;
+
   return (
     <Page
       title={`Search statistics - ${publicationSummary.title}`}
@@ -27,10 +156,19 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
         { name: 'Table tool', link: `/data-tables/${publicationSummary.slug}` },
       ]}
       pageTitleComponent={
-        <ReleasePageTitle
-          publicationSummary={publicationSummary}
-          releaseTitle={latestReleaseVersion.title}
-        />
+        <>
+          <PublishingOrganisations
+            publishingOrganisations={
+              latestReleaseVersion.publishingOrganisations
+            }
+          />
+          <div className="dfe-flex govuk-!-margin-bottom-8">
+            <ReleasePageTitle
+              publicationSummary={publicationSummary}
+              releaseTitle={latestReleaseVersion.title}
+            />
+          </div>
+        </>
       }
       width="wide"
     >
@@ -39,8 +177,13 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
           <SearchForm
             label="Search these statistics"
             hint={`Use natural language to search for statistics relating to ${publicationSummary.title}.`}
-            onSubmit={() => {}}
+            onSubmit={searchTerm => {
+              handleSearchSubmit(searchTerm);
+            }}
           />
+          <a href="#searchResults" className="govuk-skip-link">
+            Skip to results
+          </a>
           <Details
             className="govuk-!-margin-top-3 govuk-!-margin-bottom-4"
             summary="Help and example searches"
@@ -60,6 +203,108 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
             </p>
           </Details>
         </div>
+      </div>
+
+      <div
+        className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-8"
+        id="searchResults"
+      >
+        {error ? (
+          <div className="govuk-grid-column-two-thirds">
+            <ErrorMessage announceError>{error}</ErrorMessage>
+          </div>
+        ) : (
+          currentStage && (
+            <>
+              {hasNoResults ? (
+                <div role="alert" className="govuk-grid-column-two-thirds">
+                  <WarningMessage>
+                    We couldn't find any results for your search. <br />
+                    Please make sure your query is relevant to{' '}
+                    {publicationSummary.title}
+                  </WarningMessage>
+                </div>
+              ) : (
+                <>
+                  <ScreenReaderMessage
+                    message={PipelineStageLabels[currentStage]}
+                  />
+
+                  {!searchFinished && (
+                    <div className="govuk-grid-column-two-thirds">
+                      <h2 className="govuk-heading-m">
+                        {PipelineStageLabels[currentStage]}
+                      </h2>
+
+                      {currentStage === PipelineStage.STARTING && (
+                        <InsetText>Analysing "{searchedTerm}"</InsetText>
+                      )}
+
+                      {currentStage === PipelineStage.RETRIEVED &&
+                        pipelineData.retrievedData?.datasets && (
+                          <ul className="govuk-list govuk-list--spaced">
+                            {pipelineData.retrievedData.datasets.map(
+                              dataset => (
+                                <TableToolSearchShortlistedResult
+                                  key={dataset.title}
+                                  title={dataset.title}
+                                  relevance={dataset.relevanceScore}
+                                />
+                              ),
+                            )}
+                          </ul>
+                        )}
+
+                      {currentStage === PipelineStage.RERANKER &&
+                        pipelineData.rerankerData?.shortlistedDatasets && (
+                          <ul className="govuk-list govuk-list--spaced">
+                            {pipelineData.rerankerData.shortlistedDatasets.map(
+                              dataset => (
+                                <TableToolSearchShortlistedResult
+                                  key={dataset.title}
+                                  title={dataset.title}
+                                  relevance={dataset.relevanceScore}
+                                />
+                              ),
+                            )}
+                          </ul>
+                        )}
+
+                      <LoadingSpinner
+                        text="Processing request"
+                        hideText
+                        size="lg"
+                      />
+                    </div>
+                  )}
+
+                  {searchFinished && finalData && (
+                    <>
+                      <PageNav
+                        items={finalData.datasets.map(dataset => ({
+                          id: `result-${dataset.fileId}`,
+                          text: dataset.title,
+                        }))}
+                        heading="Search results"
+                      />
+                      <div className="govuk-grid-column-two-thirds">
+                        <ul className="govuk-list">
+                          {finalData.datasets.map(dataset => (
+                            <TableToolSearchFinalResult
+                              key={dataset.fileId}
+                              dataset={dataset}
+                              releaseVersionId={latestReleaseVersion.id}
+                            />
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          )
+        )}
       </div>
     </Page>
   );

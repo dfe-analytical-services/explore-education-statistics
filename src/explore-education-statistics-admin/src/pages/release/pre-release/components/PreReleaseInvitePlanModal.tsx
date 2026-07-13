@@ -99,6 +99,32 @@ export default function PreReleaseInvitePlanModal({
           </div>
         </>
       )}
+
+      {invitePlan.alreadyHasMorePowerfulRole.length > 0 && (
+        <>
+          <h2
+            id="already-has-more-powerful-role-heading"
+            className="govuk-heading-m"
+          >
+            Already has more powerful role
+          </h2>
+          <p>
+            The following email addresses will be ignored as they are already
+            have a more powerful role than pre-release:
+          </p>
+          <div className={styles.invitesOverflow}>
+            <ul
+              aria-labelledby="already-has-more-powerful-role-heading"
+              className="govuk-!-margin-2"
+              data-testid="morePowerfulRoleList"
+            >
+              {invitePlan.alreadyHasMorePowerfulRole.map(email => (
+                <li key={email}>{email}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
     </ModalConfirm>
   );
 }

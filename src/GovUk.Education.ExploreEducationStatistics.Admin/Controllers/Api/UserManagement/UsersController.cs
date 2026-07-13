@@ -35,8 +35,8 @@ public class UsersController(IUserManagementService userManagementService) : Con
     /// <summary>
     /// A BAU-only endpoint for deleting test users.
     /// </summary>
-    [HttpDelete("users/{email}")]
-    public async Task<ActionResult> DeleteUser(string email)
+    [HttpDelete("users")]
+    public async Task<ActionResult> DeleteUser([FromQuery] string email)
     {
         return await userManagementService.DeleteUser(email).HandleFailuresOrNoContent();
     }

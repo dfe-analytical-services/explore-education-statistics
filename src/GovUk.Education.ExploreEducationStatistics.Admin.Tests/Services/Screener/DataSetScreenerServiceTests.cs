@@ -28,41 +28,6 @@ public abstract class DataSetScreenerServiceTests
 
     private readonly DataFixture _dataFixture = new();
 
-    public class ScreenDataSetTests : DataSetScreenerServiceTests
-    {
-        [Fact]
-        public async Task Success()
-        {
-            // Arrange
-            var screenRequest = new DataSetScreenerRequest
-            {
-                DataFileName = "data-file-name",
-                DataFilePath = "data-file-path",
-                MetaFileName = "meta-file-name",
-                MetaFilePath = "meta-file-path",
-                StorageContainerName = "storage-container-name",
-            };
-
-            var screenResponse = new DataSetScreenerResponse { OverallResult = "Success", TestResults = [] };
-
-            var screenerClient = new Mock<IDataSetScreenerClient>(MockBehavior.Strict);
-
-            screenerClient
-                .Setup(s => s.ScreenDataSet(screenRequest, CancellationToken.None))
-                .ReturnsAsync(screenResponse);
-
-            var service = BuildService(screenerClient: screenerClient.Object);
-
-            // Act
-            var result = await service.ScreenDataSet(dataSetScreenerRequest: screenRequest, CancellationToken.None);
-
-            // Assert
-            screenerClient.VerifyAll();
-
-            Assert.Equal(screenResponse, result);
-        }
-    }
-
     public class StartScreeningTests : DataSetScreenerServiceTests
     {
         [Fact]
@@ -76,7 +41,6 @@ public abstract class DataSetScreenerServiceTests
                 DataFilePath = "data-file-path",
                 MetaFileName = "meta-file-name",
                 MetaFilePath = "meta-file-path",
-                StorageContainerName = "storage-container-name",
             };
 
             var queueServiceClient = new Mock<IQueueServiceClient>(MockBehavior.Strict);
@@ -577,7 +541,9 @@ public abstract class DataSetScreenerServiceTests
         public async Task DataSetWithScreenerProgress_ProgressUpdatesReturned()
         {
             // Arrange
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             var dataSetsUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()
@@ -647,7 +613,9 @@ public abstract class DataSetScreenerServiceTests
         public async Task DataSetBeingScreened_NoProgressUpdatesYet_NullProgressUpdateReturned()
         {
             // Arrange
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease());
 
             DataSetUpload dataSetUndergoingScreening = _dataFixture
                 .DefaultDataSetUpload()

@@ -26,6 +26,9 @@ param dateProvisioned string = utcNow('u')
 @description('The URL of the Content API.')
 param contentApiUrl string
 
+@description('The URL of the Data API.')
+param dataApiUrl string
+
 @description('Specifies whether or not the Natural Language Search Function App already exists.')
 param naturalLanguageSearchFunctionAppExists bool = true
 
@@ -106,13 +109,11 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = if (d
     location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
+    dataApiUrl: dataApiUrl
     functionAppExists: naturalLanguageSearchFunctionAppExists
     functionAppFirewallRules: []
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceName: searchServiceModule.outputs.searchServiceName
-    searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
-    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
-    locationsDictionaryContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.nlSearchLocationsDictionary
     searchServiceNLSearchFilterIndexName: searchServiceNLSearchFilterIndexName
     searchServiceNLSearchDatasetIndexName: searchServiceNLSearchDatasetIndexName
     storageFirewallRules: maintenanceIpRanges

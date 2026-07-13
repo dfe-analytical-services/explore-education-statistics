@@ -110,6 +110,8 @@ public class ProcessorStage1Tests
 
         var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
+        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         var guidGenerator = new SequentialGuidGenerator();
@@ -134,6 +136,7 @@ public class ProcessorStage1Tests
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
+            dataSetMappingService,
             importerService
         );
 

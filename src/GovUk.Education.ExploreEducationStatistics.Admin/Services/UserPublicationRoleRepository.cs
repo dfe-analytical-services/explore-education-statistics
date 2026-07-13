@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -21,19 +20,10 @@ public class UserPublicationRoleRepository(
         Guid publicationId,
         PublicationRole role,
         Guid createdById,
-        DateTime? createdDate = null,
+        DateTimeOffset createdDate = default,
         CancellationToken cancellationToken = default
     )
     {
-        if (!role.IsNewPermissionsSystemPublicationRole())
-        {
-            throw new ArgumentException(
-                $"Unexpected publication role: '{role}'. Expected a NEW permissions system role."
-            );
-        }
-
-        createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
-
         var existingUserPublicationRole = await Query(ResourceRoleFilter.All)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
@@ -73,7 +63,7 @@ public class UserPublicationRoleRepository(
             UserId = userId,
             PublicationId = publicationId,
             Role = publicationRoleToCreate.Value,
-            Created = createdDate!.Value,
+            Created = createdDate,
             CreatedById = createdById,
         };
 
@@ -88,13 +78,6 @@ public class UserPublicationRoleRepository(
         CancellationToken cancellationToken = default
     )
     {
-        if (userPublicationRolesToCreate.Any(dto => !dto.Role.IsNewPermissionsSystemPublicationRole()))
-        {
-            throw new ArgumentException(
-                $"Unexpected publication role found in the list of roles to create. All roles should be NEW permissions system roles."
-            );
-        }
-
         return await userPublicationRolesToCreate
             .ToAsyncEnumerable()
             .Where(
@@ -134,14 +117,12 @@ public class UserPublicationRoleRepository(
     public async Task<UserPublicationRole?> GetByCompositeKey(
         Guid userId,
         Guid publicationId,
-        PublicationRole role,
         CancellationToken cancellationToken = default
     )
     {
         return await Query(ResourceRoleFilter.All)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
-            .WhereRolesIn(role)
             .SingleOrDefaultAsync(cancellationToken);
     }
 
@@ -179,14 +160,12 @@ public class UserPublicationRoleRepository(
     public async Task<bool> RemoveByCompositeKey(
         Guid userId,
         Guid publicationId,
-        PublicationRole role,
         CancellationToken cancellationToken = default
     )
     {
         var userPublicationRole = await GetByCompositeKey(
             userId: userId,
             publicationId: publicationId,
-            role: role,
             cancellationToken: cancellationToken
         );
 
@@ -208,13 +187,6 @@ public class UserPublicationRoleRepository(
         if (!userPublicationRoles.Any())
         {
             return;
-        }
-
-        if (userPublicationRoles.Any(dto => !dto.Role.IsNewPermissionsSystemPublicationRole()))
-        {
-            throw new ArgumentException(
-                $"Unexpected publication role found in the list of roles to create. All roles should be NEW permissions system roles."
-            );
         }
 
         contentDbContext.UserPublicationRoles.RemoveRange(userPublicationRoles);
@@ -287,13 +259,6 @@ public class UserPublicationRoleRepository(
 
     private async Task RemoveRole(UserPublicationRole userPublicationRole, CancellationToken cancellationToken)
     {
-        if (!userPublicationRole.Role.IsNewPermissionsSystemPublicationRole())
-        {
-            throw new ArgumentException(
-                $"Unexpected publication role: '{userPublicationRole.Role}'. Expected a NEW permissions system role."
-            );
-        }
-
         contentDbContext.UserPublicationRoles.Remove(userPublicationRole);
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
@@ -304,6 +269,6 @@ public class UserPublicationRoleRepository(
         Guid PublicationId,
         PublicationRole Role,
         Guid CreatedById,
-        DateTime? CreatedDate = null
+        DateTimeOffset CreatedDate = default
     );
 }

@@ -36,7 +36,9 @@ const userService: UsersService = {
   },
 
   deleteUser(email: string): Promise<RemoveUser> {
-    return client.delete(`users/${email}`);
+    return client.delete(`users`, {
+      params: { email },
+    });
   },
 };
 

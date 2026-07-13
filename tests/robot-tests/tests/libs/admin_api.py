@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import Any
 
 import requests
 from tests.libs import local_storage_helper
@@ -12,7 +13,7 @@ class AdminClient:
     ROBOT_AUTO_KEYWORDS = False
 
     @staticmethod
-    def __request(method: str, url: str, body: object = None):
+    def __request(method: str, url: str, body: object = None, params: dict[str, Any] | None = None):
         assert method and url
         assert os.getenv("ADMIN_URL") is not None
 
@@ -27,7 +28,13 @@ class AdminClient:
         }
 
         return session.request(
-            method, url=f'{os.getenv("ADMIN_URL")}{url}', headers=headers, stream=True, json=body, verify=False
+            method,
+            url=f'{os.getenv("ADMIN_URL")}{url}',
+            params=params,
+            headers=headers,
+            stream=True,
+            json=body,
+            verify=False,
         )
 
     def get(self, url: str):
@@ -42,8 +49,8 @@ class AdminClient:
     def patch(self, url: str, body: object = None):
         return self.__request("PATCH", url, body)
 
-    def delete(self, url: str):
-        return self.__request("DELETE", url)
+    def delete(self, url: str, params: dict[str, Any] | None = None):
+        return self.__request(method="DELETE", url=url, params=params)
 
 
 admin_client = AdminClient()
@@ -104,7 +111,7 @@ def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date:
 
 
 def delete_user_invite_via_api(user_email: str):
-    response = admin_client.delete(f"/api/user-invites/{user_email}")
+    response = admin_client.delete(f"/api/user-invites", params={"email": user_email})
     assert (
         response.status_code < 300
     ), f"Removing invite for user {user_email} API request failed with {response.status_code} and {response.text}"
@@ -250,7 +257,7 @@ def user_updates_release_published_date_via_api(release_id: str, published: date
 
 
 def delete_test_user(email: str):
-    response = admin_client.delete(f"/api/users/{email}")
+    response = admin_client.delete(f"/api/users", params={"email": email})
     assert (
         response.status_code < 300
     ), f"Deleting test user {email} failed with {response.status_code} and {response.text}"

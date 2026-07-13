@@ -23,7 +23,8 @@ public class DataSetScreenerServicePermissionsTests
     [Fact]
     public async Task GetScreenerProgress()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
+
         DataSetUpload upload = _dataFixture.DefaultDataSetUpload().WithReleaseVersionId(releaseVersion.Id);
 
         await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();

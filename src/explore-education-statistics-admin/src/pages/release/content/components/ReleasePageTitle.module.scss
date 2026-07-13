@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .releasePageTitleWrap {
   display: flex;
@@ -21,13 +21,13 @@
 
 .link {
   align-items: center;
-  border: 1px solid govuk-colour('mid-grey');
+  border: 1px solid govuk-colour('black', $variant: 'tint-80');
   display: flex;
   flex-shrink: 0;
   margin-top: govuk-spacing(3);
   padding: govuk-spacing(1) govuk-spacing(2);
   text-decoration: none;
-  color: $govuk-link-colour;
+  color: govuk-functional-colour(link);
 
   @include govuk-media-query($from: tablet) {
     margin: 0 0 0 govuk-spacing(6);

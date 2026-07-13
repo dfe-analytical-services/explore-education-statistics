@@ -59,7 +59,7 @@ const FormFileInput = ({
       )}
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
       <div
-        className="govuk-drop-zone"
+        className="govuk-file-upload-wrapper"
         data-module="govuk-file-upload"
         ref={dropZoneRef}
         onDrop={onDrop}

@@ -12,20 +12,12 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class DataImportService : IDataImportService
+public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
+    : IDataImportService
 {
-    private readonly IDbContextSupplier _dbContextSupplier;
-    private readonly ILogger<DataImportService> _logger;
-
-    public DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
-    {
-        _dbContextSupplier = dbContextSupplier;
-        _logger = logger;
-    }
-
     public async Task FailImport(Guid id, List<DataImportError> errors)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
         var import = await contentDbContext.DataImports.SingleAsync(d => d.Id == id);
 
@@ -46,7 +38,7 @@ public class DataImportService : IDataImportService
 
     public async Task<DataImport> GetImport(Guid id)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         return await contentDbContext
             .DataImports.AsNoTracking()
             .Include(import => import.Errors)
@@ -57,15 +49,10 @@ public class DataImportService : IDataImportService
 
     public async Task<DataImportStatus> GetImportStatus(Guid id)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         var import = await contentDbContext.DataImports.AsNoTracking().SingleOrDefaultAsync(i => i.Id == id);
 
-        if (import == null)
-        {
-            return NOT_FOUND;
-        }
-
-        return import.Status;
+        return import?.Status ?? NOT_FOUND;
     }
 
     public async Task Update(
@@ -77,7 +64,7 @@ public class DataImportService : IDataImportService
         int? lastProcessedRowIndex = null
     )
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         var import = await contentDbContext.DataImports.SingleAsync(import => import.Id == id);
         contentDbContext.Update(import);
 
@@ -92,7 +79,7 @@ public class DataImportService : IDataImportService
 
     public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
     {
-        await using var context = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var context = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
         var import = await context.DataImports.Include(i => i.File).SingleAsync(i => i.Id == id);
 
@@ -105,7 +92,7 @@ public class DataImportService : IDataImportService
         // finishing status update.
         if (import.Status.IsFinished() || (import.Status.IsAborting() && !newStatus.IsFinished()))
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> "
                     + "{NewStatus} ({PercentageCompleteAfter}%) ignored as this import is already in finished or "
                     + "completed state state {FinishedImportStatus}",
@@ -126,7 +113,7 @@ public class DataImportService : IDataImportService
             return;
         }
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> {NewStatus} ({PercentageCompleteAfter}%)",
             filename,
             import.Status,
@@ -143,8 +130,8 @@ public class DataImportService : IDataImportService
 
     public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows)
     {
-        await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
+        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
+        await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
         var observations = statisticsDbContext.Observation.AsNoTracking().Where(o => o.SubjectId == subjectId);
 

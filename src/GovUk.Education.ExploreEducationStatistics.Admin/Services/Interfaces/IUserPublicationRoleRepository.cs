@@ -12,7 +12,7 @@ public interface IUserPublicationRoleRepository
         Guid publicationId,
         PublicationRole role,
         Guid createdById,
-        DateTime? createdDate = null,
+        DateTimeOffset createdDate = default,
         CancellationToken cancellationToken = default
     );
 
@@ -26,7 +26,6 @@ public interface IUserPublicationRoleRepository
     Task<UserPublicationRole?> GetByCompositeKey(
         Guid userId,
         Guid publicationId,
-        PublicationRole role,
         CancellationToken cancellationToken = default
     );
 
@@ -41,12 +40,7 @@ public interface IUserPublicationRoleRepository
 
     Task<bool> RemoveById(Guid userPublicationRoleId, CancellationToken cancellationToken = default);
 
-    Task<bool> RemoveByCompositeKey(
-        Guid userId,
-        Guid publicationId,
-        PublicationRole role,
-        CancellationToken cancellationToken = default
-    );
+    Task<bool> RemoveByCompositeKey(Guid userId, Guid publicationId, CancellationToken cancellationToken = default);
 
     Task RemoveMany(
         IEnumerable<UserPublicationRole> userPublicationRoles,

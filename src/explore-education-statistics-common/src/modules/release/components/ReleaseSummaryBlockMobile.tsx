@@ -72,13 +72,15 @@ export default function ReleaseSummaryBlockMobile({
               <p>
                 <span className="dfe-colour--dark-grey">Last updated</span>{' '}
                 {isEditing && !lastUpdated && 'Currently editing'}
-                {lastUpdated && <FormattedDate>{lastUpdated}</FormattedDate>}
+                {lastUpdated && (
+                  <FormattedDate usingUkTime>{lastUpdated}</FormattedDate>
+                )}
               </p>
             ) : (
               <p>
                 <span className="dfe-colour--dark-grey">Published</span>{' '}
                 {releaseDate ? (
-                  <FormattedDate>{releaseDate}</FormattedDate>
+                  <FormattedDate usingUkTime>{releaseDate}</FormattedDate>
                 ) : (
                   <span>TBA</span>
                 )}

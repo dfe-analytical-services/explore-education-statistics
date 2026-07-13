@@ -703,7 +703,6 @@ public class TableBuilderServiceTests
             var observationService = new Mock<IObservationService>(Strict);
             var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
@@ -747,27 +746,23 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        It.IsAny<IList<Observation>>(),
                         default
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
 
-            tableBuilderQueryOptimiser.Setup(s => s.IsCroppingRequired(query)).ReturnsAsync(true);
-
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
                 observationService: observationService.Object,
-                subjectCsvMetaService: subjectCsvMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
             using var stream = new MemoryStream();
 
             var result = await service.QueryToCsvStream(query, stream);
 
-            VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
+            VerifyAllMocks(observationService, subjectCsvMetaService);
 
             result.AssertRight();
 
@@ -986,7 +981,6 @@ public class TableBuilderServiceTests
             var observationService = new Mock<IObservationService>(Strict);
             var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
@@ -1027,27 +1021,23 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        It.IsAny<IList<Observation>>(),
                         default
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
 
-            tableBuilderQueryOptimiser.Setup(s => s.IsCroppingRequired(query)).ReturnsAsync(true);
-
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
                 observationService: observationService.Object,
-                subjectCsvMetaService: subjectCsvMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
             using var stream = new MemoryStream();
 
             var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
-            VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
+            VerifyAllMocks(observationService, subjectCsvMetaService);
 
             result.AssertRight();
 
@@ -1127,7 +1117,6 @@ public class TableBuilderServiceTests
             var observationService = new Mock<IObservationService>(Strict);
             var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
@@ -1159,27 +1148,23 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        It.IsAny<IList<Observation>>(),
                         default
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
 
-            tableBuilderQueryOptimiser.Setup(s => s.IsCroppingRequired(query)).ReturnsAsync(false);
-
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
                 observationService: observationService.Object,
-                subjectCsvMetaService: subjectCsvMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
             using var stream = new MemoryStream();
 
             var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
-            VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
+            VerifyAllMocks(observationService, subjectCsvMetaService);
 
             result.AssertRight();
 

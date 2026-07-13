@@ -38,6 +38,12 @@ type AppGatewayBackend = {
 
   @description('Additional health probe HTTP status codes that indicate success')
   healthProbeAdditionalStatusCodeMatches: string[]?
+
+  @description('Interval in seconds that the health probe is called. Defaults to 30 seconds if not set.')
+  intervalSeconds: int?
+
+  @description('Request timeout in seconds that the appplication gateway will wait before it returns a connection timed out error message. Acceptable values are from 1 second to 86400 seconds. Defaults to 30 seconds if not set.')
+  requestTimeout: int?
 }
 
 @export()

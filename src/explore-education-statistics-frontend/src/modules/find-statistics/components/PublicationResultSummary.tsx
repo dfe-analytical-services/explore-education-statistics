@@ -70,7 +70,9 @@ const PublicationResultSummary = ({ publication }: Props) => {
           {releaseTypes[type]}
         </SummaryListItem>
         <SummaryListItem term="Published">
-          <FormattedDate format="d MMM yyyy">{published}</FormattedDate>
+          <FormattedDate format="d MMM yyyy" usingUkTime>
+            {published}
+          </FormattedDate>
         </SummaryListItem>
         <SummaryListItem term="Theme">{theme}</SummaryListItem>
       </SummaryList>

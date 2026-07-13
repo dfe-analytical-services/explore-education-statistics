@@ -1,4 +1,4 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 $border-width: 1px;
 
@@ -68,9 +68,9 @@ $border-width: 1px;
   }
 
   th {
-    background: govuk-colour('light-grey');
-    border-bottom: 1px solid $govuk-border-colour;
-    border-left: 1px solid $govuk-border-colour;
+    background: govuk-colour('black', $variant: 'tint-95');
+    border-bottom: 1px solid govuk-functional-colour(border);
+    border-left: 1px solid govuk-functional-colour(border);
     padding: govuk-spacing(2);
     position: relative;
     text-align: center;

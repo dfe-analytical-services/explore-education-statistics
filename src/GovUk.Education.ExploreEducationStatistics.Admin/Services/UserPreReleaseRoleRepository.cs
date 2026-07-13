@@ -10,32 +10,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : IUserPreReleaseRoleRepository
 {
-    public async Task<UserReleaseRole> Create(
+    public async Task<UserPreReleaseRole> Create(
         Guid userId,
         Guid releaseVersionId,
         Guid createdById,
-        DateTime? createdDate = null,
+        DateTimeOffset createdDate = default,
         CancellationToken cancellationToken = default
     )
     {
-        createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
-
-        var newUserPreReleaseRole = new UserReleaseRole
+        var newUserPreReleaseRole = new UserPreReleaseRole
         {
             UserId = userId,
             ReleaseVersionId = releaseVersionId,
-            Role = ReleaseRole.PrereleaseViewer,
-            Created = createdDate!.Value,
+            Created = createdDate,
             CreatedById = createdById,
         };
 
-        contentDbContext.UserReleaseRoles.Add(newUserPreReleaseRole);
+        contentDbContext.UserPreReleaseRoles.Add(newUserPreReleaseRole);
         await contentDbContext.SaveChangesAsync(cancellationToken);
 
         return newUserPreReleaseRole;
     }
 
-    public async Task<List<UserReleaseRole>> CreateManyIfNotExists(
+    public async Task<List<UserPreReleaseRole>> CreateManyIfNotExists(
         HashSet<UserPreReleaseRoleCreateDto> userPreReleaseRolesToCreate,
         CancellationToken cancellationToken = default
     )
@@ -43,37 +40,37 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
         return await userPreReleaseRolesToCreate
             .ToAsyncEnumerable()
             .Where(
-                async (urr, ct) =>
+                async (uprr, ct) =>
                     !await UserHasPreReleaseRoleOnReleaseVersion(
-                        userId: urr.UserId,
-                        releaseVersionId: urr.ReleaseVersionId,
+                        userId: uprr.UserId,
+                        releaseVersionId: uprr.ReleaseVersionId,
                         resourceRoleFilter: ResourceRoleFilter.All,
                         cancellationToken: ct
                     )
             )
             .Select(
-                async (urr, ct) =>
+                async (uprr, ct) =>
                     await Create(
-                        userId: urr.UserId,
-                        releaseVersionId: urr.ReleaseVersionId,
-                        createdById: urr.CreatedById,
-                        createdDate: urr.CreatedDate,
+                        userId: uprr.UserId,
+                        releaseVersionId: uprr.ReleaseVersionId,
+                        createdById: uprr.CreatedById,
+                        createdDate: uprr.CreatedDate,
                         cancellationToken: ct
                     )
             )
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<UserReleaseRole?> GetById(
+    public async Task<UserPreReleaseRole?> GetById(
         Guid userPreReleaseRoleId,
         CancellationToken cancellationToken = default
     )
     {
         return await Query(ResourceRoleFilter.All)
-            .SingleOrDefaultAsync(urr => urr.Id == userPreReleaseRoleId, cancellationToken);
+            .SingleOrDefaultAsync(uprr => uprr.Id == userPreReleaseRoleId, cancellationToken);
     }
 
-    public async Task<UserReleaseRole?> GetByCompositeKey(
+    public async Task<UserPreReleaseRole?> GetByCompositeKey(
         Guid userId,
         Guid releaseVersionId,
         CancellationToken cancellationToken = default
@@ -85,9 +82,9 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly)
+    public IQueryable<UserPreReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly)
     {
-        var userPreReleaseRoles = contentDbContext.UserReleaseRoles.AsQueryable();
+        var userPreReleaseRoles = contentDbContext.UserPreReleaseRoles.AsQueryable();
 
         return resourceRoleFilter switch
         {
@@ -136,7 +133,7 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
     }
 
     public async Task RemoveMany(
-        IEnumerable<UserReleaseRole> userPreReleaseRoles,
+        IEnumerable<UserPreReleaseRole> userPreReleaseRoles,
         CancellationToken cancellationToken = default
     )
     {
@@ -145,7 +142,7 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
             return;
         }
 
-        contentDbContext.UserReleaseRoles.RemoveRange(userPreReleaseRoles);
+        contentDbContext.UserPreReleaseRoles.RemoveRange(userPreReleaseRoles);
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -155,7 +152,7 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
             .WhereForUser(userId)
             .ToListAsync(cancellationToken);
 
-        contentDbContext.UserReleaseRoles.RemoveRange(userPreReleaseRoles);
+        contentDbContext.UserPreReleaseRoles.RemoveRange(userPreReleaseRoles);
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -206,9 +203,9 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task Remove(UserReleaseRole userPreReleaseRole, CancellationToken cancellationToken = default)
+    private async Task Remove(UserPreReleaseRole userPreReleaseRole, CancellationToken cancellationToken = default)
     {
-        contentDbContext.UserReleaseRoles.Remove(userPreReleaseRole);
+        contentDbContext.UserPreReleaseRoles.Remove(userPreReleaseRole);
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -216,6 +213,6 @@ public class UserPreReleaseRoleRepository(ContentDbContext contentDbContext) : I
         Guid UserId,
         Guid ReleaseVersionId,
         Guid CreatedById,
-        DateTime? CreatedDate = null
+        DateTimeOffset CreatedDate = default
     );
 }

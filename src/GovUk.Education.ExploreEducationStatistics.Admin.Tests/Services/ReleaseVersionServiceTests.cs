@@ -1285,7 +1285,7 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task WithPreReleaseInviteForPendingUserInvite()
         {
-            UserReleaseRole preReleaseUserRole = _dataFixture
+            UserPreReleaseRole preReleaseUserRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUserWithPendingInvite())
                 .WithReleaseVersion(
@@ -1323,7 +1323,7 @@ public abstract class ReleaseVersionServiceTests
         [Fact]
         public async Task WithPreReleaseInviteForActiveUser()
         {
-            UserReleaseRole preReleaseUserRole = _dataFixture
+            UserPreReleaseRole preReleaseUserRole = _dataFixture
                 .DefaultUserPreReleaseRole()
                 .WithUser(_dataFixture.DefaultUser())
                 .WithReleaseVersion(
