@@ -43,7 +43,7 @@ describe('DataReplacementPlan', () => {
                 id: 'group-1',
                 label: 'Group 1',
                 valid: false,
-                filters: [
+                items: [
                   {
                     id: 'item-1',
                     label: 'Item 1',
@@ -61,7 +61,7 @@ describe('DataReplacementPlan', () => {
                 id: 'group-2',
                 label: 'Group 2',
                 valid: true,
-                filters: [
+                items: [
                   {
                     id: 'item-3',
                     label: 'Item 3',
@@ -83,7 +83,7 @@ describe('DataReplacementPlan', () => {
                 label: 'Group 3',
                 target: 'target-group-3',
                 valid: true,
-                filters: [
+                items: [
                   {
                     id: 'item-4',
                     label: 'Item 4',
@@ -96,7 +96,7 @@ describe('DataReplacementPlan', () => {
                 id: 'group-4',
                 label: 'Group 4',
                 valid: false,
-                filters: [
+                items: [
                   {
                     id: 'item-5',
                     label: 'Item 5',
@@ -344,6 +344,7 @@ describe('DataReplacementPlan', () => {
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
     valid: false,
+    hasDataBlockAndReplacementHasAdditionalFilter: false,
     mapping: {
       indicators: { candidates: {}, mappings: {} },
       locations: { candidates: {}, mappings: {} },
@@ -410,6 +411,7 @@ describe('DataReplacementPlan', () => {
       valid: true,
     },
     valid: true,
+    hasDataBlockAndReplacementHasAdditionalFilter: false,
     mapping: {
       indicators: { candidates: {}, mappings: {} },
       locations: { candidates: {}, mappings: {} },

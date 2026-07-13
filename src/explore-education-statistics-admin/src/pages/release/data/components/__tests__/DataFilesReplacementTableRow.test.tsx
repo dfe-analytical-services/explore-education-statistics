@@ -60,6 +60,7 @@ describe('DataFilesReplacementTableRow', () => {
       readyToPublish: false,
     },
     valid: true,
+    hasDataBlockAndReplacementHasAdditionalFilter: false,
     mapping: {
       indicators: { mappings: {}, candidates: {} },
       locations: { mappings: {}, candidates: {} },
