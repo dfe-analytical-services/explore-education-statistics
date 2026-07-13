@@ -31,6 +31,7 @@ import {
 import { Dictionary } from '@common/types';
 import upperFirst from 'lodash/upperFirst';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import React from 'react';
 
 const symbolOptions: SelectOption[] = symbols.map(symbol => ({
   label: upperFirst(symbol),
