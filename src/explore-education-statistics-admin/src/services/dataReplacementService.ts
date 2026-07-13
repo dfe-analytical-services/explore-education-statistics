@@ -182,8 +182,11 @@ export interface DataReplacementPlan {
   dataBlocks: DataBlockReplacementPlan[];
   footnotes: FootnoteReplacementPlan[];
   apiDataSetVersionPlan?: ApiDataSetVersionPlan;
-  valid: boolean;
   mapping: PlanMappings;
+  // a replacement is invalid if a data blocks exist and an additional filter has been added to the replacement, as
+  // data blocks will be missing a filter items
+  hasDataBlockAndReplacementHasAdditionalFilter: boolean;
+  valid: boolean;
 }
 
 type PlanMappingIndicatorsUpdateResponse = {

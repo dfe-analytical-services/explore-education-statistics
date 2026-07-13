@@ -1282,6 +1282,453 @@ public class ReplacementPlanServiceTests
         }
     }
 
+    [Fact]
+    public async Task GetReplacementPlan_AdditionalFilterWithDataBlock_ReplacementInvalid()
+    {
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
+        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
+
+        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(statsReleaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = originalFile,
+            FileId = originalFile.Id,
+        };
+
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = replacementFile,
+            FileId = replacementFile.Id,
+        };
+
+        var originalDefaultFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item" };
+        var originalDefaultFilterGroup = new FilterGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            FilterItems = [originalDefaultFilterItem],
+        };
+        var originalDefaultFilter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Label = "Test filter 1 - not changing",
+            Name = "test_filter_1_not_changing",
+            Subject = originalReleaseSubject.Subject,
+            FilterGroups = [originalDefaultFilterGroup],
+        };
+
+        var replacementDefaultFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item" };
+        var replacementDefaultFilterGroup = new FilterGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            FilterItems = [replacementDefaultFilterItem],
+        };
+        var replacementDefaultFilter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Label = "Test filter 1 - not changing",
+            Name = "test_filter_1_not_changing",
+            Subject = replacementReleaseSubject.Subject,
+            FilterGroups = [replacementDefaultFilterGroup],
+        };
+
+        var replacementNewlyIntroducedFiltersFilterItem = new FilterItem
+        {
+            Id = Guid.NewGuid(),
+            Label = "Filter item for newly introduced Filter",
+        };
+        var replacementNewlyIntroducedFilterGroup = new FilterGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Newly introduced filter group",
+            FilterItems = [replacementNewlyIntroducedFiltersFilterItem],
+        };
+        var replacementNewlyIntroducedFilter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Label = "Newly introduced filter",
+            Name = "newly_introduced_filter",
+            Subject = replacementReleaseSubject.Subject,
+            FilterGroups = [replacementNewlyIntroducedFilterGroup],
+        };
+
+        var timePeriod = new TimePeriodQuery
+        {
+            StartYear = 2019,
+            StartCode = CalendarYear,
+            EndYear = 2020,
+            EndCode = CalendarYear,
+        };
+        var dataBlock = new DataBlock
+        {
+            Name = "Test DataBlock",
+            Query = new FullTableQuery
+            {
+                SubjectId = originalReleaseSubject.SubjectId,
+                Filters = [originalDefaultFilterItem.Id],
+                Indicators = [],
+                LocationIds = [],
+                TimePeriod = timePeriod,
+            },
+            ReleaseVersion = releaseVersion,
+        };
+
+        var mapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFileId(originalReleaseFile.FileId)
+            .WithReplacementDataFileId(replacementReleaseFile.FileId)
+            .WithFilterMappings(
+                new Dictionary<Guid, FilterMapping>
+                {
+                    {
+                        originalDefaultFilter.Id,
+                        CreateFilterMapping(
+                            original: originalDefaultFilter,
+                            replacement: replacementDefaultFilter,
+                            filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                            {
+                                {
+                                    originalDefaultFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalDefaultFilterGroup,
+                                        replacement: replacementDefaultFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalDefaultFilterItem.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalDefaultFilterItem.Id,
+                                                    OriginalLabel = originalDefaultFilterItem.Label,
+                                                    ReplacementId = replacementDefaultFilterItem.Id,
+                                                    ReplacementLabel = replacementDefaultFilterItem.Label,
+                                                }
+                                            },
+                                        }
+                                    )
+                                },
+                            }
+                        )
+                    },
+                }
+            )
+            .WithUnmappedReplacementFilters([
+                new UnmappedFilter
+                {
+                    Id = replacementNewlyIntroducedFilter.Id,
+                    ColumnName = replacementNewlyIntroducedFilter.Name,
+                    Label = replacementNewlyIntroducedFilter.Label,
+                    UnmappedReplacementFilterGroups =
+                    [
+                        new UnmappedFilterGroup
+                        {
+                            Id = replacementNewlyIntroducedFilterGroup.Id,
+                            Label = replacementNewlyIntroducedFilterGroup.Label,
+                            UnmappedReplacementFilterItems =
+                            [
+                                new UnmappedFilterItem
+                                {
+                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
+                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ]);
+
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+        timePeriodService
+            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(
+                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
+            );
+        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+        releaseFileRepository
+            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
+            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.Filter.AddRange(
+                originalDefaultFilter,
+                replacementDefaultFilter,
+                replacementNewlyIntroducedFilter
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var replacementPlanService = BuildReplacementPlanService(
+                contentDbContext,
+                statisticsDbContext,
+                timePeriodService: timePeriodService.Object,
+                releaseFileRepository: releaseFileRepository.Object
+            );
+            var result = await replacementPlanService.GetReplacementPlan(
+                releaseVersionId: releaseVersion.Id,
+                originalFileId: originalFile.Id
+            );
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
+            var replacementPlan = result.AssertRight();
+            Assert.False(replacementPlan.Valid);
+            Assert.True(replacementPlan.HasDataBlockAndReplacementHasAdditionalFilter);
+            Assert.Single(replacementPlan.DataBlocks);
+            var dataBlockPlan = replacementPlan.DataBlocks.First();
+            Assert.True(dataBlockPlan.Valid);
+        }
+    }
+
+    [Fact]
+    public async Task GetReplacementPlan_AdditionalFilterButNoDataBlocks_Success()
+    {
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
+        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
+
+        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(statsReleaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = originalFile,
+            FileId = originalFile.Id,
+        };
+
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = replacementFile,
+            FileId = replacementFile.Id,
+        };
+
+        var originalDefaultFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item" };
+        var originalDefaultFilterGroup = new FilterGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            FilterItems = [originalDefaultFilterItem],
+        };
+        var originalDefaultFilter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Label = "Test filter 1 - not changing",
+            Name = "test_filter_1_not_changing",
+            Subject = originalReleaseSubject.Subject,
+            FilterGroups = [originalDefaultFilterGroup],
+        };
+
+        var replacementDefaultFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item" };
+        var replacementDefaultFilterGroup = new FilterGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Default group - not changing",
+            FilterItems = [replacementDefaultFilterItem],
+        };
+        var replacementDefaultFilter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Label = "Test filter 1 - not changing",
+            Name = "test_filter_1_not_changing",
+            Subject = replacementReleaseSubject.Subject,
+            FilterGroups = [replacementDefaultFilterGroup],
+        };
+
+        var replacementNewlyIntroducedFiltersFilterItem = new FilterItem
+        {
+            Id = Guid.NewGuid(),
+            Label = "Filter item for newly introduced Filter",
+        };
+        var replacementNewlyIntroducedFilterGroup = new FilterGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Newly introduced filter group",
+            FilterItems = [replacementNewlyIntroducedFiltersFilterItem],
+        };
+        var replacementNewlyIntroducedFilter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Label = "Newly introduced filter",
+            Name = "newly_introduced_filter",
+            Subject = replacementReleaseSubject.Subject,
+            FilterGroups = [replacementNewlyIntroducedFilterGroup],
+        };
+
+        var mapping = _fixture
+            .DefaultDataSetMapping()
+            .WithOriginalDataFileId(originalReleaseFile.FileId)
+            .WithReplacementDataFileId(replacementReleaseFile.FileId)
+            .WithFilterMappings(
+                new Dictionary<Guid, FilterMapping>
+                {
+                    {
+                        originalDefaultFilter.Id,
+                        CreateFilterMapping(
+                            original: originalDefaultFilter,
+                            replacement: replacementDefaultFilter,
+                            filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                            {
+                                {
+                                    originalDefaultFilterGroup.Id,
+                                    CreateFilterGroupMapping(
+                                        original: originalDefaultFilterGroup,
+                                        replacement: replacementDefaultFilterGroup,
+                                        filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                        {
+                                            {
+                                                originalDefaultFilterItem.Id,
+                                                new FilterItemMapping
+                                                {
+                                                    OriginalId = originalDefaultFilterItem.Id,
+                                                    OriginalLabel = originalDefaultFilterItem.Label,
+                                                    ReplacementId = replacementDefaultFilterItem.Id,
+                                                    ReplacementLabel = replacementDefaultFilterItem.Label,
+                                                }
+                                            },
+                                        }
+                                    )
+                                },
+                            }
+                        )
+                    },
+                }
+            )
+            .WithUnmappedReplacementFilters([
+                new UnmappedFilter
+                {
+                    Id = replacementNewlyIntroducedFilter.Id,
+                    ColumnName = replacementNewlyIntroducedFilter.Name,
+                    Label = replacementNewlyIntroducedFilter.Label,
+                    UnmappedReplacementFilterGroups =
+                    [
+                        new UnmappedFilterGroup
+                        {
+                            Id = replacementNewlyIntroducedFilterGroup.Id,
+                            Label = replacementNewlyIntroducedFilterGroup.Label,
+                            UnmappedReplacementFilterItems =
+                            [
+                                new UnmappedFilterItem
+                                {
+                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
+                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ]);
+
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+        timePeriodService
+            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(
+                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
+            );
+        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+        releaseFileRepository
+            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
+            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.Filter.AddRange(
+                originalDefaultFilter,
+                replacementDefaultFilter,
+                replacementNewlyIntroducedFilter
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var replacementPlanService = BuildReplacementPlanService(
+                contentDbContext,
+                statisticsDbContext,
+                timePeriodService: timePeriodService.Object,
+                releaseFileRepository: releaseFileRepository.Object
+            );
+            var result = await replacementPlanService.GetReplacementPlan(
+                releaseVersionId: releaseVersion.Id,
+                originalFileId: originalFile.Id
+            );
+            VerifyAllMocks(timePeriodService, releaseFileRepository);
+            var replacementPlan = result.AssertRight();
+            Assert.True(replacementPlan.Valid);
+            Assert.False(replacementPlan.HasDataBlockAndReplacementHasAdditionalFilter);
+        }
+    }
+
     /// <summary>
     /// Please note this test will reduce in the number of cases when the feature flag has been removed from it.
     /// </summary>

@@ -240,8 +240,3 @@ public record FilterItemMapping
 
     public MapStatus Status { get; set; }
 }
-
-// @MarkFix add tests for automapping filters
-// @MarkFix add tests for replacement plan generation
-// @MarkFix add tests for completing replacement
-// @MarkFix initialise existing DataSetMappings that don't have FilterMappings set with migration endpoint? or just delete any DataSetMappings to speed up development?

@@ -13,11 +13,22 @@ public class DataReplacementPlanViewModel
     public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
     public ReplaceApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
     public ReplacementPlanMappingViewModel Mapping { get; init; } = new();
+
+    // If the number of filters has changed, then data blocks will have the wrong number of filter items:
+    // - If a filter has been removed, then any DataBlock will be invalid as old filter items from the removed filter
+    // will not (and cannot be) be mapped. If there are no DataBlocks then it will be valid. So we don't need to worry about the number
+    // of filters being reduced, as DataBlocks will be invalid and prevent the replacement.
+    // - But if an additional filter has been added, then DataBlocks will still be marked valid despite missing
+    // an item from the new filter, meaning they'll return no results after the replacement is complete.
+    // However, if there are no DataBlocks, then the additional filter doesn't need to invalidate the replacement.
+    public bool HasDataBlockAndReplacementHasAdditionalFilter =>
+        DataBlocks.Any() && Mapping.Filters.Mappings.Count < Mapping.Filters.Candidates.Count;
     public Guid OriginalSubjectId { get; init; }
     public Guid ReplacementSubjectId { get; init; }
 
     public bool Valid =>
-        DataBlocks.All(info => info.Valid)
+        !HasDataBlockAndReplacementHasAdditionalFilter
+        && DataBlocks.All(info => info.Valid)
         && Footnotes.All(info => info.Valid)
         && (ApiDataSetVersionPlan?.Valid ?? true);
 
@@ -158,9 +169,9 @@ public class FilterGroupReplacementViewModel(
     public Guid Id { get; } = id;
     public string Label { get; } = label;
     public Guid? Target { get; } = target;
-    public IEnumerable<FilterItemReplacementViewModel> Items { get; } = items; // @MarkFix rename to Items
+    public IEnumerable<FilterItemReplacementViewModel> Items { get; } = items;
 
-    public bool Valid => Target.HasValue && Items.All(filter => filter.Valid);
+    public bool Valid => Target.HasValue && Items.All(item => item.Valid);
 }
 
 public class FilterItemReplacementViewModel(Guid id, string label, Guid? target)
