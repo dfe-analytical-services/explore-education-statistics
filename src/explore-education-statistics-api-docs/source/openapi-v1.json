@@ -1336,34 +1336,40 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FilterOptionsViewModel"
-            }
+            },
+            "description": "All the filters associated with the data set."
           },
           "indicators": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IndicatorViewModel"
-            }
+            },
+            "description": "All the indicators associated with the data set."
           },
           "geographicLevels": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GeographicLevelViewModel"
-            }
+            },
+            "description": "All the geographic levels associated with the data set."
           },
           "locations": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LocationGroupOptionsViewModel"
-            }
+            },
+            "description": "All the locations associated with the data set, grouped by geographic level."
           },
           "timePeriods": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TimePeriodOptionViewModel"
-            }
+            },
+            "description": "All the time periods associated with the data set."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "All the metadata associated with a data set."
       },
       "DataSetPaginatedListViewModel": {
         "required": [
@@ -1377,13 +1383,15 @@
               {
                 "$ref": "#/components/schemas/PagingViewModel"
               }
-            ]
+            ],
+            "description": "Provides metadata for use in pagination."
           },
           "results": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataSetViewModel"
-            }
+            },
+            "description": "The list of results for this page."
           }
         },
         "additionalProperties": false,
@@ -2057,22 +2065,26 @@
               {
                 "$ref": "#/components/schemas/PagingViewModel"
               }
-            ]
+            ],
+            "description": "Provides metadata for use in pagination."
           },
           "results": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataSetQueryResultViewModel"
-            }
+            },
+            "description": "The list of results for this page."
           },
           "warnings": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WarningViewModel"
-            }
+            },
+            "description": "A list of warnings, highlighting any potential issues with the request."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A paginated list of results from a data set query."
       },
       "DataSetQueryRequest": {
         "required": [
@@ -2158,35 +2170,56 @@
               {
                 "$ref": "#/components/schemas/TimePeriodViewModel"
               }
-            ]
+            ],
+            "description": "The time period relevant to this result's data."
           },
           "geographicLevel": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GeographicLevelCode"
               }
-            ]
+            ],
+            "description": "The geographic level relevant to this result's data."
           },
           "locations": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
+            },
+            "description": "The locations relevant to this result's data.\r\n            \r\nThis is a dictionary where the key is the location's geographic\r\nlevel and the value is the location's ID.",
+            "example": {
+              "NAT": "04bTr",
+              "REG": "4veOu",
+              "LA": "owqlK"
             }
           },
           "filters": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
+            },
+            "description": "The filters associated with this result.\r\n            \r\nThis is a dictionary where the key is the filter ID and\r\nthe value is the specific filter option ID.",
+            "example": {
+              "ups2K": "n0WqP",
+              "j51wV": "AnZsi",
+              "hAkBQ": "dvB4z"
             }
           },
           "values": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
+            },
+            "description": "The data values for the result's indicators.\r\n            \r\nThis is a dictionary where the key is the indicator ID\r\nand the value is the data value.",
+            "example": {
+              "wLcft": "23593018",
+              "4S8Ou": "50.342",
+              "9kVFg": "25369172"
             }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A result from a data set query containing its values and any facets relevant to it."
       },
       "DataSetQuerySort": {
         "required": [
@@ -2361,13 +2394,15 @@
               {
                 "$ref": "#/components/schemas/PagingViewModel"
               }
-            ]
+            ],
+            "description": "Provides metadata for use in pagination."
           },
           "results": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataSetVersionViewModel"
-            }
+            },
+            "description": "The list of results for this page."
           }
         },
         "additionalProperties": false,
@@ -2654,7 +2689,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "A filterable characteristic (excluding geography or time) of a data set.",
             "nullable": true
           },
           "previousState": {
@@ -2663,7 +2698,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "A filterable characteristic (excluding geography or time) of a data set.",
             "nullable": true
           }
         },
@@ -2679,7 +2714,7 @@
                 "$ref": "#/components/schemas/FilterOptionViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "A filterable option that can be used to filter a data set.",
             "nullable": true
           },
           "previousState": {
@@ -2688,7 +2723,7 @@
                 "$ref": "#/components/schemas/FilterOptionViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "A filterable option that can be used to filter a data set.",
             "nullable": true
           }
         },
@@ -2708,7 +2743,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "The filter the option changes belong to."
+            "description": "A filterable characteristic (excluding geography or time) of a data set."
           },
           "options": {
             "type": "array",
@@ -2729,13 +2764,18 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "The ID of the filter option.",
+            "example": "q1g3J"
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "The human-readable label describing the filter option.",
+            "example": "State-funded primary"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A filterable option that can be used to filter a data set."
       },
       "FilterOptionsViewModel": {
         "required": [
@@ -2747,25 +2787,35 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "The ID of the filter.",
+            "example": "BRlj4"
           },
           "column": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the filter CSV column.",
+            "example": "school_type"
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "The human-readable label describing the filter.",
+            "example": "School type"
           },
           "hint": {
-            "type": "string"
+            "type": "string",
+            "description": "A hint to assist in describing the filter.",
+            "example": "Additional detail about the filter."
           },
           "options": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FilterOptionViewModel"
-            }
+            },
+            "description": "The filter options belonging to this filter."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "The options available for a filterable characteristic about the data set\r\n(excluding geography or time)."
       },
       "FilterViewModel": {
         "required": [
@@ -2776,19 +2826,28 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "The ID of the filter.",
+            "example": "BRlj4"
           },
           "column": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the filter CSV column.",
+            "example": "school_type"
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "The human-readable label describing the filter.",
+            "example": "School type"
           },
           "hint": {
-            "type": "string"
+            "type": "string",
+            "description": "A hint to assist in describing the filter.",
+            "example": "Additional detail about the filter."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A filterable characteristic (excluding geography or time) of a data set."
       },
       "GeographicLevelChangeViewModel": {
         "type": "object",
@@ -2799,7 +2858,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "A geographic level (e.g. national, regional) covered by a data set.",
             "nullable": true
           },
           "previousState": {
@@ -2808,7 +2867,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "A geographic level (e.g. national, regional) covered by a data set.",
             "nullable": true
           }
         },
@@ -2852,14 +2911,19 @@
               {
                 "$ref": "#/components/schemas/GeographicLevelCode"
               }
-            ]
+            ],
+            "description": "The code for the geographic level.",
+            "example": "NAT"
           },
           "label": {
             "type": "string",
-            "readOnly": true
+            "description": "The human-readable label for the geographic level.",
+            "readOnly": true,
+            "example": "National"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A geographic level (e.g. national, regional) covered by a data set."
       },
       "IndicatorChangeViewModel": {
         "type": "object",
@@ -2870,7 +2934,7 @@
                 "$ref": "#/components/schemas/IndicatorViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "A type of data point measured by a data set.",
             "nullable": true
           },
           "previousState": {
@@ -2879,7 +2943,7 @@
                 "$ref": "#/components/schemas/IndicatorViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "A type of data point measured by a data set.",
             "nullable": true
           }
         },
@@ -2910,13 +2974,19 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "The ID of the indicator.",
+            "example": "enW68"
           },
           "column": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the indicator CSV column.",
+            "example": "sess_authorised"
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "The human-readable label of the indicator.",
+            "example": "Percentage of authorised sessions"
           },
           "unit": {
             "allOf": [
@@ -2924,15 +2994,20 @@
                 "$ref": "#/components/schemas/IndicatorUnit"
               }
             ],
-            "nullable": true
+            "description": "The type of unit that should be used when formatting the indicator.",
+            "nullable": true,
+            "example": "%"
           },
           "decimalPlaces": {
             "type": "integer",
+            "description": "The recommended number of decimal places to use when formatting the indicator.",
             "format": "int32",
-            "nullable": true
+            "nullable": true,
+            "example": 2
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A type of data point measured by a data set."
       },
       "LocationCodedOptionViewModel": {
         "allOf": [
@@ -2946,12 +3021,15 @@
             "type": "object",
             "properties": {
               "code": {
-                "type": "string"
+                "type": "string",
+                "description": "The code of the location.",
+                "example": "E12000003"
               }
             },
             "additionalProperties": false
           }
-        ]
+        ],
+        "description": "A location option that can be identified by code and used to filter a data set."
       },
       "LocationGroupChangeViewModel": {
         "type": "object",
@@ -2962,7 +3040,7 @@
                 "$ref": "#/components/schemas/LocationGroupViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "A group of locations in a data set based on their geographic level.",
             "nullable": true
           },
           "previousState": {
@@ -2971,7 +3049,7 @@
                 "$ref": "#/components/schemas/LocationGroupViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "A group of locations in a data set based on their geographic level.",
             "nullable": true
           }
         },
@@ -2990,7 +3068,8 @@
               {
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
-            ]
+            ],
+            "description": "The geographic level of the locations in this group."
           },
           "options": {
             "type": "array",
@@ -3011,11 +3090,14 @@
                 {
                   "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
                 }
-              ]
-            }
+              ],
+              "description": "A location option that can be used to filter a data set."
+            },
+            "description": "The locations belonging to this level."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "The options available for a location group in the data set."
       },
       "LocationGroupViewModel": {
         "required": [
@@ -3028,10 +3110,12 @@
               {
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
-            ]
+            ],
+            "description": "The geographic level of the locations in this group."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A group of locations in a data set based on their geographic level."
       },
       "LocationLocalAuthorityOptionViewModel": {
         "allOf": [
@@ -3046,15 +3130,20 @@
             "type": "object",
             "properties": {
               "code": {
-                "type": "string"
+                "type": "string",
+                "description": "The ONS code of the local authority.",
+                "example": "E08000019"
               },
               "oldCode": {
-                "type": "string"
+                "type": "string",
+                "description": "The old code (previously the LEA code) of the local authority.",
+                "example": "373"
               }
             },
             "additionalProperties": false
           }
-        ]
+        ],
+        "description": "A location option for a local authority that can be used to filter a data set."
       },
       "LocationOptionChangeViewModel": {
         "type": "object",
@@ -3077,7 +3166,7 @@
                 "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "A location option that can be used to filter a data set.",
             "nullable": true
           },
           "previousState": {
@@ -3098,7 +3187,7 @@
                 "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "A location option that can be used to filter a data set.",
             "nullable": true
           }
         },
@@ -3118,7 +3207,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The geographic level the changes belong to."
+            "description": "A geographic level (e.g. national, regional) covered by a data set."
           },
           "options": {
             "type": "array",
@@ -3139,13 +3228,18 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "The ID of the location.",
+            "example": "bOmZ4"
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "The human-readable label of the location.",
+            "example": "Sheffield"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A location option that can be used to filter a data set."
       },
       "LocationProviderOptionViewModel": {
         "allOf": [
@@ -3159,12 +3253,15 @@
             "type": "object",
             "properties": {
               "ukprn": {
-                "type": "string"
+                "type": "string",
+                "description": "The UKPRN (UK provider reference number) of the provider.",
+                "example": "12345678"
               }
             },
             "additionalProperties": false
           }
-        ]
+        ],
+        "description": "A location option for a provider that can be used to filter a data set."
       },
       "LocationRscRegionOptionViewModel": {
         "allOf": [
@@ -3175,7 +3272,8 @@
             "type": "object",
             "additionalProperties": false
           }
-        ]
+        ],
+        "description": "A location option for an RSC region that can be used to filter a data set."
       },
       "LocationSchoolOptionViewModel": {
         "allOf": [
@@ -3190,15 +3288,20 @@
             "type": "object",
             "properties": {
               "urn": {
-                "type": "string"
+                "type": "string",
+                "description": "The URN (unique reference number) of the school.",
+                "example": "123456"
               },
               "laEstab": {
-                "type": "string"
+                "type": "string",
+                "description": "The LAESTAB (local authority establishment number) of the school.",
+                "example": "1234567"
               }
             },
             "additionalProperties": false
           }
-        ]
+        ],
+        "description": "A location option for a school that can be used to filter a data set."
       },
       "PagingViewModel": {
         "required": [
@@ -3211,20 +3314,28 @@
         "properties": {
           "page": {
             "type": "integer",
-            "format": "int32"
+            "description": "The current page number.",
+            "format": "int32",
+            "example": 1
           },
           "pageSize": {
             "type": "integer",
-            "format": "int32"
+            "description": "The maximum number of results per page.",
+            "format": "int32",
+            "example": 20
           },
           "totalResults": {
             "type": "integer",
-            "format": "int32"
+            "description": "The total number of results across all pages.",
+            "format": "int32",
+            "example": 60
           },
           "totalPages": {
             "type": "integer",
+            "description": "The total number of pages.",
             "format": "int32",
-            "readOnly": true
+            "readOnly": true,
+            "example": 3
           }
         },
         "additionalProperties": false
@@ -3283,13 +3394,15 @@
               {
                 "$ref": "#/components/schemas/PagingViewModel"
               }
-            ]
+            ],
+            "description": "Provides metadata for use in pagination."
           },
           "results": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PublicationSummaryViewModel"
-            }
+            },
+            "description": "The list of results for this page."
           }
         },
         "additionalProperties": false,
@@ -3443,7 +3556,7 @@
                 "$ref": "#/components/schemas/TimePeriodOptionViewModel"
               }
             ],
-            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "description": "A time period option that can be used to filter a data set.",
             "nullable": true
           },
           "previousState": {
@@ -3452,7 +3565,7 @@
                 "$ref": "#/components/schemas/TimePeriodOptionViewModel"
               }
             ],
-            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "description": "A time period option that can be used to filter a data set.",
             "nullable": true
           }
         },
@@ -3472,16 +3585,23 @@
               {
                 "$ref": "#/components/schemas/TimePeriodCode"
               }
-            ]
+            ],
+            "description": "The code identifying the time period's type.",
+            "example": "AYQ1"
           },
           "period": {
-            "type": "string"
+            "type": "string",
+            "description": "The period covered by the data e.g. '2020' or '2020/2021'.",
+            "example": "2020/2021"
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "The time period in human-readable format.",
+            "example": "2020/21 Q1"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A time period option that can be used to filter a data set."
       },
       "TimePeriodRangeViewModel": {
         "required": [
@@ -3516,13 +3636,18 @@
               {
                 "$ref": "#/components/schemas/TimePeriodCode"
               }
-            ]
+            ],
+            "description": "The code identifying the time period's type.",
+            "example": "AYQ1"
           },
           "period": {
-            "type": "string"
+            "type": "string",
+            "description": "The period covered by the data e.g. '2020' or '2020/2021'.",
+            "example": "2020/2021"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A time period relating to some data."
       },
       "ValidationProblemViewModel": {
         "required": [
@@ -3580,20 +3705,31 @@
         "type": "object",
         "properties": {
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "The warning message.",
+            "example": "There are no results."
           },
           "path": {
             "type": "string",
-            "nullable": true
+            "description": "The path to the property on the request that the warning relates to.\r\nMay be omitted or be empty if no specific property of the\r\nrequest relates to the warning (it is a 'global' warning).",
+            "nullable": true,
+            "example": "results"
           },
           "code": {
-            "type": "string"
+            "type": "string",
+            "description": "The warning's machine-readable code. Can be used for further\r\nprocessing of the warning before presenting to users.",
+            "example": "NoResults"
           },
           "detail": {
-            "nullable": true
+            "description": "Additional detail about the warning that can be used to provide\r\nmore context to users. May be omitted if there is none.",
+            "nullable": true,
+            "example": {
+              "total": 0
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "A warning that points to a potential issue. This is not a critical error,\r\nbut may require attention to get the desired response."
       }
     }
   }
