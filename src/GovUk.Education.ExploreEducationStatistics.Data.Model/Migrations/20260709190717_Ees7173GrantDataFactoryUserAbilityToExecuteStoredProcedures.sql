@@ -11,9 +11,7 @@ DECLARE @SQL NVARCHAR(MAX);
 IF CAST(SERVERPROPERTY('EngineEdition') AS INT) = 5
 BEGIN
     SET @SQL = N'
-    GRANT VIEW DATABASE STATE TO [datafactory];
     GRANT KILL DATABASE CONNECTION TO [datafactory];
     ';
-
 EXEC sp_executesql @SQL;
 END
