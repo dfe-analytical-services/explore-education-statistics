@@ -184,7 +184,7 @@ export interface DataReplacementPlan {
   apiDataSetVersionPlan?: ApiDataSetVersionPlan;
   mapping: PlanMappings;
   // a replacement is invalid if a data blocks exist and an additional filter has been added to the replacement, as
-  // data blocks will be missing a filter items
+  // data blocks will be missing a filter item
   hasDataBlockAndReplacementHasAdditionalFilter: boolean;
   valid: boolean;
 }

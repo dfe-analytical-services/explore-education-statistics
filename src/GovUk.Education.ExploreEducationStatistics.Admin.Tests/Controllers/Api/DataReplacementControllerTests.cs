@@ -104,7 +104,7 @@ public abstract class DataReplacementControllerTests
                                     Source = new ReplacementPlanFilterViewModel
                                     {
                                         Id = originalFilterId,
-                                        Name = "filter_original_label",
+                                        Name = "filter_original_name",
                                         Label = "filter original label",
                                     },
                                     Type = "ManuallySet",

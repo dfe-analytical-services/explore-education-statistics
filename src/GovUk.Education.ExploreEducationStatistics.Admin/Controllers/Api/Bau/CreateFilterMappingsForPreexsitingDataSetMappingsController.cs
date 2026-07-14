@@ -190,8 +190,9 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
         // if parent is unmapped, we don't know what the replacement groups will be, so return empty unmapped list
         // if parent is mapped, we can figure out which replacement groups for this filter are unmapped
         var unmappedReplacementGroups = new List<UnmappedFilterGroup>();
-        if (replacementGroupLabelToGroupMap != null) // if parent filter isn't mapped, no group replacements to refer to
+        if (replacementGroupLabelToGroupMap != null)
         {
+            // parent is mapped
             var mappedReplacementGroupIds = filterGroupMappings
                 .Values.Where(m => m.ReplacementId.HasValue)
                 .Select(m => m.ReplacementId!.Value);
@@ -245,8 +246,9 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
         // if parent is unmapped, we don't know what the replacement items will be, so return empty unmapped list
         // if parent is mapped, we can figure out which replacement items for this group are unmapped
         var unmappedReplacementItems = new List<UnmappedFilterItem>();
-        if (replacementItemLabelToItemMap != null) // if parent isn't mapped, no replacement so no unmappedReplacementItems
+        if (replacementItemLabelToItemMap != null)
         {
+            // parent is mapped
             var mappedReplacementItemIds = filterItemMappings
                 .Values.Where(m => m.ReplacementId.HasValue)
                 .Select(m => m.ReplacementId!.Value);
