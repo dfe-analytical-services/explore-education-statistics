@@ -20,8 +20,10 @@ export interface SelectOption<Value = string | number> {
   style?: CSSProperties;
 }
 
-export interface FormSelectProps
-  extends Pick<FormLabelProps, 'hideLabel' | 'label'> {
+export interface FormSelectProps extends Pick<
+  FormLabelProps,
+  'hideLabel' | 'label'
+> {
   autoFocus?: boolean;
   className?: string;
   disabled?: boolean;

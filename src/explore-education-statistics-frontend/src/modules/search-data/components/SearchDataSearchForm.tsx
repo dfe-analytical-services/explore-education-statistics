@@ -24,8 +24,7 @@ interface Props {
 }
 
 type AzureSuggestResult =
-  | AzureDataSetSuggestResult
-  | AzurePublicationSuggestResult;
+  AzureDataSetSuggestResult | AzurePublicationSuggestResult;
 
 const isDataSetResult = (
   result: AzureSuggestResult,

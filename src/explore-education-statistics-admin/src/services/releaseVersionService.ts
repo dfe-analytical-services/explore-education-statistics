@@ -73,13 +73,11 @@ export interface ReleaseVersionSummary {
   publication?: PublicationSummaryPreview;
 }
 
-export interface DashboardReleaseVersionSummary
-  extends ReleaseVersionSummaryWithPermissions {
+export interface DashboardReleaseVersionSummary extends ReleaseVersionSummaryWithPermissions {
   publication: PublicationSummaryPreview;
 }
 
-export interface ReleaseVersionSummaryWithPermissions
-  extends ReleaseVersionSummary {
+export interface ReleaseVersionSummaryWithPermissions extends ReleaseVersionSummary {
   permissions: ReleaseVersionPermissions;
 }
 

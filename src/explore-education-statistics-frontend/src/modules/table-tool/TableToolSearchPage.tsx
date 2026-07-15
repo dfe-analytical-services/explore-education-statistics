@@ -327,9 +327,8 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const publicationSummary = await publicationService.getPublicationSummary(
-    publicationSlug,
-  );
+  const publicationSummary =
+    await publicationService.getPublicationSummary(publicationSlug);
 
   const latestReleaseVersion =
     await publicationService.getReleaseVersionSummary(

@@ -38,10 +38,7 @@ export interface PaginatedListWithAzureFacets<T> extends PaginatedList<T> {
 }
 
 export type AzureOrderByParam =
-  | 'published asc'
-  | 'published desc'
-  | 'title asc'
-  | undefined;
+  'published asc' | 'published desc' | 'title asc' | undefined;
 
 export interface AzurePublicationListRequest {
   filter?: string;

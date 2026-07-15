@@ -20,8 +20,10 @@ import {
 
 export const elementsFieldName = (name: string) => `__${name}`;
 
-export interface Props<TFormValues extends FieldValues>
-  extends OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange' | 'onBlur'> {
+export interface Props<TFormValues extends FieldValues> extends OmitStrict<
+  FormEditorProps,
+  'id' | 'value' | 'onChange' | 'onBlur'
+> {
   contentErrorDetails?: ReactNode;
   name: Path<TFormValues>;
   formGroupClass?: string;

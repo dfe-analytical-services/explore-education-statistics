@@ -95,8 +95,8 @@ export default function ChartReferenceLinesConfiguration({
   }, [chartType, axisType, referenceLines, majorAxisOptions]);
 
   const filteredOptions = useMemo<SelectOption[]>(() => {
-    return majorAxisOptions.filter(
-      option => referenceLines?.every(line => line.position !== option.value),
+    return majorAxisOptions.filter(option =>
+      referenceLines?.every(line => line.position !== option.value),
     );
   }, [referenceLines, majorAxisOptions]);
 
@@ -263,10 +263,11 @@ function getOtherAxisPositionLabel({
   }
 
   if (otherAxisEnd && otherAxisStart) {
-    return `${majorAxisOptions.find(option => option.value === otherAxisStart)
-      ?.label} - ${majorAxisOptions.find(
-      option => option.value === otherAxisEnd,
-    )?.label}`;
+    return `${
+      majorAxisOptions.find(option => option.value === otherAxisStart)?.label
+    } - ${
+      majorAxisOptions.find(option => option.value === otherAxisEnd)?.label
+    }`;
   }
 
   return null;

@@ -18,8 +18,10 @@ import React, {
 import styles from './ReorderableAccordion.module.scss';
 import { ReorderableAccordionSectionProps } from './ReorderableAccordionSection';
 
-export interface ReorderableAccordionProps
-  extends OmitStrict<AccordionProps, 'openAll'> {
+export interface ReorderableAccordionProps extends OmitStrict<
+  AccordionProps,
+  'openAll'
+> {
   heading?: string;
   onReorder: (sectionIds: string[]) => void;
   canReorder: boolean;

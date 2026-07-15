@@ -349,22 +349,18 @@ describe('redirectPages', () => {
 
   const redirectedCases: RedirectedCaseTestData[] =
     routePatternTestCases.flatMap(td => {
-      return td.redirectedCases.map(
-        (rc): RedirectedCaseTestData => ({
-          routePattern: td.routePattern,
-          oldSlugNewSlugPairsByPlaceholder: rc.oldSlugNewSlugPairsByPlaceholder,
-        }),
-      );
+      return td.redirectedCases.map((rc): RedirectedCaseTestData => ({
+        routePattern: td.routePattern,
+        oldSlugNewSlugPairsByPlaceholder: rc.oldSlugNewSlugPairsByPlaceholder,
+      }));
     });
 
   const nonRedirectedCases: NonRedirectedCaseTestData[] =
     routePatternTestCases.flatMap(td => {
-      return td.nonRedirectedCases.map(
-        (rc): NonRedirectedCaseTestData => ({
-          routePattern: td.routePattern,
-          oldSlugsByPlaceholder: rc.oldSlugsByPlaceholder,
-        }),
-      );
+      return td.nonRedirectedCases.map((rc): NonRedirectedCaseTestData => ({
+        routePattern: td.routePattern,
+        oldSlugsByPlaceholder: rc.oldSlugsByPlaceholder,
+      }));
     });
 
   // These are routes that have slugs defined that would normally be redirected, but shouldn't be due

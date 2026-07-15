@@ -13,8 +13,10 @@ import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
 const mobileWidth = 1024;
 
-interface Props
-  extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy' | 'ref'> {
+interface Props extends OmitStrict<
+  MultiHeaderTableProps,
+  'ariaLabelledBy' | 'ref'
+> {
   capMaxHeight?: boolean;
   caption: ReactNode;
   captionId: string;

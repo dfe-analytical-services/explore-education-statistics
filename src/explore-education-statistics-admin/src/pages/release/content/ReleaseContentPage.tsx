@@ -189,13 +189,11 @@ const ReleaseContentPage = ({
       const { release, unattachedDataBlocks } =
         await releaseContentService.getContent(releaseVersionId);
 
-      const canUpdateRelease = await permissionService.canUpdateRelease(
-        releaseVersionId,
-      );
+      const canUpdateRelease =
+        await permissionService.canUpdateRelease(releaseVersionId);
 
-      const featuredTables = await featuredTableService.listFeaturedTables(
-        releaseVersionId,
-      );
+      const featuredTables =
+        await featuredTableService.listFeaturedTables(releaseVersionId);
 
       return {
         release,

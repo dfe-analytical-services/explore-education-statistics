@@ -103,7 +103,7 @@ const VerticalBarBlock = ({
   // to true as it's not really natural to sort in
   // descending order most of the time.
   const chartData =
-    axes.major.sortAsc ?? true
+    (axes.major.sortAsc ?? true)
       ? chartDataUnsorted
       : chartDataUnsorted.reverse();
 

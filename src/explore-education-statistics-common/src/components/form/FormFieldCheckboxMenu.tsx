@@ -14,8 +14,9 @@ export type FormFieldCheckboxSearchGroupProps<FormValues> = OmitStrict<
   'formGroup'
 >;
 
-interface Props<TFormValues extends FieldValues>
-  extends FormFieldCheckboxSearchGroupProps<TFormValues> {
+interface Props<
+  TFormValues extends FieldValues,
+> extends FormFieldCheckboxSearchGroupProps<TFormValues> {
   legend: string;
   open?: boolean;
 }

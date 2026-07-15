@@ -31,7 +31,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useIdleTimer } from 'react-idle-timer';
+import { useIdleTimer } from 'react-idle-timer/modern';
 
 interface FormValues {
   content: string;

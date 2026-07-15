@@ -48,9 +48,8 @@ export default function useReleasePublishingStatus({
   const fetchNextStatus = useCallback(async () => {
     cancelTimer();
 
-    const status = await releaseVersionService.getReleaseVersionStatus(
-      releaseVersionId,
-    );
+    const status =
+      await releaseVersionService.getReleaseVersionStatus(releaseVersionId);
 
     const setNextStatus = (nextStatus: ReleaseVersionStageStatus) => {
       setCurrentStatus(prevStatus => {

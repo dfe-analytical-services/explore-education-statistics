@@ -12,8 +12,10 @@ import React, {
   useCallback,
 } from 'react';
 
-export interface FormTextAreaProps
-  extends Pick<FormLabelProps, 'hideLabel' | 'label'> {
+export interface FormTextAreaProps extends Pick<
+  FormLabelProps,
+  'hideLabel' | 'label'
+> {
   className?: string;
   disabled?: boolean;
   error?: ReactNode | string;

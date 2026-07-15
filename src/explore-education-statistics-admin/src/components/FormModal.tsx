@@ -12,10 +12,8 @@ import React, { ReactNode, useCallback, useState } from 'react';
 import { DefaultValues, FieldValues } from 'react-hook-form';
 
 interface Props<TFormValues extends FieldValues>
-  extends Pick<
-      ModalProps,
-      'className' | 'underlayClass' | 'triggerButton' | 'title'
-    >,
+  extends
+    Pick<ModalProps, 'className' | 'underlayClass' | 'triggerButton' | 'title'>,
     Pick<FormProviderProps<TFormValues>, 'validationSchema' | 'errorMappings'> {
   children: ReactNode;
   formId: string;
@@ -24,8 +22,7 @@ interface Props<TFormValues extends FieldValues>
   hiddenSubmittingText?: string;
   onSubmit: (formValues: TFormValues) => Promise<void>;
   confirmationWarningText?:
-    | ReactNode
-    | ((formValues: TFormValues) => ReactNode);
+    ReactNode | ((formValues: TFormValues) => ReactNode);
 }
 
 export default function FormModal<TFormValues extends FieldValues>({
