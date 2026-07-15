@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
         {
             // Migrating Analyst and Prerelease users to the new Standard User role, and removing the Analyst and Prerelease roles from the system.
             migrationBuilder.SqlFromFile(
-                MigrationConstants.ContentMigrationsPath,
+                MigrationConstants.UsersAndRolesMigrationsPath,
                 $"{MigrationId}_{nameof(Ees7228MigratingAnalystAndPrereleaseRolesToStandardUser)}.sql"
             );
 

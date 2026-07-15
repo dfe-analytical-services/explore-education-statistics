@@ -19,9 +19,9 @@ public class PreReleaseUsersController(IPreReleaseUserService preReleaseUserServ
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     [Authorize(Policy = nameof(SecurityPolicies.CanManageUsersOnSystem))]
-    public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetAllPreReleaseUsers()
+    public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetAllPurelyPreReleaseUsers()
     {
-        return await preReleaseUserService.GetAllPreReleaseUsers();
+        return await preReleaseUserService.GetAllPurelyPreReleaseUsers();
     }
 
     [HttpDelete("pre-release/roles/{id:guid}")]

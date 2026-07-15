@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -32,8 +31,7 @@ public class UserRoleService(
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserRepository userRepository,
-    UserManager<ApplicationUser> identityUserManager,
-    IGlobalRoleService globalRoleService
+    UserManager<ApplicationUser> identityUserManager
 ) : IUserRoleService
 {
     public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(
@@ -136,8 +134,6 @@ public class UserRoleService(
                                 createdById: userService.GetUserId()
                             );
 
-                            await globalRoleService.UpgradeToGlobalRoleIfRequired(user, RoleNames.Analyst);
-
                             await userResourceRoleNotificationService.NotifyUserOfNewPublicationRole(
                                 createdUserPublicationRole!.Id
                             );
@@ -222,16 +218,6 @@ public class UserRoleService(
             );
         }
 
-        var checkAspNetUserExistsResult = await GetIdentityUser(userPublicationRole.UserId);
-
-        if (checkAspNetUserExistsResult.IsRight)
-        {
-            await globalRoleService.DowngradeFromGlobalRoleIfRequired(
-                checkAspNetUserExistsResult.Right,
-                RoleNames.Analyst
-            );
-        }
-
         return Unit.Instance;
     }
 
@@ -306,7 +292,6 @@ public class UserRoleService(
                 activeUser
                 ?? await userRepository.CreateOrUpdate(
                     email: email,
-                    role: Role.Analyst,
                     createdById: userService.GetUserId(),
                     cancellationToken: cancellationToken
                 );
@@ -330,13 +315,6 @@ public class UserRoleService(
                 userPublicationRoleId: createdUserDrafterRole.Id,
                 cancellationToken: cancellationToken
             );
-
-            if (user.Active)
-            {
-                var identityUser = await GetIdentityUser(user.Id, cancellationToken);
-
-                await globalRoleService.UpgradeToGlobalRoleIfRequired(identityUser.Right, RoleNames.Analyst);
-            }
         });
     }
 

@@ -12,7 +12,7 @@ public class UserInviteCreateRequestTests
     {
         var validator = new UserInviteCreateRequest.Validator();
 
-        var request = new UserInviteCreateRequest { Email = "validEmail@test.com", RoleId = "valid-role-id" };
+        var request = new UserInviteCreateRequest { Email = "validEmail@test.com" };
 
         var result = validator.TestValidate(request);
 
@@ -24,7 +24,7 @@ public class UserInviteCreateRequestTests
     {
         var validator = new UserInviteCreateRequest.Validator();
 
-        var request = new UserInviteCreateRequest { Email = "  VALIDEMAIL@TEST.COM  ", RoleId = "valid-role-id" };
+        var request = new UserInviteCreateRequest { Email = "  VALIDEMAIL@TEST.COM  " };
 
         var result = validator.TestValidate(request);
 
@@ -41,7 +41,7 @@ public class UserInviteCreateRequestTests
     {
         var validator = new UserInviteCreateRequest.Validator();
 
-        var request = new UserInviteCreateRequest { Email = email, RoleId = "valid-role-id" };
+        var request = new UserInviteCreateRequest { Email = email };
 
         var result = validator.TestValidate(request);
 
@@ -53,24 +53,10 @@ public class UserInviteCreateRequestTests
     {
         var validator = new UserInviteCreateRequest.Validator();
 
-        var request = new UserInviteCreateRequest { Email = "invalidEmail", RoleId = "valid-role-id" };
+        var request = new UserInviteCreateRequest { Email = "invalidEmail" };
 
         var result = validator.TestValidate(request);
 
         result.ShouldHaveValidationErrorFor(x => x.Email).WithErrorCode(FluentValidationKeys.EmailValidator);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    public void WhenRoleIdIsEmpty_ValidationFails(string roleId)
-    {
-        var validator = new UserInviteCreateRequest.Validator();
-
-        var request = new UserInviteCreateRequest { Email = "validEmail@test.com", RoleId = roleId };
-
-        var result = validator.TestValidate(request);
-
-        result.ShouldHaveValidationErrorFor(x => x.RoleId).WithErrorCode(FluentValidationKeys.NotEmptyValidator);
     }
 }

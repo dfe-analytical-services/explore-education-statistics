@@ -255,6 +255,4 @@ public static class OptimisedTestUsers
     public static readonly ClaimsPrincipal Bau = new DataFixture().BauUser();
 
     public static readonly ClaimsPrincipal Authenticated = new DataFixture().AuthenticatedUser();
-
-    public static readonly ClaimsPrincipal PreReleaseUser = new DataFixture().PreReleaseUser();
 }

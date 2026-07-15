@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -19,7 +20,7 @@ public interface IUserManagementService
 
     Task<Either<ActionResult, Unit>> CancelInvite(string email);
 
-    Task<Either<ActionResult, Unit>> UpdateUserGlobalRole(string userId, string roleId);
+    Task<Either<ActionResult, Unit>> UpdateUserGlobalRole(Guid userId, GlobalRoles.Role targetGlobalRole);
 
     Task<Either<ActionResult, Unit>> DeleteUser(string email);
 }

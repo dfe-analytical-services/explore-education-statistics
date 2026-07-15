@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -13,7 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class UserRepository(
     ContentDbContext contentDbContext,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserPreReleaseRoleRepository userPreReleaseRoleRepository
+    IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
+    IGlobalRoleService globalRoleService
 ) : IUserRepository
 {
     public async Task<User?> FindPendingUserInviteByEmail(string email, CancellationToken cancellationToken = default)
@@ -71,25 +71,32 @@ public class UserRepository(
         );
     }
 
-    public async Task<User> CreateOrUpdate(
-        string email,
-        GlobalRoles.Role role,
-        Guid createdById,
-        DateTimeOffset? createdDate = null,
+    public async Task<User> UpdateGlobalRole(
+        Guid userId,
+        GlobalRoles.Role newRole,
         CancellationToken cancellationToken = default
-    ) =>
-        await CreateOrUpdate(
-            email: email,
-            roleId: role.GetEnumValue(),
-            createdById: createdById,
-            createdDate: createdDate,
-            cancellationToken: cancellationToken
-        );
+    )
+    {
+        var activeUser =
+            await FindActiveUserById(userId, cancellationToken)
+            ?? throw new InvalidOperationException("Cannot update the global role for a user that is not active.");
+
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            activeUser.RoleId = newRole.GetEnumValue();
+
+            await contentDbContext.SaveChangesAsync(cancellationToken);
+
+            await globalRoleService.UpdateGlobalRoleForUser(userId: userId, newRole: newRole);
+        });
+
+        return activeUser;
+    }
 
     public async Task<User> CreateOrUpdate(
         string email,
-        string roleId,
         Guid createdById,
+        GlobalRoles.Role role = GlobalRoles.Role.StandardUser,
         DateTimeOffset? createdDate = null,
         CancellationToken cancellationToken = default
     )
@@ -109,14 +116,14 @@ public class UserRepository(
         return existingUser is null
             ? await CreateNewUser(
                 email: normalizedEmail,
-                roleId: roleId,
+                role: role,
                 createdById: createdById,
                 createdDate: createdDate,
                 cancellationToken: cancellationToken
             )
             : await UpdateExistingUser(
                 existingUser: existingUser,
-                roleId: roleId,
+                role: role,
                 createdById: createdById,
                 createdDate: createdDate,
                 cancellationToken: cancellationToken
@@ -146,7 +153,7 @@ public class UserRepository(
 
     private async Task<User> CreateNewUser(
         string email,
-        string roleId,
+        GlobalRoles.Role role,
         Guid createdById,
         DateTimeOffset? createdDate,
         CancellationToken cancellationToken
@@ -157,7 +164,7 @@ public class UserRepository(
         var newUser = new User
         {
             Email = normalizedEmail,
-            RoleId = roleId,
+            RoleId = role.GetEnumValue(),
             Active = false,
             CreatedById = createdById,
             Created = ToUniversalTime(createdDate),
@@ -171,7 +178,7 @@ public class UserRepository(
 
     private async Task<User> UpdateExistingUser(
         User existingUser,
-        string roleId,
+        GlobalRoles.Role role,
         Guid createdById,
         DateTimeOffset? createdDate,
         CancellationToken cancellationToken
@@ -192,7 +199,7 @@ public class UserRepository(
                         user: existingUser,
                         createdById: createdById,
                         createdDate: createdDate,
-                        roleId: roleId,
+                        role: role,
                         cancellationToken: cancellationToken
                     )
                 : existingUser.IsInviteExpired()
@@ -200,47 +207,23 @@ public class UserRepository(
                         user: existingUser,
                         createdById: createdById,
                         createdDate: createdDate,
-                        roleId: roleId,
+                        role: role,
                         cancellationToken: cancellationToken
                     )
                 : await ResetPendingUserInvite(
                     user: existingUser,
-                    roleId: roleId,
+                    role: role,
                     createdDate: createdDate,
                     cancellationToken: cancellationToken
                 );
         });
     }
 
-    private async Task<User> ResetPendingUserInvite(
-        User user,
-        string roleId,
-        DateTimeOffset? createdDate,
-        CancellationToken cancellationToken
-    )
-    {
-        var higherRoles = GlobalRoles.GetHigherRoles(
-            EnumUtil.GetFromEnumValue<GlobalRoles.Role>(roleId).GetEnumLabel()
-        );
-
-        // For pending user invites, only the update role if the new one outranks (or equals) the existing one
-        var newRoleId = higherRoles.Contains(EnumUtil.GetFromEnumValue<GlobalRoles.Role>(user.RoleId).GetEnumLabel())
-            ? user.RoleId
-            : roleId;
-
-        user.RoleId = newRoleId;
-        // Always update the created date to the new one, to reset the invite expiry
-        user.Created = ToUniversalTime(createdDate);
-
-        await contentDbContext.SaveChangesAsync(cancellationToken);
-        return user;
-    }
-
     private async Task<User> ResetSoftDeletedUser(
         User user,
         Guid createdById,
         DateTimeOffset? createdDate,
-        string roleId,
+        GlobalRoles.Role role,
         CancellationToken cancellationToken
     )
     {
@@ -250,7 +233,7 @@ public class UserRepository(
         user.LastName = null;
         user.CreatedById = createdById;
         user.Created = ToUniversalTime(createdDate);
-        user.RoleId = roleId;
+        user.RoleId = role.GetEnumValue();
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
         return user;
@@ -260,13 +243,28 @@ public class UserRepository(
         User user,
         Guid createdById,
         DateTimeOffset? createdDate,
-        string roleId,
+        GlobalRoles.Role role,
         CancellationToken cancellationToken
     )
     {
         user.CreatedById = createdById;
         user.Created = ToUniversalTime(createdDate);
-        user.RoleId = roleId;
+        user.RoleId = role.GetEnumValue();
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+        return user;
+    }
+
+    private async Task<User> ResetPendingUserInvite(
+        User user,
+        GlobalRoles.Role role,
+        DateTimeOffset? createdDate,
+        CancellationToken cancellationToken
+    )
+    {
+        user.RoleId = role.GetEnumValue();
+        // Always update the created date to the new one, to reset the invite expiry
+        user.Created = ToUniversalTime(createdDate);
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
         return user;

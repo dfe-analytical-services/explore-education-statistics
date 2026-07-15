@@ -69,9 +69,9 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     }
 
     [Fact]
-    public async Task GetGlobalPermissions_AnalystUser_NotPublicationApprover()
+    public async Task GetGlobalPermissions_StandardUser_NotPublicationApprover()
     {
-        var user = _dataFixture.AnalystUser().Generate();
+        var user = _dataFixture.StandardUser().Generate();
 
         await fixture
             .GetContentDbContext()
@@ -107,9 +107,9 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     }
 
     [Fact]
-    public async Task GetGlobalPermissions_AnalystUser_PublicationApprover()
+    public async Task GetGlobalPermissions_StandardUser_PublicationApprover()
     {
-        ClaimsPrincipal identityUser = _dataFixture.AnalystUser();
+        ClaimsPrincipal identityUser = _dataFixture.StandardUser();
         User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
         UserPublicationRole userPublicationRole = _dataFixture
             .DefaultUserPublicationRole()
@@ -137,26 +137,6 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 IsBauUser: false,
                 // Expect this to be true if the user is a Publication approver
                 IsApprover: true
-            )
-        );
-    }
-
-    [Fact]
-    public async Task GetGlobalPermissions_PreReleaseUser()
-    {
-        var client = fixture.CreateClient(user: OptimisedTestUsers.PreReleaseUser);
-
-        var response = await client.GetAsync("/api/permissions/access");
-
-        response.AssertOk(
-            new GlobalPermissionsViewModel(
-                CanAccessSystem: true,
-                CanAccessAnalystPages: false,
-                CanAccessAllImports: false,
-                CanAccessPreReleasePages: true,
-                CanManageAllTaxonomy: false,
-                IsBauUser: false,
-                IsApprover: false
             )
         );
     }

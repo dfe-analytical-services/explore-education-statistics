@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IPreReleaseUserService
 {
-    Task<List<PreReleaseUserViewModel>> GetAllPreReleaseUsers();
+    Task<List<PreReleaseUserViewModel>> GetAllPurelyPreReleaseUsers();
 
     Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GetPreReleaseUsers(Guid releaseVersionId);
 

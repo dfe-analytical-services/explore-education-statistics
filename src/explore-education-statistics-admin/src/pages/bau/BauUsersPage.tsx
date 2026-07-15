@@ -8,6 +8,7 @@ import usersQueries from '@admin/queries/user-management/usersQueries';
 import logger from '@common/services/logger';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
+import { globalRoleLabels } from '@admin/services/types/GlobalRole';
 import styles from './BauUsersPage.module.scss';
 
 const BauUsersPage = () => {
@@ -56,7 +57,11 @@ const BauUsersPage = () => {
                   <tr key={user.id}>
                     <th scope="row">{user.name}</th>
                     <td>{user.email}</td>
-                    <td>{user.role ?? 'No role'}</td>
+                    <td>
+                      {user.globalRole
+                        ? globalRoleLabels[user.globalRole]
+                        : 'No role'}
+                    </td>
                     <td>
                       <Link
                         className={styles.manageUserLink}

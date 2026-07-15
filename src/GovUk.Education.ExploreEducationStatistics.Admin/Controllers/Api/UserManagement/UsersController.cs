@@ -29,7 +29,7 @@ public class UsersController(IUserManagementService userManagementService) : Con
     [HttpPut("users/{userId:guid}")]
     public async Task<ActionResult<Unit>> UpdateGlobalRole(Guid userId, UserGlobalRoleUpdateRequest request)
     {
-        return await userManagementService.UpdateUserGlobalRole(userId.ToString(), request.RoleId).HandleFailuresOrOk();
+        return await userManagementService.UpdateUserGlobalRole(userId, request.TargetGlobalRole).HandleFailuresOrOk();
     }
 
     /// <summary>

@@ -579,7 +579,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task UserOnPublicationTeam_CanCreateNextVersion_ReturnsDataSetVersionSummary()
         {
-            ClaimsPrincipal identityUser = DataFixture.AnalystUser();
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
             User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
 
             ReleaseFile releaseFile = DataFixture

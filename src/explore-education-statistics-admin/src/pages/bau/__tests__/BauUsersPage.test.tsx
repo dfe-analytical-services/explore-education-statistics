@@ -8,6 +8,7 @@ import render from '@common-test/render';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/dom';
+import { GlobalRole } from '@admin/services/types/GlobalRole';
 import BauUsersPage from '../BauUsersPage';
 
 jest.mock('@admin/services/user-management/usersService');
@@ -19,7 +20,7 @@ const user: User[] = [
     id: '1',
     name: 'TestUser1',
     email: 'test@hotmail.com',
-    role: 'test',
+    globalRole: GlobalRole.StandardUser,
   },
 ];
 

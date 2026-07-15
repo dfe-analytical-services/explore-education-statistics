@@ -27,11 +27,12 @@ public enum ValidationErrorMessages
     UserAlreadyExists,
     UserAlreadyHasResourceRole,
     UserAlreadyHasMorePowerfulRole,
+    UserIsAlreadyBauUser,
+    UserIsAlreadyStandardUser,
 
     // Invite
     InviteNotFound,
     InvalidEmailAddress,
-    InvalidUserRole,
     NoInvitableEmails,
     NotAllReleasesBelongToPublication,
 

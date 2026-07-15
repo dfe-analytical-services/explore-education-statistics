@@ -75,7 +75,7 @@ const InvitedUsersPage = () => {
                   {model.pendingInvites.map(pendingInvite => (
                     <tr key={pendingInvite.email}>
                       <td>{pendingInvite.email}</td>
-                      <td>{pendingInvite.role}</td>
+                      <td>{pendingInvite.globalRole}</td>
                       <td>
                         {pendingInvite.userPreReleaseRoles.length === 0 ? (
                           'No user pre-release roles'

@@ -7,14 +7,14 @@ import { PublicationRole } from '../types/PublicationRole';
 
 export interface PendingInvite {
   email: string;
-  role: string;
+  globalRole: string;
   userPublicationRoles: UserPublicationRole[];
   userPreReleaseRoles: UserPreReleaseRole[];
 }
 
 export interface UserInvite {
   email: string;
-  roleId: string;
+  isBau: boolean;
   userPreReleaseRoles: { releaseId: string }[];
   userPublicationRoles: {
     publicationId: string;

@@ -20,16 +20,4 @@ public static class GlobalRoles
         public const string StandardUser = "Standard User";
         public const string BauUser = "BAU User";
     }
-
-    public static List<string> GlobalRolePrecedenceOrder = new() { RoleNames.StandardUser, RoleNames.BauUser };
-
-    public static List<string> GetHigherRoles(string roleName)
-    {
-        return [.. GlobalRolePrecedenceOrder.Skip(GlobalRolePrecedenceOrder.IndexOf(roleName) + 1)];
-    }
-
-    public static List<string> GetLowerRoles(string role)
-    {
-        return GlobalRolePrecedenceOrder.GetRange(0, GlobalRolePrecedenceOrder.IndexOf(role));
-    }
 }

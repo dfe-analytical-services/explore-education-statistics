@@ -1,8 +1,9 @@
 import client from '@admin/services/utils/service';
 import { User, UserWithRoles } from '../types/userWithRoles';
+import { GlobalRole } from '../types/GlobalRole';
 
 export interface UserGlobalRoleUpdateRequest {
-  roleId: string;
+  targetGlobalRole: GlobalRole;
 }
 
 export interface RemoveUser {

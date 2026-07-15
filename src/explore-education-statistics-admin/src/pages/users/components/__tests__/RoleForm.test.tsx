@@ -1,5 +1,5 @@
 import RoleForm from '@admin/pages/users/components/RoleForm';
-import { testUser, testRoles } from '@admin/pages/users/__data__/testUserData';
+import { testUser } from '@admin/pages/users/__data__/testUserData';
 import _usersService from '@admin/services/user-management/usersService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -12,7 +12,7 @@ const usersService = _usersService as jest.Mocked<typeof _usersService>;
 
 describe('RoleForm', () => {
   test('renders the form', () => {
-    render(<RoleForm roles={testRoles} user={testUser} onUpdate={noop} />);
+    render(<RoleForm user={testUser} onUpdate={noop} />);
 
     const roleSelect = screen.getByLabelText('Role');
     const roles = within(roleSelect).getAllByRole('option');
@@ -29,9 +29,7 @@ describe('RoleForm', () => {
   test('can submit the form with the selected role', async () => {
     const user = userEvent.setup();
     const handleUpdate = jest.fn();
-    render(
-      <RoleForm roles={testRoles} user={testUser} onUpdate={handleUpdate} />,
-    );
+    render(<RoleForm user={testUser} onUpdate={handleUpdate} />);
 
     await user.selectOptions(screen.getByLabelText('Role'), ['Role 1']);
 
