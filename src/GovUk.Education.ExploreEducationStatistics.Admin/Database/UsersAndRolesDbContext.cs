@@ -124,34 +124,6 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
                 },
                 new IdentityRoleClaim<string>
                 {
-                    Id = -14,
-                    RoleId = standardUserRoleId,
-                    ClaimType = SecurityClaimTypes.AnalystPagesAccessGranted.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
-                    Id = -17,
-                    RoleId = standardUserRoleId,
-                    ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
-                    Id = -18,
-                    RoleId = bauRoleId,
-                    ClaimType = SecurityClaimTypes.AnalystPagesAccessGranted.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
-                    Id = -19,
-                    RoleId = bauRoleId,
-                    ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
-                    ClaimValue = "",
-                },
-                new IdentityRoleClaim<string>
-                {
                     Id = -22,
                     RoleId = bauRoleId,
                     ClaimType = SecurityClaimTypes.CreateAnyMethodology.ToString(),

@@ -43,9 +43,7 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithId(Guid.NewGuid())
             .WithRole(GlobalRoles.RoleNames.StandardUser)
             .WithScope(SecurityScopes.AccessAdminApiScope)
-            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.AnalystPagesAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted));
+            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted));
     }
 
     public static Generator<ClaimsPrincipal> WithId(this Generator<ClaimsPrincipal> generator, Guid userId) =>

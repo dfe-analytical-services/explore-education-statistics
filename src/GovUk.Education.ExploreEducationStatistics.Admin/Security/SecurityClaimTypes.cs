@@ -20,8 +20,6 @@ public enum SecurityClaimTypes
      * General role-based page access
      */
     ApplicationAccessGranted,
-    AnalystPagesAccessGranted,
-    PrereleasePagesAccessGranted,
     ManageAnyUser,
     AccessAllImports,
 

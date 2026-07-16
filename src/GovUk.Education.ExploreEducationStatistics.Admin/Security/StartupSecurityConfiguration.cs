@@ -50,12 +50,7 @@ public static class StartupSecurityConfiguration
 
             options.AddPolicy(
                 nameof(SecurityPolicies.CanAccessAnalystPages),
-                policy => policy.RequireClaim(nameof(SecurityClaimTypes.AnalystPagesAccessGranted))
-            );
-
-            options.AddPolicy(
-                nameof(SecurityPolicies.CanAccessPreReleasePages),
-                policy => policy.RequireClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
+                policy => policy.Requirements.Add(new AccessAnalystPagesRequirement())
             );
 
             options.AddPolicy(

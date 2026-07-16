@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 
 public static class UserExtensions
 {
+    public static bool IsBau(this User user) => user.GetGlobalRole() == GlobalRoles.Role.BauUser;
+
     public static GlobalRoles.Role GetGlobalRole(this User user) =>
         user.RoleId switch
         {

@@ -1,11 +1,10 @@
 #nullable enable
-using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -27,9 +26,13 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     private static readonly DataFixture _dataFixture = new();
 
     [Fact]
-    public async Task GetGlobalPermissions_AuthenticatedUser()
+    public async Task GetGlobalPermissions_StandardUser()
     {
-        var client = fixture.CreateClient(user: OptimisedTestUsers.Authenticated);
+        User user = _dataFixture.DefaultUser();
+
+        await fixture.GetContentDbContext().AddTestData(context => context.Users.Add(user));
+
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -38,7 +41,6 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: false,
                 CanAccessAllImports: false,
-                CanAccessPreReleasePages: false,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 IsApprover: false
@@ -49,7 +51,11 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
-        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
+        User user = _dataFixture.DefaultUser().WithRoleId(GlobalRoles.Role.BauUser.GetEnumValue());
+
+        await fixture.GetContentDbContext().AddTestData(context => context.Users.Add(user));
+
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -58,7 +64,6 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: true,
-                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: true,
                 IsBauUser: true,
                 // Expect "IsApprover" to be false even for BAU as we don't expect BAU users to be assigned
@@ -71,24 +76,19 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_StandardUser_NotPublicationApprover()
     {
-        var user = _dataFixture.StandardUser().Generate();
+        User user = _dataFixture.DefaultUser();
+        UserPublicationRole userPublicationRole = _dataFixture
+            .DefaultUserPublicationRole()
+            .WithUser(user)
+            .WithRole(PublicationRole.Drafter)
+            .WithPublication(_dataFixture.DefaultPublication());
 
+        // Add test data that gives the user access to a Publication without being an Approver.
         await fixture
             .GetContentDbContext()
-            .AddTestData(context =>
-            {
-                // Add test data that gives the user access to a Publication without being an Approver.
-                context.UserPublicationRoles.Add(
-                    _dataFixture
-                        .DefaultUserPublicationRole()
-                        .WithUserId(user.GetUserId())
-                        .WithRole(PublicationRole.Drafter)
-                        .WithPublication(_dataFixture.DefaultPublication())
-                        .Generate()
-                );
-            });
+            .AddTestData(context => context.UserPublicationRoles.Add(userPublicationRole));
 
-        var client = fixture.CreateClient(user: user);
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -97,7 +97,6 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
-                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 // Expect this to be false if the user isn't an approver
@@ -109,21 +108,18 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_StandardUser_PublicationApprover()
     {
-        ClaimsPrincipal identityUser = _dataFixture.StandardUser();
-        User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
+        User user = _dataFixture.DefaultUser();
         UserPublicationRole userPublicationRole = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
-            .WithRole(PublicationRole.Approver);
+            .WithRole(PublicationRole.Approver)
+            .WithPublication(_dataFixture.DefaultPublication());
 
         await fixture
             .GetContentDbContext()
-            .AddTestData(context =>
-            {
-                context.UserPublicationRoles.Add(userPublicationRole);
-            });
+            .AddTestData(context => context.UserPublicationRoles.Add(userPublicationRole));
 
-        var client = fixture.CreateClient(user: identityUser);
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -132,7 +128,6 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessSystem: true,
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
-                CanAccessPreReleasePages: true,
                 CanManageAllTaxonomy: false,
                 IsBauUser: false,
                 // Expect this to be true if the user is a Publication approver
