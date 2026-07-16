@@ -281,6 +281,7 @@ The service can be started against a set of non-existent database. If no pre-exi
       ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
       ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
       ALTER ROLE [db_securityadmin] add member [adminapp];
+      ALTER ROLE [db_accessadmin] add member [adminapp];
       GRANT ALTER ANY USER TO [adminapp];
       ```
     
@@ -295,6 +296,7 @@ The service can be started against a set of non-existent database. If no pre-exi
       ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
       ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
       ALTER ROLE [db_securityadmin] add member [adminapp];
+      ALTER ROLE [db_accessadmin] add member [adminapp];
       GRANT ALTER ANY USER TO [adminapp];
       ```
 
