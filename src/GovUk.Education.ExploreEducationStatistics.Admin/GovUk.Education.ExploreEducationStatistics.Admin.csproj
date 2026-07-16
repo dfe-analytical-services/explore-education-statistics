@@ -36,7 +36,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageReference Include="System.Text.Json" Version="10.0.9" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="4.13.2" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
