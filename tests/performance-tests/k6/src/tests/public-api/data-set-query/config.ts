@@ -42,10 +42,7 @@ type DataSetConfig = {
 
 function getProfileConfig(): Options {
   const profile = (__ENV.PROFILE ?? 'sequential') as
-    | 'load'
-    | 'spike'
-    | 'stress'
-    | 'sequential';
+    'load' | 'spike' | 'stress' | 'sequential';
 
   switch (profile) {
     case 'load': {
@@ -84,8 +81,7 @@ function getProfileConfig(): Options {
 
 function getQueryConfig(): QueryGeneratorConfig {
   const queryType = (__ENV.QUERY_COMPLEXITY ?? 'simple') as
-    | 'simple'
-    | 'complex';
+    'simple' | 'complex';
 
   switch (queryType) {
     case 'simple': {

@@ -7,7 +7,11 @@ import {
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableDataQuery } from '@common/services/tableBuilderService';
+import {
+  TableDataQuery,
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
+import { FinalDataset } from '@frontend/services/tableToolSearchService';
 
 export const testQuery: TableDataQuery = {
   publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
@@ -259,6 +263,80 @@ export const testPublicationMethodologyList = {
       methodologyId: 'm1',
       title: 'methodology title',
       slug: 'm1',
+    },
+  ],
+};
+
+export const testFinalResult: FinalDataset = {
+  fileId: 'test-file-id',
+  title: 'Test dataset title',
+  aiSummary: 'Test AI relevance summary explanation.',
+  filters: [],
+  geographicLevels: {},
+  timePeriod: {
+    start: { code: 'AY', year: '2014' },
+    end: { code: 'AY', year: '2016' },
+  },
+  indicators: [],
+};
+
+export const testTableDataResponse: TableDataResponse = {
+  subjectMeta: {
+    publicationName: 'Test publication',
+    subjectName: 'Test subject',
+    dataSetFileId: 'file-id',
+    geoJsonAvailable: false,
+    isCroppedTable: false,
+    filters: {
+      Filter1: {
+        legend: 'Filter 1',
+        name: 'filter1',
+        options: {
+          FilterGroup1: {
+            id: 'filter-group-1',
+            label: 'Filter group 1',
+            options: [
+              {
+                label: 'Filter 1',
+                value: 'filter-1',
+              },
+            ],
+            order: 0,
+          },
+        },
+        order: 0,
+      },
+    },
+    locations: {
+      country: [
+        {
+          id: 'england-id',
+          label: 'England',
+          value: 'england',
+        },
+      ],
+    },
+    timePeriodRange: [{ code: 'AY', label: '2020/21', year: 2020 }],
+    indicators: [
+      {
+        label: 'Number of applications received',
+        name: 'applications_received',
+        unit: '',
+        value: 'indicator-1',
+      },
+    ],
+    boundaryLevels: [],
+    footnotes: [],
+  },
+  results: [
+    {
+      filters: ['filter-1'],
+      geographicLevel: 'country',
+      locationId: 'england-id',
+      timePeriod: '2020_AY',
+      measures: {
+        'indicator-1': '608180',
+      },
     },
   ],
 };

@@ -733,6 +733,20 @@
         "description": "The name of the Azure AI data set search index used by the public frontend application"
       }
     },
+    "tableToolSearchEndpoint": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The endpoint of the Azure Function App used by the table tool search service"
+      }
+    },
+    "tableToolSearchFunctionsKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The key used to authenticate requests to the Azure Function App used by the table tool search service"
+      }
+    },
     "publicDataDbExists": {
       "type": "bool",
       "defaultValue": true,
@@ -1438,18 +1452,15 @@
         }
       ],
       "properties": {
-        "name": "[variables('dataAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
-        "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
           "netFrameworkVersion": "v8.0",
-          "AlwaysOn": true,
+          "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -1475,7 +1486,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
+        "[resourceId('Microsoft.Insights/components', variables('dataAppInsights'))]"
       ]
     },
     {
@@ -1485,11 +1496,11 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
         "[variables('ees-storage-public')]"
       ],
       "properties": {
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "22.22.0",
         "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
@@ -1551,8 +1562,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
-          "AlwaysOn": false,
+          "alwaysOn": false,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -1582,7 +1592,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
+        "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]"
       ]
     },
     {
@@ -1678,18 +1688,15 @@
         }
       ],
       "properties": {
-        "name": "[variables('contentAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-        "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
           "netFrameworkVersion": "v8.0",
-          "AlwaysOn": true,
+          "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -1715,7 +1722,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('contentAppInsights'))]"
+        "[resourceId('Microsoft.Insights/components', variables('contentAppInsights'))]"
       ]
     },
     {
@@ -1729,7 +1736,7 @@
         "[variables('ees-storage-public')]"
       ],
       "properties": {
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "22.22.0",
         "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
@@ -1786,8 +1793,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
-          "AlwaysOn": false,
+          "alwaysOn": false,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -1817,7 +1823,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
+        "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]"
       ]
     },
     {
@@ -1913,20 +1919,15 @@
         }
       ],
       "properties": {
-        "name": "[variables('adminAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
-        "hostingEnvironment": "",
         "httpsOnly": true,
-        "WEBSITE_SWAP_WARMUP_PING_STATUSES": "200, 202, 204",
-        "WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG": 1,
         "clientAffinityEnabled": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
           "netFrameworkVersion": "v8.0",
-          "AlwaysOn": true,
+          "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -1954,7 +1955,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]"
+        "[resourceId('Microsoft.Insights/components', variables('adminAppInsights'))]"
       ]
     },
     {
@@ -1970,8 +1971,8 @@
         "[variables('ees-storage-publisher')]"
       ],
       "properties": {
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
-        "AppInsights__InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
+        "AppInsights__InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
         "WEBSITE_NODE_DEFAULT_VERSION": "22.22.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
@@ -2021,7 +2022,6 @@
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api')]",
         "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
         "DataScreener__ScreenerStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('screenerStorageAccountConnectionStringSecret'), '2018-02-14').secretUriWithVersion, ')')]",
-        "DataScreener__EnhancedScreenerJourney": "[parameters('enhancedScreenerJourney')]",
         "DataScreener__ScreenerProgressUpdateIntervalSeconds": 5,
         "DataScreener__ScreenerProgressUpdateFailureIntervalMinutes": 1440
       }
@@ -2053,8 +2053,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
-          "AlwaysOn": false,
+          "alwaysOn": false,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -2081,7 +2080,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
+        "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]"
       ]
     },
     {
@@ -2276,9 +2275,7 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
-        "name": "[variables('publicAppName')]",
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
         "reserved": true,
@@ -2288,9 +2285,8 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
           "preWarmedInstanceCount": 1,
-          "framework": "node",
           "nodeVersion": "16-lts",
-          "AlwaysOn": true,
+          "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -2303,7 +2299,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('publicAppInsights'))]"
+        "[resourceId('Microsoft.Insights/components', variables('publicAppInsights'))]"
       ]
     },
     {
@@ -2316,10 +2312,12 @@
       ],
       "properties": {
         "APP_ENV": "[parameters('environmentName')]",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
         "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
+        "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[parameters('tableToolSearchEndpoint')]",
+        "AZURE_TABLE_TOOL_SEARCH_FUNCTIONS_KEY": "[parameters('tableToolSearchFunctionsKey')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
@@ -2979,7 +2977,7 @@
       }
     },
     {
-      "name": "[concat(variables('publicSqlserverName'), '/', variables('publicSqlAllowedSubnets')[copyIndex()].name)]",
+      "name": "[concat(variables('publicSqlServerName'), '/', variables('publicSqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
       "condition": "[and(equals(parameters('sqlServerPublicNetworkAccess'), 'Enabled'), parameters('useSubnets'))]",
       "apiVersion": "2015-05-01-preview",
@@ -3366,7 +3364,7 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
           "netFrameworkVersion": "v8.0",
-          "AlwaysOn": true,
+          "alwaysOn": true,
           "webSocketsEnabled": false,
           "requestTracingEnabled": true,
           "remoteDebuggingEnabled": false,
@@ -3401,7 +3399,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
         "App__EmailEnabled": "true",
         "App__SuppressExceptionsForTeamOnlyApiKeyErrors": "[parameters('notifierSuppressExceptionsForTeamOnlyApiKeyErrors')]",
         "App__Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
@@ -3517,9 +3515,8 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
           "netFrameworkVersion": "v8.0",
-          "AlwaysOn": true,
+          "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -3557,7 +3554,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2020-02-02').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('importerAppInsights')), '2020-02-02').InstrumentationKey]",
         "App__RowsPerBatch": "3000",
         "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
       }
@@ -3670,9 +3667,8 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
           "netFrameworkVersion": "v8.0",
-          "AlwaysOn": true,
+          "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
@@ -3721,7 +3717,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
         "App__PrepareScheduledReleaseVersionsFunctionCronSchedule": "[parameters('prepareScheduledReleaseVersionsFunctionCronSchedule')]",
         "App__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
         "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
@@ -4231,8 +4227,8 @@
           "environment": {
             "value": "[parameters('environment')]"
           },
-          "publisherAppName": {
-            "value": "[variables('publisherAppName')]"
+          "coreSqlServerName": {
+            "value": "[variables('coreSqlServerName')]"
           },
           "dataFactoryName": {
             "value": "[variables('dataFactoryName')]"
@@ -4256,10 +4252,8 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
         "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+        "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
       ]
     },
     {
@@ -4706,7 +4700,7 @@
       ]
     },
     {
-      "type": "microsoft.insights/actionGroups",
+      "type": "Microsoft.Insights/actionGroups",
       "apiVersion": "2019-06-01",
       "name": "[variables('actionGroupAlerts')]",
       "location": "global",
@@ -4724,13 +4718,13 @@
       }
     },
     {
-      "type": "microsoft.insights/metricAlerts",
+      "type": "Microsoft.Insights/metricAlerts",
       "apiVersion": "2018-03-01",
       "name": "[variables('metricAlerts')[copyIndex()].name]",
       "location": "global",
       "dependsOn": [
         "[variables('metricAlerts')[copyIndex()].resourceId]",
-        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+        "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
       ],
       "copy": {
         "name": "metricAlertsCopy",
@@ -4763,7 +4757,7 @@
         "targetResourceType": "[variables('metricAlerts')[copyIndex()].resourceType]",
         "actions": [
           {
-            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
           }
         ]
       }

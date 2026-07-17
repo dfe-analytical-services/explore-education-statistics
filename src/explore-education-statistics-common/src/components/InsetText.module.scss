@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .success {
-  border-left-color: govuk-colour('turquoise');
+  border-left-color: govuk-colour('teal', $variant: 'primary');
 }
 
 .warning {

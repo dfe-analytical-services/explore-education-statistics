@@ -1,8 +1,8 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .previewPlaceholder {
   align-items: center;
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-colour('black', $variant: 'tint-95');
   display: flex;
   font-size: 1.5rem;
   font-weight: $govuk-font-weight-bold;

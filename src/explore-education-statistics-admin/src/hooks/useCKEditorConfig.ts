@@ -95,8 +95,8 @@ const useCKEditorConfig = ({
                 title: 'Paragraph',
                 class: 'ck-heading_paragraph',
               },
-              ...headingOptions.filter(
-                option => allowedHeadings?.includes(option.view ?? ''),
+              ...headingOptions.filter(option =>
+                allowedHeadings?.includes(option.view ?? ''),
               ),
             ],
           }

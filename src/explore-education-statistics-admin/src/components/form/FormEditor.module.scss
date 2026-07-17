@@ -1,15 +1,18 @@
-@import '~govuk-frontend/dist/govuk/base';
-@import '~explore-education-statistics-common/src/styles/mixins';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use '~explore-education-statistics-common/src/styles/mixins' as *;
+@use '@common/styles/mixins/focus' as *;
+@use 'sass:color';
 
-$active-colour: lighten(govuk-colour('orange'), 10);
+$active-colour: color.adjust(govuk-colour('orange'), $lightness: 10%);
 
 .editor {
-  background: govuk-colour('light-grey');
-  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  background: govuk-colour('black', $variant: 'tint-95');
+  border: $govuk-border-width-form-element solid
+    govuk-functional-colour(input-border);
   margin-bottom: govuk-spacing(2);
 
   :global(.ck-focused) {
-    border-color: $govuk-input-border-colour !important;
+    border-color: govuk-functional-colour(input-border) !important;
   }
 
   // Make sure svgs are visible (they use the image tag)
@@ -46,8 +49,9 @@ $active-colour: lighten(govuk-colour('orange'), 10);
 }
 
 .readOnlyEditor {
-  background: govuk-colour('light-grey');
-  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  background: govuk-colour('black', $variant: 'tint-95');
+  border: $govuk-border-width-form-element solid
+    govuk-functional-colour(input-border);
   cursor: not-allowed;
   padding: govuk-spacing(2);
 
@@ -66,7 +70,7 @@ $active-colour: lighten(govuk-colour('orange'), 10);
   background: govuk-colour('yellow');
 
   :global(.commentStyle) {
-    background: lighten(govuk-colour('yellow'), 20);
+    background: color.adjust(govuk-colour('yellow'), $lightness: 20%);
   }
 
   :global(.commentStyle--active) {

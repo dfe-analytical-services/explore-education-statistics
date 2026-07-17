@@ -80,8 +80,7 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
   return {
     columnGroups,
     rowGroups,
-    // Reverse the order of time periods in columns so they are latest - oldest.
-    columns: filteredTimePeriodRange.reverse(),
+    columns: filteredTimePeriodRange,
     rows: indicators,
   };
 }

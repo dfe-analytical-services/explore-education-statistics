@@ -138,7 +138,7 @@ export default function FiltersForm({
     const indicators =
       indicatorValues.length === 1 && indicatorValues[0].options.length === 1
         ? [indicatorValues[0].options[0].value]
-        : initialValues?.indicators ?? [];
+        : (initialValues?.indicators ?? []);
 
     const filters = mapValues(Object.fromEntries(simpleFilters), filter => {
       const filterGroupOptions = Object.values(filter.options);

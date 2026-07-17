@@ -73,7 +73,7 @@ const ReleaseUpdatesPage = ({
               {results.map(update => (
                 <tr key={update.date}>
                   <td>
-                    <FormattedDate>{update.date}</FormattedDate>
+                    <FormattedDate usingUkTime>{update.date}</FormattedDate>
                   </td>
                   <td>{update.summary}</td>
                 </tr>

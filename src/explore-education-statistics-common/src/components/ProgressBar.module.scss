@@ -1,10 +1,10 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 $bar-border-radius: 2px;
 $bar-height: 10px;
 
 .container {
-  background: govuk-colour('mid-grey');
+  background: govuk-colour('black', $variant: 'tint-80');
   border-radius: $bar-border-radius;
   display: block;
   height: $bar-height;

@@ -20,9 +20,9 @@ public record DataSetMapping
     public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; init; } = null!;
     public List<UnmappedIndicator> UnmappedReplacementIndicators { get; init; } = [];
 
-    public Dictionary<Guid, LocationMapping> LocationMappings { get; set; } = null!; // TODO EES-7126 Change set -> init
+    public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
 
-    public List<UnmappedLocation> UnmappedReplacementLocations { get; set; } = []; // TODO EES-7126 Change set -> init
+    public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {

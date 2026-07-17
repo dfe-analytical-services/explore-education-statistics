@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interface
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -93,7 +94,7 @@ public class PublicationSubscriptionFunctions(
                         { "publication_name", subscription.Entity.Title },
                         {
                             "unsubscribe_link",
-                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription?token={unsubscribeToken}"
                         },
                     };
 
@@ -130,7 +131,7 @@ public class PublicationSubscriptionFunctions(
                         { "publication_name", req.Title },
                         {
                             "verification_link",
-                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
+                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription?token={activationCode}"
                         },
                     };
 
@@ -178,14 +179,15 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe")]
             FunctionContext context,
-        string publicationId,
-        string token
+        HttpRequest request,
+        string publicationId
     )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
+        var token = request.Query["token"].ToString();
         var email = tokenService.GetEmailFromToken(token);
         if (email is null)
         {
@@ -239,18 +241,15 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.VerifySubscription)]
     public async Task<IActionResult> VerifySubscription(
-        [HttpTrigger(
-            AuthorizationLevel.Anonymous,
-            "get",
-            Route = "publication/{publicationId}/verify-subscription/{token}"
-        )]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/verify-subscription")]
             FunctionContext context,
-        Guid publicationId,
-        string token
+        HttpRequest request,
+        Guid publicationId
     )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
+        var token = request.Query["token"].ToString();
         var email = tokenService.GetEmailFromToken(token);
 
         if (email == null)
@@ -302,7 +301,7 @@ public class PublicationSubscriptionFunctions(
             { "publication_name", newSubscription.Title },
             {
                 "unsubscribe_link",
-                $"{_appOptions.PublicAppUrl}/subscriptions/{newSubscription.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appOptions.PublicAppUrl}/subscriptions/{newSubscription.Slug}/confirm-unsubscription?token={unsubscribeToken}"
             },
         };
 

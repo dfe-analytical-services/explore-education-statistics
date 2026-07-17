@@ -1148,7 +1148,7 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        UserReleaseRole userPreReleaseRole = _fixture
+        UserPreReleaseRole userPreReleaseRole = _fixture
             .DefaultUserPreReleaseRole()
             .WithUser(_fixture.DefaultUser())
             .WithReleaseVersion(releaseVersion);

@@ -10,8 +10,10 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { ReactNode } from 'react';
 
 describe('useChartBuilderFormsContext', () => {
-  interface Props
-    extends OmitStrict<ChartBuilderFormContextProviderProps, 'children'> {
+  interface Props extends OmitStrict<
+    ChartBuilderFormContextProviderProps,
+    'children'
+  > {
     children?: ReactNode;
   }
 

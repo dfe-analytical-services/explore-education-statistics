@@ -1,0 +1,69 @@
+import render from '@common-test/render';
+import _tableBuilderService from '@common/services/tableBuilderService';
+import TableToolSearchFinalResult from '@frontend/modules/table-tool/components/TableToolSearchFinalResult';
+import { screen } from '@testing-library/react';
+import React from 'react';
+import { testFinalResult, testTableDataResponse } from './__data__/tableData';
+
+jest.mock('@common/services/tableBuilderService');
+
+const tableBuilderService = jest.mocked(_tableBuilderService);
+
+describe('TableToolSearchFinalResult', () => {
+  test('renders dataset details correctly', async () => {
+    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+
+    render(
+      <TableToolSearchFinalResult
+        releaseVersionId="test-release-version-id"
+        dataset={testFinalResult}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Test dataset title' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'View this data set' }),
+    ).toHaveAttribute('href', '/data-catalogue/test-file-id');
+
+    expect(
+      screen.getByRole('heading', { name: 'Relevance' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('Test AI relevance summary explanation.'),
+    ).toBeInTheDocument();
+  });
+
+  test('renders table when table query resolves successfully', async () => {
+    tableBuilderService.getTableData.mockResolvedValue(testTableDataResponse);
+
+    render(
+      <TableToolSearchFinalResult
+        releaseVersionId="test-release-version-id"
+        dataset={testFinalResult}
+      />,
+    );
+
+    expect(await screen.findByRole('table')).toBeInTheDocument();
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      /Number of applications received/,
+    );
+  });
+
+  test('renders error message when table query fails', async () => {
+    tableBuilderService.getTableData.mockRejectedValue(new Error('API error'));
+
+    render(
+      <TableToolSearchFinalResult
+        releaseVersionId="test-release-version-id"
+        dataset={testFinalResult}
+      />,
+    );
+
+    expect(await screen.findByText('Error loading table.')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+});

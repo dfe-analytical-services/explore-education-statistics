@@ -6,8 +6,9 @@ import useRegister from '@common/components/form/hooks/useRegister';
 import React from 'react';
 import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
-export interface FormFieldRadioSearchGroupProps<TFormValues extends FieldValues>
-  extends Omit<FormRadioSearchGroupProps, 'name' | 'value' | 'id'> {
+export interface FormFieldRadioSearchGroupProps<
+  TFormValues extends FieldValues,
+> extends Omit<FormRadioSearchGroupProps, 'name' | 'value' | 'id'> {
   name: Path<TFormValues>;
   id?: string;
   showError?: boolean;

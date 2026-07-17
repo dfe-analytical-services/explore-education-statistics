@@ -1,5 +1,5 @@
-@import '~govuk-frontend/dist/govuk/base';
-@import '@common/styles/variables';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use '@common/styles/variables' as *;
 
 .container {
   display: flex;
@@ -8,7 +8,7 @@
   gap: govuk-spacing(4);
   margin-bottom: govuk-spacing(6);
   padding: govuk-spacing(2);
-  background-color: $_govuk-rebrand-light-blue-background-colour;
+  background-color: govuk-colour('blue', $variant: 'tint-95');
 }
 
 .innerWrap {
@@ -34,7 +34,7 @@
 
 .listItemTerm {
   font-weight: normal;
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
 }
 
 .listItemDefinition {

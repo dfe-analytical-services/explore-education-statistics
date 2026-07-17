@@ -1,4 +1,8 @@
-import tableBuilderService from '@common/services/tableBuilderService';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import tableBuilderService, {
+  FullTableQuery,
+} from '@common/services/tableBuilderService';
 import formatPretty from '@common/utils/number/formatPretty';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
@@ -52,6 +56,30 @@ const tableBuilderQueries = createQueryKeys('tableBuilder', {
                   indicator.unit,
                   indicator.decimalPlaces,
                 ),
+        };
+      },
+    };
+  },
+
+  getFullTable(query: FullTableQuery, releaseVersionId?: string) {
+    return {
+      queryKey: ['fullTable', query, releaseVersionId],
+      queryFn: async () => {
+        const tableData = await tableBuilderService.getTableData(
+          query,
+          releaseVersionId,
+        );
+        if (!tableData.results.length || !tableData.subjectMeta) {
+          throw new Error(
+            'No data available for the options selected. Please try again with different options.',
+          );
+        }
+
+        const tableMapped = mapFullTable(tableData);
+        const tableHeadersConfig = getDefaultTableHeaderConfig(tableMapped);
+        return {
+          table: tableMapped,
+          tableHeaders: tableHeadersConfig,
         };
       },
     };

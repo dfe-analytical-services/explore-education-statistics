@@ -27,8 +27,7 @@ export interface ApiDataSetVersionSummary {
   type: DataSetVersionType;
 }
 
-export interface ApiDataSetDraftVersionSummary
-  extends ApiDataSetVersionSummary {
+export interface ApiDataSetDraftVersionSummary extends ApiDataSetVersionSummary {
   status: DataSetDraftVersionStatus;
 }
 
@@ -96,18 +95,12 @@ export interface TimePeriodRange {
 export type DataSetStatus = 'Draft' | 'Published' | 'Deprecated' | 'Withdrawn';
 
 export type DataSetDraftVersionStatus =
-  | 'Processing'
-  | 'Failed'
-  | 'Finalising'
-  | 'Mapping'
-  | 'Draft'
-  | 'Cancelled';
+  'Processing' | 'Failed' | 'Finalising' | 'Mapping' | 'Draft' | 'Cancelled';
 
 export type DataSetLiveVersionStatus = 'Published' | 'Deprecated' | 'Withdrawn';
 
 export type DataSetVersionStatus =
-  | DataSetDraftVersionStatus
-  | DataSetLiveVersionStatus;
+  DataSetDraftVersionStatus | DataSetLiveVersionStatus;
 
 export type DataSetVersionType = 'Major' | 'Minor' | 'Patch';
 

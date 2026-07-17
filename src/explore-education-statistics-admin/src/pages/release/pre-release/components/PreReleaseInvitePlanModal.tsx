@@ -43,7 +43,9 @@ export default function PreReleaseInvitePlanModal({
           </WarningMessage>
           <div className={styles.invitesOverflow}>
             <ul className="govuk-!-margin-2" data-testid="invitableList">
-              {invitePlan.invitable?.map(email => <li key={email}>{email}</li>)}
+              {invitePlan.invitable?.map(email => (
+                <li key={email}>{email}</li>
+              ))}
             </ul>
           </div>
         </>
@@ -93,6 +95,32 @@ export default function PreReleaseInvitePlanModal({
               data-testid="invitedList"
             >
               {invitePlan.alreadyInvited.map(email => (
+                <li key={email}>{email}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
+
+      {invitePlan.alreadyHasMorePowerfulRole.length > 0 && (
+        <>
+          <h2
+            id="already-has-more-powerful-role-heading"
+            className="govuk-heading-m"
+          >
+            Already has more powerful role
+          </h2>
+          <p>
+            The following email addresses will be ignored as they are already
+            have a more powerful role than pre-release:
+          </p>
+          <div className={styles.invitesOverflow}>
+            <ul
+              aria-labelledby="already-has-more-powerful-role-heading"
+              className="govuk-!-margin-2"
+              data-testid="morePowerfulRoleList"
+            >
+              {invitePlan.alreadyHasMorePowerfulRole.map(email => (
                 <li key={email}>{email}</li>
               ))}
             </ul>

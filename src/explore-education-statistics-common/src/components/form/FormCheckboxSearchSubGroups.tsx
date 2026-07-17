@@ -29,11 +29,10 @@ export interface OptionGroup {
   options: CheckboxOption[];
 }
 
-export interface FormCheckboxSearchSubGroupsProps
-  extends OmitStrict<
-    FormCheckboxGroupProps,
-    'onAllChange' | 'selectAll' | 'selectAllText' | 'options'
-  > {
+export interface FormCheckboxSearchSubGroupsProps extends OmitStrict<
+  FormCheckboxGroupProps,
+  'onAllChange' | 'selectAll' | 'selectAllText' | 'options'
+> {
   groupLabel?: string;
   options: OptionGroup[];
   searchLabel?: string;

@@ -1,8 +1,8 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .publication {
   align-items: flex-start;
-  border-bottom: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid govuk-functional-colour(border);
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;

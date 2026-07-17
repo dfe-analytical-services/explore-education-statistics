@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .infoIcon {
-  background-color: $govuk-link-colour;
+  background-color: govuk-functional-colour(link);
   border-radius: 10px;
   color: govuk-colour('white');
   display: inline-block;
@@ -14,7 +14,7 @@
   width: 20px;
 
   &:hover {
-    background-color: $govuk-link-hover-colour;
+    background-color: govuk-functional-colour(link-hover);
     color: govuk-colour('white');
   }
 }

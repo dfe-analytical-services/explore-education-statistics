@@ -91,6 +91,7 @@ public interface IBlobStorageService
     /// </param>
     /// <param name="path">Path to the blob within the container</param>
     /// <param name="cancellationToken">Token to cancel the request</param>
+    /// <param name="expiryDuration">The duration before the token expires</param>
     /// <returns>
     /// A <see cref="BlobDownloadToken"/> that can be used with <see cref="StreamWithToken"/>
     /// to stream a file securely from Blob Storage using SAS.
@@ -99,7 +100,8 @@ public interface IBlobStorageService
         IBlobContainer container,
         string filename,
         string path,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken,
+        TimeSpan? expiryDuration = null
     );
 
     /// <summary>

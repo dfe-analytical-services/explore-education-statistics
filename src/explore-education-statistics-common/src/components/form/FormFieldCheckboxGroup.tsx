@@ -9,8 +9,10 @@ import getErrorMessage from '@common/components/form/util/getErrorMessage';
 import React from 'react';
 import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
-export interface Props<TFormValues extends FieldValues>
-  extends Omit<FormCheckboxGroupProps, 'name' | 'value' | 'id'> {
+export interface Props<TFormValues extends FieldValues> extends Omit<
+  FormCheckboxGroupProps,
+  'name' | 'value' | 'id'
+> {
   name: Path<TFormValues>;
   id?: string;
   options: CheckboxOption[];

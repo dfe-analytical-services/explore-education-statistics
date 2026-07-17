@@ -43,23 +43,6 @@ describe('ScreenerStatus', () => {
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
-  // TODO EES-7139 - remove handling for null status once the foreground screening
-  // process has been decommissioned.
-  test('renders null status correctly', () => {
-    render(
-      <ScreenerStatus
-        releaseVersionId="release-1"
-        dataSetUpload={{
-          ...testDataSetUpload,
-          screeningStatus: undefined,
-        }}
-      />,
-    );
-
-    expect(screen.getByText('Screening')).toBeInTheDocument();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-  });
-
   test('does not fetch status from service if data set upload status is already terminal', () => {
     releaseDataFileService.getDataFileScreeningStatus.mockResolvedValue({
       status: 'PendingReview',

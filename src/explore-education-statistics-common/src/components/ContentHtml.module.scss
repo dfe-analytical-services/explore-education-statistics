@@ -1,10 +1,10 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .tableContainer {
   margin: govuk-spacing(6) govuk-spacing(4);
   overflow: auto;
 
   &:focus-visible {
-    outline: $govuk-focus-width solid $govuk-focus-colour;
+    outline: $govuk-focus-width solid govuk-functional-colour(focus);
   }
 }

@@ -94,12 +94,6 @@ public static class PublisherHostBuilderExtensions
                                 SqlServerDbContextOptionsBuilderExtensions.EnableCustomRetryOnFailure(providerOptions)
                         )
                     )
-                    .AddDbContext<StatisticsDbContext>(options =>
-                        options.UseSqlServer(
-                            ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
-                            providerOptions => providerOptions.EnableCustomRetryOnFailure()
-                        )
-                    )
                     .AddSingleton(TimeProvider.System)
                     .AddSingleton<IFileStorageService, FileStorageService>(provider => new FileStorageService(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString
@@ -153,9 +147,6 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IQueueService, QueueService>()
                     .AddScoped<IReleasePublishingStatusService, ReleasePublishingStatusService>()
                     .AddScoped<IValidationService, ValidationService>()
-                    .AddScoped<IFilterRepository, FilterRepository>()
-                    .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                    .AddScoped<IIndicatorRepository, IndicatorRepository>()
                     .AddScoped<IPublishingCompletionService, PublishingCompletionService>()
                     .AddScoped<IPublicationRepository, PublicationRepository>()
                     .AddScoped<IReleaseRepository, ReleaseRepository>()

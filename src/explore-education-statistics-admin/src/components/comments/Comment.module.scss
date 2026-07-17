@@ -1,7 +1,7 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
 
 .container {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   margin-bottom: govuk-spacing(2);
 }
 
@@ -15,7 +15,7 @@
 
   &:focus,
   &.focused {
-    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline: govuk-functional-colour(focus) solid $govuk-focus-width;
   }
 }
 

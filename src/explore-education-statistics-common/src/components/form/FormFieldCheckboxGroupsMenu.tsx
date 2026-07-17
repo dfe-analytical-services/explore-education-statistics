@@ -8,11 +8,10 @@ import React, { useEffect, useState } from 'react';
 import { FieldValues, useFormContext } from 'react-hook-form';
 import get from 'lodash/get';
 
-interface Props<TFormValues extends FieldValues>
-  extends OmitStrict<
-    FormFieldCheckboxSearchSubGroupsProps<TFormValues>,
-    'legendHidden'
-  > {
+interface Props<TFormValues extends FieldValues> extends OmitStrict<
+  FormFieldCheckboxSearchSubGroupsProps<TFormValues>,
+  'legendHidden'
+> {
   hiddenText?: string;
   legend: string;
   open?: boolean;

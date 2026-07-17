@@ -3,7 +3,7 @@
 
   &:focus {
     box-shadow: 0 0 0 2px;
-    outline: $govuk-focus-width solid $govuk-focus-colour;
+    outline: $govuk-focus-width solid govuk-functional-colour(focus);
     outline-offset: 4px;
   }
 

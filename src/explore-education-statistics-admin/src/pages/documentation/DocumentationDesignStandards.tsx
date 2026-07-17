@@ -412,7 +412,8 @@ const DocumentationDesignStandards = () => {
               <p>
                 If you have any questions about or require more detailed
                 guidance on anything outlined within this section refer to the
-                links in the following ‘Help and support’ section of contact:{' '}
+                links in the following ‘Help and support’ section of
+                contact:{' '}
               </p>
               <h3>Explore education statistics team </h3>
               <p>

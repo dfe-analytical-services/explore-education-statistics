@@ -1,11 +1,12 @@
-@import '~govuk-frontend/dist/govuk/base';
+@use '~govuk-frontend/dist/govuk/base' as *;
+@use 'sass:map';
 
 .search {
-  max-width: map-get($govuk-breakpoints, 'desktop');
+  max-width: map.get($govuk-breakpoints, 'desktop');
 }
 
 .tier {
-  background: govuk-colour('light-grey');
+  background: govuk-colour('black', $variant: 'tint-95');
   padding: govuk-spacing(2);
   margin-bottom: govuk-spacing(5);
 }

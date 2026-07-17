@@ -83,7 +83,7 @@ public class ContentDbContext : DbContext
     public virtual DbSet<MethodologyRedirect> MethodologyRedirects { get; set; }
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
-    public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+    public virtual DbSet<UserPreReleaseRole> UserPreReleaseRoles { get; set; }
     public virtual DbSet<GlossaryEntry> GlossaryEntries { get; set; }
     public virtual DbSet<Comment> Comment { get; set; }
     public virtual DbSet<PageFeedback> PageFeedback { get; set; }
@@ -636,24 +636,15 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<User>().HasOne(e => e.Role).WithMany().OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+        modelBuilder
+            .Entity<User>()
+            .ToTable(t => t.HasCheckConstraint("CK_Users_Active_SoftDeleted", "[Active] = 0 OR [SoftDeleted] IS NULL"));
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .Entity<UserPublicationRole>()
-            .HasIndex(upr => new
-            {
-                upr.UserId,
-                upr.PublicationId,
-                upr.Role,
-            })
-            .IsUnique();
-
-        modelBuilder
-            .Entity<UserPublicationRole>()
-            .Property(upr => upr.Created)
-            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        modelBuilder.Entity<UserPublicationRole>().HasIndex(upr => new { upr.UserId, upr.PublicationId }).IsUnique();
 
         modelBuilder
             .Entity<UserPublicationRole>()
@@ -666,38 +657,20 @@ public class ContentDbContext : DbContext
             .Property(upr => upr.Role)
             .HasConversion(new EnumToStringConverter<PublicationRole>())
             .HasMaxLength(20);
-
-        var unusedRoles = new[] { PublicationRole.Allower, PublicationRole.Owner };
-
-        modelBuilder.Entity<UserPublicationRole>().HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
     }
 
     private static void ConfigureUserPreReleaseRole(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .Entity<UserReleaseRole>()
-            .HasIndex(urr => new
-            {
-                urr.UserId,
-                urr.ReleaseVersionId,
-                urr.Role,
-            })
+            .Entity<UserPreReleaseRole>()
+            .HasIndex(uprr => new { uprr.UserId, uprr.ReleaseVersionId })
             .IsUnique();
 
         modelBuilder
-            .Entity<UserReleaseRole>()
-            .Property(userReleaseRole => userReleaseRole.Created)
-            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        modelBuilder
-            .Entity<UserReleaseRole>()
-            .Property(r => r.Role)
-            .HasConversion(new EnumToStringConverter<ReleaseRole>())
-            .HasMaxLength(20);
-
-        var unusedRoles = new[] { ReleaseRole.Contributor, ReleaseRole.Approver };
-
-        modelBuilder.Entity<UserReleaseRole>().HasQueryFilter(upr => !unusedRoles.Contains(upr.Role));
+            .Entity<UserPreReleaseRole>()
+            .HasOne(upr => upr.CreatedBy)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
     }
 
     private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)

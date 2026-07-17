@@ -17,7 +17,7 @@ export function createApiMocks(
   reqOptions?: RequestOptions,
   resOptions?: ResponseOptions,
 ): Mocks<ApiRequest, ApiResponse> {
-  return createMocks(reqOptions, resOptions);
+  return createMocks(reqOptions, resOptions) as Mocks<ApiRequest, ApiResponse>;
 }
 
 export function createApiRequest(
@@ -29,5 +29,5 @@ export function createApiRequest(
 export function createApiResponse(
   resOptions?: ResponseOptions,
 ): MockResponse<ApiResponse> {
-  return createResponse(resOptions);
+  return createResponse(resOptions) as MockResponse<ApiResponse>;
 }

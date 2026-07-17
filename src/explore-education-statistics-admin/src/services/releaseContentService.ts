@@ -20,11 +20,10 @@ import { Dictionary } from '@common/types';
 
 type ContentSectionViewModel = ContentSection<EditableBlock>;
 
-export interface EditableRelease
-  extends Omit<
-    ReleaseVersion<EditableContentBlock, EditableDataBlock, EditableEmbedBlock>,
-    'published'
-  > {
+export interface EditableRelease extends Omit<
+  ReleaseVersion<EditableContentBlock, EditableDataBlock, EditableEmbedBlock>,
+  'published'
+> {
   approvalStatus: ReleaseApprovalStatus;
   publicationId: string;
   published?: string;

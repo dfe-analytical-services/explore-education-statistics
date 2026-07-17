@@ -1,13 +1,7 @@
 import { NextApiHandler } from 'next';
 
 export type Method =
-  | 'get'
-  | 'post'
-  | 'put'
-  | 'patch'
-  | 'delete'
-  | 'options'
-  | 'head';
+  'get' | 'post' | 'put' | 'patch' | 'delete' | 'options' | 'head';
 
 export type MethodsConfig = {
   [key in Method]?: NextApiHandler;

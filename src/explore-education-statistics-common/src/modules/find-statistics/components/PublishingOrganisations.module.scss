@@ -1,5 +1,7 @@
-@import '@common/styles/breakpoints';
-@import '~govuk-frontend/dist/govuk/base';
+@use '@common/styles/breakpoints' as breakpoints;
+@use '~govuk-frontend/dist/govuk/base' as * with (
+  $govuk-breakpoints: breakpoints.$govuk-breakpoints
+);
 
 .container {
   display: flex;

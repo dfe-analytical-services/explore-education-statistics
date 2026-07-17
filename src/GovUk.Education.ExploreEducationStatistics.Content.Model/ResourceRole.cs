@@ -1,10 +1,10 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations.Schema;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public abstract class ResourceRole<TRoleEnum, TResource>
-    where TRoleEnum : Enum
+public abstract class ResourceRole<TResource> : ICreatedTimestamp<DateTimeOffset>
     where TResource : class
 {
     public Guid Id { get; set; }
@@ -19,13 +19,11 @@ public abstract class ResourceRole<TRoleEnum, TResource>
     [NotMapped]
     public Guid ResourceId { get; set; }
 
-    public required TRoleEnum Role { get; set; }
-
     public DateTimeOffset? EmailSent { get; set; }
 
-    public Guid? CreatedById { get; set; }
+    public required Guid CreatedById { get; set; }
 
-    public User? CreatedBy { get; set; }
+    public User CreatedBy { get; set; } = null!;
 
-    public required DateTime Created { get; set; }
+    public DateTimeOffset Created { get; set; }
 }

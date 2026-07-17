@@ -67,8 +67,7 @@ type ServiceSchema = {
 );
 
 type ServiceSchemaDockerServices =
-  | DockerService[]
-  | ((options: ProgramOptions) => DockerService[]);
+  DockerService[] | ((options: ProgramOptions) => DockerService[]);
 
 // Annoyingly, need to define these separately from schemas,
 // or we run into various circular reference issues in the types.

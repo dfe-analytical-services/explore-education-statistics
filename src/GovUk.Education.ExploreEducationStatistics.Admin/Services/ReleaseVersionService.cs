@@ -275,7 +275,7 @@ public class ReleaseVersionService(
 
     private async Task RemoveRoles(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
     {
-        // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
+        // TODO: UserPreReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
         var preReleaseRolesToRemove = await userPreReleaseRoleRepository
             .Query(ResourceRoleFilter.All)
