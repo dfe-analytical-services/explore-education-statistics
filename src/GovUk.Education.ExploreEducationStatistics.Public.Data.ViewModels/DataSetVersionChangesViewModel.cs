@@ -1,6 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
-
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 /// <summary>
 /// A set of changes made to a data set version.
