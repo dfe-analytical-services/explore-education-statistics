@@ -1,5 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Comparers;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
@@ -25,13 +23,7 @@ public class GeographicLevelMeta : ICreatedUpdatedTimestamps<DateTimeOffset, Dat
     {
         public void Configure(EntityTypeBuilder<GeographicLevelMeta> builder)
         {
-            builder
-                .Property(msb => msb.Levels)
-                .HasColumnType("text[]")
-                .HasConversion(
-                    new EnumToEnumValueListConverter<GeographicLevel>(),
-                    new ListValueComparer<GeographicLevel>()
-                );
+            builder.Property(msb => msb.Levels).HasColumnType("text[]");
         }
     }
 }

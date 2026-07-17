@@ -2,9 +2,7 @@ using System.Numerics;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Semver;
 
@@ -122,32 +120,20 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                                 tpr => tpr.Start,
                                 tpr =>
                                 {
-                                    tpr.Property(tpm => tpm.Code)
-                                        .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                                    tpr.Property(tpm => tpm.Code);
                                 }
                             );
                             msb.OwnsOne(
                                 tpr => tpr.End,
                                 tpr =>
                                 {
-                                    tpr.Property(tpm => tpm.Code)
-                                        .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                                    tpr.Property(tpm => tpm.Code);
                                 }
                             );
                         }
                     );
 
-                    ms.Property(msb => msb.GeographicLevels)
-                        .HasColumnType("text[]")
-                        .HasConversion(
-                            value => value.Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider).ToList(),
-                            value => value.Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider).ToList(),
-                            new ValueComparer<List<GeographicLevel>>(
-                                (c1, c2) => c1!.SequenceEqual(c2!),
-                                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                                c => c.ToList()
-                            )
-                        );
+                    ms.Property(msb => msb.GeographicLevels).HasColumnType("text[]");
                 }
             );
 
