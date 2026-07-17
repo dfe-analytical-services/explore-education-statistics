@@ -25,6 +25,7 @@ import userInvitesService, {
   UserInvite,
 } from '@admin/services/user-management/userInvitesService';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import { FormFieldset } from '@common/components/form';
 
 export interface InviteUserPreReleaseRole {
   releaseId: string;
@@ -155,10 +156,17 @@ export default function UserInvitePage({
               hint="The invited user must be on the DfE AAD. Contact explore.statistics@education.gov.uk if unsure."
             />
 
-            <FormFieldCheckbox<UserInviteFormValues>
-              name="isBau"
-              label="BAU User"
-            />
+            <FormFieldset
+              id="bau"
+              legend="Access level"
+              legendSize="m"
+              hint="BAU users have elevated permissions."
+            >
+              <FormFieldCheckbox<UserInviteFormValues>
+                name="isBau"
+                label="BAU User"
+              />
+            </FormFieldset>
 
             <InviteUserPreReleaseRoleForm releases={releases} />
 
