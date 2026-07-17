@@ -62,7 +62,7 @@ const RoleForm = ({ user, onUpdate }: Props) => {
             <div className="govuk-grid-column-one-quarter">
               <FormFieldCheckbox<FormValues>
                 name="isBauUser"
-                label="BAU user"
+                label="BAU User"
               />
             </div>
 

@@ -4,7 +4,7 @@ import { UserWithRoles } from '@admin/services/types/userWithRoles';
 import { PublicationRole } from '@admin/services/types/PublicationRole';
 import { GlobalRole } from '@admin/services/types/GlobalRole';
 
-export const testUser: UserWithRoles = {
+export const testStandardUser: UserWithRoles = {
   id: 'user-1-id',
   name: 'Florian Schneider',
   email: 'test@test.com',
@@ -33,6 +33,15 @@ export const testUser: UserWithRoles = {
       release: 'Release 2',
     },
   ],
+};
+
+export const testBauUser: UserWithRoles = {
+  id: 'bau-user',
+  name: 'Timothy Smith',
+  email: 'timothy@test.com',
+  globalRole: GlobalRole.BauUser,
+  userPublicationRoles: [],
+  userPreReleaseRoles: [],
 };
 
 export const testPublicationSummaries: PublicationSummaryPreview[] = [

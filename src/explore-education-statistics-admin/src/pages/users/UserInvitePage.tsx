@@ -157,7 +157,7 @@ export default function UserInvitePage({
 
             <FormFieldCheckbox<UserInviteFormValues>
               name="isBau"
-              label="BAU user"
+              label="BAU User"
             />
 
             <InviteUserPreReleaseRoleForm releases={releases} />
