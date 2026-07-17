@@ -2689,7 +2689,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "A filterable characteristic (excluding geography or time) of a data set.",
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -2698,7 +2698,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "A filterable characteristic (excluding geography or time) of a data set.",
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -2714,7 +2714,7 @@
                 "$ref": "#/components/schemas/FilterOptionViewModel"
               }
             ],
-            "description": "A filterable option that can be used to filter a data set.",
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -2723,7 +2723,7 @@
                 "$ref": "#/components/schemas/FilterOptionViewModel"
               }
             ],
-            "description": "A filterable option that can be used to filter a data set.",
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -2743,7 +2743,7 @@
                 "$ref": "#/components/schemas/FilterViewModel"
               }
             ],
-            "description": "A filterable characteristic (excluding geography or time) of a data set."
+            "description": "The filter the option changes belong to."
           },
           "options": {
             "type": "array",
@@ -2858,7 +2858,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "A geographic level (e.g. national, regional) covered by a data set.",
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -2867,7 +2867,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "A geographic level (e.g. national, regional) covered by a data set.",
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -2934,7 +2934,7 @@
                 "$ref": "#/components/schemas/IndicatorViewModel"
               }
             ],
-            "description": "A type of data point measured by a data set.",
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -2943,7 +2943,7 @@
                 "$ref": "#/components/schemas/IndicatorViewModel"
               }
             ],
-            "description": "A type of data point measured by a data set.",
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3040,7 +3040,7 @@
                 "$ref": "#/components/schemas/LocationGroupViewModel"
               }
             ],
-            "description": "A group of locations in a data set based on their geographic level.",
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3049,7 +3049,7 @@
                 "$ref": "#/components/schemas/LocationGroupViewModel"
               }
             ],
-            "description": "A group of locations in a data set based on their geographic level.",
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3166,7 +3166,7 @@
                 "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
               }
             ],
-            "description": "A location option that can be used to filter a data set.",
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3187,7 +3187,7 @@
                 "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
               }
             ],
-            "description": "A location option that can be used to filter a data set.",
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
@@ -3207,7 +3207,7 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "A geographic level (e.g. national, regional) covered by a data set."
+            "description": "The geographic level the changes belong to."
           },
           "options": {
             "type": "array",
@@ -3556,7 +3556,7 @@
                 "$ref": "#/components/schemas/TimePeriodOptionViewModel"
               }
             ],
-            "description": "A time period option that can be used to filter a data set.",
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
             "nullable": true
           },
           "previousState": {
@@ -3565,7 +3565,7 @@
                 "$ref": "#/components/schemas/TimePeriodOptionViewModel"
               }
             ],
-            "description": "A time period option that can be used to filter a data set.",
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
             "nullable": true
           }
         },
