@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations
 {
     [DbContext(typeof(UsersAndRolesDbContext))]
-    [Migration("20260710134626_Ees7228MigratingAnalystAndPrereleaseRolesToStandardUser")]
+    [Migration("20260717111019_Ees7228MigratingAnalystAndPrereleaseRolesToStandardUser")]
     partial class Ees7228MigratingAnalystAndPrereleaseRolesToStandardUser
     {
         /// <inheritdoc />
@@ -233,34 +233,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                             ClaimType = "ApplicationAccessGranted",
                             ClaimValue = "",
                             RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -14,
-                            ClaimType = "AnalystPagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -17,
-                            ClaimType = "PrereleasePagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -18,
-                            ClaimType = "AnalystPagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -19,
-                            ClaimType = "PrereleasePagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
                         },
                         new
                         {

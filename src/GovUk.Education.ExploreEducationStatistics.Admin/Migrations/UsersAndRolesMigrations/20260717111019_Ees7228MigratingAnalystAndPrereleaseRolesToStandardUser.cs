@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
     /// <inheritdoc />
     public partial class Ees7228MigratingAnalystAndPrereleaseRolesToStandardUser : Migration
     {
-        private const string MigrationId = "20260710134626";
+        private const string MigrationId = "20260717111019";
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,9 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
 
             migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -20);
 
+            migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -19);
+
+            migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -18);
+
+            migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -17);
+
             migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -16);
 
             migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -15);
+
+            migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -14);
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
