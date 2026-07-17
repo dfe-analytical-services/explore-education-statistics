@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -30,10 +29,7 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
         {
             builder.Property(m => m.Period).HasMaxLength(9);
 
-            builder
-                .Property(m => m.Code)
-                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
-                .HasMaxLength(10);
+            builder.Property(m => m.Code).HasMaxLength(10);
 
             builder
                 .HasIndex(m => new
