@@ -291,6 +291,7 @@ public static class StartupSecurityConfiguration
         /*
          * Publication management
          */
+        services.AddTransient<IAuthorizationHandler, AccessAnalystPagesAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdatePublicationSummaryAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateContactAuthorizationHandler>();

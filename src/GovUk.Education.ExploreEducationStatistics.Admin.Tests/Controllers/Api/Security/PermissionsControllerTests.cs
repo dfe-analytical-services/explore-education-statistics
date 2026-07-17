@@ -1,10 +1,13 @@
 #nullable enable
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -28,11 +31,13 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_StandardUser()
     {
-        User user = _dataFixture.DefaultUser();
+        ClaimsPrincipal identityUser = _dataFixture.StandardUser();
+
+        User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
 
         await fixture.GetContentDbContext().AddTestData(context => context.Users.Add(user));
 
-        var client = fixture.CreateClient();
+        var client = fixture.CreateClient(identityUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -51,11 +56,16 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
-        User user = _dataFixture.DefaultUser().WithRoleId(GlobalRoles.Role.BauUser.GetEnumValue());
+        ClaimsPrincipal identityUser = _dataFixture.BauUser();
+
+        User user = _dataFixture
+            .DefaultUser()
+            .WithId(identityUser.GetUserId())
+            .WithRoleId(GlobalRoles.Role.BauUser.GetEnumValue());
 
         await fixture.GetContentDbContext().AddTestData(context => context.Users.Add(user));
 
-        var client = fixture.CreateClient();
+        var client = fixture.CreateClient(identityUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -76,7 +86,8 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_StandardUser_NotPublicationApprover()
     {
-        User user = _dataFixture.DefaultUser();
+        ClaimsPrincipal identityUser = _dataFixture.StandardUser();
+        User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
         UserPublicationRole userPublicationRole = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
@@ -88,7 +99,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
             .GetContentDbContext()
             .AddTestData(context => context.UserPublicationRoles.Add(userPublicationRole));
 
-        var client = fixture.CreateClient();
+        var client = fixture.CreateClient(identityUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -108,7 +119,8 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_StandardUser_PublicationApprover()
     {
-        User user = _dataFixture.DefaultUser();
+        ClaimsPrincipal identityUser = _dataFixture.StandardUser();
+        User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
         UserPublicationRole userPublicationRole = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
@@ -119,7 +131,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
             .GetContentDbContext()
             .AddTestData(context => context.UserPublicationRoles.Add(userPublicationRole));
 
-        var client = fixture.CreateClient();
+        var client = fixture.CreateClient(identityUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 

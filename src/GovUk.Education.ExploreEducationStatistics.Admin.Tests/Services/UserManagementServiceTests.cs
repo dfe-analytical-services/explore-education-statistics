@@ -332,13 +332,9 @@ public abstract class UserManagementServiceTests
     public class UpdateUserGlobalRoleTests : UserManagementServiceTests
     {
         [Theory]
-        [InlineData(GlobalRoles.Role.StandardUser, true, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.BauUser, false, GlobalRoles.Role.StandardUser)]
-        public async Task Success(
-            GlobalRoles.Role oldGlobalRole,
-            bool upgradeToBau,
-            GlobalRoles.Role expectedNewGlobalRole
-        )
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.StandardUser)]
+        public async Task Success(GlobalRoles.Role oldGlobalRole, GlobalRoles.Role targetGlobalRole)
         {
             User activeUser = _dataFixture.DefaultUser().WithRoleId(oldGlobalRole.GetEnumValue());
 
@@ -349,14 +345,12 @@ public abstract class UserManagementServiceTests
                 .ReturnsAsync(activeUser);
 
             userRepository
-                .Setup(mock =>
-                    mock.UpdateGlobalRole(activeUser.Id, expectedNewGlobalRole, It.IsAny<CancellationToken>())
-                )
+                .Setup(mock => mock.UpdateGlobalRole(activeUser.Id, targetGlobalRole, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(It.IsAny<User>());
 
             var service = SetupService(userRepository: userRepository.Object);
 
-            var result = await service.UpdateUserGlobalRole(activeUser.Id, upgradeToBau);
+            var result = await service.UpdateUserGlobalRole(activeUser.Id, targetGlobalRole);
 
             VerifyAllMocks(userRepository);
 
@@ -376,7 +370,7 @@ public abstract class UserManagementServiceTests
 
             var service = SetupService(userRepository: userRepository.Object);
 
-            var result = await service.UpdateUserGlobalRole(activeUser.Id, true);
+            var result = await service.UpdateUserGlobalRole(activeUser.Id, GlobalRoles.Role.BauUser);
 
             VerifyAllMocks(userRepository);
 
@@ -400,7 +394,7 @@ public abstract class UserManagementServiceTests
 
             var service = SetupService(userRepository: userRepository.Object);
 
-            var result = await service.UpdateUserGlobalRole(activeUser.Id, false);
+            var result = await service.UpdateUserGlobalRole(activeUser.Id, GlobalRoles.Role.StandardUser);
 
             VerifyAllMocks(userRepository);
 
@@ -424,7 +418,7 @@ public abstract class UserManagementServiceTests
 
             var service = SetupService(userRepository: userRepository.Object);
 
-            var result = await service.UpdateUserGlobalRole(userId, false);
+            var result = await service.UpdateUserGlobalRole(userId, GlobalRoles.Role.StandardUser);
 
             result.AssertNotFound();
         }

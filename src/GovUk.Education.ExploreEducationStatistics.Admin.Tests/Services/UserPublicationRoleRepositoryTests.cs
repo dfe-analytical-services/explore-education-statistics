@@ -2676,7 +2676,7 @@ public abstract class UserPublicationRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId2))
             {
-                contentDbContext.UserPublicationRoles.Add(userPublicationRoles[1]);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2684,12 +2684,7 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                Assert.True(
-                    await repository.UserHasAnyRoleOnPublication(
-                        userId: targetActiveUser.Id,
-                        publicationId: targetPublication.Id
-                    )
-                );
+                Assert.True(await repository.UserHasAnyRole(userId: targetActiveUser.Id));
             }
         }
 

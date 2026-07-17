@@ -94,7 +94,7 @@ public class UserManagementServicePermissionTests
             .AssertForbidden(async userService =>
             {
                 var service = SetupUserManagementService(userService: userService.Object);
-                return await service.UpdateUserGlobalRole(Guid.NewGuid(), false);
+                return await service.UpdateUserGlobalRole(Guid.NewGuid(), GlobalRoles.Role.StandardUser);
             });
     }
 
