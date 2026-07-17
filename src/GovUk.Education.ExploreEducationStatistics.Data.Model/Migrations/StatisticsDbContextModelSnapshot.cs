@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.28")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -838,7 +838,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<decimal>", b =>
                 {
                     b.Property<decimal>("Column1")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(38, 18)
+                        .HasColumnType("decimal(38,18)");
 
                     b.ToTable("#TempTable<decimal>", t =>
                         {
@@ -849,7 +850,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<decimal?>", b =>
                 {
                     b.Property<decimal?>("Column1")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(38, 18)
+                        .HasColumnType("decimal(38,18)");
 
                     b.ToTable("#TempTable<decimal?>", t =>
                         {
