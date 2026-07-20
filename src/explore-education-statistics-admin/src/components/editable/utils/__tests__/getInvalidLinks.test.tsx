@@ -1,5 +1,5 @@
 import getInvalidLinks from '@admin/components/editable/utils/getInvalidLinks';
-import { JsonElement } from 'src/types/ckeditor';
+import { JsonElement } from '../../../../types/ckeditor';
 
 describe('getInvalidLinks', () => {
   const testContent: JsonElement[] = [

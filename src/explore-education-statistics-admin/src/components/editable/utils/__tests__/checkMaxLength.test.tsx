@@ -1,5 +1,5 @@
 import checkMaxLength from '@admin/components/editable/utils/checkMaxLength';
-import { JsonElement } from 'src/types/ckeditor';
+import { JsonElement } from '../../../../types/ckeditor';
 
 describe('checkMaxLength', () => {
   const testContent: JsonElement[] = [

@@ -1,5 +1,5 @@
 import getInvalidImages from '@admin/components/editable/utils/getInvalidImages';
-import { JsonElement } from 'src/types/ckeditor';
+import { JsonElement } from '../../../../types/ckeditor';
 
 describe('getInvalidImages', () => {
   const testContent: JsonElement[] = [

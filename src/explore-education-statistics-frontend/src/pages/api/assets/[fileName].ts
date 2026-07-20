@@ -25,8 +25,9 @@ export default withMethods({
     const contentType = response.headers.get('content-type') || 'image/png';
     res.setHeader('Content-Type', contentType);
 
-    // @ts-expect-error: Argument of type 'ReadableStream<Uint8Array<ArrayBuffer>>' is not assignable to parameter of type 'ReadableStream<any>'.
-    const stream = Readable.fromWeb(response.body);
+    const stream = Readable.fromWeb(
+      response.body as Parameters<typeof Readable.fromWeb>[0],
+    );
     return stream.pipe(res);
   },
 });
