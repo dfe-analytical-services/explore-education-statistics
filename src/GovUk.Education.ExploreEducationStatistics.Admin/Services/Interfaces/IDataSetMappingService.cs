@@ -8,6 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IDataSetMappingService
 {
+    Task<Either<ActionResult, FiltersMappingDto>> UpdateFilterMappings(
+        Guid releaseVersionId,
+        FilterMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    );
+
     Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(
         Guid releaseVersionId,
         IndicatorMappingUpdatesRequest request,
