@@ -65,7 +65,7 @@ jobs:
           branch: chore/update-test-snapshots
           add-paths: |
             tests/robot-tests/tests/snapshots
-          reviewers: rmbielby, lauraselby, cjrace, chfoster
+          reviewers: rmbielby, lauraselby, cjrace, matthewberobinson, dying-478
           title: ${{ steps.vars.outputs.pr_title }}
           body: ${{ steps.vars.outputs.pr_body }}
           draft: false
