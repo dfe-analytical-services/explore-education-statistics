@@ -78,8 +78,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
       await tableToolSearchService.postSearchStream(
         {
           userQuery: searchTerm.trim(),
-          publicationId:
-            'a91d9e05-be82-474c-85ae-4913158406d0' || publicationSummary.id, // hardcoding for now
+          publicationId: publicationSummary.id,
         },
         {
           signal: abortControllerRef.current.signal,
@@ -105,6 +104,8 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
 
               return updatedState;
             });
+
+            setError(null);
 
             // Abort early if there are no results.
             if (
@@ -293,7 +294,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                             <TableToolSearchFinalResult
                               key={dataset.fileId}
                               dataset={dataset}
-                              releaseVersionId={latestReleaseVersion.id}
+                              releaseVersionSummary={latestReleaseVersion}
                             />
                           ))}
                         </ul>

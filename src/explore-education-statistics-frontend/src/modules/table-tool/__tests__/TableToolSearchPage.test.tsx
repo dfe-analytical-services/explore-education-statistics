@@ -93,7 +93,7 @@ describe('TableToolSearchPage', () => {
     expect(mockPostSearchStream).toHaveBeenCalledWith(
       {
         userQuery: 'test search term',
-        publicationId: 'a91d9e05-be82-474c-85ae-4913158406d0',
+        publicationId: 'publication-summary-1',
       },
       expect.anything(),
     );
@@ -112,11 +112,33 @@ describe('TableToolSearchPage', () => {
         stage: PipelineStage.RETRIEVED,
         data: {
           datasets: [
-            { title: 'Dataset A', relevanceScore: 10, rawRelevanceScore: 0.1 },
+            {
+              title: 'Dataset A',
+              relevanceScore: 10,
+              rawRelevanceScore: 0.1,
+              publicationId: 'test-publication-id',
+              publicationSlug: 'test-publication-slug',
+              publicationTitle: 'Test publication title',
+              releaseSlug: 'test-release-slug',
+              releaseVersionId: 'test-release-version-id',
+              dataSetFileId: '',
+              description: '',
+              fileId: 'file-id-a',
+              subjectId: '',
+            },
             {
               title: 'Dataset B',
               relevanceScore: 85.5,
               rawRelevanceScore: 0.5,
+              publicationId: 'test-publication-id',
+              publicationSlug: 'test-publication-slug',
+              publicationTitle: 'Test publication title',
+              releaseSlug: 'test-release-slug',
+              releaseVersionId: 'test-release-version-id',
+              dataSetFileId: '',
+              description: '',
+              fileId: 'file-id-b',
+              subjectId: '',
             },
           ],
         },

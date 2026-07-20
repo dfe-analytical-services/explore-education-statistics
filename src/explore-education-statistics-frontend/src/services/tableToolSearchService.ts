@@ -25,10 +25,22 @@ export const PipelineStageLabels: Record<PipelineStageType, string> = {
   [PipelineStage.COMPLETE]: 'Results',
 };
 
-export interface RetrievedDataset {
+interface DatasetResultBase {
+  dataSetFileId: string;
+  description: string;
+  fileId: string;
+  publicationId: string;
+  publicationSlug: string;
+  publicationTitle: string;
+  releaseSlug: string;
+  releaseVersionId: string;
+  subjectId: string;
+  title: string;
+}
+
+export interface RetrievedDataset extends DatasetResultBase {
   rawRelevanceScore: number;
   relevanceScore: number;
-  title: string;
 }
 
 export interface ShortlistedDataset {
@@ -45,12 +57,17 @@ export interface GeographicLevelItem {
   value: string;
 }
 
-export interface FinalDataset {
-  aiSummary: string;
-  fileId: string;
-  filters: string[];
+export interface FilterIndicatorItem {
+  id: string;
+  label: string;
+}
+
+export interface FinalDataset extends DatasetResultBase {
+  filters: FilterIndicatorItem[];
   geographicLevels: Dictionary<GeographicLevelItem[]>;
-  timePeriod: {
+  indicators: FilterIndicatorItem[];
+  relevanceReason: string;
+  timePeriod?: {
     start: {
       code: string;
       year: string;
@@ -60,8 +77,6 @@ export interface FinalDataset {
       year: string;
     };
   };
-  indicators: string[];
-  title: string;
 }
 
 export interface StageStarting {

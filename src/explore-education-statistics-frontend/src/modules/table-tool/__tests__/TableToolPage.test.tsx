@@ -467,6 +467,22 @@ describe('TableToolPage', () => {
     expect(screen.getByLabelText('Great Britain')).toBeInTheDocument();
   });
 
+  test('renders the page correctly when initialQuery and initialTableData are provided', async () => {
+    render(
+      <TableToolPage
+        selectedPublication={testSelectedPublicationWithLatestRelease}
+        selectedSubjectId="1"
+        subjects={testSubjects}
+        themeMeta={testThemeMeta}
+        subjectMeta={testSubjectMeta}
+        initialQuery={testFastTrack.query}
+        initialTableData={testFastTrack.fullTable}
+      />,
+    );
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+  });
+
   test('renders the page correctly with pre-built table when a fast track is provided', async () => {
     render(
       <TableToolPage

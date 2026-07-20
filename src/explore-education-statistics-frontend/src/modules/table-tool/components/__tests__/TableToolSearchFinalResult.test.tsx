@@ -1,8 +1,8 @@
 import render from '@common-test/render';
 import _tableBuilderService from '@common/services/tableBuilderService';
+import { testReleaseVersionSummary } from '@frontend/modules/find-statistics/__tests__/__data__/testReleaseData';
 import TableToolSearchFinalResult from '@frontend/modules/table-tool/components/TableToolSearchFinalResult';
 import { screen } from '@testing-library/react';
-import React from 'react';
 import { testFinalResult, testTableDataResponse } from './__data__/tableData';
 
 jest.mock('@common/services/tableBuilderService');
@@ -15,7 +15,7 @@ describe('TableToolSearchFinalResult', () => {
 
     render(
       <TableToolSearchFinalResult
-        releaseVersionId="test-release-version-id"
+        releaseVersionSummary={testReleaseVersionSummary}
         dataset={testFinalResult}
       />,
     );
@@ -25,8 +25,8 @@ describe('TableToolSearchFinalResult', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'View this data set' }),
-    ).toHaveAttribute('href', '/data-catalogue/test-file-id');
+      screen.getByRole('link', { name: /View this data set/ }),
+    ).toHaveAttribute('href', '/data-catalogue/data-set/test-data-set-file-id');
 
     expect(
       screen.getByRole('heading', { name: 'Relevance' }),
@@ -42,7 +42,7 @@ describe('TableToolSearchFinalResult', () => {
 
     render(
       <TableToolSearchFinalResult
-        releaseVersionId="test-release-version-id"
+        releaseVersionSummary={testReleaseVersionSummary}
         dataset={testFinalResult}
       />,
     );
@@ -51,6 +51,13 @@ describe('TableToolSearchFinalResult', () => {
     expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
       /Number of applications received/,
     );
+
+    expect(
+      screen.getByRole('link', { name: /View and edit this table/ }),
+    ).toHaveAttribute(
+      'href',
+      '/data-tables/publication-slug/release-slug?fromSearch&sub=testsubjectid&tp=2014%7CAY%7C2016%7CAY',
+    );
   });
 
   test('renders error message when table query fails', async () => {
@@ -58,12 +65,14 @@ describe('TableToolSearchFinalResult', () => {
 
     render(
       <TableToolSearchFinalResult
-        releaseVersionId="test-release-version-id"
+        releaseVersionSummary={testReleaseVersionSummary}
         dataset={testFinalResult}
       />,
     );
 
-    expect(await screen.findByText('Error loading table.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Error loading table preview.'),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 });

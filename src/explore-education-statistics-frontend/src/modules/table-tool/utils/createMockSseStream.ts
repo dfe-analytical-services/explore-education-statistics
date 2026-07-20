@@ -48,14 +48,34 @@ export default function createMockSseStream({
               data: {
                 datasets: [
                   {
+                    dataSetFileId: '52d98825-1e90-4752-acb9-e751d03d0d1d',
+                    fileId: '9a0aa599-fdfd-40ad-b73a-08dec0963904',
+                    publicationId: '96f418e7-3ddb-4a8c-60dc-08deb7f1c424',
+                    publicationSlug: 'pupil-attendance-in-schools-in-england',
+                    publicationTitle: 'Pupil attendance in schools in England',
+                    releaseSlug: '2026-week-20',
+                    releaseVersionId: 'db7aad55-30b2-4d7e-bb45-08dec09602df',
+                    rawRelevanceScore: 0.024358974769711494,
+                    relevanceScore: 74.3,
+                    subjectId: '6806855d-79e6-4abd-ed1f-08dec09638f8',
                     title: 'Persistent absence in schools',
-                    relevanceScore: 50.8,
-                    rawRelevanceScore: 0.01666666753590107,
+                    description:
+                      'Persistent absence measures, year to date only, updated each publication week. Figures are provided at the local authority, regional and national level for state-funded primary, secondary and special schools.',
                   },
                   {
+                    dataSetFileId: '9e2601f1-2ff5-43a2-b892-502a7dec9ecf',
+                    fileId: '688db31c-66bd-4dbd-b73c-08dec0963904',
+                    publicationId: '96f418e7-3ddb-4a8c-60dc-08deb7f1c424',
+                    publicationSlug: 'pupil-attendance-in-schools-in-england',
+                    publicationTitle: 'Pupil attendance in schools in England',
+                    releaseSlug: '2026-week-20',
+                    releaseVersionId: 'db7aad55-30b2-4d7e-bb45-08dec09602df',
+                    rawRelevanceScore: 0.024462364614009857,
+                    relevanceScore: 74.6,
+                    subjectId: '10ea4c1e-2124-4da4-ed21-08dec09638f8',
                     title: 'Reasons for absence and attendance',
-                    relevanceScore: 73.1,
-                    rawRelevanceScore: 0.02395833283662796,
+                    description:
+                      'Daily and weekly local authority, regional and national reasons for pupil attendance and absence. Figures are provided for state-funded primary, secondary and special schools.',
                   },
                 ],
               },
@@ -102,46 +122,45 @@ export default function createMockSseStream({
               data: {
                 datasets: [
                   {
+                    dataSetFileId: '9e2601f1-2ff5-43a2-b892-502a7dec9ecf',
                     fileId: '688db31c-66bd-4dbd-b73c-08dec0963904',
-                    filters: ['Legacy family holiday (f)'],
-                    indicators: ['Percent of sessions'],
-                    geographicLevels: {
-                      'Local authority': [
-                        {
-                          id: 'bbe3cafc-2c62-42d6-4919-08d93bbc8641',
-                          label: 'Sheffield',
-                          value: 'E08000019',
-                        },
-                      ],
-                    },
-                    aiSummary:
-                      'This data is relevant because This dataset provides local authority level data on reasons for pupil absence, including holidays, with weekly time frames that cover the last 4 weeks, making it directly relevant to the query for Sheffield.\n It contains information about Daily and weekly local authority, regional and national reasons for pupil attendance and absence. Figures are provided for state-funded primary, secondary and special schools.',
-                    timePeriod: {
-                      start: {
-                        code: 'W17',
-                        year: '2026',
-                      },
-                      end: {
-                        code: 'W20',
-                        year: '2026',
-                      },
-                    },
+                    publicationId: '96f418e7-3ddb-4a8c-60dc-08deb7f1c424',
+                    publicationSlug: 'pupil-attendance-in-schools-in-england',
+                    publicationTitle: 'Pupil attendance in schools in England',
+                    releaseSlug: '2026-week-20',
+                    releaseVersionId: 'db7aad55-30b2-4d7e-bb45-08dec09602df',
+                    subjectId: '10ea4c1e-2124-4da4-ed21-08dec09638f8',
                     title: 'Reasons for absence and attendance',
-                  },
-                  {
-                    fileId: '10308fbb-da53-4eae-20d2-08dec542d092',
-                    filters: ['lorem'],
-                    indicators: ['lorem'],
-                    geographicLevels: {
-                      'Local authority': [
-                        {
-                          id: 'bbe3cafc-2c62-42d6-4919-08d93bbc8641',
-                          label: 'Sheffield',
-                          value: 'E08000019',
-                        },
-                      ],
-                    },
-                    aiSummary: 'Mock AI summary',
+                    description:
+                      'Daily and weekly local authority, regional and national reasons for pupil attendance and absence. Figures are provided for state-funded primary, secondary and special schools.',
+                    filters: [
+                      {
+                        id: '45eff781-6dbe-4c06-8c90-795cc17bbf38',
+                        label: 'Week',
+                      },
+                      {
+                        id: '6b3e255f-3f19-4609-8167-246beb16706d',
+                        label: 'Legacy family holiday (f)',
+                      },
+                      {
+                        id: 'b36a0689-f2c6-4464-95be-d82921199721',
+                        label: 'Unauthorised holiday (g)',
+                      },
+                      {
+                        id: '62e7150f-29ae-44d7-be9b-85aca0636094',
+                        label: 'Authorised holiday (h)',
+                      },
+                    ],
+                    indicators: [
+                      {
+                        id: 'ccb4341c-3fbe-47ec-087b-08dec0963a29',
+                        label: 'Percent of sessions',
+                      },
+                      {
+                        id: 'eb2ea071-0f13-438c-0879-08dec0963a29',
+                        label: 'Reference date',
+                      },
+                    ],
                     timePeriod: {
                       start: {
                         code: 'W17',
@@ -152,7 +171,19 @@ export default function createMockSseStream({
                         year: '2026',
                       },
                     },
-                    title: 'Test final result',
+                    geographicLevels: {
+                      'Local authority': [
+                        {
+                          id: 'bbe3cafc-2c62-42d6-4919-08d93bbc8641',
+                          label: 'Sheffield',
+                          value: 'E08000019',
+                        },
+                      ],
+                      National: [],
+                      Regional: [],
+                    },
+                    relevanceReason:
+                      'This dataset provides daily and weekly local authority level data on reasons for pupil absence, including holidays, and covers the relevant recent time period including the last 4 weeks.',
                   },
                 ],
                 token_usage: {
