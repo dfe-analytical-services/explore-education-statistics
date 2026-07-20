@@ -13,6 +13,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [ApiController]
 public class DataSetMappingController(IDataSetMappingService dataSetMappingService) : ControllerBase
 {
+    [HttpPatch("releases/{releaseVersionId:guid}/data/replacements/mapping/filters")]
+    public async Task<ActionResult<FiltersMappingDto>> UpdateFilterMappings(
+        [FromRoute] Guid releaseVersionId,
+        [FromBody] FilterMappingUpdatesRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await dataSetMappingService
+            .UpdateFilterMappings(releaseVersionId, request, cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPatch("releases/{releaseVersionId:guid}/data/replacements/mapping/indicators")]
     public async Task<ActionResult<List<IndicatorMappingDto>>> UpdateIndicatorMappings(
         [FromRoute] Guid releaseVersionId,
