@@ -1,6 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
-
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 /// <summary>
 /// A change to the data set, represented as the state before and after the change.

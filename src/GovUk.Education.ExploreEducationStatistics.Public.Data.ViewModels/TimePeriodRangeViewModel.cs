@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 /// <summary>
 /// Describes a time period range in human-readable format.
