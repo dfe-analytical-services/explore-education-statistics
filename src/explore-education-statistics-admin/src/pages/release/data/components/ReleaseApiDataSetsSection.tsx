@@ -81,11 +81,10 @@ export default function ReleaseApiDataSetsSection() {
                 publicationId={releaseVersion.publicationId}
                 releaseVersionId={releaseVersion.id}
                 onSubmit={async ({ releaseFileId }) => {
-                  const dataSet = await apiDataSetService.createDataSet({
+                  await apiDataSetService.createDataSet({
                     releaseFileId,
                   });
                   refetch();
-                  return dataSet;
                 }}
               />
             ) : (

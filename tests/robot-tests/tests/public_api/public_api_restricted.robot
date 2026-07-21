@@ -59,7 +59,7 @@ Save data guidance
     user clicks button    Save guidance
     user waits until page contains button    Edit guidance
 
-Create 1st API data set
+Create multiple API data sets and refresh the page
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -67,37 +67,30 @@ Create 1st API data set
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
     user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
-    user clicks button    Confirm new API data set
-
-    user waits until page contains    Creating API data set
-    user clicks link    View API data set details
-
-    user waits until page finishes loading
+    user clicks button    Confirm new API data set    ${modal}
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
-User waits until the 1st API data set status changes to 'Ready'
-    user waits until h3 is visible    Draft version details
-    user waits until draft API data set status contains    Ready
-
-Create 2nd API data set
-    user clicks link    Back to API data sets
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
+    user checks select does not contain option    name:releaseFileId    ${SUBJECT_NAME_1}
+    user checks select contains option    name:releaseFileId    ${SUBJECT_NAME_2}
     user chooses select option    name:releaseFileId    ${SUBJECT_NAME_2}
-    user clicks button    Confirm new API data set
-
-    user waits until page contains    Creating API data set
-    user clicks link    View API data set details
-
-    user waits until page finishes loading
+    user clicks button    Confirm new API data set    ${modal}
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
-User waits until the 2nd API data set status changes to 'Ready'
-    user waits until h3 is visible    Draft version details
-    user waits until draft API data set status contains    Ready
+    user reloads page    # Refresh page to see if there are any 500 errors when loading the page with multiple API data sets
+    user waits until page finishes loading
+    user waits until h2 is visible    API data sets
+    user checks page does not contain    There is a problem with the service
+
+    user waits until h3 is visible    Draft API data sets
+
+    wait until keyword succeeds    20x    %{WAIT_SMALL}s
+    ...    user checks table cell contains    1    3    Ready    testid:draft-api-data-sets
+    wait until keyword succeeds    20x    %{WAIT_SMALL}s
+    ...    user checks table cell contains    2    3    Ready    testid:draft-api-data-sets
 
 Verify the contents inside the 'Draft API data sets' table
-    user clicks link    Back to API data sets
     user waits until h3 is visible    Draft API data sets
 
     user checks table column heading contains    1    1    Draft version    testid:draft-api-data-sets
@@ -106,9 +99,11 @@ Verify the contents inside the 'Draft API data sets' table
     user checks table column heading contains    1    4    Actions    testid:draft-api-data-sets
 
     user checks table cell contains    1    1    v1.0    testid:draft-api-data-sets
+    user checks table cell contains    1    2    ${SUBJECT_NAME_1}    testid:draft-api-data-sets
     user checks table cell contains    1    3    Ready    testid:draft-api-data-sets
 
     user checks table cell contains    2    1    v1.0    testid:draft-api-data-sets
+    user checks table cell contains    2    2    ${SUBJECT_NAME_2}    testid:draft-api-data-sets
     user checks table cell contains    2    3    Ready    testid:draft-api-data-sets
 
 Click on 'View Details' link

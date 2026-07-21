@@ -2,18 +2,15 @@ import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataS
 import _apiDataSetCandidateService, {
   ApiDataSetCandidate,
 } from '@admin/services/apiDataSetCandidateService';
-import _apiDataSetService from '@admin/services/apiDataSetService';
 import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import { createMemoryHistory, History } from 'history';
 import { ReactNode } from 'react';
 import { Router } from 'react-router-dom';
 
-jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetCandidateService');
 
 const apiDataSetCandidateService = jest.mocked(_apiDataSetCandidateService);
-const apiDataSetService = jest.mocked(_apiDataSetService);
 
 describe('ApiDataSetCreateModal', () => {
   const testCandidates: ApiDataSetCandidate[] = [
@@ -100,16 +97,10 @@ describe('ApiDataSetCreateModal', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('submitting the form calls onSubmit', async () => {
-    apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
-    apiDataSetService.createDataSet.mockResolvedValue({
-      id: 'data-set-id',
-      title: 'Test title',
-      summary: 'Test summary',
-      status: 'Draft',
-      previousReleaseIds: [],
-    });
-
+  test('submitting the form closes the modal and refreshes the candidates', async () => {
+    apiDataSetCandidateService.listCandidates
+      .mockResolvedValueOnce(testCandidates)
+      .mockResolvedValue([]);
     const handleSubmit = jest.fn();
 
     const { user } = render(
@@ -143,6 +134,27 @@ describe('ApiDataSetCreateModal', () => {
         releaseFileId: testCandidates[0].releaseFileId,
       });
     });
+
+    await waitFor(() => {
+      expect(apiDataSetCandidateService.listCandidates).toHaveBeenCalledTimes(
+        2,
+      );
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: 'Create API data set' }),
+    );
+
+    const modal = within(await screen.findByRole('dialog'));
+    expect(
+      modal.getByText(
+        /No API data sets can be created as there are no candidate data files available/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      modal.queryByRole('heading', { name: 'Creating API data set' }),
+    ).not.toBeInTheDocument();
   });
 
   function render(

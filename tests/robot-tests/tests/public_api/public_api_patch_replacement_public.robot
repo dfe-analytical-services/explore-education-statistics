@@ -50,16 +50,7 @@ Create the initial API data set version
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
 
-    user clicks button    Create API data set
-    ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${SUBJECT_1_NAME}
-    user clicks button    Confirm new API data set
-
-    user waits until page contains    Creating API data set
-    user clicks link    View API data set details
-
-    user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set
+    user creates API data set and opens details    ${SUBJECT_1_NAME}
 
 User waits until the initial API data set version's status changes to "Ready"
     user waits until h3 is visible    Draft version details
