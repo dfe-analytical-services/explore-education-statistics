@@ -1,6 +1,6 @@
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable react/prefer-stateless-function */
 /* eslint-disable max-classes-per-file */
+/* eslint-disable import/export */
 
 declare module 'recharts/lib/component/DefaultLegendContent';
 

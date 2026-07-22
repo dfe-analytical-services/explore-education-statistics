@@ -42,6 +42,7 @@ export function setupPublicPageTest(name: string): PublicPageSetupData {
     `Getting buildId from page ${environmentAndUsers.environment.publicUrl}`,
   );
 
+  // eslint-disable-next-line import/no-named-as-default-member
   const response = http.get(environmentAndUsers.environment.publicUrl);
   const regexp = /"buildId":"([-0-9a-zA-Z_]*)"/g;
   const buildIdMatches = regexp.exec(response.body as string);
@@ -137,6 +138,7 @@ function testRequest({
   let successfulRequest = false;
 
   try {
+    // eslint-disable-next-line import/no-named-as-default-member
     response = http.get(absoluteUrl, {
       headers: prefetch
         ? {

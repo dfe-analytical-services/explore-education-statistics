@@ -28,6 +28,7 @@ const screenerLocalDir = `${accountRoot}/${screenerRepositoryName}`;
 const screenerRepoUrl =
   'https://github.com/dfe-analytical-services/ees-screener-api';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const allowedDockerServices = [
   'db',
   'data-storage',
@@ -71,6 +72,7 @@ type ServiceSchemaDockerServices =
 
 // Annoyingly, need to define these separately from schemas,
 // or we run into various circular reference issues in the types.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const allowedServiceNames = [
   'admin',
   'analytics',
@@ -376,10 +378,11 @@ async function startDockerServices() {
 async function startService(service: ServiceName): Promise<void> {
   const schema = serviceSchemas[service];
 
-  let command = '';
+  let command: string;
   let args: string[] = [];
 
   let lockUntilReady = false;
+  // eslint-disable-next-line no-unassigned-vars
   let beforeTask: (() => void | Promise<void>) | undefined;
   let checkReady: ((line: string) => boolean) | undefined;
 

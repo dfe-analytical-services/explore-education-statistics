@@ -28,6 +28,7 @@ const performTest = () => {
   const startTime = Date.now();
   let response;
   try {
+    // eslint-disable-next-line import/no-named-as-default-member
     response = http.get(
       `${environmentAndUsers.environment.contentApiUrl}/publications/pupil-absence-in-schools-in-england/releases/2016-17`,
       {

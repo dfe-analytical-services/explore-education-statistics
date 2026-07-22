@@ -31,7 +31,7 @@ import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
 import LineChartLabel from '@common/modules/charts/components/LineChartLabel';
 import getUnit from '@common/modules/charts/util/getUnit';
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import {
   CartesianGrid,
   Legend,
@@ -117,9 +117,7 @@ const LineChartBlock = ({
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
-  const legendItemSorter = useMemo(() => {
-    return createLegendItemSorter(dataSetCategoryConfigs);
-  }, [dataSetCategoryConfigs]);
+  const legendItemSorter = createLegendItemSorter(dataSetCategoryConfigs);
 
   const rightMargin =
     legend.position === 'inline' &&
@@ -349,7 +347,6 @@ export default memo(LineChartBlock);
 
 const getDot =
   (symbol: ChartSymbol | 'none' = 'circle') =>
-  // eslint-disable-next-line react/display-name
   ({ ref, ...props }: SymbolsProps) => {
     if (symbol === 'none') {
       return undefined;

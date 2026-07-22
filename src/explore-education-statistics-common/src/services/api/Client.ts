@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-named-as-default
 import Axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -62,6 +63,7 @@ export default class Client {
     responseInterceptors,
     paramsSerializer = defaultParamsSerializer,
   }: ClientOptions) {
+    // eslint-disable-next-line import/no-named-as-default-member
     this.axios = Axios.create({
       baseURL,
       paramsSerializer,

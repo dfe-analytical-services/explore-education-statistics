@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default-member */
 import { sleep } from 'k6';
 import http, { RefinedResponse } from 'k6/http';
 import HttpClient from './httpClient';

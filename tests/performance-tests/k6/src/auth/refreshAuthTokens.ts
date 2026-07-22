@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable camelcase */
 import http from 'k6/http';
 import { AuthDetails } from './getAuthTokens';
 import getEnvironmentAndUsersFromFile from '../utils/environmentAndUsers';
@@ -32,6 +31,7 @@ export default function refreshAuthTokens({
     },
   };
 
+  // eslint-disable-next-line import/no-named-as-default-member
   const response = http.post(refreshTokenUrl, requestBody, params);
 
   if (response.status !== 200) {

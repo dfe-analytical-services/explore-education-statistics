@@ -118,6 +118,7 @@ export default function FormComboBox({
       return -1;
     }
 
+    // eslint-disable-next-line no-useless-assignment
     let nextSelectedOption = selectedOption;
 
     switch (event.key) {

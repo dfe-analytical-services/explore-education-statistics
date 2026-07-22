@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console,import/no-named-as-default-member */
 import http, { RefinedResponse } from 'k6/http';
 import { stringifyWithoutNulls } from './utils';
 

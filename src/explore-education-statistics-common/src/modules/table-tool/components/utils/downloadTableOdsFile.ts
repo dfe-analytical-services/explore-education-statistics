@@ -71,10 +71,8 @@ export function appendColumnWidths(sheet: WorkSheet): WorkSheet {
       let length = 0;
 
       if (typeof value.v === 'string') {
-        // eslint-disable-next-line prefer-destructuring
         length = value.v.length;
       } else if (typeof value.v === 'number') {
-        // eslint-disable-next-line prefer-destructuring
         length = value.v.toString().length;
       }
 

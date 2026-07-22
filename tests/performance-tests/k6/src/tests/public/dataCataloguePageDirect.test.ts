@@ -68,6 +68,7 @@ function getDataUrls(): string[] {
     `Getting data set search results from ${dataSetSearchResultsUrl}`,
   );
 
+  // eslint-disable-next-line import/no-named-as-default-member
   const dataSetsJson = http.get(dataSetSearchResultsUrl);
 
   const dataSets = dataSetsJson.json('results') as {
