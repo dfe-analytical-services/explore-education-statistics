@@ -6,9 +6,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 1. Define exact versions
 ENV NVM_DIR=/usr/local/nvm
 ENV NODE_VERSION=22.22.0
-ENV RUBY_VERSION=3.2.6
-# IMPORTANT: Ruby 3.2.x still uses '3.2.0' as the ABI directory name for gems
-ENV RUBY_ABI_VERSION=3.2.0
+ENV RUBY_VERSION=4.0.6
+# IMPORTANT: Ruby 4.0.x uses '4.0.0' as the ABI directory name for gems
+ENV RUBY_ABI_VERSION=4.0.0
 
 # 2. Install dependencies for compiling Ruby
 RUN apt update && \
@@ -49,7 +49,7 @@ WORKDIR /home/ubuntu/docs
 # Cache the appropriate Gems in the Docker image based on the current state of the
 # `Gemfile` and `Gemfile.lock` that was copied to a temporary staging area in a
 # previous step above.
-RUN gem install bundler -v 2.5.22 --user-install && \
+RUN gem install bundler -v 4.0.16 --user-install && \
     cd /tmp/gemfile-cache && \
     # We use 'bundle' directly now because it's in the PATH
     bundle config set --local path '/home/ubuntu/.local/share/gem' && \

@@ -32,7 +32,7 @@ This will start the Middleman development server on [https://localhost:4567](htt
 The following pre-requisite dependencies are required to get started:
 
 - [Node.js](https://nodejs.org/en/) v20+ (can be installed with [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm))
-- [Ruby](https://www.ruby-lang.org/en/) v3.2+ (can be installed with [rbenv](https://github.com/rbenv/rbenv) or [rvm](https://rvm.io/))
+- [Ruby](https://www.ruby-lang.org/en/) v4.0+ (can be installed with [rbenv](https://github.com/rbenv/rbenv) or [rvm](https://rvm.io/))
 
 As always, it's advisable to install any versions using a version manager to make it easier to upgrade 
 and keep aligned with the project.
