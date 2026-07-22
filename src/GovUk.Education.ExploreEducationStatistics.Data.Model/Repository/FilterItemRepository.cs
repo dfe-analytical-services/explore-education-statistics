@@ -122,4 +122,20 @@ public class FilterItemRepository(
             .Where(fi => filterItemIds.Contains(fi.Id))
             .ToListAsync();
     }
+
+    public async Task<IList<FilterItem>> GetFilterItemsFromObservations(IEnumerable<Observation> observations)
+    {
+        var filterItemIds = observations
+            .SelectMany(observation => observation.FilterItems)
+            .Select(ofi => ofi.FilterItemId)
+            .Distinct()
+            .ToList();
+
+        return await statisticsDbContext
+            .FilterItem.AsNoTracking()
+            .Include(fi => fi.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+            .Where(fi => filterItemIds.Contains(fi.Id))
+            .ToListAsync();
+    }
 }
