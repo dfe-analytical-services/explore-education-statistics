@@ -24,13 +24,11 @@ public abstract class GlobalRoleServiceTests
     public class SetGlobalRoleForUserTests : GlobalRoleServiceTests
     {
         [Theory]
-        [InlineData(Role.StandardUser, Role.StandardUser, Role.StandardUser)]
         [InlineData(Role.StandardUser, Role.BauUser, Role.BauUser)]
         [InlineData(Role.BauUser, Role.StandardUser, Role.StandardUser)]
-        [InlineData(Role.BauUser, Role.BauUser, Role.BauUser)]
         [InlineData(null, Role.StandardUser, Role.StandardUser)]
         [InlineData(null, Role.BauUser, Role.BauUser)]
-        public async Task Success(Role? oldRole, Role newRole, Role expectedUpdatedRole)
+        public async Task UpdatingToDifferentGlobalRole_Success(Role? oldRole, Role newRole, Role expectedUpdatedRole)
         {
             var userId = Guid.NewGuid();
             var user = new ApplicationUser { Id = userId.ToString() };
@@ -63,13 +61,13 @@ public abstract class GlobalRoleServiceTests
 
             userManager
                 .Setup(mock => mock.AddToRoleAsync(ItIsUser(user), expectedUpdatedRole.GetEnumLabel()))
-                .ReturnsAsync(new IdentityResult());
+                .ReturnsAsync(IdentityResult.Success);
 
             if (hasOldRole)
             {
                 userManager
                     .Setup(mock => mock.RemoveFromRoleAsync(ItIsUser(user), oldRole!.GetEnumLabel()))
-                    .ReturnsAsync(new IdentityResult());
+                    .ReturnsAsync(IdentityResult.Success);
             }
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
@@ -80,6 +78,44 @@ public abstract class GlobalRoleServiceTests
                 );
 
                 var result = await service.UpdateGlobalRoleForUser(userId, newRole);
+
+                result.AssertRight();
+            }
+
+            VerifyAllMocks(userManager);
+        }
+
+        [Theory]
+        [InlineData(Role.StandardUser)]
+        [InlineData(Role.BauUser)]
+        public async Task UpdatingToExistingGlobalRole_ExitsEarly(Role role)
+        {
+            var userId = Guid.NewGuid();
+            var user = new ApplicationUser { Id = userId.ToString() };
+
+            var existingIdentityRole = new IdentityRole { Id = role!.GetEnumValue(), Name = role!.GetEnumLabel() };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                userAndRolesDbContext.Users.Add(user);
+                userAndRolesDbContext.Roles.Add(existingIdentityRole!);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            userManager.Setup(mock => mock.GetRolesAsync(ItIsUser(user))).ReturnsAsync([role!.GetEnumLabel()]);
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    identityUserManager: userManager.Object
+                );
+
+                var result = await service.UpdateGlobalRoleForUser(userId, role);
 
                 result.AssertRight();
             }

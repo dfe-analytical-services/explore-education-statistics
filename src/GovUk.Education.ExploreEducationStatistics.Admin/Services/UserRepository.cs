@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -87,7 +88,9 @@ public class UserRepository(
 
             await contentDbContext.SaveChangesAsync(cancellationToken);
 
-            await globalRoleService.UpdateGlobalRoleForUser(userId: userId, newRole: newRole);
+            await globalRoleService
+                .UpdateGlobalRoleForUser(userId: userId, newRole: newRole)
+                .OrThrow(_ => new InvalidOperationException("Updating the user's global role unexpectedly failed."));
         });
 
         return activeUser;

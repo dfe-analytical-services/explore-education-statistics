@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -39,6 +40,12 @@ public abstract class UserRepositoryTests
         fixture => fixture.DefaultUserWithExpiredInvite(),
         // Soft Deleted User
         fixture => fixture.DefaultSoftDeletedUser(),
+    ];
+
+    public static readonly TheoryData<ActionResult> GlobalRoleServiceFailureResults =
+    [
+        new ForbidResult(),
+        new NotFoundResult(),
     ];
 
     public class FindPendingUserInviteByEmailTests : UserRepositoryTests
@@ -1654,6 +1661,39 @@ public abstract class UserRepositoryTests
                 var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), updatedUser.RoleId);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(GlobalRoleServiceFailureResults))]
+        public async Task UpdatingGlobalRoleFails_Throws(ActionResult actionResult)
+        {
+            var role = GlobalRoles.Role.StandardUser;
+
+            // Active User
+            User user = _dataFixture.DefaultUser().WithRoleId(role.GetEnumValue());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
+            globalRoleService.Setup(mock => mock.UpdateGlobalRoleForUser(user.Id, role)).ReturnsAsync(actionResult);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    globalRoleService: globalRoleService.Object
+                );
+
+                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await repository.UpdateGlobalRole(userId: user.Id, newRole: role)
+                );
             }
         }
 

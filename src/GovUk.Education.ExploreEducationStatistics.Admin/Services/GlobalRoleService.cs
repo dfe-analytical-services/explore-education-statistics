@@ -29,16 +29,37 @@ public class GlobalRoleService(
     private async Task SetExclusiveGlobalRoleIfRequired(ApplicationUser user, Role role)
     {
         var roleName = role.GetEnumLabel();
-        var currentGlobalRoleNameForUser = await GetGlobalRoleNameForUser(user);
+        var currentRole = await GetGlobalRoleNameForUser(user);
 
-        if (currentGlobalRoleNameForUser is null)
+        if (currentRole == roleName)
         {
-            await identityUserManager.AddToRoleAsync(user, roleName);
             return;
         }
 
-        await identityUserManager.AddToRoleAsync(user, roleName);
-        await identityUserManager.RemoveFromRoleAsync(user, currentGlobalRoleNameForUser);
+        var addResult = await identityUserManager.AddToRoleAsync(user, roleName);
+
+        if (!addResult.Succeeded)
+        {
+            throw new InvalidOperationException(
+                $"Failed to add user '{user.Id}' to role '{roleName}'. "
+                    + $"Errors: {string.Join(", ", addResult.Errors.Select(e => e.Description))}"
+            );
+        }
+
+        if (currentRole is null)
+        {
+            return;
+        }
+
+        var removeResult = await identityUserManager.RemoveFromRoleAsync(user, currentRole);
+
+        if (!removeResult.Succeeded)
+        {
+            throw new InvalidOperationException(
+                $"Failed to remove user '{user.Id}' from role '{currentRole}'. "
+                    + $"Errors: {string.Join(", ", removeResult.Errors.Select(e => e.Description))}"
+            );
+        }
     }
 
     private async Task<string?> GetGlobalRoleNameForUser(ApplicationUser user)
