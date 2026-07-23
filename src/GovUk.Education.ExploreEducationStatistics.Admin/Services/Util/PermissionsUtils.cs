@@ -18,9 +18,6 @@ public static class PermissionsUtils
     {
         return new ReleasePermissions
         {
-            CanAddPreReleaseUsers = await userService
-                .CheckCanAssignPreReleaseContactsToReleaseVersion(releaseVersion)
-                .IsRight(),
             CanUpdateRelease = await userService.CheckCanUpdateRelease(releaseVersion.Release).IsRight(),
             CanViewReleaseVersion = await userService.CheckCanViewReleaseVersion(releaseVersion).IsRight(),
             CanUpdateReleaseVersion = await userService.CheckCanUpdateReleaseVersion(releaseVersion).IsRight(),
@@ -49,7 +46,6 @@ public static class PermissionsUtils
             CanManageReleaseSeries = await userService.CheckCanManageReleaseSeries(publication).IsRight(),
             CanUpdateContact = await userService.CheckCanUpdateContact(publication).IsRight(),
             CanUpdateDrafters = await userService.CheckCanUpdateDrafters(publication).IsRight(),
-            CanViewReleaseTeamAccess = await userService.CheckCanViewReleaseTeamAccess(publication).IsRight(),
         };
     }
 

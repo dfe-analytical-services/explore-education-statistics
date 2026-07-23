@@ -203,14 +203,6 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateContact);
     }
 
-    public static Task<Either<ActionResult, Publication>> CheckCanViewReleaseTeamAccess(
-        this IUserService userService,
-        Publication publication
-    )
-    {
-        return userService.CheckPolicy(publication, SecurityPolicies.CanViewReleaseTeamAccess);
-    }
-
     public static Task<Either<ActionResult, Publication>> CheckCanUpdateDrafters(
         this IUserService userService,
         Publication publication

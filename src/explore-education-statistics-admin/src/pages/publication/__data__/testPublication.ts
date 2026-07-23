@@ -24,6 +24,5 @@ export const testPublication: PublicationWithPermissions = {
     canManageReleaseSeries: true,
     canUpdateContact: true,
     canUpdateDrafters: true,
-    canViewReleaseTeamAccess: true,
   },
 };
