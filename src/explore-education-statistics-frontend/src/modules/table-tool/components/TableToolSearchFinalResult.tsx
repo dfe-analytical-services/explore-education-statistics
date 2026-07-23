@@ -19,25 +19,21 @@ interface TableToolSearchFinalResultProps {
 }
 
 const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
-  const {
-    timePeriod: { start, end } = {},
-    filters,
-    indicators,
-    geographicLevels,
-    subjectId,
-  } = dataset;
+  const { timePeriod, filters, indicators, geographicLevels, subjectId } =
+    dataset;
+
   return {
     subjectId,
     locationIds: Object.values(geographicLevels).flatMap(locations =>
       locations.map(location => location.id),
     ),
     timePeriod:
-      start?.year && end?.year
+      timePeriod?.start?.year && timePeriod?.end?.year
         ? {
-            startYear: parseInt(start.year, 10),
-            startCode: start.code,
-            endYear: parseInt(end.year, 10),
-            endCode: end.code,
+            startYear: timePeriod.start.year,
+            startCode: timePeriod.start.code,
+            endYear: timePeriod.end.year,
+            endCode: timePeriod.end.code,
           }
         : undefined,
     filters: filters.map(filter => filter.id),
