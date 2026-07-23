@@ -26,6 +26,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Moq.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -697,33 +698,6 @@ public class ThemeServiceTests
     }
 
     [Fact]
-    public async Task DeleteTheme_DisallowedByNamingConvention()
-    {
-        var theme = new Theme
-        {
-            Title = "Non-conforming title",
-            Publications = [new() { Title = "UI test publication 1" }, new() { Title = "UI test publication 2" }],
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.Add(theme);
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var service = SetupThemeService(context);
-            var result = await service.DeleteTheme(theme.Id);
-
-            result.AssertForbidden();
-            Assert.Equal(1, await context.Themes.CountAsync());
-        }
-    }
-
-    [Fact]
     public async Task DeleteTheme_DisallowedByConfiguration()
     {
         var theme = new Theme
@@ -930,6 +904,88 @@ public class ThemeServiceTests
         }
     }
 
+    [Fact]
+    public async Task DeleteThemes_Success_DeletesAllSpecifiedThemes()
+    {
+        var theme1 = new Theme { Id = Guid.NewGuid(), Title = "Theme 1 to delete" };
+        var theme2 = new Theme { Id = Guid.NewGuid(), Title = "Theme 2 to delete" };
+        var otherTheme = new Theme { Id = Guid.NewGuid(), Title = "Theme to retain" };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.Themes.AddRange(theme1, theme2, otherTheme);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+
+            var result = await service.DeleteThemes([theme1.Id, theme2.Id]);
+
+            VerifyAllMocks(publishingService);
+
+            result.AssertRight();
+
+            var remainingThemes = await context.Themes.ToListAsync();
+            Assert.Single(remainingThemes);
+            Assert.Equal(otherTheme.Id, remainingThemes[0].Id);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteThemes_DisallowedByConfiguration_ThemeNotDeleted()
+    {
+        var theme = new Theme { Id = Guid.NewGuid(), Title = "Theme to delete" };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.Themes.Add(theme);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = SetupThemeService(context, enableThemeDeletion: false);
+
+            var result = await service.DeleteThemes([theme.Id]);
+            result.AssertForbidden();
+
+            Assert.Equal(1, await context.Themes.CountAsync());
+        }
+    }
+
+    [Fact]
+    public async Task DeleteThemes_DisallowedInProduction_ThemeNotDeleted()
+    {
+        var theme = new Theme { Id = Guid.NewGuid(), Title = "Theme to delete" };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.Themes.Add(theme);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = SetupThemeService(context, environmentName: Environments.Production);
+
+            var result = await service.DeleteThemes([theme.Id]);
+            result.AssertForbidden();
+
+            Assert.Equal(1, await context.Themes.CountAsync());
+        }
+    }
+
     private static ThemeService SetupThemeService(
         ContentDbContext? contentDbContext = null,
         PublicDataDbContext? publicDataDbContext = null,
@@ -940,7 +996,8 @@ public class ThemeServiceTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        bool enableThemeDeletion = true
+        bool enableThemeDeletion = true,
+        string environmentName = nameof(Environments.Development)
     )
     {
         contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -966,7 +1023,8 @@ public class ThemeServiceTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            Mock.Of<IHostEnvironment>(e => e.EnvironmentName == environmentName)
         );
     }
 
