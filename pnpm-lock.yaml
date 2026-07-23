@@ -465,17 +465,17 @@ importers:
   src/explore-education-statistics-ckeditor:
     devDependencies:
       '@babel/core':
-        specifier: ^7.29.7
-        version: 7.29.7
+        specifier: ^8.0.1
+        version: 8.0.1
       '@babel/preset-env':
-        specifier: ^7.29.7
-        version: 7.29.7(@babel/core@7.29.7)
+        specifier: ^8.0.2
+        version: 8.0.2(@babel/core@8.0.1)
       '@ckeditor/ckeditor5-dev-utils':
         specifier: ^50.3.1
         version: 50.3.1(typescript@6.0.3)(webpack@5.105.2)
       babel-loader:
-        specifier: ^10.0.0
-        version: 10.0.0(@babel/core@7.29.7)(webpack@5.105.2)
+        specifier: ^10.1.1
+        version: 10.1.1(@babel/core@8.0.1)(webpack@5.105.2)
       ckeditor5:
         specifier: ^46.0.0
         version: 46.1.1
@@ -1413,18 +1413,6 @@ packages:
       '@babel/helper-skip-transparent-expression-wrappers': 8.0.0
       '@babel/traverse': 8.0.4
       semver: 7.8.5
-    dev: true
-
-  /@babel/helper-create-regexp-features-plugin@7.28.5(@babel/core@7.29.7):
-    resolution: {integrity: sha512-N1EhvLtHzOvj7QQOUCCS3NrPJP8c5W6ZXCHDn7Yialuy1iu4r5EmIYkXlKNqT99Ciw+W0mDqWoR6HWMZlFP3hw==}
-    engines: {node: '>=6.9.0'}
-    peerDependencies:
-      '@babel/core': ^7.0.0
-    dependencies:
-      '@babel/core': 7.29.7
-      '@babel/helper-annotate-as-pure': 7.29.7
-      regexpu-core: 6.4.0
-      semver: 6.3.1
     dev: true
 
   /@babel/helper-create-regexp-features-plugin@7.29.7(@babel/core@7.29.7):
@@ -2375,7 +2363,7 @@ packages:
       '@babel/core': ^7.0.0
     dependencies:
       '@babel/core': 7.29.7
-      '@babel/helper-create-regexp-features-plugin': 7.28.5(@babel/core@7.29.7)
+      '@babel/helper-create-regexp-features-plugin': 7.29.7(@babel/core@7.29.7)
       '@babel/helper-plugin-utils': 7.29.7
     dev: true
 
@@ -3841,7 +3829,7 @@ packages:
     dependencies:
       '@babel/core': 7.29.7
       '@babel/helper-plugin-utils': 7.29.7
-      '@babel/types': 7.29.0
+      '@babel/types': 7.29.7
       esutils: 2.0.3
     dev: true
 
@@ -10231,14 +10219,20 @@ packages:
       - supports-color
     dev: true
 
-  /babel-loader@10.0.0(@babel/core@7.29.7)(webpack@5.105.2):
-    resolution: {integrity: sha512-z8jt+EdS61AMw22nSfoNJAZ0vrtmhPRVi6ghL3rCeRZI8cdNYFiV5xeV3HbE7rlZZNmGH8BVccwWt8/ED0QOHA==}
+  /babel-loader@10.1.1(@babel/core@8.0.1)(webpack@5.105.2):
+    resolution: {integrity: sha512-JwKSzk2kjIe7mgPK+/lyZ2QAaJcpahNAdM+hgR2HI8D0OJVkdj8Rl6J3kaLYki9pwF7P2iWnD8qVv80Lq1ABtg==}
     engines: {node: ^18.20.0 || ^20.10.0 || >=22.0.0}
     peerDependencies:
-      '@babel/core': ^7.12.0
+      '@babel/core': ^7.12.0 || ^8.0.0-beta.1
+      '@rspack/core': ^1.0.0 || ^2.0.0-0
       webpack: '>=5.61.0'
+    peerDependenciesMeta:
+      '@rspack/core':
+        optional: true
+      webpack:
+        optional: true
     dependencies:
-      '@babel/core': 7.29.7
+      '@babel/core': 8.0.1
       find-up: 5.0.0
       webpack: 5.105.2(postcss@8.4.25)(webpack-cli@5.1.4)
     dev: true
