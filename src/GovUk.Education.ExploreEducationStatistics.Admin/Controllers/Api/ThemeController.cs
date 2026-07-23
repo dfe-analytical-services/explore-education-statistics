@@ -47,4 +47,10 @@ public class ThemeController(IThemeService themeService) : ControllerBase
     {
         return await themeService.DeleteUITestThemes(cancellationToken).HandleFailuresOrNoContent();
     }
+
+    [HttpDelete("themes/bulk")]
+    public async Task<ActionResult> DeleteThemes([FromBody] List<Guid> themeIds, CancellationToken cancellationToken)
+    {
+        return await themeService.DeleteThemes(themeIds, cancellationToken).HandleFailuresOrNoContent();
+    }
 }

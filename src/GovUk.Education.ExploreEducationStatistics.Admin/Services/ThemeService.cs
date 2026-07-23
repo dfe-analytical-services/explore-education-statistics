@@ -33,7 +33,8 @@ public class ThemeService(
     IPublishingService publishingService,
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
-    IUserPublicationRoleRepository userPublicationRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IHostEnvironment hostEnvironment
 ) : IThemeService
 {
     private readonly bool _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
@@ -130,6 +131,24 @@ public class ThemeService(
 
                 await publishingService.TaxonomyChanged(cancellationToken);
             });
+    }
+
+    public async Task<Either<ActionResult, Unit>> DeleteThemes(
+        List<Guid> themeIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (hostEnvironment.IsProduction())
+        {
+            return new ForbidResult();
+        }
+
+        var results = await themeIds
+            .ToAsyncEnumerable()
+            .Select(async (themeId, index, cancellationToken) => await DeleteTheme(themeId, cancellationToken))
+            .ToListAsync(cancellationToken);
+
+        return results.OnSuccessAllReturnVoid();
     }
 
     private async Task<Either<List<ActionResult>, Unit>> DeletePublicationsForTheme(
