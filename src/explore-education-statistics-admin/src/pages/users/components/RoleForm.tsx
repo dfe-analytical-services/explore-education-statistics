@@ -10,7 +10,7 @@ import { GlobalRole } from '@admin/services/types/GlobalRole';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 
 interface FormValues {
-  isBauUser: boolean;
+  isSuperUser: boolean;
 }
 
 interface FormValues {
@@ -24,9 +24,9 @@ interface Props {
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
-    target: 'isBauUser',
+    target: 'isSuperUser',
     messages: {
-      UserIsAlreadyBauUser: 'User is already a BAU User',
+      UserIsAlreadyBauUser: 'User is already a Super User',
       UserIsAlreadyStandardUser: 'User is already a Standard User',
     },
   }),
@@ -35,7 +35,7 @@ const errorMappings = [
 const RoleForm = ({ user, onUpdate }: Props) => {
   const handleSubmit = async (values: FormValues) => {
     await usersService.updateUserGlobalRole(user.id, {
-      targetGlobalRole: values.isBauUser
+      targetGlobalRole: values.isSuperUser
         ? GlobalRole.BauUser
         : GlobalRole.StandardUser,
     });
@@ -48,21 +48,21 @@ const RoleForm = ({ user, onUpdate }: Props) => {
       errorMappings={errorMappings}
       enableReinitialize
       initialValues={{
-        isBauUser: user.globalRole === GlobalRole.BauUser,
+        isSuperUser: user.globalRole === GlobalRole.BauUser,
       }}
     >
       <Form id={user.id} onSubmit={handleSubmit}>
         <FormFieldset
-          id="bau"
+          id="superUser"
           legend="Access level"
           legendSize="m"
-          hint="BAU users have elevated permissions."
+          hint="Super Users have elevated permissions."
         >
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-quarter">
               <FormFieldCheckbox<FormValues>
-                name="isBauUser"
-                label="BAU User"
+                name="isSuperUser"
+                label="Super User"
               />
             </div>
 
