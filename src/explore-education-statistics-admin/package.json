@@ -42,11 +42,10 @@
     "yup": "^1.3.3"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.1",
-    "@babel/preset-env": "^8.0.2",
-    "@babel/preset-typescript": "^8.0.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@svgr/webpack": "^6.5.1",
+    "@swc/core": "^1.15.46",
+    "@swc/jest": "^0.2.39",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -106,6 +105,7 @@
     "style-loader": "^4.0.0",
     "stylelint": "^17.14.0",
     "stylelint-webpack-plugin": "^5.1.0",
+    "swc-loader": "^0.2.7",
     "terser-webpack-plugin": "^5.6.1",
     "typescript": "^6.0.3",
     "webpack": "^5.108.0",
