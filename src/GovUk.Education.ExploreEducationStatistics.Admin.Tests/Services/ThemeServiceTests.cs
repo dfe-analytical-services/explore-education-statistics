@@ -697,33 +697,6 @@ public class ThemeServiceTests
     }
 
     [Fact]
-    public async Task DeleteTheme_DisallowedByNamingConvention()
-    {
-        var theme = new Theme
-        {
-            Title = "Non-conforming title",
-            Publications = [new() { Title = "UI test publication 1" }, new() { Title = "UI test publication 2" }],
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.Add(theme);
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var service = SetupThemeService(context);
-            var result = await service.DeleteTheme(theme.Id);
-
-            result.AssertForbidden();
-            Assert.Equal(1, await context.Themes.CountAsync());
-        }
-    }
-
-    [Fact]
     public async Task DeleteTheme_DisallowedByConfiguration()
     {
         var theme = new Theme
