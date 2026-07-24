@@ -282,8 +282,8 @@ export const testFinalResult: FinalDataset = {
   filters: [],
   geographicLevels: {},
   timePeriod: {
-    start: { code: 'AY', year: '2014' },
-    end: { code: 'AY', year: '2016' },
+    start: { code: 'AY', year: 2014 },
+    end: { code: 'AY', year: 2016 },
   },
   indicators: [],
 };

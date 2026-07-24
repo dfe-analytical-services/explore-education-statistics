@@ -112,7 +112,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
               (message.stage === PipelineStage.RETRIEVED &&
                 message.data.datasets.length === 0) ||
               (message.stage === PipelineStage.RERANKER &&
-                message.data.shortlistedDatasets.length === 0)
+                message.data.datasets.length === 0)
             ) {
               abortControllerRef.current?.abort();
             }
@@ -144,7 +144,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
 
   const hasNoResults =
     (retrievedData && retrievedData.datasets.length === 0) ||
-    (rerankerData && rerankerData.shortlistedDatasets.length === 0) ||
+    (rerankerData && rerankerData.datasets.length === 0) ||
     (finalData && finalData.datasets.length === 0);
 
   const searchFinished = currentStage === PipelineStage.COMPLETE;
@@ -257,17 +257,15 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                         )}
 
                       {currentStage === PipelineStage.RERANKER &&
-                        pipelineData.rerankerData?.shortlistedDatasets && (
+                        pipelineData.rerankerData?.datasets && (
                           <ul className="govuk-list govuk-list--spaced">
-                            {pipelineData.rerankerData.shortlistedDatasets.map(
-                              dataset => (
-                                <TableToolSearchShortlistedResult
-                                  key={dataset.title}
-                                  title={dataset.title}
-                                  relevance={dataset.relevanceScore}
-                                />
-                              ),
-                            )}
+                            {pipelineData.rerankerData.datasets.map(dataset => (
+                              <TableToolSearchShortlistedResult
+                                key={dataset.title}
+                                title={dataset.title}
+                                relevance={dataset.relevanceScore}
+                              />
+                            ))}
                           </ul>
                         )}
 

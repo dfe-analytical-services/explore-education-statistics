@@ -25,6 +25,11 @@ export const PipelineStageLabels: Record<PipelineStageType, string> = {
   [PipelineStage.COMPLETE]: 'Results',
 };
 
+interface TokenUsage {
+  input: number;
+  output: number;
+}
+
 interface DatasetResultBase {
   dataSetFileId: string;
   description: string;
@@ -39,16 +44,20 @@ interface DatasetResultBase {
 }
 
 export interface RetrievedDataset extends DatasetResultBase {
+  filters: string[];
+  indicators: string[];
   rawRelevanceScore: number;
   relevanceScore: number;
+  timePeriodRange?: {
+    from: string;
+    to: string;
+  };
 }
 
-export interface ShortlistedDataset {
-  fileId: string;
+export interface ShortlistedDataset extends DatasetResultBase {
   relevantFilters: string[];
   relevanceReason: string;
   relevanceScore: number;
-  title: string;
 }
 
 export interface GeographicLevelItem {
@@ -67,16 +76,16 @@ export interface FinalDataset extends DatasetResultBase {
   geographicLevels: Dictionary<GeographicLevelItem[]>;
   indicators: FilterIndicatorItem[];
   relevanceReason: string;
-  timePeriod?: {
+  timePeriod: {
     start: {
       code: string;
-      year: string;
+      year: number;
     };
     end: {
       code: string;
-      year: string;
+      year: number;
     };
-  };
+  } | null;
 }
 
 export interface StageStarting {
@@ -91,25 +100,24 @@ export interface StageRetrieved {
 export interface StageReranker {
   stage: typeof PipelineStage.RERANKER;
   data: {
+    confidence: string;
+    cost: number;
+    datasets: ShortlistedDataset[];
     queryRequirements: {
       filters: string[];
       geography: string[];
-      timePeriod: string;
+      timePeriod: string | null;
     };
-    shortlistedDatasets: ShortlistedDataset[];
-    confidence: string;
+    tokenUsage: TokenUsage;
   };
 }
 
 export interface StageComplete {
   stage: typeof PipelineStage.COMPLETE;
   data: {
-    datasets: FinalDataset[];
-    token_usage: {
-      input: number;
-      output: number;
-    };
     cost: number;
+    datasets: FinalDataset[];
+    tokenUsage: TokenUsage;
   };
 }
 

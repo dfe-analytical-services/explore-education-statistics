@@ -125,6 +125,8 @@ describe('TableToolSearchPage', () => {
               description: '',
               fileId: 'file-id-a',
               subjectId: '',
+              filters: [],
+              indicators: [],
             },
             {
               title: 'Dataset B',
@@ -139,6 +141,8 @@ describe('TableToolSearchPage', () => {
               description: '',
               fileId: 'file-id-b',
               subjectId: '',
+              filters: [],
+              indicators: [],
             },
           ],
         },
@@ -155,17 +159,30 @@ describe('TableToolSearchPage', () => {
       capturedOptions.onMessage({
         stage: PipelineStage.RERANKER,
         data: {
-          shortlistedDatasets: [
+          datasets: [
             {
               fileId: 'file-1',
               title: 'Dataset B',
               relevanceScore: 85.5,
               relevanceReason: 'Test relevance reason',
               relevantFilters: [],
+              dataSetFileId: 'dataset-file-id',
+              description: 'description',
+              publicationId: 'publication-id',
+              publicationSlug: 'publication-slug',
+              publicationTitle: 'publication-title',
+              releaseSlug: 'release-slug',
+              releaseVersionId: 'release-version-id',
+              subjectId: 'subject-id',
             },
           ],
           queryRequirements: { filters: [], geography: [], timePeriod: '' },
           confidence: 'high',
+          tokenUsage: {
+            input: 100,
+            output: 100,
+          },
+          cost: 0.4,
         },
       });
     });
@@ -182,7 +199,7 @@ describe('TableToolSearchPage', () => {
         stage: PipelineStage.COMPLETE,
         data: {
           datasets: [testFinalResult],
-          token_usage: {
+          tokenUsage: {
             input: 100,
             output: 100,
           },
