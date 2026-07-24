@@ -58,9 +58,6 @@ param searchServiceSemanticRankerAvailability string
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
-@description('Indicates whether to deploy the Natural Language Search Function App as part of this deployment.')
-param deployNaturalLanguageSearchFunctionApp bool = false
-
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
@@ -103,7 +100,7 @@ module monitoringModule 'application/monitoring.bicep' = {
   }
 }
 
-module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = if (deployNaturalLanguageSearchFunctionApp) {
+module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
   name: 'nlSearchFunctionAppApplicationModuleDeploy'
   params: {
     location: location
@@ -181,6 +178,6 @@ output searchDocsFunctionAppUrl string = searchDocsFunctionAppModule.outputs.fun
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchStorageAccountManagedIdentityConnectionString string = searchServiceModule.outputs.searchStorageAccountManagedIdentityConnectionString
 output searchDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.searchDocuments
-output nlSearchFunctionAppUrl string = deployNaturalLanguageSearchFunctionApp ? nlSearchFunctionAppModule.outputs.functionAppUrl : ''
+output nlSearchFunctionAppUrl string = nlSearchFunctionAppModule.outputs.functionAppUrl
 output nlSearchDatasetDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.nlSearchDatasetDocuments
 output nlSearchFilterDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.nlSearchFilterDocuments
