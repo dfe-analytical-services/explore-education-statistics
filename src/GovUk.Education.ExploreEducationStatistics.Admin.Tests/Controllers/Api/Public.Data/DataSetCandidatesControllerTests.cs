@@ -83,50 +83,6 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
             );
         }
 
-        [Fact]
-        public async Task ReleaseFileHasProcessingDataSetVersion_NotReturned()
-        {
-            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
-
-            var dataImports = DataFixture.DefaultDataImport().WithStatus(DataImportStatus.COMPLETE).GenerateList(2);
-
-            var releaseVersion = release.Versions.Single();
-
-            var releaseFiles = dataImports
-                .Select(dataImport =>
-                    DataFixture
-                        .DefaultReleaseFile()
-                        .WithFile(dataImport.File)
-                        .WithReleaseVersion(releaseVersion)
-                        .WithApiCompatibility(true)
-                        .Generate()
-                )
-                .ToList();
-
-            DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithStatus(DataSetVersionStatus.Processing)
-                .WithDataSet(DataFixture.DefaultDataSet())
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[0].Id));
-
-            await fixture
-                .GetContentDbContext()
-                .AddTestData(context =>
-                {
-                    context.DataImports.AddRange(dataImports);
-                    context.ReleaseFiles.AddRange(releaseFiles);
-                });
-
-            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersions.Add(dataSetVersion));
-
-            var response = await GetDataSetCandidates(releaseVersion.Id);
-
-            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
-
-            var candidate = Assert.Single(candidates);
-            Assert.Equal(releaseFiles[1].Id, candidate.ReleaseFileId);
-        }
-
         [Theory]
         [InlineData(SecurityClaimTypes.UpdateAllReleases)]
         [InlineData(SecurityClaimTypes.CreateAnyRelease)]

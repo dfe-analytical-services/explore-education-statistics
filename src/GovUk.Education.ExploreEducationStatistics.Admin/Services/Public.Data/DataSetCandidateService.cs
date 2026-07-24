@@ -7,17 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-internal class DataSetCandidateService(
-    ContentDbContext contentDbContext,
-    PublicDataDbContext publicDataDbContext,
-    IUserService userService
-) : IDataSetCandidateService
+internal class DataSetCandidateService(ContentDbContext contentDbContext, IUserService userService)
+    : IDataSetCandidateService
 {
     public async Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> ListCandidates(
         Guid releaseVersionId,
@@ -45,7 +41,7 @@ internal class DataSetCandidateService(
         CancellationToken cancellationToken
     )
     {
-        var candidates = await contentDbContext
+        return await contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Where(rf => rf.File.Type == FileType.Data)
@@ -64,17 +60,5 @@ internal class DataSetCandidateService(
             .Select(rf => new DataSetCandidateViewModel { ReleaseFileId = rf.Id, Title = rf.Name! })
             .OrderBy(rf => rf.Title)
             .ToListAsync(cancellationToken: cancellationToken);
-
-        var candidateReleaseFileIds = candidates.Select(candidate => candidate.ReleaseFileId).ToList();
-
-        var usedReleaseFileIds = (
-            await publicDataDbContext
-                .DataSetVersions.AsNoTracking()
-                .Where(dataSetVersion => candidateReleaseFileIds.Contains(dataSetVersion.Release.ReleaseFileId))
-                .Select(dataSetVersion => dataSetVersion.Release.ReleaseFileId)
-                .ToListAsync(cancellationToken)
-        ).ToHashSet();
-
-        return candidates.Where(candidate => !usedReleaseFileIds.Contains(candidate.ReleaseFileId)).ToList();
     }
 }
