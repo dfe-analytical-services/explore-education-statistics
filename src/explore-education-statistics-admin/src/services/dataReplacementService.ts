@@ -155,7 +155,7 @@ export interface LocationSource {
 
 export type IndicatorCandidate = IndicatorSource;
 
-export type SourceItem = IndicatorSource | LocationSource /* | FilterSource */;
+export type SourceItem = IndicatorSource | LocationSource; /* | FilterSource */
 
 export type IndicatorMapping = ReplacementMapping<IndicatorSource>;
 export type LocationMapping = ReplacementMapping<LocationSource>;

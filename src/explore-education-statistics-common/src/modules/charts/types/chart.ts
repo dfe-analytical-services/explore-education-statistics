@@ -15,11 +15,7 @@ import { NestedPartial } from '@common/types';
 export type TitleType = 'default' | 'alternative';
 
 export type ChartType =
-  | 'line'
-  | 'verticalbar'
-  | 'horizontalbar'
-  | 'map'
-  | 'infographic';
+  'line' | 'verticalbar' | 'horizontalbar' | 'map' | 'infographic';
 
 export type ChartSymbol =
   | 'circle'
@@ -330,8 +326,4 @@ interface VerticalBarChart {
  * to our newer one that is being used by {@see ChartRendererProps}.
  */
 export type Chart =
-  | Infographic
-  | LineChart
-  | MapChart
-  | HorizontalBarChart
-  | VerticalBarChart;
+  Infographic | LineChart | MapChart | HorizontalBarChart | VerticalBarChart;

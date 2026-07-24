@@ -178,7 +178,7 @@ Invite Pre-release users during amendment
     user waits until h2 is visible    Manage pre-release user access
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered-prerelease-and-amend-3@notifications.service.gov.uk
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations

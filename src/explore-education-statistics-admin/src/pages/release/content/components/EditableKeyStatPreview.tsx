@@ -7,8 +7,10 @@ import KeyStat, {
 import { OmitStrict } from '@common/types';
 import React from 'react';
 
-export interface EditableKeyStatDisplayProps
-  extends OmitStrict<KeyStatProps, 'children' | 'includeWrapper'> {
+export interface EditableKeyStatDisplayProps extends OmitStrict<
+  KeyStatProps,
+  'children' | 'includeWrapper'
+> {
   isReordering?: boolean;
   onRemove?: () => void;
   onEdit: () => void;

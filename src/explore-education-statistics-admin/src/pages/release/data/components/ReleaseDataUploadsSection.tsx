@@ -112,18 +112,17 @@ export default function ReleaseDataUploadsSection({
           releaseVersionId,
           dataFile.id,
         );
-        setAllDataFiles(
-          currentDataFiles =>
-            currentDataFiles?.map(file =>
-              file.id !== dataFile.id
-                ? file
-                : {
-                    ...dataFile,
-                    rows: importStatus.totalRows,
-                    status: importStatus.status,
-                    permissions,
-                  },
-            ),
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles?.map(file =>
+            file.id !== dataFile.id
+              ? file
+              : {
+                  ...dataFile,
+                  rows: importStatus.totalRows,
+                  status: importStatus.status,
+                  permissions,
+                },
+          ),
         );
       } catch {
         refetchDataFiles();
@@ -139,16 +138,15 @@ export default function ReleaseDataUploadsSection({
           releaseVersionId,
           updatedDataFile.id,
         );
-        setAllDataFiles(
-          currentDataFiles =>
-            currentDataFiles?.map(file =>
-              file.id !== updatedDataFile.id
-                ? file
-                : {
-                    ...updatedDataFile,
-                    permissions,
-                  },
-            ),
+        setAllDataFiles(currentDataFiles =>
+          currentDataFiles?.map(file =>
+            file.id !== updatedDataFile.id
+              ? file
+              : {
+                  ...updatedDataFile,
+                  permissions,
+                },
+          ),
         );
       } catch {
         refetchDataFiles();
@@ -164,9 +162,8 @@ export default function ReleaseDataUploadsSection({
         dataSetUploadIds,
       );
 
-      setAllDataUploads(
-        uploads =>
-          uploads?.filter(upload => !dataSetUploadIds.includes(upload.id)),
+      setAllDataUploads(uploads =>
+        uploads?.filter(upload => !dataSetUploadIds.includes(upload.id)),
       );
 
       await refetchDataSetUploads();
@@ -187,8 +184,8 @@ export default function ReleaseDataUploadsSection({
 
   const handleDeleteConfirm = useCallback(
     async (deletedFileId: string) => {
-      setAllDataFiles(
-        files => files?.filter(dataFile => dataFile.id !== deletedFileId),
+      setAllDataFiles(files =>
+        files?.filter(dataFile => dataFile.id !== deletedFileId),
       );
     },
     [setAllDataFiles],

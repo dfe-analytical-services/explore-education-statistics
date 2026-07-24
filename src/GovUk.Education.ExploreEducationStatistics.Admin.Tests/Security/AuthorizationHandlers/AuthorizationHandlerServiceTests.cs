@@ -282,6 +282,47 @@ public abstract class AuthorizationHandlerServiceTests
         }
     }
 
+    public class UserHasAnyPublicationRoleTests : AuthorizationHandlerServiceTests
+    {
+        [Fact]
+        public async Task UserDoesNotHaveAnyPublicationRoles_ReturnsFalse()
+        {
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+            userPublicationRoleRepository
+                .Setup(mock =>
+                    mock.UserHasAnyRole(_userId, ResourceRoleFilter.ActiveOnly, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(false);
+
+            var authorizationHandlerService = BuildService(
+                userPublicationRoleRepository: userPublicationRoleRepository.Object
+            );
+
+            var result = await authorizationHandlerService.UserHasAnyPublicationRole(userId: _userId);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UserHasAPublicationRole_ReturnsTrue()
+        {
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+            userPublicationRoleRepository
+                .Setup(mock =>
+                    mock.UserHasAnyRole(_userId, ResourceRoleFilter.ActiveOnly, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(true);
+
+            var authorizationHandlerService = BuildService(
+                userPublicationRoleRepository: userPublicationRoleRepository.Object
+            );
+
+            var result = await authorizationHandlerService.UserHasAnyPublicationRole(userId: _userId);
+
+            Assert.True(result);
+        }
+    }
+
     public class UserHasPreReleaseRoleOnReleaseVersionTests : AuthorizationHandlerServiceTests
     {
         [Fact]

@@ -51,3 +51,10 @@ jobs:
     displayName: Public API suite - Robot UI tests
     testFolder: tests/public_api
     artifactName: test-results-admin-public-api
+
+- template: azure-pipelines-run-ui-test-suite.yml
+  parameters:
+    jobName: SeedData
+    displayName: Seed data suite - Robot UI tests
+    testFolder: tests/seed_data
+    artifactName: test-results-seed-data

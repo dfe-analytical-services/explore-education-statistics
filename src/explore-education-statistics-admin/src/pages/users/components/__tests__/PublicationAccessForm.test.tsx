@@ -1,6 +1,6 @@
 import PublicationAccessForm from '@admin/pages/users/components/PublicationAccessForm';
 import {
-  testUser,
+  testStandardUser,
   testPublicationSummaries,
 } from '@admin/pages/users/__data__/testUserData';
 import _publicationRolesService from '@admin/services/user-management/publicationRolesService';
@@ -21,7 +21,7 @@ describe('PublicationAccessForm', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={noop}
       />,
     );
@@ -50,7 +50,7 @@ describe('PublicationAccessForm', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={handleUpdate}
       />,
     );
@@ -91,7 +91,7 @@ describe('PublicationAccessForm', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={handleUpdate}
       />,
     );
@@ -121,7 +121,7 @@ describe('PublicationAccessForm', () => {
     render(
       <PublicationAccessForm
         publications={testPublicationSummaries}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={noop}
       />,
     );

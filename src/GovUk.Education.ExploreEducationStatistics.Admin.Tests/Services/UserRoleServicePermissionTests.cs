@@ -158,8 +158,7 @@ public class UserRoleServicePermissionTests
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserRepository? userRepository = null,
         UserManager<ApplicationUser>? userManager = null,
-        IUserService? userService = null,
-        IGlobalRoleService? globalRoleService = null
+        IUserService? userService = null
     )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
@@ -175,8 +174,7 @@ public class UserRoleServicePermissionTests
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
-            userManager ?? MockUserManager().Object,
-            globalRoleService ?? Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
+            userManager ?? MockUserManager().Object
         );
     }
 }

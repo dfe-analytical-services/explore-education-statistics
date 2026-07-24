@@ -44,9 +44,7 @@ export type EditableEmbedBlock = EmbedBlock & {
 };
 
 export type EditableBlock =
-  | EditableContentBlock
-  | EditableDataBlock
-  | EditableEmbedBlock;
+  EditableContentBlock | EditableDataBlock | EditableEmbedBlock;
 
 export type ContentBlockPutModel = Pick<EditableContentBlock, 'body'>;
 export type ContentBlockPostModel = Pick<

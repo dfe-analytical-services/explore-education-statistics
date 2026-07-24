@@ -32,7 +32,7 @@ Create Publication as bau1
 Assign various release access permissions to analysts
     user changes to bau1
     user gives analyst publication drafter access    ${PUBLICATION_NAME}
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
 
 Sign in as analyst1 and go to Manage team access page
     user changes to analyst1
@@ -43,7 +43,7 @@ Sign in as analyst1 and go to Manage team access page
     user checks page contains    There are no approvers, or pending approver invites, for this publication.
 
 Invite existing user analyst2 to be a drafter for the publication
-    user enters text into element    id:inviteDrafterForm-email    EES-test.ANALYST2@education.gov.uk
+    user enters text into element    id:inviteDrafterForm-email    ees-test.analyst2@education.gov.uk
     user clicks button    Invite drafter
 
 Validate updated drafters displayed for the publication
@@ -89,7 +89,7 @@ Validate removed brand new user no longer visible in publication drafter roles t
     user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationDrafterRoles
 
 Invite existing user analyst2 to be a drafter for the publication again
-    user enters text into element    id:inviteDrafterForm-email    EES-test.ANALYST2@education.gov.uk
+    user enters text into element    id:inviteDrafterForm-email    ees-test.analyst2@education.gov.uk
     user clicks button    Invite drafter
 
 Validate publication drafters table containst analyst2 again

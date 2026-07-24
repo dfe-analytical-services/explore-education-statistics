@@ -4,7 +4,7 @@ import { ErrorBody } from '@frontend/modules/api/types/error';
 import { NextApiRequest, NextApiResponse } from 'next';
 import withMethods from '@frontend/middleware/api/withMethods';
 
-const health = async function (
+const health = async function healthFunction(
   _req: NextApiRequest,
   res: NextApiResponse<string | ErrorBody>,
 ) {

@@ -1,76 +1,57 @@
+import ErrorMessage from '@common/components/ErrorMessage';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
+import { ReleaseVersionSummary } from '@common/services/publicationService';
+import { FullTableQuery } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
+import styles from '@frontend/modules/table-tool/components/TableToolSearchFinalResult.module.scss';
+import { encodeFullTableQueryToParams } from '@frontend/modules/table-tool/utils/fullTableQueryTranscode';
 import { FinalDataset } from '@frontend/services/tableToolSearchService';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 interface TableToolSearchFinalResultProps {
   dataset: FinalDataset;
-  releaseVersionId: string;
+  releaseVersionSummary: ReleaseVersionSummary;
 }
+
+const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
+  const { timePeriod, filters, indicators, geographicLevels, subjectId } =
+    dataset;
+
+  return {
+    subjectId,
+    locationIds: Object.values(geographicLevels).flatMap(locations =>
+      locations.map(location => location.id),
+    ),
+    timePeriod:
+      timePeriod?.start?.year && timePeriod?.end?.year
+        ? {
+            startYear: timePeriod.start.year,
+            startCode: timePeriod.start.code,
+            endYear: timePeriod.end.year,
+            endCode: timePeriod.end.code,
+          }
+        : undefined,
+    filters: filters.map(filter => filter.id),
+    indicators: indicators.map(indicator => indicator.id),
+  };
+};
 
 const TableToolSearchFinalResult = ({
   dataset,
-  releaseVersionId,
+  releaseVersionSummary,
 }: TableToolSearchFinalResultProps) => {
-  // Use test data for now, implement when backend provides required data
-  const fullTableQuery =
-    dataset.title === 'Test final result'
-      ? {
-          subjectId: '821750f6-939f-4f60-20d4-08dec542d092',
-          locationIds: [
-            'a455a027-e635-4e90-a0b8-08dec542d106',
-            'a2857282-154f-44cb-a0bb-08dec542d106',
-          ],
-          timePeriod: {
-            startYear: 2014,
-            startCode: 'AY',
-            endYear: 2016,
-            endCode: 'AY',
-          },
-          filters: [],
-          filterHierarchiesOptions: {},
-          indicators: [
-            '4f9f7d79-c3a5-459c-a0b5-08dec542d106',
-            '1bd72149-5230-40ab-a0ac-08dec542d106',
-            '0e74dcb9-9c90-4747-a0a4-08dec542d106',
-            '922db259-ddcc-4a64-a09d-08dec542d106',
-          ],
-        }
-      : {
-          subjectId: '10308fbb-da53-4eae-20d2-08dec542d092',
-          locationIds: [
-            'dd13fe4c-d79d-4412-778c-08dec542d100',
-            '3bbe6385-e5fc-4867-77d7-08dec542d100',
-            'bd0133ed-6e3a-4f15-77ce-08dec542d100',
-            '01c13f50-725d-4e33-77ca-08dec542d100',
-          ],
-          timePeriod: {
-            startYear: 2014,
-            startCode: 'AY',
-            endYear: 2016,
-            endCode: 'AY',
-          },
-          filters: [
-            '04739429-a265-4f28-80a5-4a6fc96bc29e',
-            'f6968c07-3256-41e9-a420-c6a35d78eaa9',
-            'e5936411-6c33-46e4-b247-5d0a8059835f',
-            '24b99a48-5448-4aba-a7c4-a1408cbbc1af',
-          ],
-          indicators: [
-            '6543f18b-c9fd-4866-776e-08dec542d100',
-            'dfbc7a76-1a0a-4649-7775-08dec542d100',
-            '32a616ef-6ade-4514-7781-08dec542d100',
-            'f2bab6fb-38c5-47f2-776d-08dec542d100',
-            'd5034dd2-8b52-4a84-777d-08dec542d100',
-            '370436e9-5880-444d-777f-08dec542d100',
-          ],
-        };
+  const fullTableQuery = generateQueryFromResult(dataset);
+
   const { data, isError, isLoading } = useQuery({
-    ...tableBuilderQueries.getFullTable(fullTableQuery, releaseVersionId),
+    ...tableBuilderQueries.getFullTable(
+      fullTableQuery,
+      releaseVersionSummary.id,
+    ),
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
@@ -91,23 +72,42 @@ const TableToolSearchFinalResult = ({
       <h2 className="govuk-heading-m govuk-!-margin-bottom-2">
         {dataset.title}
       </h2>
-      <Link to={`/data-catalogue/${dataset.fileId}`}>View this data set</Link>
+      <Link to={`/data-catalogue/data-set/${dataset.dataSetFileId}`}>
+        View this data set <VisuallyHidden> - {dataset.title}</VisuallyHidden>
+      </Link>
       <h3 className="govuk-heading-s govuk-!-margin-top-4">Relevance</h3>
-      <p className="govuk-body">{dataset.aiSummary}</p>
+      <p className="govuk-body">{dataset.relevanceReason}</p>
 
       <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
-        {isError && <p>Error loading table.</p>}
+        {isError && <ErrorMessage>Error loading table preview.</ErrorMessage>}
         {table && tableHeaders && (
-          <TimePeriodDataTable
-            capMaxHeight
-            captionTitle={generatedCaption}
-            defaultCaptionId={`dataTableCaption-${dataset.fileId}`}
-            defaultFootnotesId={`dataTableFootnotes-${dataset.fileId}`}
-            fullTable={table}
-            query={fullTableQuery}
-            releaseVersionId={releaseVersionId}
-            tableHeadersConfig={tableHeaders}
-          />
+          <>
+            <div className={styles.previewNotice}>
+              <p className="govuk-body govuk-!-margin-bottom-0">
+                Table showing a preview from:
+                <br />
+                {dataset.title}
+              </p>
+              <Link
+                to={`/data-tables/${releaseVersionSummary.publication.slug}/${
+                  releaseVersionSummary.slug
+                }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
+              >
+                View and edit this table{' '}
+                <VisuallyHidden> - {dataset.title}</VisuallyHidden>
+              </Link>
+            </div>
+            <TimePeriodDataTable
+              capMaxHeight
+              captionTitle={generatedCaption}
+              defaultCaptionId={`dataTableCaption-${dataset.fileId}`}
+              defaultFootnotesId={`dataTableFootnotes-${dataset.fileId}`}
+              fullTable={table}
+              query={fullTableQuery}
+              releaseVersionId={releaseVersionSummary.id}
+              tableHeadersConfig={tableHeaders}
+            />
+          </>
         )}
       </LoadingSpinner>
     </li>

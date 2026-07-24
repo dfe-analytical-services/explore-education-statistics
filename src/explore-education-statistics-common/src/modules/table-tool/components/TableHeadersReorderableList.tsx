@@ -105,8 +105,7 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
 
   const performAction = (
     event:
-      | React.MouseEvent<HTMLDivElement>
-      | React.KeyboardEvent<HTMLDivElement>,
+      React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
     index: number,
   ) => {
     if (isGroupKeyUsed(event)) {

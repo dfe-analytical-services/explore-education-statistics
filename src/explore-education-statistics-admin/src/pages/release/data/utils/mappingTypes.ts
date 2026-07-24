@@ -28,23 +28,15 @@ export type CandidateWithKey =
   | IndicatorCandidateWithKey;
 
 export type AutoMappedItem =
-  | AutoMappedLocation
-  | AutoMappedFilterOption
-  | AutoMappedIndicator;
+  AutoMappedLocation | AutoMappedFilterOption | AutoMappedIndicator;
 
 export type MappableSourceItem =
-  | LocationOptionSource
-  | FilterOptionSource
-  | IndicatorSource;
+  LocationOptionSource | FilterOptionSource | IndicatorSource;
 
 export type MappableItem =
-  | MappableLocation
-  | MappableFilterOption
-  | MappableIndicator;
+  MappableLocation | MappableFilterOption | MappableIndicator;
 
 export type MappingWithKey =
-  | LocationMappingWithKey
-  | FilterOptionMappingWithKey
-  | IndicatorMappingWithKey;
+  LocationMappingWithKey | FilterOptionMappingWithKey | IndicatorMappingWithKey;
 
 export default {};

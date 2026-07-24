@@ -3,8 +3,7 @@ import AccordionSection, {
 } from '@common/components/AccordionSection';
 import React from 'react';
 
-export interface ReorderableAccordionSectionProps
-  extends AccordionSectionProps {
+export interface ReorderableAccordionSectionProps extends AccordionSectionProps {
   id: string;
   isReordering?: boolean;
 }

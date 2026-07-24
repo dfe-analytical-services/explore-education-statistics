@@ -1,14 +1,12 @@
 import ManageUserPage from '@admin/pages/users/ManageUserPage';
 import {
   testPublicationSummaries,
-  testRoles,
   testReleases,
-  testUser,
+  testStandardUser,
 } from '@admin/pages/users/__data__/testUserData';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService from '@admin/services/publicationService';
 import _usersService from '@admin/services/user-management/usersService';
-import _globalRolesService from '@admin/services/user-management/globalRolesService';
 import _releaseService from '@admin/services/releaseService';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
@@ -19,15 +17,11 @@ import { administrationUserManageRoute } from '@admin/routes/administrationRoute
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/releaseService');
 jest.mock('@admin/services/user-management/usersService');
-jest.mock('@admin/services/user-management/globalRolesService');
 
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 const usersService = _usersService as jest.Mocked<typeof _usersService>;
-const globalRolesService = _globalRolesService as jest.Mocked<
-  typeof _globalRolesService
->;
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ManageUserPage', () => {
@@ -56,9 +50,13 @@ describe('ManageUserPage', () => {
       within(screen.getByTestId('Email')).getByText('test@test.com'),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Role')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Update role' }),
+      screen.getByRole('checkbox', {
+        name: 'BAU User',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Update access' }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText('Release')).toBeInTheDocument();
     expect(
@@ -75,9 +73,8 @@ describe('ManageUserPage', () => {
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,
     );
-    globalRolesService.getRoles.mockResolvedValue(testRoles);
     releaseService.getReleases.mockResolvedValue(testReleases);
-    usersService.getUser.mockResolvedValue(testUser);
+    usersService.getUser.mockResolvedValue(testStandardUser);
 
     render(
       <MemoryRouter

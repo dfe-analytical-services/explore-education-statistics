@@ -12,7 +12,6 @@ import { RouteComponentProps } from 'react-router';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import releaseQueries from '@admin/queries/releaseQueries';
-import globalRolesQueries from '@admin/queries/user-management/globalRolesQueries';
 
 export default function ManageUserPage({
   match,
@@ -25,9 +24,6 @@ export default function ManageUserPage({
     refetch,
   } = useQuery(usersQueries.getUser(userId));
 
-  const { data: roles, isLoading: isLoadingRoles } = useQuery(
-    globalRolesQueries.getRoles,
-  );
   const { data: releases, isLoading: isLoadingReleases } = useQuery(
     releaseQueries.getReleases,
   );
@@ -57,9 +53,7 @@ export default function ManageUserPage({
               </SummaryListItem>
             </SummaryList>
 
-            <LoadingSpinner loading={isLoadingRoles}>
-              <RoleForm roles={roles} user={user} onUpdate={refetch} />
-            </LoadingSpinner>
+            <RoleForm user={user} onUpdate={refetch} />
 
             <LoadingSpinner loading={isLoadingReleases}>
               <PreReleaseAccessForm

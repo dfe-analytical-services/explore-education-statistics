@@ -1,12 +1,12 @@
 import redirectPages from '@frontend/middleware/pages/redirectPages';
 import chain from './middleware/chain';
-import rewritePaths from './middleware/pages/rewritePaths';
+import updateRequestDestinations from './middleware/pages/updateRequestDestinations';
 import noIndexPagesWithParams from './middleware/pages/noIndexPagesWithParams';
 import cacheControlHeaders from './middleware/headers/cacheControlHeaders';
 import securityHeaders from './middleware/headers/securityHeaders';
 
 export default chain([
-  rewritePaths,
+  updateRequestDestinations,
   redirectPages,
   cacheControlHeaders,
   securityHeaders,

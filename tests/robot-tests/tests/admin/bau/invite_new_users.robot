@@ -45,7 +45,7 @@ Invite a new user without any additional roles
 Validate newly invited user appears on Pending invites page
     ${ROW}=    user gets table row    ${EMAIL}
     set suite variable    ${ROW}
-    user checks element contains    ${ROW}    Analyst
+    user checks element contains    ${ROW}    Standard User
     user checks element contains    ${ROW}    No user pre-release roles
     user checks element contains    ${ROW}    No user publication roles
 
@@ -96,7 +96,7 @@ Invite a new user with pre-release and publication roles within the same publica
 Validate newly invited user with roles appears on Pending invites page but the redundant pre-release role was not added
     ${ROW}=    user gets table row    ${EMAIL}
     set suite variable    ${ROW}
-    user checks element contains    ${ROW}    Analyst
+    user checks element contains    ${ROW}    Standard User
     user checks element does not contain    ${ROW}    Academic year 2000/01
     user checks element does not contain    ${ROW}    Academic year 2001/02
     user checks element contains    ${ROW}    No user pre-release roles
@@ -149,7 +149,7 @@ Invite a new user with pre-release and publication roles within different public
 Validate newly invited user with roles appears on Pending invites page and the pre-release role appears this time
     ${ROW}=    user gets table row    ${EMAIL}
     set suite variable    ${ROW}
-    user checks element contains    ${ROW}    Analyst
+    user checks element contains    ${ROW}    Standard User
     user checks element contains    ${ROW}    Academic year 2000/01
     user checks element does not contain    ${ROW}    Academic year 2001/02
     user checks element contains    ${ROW}    ${PUBLICATION2_NAME} - Approver

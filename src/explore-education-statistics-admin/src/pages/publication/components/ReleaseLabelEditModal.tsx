@@ -87,7 +87,8 @@ export default function ReleaseLabelEditModal({
         <WarningMessage className="govuk-!-font-weight-regular">
           {formattedLabel ? (
             <span>
-              Changing this release's label to <strong>{formattedLabel}</strong>{' '}
+              Changing this release's label to{' '}
+              <strong>{formattedLabel}</strong>{' '}
             </span>
           ) : (
             <span>

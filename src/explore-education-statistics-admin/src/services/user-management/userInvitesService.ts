@@ -7,14 +7,14 @@ import { PublicationRole } from '../types/PublicationRole';
 
 export interface PendingInvite {
   email: string;
-  role: string;
+  globalRole: string;
   userPublicationRoles: UserPublicationRole[];
   userPreReleaseRoles: UserPreReleaseRole[];
 }
 
 export interface UserInvite {
   email: string;
-  roleId: string;
+  isBau: boolean;
   userPreReleaseRoles: { releaseId: string }[];
   userPublicationRoles: {
     publicationId: string;
@@ -24,7 +24,7 @@ export interface UserInvite {
 
 export interface UserInvitesService {
   getPendingInvites(): Promise<PendingInvite[]>;
-  inviteUser: (invite: UserInvite) => Promise<boolean>;
+  inviteUser: (invite: UserInvite) => Promise<void>;
   cancelInvite: (email: string) => Promise<boolean>;
 }
 
@@ -33,7 +33,7 @@ const userInvitesService: UserInvitesService = {
     return client.get<PendingInvite[]>('/user-invites');
   },
 
-  inviteUser(invite: UserInvite): Promise<boolean> {
+  inviteUser(invite: UserInvite): Promise<void> {
     return client.post(`/user-invites`, invite);
   },
 

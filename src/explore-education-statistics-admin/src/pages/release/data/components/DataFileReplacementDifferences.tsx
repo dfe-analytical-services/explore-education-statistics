@@ -44,7 +44,7 @@ export function uniqueByLabel<T extends { label: string }>(items: T[]): T[] {
  */
 function createTableMappingsAndGroups<
   G extends IndicatorGroupReplacement | LocationReplacement,
-  R extends G[keyof G] extends TargetReplacement ? G[keyof G] : never,
+  R extends (G[keyof G] extends TargetReplacement ? G[keyof G] : never),
 >(
   replacementMappings: Dictionary<ReplacementMapping<unknown>>,
   groups: G[],

@@ -1,6 +1,6 @@
 import PreReleaseAccessForm from '@admin/pages/users/components/PreReleaseAccessForm';
 import {
-  testUser,
+  testStandardUser,
   testReleases,
 } from '@admin/pages/users/__data__/testUserData';
 import _preReleaseUsersService from '@admin/services/user-management/preReleaseUsersService';
@@ -19,7 +19,7 @@ describe('PreReleaseAccessForm', () => {
     render(
       <PreReleaseAccessForm
         releases={testReleases}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={noop}
       />,
     );
@@ -42,7 +42,7 @@ describe('PreReleaseAccessForm', () => {
     render(
       <PreReleaseAccessForm
         releases={testReleases}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={handleUpdate}
       />,
     );
@@ -75,7 +75,7 @@ describe('PreReleaseAccessForm', () => {
     render(
       <PreReleaseAccessForm
         releases={testReleases}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={handleUpdate}
       />,
     );
@@ -105,7 +105,7 @@ describe('PreReleaseAccessForm', () => {
     render(
       <PreReleaseAccessForm
         releases={testReleases}
-        user={testUser}
+        user={testStandardUser}
         onUpdate={noop}
       />,
     );

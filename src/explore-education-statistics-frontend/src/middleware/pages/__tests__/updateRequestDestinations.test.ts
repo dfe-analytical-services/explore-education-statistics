@@ -1,23 +1,26 @@
 import { NextResponse } from 'next/server';
 import runMiddleware from '../../__tests__/util/runMiddleware';
-import rewritePaths from '../rewritePaths';
+import updateRequestDestinations from '../updateRequestDestinations';
 
-describe('rewritePaths', () => {
-  const rewriteSpy = jest.spyOn(NextResponse, 'rewrite');
+describe('updateRequestDestinations', () => {
+  const redirectSpy = jest.spyOn(NextResponse, 'redirect');
   const nextSpy = jest.spyOn(NextResponse, 'next');
 
-  test('rewrites data-catalogue csv downloads to file download endpoint', async () => {
+  test('temporary redirects data-catalogue csv downloads to file download endpoint', async () => {
     const testId = 'test-id-1';
     process.env.CONTENT_API_BASE_URL = 'https://my-content-env';
 
     await runMiddleware(
-      rewritePaths,
+      updateRequestDestinations,
       `https://my-env/data-catalogue/data-set/${testId}/csv`,
     );
 
-    expect(rewriteSpy).toHaveBeenCalledTimes(1);
-    expect(rewriteSpy).toHaveBeenCalledWith(
+    expect(redirectSpy).toHaveBeenCalledTimes(1);
+    expect(redirectSpy).toHaveBeenCalledWith(
       `${process.env.CONTENT_API_BASE_URL}/data-set-files/${testId}/download`,
+      {
+        status: 307,
+      },
     );
     expect(nextSpy).not.toHaveBeenCalled();
   });

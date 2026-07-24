@@ -116,6 +116,9 @@ user opens ie
 
 user opens chrome headlessly
     [Arguments]    ${alias}=headless_chrome
+
+    ${absolute_downloads_dir}=    Normalize Path    ${DOWNLOADS_DIR}
+
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     Call Method    ${c_opts}    add_argument    headless
     Call Method    ${c_opts}    add_argument    start-maximized
@@ -129,7 +132,10 @@ user opens chrome headlessly
     Call Method    ${c_opts}    add_argument    log-level\=3
     Call Method    ${c_opts}    add_argument    disable-logging
 
-    ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
+    ${prefs}=    Create Dictionary
+    ...    download.default_directory=${absolute_downloads_dir}
+    ...    download.prompt_for_download=${FALSE}
+
     Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
 
     IF    "${log_network_traffic}" == "1"
@@ -143,6 +149,9 @@ user opens chrome headlessly
 
 user opens chrome visually
     [Arguments]    ${alias}=chrome
+
+    ${absolute_downloads_dir}=    Normalize Path    ${DOWNLOADS_DIR}
+
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     Call Method    ${c_opts}    add_argument    no-sandbox
     Call Method    ${c_opts}    add_argument    disable-gpu
@@ -150,7 +159,10 @@ user opens chrome visually
     Call Method    ${c_opts}    add_argument    window-size\=1920,1080
     Call Method    ${c_opts}    add_argument    ignore-certificate-errors
 
-    ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
+    ${prefs}=    Create Dictionary
+    ...    download.default_directory=${absolute_downloads_dir}
+    ...    download.prompt_for_download=${FALSE}
+
     Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
     Create Webdriver    Chrome    ${alias}    options=${c_opts}
     ${all_opts}=    Call Method    ${c_opts}    to_capabilities

@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.22")
+                .HasAnnotation("ProductVersion", "8.0.28")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -131,15 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                         {
                             Id = "f9ddb43e-aa9e-41ed-837d-3062e130c425",
                             ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Name = "Analyst",
-                            NormalizedName = "ANALYST"
-                        },
-                        new
-                        {
-                            Id = "17e634f4-7a2b-4a23-8636-b079877b4232",
-                            ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
-                            Name = "Prerelease User",
-                            NormalizedName = "PRERELEASE USER"
+                            Name = "Standard User",
+                            NormalizedName = "STANDARD USER"
                         });
                 });
 
@@ -235,62 +228,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
                         {
                             Id = -13,
                             ClaimType = "ApplicationAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -14,
-                            ClaimType = "AnalystPagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -15,
-                            ClaimType = "ApplicationAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
-                        },
-                        new
-                        {
-                            Id = -16,
-                            ClaimType = "PrereleasePagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "17e634f4-7a2b-4a23-8636-b079877b4232"
-                        },
-                        new
-                        {
-                            Id = -17,
-                            ClaimType = "PrereleasePagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
-                        },
-                        new
-                        {
-                            Id = -18,
-                            ClaimType = "AnalystPagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -19,
-                            ClaimType = "PrereleasePagesAccessGranted",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -20,
-                            ClaimType = "CanViewPrereleaseContacts",
-                            ClaimValue = "",
-                            RoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3"
-                        },
-                        new
-                        {
-                            Id = -21,
-                            ClaimType = "CanViewPrereleaseContacts",
                             ClaimValue = "",
                             RoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425"
                         },

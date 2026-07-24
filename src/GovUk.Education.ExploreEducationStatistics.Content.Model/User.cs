@@ -25,7 +25,7 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public required bool Active { get; set; }
 
-    public IdentityRole? Role { get; set; }
+    public IdentityRole Role { get; set; } = null!;
 
     public required string RoleId { get; set; }
 
@@ -34,6 +34,10 @@ public class User : ICreatedTimestamp<DateTimeOffset>
     public User CreatedBy { get; set; } = null!;
 
     public required Guid CreatedById { get; set; }
+
+    public List<UserPublicationRole> UserPublicationRoles { get; set; } = [];
+
+    public List<UserPreReleaseRole> UserPreReleaseRoles { get; set; } = [];
 
     public string DisplayName => $"{FirstName?.Trim()} {LastName?.Trim()}".Trim();
 }

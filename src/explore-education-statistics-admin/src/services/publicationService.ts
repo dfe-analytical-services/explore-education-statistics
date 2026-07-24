@@ -248,8 +248,8 @@ const publicationService = {
   },
 
   listReleaseVersions<
-    TReleaseVersionSummary extends
-      ReleaseVersionSummary = ReleaseVersionSummary,
+    TReleaseVersionSummary extends ReleaseVersionSummary =
+      ReleaseVersionSummary,
   >(
     publicationId: string,
     params: ListReleaseVersionsParams,

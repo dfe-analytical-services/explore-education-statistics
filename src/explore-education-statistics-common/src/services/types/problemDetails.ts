@@ -17,8 +17,9 @@ export interface ProblemDetails {
   detail?: string;
 }
 
-export interface ValidationProblemDetails<TCode extends string = string>
-  extends ProblemDetails {
+export interface ValidationProblemDetails<
+  TCode extends string = string,
+> extends ProblemDetails {
   /**
    * Errors associated with the validation problem.
    */

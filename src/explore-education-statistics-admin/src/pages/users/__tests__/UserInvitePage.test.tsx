@@ -1,7 +1,6 @@
 import UserInvitePage from '@admin/pages/users/UserInvitePage';
 import {
   testPublicationSummaries,
-  testRoles,
   testReleases,
 } from '@admin/pages/users/__data__/testUserData';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
@@ -11,7 +10,6 @@ import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { administrationUserInviteRoute } from '@admin/routes/administrationRoutes';
-import _globalRolesService from '@admin/services/user-management/globalRolesService';
 import _releaseService from '@admin/services/releaseService';
 import { PublicationRole } from '@admin/services/types/PublicationRole';
 import _userInvitesService from '@admin/services/user-management/userInvitesService';
@@ -19,15 +17,11 @@ import _userInvitesService from '@admin/services/user-management/userInvitesServ
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/releaseService');
 jest.mock('@admin/services/user-management/userInvitesService');
-jest.mock('@admin/services/user-management/globalRolesService');
 
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
-const globalRolesService = _globalRolesService as jest.Mocked<
-  typeof _globalRolesService
->;
 const userInvitesService = _userInvitesService as jest.Mocked<
   typeof _userInvitesService
 >;
@@ -43,7 +37,11 @@ describe('UserInvitePage', () => {
       screen.getByRole('heading', { name: 'Invite user' }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText('User email')).toBeInTheDocument();
-    expect(screen.getByLabelText('Role')).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', {
+        name: 'BAU User',
+      }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Add pre-release role' }),
     ).toBeInTheDocument();
@@ -76,29 +74,6 @@ describe('UserInvitePage', () => {
     expect(
       screen.getByTestId('inviteUserForm-userEmail-error'),
     ).toHaveTextContent('Provide the users email');
-  });
-
-  test('shows validation error if role is empty', async () => {
-    const { user } = renderPage();
-    expect(
-      await screen.findByText('Manage access to this service'),
-    ).toBeInTheDocument();
-
-    await user.type(screen.getByLabelText('User email'), 'test@test.com');
-
-    await user.selectOptions(screen.getByLabelText('Role'), 'Choose role');
-    await user.click(screen.getByRole('button', { name: 'Send invite' }));
-
-    expect(await screen.findByText('There is a problem')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', {
-        name: 'Choose role for the user',
-      }),
-    ).toHaveAttribute('href', '#inviteUserForm-roleId');
-
-    expect(screen.getByTestId('inviteUserForm-roleId-error')).toHaveTextContent(
-      'Choose role for the user',
-    );
   });
 
   describe('adding pre-release roles', () => {
@@ -389,7 +364,7 @@ describe('UserInvitePage', () => {
     });
     expect(userInvitesService.inviteUser).toHaveBeenCalledWith({
       email: 'test@test.com',
-      roleId: 'role-1-id',
+      isBau: false,
       userPreReleaseRoles: [],
       userPublicationRoles: [],
     });
@@ -431,7 +406,7 @@ describe('UserInvitePage', () => {
     });
     expect(userInvitesService.inviteUser).toHaveBeenCalledWith({
       email: 'test@test.com',
-      roleId: 'role-1-id',
+      isBau: false,
       userPreReleaseRoles: [{ releaseId: 'release-1-id' }],
       userPublicationRoles: [
         {
@@ -442,11 +417,43 @@ describe('UserInvitePage', () => {
     });
   });
 
+  test('submits successfully when global role is changed to BAU', async () => {
+    const { user } = renderPage();
+    expect(
+      await screen.findByText('Manage access to this service'),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('User email'), 'test@test.com');
+
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'BAU User',
+    });
+
+    expect(checkbox).not.toBeChecked();
+
+    await user.click(checkbox);
+
+    expect(checkbox).toBeChecked();
+
+    expect(userInvitesService.inviteUser).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Send invite' }));
+
+    await waitFor(() => {
+      expect(userInvitesService.inviteUser).toHaveBeenCalledTimes(1);
+    });
+    expect(userInvitesService.inviteUser).toHaveBeenCalledWith({
+      email: 'test@test.com',
+      isBau: true,
+      userPreReleaseRoles: [],
+      userPublicationRoles: [],
+    });
+  });
+
   const renderPage = () => {
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,
     );
-    globalRolesService.getRoles.mockResolvedValue(testRoles);
     releaseService.getReleases.mockResolvedValue(testReleases);
 
     return render(

@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -23,14 +22,9 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(SecurityPolicies.IsBauUser);
     }
 
-    public static Task<Either<ActionResult, Unit>> CheckCanAccessAnalystPages(this IUserService userService)
+    public static Task<Either<ActionResult, User>> CheckCanAccessAnalystPages(this IUserService userService, User user)
     {
-        return userService.CheckPolicy(SecurityPolicies.CanAccessAnalystPages);
-    }
-
-    public static Task<Either<ActionResult, Unit>> CheckCanAccessPreReleasePages(this IUserService userService)
-    {
-        return userService.CheckPolicy(SecurityPolicies.CanAccessPreReleasePages);
+        return userService.CheckPolicy(user, SecurityPolicies.CanAccessAnalystPages);
     }
 
     public static Task<Either<ActionResult, PublicationMethodology>> CheckCanDropMethodologyLink(

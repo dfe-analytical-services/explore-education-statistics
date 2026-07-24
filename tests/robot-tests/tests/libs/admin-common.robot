@@ -708,26 +708,26 @@ user changes methodology status to Higher level review
     user checks page contains tag    In Review
 
 user gives analyst publication drafter access
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Drafter    ${ANALYST_EMAIL}
 
 user gives analyst publication approver access
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
 user removes publication drafter access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user removes publication access from analyst    ${PUBLICATION_NAME}    Drafter    ${ANALYST_EMAIL}
 
 user removes publication approver access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user removes publication access from analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
 user gives publication access to analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${ROLE}
-    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    ...    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user chooses select option    css:[name="publicationId"]    ${PUBLICATION_NAME}
     user waits until element is enabled    css:[name="publicationRole"]
@@ -740,7 +740,7 @@ user removes publication access from analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${ROLE}
-    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    ...    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     ${table}=    user gets testid element    publicationAccessTable
     ${row}=    get child element    ${table}
@@ -752,7 +752,7 @@ user gives pre-release access to analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
-    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    ...    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user scrolls to element    css:[name="releaseId"]
     user chooses select option    css:[name="releaseId"]    ${PUBLICATION_NAME} - ${RELEASE_NAME}
@@ -764,7 +764,7 @@ user removes pre-release access from analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
-    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    ...    ${ANALYST_EMAIL}=ees-test.analyst1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     ${table}=    user gets testid element    preReleaseAccessTable
     ${row}=    get child element    ${table}

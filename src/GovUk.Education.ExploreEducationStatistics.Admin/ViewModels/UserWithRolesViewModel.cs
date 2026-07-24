@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -20,7 +21,8 @@ public record UserViewModel
 
     public required string Email { get; init; } = string.Empty;
 
-    public string? Role { get; init; }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public required GlobalRoles.Role GlobalRole { get; init; }
 }
 
 public record UserPublicationRoleViewModel

@@ -17,8 +17,7 @@ const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
 
 export interface DataBlockTabsProps {
   additionalTabContent?:
-    | ((props: { dataBlock: DataBlock }) => ReactNode)
-    | ReactNode;
+    ((props: { dataBlock: DataBlock }) => ReactNode) | ReactNode;
   dataBlock: DataBlock;
   dataBlockStaleTime?: number;
   firstTabs?: ReactNode;

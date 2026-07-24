@@ -9,5 +9,3 @@ param searchServiceSemanticRankerAvailability = 'free'
 
 // Allow API key authentication for the Azure AI Search service to support local development.
 param searchServiceLocalAuthEnabled = true
-
-param deployNaturalLanguageSearchFunctionApp = true

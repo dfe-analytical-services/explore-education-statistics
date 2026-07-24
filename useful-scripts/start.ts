@@ -67,8 +67,7 @@ type ServiceSchema = {
 );
 
 type ServiceSchemaDockerServices =
-  | DockerService[]
-  | ((options: ProgramOptions) => DockerService[]);
+  DockerService[] | ((options: ProgramOptions) => DockerService[]);
 
 // Annoyingly, need to define these separately from schemas,
 // or we run into various circular reference issues in the types.
@@ -349,11 +348,23 @@ async function startDockerServices() {
       servicesToStart.includes('admin') ||
       servicesToStart.includes('dataScreener')
     ) {
+      await $$`docker compose down data-screener`;
+      await $$`docker compose rm -f data-screener`;
+
       cloneRequiredRepository(
         screenerRepositoryName,
         screenerLocalDir,
         screenerRepoUrl,
       );
+
+      // Pull the CRAN packages from a repository snapshot 3 weeks old to better ensure
+      // that we're grabbing dependencies that have pre-compiled binaries during local
+      // development.
+      //
+      // The Screener API build pipeline will continue to pull from the very latest CRAN
+      // repositories as build speed in the build pipeline is not as crucial as it is locally.
+      const cranSnapshotDate = getMondayDateStringForPriorWeek(3);
+      await $$`docker build --build-arg CRAN_REPOSITORY_SNAPSHOT_VERSION=${cranSnapshotDate} -t explore-education-statistics-data-screener ${screenerLocalDir}`;
     }
 
     await $$`docker compose up ${[...args, ...dockerServicesToStart]}`;
@@ -555,4 +566,16 @@ function cloneRequiredRepository(
       console.error(`Failed to pull repository '${repositoryName}'`);
     }
   }
+}
+
+function getMondayDateStringForPriorWeek(numberOfWeeksPrior: number): string {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const isoDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
+
+  const daysToSubtract = isoDayOfWeek + numberOfWeeksPrior * 7 - 1;
+
+  const previousMonday = new Date(today);
+  previousMonday.setDate(today.getDate() - daysToSubtract);
+  return previousMonday.toISOString().split('T')[0];
 }

@@ -37,6 +37,9 @@ Create publication and releases
     user gives analyst publication drafter access
     ...    ${PUBLICATION_NAME}
 
+    user removes publication drafter access from analyst
+    ...    ${PUBLICATION_NAME}
+
     user gives pre-release access to analyst
     ...    ${PUBLICATION_NAME}
     ...    Academic year 2025/26

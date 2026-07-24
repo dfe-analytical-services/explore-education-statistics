@@ -55,11 +55,10 @@ interface FormReferenceLine extends ReferenceLine {
   otherAxisPositionType?: OtherAxisPositionType;
 }
 
-export interface ChartAxisConfigurationFormValues
-  extends OmitStrict<
-    AxisConfiguration,
-    'dataSets' | 'type' | 'label' | 'referenceLines'
-  > {
+export interface ChartAxisConfigurationFormValues extends OmitStrict<
+  AxisConfiguration,
+  'dataSets' | 'type' | 'label' | 'referenceLines'
+> {
   labelText?: string;
   labelWidth?: number | null;
   referenceLines?: FormReferenceLine[];

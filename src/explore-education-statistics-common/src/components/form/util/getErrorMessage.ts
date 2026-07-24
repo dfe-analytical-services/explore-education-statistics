@@ -6,5 +6,5 @@ export default function getErrorMessage<TValues extends FieldValues>(
   name: Path<TValues>,
   showError = true,
 ): string {
-  return showError ? (get(errors, name)?.message as string) ?? '' : '';
+  return showError ? ((get(errors, name)?.message as string) ?? '') : '';
 }

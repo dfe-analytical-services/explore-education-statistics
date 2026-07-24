@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 /// <summary>
 /// Provides high-level information about a data set.

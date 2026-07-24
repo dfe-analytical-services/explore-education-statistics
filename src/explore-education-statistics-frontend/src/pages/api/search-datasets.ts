@@ -89,9 +89,8 @@ export default withMethods({
 
       const { count = 0, results } = searchResults;
 
-      const transformedResultsArray = await transformDataSetListResults(
-        results,
-      );
+      const transformedResultsArray =
+        await transformDataSetListResults(results);
 
       const dataSetsResult = {
         paging: {

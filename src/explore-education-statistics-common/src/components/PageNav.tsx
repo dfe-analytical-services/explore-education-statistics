@@ -8,8 +8,7 @@ interface Props {
   heading?: string;
   items: NavItem[];
   widthClassName?:
-    | 'govuk-grid-column-one-quarter'
-    | 'govuk-grid-column-one-third';
+    'govuk-grid-column-one-quarter' | 'govuk-grid-column-one-third';
   onClickItem?: (id: string) => void;
 }
 

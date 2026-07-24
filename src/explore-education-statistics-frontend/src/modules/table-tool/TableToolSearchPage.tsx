@@ -78,8 +78,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
       await tableToolSearchService.postSearchStream(
         {
           userQuery: searchTerm.trim(),
-          publicationId:
-            'a91d9e05-be82-474c-85ae-4913158406d0' || publicationSummary.id, // hardcoding for now
+          publicationId: publicationSummary.id,
         },
         {
           signal: abortControllerRef.current.signal,
@@ -106,12 +105,14 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
               return updatedState;
             });
 
+            setError(null);
+
             // Abort early if there are no results.
             if (
               (message.stage === PipelineStage.RETRIEVED &&
                 message.data.datasets.length === 0) ||
               (message.stage === PipelineStage.RERANKER &&
-                message.data.shortlistedDatasets.length === 0)
+                message.data.datasets.length === 0)
             ) {
               abortControllerRef.current?.abort();
             }
@@ -143,7 +144,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
 
   const hasNoResults =
     (retrievedData && retrievedData.datasets.length === 0) ||
-    (rerankerData && rerankerData.shortlistedDatasets.length === 0) ||
+    (rerankerData && rerankerData.datasets.length === 0) ||
     (finalData && finalData.datasets.length === 0);
 
   const searchFinished = currentStage === PipelineStage.COMPLETE;
@@ -256,17 +257,15 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                         )}
 
                       {currentStage === PipelineStage.RERANKER &&
-                        pipelineData.rerankerData?.shortlistedDatasets && (
+                        pipelineData.rerankerData?.datasets && (
                           <ul className="govuk-list govuk-list--spaced">
-                            {pipelineData.rerankerData.shortlistedDatasets.map(
-                              dataset => (
-                                <TableToolSearchShortlistedResult
-                                  key={dataset.title}
-                                  title={dataset.title}
-                                  relevance={dataset.relevanceScore}
-                                />
-                              ),
-                            )}
+                            {pipelineData.rerankerData.datasets.map(dataset => (
+                              <TableToolSearchShortlistedResult
+                                key={dataset.title}
+                                title={dataset.title}
+                                relevance={dataset.relevanceScore}
+                              />
+                            ))}
                           </ul>
                         )}
 
@@ -293,7 +292,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                             <TableToolSearchFinalResult
                               key={dataset.fileId}
                               dataset={dataset}
-                              releaseVersionId={latestReleaseVersion.id}
+                              releaseVersionSummary={latestReleaseVersion}
                             />
                           ))}
                         </ul>
@@ -327,9 +326,8 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const publicationSummary = await publicationService.getPublicationSummary(
-    publicationSlug,
-  );
+  const publicationSummary =
+    await publicationService.getPublicationSummary(publicationSlug);
 
   const latestReleaseVersion =
     await publicationService.getReleaseVersionSummary(

@@ -3,77 +3,71 @@ import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
-import { mapFieldErrors } from '@common/validation/serverValidations';
-import Yup from '@common/validation/yup';
-import React, { useMemo } from 'react';
-import { ObjectSchema } from 'yup';
-import { Role } from '@admin/services/user-management/globalRolesService';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import React from 'react';
 import { UserWithRoles } from '@admin/services/types/userWithRoles';
-
-const updateRoleFormErrorMappings = [
-  mapFieldErrors<FormValues>({
-    target: 'roleId',
-    messages: {
-      RoleDoesNotExist: 'Role does not exist',
-    },
-  }),
-];
+import { GlobalRole } from '@admin/services/types/GlobalRole';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 
 interface FormValues {
-  roleId: string;
+  isBauUser: boolean;
+}
+
+interface FormValues {
+  targetGlobalRole: GlobalRole;
 }
 
 interface Props {
-  roles?: Role[];
   user: UserWithRoles;
   onUpdate: () => void;
 }
 
-const RoleForm = ({ roles, user, onUpdate }: Props) => {
-  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    return Yup.object({
-      roleId: Yup.string().required('Choose role for the user'),
-    });
-  }, []);
+const errorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'isBauUser',
+    messages: {
+      UserIsAlreadyBauUser: 'User is already a BAU User',
+      UserIsAlreadyStandardUser: 'User is already a Standard User',
+    },
+  }),
+];
 
+const RoleForm = ({ user, onUpdate }: Props) => {
   const handleSubmit = async (values: FormValues) => {
-    await usersService.updateUserGlobalRole(user.id, values);
+    await usersService.updateUserGlobalRole(user.id, {
+      targetGlobalRole: values.isBauUser
+        ? GlobalRole.BauUser
+        : GlobalRole.StandardUser,
+    });
+
     onUpdate();
   };
 
   return (
     <FormProvider
+      errorMappings={errorMappings}
       enableReinitialize
-      errorMappings={updateRoleFormErrorMappings}
       initialValues={{
-        roleId: user.role ?? '',
+        isBauUser: user.globalRole === GlobalRole.BauUser,
       }}
-      validationSchema={validationSchema}
     >
       <Form id={user.id} onSubmit={handleSubmit}>
         <FormFieldset
-          id="role"
-          legend="Role"
+          id="bau"
+          legend="Access level"
           legendSize="m"
-          hint="The users' role within the service."
+          hint="BAU users have elevated permissions."
         >
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-quarter">
-              <FormFieldSelect<FormValues>
-                label="Role"
-                name="roleId"
-                options={roles?.map(role => ({
-                  label: role.name,
-                  value: role.id,
-                }))}
-                placeholder="Choose role"
+              <FormFieldCheckbox<FormValues>
+                name="isBauUser"
+                label="BAU User"
               />
             </div>
+
             <div className="govuk-grid-column-one-quarter">
-              <Button type="submit" className="govuk-!-margin-top-6">
-                Update role
-              </Button>
+              <Button type="submit">Update access</Button>
             </div>
           </div>
         </FormFieldset>

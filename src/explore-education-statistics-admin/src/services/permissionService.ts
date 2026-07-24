@@ -1,10 +1,8 @@
-import { User } from '@admin/contexts/AuthContext';
 import client from '@admin/services/utils/service';
 import { parseISO } from 'date-fns';
 
 export interface GlobalPermissions {
   canAccessSystem: boolean;
-  canAccessPreReleasePages: boolean;
   canAccessAnalystPages: boolean;
   canAccessAllImports: boolean;
   canManageAllTaxonomy: boolean;
@@ -39,9 +37,6 @@ export interface PreReleaseWindowStatus {
 const permissionService = {
   getGlobalPermissions(): Promise<GlobalPermissions> {
     return client.get(`/permissions/access`);
-  },
-  canAccessPrereleasePages(user?: User): Promise<boolean> {
-    return Promise.resolve(!!user?.permissions.canAccessPreReleasePages);
   },
   canUpdateRelease(releaseId: string): Promise<boolean> {
     return client.get(`/permissions/release/${releaseId}/update`);

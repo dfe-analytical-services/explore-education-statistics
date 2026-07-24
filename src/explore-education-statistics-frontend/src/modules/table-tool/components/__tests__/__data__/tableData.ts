@@ -269,13 +269,21 @@ export const testPublicationMethodologyList = {
 
 export const testFinalResult: FinalDataset = {
   fileId: 'test-file-id',
+  subjectId: 'test-subject-id',
+  dataSetFileId: 'test-data-set-file-id',
+  description: 'Test dataset description',
+  publicationId: 'test-publication-id',
+  publicationSlug: 'test-publication-slug',
+  publicationTitle: 'Test publication title',
+  relevanceReason: 'Test AI relevance summary explanation.',
+  releaseSlug: 'test-release-slug',
+  releaseVersionId: 'test-release-version-id',
   title: 'Test dataset title',
-  aiSummary: 'Test AI relevance summary explanation.',
   filters: [],
   geographicLevels: {},
   timePeriod: {
-    start: { code: 'AY', year: '2014' },
-    end: { code: 'AY', year: '2016' },
+    start: { code: 'AY', year: 2014 },
+    end: { code: 'AY', year: 2016 },
   },
   indicators: [],
 };

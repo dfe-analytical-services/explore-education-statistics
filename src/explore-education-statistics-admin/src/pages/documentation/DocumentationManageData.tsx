@@ -400,7 +400,8 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     Add the content of your footnote into the text box at the
-                    bottom of the page and then select the green ‘Save’ button.{' '}
+                    bottom of the page and then select the green ‘Save’
+                    button.{' '}
                   </h4>
                   <img
                     src={imageFootnotesSave}
@@ -585,7 +586,8 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
               </ul>
               <h3>Help and support</h3>
               <p>
-                If you have any issues uploading files to your release contact:{' '}
+                If you have any issues uploading files to your release
+                contact:{' '}
               </p>
               <strong>Explore education statistics team </strong>
               <p>

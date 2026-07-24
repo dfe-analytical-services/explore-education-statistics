@@ -65,6 +65,13 @@ public interface IUserPublicationRoleRepository
         params PublicationRole[] rolesToInclude
     );
 
+    Task<bool> UserHasAnyRole(
+        Guid userId,
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
+        CancellationToken cancellationToken = default,
+        params PublicationRole[] rolesToInclude
+    );
+
     Task MarkEmailAsSent(
         Guid userPublicationRoleId,
         DateTimeOffset? dateSent = null,

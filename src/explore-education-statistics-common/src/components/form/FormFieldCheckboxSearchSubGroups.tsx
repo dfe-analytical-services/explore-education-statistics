@@ -12,9 +12,9 @@ import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 export interface FormFieldCheckboxSearchSubGroupsProps<
   TFormValues extends FieldValues,
 > extends Omit<
-    FormCheckboxSearchSubGroupsProps,
-    'name' | 'value' | 'inputRef' | 'id'
-  > {
+  FormCheckboxSearchSubGroupsProps,
+  'name' | 'value' | 'inputRef' | 'id'
+> {
   name: Path<TFormValues>;
   id?: string;
   showError?: boolean;

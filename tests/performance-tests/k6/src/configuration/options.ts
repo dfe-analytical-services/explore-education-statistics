@@ -6,10 +6,7 @@ import sequentialRequestProfile from './sequentialRequestsProfile';
 
 export default function getStandardOptions(): Options {
   const profile = (__ENV.PROFILE ?? 'sequential') as
-    | 'load'
-    | 'spike'
-    | 'stress'
-    | 'sequential';
+    'load' | 'spike' | 'stress' | 'sequential';
 
   switch (profile) {
     case 'load': {

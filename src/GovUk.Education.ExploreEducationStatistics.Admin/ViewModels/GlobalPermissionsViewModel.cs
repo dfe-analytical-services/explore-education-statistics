@@ -4,7 +4,6 @@ public record GlobalPermissionsViewModel(
     bool CanAccessSystem,
     bool CanAccessAnalystPages,
     bool CanAccessAllImports,
-    bool CanAccessPreReleasePages,
     bool CanManageAllTaxonomy,
     bool IsBauUser,
     bool IsApprover

@@ -52,9 +52,7 @@ const EditableEmbedForm = ({
           test: (value: string) =>
             Boolean(
               value &&
-                permittedEmbedUrlDomains.some(domain =>
-                  value.startsWith(domain),
-                ),
+              permittedEmbedUrlDomains.some(domain => value.startsWith(domain)),
             ),
         }),
     });

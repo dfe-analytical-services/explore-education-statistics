@@ -7,11 +7,12 @@ import getErrorMessage from '@common/components/form/util/getErrorMessage';
 import React, { memo, useCallback } from 'react';
 import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
-export interface FormFieldRadioGroupProps<TFormValues extends FieldValues>
-  extends Omit<
-    FormRadioGroupProps,
-    'name' | 'value' | 'inputRef' | 'id' | 'error'
-  > {
+export interface FormFieldRadioGroupProps<
+  TFormValues extends FieldValues,
+> extends Omit<
+  FormRadioGroupProps,
+  'name' | 'value' | 'inputRef' | 'id' | 'error'
+> {
   name: Path<TFormValues>;
   id?: string;
   showError?: boolean;
