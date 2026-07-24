@@ -12,21 +12,20 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import InviteUserPreReleaseRoleForm from '@admin/pages/users/components/InviteUserPreReleaseRoleForm';
 import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import { ObjectSchema } from 'yup';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 import { RouteComponentProps } from 'react-router';
-import orderBy from 'lodash/orderBy';
 import {
   PublicationRole,
   publicationRoles,
 } from '@admin/services/types/PublicationRole';
 import releaseQueries from '@admin/queries/releaseQueries';
-import globalRolesQueries from '@admin/queries/user-management/globalRolesQueries';
 import userInvitesService, {
   UserInvite,
 } from '@admin/services/user-management/userInvitesService';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import { FormFieldset } from '@common/components/form';
 
 export interface InviteUserPreReleaseRole {
   releaseId: string;
@@ -39,7 +38,7 @@ export interface InviteUserPublicationRole {
 
 export interface UserInviteFormValues {
   userEmail: string;
-  roleId: string;
+  isBau: boolean;
   userPreReleaseRoles?: InviteUserPreReleaseRole[];
   userPublicationRoles?: InviteUserPublicationRole[];
   publicationId?: string;
@@ -61,10 +60,6 @@ export default function UserInvitePage({
 }: RouteComponentProps & ErrorControlState) {
   const formId = 'inviteUserForm';
 
-  const { data: globalRoles, isLoading: isLoadingGlobalRoles } = useQuery(
-    globalRolesQueries.getRoles,
-  );
-
   const { data: releases, isLoading: isLoadingReleases } = useQuery(
     releaseQueries.getReleases,
   );
@@ -73,8 +68,7 @@ export default function UserInvitePage({
     publicationQueries.getPublicationSummaries,
   );
 
-  const isLoading =
-    isLoadingGlobalRoles || isLoadingReleases || isLoadingPublications;
+  const isLoading = isLoadingReleases || isLoadingPublications;
 
   const cancelHandler = () => history.push('/administration/users/invites');
 
@@ -96,7 +90,7 @@ export default function UserInvitePage({
 
     const submission: UserInvite = {
       email: values.userEmail,
-      roleId: values.roleId,
+      isBau: values.isBau,
       userPreReleaseRoles,
       userPublicationRoles,
     };
@@ -111,7 +105,7 @@ export default function UserInvitePage({
       userEmail: Yup.string()
         .required('Provide the users email')
         .email('Provide a valid email address'),
-      roleId: Yup.string().required('Choose role for the user'),
+      isBau: Yup.boolean().required(),
       userPreReleaseRoles: Yup.array().of(
         Yup.object({
           releaseId: Yup.string().required(
@@ -149,9 +143,7 @@ export default function UserInvitePage({
           errorMappings={errorMappings}
           initialValues={{
             userEmail: '',
-            roleId:
-              orderBy(globalRoles, globalRole => globalRole.name)?.[0]?.id ??
-              '',
+            isBau: false,
             userPublicationRoles: [],
           }}
           validationSchema={validationSchema}
@@ -164,16 +156,17 @@ export default function UserInvitePage({
               hint="The invited user must be on the DfE AAD. Contact explore.statistics@education.gov.uk if unsure."
             />
 
-            <FormFieldSelect<UserInviteFormValues>
-              label="Role"
-              name="roleId"
-              hint="The user's role within the service."
-              placeholder="Choose role"
-              options={globalRoles?.map(globalRole => ({
-                label: globalRole.name,
-                value: globalRole.id,
-              }))}
-            />
+            <FormFieldset
+              id="bau"
+              legend="Access level"
+              legendSize="m"
+              hint="BAU users have elevated permissions."
+            >
+              <FormFieldCheckbox<UserInviteFormValues>
+                name="isBau"
+                label="BAU User"
+              />
+            </FormFieldset>
 
             <InviteUserPreReleaseRoleForm releases={releases} />
 

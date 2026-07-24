@@ -32,46 +32,24 @@ public class PreReleaseUserService(
     IUserRepository userRepository,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IReleaseVersionRepository releaseVersionRepository,
-    IGlobalRoleService globalRoleService
+    IReleaseVersionRepository releaseVersionRepository
 ) : IPreReleaseUserService
 {
-    public async Task<List<PreReleaseUserViewModel>> GetAllPreReleaseUsers()
-    {
-        return
-        [
-            .. (
-                await usersAndRolesDbContext
-                    .Users.Join(
-                        usersAndRolesDbContext.UserRoles,
-                        user => user.Id,
-                        userRole => userRole.UserId,
-                        (user, userRole) => new { user, userRoleId = userRole.RoleId }
-                    )
-                    .Join(
-                        usersAndRolesDbContext.Roles,
-                        prev => prev.userRoleId,
-                        role => role.Id,
-                        (prev, role) =>
-                            new
-                            {
-                                UserId = Guid.Parse(prev.user.Id),
-                                Name = prev.user.FirstName + " " + prev.user.LastName,
-                                prev.user.Email,
-                                Role = role.Name,
-                            }
-                    )
-                    .OrderBy(x => x.Name)
-                    .Where(u => u.Role == Role.PrereleaseUser.GetEnumLabel())
-                    .ToListAsync()
-            ).Select(u => new PreReleaseUserViewModel
+    public async Task<List<PreReleaseUserViewModel>> GetAllPurelyPreReleaseUsers() =>
+        await contentDbContext
+            .Users.AsNoTracking()
+            .Where(u => u.Active)
+            .Where(u => u.Role.Name == RoleNames.StandardUser)
+            .Where(u => !u.UserPublicationRoles.Any())
+            .Where(u => u.UserPreReleaseRoles.Any())
+            .Select(u => new PreReleaseUserViewModel
             {
-                Id = u.UserId,
-                Name = u.Name,
-                Email = u.Email!,
-            }),
-        ];
-    }
+                Id = u.Id,
+                Name = u.FirstName + " " + u.LastName,
+                Email = u.Email,
+            })
+            .OrderBy(u => u.Name)
+            .ToListAsync();
 
     public async Task<Either<ActionResult, List<PreReleaseUserSummaryViewModel>>> GetPreReleaseUsers(
         Guid releaseVersionId
@@ -270,12 +248,7 @@ public class PreReleaseUserService(
         await contentDbContext.RequireTransaction(async () =>
         {
             var userToUse =
-                activeUser
-                ?? await userRepository.CreateOrUpdate(
-                    email: email,
-                    role: Role.PrereleaseUser,
-                    createdById: userService.GetUserId()
-                );
+                activeUser ?? await userRepository.CreateOrUpdate(email: email, createdById: userService.GetUserId());
 
             await CreatePreReleaseRoleAndNotify(releaseVersion, userToUse);
         });
@@ -289,11 +262,7 @@ public class PreReleaseUserService(
         {
             var userToUse = user.Active
                 ? user
-                : await userRepository.CreateOrUpdate(
-                    email: user.Email,
-                    role: Role.PrereleaseUser,
-                    createdById: userService.GetUserId()
-                );
+                : await userRepository.CreateOrUpdate(email: user.Email, createdById: userService.GetUserId());
 
             await CreatePreReleaseRoleAndNotify(releaseVersion, userToUse);
         });
@@ -307,13 +276,6 @@ public class PreReleaseUserService(
             createdById: userService.GetUserId()
         );
 
-        if (user.Active)
-        {
-            var identityUser = await GetIdentityUser(user.Id);
-
-            await globalRoleService.UpgradeToGlobalRoleIfRequired(identityUser, RoleNames.PrereleaseUser);
-        }
-
         var shouldSendEmail = releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved;
 
         if (shouldSendEmail)
@@ -325,7 +287,7 @@ public class PreReleaseUserService(
     private async Task<Either<ActionResult, Unit>> RemovePreReleaseRole(UserPreReleaseRole userPreReleaseRole) =>
         await userService
             .CheckCanAssignPreReleaseContactsToReleaseVersion(userPreReleaseRole.ReleaseVersion)
-            .OnSuccessDo(async _ =>
+            .OnSuccessVoid(async _ =>
             {
                 var removed = await userPreReleaseRoleRepository.RemoveById(userPreReleaseRole.Id);
 
@@ -334,15 +296,6 @@ public class PreReleaseUserService(
                     throw new InvalidOperationException(
                         $"Failed to remove User Pre-Release Role with ID {userPreReleaseRole.Id}"
                     );
-                }
-            })
-            .OnSuccessVoid(async _ =>
-            {
-                if (userPreReleaseRole.User.Active)
-                {
-                    var identityUser = await GetIdentityUser(userPreReleaseRole.UserId);
-
-                    await globalRoleService.DowngradeFromGlobalRoleIfRequired(identityUser, RoleNames.PrereleaseUser);
                 }
             });
 

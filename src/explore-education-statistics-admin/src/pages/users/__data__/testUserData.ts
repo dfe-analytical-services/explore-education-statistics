@@ -1,14 +1,14 @@
 import { PublicationSummaryPreview } from '@common/services/publicationService';
 import { IdTitlePair } from '@admin/services/types/common';
 import { UserWithRoles } from '@admin/services/types/userWithRoles';
-import { Role } from '@admin/services/user-management/globalRolesService';
 import { PublicationRole } from '@admin/services/types/PublicationRole';
+import { GlobalRole } from '@admin/services/types/GlobalRole';
 
-export const testUser: UserWithRoles = {
+export const testStandardUser: UserWithRoles = {
   id: 'user-1-id',
   name: 'Florian Schneider',
   email: 'test@test.com',
-  role: 'role-guid-1',
+  globalRole: GlobalRole.StandardUser,
   userPublicationRoles: [
     {
       id: 'pr-id-1',
@@ -33,6 +33,15 @@ export const testUser: UserWithRoles = {
       release: 'Release 2',
     },
   ],
+};
+
+export const testBauUser: UserWithRoles = {
+  id: 'bau-user',
+  name: 'Timothy Smith',
+  email: 'timothy@test.com',
+  globalRole: GlobalRole.BauUser,
+  userPublicationRoles: [],
+  userPreReleaseRoles: [],
 };
 
 export const testPublicationSummaries: PublicationSummaryPreview[] = [
@@ -71,19 +80,6 @@ export const testPublicationSummaries: PublicationSummaryPreview[] = [
       teamEmail: 'Mock Contact Team Email',
       contactName: 'Mock Contact Name',
     },
-  },
-];
-
-export const testRoles: Role[] = [
-  {
-    id: 'role-1-id',
-    name: 'Role 1',
-    normalizedName: 'Role 1 normalized name',
-  },
-  {
-    id: 'role-2-id',
-    name: 'Role 2',
-    normalizedName: 'Role 2 normalized name',
   },
 ];
 

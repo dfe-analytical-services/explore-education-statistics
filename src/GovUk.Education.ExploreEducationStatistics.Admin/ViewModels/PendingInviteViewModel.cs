@@ -5,7 +5,7 @@ public record PendingInviteViewModel
 {
     public required string Email { get; init; }
 
-    public required string Role { get; init; }
+    public required string GlobalRole { get; init; }
 
     public List<UserPublicationRoleViewModel> UserPublicationRoles { get; init; } = [];
 

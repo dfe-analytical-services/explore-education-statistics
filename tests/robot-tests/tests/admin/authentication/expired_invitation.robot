@@ -14,7 +14,7 @@ Invite user to the service with an unexpired invite via the API
     delete test user    %{EXPIRED_INVITE_USER_EMAIL}
     user adds user invite via api
     ...    %{EXPIRED_INVITE_USER_EMAIL}
-    ...    Analyst
+    ...    Standard
 
 Check that the invite appears on the Invite Users page
     user navigates to    %{ADMIN_URL}/administration/users/invites
@@ -24,7 +24,7 @@ Check that the invite appears on the Invite Users page
 Update user invite with an expired created date via the API
     user adds user invite via api
     ...    %{EXPIRED_INVITE_USER_EMAIL}
-    ...    Analyst
+    ...    Standard
     ...    2022-10-01 11:00:00
 
 Check that the invite does not appear on the Invite Users page

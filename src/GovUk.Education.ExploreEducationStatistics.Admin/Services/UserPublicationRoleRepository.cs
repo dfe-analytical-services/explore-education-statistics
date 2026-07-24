@@ -236,6 +236,21 @@ public class UserPublicationRoleRepository(
             .AnyAsync(cancellationToken);
     }
 
+    public async Task<bool> UserHasAnyRole(
+        Guid userId,
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
+        CancellationToken cancellationToken = default,
+        params PublicationRole[] rolesToInclude
+    )
+    {
+        var rolesToCheck = rolesToInclude.IsNullOrEmpty() ? EnumUtil.GetEnumsArray<PublicationRole>() : rolesToInclude;
+
+        return await Query(resourceRoleFilter)
+            .WhereForUser(userId)
+            .WhereRolesIn(rolesToCheck)
+            .AnyAsync(cancellationToken);
+    }
+
     public async Task MarkEmailAsSent(
         Guid userPublicationRoleId,
         DateTimeOffset? dateSent = null,

@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -36,18 +35,6 @@ public class UserManagementServicePermissionTests
             {
                 var service = SetupUserManagementService(userService: userService.Object);
                 return await service.ListAllUsers();
-            });
-    }
-
-    [Fact]
-    public async Task ListRoles()
-    {
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .ExpectCheckToFail(CanManageUsersOnSystem)
-            .AssertForbidden(async userService =>
-            {
-                var service = SetupUserManagementService(userService: userService.Object);
-                return await service.ListRoles();
             });
     }
 
@@ -107,7 +94,7 @@ public class UserManagementServicePermissionTests
             .AssertForbidden(async userService =>
             {
                 var service = SetupUserManagementService(userService: userService.Object);
-                return await service.UpdateUserGlobalRole(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                return await service.UpdateUserGlobalRole(Guid.NewGuid(), GlobalRoles.Role.StandardUser);
             });
     }
 
@@ -167,9 +154,7 @@ public class UserManagementServicePermissionTests
     private static UserManagementService SetupUserManagementService(
         ContentDbContext? contentDbContext = null,
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
-        IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IUserRoleService? userRoleService = null,
-        IGlobalRoleService? globalRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
@@ -185,9 +170,7 @@ public class UserManagementServicePermissionTests
         return new UserManagementService(
             usersAndRolesDbContext,
             contentDbContext,
-            usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-            globalRoleService ?? Mock.Of<IGlobalRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),

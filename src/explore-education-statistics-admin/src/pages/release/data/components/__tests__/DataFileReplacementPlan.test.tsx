@@ -1575,7 +1575,6 @@ describe('DataReplacementPlan', () => {
     const defaultPermissions = {
       isBauUser: bauUser,
       canAccessSystem: true,
-      canAccessPreReleasePages: true,
       canAccessAnalystPages: true,
       canAccessAllImports: true,
       canManageAllTaxonomy: true,

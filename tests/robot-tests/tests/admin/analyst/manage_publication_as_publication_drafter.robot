@@ -28,7 +28,7 @@ Check that no publication roles are listed yet on the Team access page
 
 Assign publication drafter permissions to analyst1
     user adds publication role to user via api
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
     ...    ${PUBLICATION_ID}
     ...    Drafter
 

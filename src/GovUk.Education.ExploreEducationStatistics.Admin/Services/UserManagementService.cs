@@ -1,15 +1,16 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -19,8 +20,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using UserPreReleaseRoleCreateDto = GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPreReleaseRoleRepository.UserPreReleaseRoleCreateDto;
 using UserPublicationRoleCreateDto = GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository.UserPublicationRoleCreateDto;
 
@@ -29,9 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class UserManagementService(
     UsersAndRolesDbContext usersAndRolesDbContext,
     ContentDbContext contentDbContext,
-    IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
     IUserRoleService userRoleService,
-    IGlobalRoleService globalRoleService,
     IUserRepository userRepository,
     IUserService userService,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
@@ -47,55 +44,18 @@ public class UserManagementService(
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                var roles = await usersAndRolesDbContext.Roles.ToListAsync();
-                var preReleaseRole = roles.Single(role => role.Name == RoleNames.PrereleaseUser);
-                var users = usersAndRolesDbContext.Users;
-                var userRoles = usersAndRolesDbContext.UserRoles;
-                var nonPreReleaseUsers = users.Where(user =>
-                    !userRoles.Any(userRole => userRole.UserId == user.Id && userRole.RoleId == preReleaseRole.Id)
-                );
-                var usersAndRoles = await nonPreReleaseUsers
-                    .Select(user => new
-                    {
-                        Id = Guid.Parse(user.Id),
-                        Name = user.FirstName + " " + user.LastName,
-                        user.Email,
-                        Role = userRoles
-                            .Where(userRole => userRole.UserId == user.Id)
-                            .Select(userRole => userRole.RoleId)
-                            .FirstOrDefault(),
-                    })
-                    .ToListAsync();
+                var activeUsers = await contentDbContext.Users.AsNoTracking().Where(user => user.Active).ToListAsync();
 
-                return usersAndRoles
-                    .Select(userAndRole => new UserViewModel
+                return activeUsers
+                    .Select(user => new UserViewModel
                     {
-                        Id = userAndRole.Id,
-                        Name = userAndRole.Name,
-                        Email = userAndRole.Email,
-                        Role = roles.SingleOrDefault(role => role.Id == userAndRole.Role)?.Name,
+                        Id = user.Id,
+                        Name = user.DisplayName,
+                        Email = user.Email,
+                        GlobalRole = user.GetGlobalRole(),
                     })
-                    .OrderBy(userAndRole => userAndRole.Name)
+                    .OrderBy(user => user.Name)
                     .ToList();
-            });
-    }
-
-    public async Task<Either<ActionResult, List<RoleViewModel>>> ListRoles()
-    {
-        return await userService
-            .CheckCanManageAllUsers()
-            .OnSuccess(async () =>
-            {
-                return await usersAndRolesDbContext
-                    .Roles.AsQueryable()
-                    .Select(r => new RoleViewModel
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        NormalizedName = r.NormalizedName,
-                    })
-                    .OrderBy(x => x.Name)
-                    .ToListAsync();
             });
     }
 
@@ -105,29 +65,22 @@ public class UserManagementService(
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                return await usersAndRolesPersistenceHelper
-                    .CheckEntityExists<ApplicationUser, string>(id.ToString())
+                return await GetActiveUserById(id)
                     .OnSuccess(async user =>
                     {
-                        return await globalRoleService
-                            .GetGlobalRolesForUser(user.Id)
-                            .OnSuccessCombineWith(_ => userRoleService.GetPublicationRolesForUser(id))
+                        return await userRoleService
+                            .GetPublicationRolesForUser(id)
                             .OnSuccessCombineWith(_ => preReleaseUserService.GetPreReleaseRolesForUser(id))
                             .OnSuccess(tuple =>
                             {
-                                var (globalRoles, publicationRoles, preReleaseRoles) = tuple;
-
-                                // Currently we only allow a user to have a maximum of one global role,
-                                // and potentially no global role at all if other permissions in the system
-                                // have been removed.
-                                var globalRole = globalRoles.FirstOrDefault();
+                                var (publicationRoles, preReleaseRoles) = tuple;
 
                                 return new UserWithRolesViewModel
                                 {
                                     Id = id,
-                                    Name = user.FirstName + " " + user.LastName,
+                                    Name = user.DisplayName,
                                     Email = user.Email!,
-                                    Role = globalRole?.Id,
+                                    GlobalRole = user.GetGlobalRole(),
                                     UserPublicationRoles = publicationRoles,
                                     UserPreReleaseRoles = preReleaseRoles,
                                 };
@@ -184,7 +137,7 @@ public class UserManagementService(
                             return new PendingInviteViewModel
                             {
                                 Email = pendingUserInvite.Email,
-                                Role = pendingUserInvite.Role!.Name!,
+                                GlobalRole = pendingUserInvite.Role!.Name!,
                                 UserPublicationRoles = userPublicationRoles,
                                 UserPreReleaseRoles = userPreReleaseRoles,
                             };
@@ -199,22 +152,15 @@ public class UserManagementService(
         return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(() => ValidateActiveUserDoesNotExist(request.Email))
-            .OnSuccess<ActionResult, Unit, User>(async () =>
+            .OnSuccess(async () =>
             {
-                var role = await usersAndRolesDbContext
-                    .Roles.AsNoTracking()
-                    .SingleOrDefaultAsync(r => r.Id == request.RoleId);
-
-                if (role is null)
-                {
-                    return ValidationActionResult(InvalidUserRole);
-                }
+                var globalRoleToSet = request.IsBau ? Role.BauUser : Role.StandardUser;
 
                 var createdById = userService.GetUserId();
 
                 var user = await userRepository.CreateOrUpdate(
                     email: request.Email,
-                    roleId: request.RoleId,
+                    role: globalRoleToSet,
                     createdById: createdById,
                     createdDate: request.CreatedDate
                 );
@@ -276,18 +222,20 @@ public class UserManagementService(
             );
     }
 
-    public async Task<Either<ActionResult, Unit>> UpdateUserGlobalRole(string userId, string roleId)
+    public async Task<Either<ActionResult, Unit>> UpdateUserGlobalRole(Guid userId, Role targetGlobalRole)
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => globalRoleService.SetGlobalRoleForUser(userId, roleId));
+            .OnSuccess(async () => await GetActiveUserById(userId))
+            .OnSuccessDo(user => CheckUserGlobalRoleNeedsUpdating(user: user, targetGlobalRole: targetGlobalRole))
+            .OnSuccessVoid(() => userRepository.UpdateGlobalRole(userId: userId, newRole: targetGlobalRole));
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteUser(string email)
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(async () => await GetActiveUser(email))
+            .OnSuccess(async () => await GetActiveUserByEmail(email))
             .OnSuccessCombineWith(async _ => await GetIdentityUser(email))
             .OnSuccessVoid(async tuple =>
             {
@@ -302,7 +250,28 @@ public class UserManagementService(
             });
     }
 
-    private async Task<Either<ActionResult, User>> GetActiveUser(string email) =>
+    private static Either<ActionResult, Unit> CheckUserGlobalRoleNeedsUpdating(User user, Role targetGlobalRole)
+    {
+        var userGlobalRole = user.GetGlobalRole();
+        var usersCurrentGlobalRoleIsBau = userGlobalRole == Role.BauUser;
+
+        if (usersCurrentGlobalRoleIsBau && targetGlobalRole == Role.BauUser)
+        {
+            return ValidationUtils.ValidationActionResult(ValidationErrorMessages.UserIsAlreadyBauUser);
+        }
+
+        if (!usersCurrentGlobalRoleIsBau && targetGlobalRole == Role.StandardUser)
+        {
+            return ValidationUtils.ValidationActionResult(ValidationErrorMessages.UserIsAlreadyStandardUser);
+        }
+
+        return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, User>> GetActiveUserById(Guid userId) =>
+        await userRepository.FindActiveUserById(userId) ?? new Either<ActionResult, User>(new NotFoundResult());
+
+    private async Task<Either<ActionResult, User>> GetActiveUserByEmail(string email) =>
         await userRepository.FindActiveUserByEmail(email) ?? new Either<ActionResult, User>(new NotFoundResult());
 
     private async Task<Either<ActionResult, ApplicationUser>> GetIdentityUser(string email) =>
@@ -310,10 +279,12 @@ public class UserManagementService(
 
     private async Task<Either<ActionResult, Unit>> ValidateActiveUserDoesNotExist(string email) =>
         await userRepository.FindActiveUserByEmail(email) is not null
-            ? ValidationActionResult(UserAlreadyExists)
+            ? ValidationUtils.ValidationActionResult(ValidationErrorMessages.UserAlreadyExists)
             : Unit.Instance;
 
     private async Task<Either<ActionResult, User>> GetPendingUserInvite(string email) =>
         await userRepository.FindPendingUserInviteByEmail(email)
-        ?? new Either<ActionResult, User>(ValidationActionResult(InviteNotFound));
+        ?? new Either<ActionResult, User>(
+            ValidationUtils.ValidationActionResult(ValidationErrorMessages.InviteNotFound)
+        );
 }

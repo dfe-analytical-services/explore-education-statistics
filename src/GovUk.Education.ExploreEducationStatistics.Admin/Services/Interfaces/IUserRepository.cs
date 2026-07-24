@@ -18,18 +18,12 @@ public interface IUserRepository
 
     Task<User> FindDeletedUserPlaceholder(CancellationToken cancellationToken = default);
 
-    Task<User> CreateOrUpdate(
-        string email,
-        Role role,
-        Guid createdById,
-        DateTimeOffset? createdDate = null,
-        CancellationToken cancellationToken = default
-    );
+    Task<User> UpdateGlobalRole(Guid userId, Role newRole, CancellationToken cancellationToken = default);
 
     Task<User> CreateOrUpdate(
         string email,
-        string roleId,
         Guid createdById,
+        Role role = Role.StandardUser,
         DateTimeOffset? createdDate = null,
         CancellationToken cancellationToken = default
     );

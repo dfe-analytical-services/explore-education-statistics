@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -24,6 +25,7 @@ public class PermissionsController(
     ContentDbContext contentDbContext,
     IReleaseFileService releaseFileService,
     IUserService userService,
+    IUserRepository userRepository,
     IPreReleaseService preReleaseService,
     IUserPublicationRoleRepository userPublicationRoleRepository
 ) : ControllerBase
@@ -31,7 +33,9 @@ public class PermissionsController(
     [HttpGet("permissions/access")]
     public async Task<ActionResult<GlobalPermissionsViewModel>> GetGlobalPermissions()
     {
-        var isBauUser = await userService.CheckIsBauUser().IsRight();
+        var user = (await userRepository.FindActiveUserById(userService.GetUserId()))!;
+
+        var isBauUser = user.IsBau();
 
         // Note that we are deliberately not giving BAU Users the Approver permission, as we would
         // not expect a user with that role to be the target of specific Release or Publication
@@ -42,9 +46,8 @@ public class PermissionsController(
 
         return new GlobalPermissionsViewModel(
             CanAccessSystem: await userService.CheckCanAccessSystem().IsRight(),
-            CanAccessAnalystPages: await userService.CheckCanAccessAnalystPages().IsRight(),
+            CanAccessAnalystPages: await userService.CheckCanAccessAnalystPages(user).IsRight(),
             CanAccessAllImports: await userService.CheckCanViewAllImports().IsRight(),
-            CanAccessPreReleasePages: await userService.CheckCanAccessPreReleasePages().IsRight(),
             CanManageAllTaxonomy: await userService.CheckCanManageAllTaxonomy().IsRight(),
             IsBauUser: isBauUser,
             IsApprover: isApprover

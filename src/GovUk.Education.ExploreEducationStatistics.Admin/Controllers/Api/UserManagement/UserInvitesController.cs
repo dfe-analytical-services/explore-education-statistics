@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,9 +20,9 @@ public class UserInvitesController(IUserManagementService userManagementService)
     }
 
     [HttpPost("user-invites")]
-    public async Task<ActionResult<User>> InviteUser(UserInviteCreateRequest request)
+    public async Task<ActionResult> InviteUser(UserInviteCreateRequest request)
     {
-        return await userManagementService.InviteUser(request).HandleFailuresOrOk();
+        return await userManagementService.InviteUser(request).HandleFailuresOrNoContent();
     }
 
     [HttpDelete("user-invites")]

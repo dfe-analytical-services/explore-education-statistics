@@ -96,12 +96,12 @@ def user_creates_test_publication_via_api(publication_name: str, theme_id: str =
     return response.json()["id"]
 
 
-def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date: str = None):
+def user_adds_user_invite_via_api(user_email: str, global_role_type: str, created_date: str = None):
     response = admin_client.post(
         f"/api/user-invites",
         {
             "email": user_email,
-            "roleId": _get_global_role_id(role_name),
+            "isBau": _is_bau(global_role_type),
             "createdDate": created_date or datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
         },
     )
@@ -297,18 +297,14 @@ def _get_prerelease_user_details_via_api(user_email: str):
     return matching_users[0]
 
 
-def _get_global_role_id(role_name: str):
-    response = admin_client.get("/api/global-roles")
-    assert (
-        response.status_code < 300
-    ), f"Getting list of global roles failed with {response.status_code} and {response.text}"
+def _is_bau(global_role_type: str):
+    if global_role_type == "Standard":
+        return False
 
-    roles = response.json()
-    matching_roles = list(filter(lambda role: role["name"] == role_name, roles))
+    if global_role_type == "BAU":
+        return True
 
-    assert matching_roles, f"Could not find global role matching name {role_name}"
-
-    return matching_roles[0]["id"]
+    raise AssertionError(f"Could not find global role matching type {global_role_type}")
 
 
 def user_updates_methodology_published_date_via_api(methodology_id: str, published: datetime) -> None:
