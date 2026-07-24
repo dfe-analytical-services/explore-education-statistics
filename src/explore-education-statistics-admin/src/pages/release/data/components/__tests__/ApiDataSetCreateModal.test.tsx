@@ -100,7 +100,7 @@ describe('ApiDataSetCreateModal', () => {
   test('submitting the form closes the modal and refreshes the candidates', async () => {
     apiDataSetCandidateService.listCandidates
       .mockResolvedValueOnce(testCandidates)
-      .mockResolvedValue([]);
+      .mockResolvedValue([testCandidates[1]]);
     const handleSubmit = jest.fn();
 
     const { user } = render(
@@ -147,11 +147,10 @@ describe('ApiDataSetCreateModal', () => {
     );
 
     const modal = within(await screen.findByRole('dialog'));
-    expect(
-      modal.getByText(
-        /No API data sets can be created as there are no candidate data files available/,
-      ),
-    ).toBeInTheDocument();
+    await user.selectOptions(
+      await screen.findByLabelText('Data set'),
+      testCandidates[1].releaseFileId,
+    );
     expect(
       modal.queryByRole('heading', { name: 'Creating API data set' }),
     ).not.toBeInTheDocument();
