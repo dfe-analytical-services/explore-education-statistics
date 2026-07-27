@@ -39,7 +39,7 @@ public class ThemeController(IThemeService themeService) : ControllerBase
     [HttpDelete("themes/{themeId:guid}")]
     public async Task<ActionResult> DeleteTheme([Required] Guid themeId)
     {
-        return await themeService.DeleteTheme(themeId).HandleFailuresOrNoContent();
+        return await themeService.DeleteThemes([themeId]).HandleFailuresOrNoContent();
     }
 
     [HttpDelete("themes")]

@@ -26,7 +26,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Moq;
 using Moq.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -387,7 +386,7 @@ public class ThemeServiceTests
 
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-            var result = await service.DeleteTheme(theme.Id);
+            var result = await service.DeleteThemes([theme.Id]);
 
             VerifyAllMocks(methodologyService, publishingService);
 
@@ -518,7 +517,7 @@ public class ThemeServiceTests
 
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-            var result = await service.DeleteTheme(theme.Id);
+            var result = await service.DeleteThemes([theme.Id]);
 
             VerifyAllMocks(releaseDataFileService, publishingService, releaseVersionService);
 
@@ -609,7 +608,7 @@ public class ThemeServiceTests
 
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-            var result = await service.DeleteTheme(theme.Id);
+            var result = await service.DeleteThemes([theme.Id]);
 
             VerifyAllMocks(releaseDataFileService, publishingService, releaseVersionService);
 
@@ -686,7 +685,7 @@ public class ThemeServiceTests
 
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-            var result = await service.DeleteTheme(themeId);
+            var result = await service.DeleteThemes([themeId]);
 
             VerifyAllMocks(publishingService, releaseVersionService);
 
@@ -718,7 +717,7 @@ public class ThemeServiceTests
         {
             var service = SetupThemeService(context, enableThemeDeletion: false);
 
-            var result = await service.DeleteTheme(theme.Id);
+            var result = await service.DeleteThemes([theme.Id]);
             result.AssertForbidden();
 
             Assert.Equal(1, await context.Themes.CountAsync());
@@ -794,7 +793,7 @@ public class ThemeServiceTests
                 .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                 .ReturnsAsync(Unit.Instance);
 
-            var result = await service.DeleteTheme(theme.Id);
+            var result = await service.DeleteThemes([theme.Id]);
 
             VerifyAllMocks(releaseDataFileService, methodologyService, publishingService, releaseVersionService);
 
@@ -977,7 +976,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context, environmentName: Environments.Production);
+            var service = SetupThemeService(context);
 
             var result = await service.DeleteThemes([theme.Id]);
             result.AssertForbidden();
@@ -996,8 +995,7 @@ public class ThemeServiceTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        bool enableThemeDeletion = true,
-        string environmentName = nameof(Environments.Development)
+        bool enableThemeDeletion = true
     )
     {
         contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -1023,8 +1021,7 @@ public class ThemeServiceTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-            Mock.Of<IHostEnvironment>(e => e.EnvironmentName == environmentName)
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );
     }
 
