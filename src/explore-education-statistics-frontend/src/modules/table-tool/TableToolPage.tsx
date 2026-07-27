@@ -1,6 +1,7 @@
 import TableToolWizard, {
   InitialTableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
@@ -33,8 +34,14 @@ import logger from '@common/services/logger';
 
 const defaultPageTitle = 'Create your own tables';
 
+// Pre-built tables can contain thousands of rows. Rendering them on the server
+// blocks the entire response, so defer the final table until after hydration.
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
+  {
+    loading: () => <LoadingSpinner text="Loading table" />,
+    ssr: false,
+  },
 );
 
 export interface TableToolPageProps {
@@ -368,8 +375,9 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const publicationSummary =
-    await publicationService.getPublicationSummary(publicationSlug);
+  const publicationSummary = await publicationService.getPublicationSummary(
+    publicationSlug,
+  );
   const { latestRelease } = publicationSummary;
   const selectedReleaseVersion =
     await publicationService.getReleaseVersionSummary(

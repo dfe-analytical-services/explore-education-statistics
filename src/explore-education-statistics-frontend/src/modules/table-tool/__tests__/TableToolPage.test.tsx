@@ -7,7 +7,6 @@ import {
 } from '@common/services/tableBuilderService';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import preloadAll from 'jest-next-dynamic';
 import TableToolPage from '@frontend/modules/table-tool/TableToolPage';
 import React from 'react';
 import render from '@common-test/render';
@@ -367,8 +366,6 @@ describe('TableToolPage', () => {
     },
   };
 
-  beforeAll(preloadAll);
-
   test('renders the page correctly with themes and publications', async () => {
     render(<TableToolPage themeMeta={testThemeMeta} />);
 
@@ -480,7 +477,8 @@ describe('TableToolPage', () => {
       />,
     );
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByText('Loading table')).toBeInTheDocument();
+    expect(await screen.findByRole('table')).toBeInTheDocument();
   });
 
   test('renders the page correctly with pre-built table when a fast track is provided', async () => {
@@ -495,7 +493,7 @@ describe('TableToolPage', () => {
       />,
     );
 
-    expect(screen.getByRole('table')).toMatchSnapshot();
+    expect(await screen.findByRole('table')).toMatchSnapshot();
   });
 
   test('renders the page correctly when a fast track is provided and this is the latest data', async () => {
