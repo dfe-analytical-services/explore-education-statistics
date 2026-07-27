@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -71,7 +70,7 @@ public class ThemeServicePermissionTests
     }
 
     [Fact]
-    public async Task CreateTheme()
+    public async Task CreateTheme_DisallowedByPolicy_ReturnsForbidden()
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
@@ -86,7 +85,7 @@ public class ThemeServicePermissionTests
     }
 
     [Fact]
-    public async Task UpdateTheme()
+    public async Task UpdateTheme_DisallowedByPolicy_ReturnsForbidden()
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
@@ -102,7 +101,7 @@ public class ThemeServicePermissionTests
     }
 
     [Fact]
-    public async Task GetTheme()
+    public async Task GetTheme_DisallowedByPolicy_ReturnsForbidden()
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
@@ -115,7 +114,7 @@ public class ThemeServicePermissionTests
     }
 
     [Fact]
-    public async Task DeleteTheme()
+    public async Task DeleteTheme_DisallowedByPolicy_ReturnsForbidden()
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
@@ -123,18 +122,23 @@ public class ThemeServicePermissionTests
             {
                 var service = SetupThemeService(userService: userService.Object);
 
-                return await service.DeleteTheme(_theme.Id);
+                return await service.DeleteThemes([_theme.Id]);
             });
     }
 
     [Fact]
-    public async Task DeleteUiTestThemes()
+    public async Task DeleteUITestThemes_DisallowedByPolicy_ReturnsForbidden()
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
             .AssertForbidden(async userService =>
             {
-                var service = SetupThemeService(userService: userService.Object);
+                await using var context = DbUtils.InMemoryApplicationDbContext();
+
+                context.Add(new Theme { Title = "UI test theme" });
+                await context.SaveChangesAsync();
+
+                var service = SetupThemeService(userService: userService.Object, contentDbContext: context);
 
                 return await service.DeleteUITestThemes();
             });
@@ -175,8 +179,7 @@ public class ThemeServicePermissionTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-            Mock.Of<IHostEnvironment>(e => e.EnvironmentName == Environments.Production)
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
         );
     }
 }

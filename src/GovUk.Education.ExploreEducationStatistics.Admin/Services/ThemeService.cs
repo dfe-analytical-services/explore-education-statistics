@@ -33,8 +33,7 @@ public class ThemeService(
     IPublishingService publishingService,
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IHostEnvironment hostEnvironment
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : IThemeService
 {
     private readonly bool _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
@@ -114,41 +113,33 @@ public class ThemeService(
             .OnSuccess(list => list.Select(mapper.Map<ThemeViewModel>).OrderBy(theme => theme.Title).ToList());
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteTheme(
-        Guid themeId,
-        CancellationToken cancellationToken = default
-    )
-    {
-        return await userService
-            .CheckCanManageAllTaxonomy()
-            .OnSuccess(() => contentDbContext.Themes.FirstOrNotFoundAsync(t => t.Id == themeId, cancellationToken))
-            .OnSuccessDo(CheckCanDeleteTheme)
-            .OnSuccessDo(() => DeletePublicationsForTheme(themeId, cancellationToken))
-            .OnSuccessVoid(async theme =>
-            {
-                contentDbContext.Themes.Remove(theme);
-                await contentDbContext.SaveChangesAsync(cancellationToken);
-
-                await publishingService.TaxonomyChanged(cancellationToken);
-            });
-    }
-
     public async Task<Either<ActionResult, Unit>> DeleteThemes(
         List<Guid> themeIds,
         CancellationToken cancellationToken = default
     )
     {
-        if (hostEnvironment.IsProduction())
-        {
-            return new ForbidResult();
-        }
+        return await CheckCanDeleteTheme()
+            .OnSuccess(async _ => await userService.CheckCanManageAllTaxonomy())
+            .OnSuccess(() => contentDbContext.Themes.Where(t => themeIds.Contains(t.Id)).OrNotFound())
+            .OnSuccess(async themes =>
+            {
+                await using var transaction = await contentDbContext.Database.BeginTransactionAsync();
 
-        var results = await themeIds
-            .ToAsyncEnumerable()
-            .Select(async (themeId, index, cancellationToken) => await DeleteTheme(themeId, cancellationToken))
-            .ToListAsync(cancellationToken);
+                await themes.ForEachAsync(async theme =>
+                {
+                    await DeletePublicationsForTheme(theme.Id, cancellationToken)
+                        .OnSuccessDo(() => contentDbContext.Themes.Remove(theme));
+                });
 
-        return results.OnSuccessAllReturnVoid();
+                return transaction;
+            })
+            .OnSuccessVoid(async transaction =>
+            {
+                await contentDbContext.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync();
+
+                await publishingService.TaxonomyChanged(cancellationToken);
+            });
     }
 
     private async Task<Either<List<ActionResult>, Unit>> DeletePublicationsForTheme(
@@ -241,7 +232,6 @@ public class ThemeService(
             {
                 contentDbContext.Publications.Remove(publication);
                 contentDbContext.Contacts.Remove(publication.Contact);
-                await contentDbContext.SaveChangesAsync(cancellationToken);
 
                 await eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, latestPublicationRelease);
             });
@@ -249,28 +239,16 @@ public class ThemeService(
 
     public async Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default)
     {
-        return !_themeDeletionAllowed
-            ? new ForbidResult()
-            : await userService
-                .CheckCanManageAllTaxonomy()
-                .OnSuccess(async _ =>
-                    (await contentDbContext.Themes.ToListAsync(cancellationToken)).Where(theme =>
-                        theme.IsTestOrSeedTheme()
-                    )
-                )
-                .OnSuccessVoid(async themes =>
-                {
-                    foreach (var theme in themes)
-                    {
-                        await DeleteTheme(theme.Id, cancellationToken);
-                    }
+        var themes = await contentDbContext.Themes.ToListAsync(cancellationToken);
 
-                    await contentDbContext.SaveChangesAsync(cancellationToken);
-                    await publishingService.TaxonomyChanged(cancellationToken);
-                });
+        var testThemeIds = themes.Where(theme => theme.IsTestOrSeedTheme()).Select(theme => theme.Id).ToList();
+
+        return themes.Count > 0
+            ? await DeleteThemes(testThemeIds, cancellationToken)
+            : new OkObjectResult("No test themes to delete.");
     }
 
-    private async Task<Either<ActionResult, Unit>> CheckCanDeleteTheme(Theme theme)
+    private async Task<Either<ActionResult, Unit>> CheckCanDeleteTheme()
     {
         if (!_themeDeletionAllowed)
         {
