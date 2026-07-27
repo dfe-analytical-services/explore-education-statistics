@@ -3,7 +3,7 @@ using '../main.bicep'
 // Environment Params
 param environmentName = 'Production'
 
-param averagePublicSiteResponseTimeAlertThresholdMillis = 1000
+param averagePublicSiteResponseTimeAlertThresholdMillis = 15000
 
 param publicSiteInternalServiceFqdn = 's101p01-ees-fde-hzgvd4b5effuaua2.a02.azurefd.net'
 
