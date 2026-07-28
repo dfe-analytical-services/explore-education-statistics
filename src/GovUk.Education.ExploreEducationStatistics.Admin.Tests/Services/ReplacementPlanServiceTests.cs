@@ -711,7 +711,7 @@ public class ReplacementPlanServiceTests
                 new ReplacementPlanIndicatorMappingViewModel
                 {
                     CandidateKey = null,
-                    Type = nameof(MapStatus.Unset),
+                    Type = MapStatus.Unset,
                     Source = new ReplacementPlanIndicatorViewModel
                     {
                         Id = originalIndicator.Id,
@@ -738,7 +738,7 @@ public class ReplacementPlanServiceTests
                 new ReplacementPlanLocationMappingViewModel
                 {
                     CandidateKey = null,
-                    Type = nameof(MapStatus.Unset),
+                    Type = MapStatus.Unset,
                     Source = new ReplacementPlanLocationViewModel
                     {
                         Id = originalLocation.Id,
@@ -2578,7 +2578,7 @@ public class ReplacementPlanServiceTests
                 new ReplacementPlanIndicatorMappingViewModel
                 {
                     CandidateKey = replacementIndicator.Id,
-                    Type = nameof(MapStatus.AutoSet),
+                    Type = MapStatus.AutoSet,
                     Source = new ReplacementPlanIndicatorViewModel
                     {
                         Id = originalIndicator.Id,
@@ -2609,7 +2609,7 @@ public class ReplacementPlanServiceTests
                 new ReplacementPlanLocationMappingViewModel
                 {
                     CandidateKey = replacementLocation.Id,
-                    Type = nameof(MapStatus.AutoSet),
+                    Type = MapStatus.AutoSet,
                     Source = new ReplacementPlanLocationViewModel
                     {
                         Id = originalLocation.Id,
@@ -2907,7 +2907,7 @@ public class ReplacementPlanServiceTests
                         Label = originalIndicatorA.Label,
                         Name = originalIndicatorA.Name,
                     },
-                    Type = nameof(MapStatus.ManuallySet),
+                    Type = MapStatus.ManuallySet,
                 },
                 indicatorMappingPlan.Mappings.Values
             );
@@ -2921,7 +2921,7 @@ public class ReplacementPlanServiceTests
                         Label = originalIndicatorToBeRemoved.Label,
                         Name = originalIndicatorToBeRemoved.Name,
                     },
-                    Type = nameof(MapStatus.Unset),
+                    Type = MapStatus.Unset,
                 },
                 indicatorMappingPlan.Mappings.Values
             );
@@ -3193,7 +3193,7 @@ public class ReplacementPlanServiceTests
                 new ReplacementPlanIndicatorMappingViewModel
                 {
                     CandidateKey = null,
-                    Type = nameof(MapStatus.Unset),
+                    Type = MapStatus.Unset,
                     Source = new ReplacementPlanIndicatorViewModel
                     {
                         Id = originalIndicatorA.Id,
@@ -3503,7 +3503,7 @@ public class ReplacementPlanServiceTests
                         Code = locationEng.ToLocationAttribute().Code!,
                         Name = locationEng.ToLocationAttribute().Name!,
                     },
-                    Type = nameof(MapStatus.AutoSet),
+                    Type = MapStatus.AutoSet,
                 },
                 locationMappingPlan.Mappings.Values
             );
@@ -3517,7 +3517,7 @@ public class ReplacementPlanServiceTests
                         Code = originalLocationDerby.ToLocationAttribute().Code!,
                         Name = originalLocationDerby.ToLocationAttribute().Name!,
                     },
-                    Type = nameof(MapStatus.ManuallySet),
+                    Type = MapStatus.ManuallySet,
                 },
                 locationMappingPlan.Mappings.Values
             );
@@ -3531,7 +3531,7 @@ public class ReplacementPlanServiceTests
                         Code = locationLeicester.ToLocationAttribute().Code!,
                         Name = locationLeicester.ToLocationAttribute().Name!,
                     },
-                    Type = nameof(MapStatus.AutoSet),
+                    Type = MapStatus.AutoSet,
                 },
                 locationMappingPlan.Mappings.Values
             );
@@ -3545,7 +3545,7 @@ public class ReplacementPlanServiceTests
                         Code = originalLocationBirmingham.ToLocationAttribute().Code!,
                         Name = originalLocationBirmingham.ToLocationAttribute().Name!,
                     },
-                    Type = nameof(MapStatus.Unset),
+                    Type = MapStatus.Unset,
                 },
                 locationMappingPlan.Mappings.Values
             );
@@ -3814,7 +3814,7 @@ public class ReplacementPlanServiceTests
                     Code = originalLocationDerby.ToLocationAttribute().Code!,
                     Name = originalLocationDerby.ToLocationAttribute().Name!,
                 },
-                Type = nameof(MapStatus.Unset),
+                Type = MapStatus.Unset,
             };
             Assert.Equal(expectedLocationMapping, locationMapping.Value);
 

@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Moq;
 using Newtonsoft.Json;
@@ -107,7 +108,7 @@ public abstract class DataReplacementControllerTests
                                         Name = "filter_original_name",
                                         Label = "filter original label",
                                     },
-                                    Type = "ManuallySet",
+                                    Type = MapStatus.ManuallySet,
                                     CandidateKey = replacementFilterId,
                                     FilterGroups = new ReplacementPlanFilterGroupMappingsViewModel
                                     {
@@ -122,7 +123,7 @@ public abstract class DataReplacementControllerTests
                                                         Id = originalFilterGroupId,
                                                         Label = "filter group original label",
                                                     },
-                                                    Type = "AutoSet",
+                                                    Type = MapStatus.AutoSet,
                                                     CandidateKey = replacementFilterGroupId,
                                                     FilterItems = new ReplacementPlanFilterItemMappingsViewModel
                                                     {
@@ -140,7 +141,7 @@ public abstract class DataReplacementControllerTests
                                                                         Id = originalFilterItemId,
                                                                         Label = "filter item original label",
                                                                     },
-                                                                    Type = "AutoSet",
+                                                                    Type = MapStatus.AutoSet,
                                                                     CandidateKey = replacementFilterItemId,
                                                                 }
                                                             },
@@ -205,7 +206,7 @@ public abstract class DataReplacementControllerTests
                                         Name = "original_indicator",
                                         Label = "Original indicator",
                                     },
-                                    Type = "ManuallySet",
+                                    Type = MapStatus.ManuallySet,
                                     CandidateKey = replacementIndicatorId,
                                 }
                             },
@@ -237,7 +238,7 @@ public abstract class DataReplacementControllerTests
                                         Code = "E9000",
                                         Name = "OriginalLocation",
                                     },
-                                    Type = "ManuallySet",
+                                    Type = MapStatus.ManuallySet,
                                     CandidateKey = replacementLocationId,
                                 }
                             },

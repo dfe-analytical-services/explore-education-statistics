@@ -334,50 +334,92 @@ public class ReplacementPlanService(
             .ToList();
     }
 
+    // Returns only items (and their parent group/filter) that are included in the data block
     private static Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
         HashSet<Guid> dataBlockFilterItemIds,
         DataSetMapping mapping
     )
     {
-        return mapping
-            .FilterMappings.Values.Where(filterMap =>
-                filterMap
-                    .FilterGroupMappings.Values.SelectMany(groupMap => groupMap.FilterItemMappings.Values)
-                    .Select(item => item.OriginalId)
-                    .Any(dataBlockFilterItemIds.Contains)
-            )
-            .ToDictionary(
-                filterMap => filterMap.OriginalId,
-                filterMap => new FilterReplacementViewModel(
-                    id: filterMap.OriginalId,
-                    name: filterMap.OriginalColumnName,
-                    label: filterMap.OriginalLabel,
-                    target: filterMap.ReplacementId,
-                    groups: filterMap
-                        .FilterGroupMappings.Values.Where(groupMap =>
-                            groupMap
-                                .FilterItemMappings.Values.Select(item => item.OriginalId)
-                                .Any(dataBlockFilterItemIds.Contains)
-                        )
-                        .ToDictionary(
-                            groupMap => groupMap.OriginalId,
-                            groupMap => new FilterGroupReplacementViewModel(
-                                id: groupMap.OriginalId,
-                                label: groupMap.OriginalLabel,
-                                target: groupMap.ReplacementId,
-                                items: groupMap
-                                    .FilterItemMappings.Values.Where(itemMap =>
-                                        dataBlockFilterItemIds.Contains(itemMap.OriginalId)
-                                    )
-                                    .Select(itemMap => new FilterItemReplacementViewModel(
-                                        id: itemMap.OriginalId,
-                                        label: itemMap.OriginalLabel,
-                                        target: itemMap.ReplacementId
-                                    ))
-                            )
-                        )
-                )
+        var result = new Dictionary<Guid, FilterReplacementViewModel>();
+
+        foreach (var filterMap in mapping.FilterMappings.Values)
+        {
+            var groupViewModels = ValidateFilterGroupsForDataBlock(
+                dataBlockFilterItemIds,
+                filterMap.FilterGroupMappings
             );
+
+            if (groupViewModels.Count > 0)
+            {
+                result.Add(
+                    filterMap.OriginalId,
+                    new FilterReplacementViewModel(
+                        id: filterMap.OriginalId,
+                        target: filterMap.ReplacementId,
+                        label: filterMap.OriginalLabel,
+                        name: filterMap.OriginalColumnName,
+                        groups: groupViewModels
+                    )
+                );
+            }
+        }
+
+        return result;
+    }
+
+    private static Dictionary<Guid, FilterGroupReplacementViewModel> ValidateFilterGroupsForDataBlock(
+        HashSet<Guid> dataBlockFilterItemIds,
+        Dictionary<Guid, FilterGroupMapping> filterGroupMappings
+    )
+    {
+        var groupViewModels = new Dictionary<Guid, FilterGroupReplacementViewModel>();
+
+        foreach (var groupMap in filterGroupMappings)
+        {
+            var itemViewModels = ValidateFilterItemsForDataBlock(
+                dataBlockFilterItemIds,
+                groupMap.Value.FilterItemMappings
+            );
+
+            if (itemViewModels.Count > 0)
+            {
+                groupViewModels.Add(
+                    groupMap.Value.OriginalId,
+                    new FilterGroupReplacementViewModel(
+                        groupMap.Value.OriginalId,
+                        groupMap.Value.OriginalLabel,
+                        groupMap.Value.ReplacementId,
+                        itemViewModels
+                    )
+                );
+            }
+        }
+
+        return groupViewModels;
+    }
+
+    private static List<FilterItemReplacementViewModel> ValidateFilterItemsForDataBlock(
+        HashSet<Guid> dataBlockFilterItemIds,
+        Dictionary<Guid, FilterItemMapping> filterItemMappings
+    )
+    {
+        var itemViewModels = new List<FilterItemReplacementViewModel>();
+
+        foreach (var itemMap in filterItemMappings)
+        {
+            if (dataBlockFilterItemIds.Contains(itemMap.Value.OriginalId))
+            {
+                itemViewModels.Add(
+                    new FilterItemReplacementViewModel(
+                        itemMap.Value.OriginalId,
+                        itemMap.Value.OriginalLabel,
+                        itemMap.Value.ReplacementId
+                    )
+                );
+            }
+        }
+
+        return itemViewModels;
     }
 
     private static Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(

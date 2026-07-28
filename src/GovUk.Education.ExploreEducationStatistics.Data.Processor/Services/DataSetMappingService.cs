@@ -213,19 +213,16 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
         Guid replacementSubjectId
     )
     {
-        var originalFilters = await statisticsDbContext
+        var filters = await statisticsDbContext
             .Filter.AsNoTracking()
             .Include(f => f.FilterGroups)
                 .ThenInclude(fg => fg.FilterItems)
-            .Where(f => f.SubjectId == originalSubjectId)
+            .Where(f => f.SubjectId == originalSubjectId || f.SubjectId == replacementSubjectId)
             .ToListAsync();
 
-        var replacementFilters = await statisticsDbContext
-            .Filter.AsNoTracking()
-            .Include(f => f.FilterGroups)
-                .ThenInclude(fg => fg.FilterItems)
-            .Where(f => f.SubjectId == replacementSubjectId)
-            .ToListAsync();
+        var originalFilters = filters.Where(f => f.SubjectId == originalSubjectId).ToList();
+
+        var replacementFilters = filters.Where(f => f.SubjectId == replacementSubjectId).ToList();
 
         // Create dictionaries to speed up performance when creating filterMappings/unmappedReplacementFilters
         var replacementFiltersMap = replacementFilters.ToDictionary(f => f.Name, f => f); // automap filters by column name

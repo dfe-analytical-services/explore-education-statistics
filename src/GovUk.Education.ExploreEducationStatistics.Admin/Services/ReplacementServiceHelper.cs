@@ -14,7 +14,7 @@ public abstract class ReplacementServiceHelper
         DataSetMapping mapping
     )
     {
-        // Replace filters that have been mapped
+        // 1. Add mapped replacement filters
         var replacementSequence = new List<FilterSequenceEntry>();
         var filterIdsWithMapping = mapping
             .FilterMappings.Values.Where(filterMap => filterMap.ReplacementId != null)

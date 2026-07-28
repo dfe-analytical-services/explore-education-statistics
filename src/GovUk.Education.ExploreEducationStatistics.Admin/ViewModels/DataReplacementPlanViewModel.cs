@@ -1,9 +1,9 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -14,13 +14,11 @@ public class DataReplacementPlanViewModel
     public ReplaceApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
     public ReplacementPlanMappingViewModel Mapping { get; init; } = new();
 
-    // If the number of filters has changed, then data blocks will have the wrong number of filter items:
-    // - If a filter has been removed, then any DataBlock will be invalid as old filter items from the removed filter
-    // will not (and cannot be) be mapped. If there are no DataBlocks then it will be valid. So we don't need to worry about the number
-    // of filters being reduced, as DataBlocks will be invalid and prevent the replacement.
-    // - But if an additional filter has been added, then DataBlocks will still be marked valid despite missing
-    // an item from the new filter, meaning they'll return no results after the replacement is complete.
-    // However, if there are no DataBlocks, then the additional filter doesn't need to invalidate the replacement.
+    // If the replacement introduces additional filters, existing data blocks become problematic: the data blocks won't
+    // contain filter items for the new filters, and will appear valid, but will return no results after the
+    // replacement.
+    // If the replacement removes filters, then existing data blocks referencing the removed filters' items will be
+    // considered invalid and prevent the replacement, so we don't need to handle that case.
     public bool HasDataBlockAndReplacementHasAdditionalFilter =>
         DataBlocks.Any() && Mapping.Filters.Mappings.Count < Mapping.Filters.Candidates.Count;
     public Guid OriginalSubjectId { get; init; }
@@ -246,7 +244,7 @@ public class TimePeriodRangeReplacementViewModel
 
 public class TimePeriodReplacementViewModel : ReplacementViewModel
 {
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public TimeIdentifier Code { get; }
 
     public int Year { get; }
@@ -342,7 +340,7 @@ public record ReplacementPlanIndicatorMappingsViewModel
                     Name = indicatorMap.OriginalColumnName,
                     Label = indicatorMap.OriginalLabel,
                 },
-                Type = indicatorMap.Status.ToString(),
+                Type = indicatorMap.Status,
                 CandidateKey = indicatorMap.ReplacementId,
             }
         );
@@ -382,7 +380,9 @@ public record ReplacementPlanIndicatorMappingsViewModel
 public record ReplacementPlanIndicatorMappingViewModel
 {
     public ReplacementPlanIndicatorViewModel Source { get; init; } = null!;
-    public string Type { get; init; } = "";
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
     public Guid? CandidateKey { get; init; } // replacement indicator id
 }
 
@@ -413,7 +413,7 @@ public record ReplacementPlanLocationMappingsViewModel
                     Code = locationMap.OriginalCode,
                     Name = locationMap.OriginalName,
                 },
-                Type = locationMap.Status.ToString(),
+                Type = locationMap.Status,
                 CandidateKey = locationMap.ReplacementId,
             }
         );
@@ -454,7 +454,10 @@ public record ReplacementPlanLocationMappingsViewModel
 public record ReplacementPlanLocationMappingViewModel
 {
     public ReplacementPlanLocationViewModel Source { get; init; } = null!;
-    public string Type { get; init; } = "";
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
     public Guid? CandidateKey { get; init; } // replacement location id
 }
 
@@ -486,7 +489,7 @@ public record ReplacementPlanFilterMappingsViewModel
                     Label = filterMap.OriginalLabel,
                 },
                 CandidateKey = filterMap.ReplacementId,
-                Type = filterMap.Status.ToString(),
+                Type = filterMap.Status,
                 FilterGroups = ReplacementPlanFilterGroupMappingsViewModel.FromModel(filterMap),
             }
         );
@@ -523,7 +526,10 @@ public record ReplacementPlanFilterMappingsViewModel
 public record ReplacementPlanFilterMappingViewModel
 {
     public ReplacementPlanFilterViewModel Source { get; init; } = null!;
-    public string Type { get; init; } = "";
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
     public Guid? CandidateKey { get; init; } // replacement filter id
 
     public ReplacementPlanFilterGroupMappingsViewModel FilterGroups { get; init; } = null!;
@@ -556,7 +562,7 @@ public record ReplacementPlanFilterGroupMappingsViewModel
                     Label = groupMap.OriginalLabel,
                 },
                 CandidateKey = groupMap.ReplacementId,
-                Type = groupMap.Status.ToString(),
+                Type = groupMap.Status,
                 FilterItems = ReplacementPlanFilterItemMappingsViewModel.FromModel(groupMap),
             }
         );
@@ -583,7 +589,10 @@ public record ReplacementPlanFilterGroupMappingsViewModel
 public record ReplacementPlanFilterGroupMappingViewModel
 {
     public ReplacementPlanFilterGroupViewModel Source { get; init; } = null!;
-    public string Type { get; init; } = "";
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
     public Guid? CandidateKey { get; init; } // replacement filter group id
 
     public ReplacementPlanFilterItemMappingsViewModel FilterItems { get; init; } = null!;
@@ -615,7 +624,7 @@ public record ReplacementPlanFilterItemMappingsViewModel
                     Label = itemMap.OriginalLabel,
                 },
                 CandidateKey = itemMap.ReplacementId,
-                Type = itemMap.Status.ToString(),
+                Type = itemMap.Status,
             }
         );
         var itemCandidates = groupMapping
@@ -637,7 +646,10 @@ public record ReplacementPlanFilterItemMappingsViewModel
 public record ReplacementPlanFilterItemMappingViewModel
 {
     public ReplacementPlanFilterItemViewModel Source { get; init; } = null!;
-    public string Type { get; init; } = "";
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
     public Guid? CandidateKey { get; init; } // replacement filter item id
 }
 

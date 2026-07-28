@@ -97,9 +97,9 @@ public record DataSetMapping
             builder
                 .Property(x => x.FilterMappings)
                 .HasConversion(
-                    locationMappings => JsonSerializer.Serialize(locationMappings, JsonOptions),
-                    locMappingString =>
-                        JsonSerializer.Deserialize<Dictionary<Guid, FilterMapping>>(locMappingString, JsonOptions)
+                    filterMappings => JsonSerializer.Serialize(filterMappings, JsonOptions),
+                    filterMappingString =>
+                        JsonSerializer.Deserialize<Dictionary<Guid, FilterMapping>>(filterMappingString, JsonOptions)
                         ?? new Dictionary<Guid, FilterMapping>(),
                     ValueComparer.CreateDefault<Dictionary<Guid, FilterMapping>>(false)
                 )
