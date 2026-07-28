@@ -1003,7 +1003,7 @@
         "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
         "resourceType": "Microsoft.Web/sites",
         "metricName": "HttpResponseTime",
-        "threshold": 10,
+        "threshold": 12,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
