@@ -142,9 +142,6 @@
     "publicAppCompressionDisable": {
       "value": true
     },
-    "datasetsSearchIndexName": {
-      "value": "nl-search-dataset-index"
-    },
     "sqlServerPublicNetworkAccess": {
       "value": "Disabled"
     },

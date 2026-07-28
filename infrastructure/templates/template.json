@@ -728,9 +728,9 @@
     },
     "datasetsSearchIndexName": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "nl-search-dataset-index",
       "metadata": {
-        "description": "The name of the Azure AI data set search index used by the public frontend application"
+        "description": "The name of the Azure AI Search data set index used by the public frontend application"
       }
     },
     "tableToolSearchEndpoint": {
