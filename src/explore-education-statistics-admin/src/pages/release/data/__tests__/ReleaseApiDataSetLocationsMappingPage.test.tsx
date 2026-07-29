@@ -72,6 +72,36 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     previousReleaseIds: [],
   };
 
+  test('renders finalised mappings as read-only', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDataSet.draftVersion!,
+        status: 'Draft',
+      },
+    });
+    apiDataSetVersionService.getLocationsMapping.mockResolvedValue(
+      testLocationsMapping,
+    );
+
+    renderPage();
+
+    expect(
+      await screen.findByText(
+        /These mappings are read-only because this data set version has been finalised/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('columnheader', { name: 'Actions' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^Map location/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^No mapping/ }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders the mappings tables correctly', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getLocationsMapping.mockResolvedValue(

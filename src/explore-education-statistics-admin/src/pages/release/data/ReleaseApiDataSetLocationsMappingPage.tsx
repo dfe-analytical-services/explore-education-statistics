@@ -25,6 +25,7 @@ import apiDataSetVersionService, {
 } from '@admin/services/apiDataSetVersionService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import NotificationBanner from '@common/components/NotificationBanner';
 import PageNav, { NavItem } from '@common/components/PageNav';
@@ -94,6 +95,9 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
+  const isFinalised = dataSet?.draftVersion?.status === 'Draft';
 
   useEffect(() => {
     if (locationsMapping) {
@@ -283,13 +287,17 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
   const handleUpdateMapping = useCallback(
     async (update: PendingMappingUpdate) => {
+      if (!canUpdateMappings) {
+        return;
+      }
+
       setPendingUpdates(current => [
         ...current,
         { ...update, level: update.groupKey },
       ]);
       handleUpdate();
     },
-    [handleUpdate],
+    [canUpdateMappings, handleUpdate],
   );
 
   return (
@@ -315,7 +323,13 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map locations</span>
             <h2>{dataSet?.title}</h2>
-            {!!unmappedLocationErrors.length && (
+            {isFinalised && (
+              <InsetText>
+                These mappings are read-only because this data set version has
+                been finalised. Unfinalise the data set version to make changes.
+              </InsetText>
+            )}
+            {canUpdateMappings && !!unmappedLocationErrors.length && (
               <NotificationBanner title="Action required">
                 <ul className="govuk-list">
                   {unmappedLocationErrors.map(error => (
@@ -393,6 +407,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                         mappableItems={levelMappableLocations}
                         newItems={newLocations[level]}
                         pendingUpdates={pendingUpdates}
+                        readOnly={!canUpdateMappings}
                         renderCandidate={candidate => (
                           <>
                             {candidate.label}
@@ -524,6 +539,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                           autoMappedItems={levelAutoMappedLocations}
                           newItems={newLocations[level]}
                           pendingUpdates={pendingUpdates}
+                          readOnly={!canUpdateMappings}
                           renderCandidate={candidate => (
                             <>
                               {candidate.label}

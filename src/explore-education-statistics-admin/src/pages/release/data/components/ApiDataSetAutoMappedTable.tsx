@@ -29,6 +29,7 @@ interface Props {
   itemPluralLabel: string;
   newItems?: CandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
+  readOnly?: boolean;
   renderCandidate: (candidate: CandidateWithKey) => ReactNode;
   renderSource: (source: MappableSourceItem) => ReactNode;
   renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
@@ -45,6 +46,7 @@ export default function ApiDataSetAutoMappedTable({
   itemPluralLabel,
   newItems = [],
   pendingUpdates = [],
+  readOnly = false,
   renderCandidate,
   renderSource,
   renderSourceDetails,
@@ -132,7 +134,9 @@ export default function ApiDataSetAutoMappedTable({
                 <th className="govuk-!-width-one-third">Current data set</th>
                 <th className="govuk-!-width-one-third">New data set</th>
                 <th>Type</th>
-                <th className="govuk-!-text-align-right">Actions</th>
+                {!readOnly && (
+                  <th className="govuk-!-text-align-right">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -148,28 +152,30 @@ export default function ApiDataSetAutoMappedTable({
                       <td>
                         <Tag colour="grey">Minor</Tag>
                       </td>
-                      <td className="govuk-!-text-align-right">
-                        {isPendingUpdate ? (
-                          <LoadingSpinner
-                            alert
-                            hideText
-                            inline
-                            size="sm"
-                            text={`Updating auto-mapping for ${mapping.source.label}`}
-                          />
-                        ) : (
-                          <ApiDataSetMappingModal
-                            candidate={candidate}
-                            candidateHint={candidateHint}
-                            groupKey={groupKey}
-                            itemLabel={itemLabel}
-                            mapping={mapping}
-                            newItems={newItems}
-                            renderSourceDetails={renderSourceDetails}
-                            onSubmit={onUpdate}
-                          />
-                        )}
-                      </td>
+                      {!readOnly && (
+                        <td className="govuk-!-text-align-right">
+                          {isPendingUpdate ? (
+                            <LoadingSpinner
+                              alert
+                              hideText
+                              inline
+                              size="sm"
+                              text={`Updating auto-mapping for ${mapping.source.label}`}
+                            />
+                          ) : (
+                            <ApiDataSetMappingModal
+                              candidate={candidate}
+                              candidateHint={candidateHint}
+                              groupKey={groupKey}
+                              itemLabel={itemLabel}
+                              mapping={mapping}
+                              newItems={newItems}
+                              renderSourceDetails={renderSourceDetails}
+                              onSubmit={onUpdate}
+                            />
+                          )}
+                        </td>
+                      )}
                     </tr>
                   );
                 },

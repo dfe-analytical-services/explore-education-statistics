@@ -18,6 +18,7 @@ import PageNav, { NavItem } from '@common/components/PageNav';
 import Link from '@admin/components/Link';
 import { generatePath } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import InsetText from '@common/components/InsetText';
 import Tag from '@common/components/Tag';
 import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
 import Accordion from '@common/components/Accordion';
@@ -68,6 +69,9 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
+  const isFinalised = dataSet?.draftVersion?.status === 'Draft';
 
   useEffect(() => {
     if (indicatorsMapping) {
@@ -193,10 +197,14 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
 
   const handleUpdateMapping = useCallback(
     async (update: PendingMappingUpdate) => {
+      if (!canUpdateMappings) {
+        return;
+      }
+
       setPendingUpdates(current => [...current, update]);
       handleUpdate();
     },
-    [handleUpdate],
+    [canUpdateMappings, handleUpdate],
   );
 
   const unmappedIndicatorErrors =
@@ -224,7 +232,13 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map indicators</span>
             <h2>{dataSet?.title}</h2>
-            {!!unmappedIndicatorErrors.length && (
+            {isFinalised && (
+              <InsetText>
+                These mappings are read-only because this data set version has
+                been finalised. Unfinalise the data set version to make changes.
+              </InsetText>
+            )}
+            {canUpdateMappings && !!unmappedIndicatorErrors.length && (
               <NotificationBanner title="Action required">
                 <ul className="govuk-list">
                   {unmappedIndicatorErrors.map(error => (
@@ -261,6 +275,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 mappableItems={mappableIndicators}
                 newItems={newIndicators}
                 pendingUpdates={pendingUpdates}
+                readOnly={!canUpdateMappings}
                 renderCandidate={candidate => candidate.label}
                 renderSource={source => source.label}
                 onUpdate={handleUpdateMapping}
@@ -321,6 +336,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                     autoMappedItems={autoMappedIndicators}
                     newItems={newIndicators}
                     pendingUpdates={pendingUpdates}
+                    readOnly={!canUpdateMappings}
                     renderCandidate={candidate => candidate.label}
                     renderSource={source => source.label}
                     searchFilter={searchTerm =>

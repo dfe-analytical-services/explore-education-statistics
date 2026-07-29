@@ -71,6 +71,36 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
     previousReleaseIds: [],
   };
 
+  test('renders finalised mappings as read-only', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testDataSet.draftVersion!,
+        status: 'Draft',
+      },
+    });
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
+      testIndicatorsMapping,
+    );
+
+    renderPage();
+
+    expect(
+      await screen.findByText(
+        /These mappings are read-only because this data set version has been finalised/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('columnheader', { name: 'Actions' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^Map indicator/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^No mapping/ }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders the mappings tables correctly', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
