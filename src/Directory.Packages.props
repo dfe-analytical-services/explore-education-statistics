@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup Label="EES Common">
-    <PackageVersion Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.0.0" />
+    <PackageVersion Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup Label="Entity Framework Core">
