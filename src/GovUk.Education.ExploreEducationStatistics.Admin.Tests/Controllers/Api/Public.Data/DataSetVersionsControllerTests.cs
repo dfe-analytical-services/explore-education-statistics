@@ -943,6 +943,91 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
     }
 
+    public class UnfinaliseVersionTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests(fixture)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            var dataSetVersion = await SetupPatchVersion();
+            var processorClientMock = fixture.GetProcessorClientMock();
+            processorClientMock
+                .Setup(client => client.UnfinaliseDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            var response = await UnfinaliseVersion(dataSetVersion.Id);
+
+            response.AssertNoContent();
+            MockUtils.VerifyAllMocks(processorClientMock);
+        }
+
+        [Fact]
+        public async Task NotBauUser_Returns403()
+        {
+            var dataSetVersion = await SetupPatchVersion();
+
+            var response = await UnfinaliseVersion(dataSetVersion.Id, OptimisedTestUsers.Authenticated);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task ProcessorValidationFailure_IsPropagated()
+        {
+            var dataSetVersion = await SetupPatchVersion();
+            var processorClientMock = fixture.GetProcessorClientMock();
+            processorClientMock
+                .Setup(client => client.UnfinaliseDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                    new BadRequestObjectResult(
+                        new ValidationProblemViewModel
+                        {
+                            Errors = [new ErrorViewModel { Code = "cannot_unfinalise", Path = "dataSetVersionId" }],
+                        }
+                    )
+                );
+
+            var response = await UnfinaliseVersion(dataSetVersion.Id);
+
+            response.AssertValidationProblem().AssertHasError("dataSetVersionId", "cannot_unfinalise");
+            MockUtils.VerifyAllMocks(processorClientMock);
+        }
+
+        private async Task<HttpResponseMessage> UnfinaliseVersion(Guid dataSetVersionId, ClaimsPrincipal? user = null)
+        {
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
+            return await client.PostAsync(
+                new Uri($"{BaseUrl}/{dataSetVersionId}/unfinalise", UriKind.Relative),
+                content: null
+            );
+        }
+
+        private async Task<DataSetVersion> SetupPatchVersion()
+        {
+            var releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .Generate();
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            var dataSet = DataFixture.DefaultDataSet().WithStatusDraft().Generate();
+            var dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithVersionNumber(major: 1, minor: 0, patch: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .Generate();
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersions.Add(dataSetVersion));
+            return dataSetVersion;
+        }
+    }
+
     public class GetVersionChangesTests(DataSetVersionsControllerTestsFixture fixture)
         : DataSetVersionsControllerTests(fixture)
     {

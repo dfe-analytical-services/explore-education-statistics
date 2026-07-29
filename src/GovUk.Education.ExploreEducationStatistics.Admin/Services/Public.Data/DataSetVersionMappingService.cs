@@ -172,7 +172,9 @@ public class DataSetVersionMappingService(
         return await publicDataDbContext.RequireTransaction(async () =>
             await userService
                 .CheckIsBauUser()
-                .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+                .OnSuccess(() =>
+                    CheckMappingExists(nextDataSetVersionId, cancellationToken, requireMappingStatus: true)
+                )
                 .OnSuccess(_ => validateCandidatesFn())
                 .OnSuccess(validationResults =>
                 {
@@ -779,14 +781,32 @@ public class DataSetVersionMappingService(
 
     private async Task<Either<ActionResult, DataSetVersionMapping>> CheckMappingExists(
         Guid nextDataSetVersionId,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken,
+        bool requireMappingStatus = false
     )
     {
-        return await publicDataDbContext
+        var mapping = await publicDataDbContext
             .DataSetVersionMappings.AsNoTracking()
-            .SingleOrNotFoundAsync(
-                mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
-                cancellationToken
+            .Include(mapping => mapping.TargetDataSetVersion)
+            .SingleOrDefaultAsync(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId, cancellationToken);
+
+        if (mapping is null)
+        {
+            return new NotFoundResult();
+        }
+
+        if (requireMappingStatus && mapping.TargetDataSetVersion.Status != DataSetVersionStatus.Mapping)
+        {
+            return ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetVersionMappingCannotBeUpdated.Code,
+                    Message = ValidationMessages.DataSetVersionMappingCannotBeUpdated.Message,
+                    Path = "nextDataSetVersionId",
+                }
             );
+        }
+
+        return mapping;
     }
 }

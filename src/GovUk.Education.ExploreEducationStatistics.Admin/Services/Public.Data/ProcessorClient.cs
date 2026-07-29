@@ -90,6 +90,23 @@ internal class ProcessorClient(
         );
     }
 
+    public async Task<Either<ActionResult, Unit>> UnfinaliseDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await SendRequest<Unit>(
+            () =>
+                httpClient.PostAsync(
+                    $"api/UnfinaliseDataSetVersion/{dataSetVersionId}",
+                    content: null,
+                    cancellationToken
+                ),
+            response => response.StatusCode == HttpStatusCode.NotFound ? new NotFoundResult() : null,
+            cancellationToken
+        );
+    }
+
     private async Task<Either<ActionResult, TResponse>> SendPost<TRequest, TResponse>(
         string url,
         TRequest request,

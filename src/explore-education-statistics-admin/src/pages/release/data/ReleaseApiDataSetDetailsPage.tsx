@@ -37,6 +37,8 @@ import isPatchVersion from '@common/utils/isPatchVersion';
 import InsetText from '@common/components/InsetText';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
 import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
+import ModalConfirm from '@common/components/ModalConfirm';
+import ButtonText from '@common/components/ButtonText';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -96,6 +98,14 @@ export default function ReleaseApiDataSetDetailsPage() {
     }
   };
 
+  const handleUnfinalise = async () => {
+    if (dataSet?.draftVersion) {
+      await apiDataSetVersionService.unfinaliseVersion(dataSet.draftVersion.id);
+      setFinalisingStatus(undefined);
+      await refetch();
+    }
+  };
+
   const columnSizeClassName =
     dataSet?.latestLiveVersion && dataSet?.draftVersion
       ? 'govuk-grid-column-one-half-from-desktop'
@@ -108,6 +118,27 @@ export default function ReleaseApiDataSetDetailsPage() {
     canUpdateRelease,
     dataSet,
   );
+
+  const unfinaliseAction =
+    canUpdateRelease && isPatch && dataSet?.draftVersion?.status === 'Draft' ? (
+      <ModalConfirm
+        title="Unfinalise this data set version"
+        confirmText="Unfinalise data set version"
+        triggerButton={
+          <ButtonText>Unfinalise this data set version</ButtonText>
+        }
+        onConfirm={handleUnfinalise}
+      >
+        <p>
+          Unfinalising this data set version will return it to the mapping
+          journey and allow you to edit its mappings again.
+        </p>
+        <p>
+          The data set preview will be unavailable until the version is
+          finalised again.
+        </p>
+      </ModalConfirm>
+    ) : null;
 
   const draftVersionSummary = dataSet?.draftVersion ? (
     <ApiDataSetVersionSummaryList
@@ -165,6 +196,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                     View preview token log
                   </Link>
                 </li>
+                {unfinaliseAction && <li>{unfinaliseAction}</li>}
               </>
             )}
             {canUpdateRelease &&

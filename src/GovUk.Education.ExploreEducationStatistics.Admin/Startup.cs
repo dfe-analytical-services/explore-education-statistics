@@ -929,6 +929,14 @@ internal class NoOpProcessorClient : IProcessorClient
     {
         return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
     }
+
+    public Task<Either<ActionResult, Unit>> UnfinaliseDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
+    }
 }
 
 internal class NoOpDataSetVersionService : IDataSetVersionService
@@ -982,6 +990,14 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
     ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
+    }
+
+    public Task<Either<ActionResult, Unit>> UnfinaliseVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default
     )

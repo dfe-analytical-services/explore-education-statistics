@@ -11,7 +11,10 @@ import { Dictionary } from '@common/types';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 
 export type MappingType =
-  'ManualMapped' | 'ManualNone' | 'AutoNone' | 'AutoMapped';
+  | 'ManualMapped'
+  | 'ManualNone'
+  | 'AutoNone'
+  | 'AutoMapped';
 
 export type Mapping<TSource> = {
   candidateKey?: string;
@@ -150,6 +153,11 @@ const apiDataSetVersionService = {
   },
   deleteVersion(dataSetVersionId: string): Promise<void> {
     return client.delete(`/public-data/data-set-versions/${dataSetVersionId}`);
+  },
+  unfinaliseVersion(dataSetVersionId: string): Promise<void> {
+    return client.post(
+      `/public-data/data-set-versions/${dataSetVersionId}/unfinalise`,
+    );
   },
   listVersions(
     params?: ListVersionsParams,

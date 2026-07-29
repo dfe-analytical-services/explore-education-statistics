@@ -60,6 +60,11 @@ public static class ValidationMessages
         Message: "The data set version must be in the 'Mapping' status."
     );
 
+    public static readonly LocalizableMessage DataSetVersionCanNotBeUnfinalised = new(
+        Code: nameof(DataSetVersionCanNotBeUnfinalised),
+        Message: "Only a finalised patch data set version can be unfinalised."
+    );
+
     public static readonly LocalizableMessage ImportInManualMappingStateNotFound = new(
         Code: nameof(ImportInManualMappingStateNotFound),
         Message: "An import in mapping state could not be found."
