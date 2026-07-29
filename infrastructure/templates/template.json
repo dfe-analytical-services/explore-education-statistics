@@ -720,16 +720,16 @@
     },
     "datasetsSearchIndexName": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "nl-search-dataset-index",
       "metadata": {
-        "description": "The name of the Azure AI data set search index used by the public frontend application"
+        "description": "The name of the Azure AI Search data set index used by the public frontend application"
       }
     },
-    "tableToolSearchEndpoint": {
+    "nlSearchFunctionRoute": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "/api/natural_language_search_function",
       "metadata": {
-        "description": "The endpoint of the Azure Function App used by the table tool search service"
+        "description": "The HTTP route of the Natural Language Search function, relative to the Natural Language Search Function app host."
       }
     },
     "tableToolSearchFunctionsKey": {
@@ -1386,6 +1386,7 @@
     "screenerStorageAccountConnectionStringSecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('screenerStorageAccountConnectionStringSecretKey'))]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
     "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
+    "nlSearchFunctionAppName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fa-nlsearch')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
     "baseAdminAllowedOrigins": [
       "[concat('https://', parameters('adminUri'))]"
@@ -1398,6 +1399,7 @@
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
     "apiVersions": {
       "afdEndpoint": "2025-06-01",
+      "nlSearchFunctionApp": "2025-03-01",
       "searchService": "2025-05-01"
     },
     "resourceIds": {
@@ -2308,7 +2310,7 @@
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
         "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
-        "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[parameters('tableToolSearchEndpoint')]",
+        "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('nlSearchFunctionAppName')), variables('apiVersions').nlSearchFunctionApp).defaultHostName, parameters('nlSearchFunctionRoute'))]",
         "AZURE_TABLE_TOOL_SEARCH_FUNCTIONS_KEY": "[parameters('tableToolSearchFunctionsKey')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
