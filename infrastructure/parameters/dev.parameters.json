@@ -150,9 +150,6 @@
     },
     "tableToolSearchEndpoint": {
       "value": "https://s101d01-ees-fa-nlsearch.azurewebsites.net/api/natural_language_search_function"
-    },
-    "sqlAuditing": {
-      "value": true
     }
   }
 }
