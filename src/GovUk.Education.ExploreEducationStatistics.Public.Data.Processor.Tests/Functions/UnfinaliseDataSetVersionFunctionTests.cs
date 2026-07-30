@@ -37,8 +37,10 @@ public class UnfinaliseDataSetVersionFunctionTests(UnfinaliseDataSetVersionFunct
 {
     private static readonly DataFixture DataFixture = new();
 
-    [Fact]
-    public async Task Success_PreservesVersionMappingImportSourcesAndPreviewToken()
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(0, 1)]
+    public async Task Success_PreservesVersionMappingImportSourcesAndPreviewToken(int minor, int patch)
     {
         var dataSet = DataFixture.DefaultDataSet().WithStatusDraft().Generate();
         var sourceVersion = DataFixture
@@ -55,7 +57,7 @@ public class UnfinaliseDataSetVersionFunctionTests(UnfinaliseDataSetVersionFunct
         var targetVersion = DataFixture
             .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
             .WithDataSet(dataSet)
-            .WithVersionNumber(major: 1, minor: 0, patch: 1)
+            .WithVersionNumber(major: 1, minor: minor, patch: patch)
             .WithStatusDraft()
             .WithImports(() => [import])
             .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
@@ -131,20 +133,19 @@ public class UnfinaliseDataSetVersionFunctionTests(UnfinaliseDataSetVersionFunct
     }
 
     [Theory]
-    [InlineData(0, DataSetVersionStatus.Draft)]
-    [InlineData(1, DataSetVersionStatus.Mapping)]
-    [InlineData(1, DataSetVersionStatus.Processing)]
-    [InlineData(1, DataSetVersionStatus.Finalising)]
-    [InlineData(1, DataSetVersionStatus.Published)]
-    [InlineData(1, DataSetVersionStatus.Failed)]
-    [InlineData(1, DataSetVersionStatus.Cancelled)]
-    public async Task InvalidVersionTypeOrStatus_ReturnsValidationProblem(int patch, DataSetVersionStatus status)
+    [InlineData(DataSetVersionStatus.Mapping)]
+    [InlineData(DataSetVersionStatus.Processing)]
+    [InlineData(DataSetVersionStatus.Finalising)]
+    [InlineData(DataSetVersionStatus.Published)]
+    [InlineData(DataSetVersionStatus.Failed)]
+    [InlineData(DataSetVersionStatus.Cancelled)]
+    public async Task InvalidStatus_ReturnsValidationProblem(DataSetVersionStatus status)
     {
         var dataSet = DataFixture.DefaultDataSet().WithStatusDraft().Generate();
         var version = DataFixture
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
-            .WithVersionNumber(major: 1, minor: 0, patch: patch)
+            .WithVersionNumber(major: 1, minor: 1)
             .WithStatus(status)
             .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
             .Generate();

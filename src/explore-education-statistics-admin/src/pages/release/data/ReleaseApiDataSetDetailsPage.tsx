@@ -120,7 +120,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   );
 
   const unfinaliseAction =
-    canUpdateRelease && isPatch && dataSet?.draftVersion?.status === 'Draft' ? (
+    canUpdateRelease && dataSet?.draftVersion?.status === 'Draft' ? (
       <ModalConfirm
         title="Unfinalise this data set version"
         confirmText="Unfinalise data set version"

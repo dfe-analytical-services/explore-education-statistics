@@ -62,7 +62,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage DataSetVersionCanNotBeUnfinalised = new(
         Code: nameof(DataSetVersionCanNotBeUnfinalised),
-        Message: "Only a finalised patch data set version can be unfinalised."
+        Message: "Only a finalised data set version can be unfinalised."
     );
 
     public static readonly LocalizableMessage ImportInManualMappingStateNotFound = new(

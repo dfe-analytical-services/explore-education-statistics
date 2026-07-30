@@ -325,8 +325,9 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
             <h2>{dataSet?.title}</h2>
             {isFinalised && (
               <InsetText>
-                These mappings are read-only because this data set version has
-                been finalised. Unfinalise the data set version to make changes.
+                These mappings cannot be edited because this data set version
+                has been finalised. Unfinalise the data set version to make
+                changes.
               </InsetText>
             )}
             {canUpdateMappings && !!unmappedLocationErrors.length && (

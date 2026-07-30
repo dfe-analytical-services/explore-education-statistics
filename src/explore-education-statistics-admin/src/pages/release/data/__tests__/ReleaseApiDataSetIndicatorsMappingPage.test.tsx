@@ -87,7 +87,7 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
 
     expect(
       await screen.findByText(
-        /These mappings are read-only because this data set version has been finalised/,
+        /These mappings cannot be edited because this data set version has been finalised/,
       ),
     ).toBeInTheDocument();
     expect(

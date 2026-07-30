@@ -1322,18 +1322,21 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
   });
 
-  test('unfinalises a finalised patch version', async () => {
+  test.each([
+    ['patch', testPatchDraftVersion],
+    ['non-patch', testDraftVersion],
+  ])('unfinalises a finalised %s version', async (_, draftVersion) => {
     apiDataSetService.getDataSet
       .mockResolvedValueOnce({
         ...testDataSet,
         draftVersion: {
-          ...testPatchDraftVersion,
+          ...draftVersion,
         },
       })
       .mockResolvedValue({
         ...testDataSet,
         draftVersion: {
-          ...testPatchDraftVersion,
+          ...draftVersion,
           status: 'Mapping',
           mappingStatus: {
             filtersComplete: true,
@@ -1374,7 +1377,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     await waitFor(() => {
       expect(apiDataSetVersionService.unfinaliseVersion).toHaveBeenCalledWith(
-        testPatchDraftVersion.id,
+        draftVersion.id,
       );
       expect(screen.getByTestId('draft-version-tasks')).toBeInTheDocument();
       expect(

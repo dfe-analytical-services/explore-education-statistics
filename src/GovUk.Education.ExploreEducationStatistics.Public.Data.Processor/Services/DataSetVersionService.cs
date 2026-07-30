@@ -164,7 +164,7 @@ internal class DataSetVersionService(
 
     private static Either<ActionResult, Unit> CheckCanUnfinaliseDataSetVersion(DataSetVersion dataSetVersion)
     {
-        if (dataSetVersion.VersionPatch > 0 && dataSetVersion.Status == DataSetVersionStatus.Draft)
+        if (dataSetVersion.Status == DataSetVersionStatus.Draft)
         {
             return Unit.Instance;
         }
