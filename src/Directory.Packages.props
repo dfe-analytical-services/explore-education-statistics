@@ -142,7 +142,7 @@
     <PackageVersion Include="CliWrap" Version="3.10.1" />
     <PackageVersion Include="Cronos" Version="0.13.0" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
-    <PackageVersion Include="Generator.Equals" Version="3.3.0" />
+    <PackageVersion Include="Generator.Equals" Version="4.0.1" />
     <PackageVersion Include="GeoJSON.Net" Version="1.4.1" />
     <PackageVersion Include="GovukNotify" Version="7.2.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
