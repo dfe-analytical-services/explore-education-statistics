@@ -194,25 +194,34 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
   });
 
   test('shows validation error when start date is more than 7 days from current time', async () => {
-    const afterTodayBy8Days = addDays(new Date(), 8);
-    const afterTodayBy10Days = addDays(new Date(), 10);
+    jest.useFakeTimers({
+      advanceTimers: true,
+      now: new Date('2026-07-30T12:00:00Z'),
+    });
 
-    const handleSubmit = jest.fn();
+    try {
+      const afterTodayBy8Days = addDays(new Date(), 8);
+      const afterTodayBy10Days = addDays(new Date(), 10);
 
-    await renderWithCustomDatesSubmitted(
-      afterTodayBy8Days,
-      afterTodayBy10Days,
-      handleSubmit,
-    );
+      const handleSubmit = jest.fn();
 
-    expect(
-      await screen.findByText(
-        'Activates date must be within 7 days from today.',
-        {
-          selector: '#apiDataSetTokenCreateForm-activates-error',
-        },
-      ),
-    ).toBeInTheDocument();
+      await renderWithCustomDatesSubmitted(
+        afterTodayBy8Days,
+        afterTodayBy10Days,
+        handleSubmit,
+      );
+
+      expect(
+        await screen.findByText(
+          'Activates date must be within 7 days from today.',
+          {
+            selector: '#apiDataSetTokenCreateForm-activates-error',
+          },
+        ),
+      ).toBeInTheDocument();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   test('shows validation error when end date is beyond 7 days from the start date', async () => {
