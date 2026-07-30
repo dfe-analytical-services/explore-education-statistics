@@ -633,6 +633,54 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenSupportingFilesHaveNoOrderDefined_ReturnsSupportingFilesInTitleOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            var supportingFiles = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Ancillary))
+                .WithReleaseVersion(releaseVersion)
+                .WithOrder(0) // All files have a default order of 0
+                .ForIndex(0, s => s.SetName("Supporting file B"))
+                .ForIndex(1, s => s.SetName("Supporting file C"))
+                .ForIndex(2, s => s.SetName("Supporting file A"))
+                .GenerateArray(3);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.AddRange(supportingFiles);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(3, result.SupportingFiles.Length);
+                Assert.Equal("Supporting file A", result.SupportingFiles[0].Title);
+                Assert.Equal("Supporting file B", result.SupportingFiles[1].Title);
+                Assert.Equal("Supporting file C", result.SupportingFiles[2].Title);
+            }
+        }
+
+        [Fact]
         public async Task WhenSupportingFileHasNoSummary_ReturnsEmptySummary()
         {
             // Arrange

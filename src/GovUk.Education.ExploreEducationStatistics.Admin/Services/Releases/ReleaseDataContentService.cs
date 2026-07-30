@@ -87,6 +87,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
             .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
             .Where(rf => rf.File.Type == FileType.Ancillary)
             .OrderBy(rf => rf.Order)
+            .ThenBy(rf => rf.Name)
             .ToArrayAsync(cancellationToken);
         return releaseFiles.Select(ReleaseDataContentSupportingFileDto.FromReleaseFile).ToArray();
     }
