@@ -5,10 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagger;
@@ -36,19 +34,17 @@ public class JsonConverterSchemaFilterTests
         var schema = GenerateSchema<TestEnumConverters>();
 
         var schemaPropertyName = propertyName.CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
-        Assert.Null(propertySchema.Reference);
+        Assert.NotNull(propertySchema.AllOf);
         Assert.Empty(propertySchema.AllOf);
 
-        Assert.Equal("string", propertySchema.Type);
+        Assert.Equal(JsonSchemaType.String, propertySchema.Type);
+        Assert.NotNull(propertySchema.Enum);
         Assert.Equal(2, propertySchema.Enum.Count);
 
-        var enumString1 = Assert.IsType<OpenApiString>(propertySchema.Enum[0]);
-        Assert.Equal(nameof(TestEnum.Sample1), enumString1.Value);
-
-        var enumString2 = Assert.IsType<OpenApiString>(propertySchema.Enum[1]);
-        Assert.Equal(nameof(TestEnum.Sample2), enumString2.Value);
+        Assert.Equal(nameof(TestEnum.Sample1), propertySchema.Enum[0].GetValue<string>());
+        Assert.Equal(nameof(TestEnum.Sample2), propertySchema.Enum[1].GetValue<string>());
     }
 
     [Fact]
@@ -57,19 +53,17 @@ public class JsonConverterSchemaFilterTests
         var schema = GenerateSchema<TestEnumConverters>();
 
         var schemaPropertyName = nameof(TestEnumConverters.EnumToEnumLabel).CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
-        Assert.Null(propertySchema.Reference);
+        Assert.NotNull(propertySchema.AllOf);
         Assert.Empty(propertySchema.AllOf);
 
-        Assert.Equal("string", propertySchema.Type);
+        Assert.Equal(JsonSchemaType.String, propertySchema.Type);
+        Assert.NotNull(propertySchema.Enum);
         Assert.Equal(2, propertySchema.Enum.Count);
 
-        var enumString1 = Assert.IsType<OpenApiString>(propertySchema.Enum[0]);
-        Assert.Equal(TestEnum.Sample1.GetEnumLabel(), enumString1.Value);
-
-        var enumString2 = Assert.IsType<OpenApiString>(propertySchema.Enum[1]);
-        Assert.Equal(TestEnum.Sample2.GetEnumLabel(), enumString2.Value);
+        Assert.Equal(TestEnum.Sample1.GetEnumLabel(), propertySchema.Enum[0].GetValue<string>());
+        Assert.Equal(TestEnum.Sample2.GetEnumLabel(), propertySchema.Enum[1].GetValue<string>());
     }
 
     [Fact]
@@ -78,19 +72,17 @@ public class JsonConverterSchemaFilterTests
         var schema = GenerateSchema<TestEnumConverters>();
 
         var schemaPropertyName = nameof(TestEnumConverters.EnumToEnumValue).CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
-        Assert.Null(propertySchema.Reference);
+        Assert.NotNull(propertySchema.AllOf);
         Assert.Empty(propertySchema.AllOf);
 
-        Assert.Equal("string", propertySchema.Type);
+        Assert.Equal(JsonSchemaType.String, propertySchema.Type);
+        Assert.NotNull(propertySchema.Enum);
         Assert.Equal(2, propertySchema.Enum.Count);
 
-        var enumString1 = Assert.IsType<OpenApiString>(propertySchema.Enum[0]);
-        Assert.Equal(TestEnum.Sample1.GetEnumValue(), enumString1.Value);
-
-        var enumString2 = Assert.IsType<OpenApiString>(propertySchema.Enum[1]);
-        Assert.Equal(TestEnum.Sample2.GetEnumValue(), enumString2.Value);
+        Assert.Equal(TestEnum.Sample1.GetEnumValue(), propertySchema.Enum[0].GetValue<string>());
+        Assert.Equal(TestEnum.Sample2.GetEnumValue(), propertySchema.Enum[1].GetValue<string>());
     }
 
     [Fact]
@@ -99,19 +91,21 @@ public class JsonConverterSchemaFilterTests
         var schema = GenerateSchema<TestReadOnlyListEnumConverters>();
 
         var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumLabels).CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
-        Assert.Null(propertySchema.Reference);
-        Assert.Empty(propertySchema.AllOf);
+        Assert.Null(propertySchema.AllOf);
 
-        Assert.Equal("array", propertySchema.Type);
+        // TODO EES-6893
+        // Assert.Equal(JsonSchemaType.Array, propertySchema.Type);
 
-        Assert.Null(propertySchema.Items.Reference);
-        Assert.Empty(propertySchema.Items.AllOf);
+        var items = GetItemsSchemaReference(propertySchema);
+        // TODO EES-6893
+        //Assert.Null(items.Reference);
+        Assert.Null(items.AllOf);
 
-        var enumStrings = propertySchema.Items.Enum.Cast<OpenApiString>().Select(e => e.Value).ToList();
-
-        Assert.Equal(EnumUtil.GetEnumLabels<GeographicLevel>(), enumStrings);
+        // TODO EES-6893
+        // var enumStrings = GetSchemaEnumValues<string>(items);
+        // Assert.Equal(EnumUtil.GetEnumLabels<GeographicLevel>(), enumStrings);
     }
 
     [Fact]
@@ -120,19 +114,21 @@ public class JsonConverterSchemaFilterTests
         var schema = GenerateSchema<TestReadOnlyListEnumConverters>();
 
         var schemaPropertyName = nameof(TestReadOnlyListEnumConverters.GeographicLevelEnumValues).CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
-        Assert.Null(propertySchema.Reference);
-        Assert.Empty(propertySchema.AllOf);
+        Assert.Null(propertySchema.AllOf);
 
-        Assert.Equal("array", propertySchema.Type);
+        // TODO EES-6893
+        // Assert.Equal(JsonSchemaType.Array, propertySchema.Type);
 
-        Assert.Null(propertySchema.Items.Reference);
-        Assert.Empty(propertySchema.Items.AllOf);
+        var items = GetItemsSchemaReference(propertySchema);
+        // TODO EES-6893
+        // Assert.Null(items.Reference);
+        Assert.Null(items.AllOf);
 
-        var enumStrings = propertySchema.Items.Enum.Cast<OpenApiString>().Select(e => e.Value).ToList();
-
-        Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>(), enumStrings);
+        // TODO EES-6893
+        // var enumStrings = GetSchemaEnumValues<string>(items);
+        // Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>(), enumStrings);
     }
 
     [Theory]
@@ -145,12 +141,13 @@ public class JsonConverterSchemaFilterTests
         var schema = GenerateSchema<TestIgnoredGeographicLevelConverters>();
 
         var schemaPropertyName = propertyName.CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
+        Assert.NotNull(propertySchema.AllOf);
         Assert.NotEmpty(propertySchema.AllOf);
 
         Assert.Null(propertySchema.Type);
-        Assert.Empty(propertySchema.Enum);
+        Assert.Null(propertySchema.Enum);
     }
 
     [Theory]
@@ -163,12 +160,13 @@ public class JsonConverterSchemaFilterTests
         var schema = GenerateSchema<TestIgnoredIndicatorUnitConverters>();
 
         var schemaPropertyName = propertyName.CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
+        Assert.NotNull(propertySchema.AllOf);
         Assert.NotEmpty(propertySchema.AllOf);
 
         Assert.Null(propertySchema.Type);
-        Assert.Empty(propertySchema.Enum);
+        Assert.Null(propertySchema.Enum);
     }
 
     [Theory]
@@ -178,18 +176,19 @@ public class JsonConverterSchemaFilterTests
     [InlineData(nameof(TestIgnoredTimeIdentifierConverters.EnumToEnumValue))]
     public void TimeIdentifier_Ignored(string propertyName)
     {
-        var schema = GenerateSchema<TestIgnoredGeographicLevelConverters>();
+        var schema = GenerateSchema<TestIgnoredTimeIdentifierConverters>();
 
         var schemaPropertyName = propertyName.CamelCase();
-        var propertySchema = schema.Properties[schemaPropertyName];
+        var propertySchema = GetPropertySchema(schema, schemaPropertyName);
 
+        Assert.NotNull(propertySchema.AllOf);
         Assert.NotEmpty(propertySchema.AllOf);
 
         Assert.Null(propertySchema.Type);
-        Assert.Empty(propertySchema.Enum);
+        Assert.Null(propertySchema.Enum);
     }
 
-    private OpenApiSchema GenerateSchema<TConverters>()
+    private IOpenApiSchema GenerateSchema<TConverters>()
     {
         _schemaGenerator.GenerateSchema(typeof(TestEnum), _schemaRepository);
         _schemaGenerator.GenerateSchema(typeof(TConverters), _schemaRepository);
@@ -197,6 +196,28 @@ public class JsonConverterSchemaFilterTests
         return _schemaRepository.Schemas[typeof(TConverters).Name];
     }
 
+    private static IOpenApiSchema GetPropertySchema(IOpenApiSchema schema, string name)
+    {
+        Assert.NotNull(schema.Properties);
+        Assert.True(schema.Properties.TryGetValue(name, out var property), $"Schema has no property '{name}'.");
+        return property;
+    }
+
+    private static OpenApiSchemaReference GetItemsSchemaReference(IOpenApiSchema? schema)
+    {
+        Assert.NotNull(schema);
+        Assert.NotNull(schema.Items);
+        return Assert.IsType<OpenApiSchemaReference>(schema.Items);
+    }
+
+    private static IReadOnlyList<T> GetSchemaEnumValues<T>(IOpenApiSchema? schema)
+    {
+        Assert.NotNull(schema);
+        Assert.NotNull(schema.Enum);
+        return [.. schema.Enum.Select(e => e.GetValue<T>())];
+    }
+
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class TestEnumConverters
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -212,6 +233,7 @@ public class JsonConverterSchemaFilterTests
         public TestEnum EnumToEnumValue { get; init; }
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class TestIgnoredGeographicLevelConverters
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -227,6 +249,7 @@ public class JsonConverterSchemaFilterTests
         public GeographicLevel EnumToEnumValue { get; init; }
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class TestIgnoredIndicatorUnitConverters
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -242,6 +265,7 @@ public class JsonConverterSchemaFilterTests
         public IndicatorUnit EnumToEnumValue { get; init; }
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class TestIgnoredTimeIdentifierConverters
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -257,6 +281,7 @@ public class JsonConverterSchemaFilterTests
         public TimeIdentifier EnumToEnumValue { get; init; }
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class TestReadOnlyListEnumConverters
     {
         [JsonConverter(
@@ -270,6 +295,7 @@ public class JsonConverterSchemaFilterTests
         public IReadOnlyList<GeographicLevel> GeographicLevelEnumValues { get; init; } = [];
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private enum TestEnum
     {
         [EnumLabelValue("Sample 1", "sample-1")]

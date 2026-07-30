@@ -1,6 +1,7 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -40,13 +41,20 @@ internal class DefaultValuesOperationFilter : IOperationFilter
 
             parameter.Description ??= description.ModelMetadata?.Description;
 
-            if (parameter.Schema.Default == null && description.DefaultValue != null)
+            if (
+                parameter.Schema is OpenApiSchema openApiSchema
+                && openApiSchema.Default == null
+                && description.DefaultValue != null
+            )
             {
                 var json = JsonSerializer.Serialize(description.DefaultValue, description.ModelMetadata!.ModelType);
-                parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
+                openApiSchema.Default = JsonNode.Parse(json);
             }
 
-            parameter.Required |= description.IsRequired;
+            if (parameter is OpenApiParameter openApiParameter)
+            {
+                openApiParameter.Required |= description.IsRequired;
+            }
         }
     }
 }
