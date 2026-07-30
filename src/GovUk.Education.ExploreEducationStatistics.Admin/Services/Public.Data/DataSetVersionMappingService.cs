@@ -173,7 +173,7 @@ public class DataSetVersionMappingService(
             await userService
                 .CheckIsBauUser()
                 .OnSuccess(() =>
-                    CheckMappingExists(nextDataSetVersionId, cancellationToken, requireMappingStatus: true)
+                    CheckMappingExists(nextDataSetVersionId, cancellationToken).OnSuccess(CheckInMappingStatus)
                 )
                 .OnSuccess(_ => validateCandidatesFn())
                 .OnSuccess(validationResults =>
@@ -779,23 +779,9 @@ public class DataSetVersionMappingService(
             .OnSuccess(createSuccessfulResponseFn);
     }
 
-    private async Task<Either<ActionResult, DataSetVersionMapping>> CheckMappingExists(
-        Guid nextDataSetVersionId,
-        CancellationToken cancellationToken,
-        bool requireMappingStatus = false
-    )
+    private static Either<ActionResult, Unit> CheckInMappingStatus(DataSetVersionMapping mapping)
     {
-        var mapping = await publicDataDbContext
-            .DataSetVersionMappings.AsNoTracking()
-            .Include(mapping => mapping.TargetDataSetVersion)
-            .SingleOrDefaultAsync(mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId, cancellationToken);
-
-        if (mapping is null)
-        {
-            return new NotFoundResult();
-        }
-
-        if (requireMappingStatus && mapping.TargetDataSetVersion.Status != DataSetVersionStatus.Mapping)
+        if (mapping.TargetDataSetVersion.Status != DataSetVersionStatus.Mapping)
         {
             return ValidationUtils.ValidationResult(
                 new ErrorViewModel
@@ -807,6 +793,20 @@ public class DataSetVersionMappingService(
             );
         }
 
-        return mapping;
+        return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, DataSetVersionMapping>> CheckMappingExists(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return await publicDataDbContext
+            .DataSetVersionMappings.AsNoTracking()
+            .Include(mapping => mapping.TargetDataSetVersion)
+            .SingleOrNotFoundAsync(
+                mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
+                cancellationToken
+            );
     }
 }
