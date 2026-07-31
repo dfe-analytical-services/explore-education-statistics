@@ -519,6 +519,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -531,7 +532,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 10000,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -753,6 +756,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -765,7 +769,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 20,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -989,6 +995,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -1001,7 +1008,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 40,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -1098,6 +1107,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -1110,7 +1120,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 20,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -1316,7 +1328,8 @@
             "items": {
               "type": "string"
             },
-            "description": "The indicators available in the data set."
+            "description": "The indicators available in the data set.",
+            "example": "[\"Authorised absence rate\" \"Overall absence rate\"]"
           }
         },
         "additionalProperties": false,
@@ -3069,7 +3082,8 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The geographic level of the locations in this group."
+            "description": "The geographic level of the locations in this group.",
+            "example": "NAT"
           },
           "options": {
             "type": "array",
@@ -3111,7 +3125,8 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The geographic level of the locations in this group."
+            "description": "The geographic level of the locations in this group.",
+            "example": "NAT"
           }
         },
         "additionalProperties": false,
@@ -3732,5 +3747,16 @@
         "description": "A warning that points to a potential issue. This is not a critical error,\r\nbut may require attention to get the desired response."
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "DataSets"
+    },
+    {
+      "name": "DataSetVersions"
+    },
+    {
+      "name": "Publications"
+    }
+  ]
 }

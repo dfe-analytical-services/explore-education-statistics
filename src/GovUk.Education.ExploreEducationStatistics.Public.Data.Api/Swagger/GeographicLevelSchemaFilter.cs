@@ -1,21 +1,25 @@
+using System.Text.Json.Nodes;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 public class GeographicLevelSchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.MemberInfo == null && context.Type == typeof(GeographicLevel))
+        if (
+            context.MemberInfo == null
+            && context.Type == typeof(GeographicLevel)
+            && schema is OpenApiSchema openApiSchema
+        )
         {
-            schema.Type = "string";
-            schema.Format = null;
+            openApiSchema.Type = JsonSchemaType.String;
+            openApiSchema.Format = null;
 
-            schema.Description = """
+            openApiSchema.Description = """
                 The code for a geographic level that locations are grouped by.
 
                 The allowed values are:
@@ -41,11 +45,11 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
                 - `PFA` - Police Force Area
                 """;
 
-            schema.Example = new OpenApiString("NAT");
+            openApiSchema.Example = JsonValue.Create("NAT");
 
-            schema.Enum = GeographicLevelUtils
-                .OrderedCodes.Select(code => new OpenApiString(code))
-                .ToList<IOpenApiAny>();
+            openApiSchema.Enum = GeographicLevelUtils
+                .OrderedCodes.Select(JsonNode (code) => JsonValue.Create(code))
+                .ToList();
         }
     }
 }

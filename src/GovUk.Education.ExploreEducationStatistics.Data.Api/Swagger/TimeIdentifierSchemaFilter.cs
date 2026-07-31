@@ -1,8 +1,8 @@
 ﻿#nullable enable
+using System.Text.Json.Nodes;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
@@ -12,14 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
 /// </summary>
 public class TimeIdentifierSchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type == typeof(TimeIdentifier))
+        if (context.Type == typeof(TimeIdentifier) && schema is OpenApiSchema openApiSchema)
         {
-            schema.Enum.Clear();
-            var timeIdentifiers = Enum.GetValues<TimeIdentifier>();
-            var values = timeIdentifiers.Select(name => name.GetEnumValue());
-            schema.Enum.AddRange(values.Select(v => new OpenApiString($"{v}")));
+            openApiSchema.Enum = Enum.GetValues<TimeIdentifier>()
+                .Select(JsonNode (timeIdentifier) => JsonValue.Create(timeIdentifier.GetEnumValue()))
+                .ToList();
         }
     }
 }
