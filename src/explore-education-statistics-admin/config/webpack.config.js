@@ -741,7 +741,6 @@ module.exports = webpackEnv => {
           quiet: true,
           // ESLint class options
           cwd: paths.appPath,
-          resolvePluginsRelativeTo: __dirname,
           // EES - We have our own ESLint config, so we comment this out.
           // baseConfig: {
           //   extends: [require.resolve('eslint-config-react-app/base')],
