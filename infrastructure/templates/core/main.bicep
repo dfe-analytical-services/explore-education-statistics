@@ -28,7 +28,13 @@ param certificateType FrontDoorCertificateType = 'BringYourOwn'
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
-@description('Whether or not to deploy Application Gateway and its confirmation.')
+@description('Whether or not to deploy subnets.')
+param deploySubnets bool = false
+
+@description('Whether or not to deploy Azure Front Door.')
+param deployAzureFrontDoor bool = false
+
+@description('Whether or not to deploy Application Gateway and its configuration.')
 param deployApplicationGateway bool = false
 
 @description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
@@ -65,12 +71,16 @@ var resourceNames = {
     publicApiDocsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
     publicSiteApp: '${subscription}-as-ees-public-site'
     publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
-    vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
-    subnets: {
-      eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
-      appGateway: '${resourcePrefix}-snet-${abbreviations.networkApplicationGateways}-01'
-    }
+  }
+}
+
+module vNetModule 'application/virtual-network/virtual-network.bicep' = {
+  name: 'vNetModuleDeploy'
+  params: {
+    subscription: subscription
+    deploySubnets: deploySubnets
+    tagValues: tagValues
   }
 }
 
@@ -106,9 +116,9 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
       adminApp: resourceNames.existingResources.adminApp
       alertsGroup: resourceNames.existingResources.alertsGroup
       publisherFunction: resourceNames.existingResources.publisherFunction
-      vNet: resourceNames.existingResources.vNet
+      vNet: vNetModule.outputs.vNetName
       subnets: {
-        eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
+        eventGridCustomTopicPrivateEndpoints: vNetModule.outputs.eventGridCustomTopicPrivateEndpointsSubnetName
       }
     }
     deployAlerts: deployAlerts
@@ -116,7 +126,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
   }
 }
 
-module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
+module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzureFrontDoor) {
   name: 'frontDoorModuleDeploy'
   params: {
     subscription: subscription
@@ -141,7 +151,7 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
     publicApiAppName: resourceNames.existingResources.publicApiApp
     publicApiDocsAppName: resourceNames.existingResources.publicApiDocsApp
     publicSiteAppServiceName: resourceNames.existingResources.publicSiteApp
-    vnetName: resourceNames.existingResources.vNet
+    vnetName: vNetModule.outputs.vNetName
     publicApiAppGatewayFqdn: publicApiApplicationGatewayFqdn
     publicApiPublicUrl: publicApiPublicUrl
     publicSiteFqdn: replace(publicSiteUrl, 'https://', '')

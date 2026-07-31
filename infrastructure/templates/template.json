@@ -455,10 +455,6 @@
       "type": "bool",
       "defaultValue": true
     },
-    "deploySubnets": {
-      "type": "bool",
-      "defaultValue": true
-    },
     "backupVaultAzureBlobsRegistrationsDeployed": {
       "type": "bool",
       "defaultValue": true,
@@ -1236,8 +1232,6 @@
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
-    "analyticsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-analytics')]",
-    "analyticsStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-anlyt-pep')]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
     "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
     "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
@@ -1250,22 +1244,10 @@
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
-    "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
-    "publicApiStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-sa-pep')]",
-    "nlSearchFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-nlsearch')]",
-    "nlSearchFunctionAppPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-nlsearch-pep')]",
-    "searchDocsFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs')]",
-    "searchDocsFunctionAppPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-fa-searchdocs-pep')]",
-    "searchStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sa-search-pep')]",
     "sqlServerPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sqlsvr-pep')]",
     "sqlServerPrivateEndpointsSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('sqlServerPrivateEndpointsSubnetName'))]",
-    "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
-    "eventGridCustomTopicPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-evgt-pep')]",
-    "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
-    "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
     "screenerFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-fa-screener')]",
     "screenerFunctionAppSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('screenerFunctionAppSubnetName'))]",
-    "screenerStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-sa-screener-pep')]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -1440,8 +1422,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]"
           ]
         }
       ],
@@ -1579,8 +1560,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppName'), parameters('deploySlotName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppName'), parameters('deploySlotName'))]"
           ]
         }
       ],
@@ -1675,8 +1655,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]"
           ]
         }
       ],
@@ -1809,8 +1788,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppName'), parameters('deploySlotName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppName'), parameters('deploySlotName'))]"
           ]
         }
       ],
@@ -1905,8 +1883,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]"
           ]
         }
       ],
@@ -2065,8 +2042,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppName'), parameters('deploySlotName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppName'), parameters('deploySlotName'))]"
           ]
         }
       ],
@@ -2446,9 +2422,6 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
-      "dependsOn": [
-        "[variables('vNetRef')]"
-      ],
       "sku": {
         "name": "Standard_RAGRS"
       }
@@ -3009,8 +2982,7 @@
         "ignoreMissingVnetServiceEndpoint": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-        "[variables('vNetRef')]"
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
       ],
       "copy": {
         "name": "networkRuleLoop",
@@ -3328,8 +3300,7 @@
         "ignoreMissingVnetServiceEndpoint": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-        "[variables('vNetRef')]"
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
       ],
       "copy": {
         "name": "networkRuleLoop",
@@ -3715,8 +3686,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]"
           ]
         }
       ],
@@ -3866,8 +3836,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]"
           ]
         }
       ],
@@ -4017,8 +3986,7 @@
             "swiftSupported": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-            "[variables('vNetRef')]"
+            "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
           ]
         }
       ],
@@ -4218,368 +4186,6 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      }
-    },
-    {
-      "condition": "[parameters('deploySubnets')]",
-      "apiVersion": "2020-05-01",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[variables('vNetName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Virtual network",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "10.0.0.0/16"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('adminSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.0.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Sql"
-                },
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms",
-                    "actions": [
-                      "Microsoft.Network/virtualNetworks/subnets/action"
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('importerSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.1.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Sql"
-                },
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms",
-                    "actions": [
-                      "Microsoft.Network/virtualNetworks/subnets/action"
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('publisherSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.2.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Sql"
-                },
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms",
-                    "actions": [
-                      "Microsoft.Network/virtualNetworks/subnets/action"
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('notifySubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.3.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Sql"
-                },
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms",
-                    "actions": [
-                      "Microsoft.Network/virtualNetworks/subnets/action"
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('contentSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.4.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Sql"
-                },
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms",
-                    "actions": [
-                      "Microsoft.Network/virtualNetworks/subnets/action"
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('dataSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.5.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Sql"
-                },
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms",
-                    "actions": [
-                      "Microsoft.Network/virtualNetworks/subnets/action"
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('publicApiDataProcessorSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.6.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Sql"
-                },
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('publicApiDataProcessorPrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.7.0/24"
-            }
-          },
-          {
-            "name": "[variables('containerAppEnvironmentSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.8.0/23",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "environment",
-                  "properties": {
-                    "serviceName": "Microsoft.App/environments"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('applicationGatewaySubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.10.0/24"
-            }
-          },
-          {
-            "name": "[variables('publicApiStoragePrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.11.0/24"
-            }
-          },
-          {
-            "name": "[variables('psqlFlexibleServerSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.12.0/24"
-            }
-          },
-          {
-            "name": "[variables('searchStoragePrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.13.0/24"
-            }
-          },
-          {
-            "name": "[variables('searchDocsFunctionAppSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.14.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('searchDocsFunctionAppPrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.15.0/24"
-            }
-          },
-          {
-            "name": "[variables('analyticsStoragePrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.16.0/24"
-            }
-          },
-          {
-            "name": "[variables('analyticsFunctionAppSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.17.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('screenerStoragePrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.18.0/24"
-            }
-          },
-          {
-            "name": "[variables('screenerFunctionAppSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.19.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('eventGridCustomTopicPrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.20.0/24"
-            }
-          },
-          {
-            "name": "[variables('nlSearchFunctionAppPrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.21.0/24"
-            }
-          },
-          {
-            "name": "[variables('nlSearchFunctionAppSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.22.0/24",
-              "serviceEndpoints": [
-                {
-                  "service": "Microsoft.Storage"
-                }
-              ],
-              "delegations": [
-                {
-                  "name": "webapp",
-                  "properties": {
-                    "serviceName": "Microsoft.Web/serverFarms"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('sqlServerPrivateEndpointsSubnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.23.0/24"
-            }
-          }
-        ]
       }
     },
     {

@@ -11,6 +11,10 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deploySubnets
+    type: string
+  - name: deployAzureFrontDoor
+    type: string
   - name: deployApplicationGateway
     type: string
   - name: deployAlerts
@@ -35,6 +39,8 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               publicSiteUrl='$(publicSiteUrl)' \
+              deploySubnets=${{ parameters.deploySubnets }} \
+              deployAzureFrontDoor=${{ parameters.deployAzureFrontDoor }} \
               deployApplicationGateway=${{ parameters.deployApplicationGateway }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               resourceTags='$(resourceTags)'

@@ -35,9 +35,6 @@
     "useSubnets": {
       "value": true
     },
-    "deploySubnets": {
-      "value": true
-    },
     "domain": {
       "value": "test.explore-education-statistics.service.gov.uk"
     },

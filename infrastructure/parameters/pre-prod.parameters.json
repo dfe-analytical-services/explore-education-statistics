@@ -38,9 +38,6 @@
     "useSubnets": {
       "value": true
     },
-    "deploySubnets": {
-      "value": true
-    },
     "autoscaleAppServices": {
       "value": false
     },
