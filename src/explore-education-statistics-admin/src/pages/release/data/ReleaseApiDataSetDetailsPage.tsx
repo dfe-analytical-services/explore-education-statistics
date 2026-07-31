@@ -130,8 +130,8 @@ export default function ReleaseApiDataSetDetailsPage() {
         onConfirm={handleUnfinalise}
       >
         <p>
-          Unfinalising this data set version will return it to the mapping
-          journey and allow you to edit its mappings again.
+          Unfinalising this data set version will return it to the mapping step
+          and allow you to edit its mappings again.
         </p>
         <p>
           The data set preview will be unavailable until the version is

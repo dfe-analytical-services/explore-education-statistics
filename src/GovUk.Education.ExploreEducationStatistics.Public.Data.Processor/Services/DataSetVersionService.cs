@@ -182,6 +182,7 @@ internal class DataSetVersionService(
 
     private async Task RemoveFinalisedVersionData(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
     {
+        // TODO EES-7508: 'Unfinalise' action should use cascade deletion where possible
         var dataSetVersionId = dataSetVersion.Id;
 
         publicDataDbContext.FilterMetaChanges.RemoveRange(

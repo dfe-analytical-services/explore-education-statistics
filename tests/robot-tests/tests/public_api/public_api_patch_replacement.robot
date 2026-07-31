@@ -372,7 +372,7 @@ Unfinalise the patch API data set version
     ${modal}=    user waits until modal is visible    Unfinalise this data set version
     user waits until parent contains element
     ...    ${modal}
-    ...    text:Unfinalising this data set version will return it to the mapping journey and allow you to edit its mappings again.
+    ...    text:Unfinalising this data set version will return it to the mapping step and allow you to edit its mappings again.
     user clicks button    Unfinalise data set version
     user waits until modal is not visible    Unfinalise this data set version
     user waits until h3 is visible    Draft version tasks

@@ -1329,9 +1329,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     apiDataSetService.getDataSet
       .mockResolvedValueOnce({
         ...testDataSet,
-        draftVersion: {
-          ...draftVersion,
-        },
+        draftVersion,
       })
       .mockResolvedValue({
         ...testDataSet,
@@ -1368,7 +1366,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     const dialog = within(screen.getByRole('dialog'));
     expect(
-      dialog.getByText(/return it to the mapping journey/),
+      dialog.getByText(/return it to the mapping step/),
     ).toBeInTheDocument();
 
     await user.click(
