@@ -1726,7 +1726,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-public')]"
       ],
       "properties": {
@@ -1959,7 +1958,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-core')]",
         "[variables('ees-storage-public')]",
         "[variables('ees-storage-publisher')]"
@@ -2454,6 +2452,17 @@
       ],
       "sku": {
         "name": "Standard_RAGRS"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), 'ees-storage-core')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
       }
     },
     {
@@ -3479,6 +3488,17 @@
       }
     },
     {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), 'ees-storage-notifications')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
+      }
+    },
+    {
       "name": "[variables('publicStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2023-05-01",
@@ -3526,6 +3546,17 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), 'ees-storage-public')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
       }
     },
     {
@@ -3724,7 +3755,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-notifications')]"
       ],
       "properties": {
@@ -3879,7 +3909,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-core')]"
       ],
       "properties": {
@@ -4035,7 +4064,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-core')]",
         "[variables('ees-storage-public')]",
         "[variables('ees-storage-notifications')]",
@@ -4137,6 +4165,17 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), 'ees-storage-publisher')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
       }
     },
     {
@@ -4586,90 +4625,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
-      ]
-    },
-    {
-      "name": "[variables('keyVaultName')]",
-      "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2026-02-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Key Vault",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "tenantId": "[subscription().tenantId]",
-        "sku": {
-          "family": "A",
-          "name": "Standard"
-        },
-        "enabledForDeployment": true,
-        "enabledForDiskEncryption": true,
-        "enabledForTemplateDeployment": true,
-        "enableSoftDelete": true,
-        "enablePurgeProtection": true,
-        "enableRbacAuthorization": true
-      },
-      "resources": [
-        {
-          "type": "secrets",
-          "name": "ees-storage-core",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        },
-        {
-          "type": "secrets",
-          "name": "ees-storage-notifications",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        },
-        {
-          "type": "secrets",
-          "name": "ees-storage-public",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        },
-        {
-          "type": "secrets",
-          "name": "ees-storage-publisher",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        }
       ]
     },
     {
@@ -5028,10 +4984,7 @@
             }
           }
         }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
-      ]
+      }
     },
     {
       "type": "Microsoft.Insights/actionGroups",

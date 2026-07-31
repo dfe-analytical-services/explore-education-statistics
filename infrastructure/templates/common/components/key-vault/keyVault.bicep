@@ -1,11 +1,11 @@
 @description('Specifies the name of the Key Vault')
 param keyVaultName string
 
-@description('Specifies the location for all resources.')
-param location string
+@description('Specifies the location for all resources. Defaults to the Resource Group location.')
+param location string = resourceGroup().location
 
-@description('Specifies the Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. Get it by using Get-AzSubscription cmdlet.')
-param tenantId string
+@description('Specifies the Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. Defaults to the Resource Group tenant.')
+param tenantId string = tenant().tenantId
 
 @description('Specifies whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault.')
 param enabledForDeployment bool = true

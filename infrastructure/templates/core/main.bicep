@@ -56,16 +56,14 @@ var tagValues = union(resourceTags ?? {}, {
 })
 
 var resourcePrefix = '${subscription}-ees'
-var legacyResourcePrefix = subscription
 var publicApiResourcePrefix = '${subscription}-ees-papi'
 
 var resourceNames = {
   existingResources: {
     adminApp: '${subscription}-as-ees-admin'
-    keyVault: '${legacyResourcePrefix}-kv-ees-01'
     publicApiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
     publicApiDocsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
-    publicSiteApp: '${legacyResourcePrefix}-as-ees-public-site'
+    publicSiteApp: '${subscription}-as-ees-public-site'
     publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
     vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
     alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
@@ -73,6 +71,14 @@ var resourceNames = {
       eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
       appGateway: '${resourcePrefix}-snet-${abbreviations.networkApplicationGateways}-01'
     }
+  }
+}
+
+module keyVaultModule 'application/keyVault/keyVault.bicep' = {
+  name: 'keyVaultModuleDeploy'
+  params: {
+    subscription: subscription
+    tagValues: tagValues
   }
 }
 
@@ -115,7 +121,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
   params: {
     subscription: subscription
     resourcePrefix: resourcePrefix
-    legacyResourcePrefix: legacyResourcePrefix
+    legacyResourcePrefix: keyVaultModule.outputs.keyVaultName
     publicSiteUrl: publicSiteUrl
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
@@ -131,7 +137,7 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
     location: location
     subscription: subscription
     alertsGroupName: resourceNames.existingResources.alertsGroup
-    keyVaultName: resourceNames.existingResources.keyVault
+    keyVaultName: keyVaultModule.outputs.keyVaultName
     publicApiAppName: resourceNames.existingResources.publicApiApp
     publicApiDocsAppName: resourceNames.existingResources.publicApiDocsApp
     publicSiteAppServiceName: resourceNames.existingResources.publicSiteApp
