@@ -716,7 +716,7 @@ static class DataSetVersionMappingControllerIndicatorTestsHelpers
         DataSetVersion nextDataSetVersion = DataFixture
             .DefaultDataSetVersion()
             .WithVersionNumber(major: 1, minor: 1)
-            .WithStatusDraft()
+            .WithStatus(DataSetVersionStatus.Mapping)
             .WithDataSet(dataSet)
             .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 

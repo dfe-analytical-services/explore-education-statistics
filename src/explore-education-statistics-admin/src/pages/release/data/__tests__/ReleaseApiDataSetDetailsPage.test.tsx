@@ -1322,6 +1322,114 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
   });
 
+  test.each([
+    ['patch', testPatchDraftVersion],
+    ['non-patch', testDraftVersion],
+  ])('unfinalises a finalised %s version', async (_, draftVersion) => {
+    apiDataSetService.getDataSet
+      .mockResolvedValueOnce({
+        ...testDataSet,
+        draftVersion,
+      })
+      .mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...draftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+            indicatorsComplete: true,
+            filtersHaveMajorChange: false,
+            locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
+            isMajorVersionUpdate: false,
+          },
+        },
+      });
+    apiDataSetVersionService.unfinaliseVersion.mockResolvedValue();
+
+    const { user } = renderPage();
+
+    const finalisedDraftSummary = within(
+      await screen.findByTestId('draft-version-summary'),
+    );
+    expect(finalisedDraftSummary.getByTestId('Status')).toHaveTextContent(
+      'Ready',
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Unfinalise this data set version',
+      }),
+    );
+
+    const dialog = within(screen.getByRole('dialog'));
+    expect(
+      dialog.getByText(/return it to the mapping step/),
+    ).toBeInTheDocument();
+
+    await user.click(
+      dialog.getByRole('button', { name: 'Unfinalise data set version' }),
+    );
+
+    await waitFor(() => {
+      expect(apiDataSetVersionService.unfinaliseVersion).toHaveBeenCalledWith(
+        draftVersion.id,
+      );
+      expect(screen.getByTestId('draft-version-tasks')).toBeInTheDocument();
+      expect(
+        within(screen.getByTestId('draft-version-summary')).getByTestId(
+          'Status',
+        ),
+      ).toHaveTextContent('Action required');
+      expect(
+        screen.queryByRole('button', {
+          name: 'Unfinalise this data set version',
+        }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', {
+          name: 'Finalise this data set version',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Map locations' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Map filters' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Map indicators' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('does not show the unfinalise action for an approved release', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: {
+        ...testPatchDraftVersion,
+      },
+    });
+
+    renderPage({
+      releaseVersion: {
+        ...testDraftRelease,
+        approvalStatus: 'Approved',
+      },
+    });
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Unfinalise this data set version',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   function renderPage(options?: {
     releaseVersion?: ReleaseVersion;
     dataSetId?: string;

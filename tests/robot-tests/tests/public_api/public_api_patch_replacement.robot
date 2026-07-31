@@ -104,7 +104,6 @@ Validate error summary for major versions is displayed on Api Data Set Details p
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
     ...    This API data set can not be published because it has major changes that are not allowed.
-    user checks element is visible    testid:cancel-replacement-link
 
 Cancel data replacement which results in major API version
     user clicks link    Data and files
@@ -141,7 +140,6 @@ Validate error summary is displayed on Api Data Set Details page
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
     ...    This API data set can not be published because location, filter or indicator mappings are not yet complete.
-    user checks element is visible    testid:cancel-replacement-link
 
 Validate the summary contents inside the 'Latest live version details' table
     user waits until h3 is visible    Latest live version details
@@ -368,6 +366,27 @@ Confirm finalization of this API data set version
     user waits for caches to expire
     user waits until h2 is visible    Mappings finalised
     user waits until page contains    Draft API data set version is ready to be published
+
+Unfinalise the patch API data set version
+    user clicks button    Unfinalise this data set version
+    ${modal}=    user waits until modal is visible    Unfinalise this data set version
+    user waits until parent contains element
+    ...    ${modal}
+    ...    text:Unfinalising this data set version will return it to the mapping step and allow you to edit its mappings again.
+    user clicks button    Unfinalise data set version
+    user waits until modal is not visible    Unfinalise this data set version
+    user waits until h3 is visible    Draft version tasks
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    testid:map-indicators-task    link:Map indicators
+    user waits until page contains    Finalise this data set version
+
+Re-finalise the same patch API data set version
+    user clicks button    Finalise this data set version
+    user waits for caches to expire
+    user waits until h2 is visible    Mappings finalised
+    user waits until page contains    Draft API data set version is ready to be published
+    user waits until page contains    Unfinalise this data set version
 
 Verify that API summary tags have status OK and then press 'confirm data replacement'
     user clicks link    Back to API data sets

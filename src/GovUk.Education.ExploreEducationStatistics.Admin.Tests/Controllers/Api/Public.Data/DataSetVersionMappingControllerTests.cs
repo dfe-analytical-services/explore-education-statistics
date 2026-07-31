@@ -929,6 +929,42 @@ public abstract class DataSetVersionMappingControllerTests(DataSetVersionMapping
             response.AssertNotFound();
         }
 
+        [Theory]
+        [InlineData(DataSetVersionStatus.Draft)]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Finalising)]
+        public async Task DataSetVersionNotInMappingStatus_Returns400(DataSetVersionStatus status)
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext()
+            );
+            nextDataSetVersion.Status = status;
+
+            var mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Update(nextDataSetVersion);
+                    context.DataSetVersionMappings.Add(mapping);
+                });
+
+            var response = await ApplyBatchLocationMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: []
+            );
+
+            response
+                .AssertValidationProblem()
+                .AssertHasError("nextDataSetVersionId", ValidationMessages.DataSetVersionMappingCannotBeUpdated.Code);
+        }
+
         [Fact]
         public async Task EmptyRequiredFields_Return400()
         {
@@ -2234,7 +2270,7 @@ static class DataSetVersionMappingControllerTestsHelpers
         DataSetVersion nextDataSetVersion = DataFixture
             .DefaultDataSetVersion()
             .WithVersionNumber(major: 1, minor: 1)
-            .WithStatusDraft()
+            .WithStatus(DataSetVersionStatus.Mapping)
             .WithDataSet(dataSet)
             .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 

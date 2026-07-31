@@ -211,6 +211,27 @@ public class DataSetVersionService(
             );
     }
 
+    public async Task<Either<ActionResult, Unit>> UnfinaliseVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await userService
+            .CheckIsBauUser()
+            .OnSuccess(() => GetVersion(dataSetVersionId, cancellationToken))
+            .OnSuccess(async dataSetVersion =>
+                await contentDbContext
+                    .ReleaseFiles.AsNoTracking()
+                    .Where(releaseFile => releaseFile.Id == dataSetVersion.Release.ReleaseFileId)
+                    .Select(releaseFile => releaseFile.ReleaseVersion)
+                    .SingleAsync(cancellationToken)
+            )
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccessVoid(async _ =>
+                await processorClient.UnfinaliseDataSetVersion(dataSetVersionId, cancellationToken)
+            );
+    }
+
     public async Task<Either<ActionResult, HttpResponseMessage>> GetVersionChanges(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default
