@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
@@ -38,10 +37,7 @@ public class LocationMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
                     b => b.HasOne(l => l.Meta).WithMany(m => m.OptionLinks).HasForeignKey(l => l.MetaId)
                 );
 
-            builder
-                .Property(m => m.Level)
-                .HasMaxLength(5)
-                .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
+            builder.Property(m => m.Level).HasMaxLength(5);
 
             builder.HasIndex(m => new { m.DataSetVersionId, m.Level }).IsUnique();
         }

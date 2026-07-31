@@ -1,7 +1,6 @@
 ﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Nodes;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
@@ -11,12 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
 /// </summary>
 public class EnumSchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type.IsEnum)
+        if (context.Type.IsEnum && schema is OpenApiSchema openApiSchema)
         {
-            schema.Enum.Clear();
-            schema.Enum.AddRange(Enum.GetNames(context.Type).Select(name => new OpenApiString($"{name}")));
+            openApiSchema.Enum = Enum.GetNames(context.Type).Select(JsonNode (name) => JsonValue.Create(name)).ToList();
         }
     }
 }

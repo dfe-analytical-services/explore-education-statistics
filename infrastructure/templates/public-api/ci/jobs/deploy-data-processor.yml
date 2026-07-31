@@ -73,6 +73,7 @@ jobs:
                 maxAttempts: 20
                 accessTokenScope: $(dataProcessorAppRegistrationClientId)
                 endpoint: $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck
+                condition: and(succeeded(), eq(variables.awaitHealthyProcessorStagingSlot, true))
                 # We allow 404s because if this is the first time the Function App is being deployed, there won't be any
                 # deployed code yet in the staging slot.
                 allow404s: true

@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagger;
@@ -29,7 +29,9 @@ public class RequiredPropertySchemaFilterTests
     {
         var schema = GenerateSchema<TestClassAllRequired>();
 
+        Assert.NotNull(schema.Required);
         Assert.Equal(3, schema.Required.Count);
+
         Assert.Contains(nameof(TestClassAllRequired.FirstName).ToLowerFirst(), schema.Required);
         Assert.Contains(nameof(TestClassAllRequired.LastName).ToLowerFirst(), schema.Required);
         Assert.Contains(nameof(TestClassAllRequired.Age).ToLowerFirst(), schema.Required);
@@ -40,7 +42,9 @@ public class RequiredPropertySchemaFilterTests
     {
         var schema = GenerateSchema<TestClassSomeRequired>();
 
+        Assert.NotNull(schema.Required);
         Assert.Single(schema.Required);
+
         Assert.Contains(nameof(TestClassSomeRequired.FirstName).ToLowerFirst(), schema.Required);
     }
 
@@ -49,7 +53,9 @@ public class RequiredPropertySchemaFilterTests
     {
         var schema = GenerateSchema<TestClassReferenceTypes>();
 
+        Assert.NotNull(schema.Required);
         Assert.Equal(2, schema.Required.Count);
+
         Assert.Contains(nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst(), schema.Required);
         Assert.Contains(nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst(), schema.Required);
     }
@@ -59,8 +65,12 @@ public class RequiredPropertySchemaFilterTests
     {
         var schema = GenerateSchema<TestClassReferenceTypes>();
 
-        Assert.True(schema.Properties[nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst()].Nullable);
-        Assert.False(schema.Properties[nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst()].Nullable);
+        Assert.NotNull(schema.Properties);
+        Assert.Equal(
+            JsonSchemaType.Null,
+            schema.Properties[nameof(TestClassReferenceTypes.RequiredNullable).ToLowerFirst()].Type
+        );
+        Assert.Null(schema.Properties[nameof(TestClassReferenceTypes.RequiredNonNullable).ToLowerFirst()].Type);
     }
 
     [Fact]
@@ -68,6 +78,7 @@ public class RequiredPropertySchemaFilterTests
     {
         var schema = GenerateSchema<TestClassJsonIgnored>();
 
+        Assert.NotNull(schema.Required);
         Assert.Empty(schema.Required);
     }
 
@@ -76,13 +87,14 @@ public class RequiredPropertySchemaFilterTests
     {
         var schema = GenerateSchema<TestClassJsonPropertyName>();
 
+        Assert.NotNull(schema.Required);
         Assert.Equal(2, schema.Required.Count);
 
         Assert.Contains("GivenName", schema.Required);
         Assert.Contains("AgeYears", schema.Required);
     }
 
-    private OpenApiSchema GenerateSchema<T>()
+    private IOpenApiSchema GenerateSchema<T>()
     {
         _schemaGenerator.GenerateSchema(typeof(T), _schemaRepository);
 

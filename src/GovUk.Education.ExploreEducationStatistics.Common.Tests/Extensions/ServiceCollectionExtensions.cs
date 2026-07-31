@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using static Moq.MockBehavior;
@@ -22,7 +23,7 @@ public static class ServiceCollectionExtensions
         where TDbContext : DbContext
     {
         // Remove the default DbContext descriptor that was provided by Startup.cs.
-        var descriptor = services.Single(d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
+        var descriptor = services.Single(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<TDbContext>));
 
         services.Remove(descriptor);
 
