@@ -1,5 +1,5 @@
-@description('Resource prefix for legacy resources.')
-param legacyResourcePrefix string
+@description('Name of the Key Vault instance in which to store certificates.')
+param keyVaultName string
 
 @description('Name of the Azure Front Door instance.')
 param frontDoorName string
@@ -9,8 +9,6 @@ param siteHostName string
 
 @description('Name of the certificate.')
 param certificateName string
-
-var keyVaultName = '${legacyResourcePrefix}-kv-ees-01'
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorName
