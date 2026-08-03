@@ -83,7 +83,7 @@ export default function DifferencesItemMappingModal<
     return {
       value: id,
       label: candidate[rowLabel] as string,
-      hint: hintLabelEntries
+      hint: (hintLabelEntries && hintLabelEntries.length > 0)
         ? `(${hintLabelEntries
             .map(([key, label]) => `${label} : ${candidate[key]}`)
             .join(', ')})`
