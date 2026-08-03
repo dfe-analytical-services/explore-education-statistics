@@ -403,11 +403,13 @@ public class PermalinkService : IPermalinkService
 
         if (csvMeta is not null)
         {
-            await Task.WhenAll(uploadTableTask, UploadTableCsv(permalink, observations, csvMeta, cancellationToken));
-            return;
+            var uploadTableCsvTask = UploadTableCsv(permalink, observations, csvMeta, cancellationToken);
+            await Task.WhenAll(uploadTableTask, uploadTableCsvTask);
         }
-
-        await uploadTableTask;
+        else
+        {
+            await uploadTableTask;
+        }
     }
 
     private async Task UploadTableCsv(
