@@ -26,6 +26,7 @@ const testReplacementPlan: DataReplacementPlan = {
   hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
+    filters: { mappings: {}, candidates: {} },
     indicators: {
       mappings: {
         enrolments_again: {
@@ -223,6 +224,7 @@ const testReplacementPlanWithLocation: DataReplacementPlan = {
   hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
+    filters: { mappings: {}, candidates: {} },
     indicators: {
       mappings: {
         enrolments_again: {
@@ -455,13 +457,8 @@ describe('DataFileReplacementDifferences', () => {
       tableId: indicatorsTableId,
       itemType: 'indicator',
       mappingsPlan: testReplacementPlanWithLocation.mapping.indicators,
-      mappingGroups: [
-        {
-          label: 'Enrolment Group',
-          mappings: ['enrolments_again', 'enrolments'],
-        },
-      ],
-      mappingsToShow: new Set(['enrolments_again', 'enrolments']),
+      replacementGroups: expect.any(Array),
+      getGroupMappings: expect.any(Function),
       rowLabel: 'label',
       mappedDataLabels: {
         label: 'Label',
@@ -473,13 +470,8 @@ describe('DataFileReplacementDifferences', () => {
       tableId: locationsTableId,
       itemType: 'location',
       mappingsPlan: testReplacementPlanWithLocation.mapping.locations,
-      mappingGroups: [
-        {
-          label: 'Country',
-          mappings: ['country-england'],
-        },
-      ],
-      mappingsToShow: new Set(['country-england']),
+      replacementGroups: expect.any(Array),
+      getGroupMappings: expect.any(Function),
       rowLabel: 'name',
       mappedDataLabels: {
         name: 'Name',

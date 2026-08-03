@@ -1,20 +1,16 @@
 import dataReplacementService, {
   DataReplacementPlan,
-  IndicatorGroupReplacement,
-  LocationReplacement,
-  MappingsPlan,
+  FilterMappingFilterGroups,
+  FilterMappingFilterItems,
+  FilterMappingPlan,
+  FilterMappingSource,
   PlanMappings,
-  ReplacementMapping,
-  TargetReplacement,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import React, { useCallback, useMemo } from 'react';
 import { useImmer } from 'use-immer';
-import pickBy from 'lodash/pickBy';
-import { Dictionary } from '@common/types';
-import DataFileReplacementDifferencesTable, {
-  TableMappingGroup,
-} from './DataFileReplacementDifferencesTable';
+import DataFileReplacementFilterDifferencesTable from '@admin/pages/release/data/components/DataFileReplacementFilterDifferencesTable';
+import DataFileReplacementDifferencesTable from './DataFileReplacementDifferencesTable';
 
 interface Props {
   releaseVersionId: string;
@@ -24,67 +20,6 @@ interface Props {
   reloadPlan: () => void;
 }
 
-const getNonAutoSetMappings = (mappings: MappingsPlan<unknown>['mappings']) => {
-  return pickBy(mappings, value => value.type !== 'AutoSet');
-};
-
-export function uniqueByLabel<T extends { label: string }>(items: T[]): T[] {
-  return Array.from(new Map(items.map(item => [item.label, item])).values());
-}
-
-/**
- * Builds the data for the tables.
- *
- * This is restricted to items in the groups that are in the replacement mappings.
- *
- * Returns an object containing both:
- * Groups of mapping ids with the same structure as the original groups (filters out empty groups)
- * A set of all mapping ids that both exist in the replacement mappings and the original groups
- *
- */
-function createTableMappingsAndGroups<
-  G extends IndicatorGroupReplacement | LocationReplacement,
-  R extends (G[keyof G] extends TargetReplacement ? G[keyof G] : never),
->(
-  replacementMappings: Dictionary<ReplacementMapping<unknown>>,
-  groups: G[],
-  childKey: keyof G,
-) {
-  return groups.reduce<{
-    allUniqueMappingIds: Set<string>;
-    groupedMappings: TableMappingGroup[];
-  }>(
-    ({ allUniqueMappingIds, groupedMappings }, group) => {
-      const children = (group[childKey] ?? []) as R[];
-
-      const filteredChildren = children.filter(
-        child => replacementMappings[child.id],
-      );
-      if (filteredChildren.length === 0)
-        return { allUniqueMappingIds, groupedMappings };
-
-      const mappings = filteredChildren.map(child => child.id);
-
-      mappings.forEach(childId => allUniqueMappingIds.add(childId));
-
-      return {
-        allUniqueMappingIds,
-        groupedMappings: [
-          ...groupedMappings,
-          {
-            label: group.label,
-            mappings,
-          },
-        ],
-      };
-    },
-    {
-      allUniqueMappingIds: new Set<string>(),
-      groupedMappings: [],
-    },
-  );
-}
-
 export default function DataFileReplacementDifferences({
   releaseVersionId,
   fileId,
@@ -92,14 +27,14 @@ export default function DataFileReplacementDifferences({
   plan,
   reloadPlan,
 }: Props) {
-  const groupsAndMappingsForTables = useMemo(() => {
-    // first determine the indicators
-    const indicatorsToShow = getNonAutoSetMappings(
-      plan.mapping.indicators.mappings,
-    );
+  const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(
+    plan.mapping,
+  );
 
+  // instead of passing the datablocks down to the tables, it seems better to handle this here
+  const indicatorReplacementGroups = useMemo(() => {
     // combine all indicator groups from data blocks and footnotes and then dedupe by label
-    const allIndicatorGroups = [
+    return [
       ...plan.dataBlocks.flatMap(block =>
         Object.values(block.indicatorGroups || {}),
       ),
@@ -107,54 +42,13 @@ export default function DataFileReplacementDifferences({
         Object.values(footnote.indicatorGroups || {}),
       ),
     ];
+  }, [plan.dataBlocks, plan.footnotes]);
 
-    const uniqueIndicatorGroups = uniqueByLabel(allIndicatorGroups);
-
-    const groupedIndicatorMappings = createTableMappingsAndGroups(
-      indicatorsToShow,
-      uniqueIndicatorGroups,
-      'indicators',
-    );
-
-    const allLocations = plan.dataBlocks.flatMap(block =>
+  const locationReplacementGroups = useMemo(() => {
+    return plan.dataBlocks.flatMap(block =>
       Object.values(block.locations || {}),
     );
-
-    const uniqueLocationGroups = uniqueByLabel(allLocations);
-
-    // second determine the locations
-    const locationsToShow = getNonAutoSetMappings(
-      plan.mapping.locations.mappings,
-    );
-
-    const groupedLocationMappings = createTableMappingsAndGroups(
-      locationsToShow,
-      uniqueLocationGroups,
-      'locationAttributes',
-    );
-
-    // TODO: filters will follow a similar pattern
-
-    return {
-      indicators: {
-        allUniqueMappingIds: groupedIndicatorMappings.allUniqueMappingIds,
-        groupedMappings: groupedIndicatorMappings.groupedMappings,
-      },
-      locations: {
-        allUniqueMappingIds: groupedLocationMappings.allUniqueMappingIds,
-        groupedMappings: groupedLocationMappings.groupedMappings,
-      },
-    };
-  }, [
-    plan.dataBlocks,
-    plan.footnotes,
-    plan.mapping.indicators.mappings,
-    plan.mapping.locations.mappings,
-  ]);
-
-  const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(
-    plan.mapping,
-  );
+  }, [plan.dataBlocks]);
 
   const handleIndicatorsMappingUpdate = useCallback(
     async ({ sourceKey, candidateKey }: UpdateMappingPayload) => {
@@ -216,6 +110,75 @@ export default function DataFileReplacementDifferences({
     ],
   );
 
+  const handleFiltersMappingUpdate = useCallback(
+    async (updatePayload: UpdateMappingPayload, type: string) => {
+      const { sourceKey, candidateKey } = updatePayload;
+
+      updatePlanMappings(draft => {
+        const updateMapping = (
+          mappingsPlan:
+            | FilterMappingPlan
+            | FilterMappingFilterGroups
+            | FilterMappingFilterItems<FilterMappingSource>,
+        ): boolean => {
+          const mapping = mappingsPlan.mappings[sourceKey];
+
+          if (mapping) {
+            mapping.candidateKey = candidateKey;
+            mapping.type = 'ManuallySet';
+            return true;
+          }
+
+          return Object.values(mappingsPlan.mappings).some(childMapping => {
+            if ('filterGroups' in childMapping) {
+              return updateMapping(
+                childMapping.filterGroups as FilterMappingFilterGroups,
+              );
+            }
+
+            if ('filterItems' in childMapping) {
+              return updateMapping(
+                childMapping.filterItems as FilterMappingFilterItems<FilterMappingSource>,
+              );
+            }
+
+            return false;
+          });
+        };
+
+        updateMapping(draft.filters);
+
+        return draft;
+      });
+
+      const updateData = {
+        originalId: updatePayload.sourceKey,
+        newReplacementId: updatePayload.candidateKey,
+      };
+      const filterUpdates = type === 'filter' ? [updateData] : [];
+      const filterGroupUpdates = type === 'group' ? [updateData] : [];
+      const filterItemUpdates = type === 'item' ? [updateData] : [];
+
+      await dataReplacementService.updatePlanFilterMappings(
+        releaseVersionId,
+        fileId,
+        replacementFileId,
+        filterUpdates,
+        filterGroupUpdates,
+        filterItemUpdates,
+      );
+
+      reloadPlan();
+    },
+    [
+      fileId,
+      releaseVersionId,
+      reloadPlan,
+      replacementFileId,
+      updatePlanMappings,
+    ],
+  );
+
   return (
     <>
       <h3>Mapping Dependencies</h3>
@@ -228,40 +191,37 @@ export default function DataFileReplacementDifferences({
         represented.
       </p>
 
-      {groupsAndMappingsForTables.indicators.allUniqueMappingIds.size > 0 && (
-        <DataFileReplacementDifferencesTable
-          tableId="replacements-differences-indicators-table"
-          itemType="indicator"
-          mappingsPlan={planMappings.indicators}
-          mappingGroups={groupsAndMappingsForTables.indicators.groupedMappings}
-          mappingsToShow={
-            groupsAndMappingsForTables.indicators.allUniqueMappingIds
-          }
-          handleMappingUpdate={handleIndicatorsMappingUpdate}
-          rowLabel="label"
-          mappedDataLabels={{
-            label: 'Label',
-            name: 'Name',
-          }}
-        />
-      )}
-      {groupsAndMappingsForTables.locations.allUniqueMappingIds.size > 0 && (
-        <DataFileReplacementDifferencesTable
-          tableId="replacements-differences-locations-table"
-          itemType="location"
-          mappingsPlan={planMappings.locations}
-          mappingGroups={groupsAndMappingsForTables.locations.groupedMappings}
-          mappingsToShow={
-            groupsAndMappingsForTables.locations.allUniqueMappingIds
-          }
-          handleMappingUpdate={handleLocationsMappingUpdate}
-          rowLabel="name"
-          mappedDataLabels={{
-            name: 'Name',
-            code: 'Code',
-          }}
-        />
-      )}
+      <DataFileReplacementDifferencesTable
+        tableId="replacements-differences-indicators-table"
+        itemType="indicator"
+        mappingsPlan={planMappings.indicators}
+        replacementGroups={indicatorReplacementGroups}
+        getGroupMappings={group => group.indicators}
+        handleMappingUpdate={handleIndicatorsMappingUpdate}
+        rowLabel="label"
+        mappedDataLabels={{
+          label: 'Label',
+          name: 'Name',
+        }}
+      />
+      <DataFileReplacementDifferencesTable
+        tableId="replacements-differences-locations-table"
+        itemType="location"
+        mappingsPlan={planMappings.locations}
+        replacementGroups={locationReplacementGroups}
+        getGroupMappings={group => group.locationAttributes}
+        handleMappingUpdate={handleLocationsMappingUpdate}
+        rowLabel="name"
+        mappedDataLabels={{
+          name: 'Name',
+          code: 'Code',
+        }}
+      />
+
+      <DataFileReplacementFilterDifferencesTable
+        filters={plan.mapping.filters}
+        handleMappingUpdate={handleFiltersMappingUpdate}
+      />
     </>
   );
 }
