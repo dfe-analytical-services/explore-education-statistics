@@ -258,15 +258,6 @@ public class ThemeService(
             return new ForbidResult();
         }
 
-        // For now we only want to delete test themes as we
-        // don't really have a mechanism to clean things up
-        // properly across the entire application.
-        // TODO: EES-1295 ability to completely delete releases
-        if (!theme.IsTestOrSeedTheme())
-        {
-            return new ForbidResult();
-        }
-
         return await Task.FromResult(Unit.Instance);
     }
 
