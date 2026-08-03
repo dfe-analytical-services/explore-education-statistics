@@ -105,11 +105,6 @@ describe('PendingDataReplacementSection', () => {
     ).not.toBeInTheDocument();
     expect(
       screen.queryByText(
-        /You do not have permission to cancel this data replacement. This is because it is linked to an API data set version which can only be modified by BAU users./i,
-      ),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(
         /Are you sure you want to cancel this data replacement and remove the attached draft API version?/i,
       ),
     ).toBeInTheDocument();

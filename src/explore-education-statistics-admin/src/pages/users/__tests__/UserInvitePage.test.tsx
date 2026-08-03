@@ -39,7 +39,7 @@ describe('UserInvitePage', () => {
     expect(screen.getByLabelText('User email')).toBeInTheDocument();
     expect(
       screen.getByRole('checkbox', {
-        name: 'BAU User',
+        name: 'Super User',
       }),
     ).toBeInTheDocument();
     expect(
@@ -426,7 +426,7 @@ describe('UserInvitePage', () => {
     await user.type(screen.getByLabelText('User email'), 'test@test.com');
 
     const checkbox = screen.getByRole('checkbox', {
-      name: 'BAU User',
+      name: 'Super User',
     });
 
     expect(checkbox).not.toBeChecked();
