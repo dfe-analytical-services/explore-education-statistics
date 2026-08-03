@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
@@ -97,11 +96,6 @@ public static class StartupSecurityConfiguration
             );
 
             options.AddPolicy(
-                nameof(SecurityPolicies.CanViewReleaseTeamAccess),
-                policy => policy.Requirements.Add(new ViewSpecificPublicationReleaseTeamAccessRequirement())
-            );
-
-            options.AddPolicy(
                 nameof(SecurityPolicies.CanManagePublicationReleaseSeries),
                 policy => policy.Requirements.Add(new ManagePublicationReleaseSeriesRequirement())
             );
@@ -162,11 +156,6 @@ public static class StartupSecurityConfiguration
             options.AddPolicy(
                 nameof(SecurityPolicies.CanDeleteTestRelease),
                 policy => policy.Requirements.Add(new DeleteTestReleaseRequirement())
-            );
-
-            options.AddPolicy(
-                nameof(DataSecurityPolicies.CanViewSubjectData),
-                policy => policy.Requirements.Add(new ViewSubjectDataRequirement())
             );
 
             options.AddPolicy(
@@ -302,7 +291,6 @@ public static class StartupSecurityConfiguration
             IAuthorizationHandler,
             ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
         >();
-        services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ManagePublicationReleaseSeriesAuthorizationHandler>();
 
         /*
@@ -317,7 +305,6 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationHandler, MarkReleaseAsHigherLevelReviewAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, MarkReleaseAsApprovedAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificReleaseAuthorizationHandler>();
-        services.AddTransient<IAuthorizationHandler, ViewSubjectDataAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ResolveSpecificCommentAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();

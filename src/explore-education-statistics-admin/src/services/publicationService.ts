@@ -50,7 +50,6 @@ export interface PublicationPermissions {
   canManageReleaseSeries: boolean;
   canUpdateContact: boolean;
   canUpdateDrafters: boolean;
-  canViewReleaseTeamAccess: boolean;
 }
 
 export interface PublicationWithPermissions extends Publication {

@@ -124,8 +124,6 @@ public record ReleaseVersionViewModel
 
 public record ReleasePermissions
 {
-    public bool CanAddPreReleaseUsers { get; init; }
-
     public bool CanUpdateRelease { get; init; }
 
     public bool CanViewReleaseVersion { get; set; }
