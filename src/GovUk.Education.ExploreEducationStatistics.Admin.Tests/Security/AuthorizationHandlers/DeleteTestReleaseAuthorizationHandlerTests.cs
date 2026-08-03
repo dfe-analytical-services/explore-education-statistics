@@ -83,11 +83,12 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task RealReleaseVersion_FailsForAllGlobalRoles()
+        public async Task RealReleaseVersion_SucceedsOnlyForValidGlobalRoles()
         {
-            await AssertHandlerFailsForAllGlobalRoles<DeleteTestReleaseRequirement, ReleaseVersion>(
+            await AssertHandlerSucceedsWithCorrectGlobalRoles<DeleteTestReleaseRequirement, ReleaseVersion>(
                 BuildHandler(enableThemeDeletion: true),
-                _realReleaseVersion
+                _realReleaseVersion,
+                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
             );
         }
 
