@@ -120,23 +120,21 @@ public class ThemeService(
     {
         return await CheckCanDeleteTheme()
             .OnSuccess(async _ => await userService.CheckCanManageAllTaxonomy())
-            .OnSuccess(() => contentDbContext.Themes.Where(t => themeIds.Contains(t.Id)).OrNotFound())
-            .OnSuccess(async themes =>
+            .OnSuccess(() =>
+                contentDbContext.Themes.Where(t => themeIds.Contains(t.Id)).ToListAsync(cancellationToken).OrNotFound()
+            )
+            .OnSuccessVoid(async themes =>
             {
-                await using var transaction = await contentDbContext.Database.BeginTransactionAsync();
+                await using var transaction = await contentDbContext.Database.BeginTransactionAsync(cancellationToken);
 
-                await themes.ForEachAsync(async theme =>
+                foreach (var theme in themes)
                 {
                     await DeletePublicationsForTheme(theme.Id, cancellationToken)
                         .OnSuccessDo(() => contentDbContext.Themes.Remove(theme));
-                });
+                }
 
-                return transaction;
-            })
-            .OnSuccessVoid(async transaction =>
-            {
                 await contentDbContext.SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync();
+                await transaction.CommitAsync(cancellationToken);
 
                 await publishingService.TaxonomyChanged(cancellationToken);
             });
