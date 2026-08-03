@@ -427,7 +427,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage AnalystCannotReplaceApiDataSet = new(
         Code: nameof(AnalystCannotReplaceApiDataSet),
-        Message: "You do not have permission to start this data replacement. This is because data set with title '{0}' is linked to an API data set version which can only be modified by BAU users. Please contact the explore statistics team at explore.statistics@education.gov.uk for support on starting this replacement."
+        Message: "You do not have permission to start this data replacement. This is because data set with title '{0}' is linked to an API data set version which can only be modified by Super Users. Please contact the explore statistics team at explore.statistics@education.gov.uk for support on starting this replacement."
     );
 
     public static ErrorViewModel GenerateErrorAnalystCannotReplaceApiDataSet(string title)

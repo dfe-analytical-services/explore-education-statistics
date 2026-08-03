@@ -157,7 +157,7 @@ export default function UserInvitePage({
             />
 
             <FormFieldset
-              id="superUser"
+              id="super-user"
               legend="Access level"
               legendSize="m"
               hint="Super Users have elevated permissions."

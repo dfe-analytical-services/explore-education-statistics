@@ -53,7 +53,7 @@ const RoleForm = ({ user, onUpdate }: Props) => {
     >
       <Form id={user.id} onSubmit={handleSubmit}>
         <FormFieldset
-          id="superUser"
+          id="super-user"
           legend="Access level"
           legendSize="m"
           hint="Super Users have elevated permissions."
