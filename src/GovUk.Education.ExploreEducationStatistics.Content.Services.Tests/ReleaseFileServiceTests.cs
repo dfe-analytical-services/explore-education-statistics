@@ -980,10 +980,11 @@ public class ReleaseFileServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task ZipFilesToStream_NoFileIds_CachedAllFilesZip()
+    public async Task ZipFilesToStream_NoFileIds_CachedPublishedAllFilesZipDoesNotExpire()
     {
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
+            .WithPublished(DateTimeOffset.UtcNow.AddDays(-1))
             .WithRelease(
                 _dataFixture
                     .DefaultRelease()
@@ -1010,7 +1011,7 @@ public class ReleaseFileServiceTests : IDisposable
                 path: allFilesZipPath,
                 contentType: "application/zip",
                 contentLength: 1000L,
-                updated: DateTimeOffset.UtcNow.AddMinutes(-5)
+                updated: DateTimeOffset.UtcNow.AddHours(-2)
             )
         );
 

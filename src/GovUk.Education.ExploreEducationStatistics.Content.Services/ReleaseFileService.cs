@@ -173,7 +173,11 @@ public class ReleaseFileService(
         // but this a chunk of work to get working properly as piping
         // the cached file to target stream isn't super trivial.
         // For now, we'll just do this manually as it's way easier.
-        if (allFilesZip?.Updated is not null && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
+        var cacheIsFresh =
+            releaseVersion.Published is not null
+            || allFilesZip?.Updated?.AddSeconds(AllFilesZipTtl) >= DateTimeOffset.UtcNow;
+
+        if (allFilesZip is not null && cacheIsFresh)
         {
             var streamResult = await publicBlobStorageService.GetDownloadStream(
                 containerName: PublicReleaseFiles,
