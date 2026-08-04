@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,14 +17,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
 [Route("api")]
 public class MethodologyController : ControllerBase
 {
+    private readonly ContentDbContext _contentDbContext;
     private readonly IMethodologyService _methodologyService;
     private readonly IMethodologyAmendmentService _methodologyAmendmentService;
 
     public MethodologyController(
+        ContentDbContext contentDbContext,
         IMethodologyService methodologyService,
         IMethodologyAmendmentService methodologyAmendmentService
     )
     {
+        _contentDbContext = contentDbContext;
         _methodologyService = methodologyService;
         _methodologyAmendmentService = methodologyAmendmentService;
     }
@@ -108,7 +112,9 @@ public class MethodologyController : ControllerBase
     [HttpDelete("methodology/{methodologyVersionId:guid}")]
     public Task<ActionResult> DeleteMethodologyVersion(Guid methodologyVersionId)
     {
-        return _methodologyService.DeleteMethodologyVersion(methodologyVersionId).HandleFailuresOrNoContent();
+        return _methodologyService
+            .DeleteMethodologyVersion(_contentDbContext, methodologyVersionId)
+            .HandleFailuresOrNoContent();
     }
 
     [HttpGet("methodology/{methodologyVersionId:guid}/status")]

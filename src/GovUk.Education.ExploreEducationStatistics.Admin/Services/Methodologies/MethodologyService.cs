@@ -440,10 +440,15 @@ public class MethodologyService(
             });
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false)
+    public async Task<Either<ActionResult, Unit>> DeleteMethodology(
+        ContentDbContext context,
+        Guid methodologyId,
+        bool forceDelete = false
+    )
     {
-        return await persistenceHelper
-            .CheckEntityExists<Methodology>(methodologyId, query => query.Include(m => m.Versions))
+        return await context
+            .Methodologies.Include(m => m.Versions)
+            .SingleOrNotFound(m => m.Id == methodologyId)
             .OnSuccess(async methodology =>
             {
                 var methodologyVersionIds = methodology
@@ -461,7 +466,7 @@ public class MethodologyService(
                     .Select(methodologyVersionId =>
                         methodology.Versions.Single(version => version.Id == methodologyVersionId)
                     )
-                    .Select(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
+                    .Select(methodologyVersion => DeleteVersion(context, methodologyVersion, forceDelete))
                     .OnSuccessAll()
                     .OnSuccessVoid(async () =>
                     {
@@ -472,13 +477,14 @@ public class MethodologyService(
     }
 
     public Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(
+        ContentDbContext context,
         Guid methodologyVersionId,
         bool forceDelete = false
     )
     {
         return persistenceHelper
             .CheckEntityExists<MethodologyVersion>(methodologyVersionId, query => query.Include(m => m.Methodology))
-            .OnSuccessDo(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
+            .OnSuccessDo(methodologyVersion => DeleteVersion(context, methodologyVersion, forceDelete))
             .OnSuccessVoid(DeleteMethodologyIfOrphaned);
     }
 
@@ -632,6 +638,7 @@ public class MethodologyService(
     }
 
     private async Task<Either<ActionResult, Unit>> DeleteVersion(
+        ContentDbContext contentDbContext,
         MethodologyVersion methodologyVersion,
         bool forceDelete = false
     )
@@ -641,9 +648,9 @@ public class MethodologyService(
             .OnSuccess(() => methodologyImageService.DeleteAll(methodologyVersion.Id, forceDelete))
             .OnSuccessVoid(async () =>
             {
-                context.MethodologyVersions.Remove(methodologyVersion);
+                contentDbContext.MethodologyVersions.Remove(methodologyVersion);
 
-                await context.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
             });
     }
 

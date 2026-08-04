@@ -136,7 +136,7 @@ public class ThemeService(
                     {
                         foreach (var theme in themes)
                         {
-                            await DeletePublicationsForTheme(theme.Id, cancellationToken)
+                            await DeletePublicationsForTheme(contentDbContext, theme.Id, cancellationToken)
                                 .OnSuccessDo(() => ctxDelegate.Themes.Remove(theme));
                         }
 
@@ -149,11 +149,12 @@ public class ThemeService(
     }
 
     private async Task<Either<List<ActionResult>, Unit>> DeletePublicationsForTheme(
+        ContentDbContext context,
         Guid themeId,
         CancellationToken cancellationToken
     )
     {
-        var publicationIds = await contentDbContext
+        var publicationIds = await context
             .Publications.Where(p => p.ThemeId == themeId)
             .Select(p => p.Id)
             .ToListAsync(cancellationToken);
@@ -161,7 +162,7 @@ public class ThemeService(
         var deletePublicationResults = await publicationIds
             .ToAsyncEnumerable()
             .SelectAwait(async publicationId =>
-                await DeleteMethodologiesForPublication(publicationId, cancellationToken)
+                await DeleteMethodologiesForPublication(context, publicationId, cancellationToken)
                     .OnSuccess(() => DeletePublication(publicationId, cancellationToken))
             )
             .ToListAsync(cancellationToken);
@@ -170,26 +171,28 @@ public class ThemeService(
     }
 
     private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublication(
+        ContentDbContext context,
         Guid publicationId,
         CancellationToken cancellationToken
     )
     {
-        var methodologyIdsToDelete = await contentDbContext
+        var methodologyIdsToDelete = await context
             .PublicationMethodologies.Where(pm => pm.Owner && pm.PublicationId == publicationId)
             .Select(pm => pm.MethodologyId)
             .ToListAsync(cancellationToken);
 
         return await methodologyIdsToDelete
-            .Select(methodologyId => methodologyService.DeleteMethodology(methodologyId, true))
+            .Select(methodologyId => methodologyService.DeleteMethodology(context, methodologyId, true))
             .OnSuccessAllReturnVoid();
     }
 
     private async Task<Either<ActionResult, Unit>> DeletePublication(
+        ContentDbContext context,
         Guid publicationId,
         CancellationToken cancellationToken
     )
     {
-        var publication = await contentDbContext
+        var publication = await context
             .Publications.Include(p => p.LatestPublishedReleaseVersion)
             .Include(p => p.Contact)
             .FirstAsync(p => p.Id == publicationId, cancellationToken);
@@ -207,7 +210,7 @@ public class ThemeService(
 
         // Some Content Db Releases may be soft-deleted and therefore not visible.
         // Ignore the query filter to make sure they are found
-        var releaseVersionsToDelete = await contentDbContext
+        var releaseVersionsToDelete = await context
             .ReleaseVersions.AsNoTracking()
             .IgnoreQueryFilters()
             .Include(rv => rv.Release)

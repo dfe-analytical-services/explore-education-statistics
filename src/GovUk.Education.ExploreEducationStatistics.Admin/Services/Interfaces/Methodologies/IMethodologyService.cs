@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -15,9 +16,17 @@ public interface IMethodologyService
 
     Task<Either<ActionResult, MethodologyVersionViewModel>> CreateMethodology(Guid publicationId);
 
-    Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false);
+    Task<Either<ActionResult, Unit>> DeleteMethodology(
+        ContentDbContext contentDbContext,
+        Guid methodologyId,
+        bool forceDelete = false
+    );
 
-    Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(Guid methodologyVersionId, bool forceDelete = false);
+    Task<Either<ActionResult, Unit>> DeleteMethodologyVersion(
+        ContentDbContext context,
+        Guid methodologyVersionId,
+        bool forceDelete = false
+    );
 
     Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId);
 
