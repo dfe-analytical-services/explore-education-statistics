@@ -3,7 +3,8 @@ import educationInNumbersContentService, {
 } from '@admin/services/educationInNumbersContentService';
 import {
   EinBlockType,
-  EinFreeTextStatTile,
+  EinTile,
+  EinTileType,
 } from '@common/services/types/einBlocks';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 import { FreeTextStatTileFormValues } from '../components/EditableFreeTextStatTileForm';
@@ -224,21 +225,24 @@ export default function useEducationInNumbersPageContentActions() {
     });
   }
 
-  async function addFreeTextStatTile({
+  async function addTile({
     educationInNumbersPageId,
     blockId,
     sectionId,
+    type,
   }: {
     educationInNumbersPageId: string;
     blockId: string;
     sectionId: string;
+    type: EinTileType;
   }) {
-    const newTile = await educationInNumbersContentService.addFreeTextStatTile({
+    const newTile = await educationInNumbersContentService.addTile({
       educationInNumbersPageId,
       blockId,
+      type,
     });
     dispatch({
-      type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK',
+      type: 'ADD_TILE_TO_BLOCK',
       payload: {
         meta: { blockId, sectionId },
         tile: newTile,
@@ -276,7 +280,7 @@ export default function useEducationInNumbersPageContentActions() {
     return newTile;
   }
 
-  async function reorderFreeTextStatTiles({
+  async function reorderTiles({
     educationInNumbersPageId,
     blockId,
     sectionId,
@@ -285,16 +289,15 @@ export default function useEducationInNumbersPageContentActions() {
     educationInNumbersPageId: string;
     blockId: string;
     sectionId: string;
-    tiles: EinFreeTextStatTile[];
+    tiles: EinTile[];
   }) {
-    const newTiles =
-      await educationInNumbersContentService.reorderFreeTextStatTiles({
-        educationInNumbersPageId,
-        blockId,
-        order: tiles.map(tile => tile.id),
-      });
+    const newTiles = await educationInNumbersContentService.reorderTiles({
+      educationInNumbersPageId,
+      blockId,
+      order: tiles.map(tile => tile.id),
+    });
     dispatch({
-      type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK',
+      type: 'REORDER_TILES_IN_BLOCK',
       payload: {
         meta: { blockId, sectionId },
         tiles: newTiles,
@@ -302,7 +305,7 @@ export default function useEducationInNumbersPageContentActions() {
     });
   }
 
-  async function deleteFreeTextStatTile({
+  async function deleteTile({
     educationInNumbersPageId,
     blockId,
     sectionId,
@@ -313,13 +316,13 @@ export default function useEducationInNumbersPageContentActions() {
     sectionId: string;
     tileId: string;
   }) {
-    await educationInNumbersContentService.deleteFreeTextStatTile({
+    await educationInNumbersContentService.deleteTile({
       educationInNumbersPageId,
       blockId,
       tileId,
     });
     dispatch({
-      type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK',
+      type: 'DELETE_TILE_FROM_BLOCK',
       payload: {
         meta: { blockId, sectionId, tileId },
       },
@@ -327,10 +330,10 @@ export default function useEducationInNumbersPageContentActions() {
   }
 
   return {
-    addFreeTextStatTile,
+    addTile,
     updateFreeTextStatTile,
-    deleteFreeTextStatTile,
-    reorderFreeTextStatTiles,
+    deleteTile,
+    reorderTiles,
     deleteContentSectionBlock,
     updateContentSectionBlock,
     addContentSectionBlock,

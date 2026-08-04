@@ -6,7 +6,9 @@ import {
   EinContentBlock,
   EinFreeTextStatTile,
   EinHtmlBlock,
+  EinTile,
   EinTileGroupBlock,
+  EinTileType,
 } from '@common/services/types/einBlocks';
 
 // ContentSection is shared with release/methodology too
@@ -112,16 +114,18 @@ const educationInNumbersContentService = {
     );
   },
 
-  addFreeTextStatTile({
+  addTile({
     educationInNumbersPageId,
     blockId,
+    type,
   }: {
     educationInNumbersPageId: string;
     blockId: string;
-  }): Promise<EinFreeTextStatTile> {
+    type: EinTileType;
+  }): Promise<EinTile> {
     return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/add`,
-      { type: 'FreeTextStatTile' },
+      { type },
     );
   },
 
@@ -140,7 +144,9 @@ const educationInNumbersContentService = {
     );
   },
 
-  reorderFreeTextStatTiles({
+  // @MarkFix updateApiQueryStatTile goes here
+
+  reorderTiles({
     educationInNumbersPageId,
     blockId,
     order,
@@ -148,14 +154,14 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     blockId: string;
     order: string[];
-  }): Promise<EinFreeTextStatTile[]> {
+  }): Promise<EinTile[]> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/order`,
       order,
     );
   },
 
-  deleteFreeTextStatTile({
+  deleteTile({
     educationInNumbersPageId,
     blockId,
     tileId,

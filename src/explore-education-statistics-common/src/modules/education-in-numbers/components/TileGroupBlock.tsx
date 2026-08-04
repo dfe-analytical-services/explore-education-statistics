@@ -2,6 +2,7 @@ import FreeTextStatTile from '@common/modules/education-in-numbers/components/Fr
 import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
 import { EinTileGroupBlock } from '@common/services/types/einBlocks';
 import React from 'react';
+import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryTextStatTile';
 
 export interface TileGroupBlockProps {
   block: EinTileGroupBlock;
@@ -17,11 +18,27 @@ const TileGroupBlock = ({ block }: TileGroupBlockProps) => {
           {title}
         </h3>
       )}
-      <FreeTextStatTileWrapper>
-        {tiles.map(tile => (
-          <FreeTextStatTile key={tile.id} tile={tile} />
-        ))}
-      </FreeTextStatTileWrapper>
+      {tiles.map(tile => {
+        switch (tile.type) {
+          case 'FreeTextStatTile':
+            return (
+              <FreeTextStatTileWrapper>
+                <FreeTextStatTile key={tile.id} tile={tile} />
+              </FreeTextStatTileWrapper>
+            );
+          case 'ApiQueryStatTile':
+            return (
+              <FreeTextStatTileWrapper>
+                {' '}
+                {/* @MarkFix generic wrapper? */}
+                <ApiQueryStatTile key={tile.id} tile={tile} />{' '}
+                {/* // @MarkFix */}
+              </FreeTextStatTileWrapper>
+            );
+          default:
+            return null; // @MarkFix
+        }
+      })}
     </div>
   );
 };

@@ -125,7 +125,7 @@ export const educationInNumbersPageReducer: ImmerReducer<
       }
       return draft;
     }
-    case 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK': {
+    case 'ADD_TILE_TO_BLOCK': {
       const { tile, meta } = action.payload;
       const { blockId, sectionId } = meta;
       if (!draft.pageContent.content) {
@@ -173,7 +173,7 @@ export const educationInNumbersPageReducer: ImmerReducer<
       );
       return draft;
     }
-    case 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK': {
+    case 'REORDER_TILES_IN_BLOCK': {
       const { tiles: newTiles, meta } = action.payload;
       const { blockId, sectionId } = meta;
       if (!draft.pageContent.content) {
@@ -194,7 +194,7 @@ export const educationInNumbersPageReducer: ImmerReducer<
       matchingBlock.tiles = newTiles;
       return draft;
     }
-    case 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK': {
+    case 'DELETE_TILE_FROM_BLOCK': {
       const { meta } = action.payload;
       const { blockId, sectionId, tileId } = meta;
       if (!draft.pageContent.content) {

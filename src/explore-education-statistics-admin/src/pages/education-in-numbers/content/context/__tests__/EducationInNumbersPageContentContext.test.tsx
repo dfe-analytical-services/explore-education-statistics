@@ -220,7 +220,8 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(pageContent.content[0].heading).toEqual('updated heading');
   });
 
-  test('ADD_FREE_TEXT_STAT_TILE_TO_BLOCK adds a tile to a block', () => {
+  test('ADD_TILE_TO_BLOCK adds a tile to a block', () => {
+    // @MarkFix want a version of this with ApiQueryStatTile?
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
     const newTile: EinFreeTextStatTile = {
@@ -240,7 +241,7 @@ describe('EducationInNumbersPageContentContext', () => {
         pageVersion: testEinPageVersion,
       },
       {
-        type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK',
+        type: 'ADD_TILE_TO_BLOCK',
         payload: {
           meta: {
             blockId: block.id,
@@ -260,7 +261,7 @@ describe('EducationInNumbersPageContentContext', () => {
   test('UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK updates a tile in a block', () => {
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
-    const tileToUpdate = block.tiles[0];
+    const tileToUpdate = block.tiles[0] as EinFreeTextStatTile;
 
     const newStatistic = '9999';
 
@@ -302,7 +303,7 @@ describe('EducationInNumbersPageContentContext', () => {
         pageVersion: testEinPageVersion,
       },
       {
-        type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK',
+        type: 'REORDER_TILES_IN_BLOCK',
         payload: {
           meta: {
             blockId: block.id,
@@ -332,7 +333,7 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(updatedBlock.tiles[0].order).toEqual(0);
   });
 
-  test('DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK removes a tile from a block', () => {
+  test('DELETE_TILE_FROM_BLOCK removes a tile from a block', () => {
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
     const tileToDelete = block.tiles[0];
@@ -343,7 +344,7 @@ describe('EducationInNumbersPageContentContext', () => {
         pageVersion: testEinPageVersion,
       },
       {
-        type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK',
+        type: 'DELETE_TILE_FROM_BLOCK',
         payload: {
           meta: {
             tileId: tileToDelete.id,
