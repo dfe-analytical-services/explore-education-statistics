@@ -173,29 +173,38 @@ public class ReleaseFileService(
         // but this a chunk of work to get working properly as piping
         // the cached file to target stream isn't super trivial.
         // For now, we'll just do this manually as it's way easier.
-        var cacheIsFresh =
-            releaseVersion.Published is not null
-            || allFilesZip?.Updated?.AddSeconds(AllFilesZipTtl) >= DateTimeOffset.UtcNow;
-
-        if (allFilesZip is not null && cacheIsFresh)
+        if (allFilesZip?.Updated is null)
         {
-            var streamResult = await publicBlobStorageService.GetDownloadStream(
-                containerName: PublicReleaseFiles,
-                path: path,
-                cancellationToken: cancellationToken
-            );
-
-            if (streamResult.IsLeft)
-            {
-                return false;
-            }
-
-            await using var blobStream = streamResult.Right;
-            await blobStream.CopyToAsync(outputStream, cancellationToken);
-            return true;
+            return false;
         }
 
-        return false;
+        if (releaseVersion.Published is not null && allFilesZip.Updated < releaseVersion.Published)
+        {
+            return false;
+        }
+
+        if (
+            releaseVersion.Published is null
+            && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) < DateTimeOffset.UtcNow
+        )
+        {
+            return false;
+        }
+
+        var streamResult = await publicBlobStorageService.GetDownloadStream(
+            containerName: PublicReleaseFiles,
+            path: path,
+            cancellationToken: cancellationToken
+        );
+
+        if (streamResult.IsLeft)
+        {
+            return false;
+        }
+
+        await using var blobStream = streamResult.Right;
+        await blobStream.CopyToAsync(outputStream, cancellationToken);
+        return true;
     }
 
     private async Task ZipAllFilesToStream(
