@@ -118,13 +118,14 @@ public class ThemeService(
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckCanDeleteTheme()
+        return await CheckCanDeleteThemes()
             .OnSuccess(async _ => await userService.CheckCanManageAllTaxonomy())
-            .OnSuccess(() =>
-                contentDbContext.Themes.Where(t => themeIds.Contains(t.Id)).ToListAsync(cancellationToken).OrNotFound()
-            )
-            .OnSuccessVoid(async themes =>
+            .OnSuccessVoid(async () =>
             {
+                var themes = await contentDbContext
+                    .Themes.Where(t => themeIds.Contains(t.Id))
+                    .ToListAsync(cancellationToken);
+
                 await using var transaction = await contentDbContext.Database.BeginTransactionAsync(cancellationToken);
 
                 foreach (var theme in themes)
@@ -246,7 +247,7 @@ public class ThemeService(
             : new OkObjectResult("No test themes to delete.");
     }
 
-    private async Task<Either<ActionResult, Unit>> CheckCanDeleteTheme()
+    private async Task<Either<ActionResult, Unit>> CheckCanDeleteThemes()
     {
         if (!_themeDeletionAllowed)
         {

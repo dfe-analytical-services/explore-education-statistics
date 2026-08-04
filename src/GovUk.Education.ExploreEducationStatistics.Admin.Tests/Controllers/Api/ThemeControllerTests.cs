@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -69,6 +70,6 @@ public class ThemeControllerTests
 
         var result = await controller.DeleteThemes(themeIds, CancellationToken.None);
 
-        Assert.IsType<ForbidResult>(result);
+        result.AssertForbidden();
     }
 }

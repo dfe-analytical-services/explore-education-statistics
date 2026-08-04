@@ -114,7 +114,7 @@ public class ThemeServicePermissionTests
     }
 
     [Fact]
-    public async Task DeleteTheme_DisallowedByPolicy_ReturnsForbidden()
+    public async Task DeleteThemes_DisallowedByPolicy_ReturnsForbidden()
     {
         await PolicyCheckBuilder()
             .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
