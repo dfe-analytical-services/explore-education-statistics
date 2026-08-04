@@ -8,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -159,7 +161,8 @@ public class ThemeServicePermissionTests
         IPublishingService? publishingService = null,
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IDatabaseHelper? databaseHelper = null
     )
     {
         var publicContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
@@ -179,7 +182,8 @@ public class ThemeServicePermissionTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            databaseHelper ?? new InMemoryDatabaseHelper(new InMemoryDbContextSupplier())
         );
     }
 }

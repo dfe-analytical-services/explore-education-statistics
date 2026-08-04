@@ -8,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -33,7 +35,8 @@ public class ThemeService(
     IPublishingService publishingService,
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
-    IUserPublicationRoleRepository userPublicationRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IDatabaseHelper databaseHelper
 ) : IThemeService
 {
     private readonly bool _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
@@ -120,21 +123,26 @@ public class ThemeService(
     {
         return await CheckCanDeleteTheme()
             .OnSuccess(async _ => await userService.CheckCanManageAllTaxonomy())
-            .OnSuccess(() =>
-                contentDbContext.Themes.Where(t => themeIds.Contains(t.Id)).ToListAsync(cancellationToken).OrNotFound()
+            .OnSuccess(async () =>
+                await (
+                    await contentDbContext.Themes.Where(t => themeIds.Contains(t.Id)).ToListAsync(cancellationToken)
+                ).OrNotFound()
             )
             .OnSuccessVoid(async themes =>
             {
-                await using var transaction = await contentDbContext.Database.BeginTransactionAsync(cancellationToken);
+                await databaseHelper.DoInTransaction(
+                    contentDbContext,
+                    async ctxDelegate =>
+                    {
+                        foreach (var theme in themes)
+                        {
+                            await DeletePublicationsForTheme(theme.Id, cancellationToken)
+                                .OnSuccessDo(() => ctxDelegate.Themes.Remove(theme));
+                        }
 
-                foreach (var theme in themes)
-                {
-                    await DeletePublicationsForTheme(theme.Id, cancellationToken)
-                        .OnSuccessDo(() => contentDbContext.Themes.Remove(theme));
-                }
-
-                await contentDbContext.SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
+                        await ctxDelegate.SaveChangesAsync(cancellationToken);
+                    }
+                );
 
                 await publishingService.TaxonomyChanged(cancellationToken);
             });

@@ -13,6 +13,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -21,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -34,6 +37,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
@@ -47,13 +51,18 @@ public class ThemeServiceTests
     [Fact]
     public async Task CreateTheme()
     {
-        await using var context = InMemoryApplicationDbContext();
+        var contextId = Guid.NewGuid().ToString();
+        await using var context = InMemoryApplicationDbContext(contextId);
 
         var publishingService = new Mock<IPublishingService>(Strict);
 
         publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-        var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+        var service = SetupThemeService(
+            contentDbContextId: contextId,
+            contentDbContext: context,
+            publishingService: publishingService.Object
+        );
 
         var result = await service.CreateTheme(
             new ThemeSaveViewModel { Title = "Test theme", Summary = "Test summary" }
@@ -79,7 +88,6 @@ public class ThemeServiceTests
     public async Task CreateTheme_FailsNonUniqueSlug()
     {
         var contextId = Guid.NewGuid().ToString();
-
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             context.Add(
@@ -96,7 +104,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context);
+            var service = SetupThemeService(contextId, context);
             var result = await service.CreateTheme(
                 new ThemeSaveViewModel { Title = "Test theme", Summary = "Test summary" }
             );
@@ -137,6 +145,7 @@ public class ThemeServiceTests
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
 
             var service = SetupThemeService(
+                contentDbContextId: contextId,
                 contentDbContext: context,
                 publishingService: publishingService.Object,
                 adminEventRaiser: adminEventRaiser.Build()
@@ -197,7 +206,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context);
+            var service = SetupThemeService(contextId, context);
             var result = await service.UpdateTheme(
                 theme.Id,
                 new ThemeSaveViewModel { Title = "Other theme", Summary = "Updated summary" }
@@ -227,7 +236,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context);
+            var service = SetupThemeService(contextId, context);
             var result = await service.GetTheme(theme.Id);
 
             var viewModel = result.AssertRight();
@@ -253,7 +262,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context);
+            var service = SetupThemeService(contextId, context);
 
             var themes = await service.GetThemes();
 
@@ -359,21 +368,22 @@ public class ThemeServiceTests
 
         using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
 
-        await using (var contentContext = fixture.CreateContext())
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentContext = InMemoryContentDbContext(contentDbContextId))
         {
             contentContext.Publications.AddRange(publications);
             contentContext.Methodologies.Add(methodology);
             await contentContext.SaveChangesAsync();
         }
 
-        await using (var contentContext = fixture.CreateContext())
+        await using (var contentContext = InMemoryContentDbContext(contentDbContextId))
         {
             var publication = await contentContext.Publications.SingleAsync(p => p.Id == publication1.Id);
             publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id;
             await contentContext.SaveChangesAsync();
         }
 
-        await using (var contentContext = fixture.CreateContext())
+        await using (var contentContext = InMemoryContentDbContext(contentDbContextId))
         {
             Assert.Equal(1, contentContext.Themes.Count());
             Assert.Equal(3, contentContext.Publications.Count());
@@ -388,14 +398,15 @@ public class ThemeServiceTests
         var methodologyService = new Mock<IMethodologyService>(Strict);
         var publishingService = new Mock<IPublishingService>(Strict);
 
-        await using (var contentContext = fixture.CreateContext())
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupThemeService(
-                contentContext,
+                contentDbContextId,
+                contentDbContext,
                 adminEventRaiser: adminEventRaiser.Build(),
                 methodologyService: methodologyService.Object,
                 publishingService: publishingService.Object,
-                releaseVersionService: new TestReleaseVersionService(contentContext)
+                releaseVersionService: new TestReleaseVersionService(contentDbContext)
             );
 
             methodologyService.Setup(s => s.DeleteMethodology(methodology.Id, true)).ReturnsAsync(Unit.Instance);
@@ -486,17 +497,16 @@ public class ThemeServiceTests
             )
             .GenerateList();
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
-
-        await using (var contentContext = fixture.CreateContext())
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            contentContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2, releaseVersion3);
-            contentContext.ReleaseFiles.AddRange(
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2, releaseVersion3);
+            contentDbContext.ReleaseFiles.AddRange(
                 releaseVersion1ReleaseFile,
                 releaseVersion2ReleaseFile,
                 releaseVersion3ReleaseFile
             );
-            await contentContext.SaveChangesAsync();
+            await contentDbContext.SaveChangesAsync();
         }
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
@@ -506,10 +516,11 @@ public class ThemeServiceTests
         var publicDataDbContext = new Mock<PublicDataDbContext>();
         publicDataDbContext.SetupGet(c => c.DataSetVersions).ReturnsDbSet(dataSetVersions);
 
-        await using (var contentContext = fixture.CreateContext())
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupThemeService(
-                contentDbContext: contentContext,
+                contentDbContextId: contentDbContextId,
+                contentDbContext: contentDbContext,
                 publicDataDbContext: publicDataDbContext.Object,
                 publishingService: publishingService.Object,
                 releaseVersionService: releaseVersionService.Object
@@ -574,9 +585,8 @@ public class ThemeServiceTests
 
         ReleaseVersion release2Version2 = _fixture.DefaultReleaseVersion().WithVersion(1).WithRelease(release2);
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
-
-        await using (var contentContext = fixture.CreateContext())
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentContext = InMemoryContentDbContext(contentDbContextId))
         {
             contentContext.ReleaseVersions.AddRange(
                 release1Version1,
@@ -594,9 +604,10 @@ public class ThemeServiceTests
         var publishingService = new Mock<IPublishingService>(Strict);
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
-        await using (var contentContext = fixture.CreateContext())
+        await using (var contentContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupThemeService(
+                contentDbContextId: contentDbContextId,
                 contentDbContext: contentContext,
                 publishingService: publishingService.Object,
                 releaseVersionService: releaseVersionService.Object
@@ -666,9 +677,8 @@ public class ThemeServiceTests
             Contact = NewContact(),
         };
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
-
-        await using (var contentContext = fixture.CreateContext())
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentContext = InMemoryContentDbContext(contentDbContextId))
         {
             contentContext.Publications.Add(publication);
             contentContext.Themes.Add(theme);
@@ -682,10 +692,11 @@ public class ThemeServiceTests
         var publishingService = new Mock<IPublishingService>(Strict);
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
-        await using (var contentContext = fixture.CreateContext())
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupThemeService(
-                contentContext,
+                contentDbContextId,
+                contentDbContext,
                 publishingService: publishingService.Object,
                 releaseVersionService: releaseVersionService.Object
             );
@@ -707,8 +718,8 @@ public class ThemeServiceTests
 
             result.AssertRight();
 
-            Assert.Equal(0, contentContext.Publications.Count());
-            Assert.Equal(0, contentContext.Themes.Count());
+            Assert.Equal(0, contentDbContext.Publications.Count());
+            Assert.Equal(0, contentDbContext.Themes.Count());
         }
     }
 
@@ -731,7 +742,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context, enableThemeDeletion: false);
+            var service = SetupThemeService(contextId, context, enableThemeDeletion: false);
 
             var result = await service.DeleteThemes([theme.Id]);
             result.AssertForbidden();
@@ -771,20 +782,19 @@ public class ThemeServiceTests
             .DefaultMethodology()
             .WithOwningPublication(otherReleaseVersion.Release.Publication);
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
-
-        await using (var contentContext = fixture.CreateContext())
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            contentContext.Methodologies.AddRange(methodology, otherMethodology);
-            contentContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
-            contentContext.Themes.AddRange(theme, otherTheme);
+            contentDbContext.Methodologies.AddRange(methodology, otherMethodology);
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
+            contentDbContext.Themes.AddRange(theme, otherTheme);
 
-            await contentContext.SaveChangesAsync();
+            await contentDbContext.SaveChangesAsync();
 
-            Assert.Equal(2, contentContext.Publications.Count());
-            Assert.Equal(2, contentContext.Themes.Count());
-            Assert.Equal(2, contentContext.Methodologies.Count());
-            Assert.Equal(2, contentContext.PublicationMethodologies.Count());
+            Assert.Equal(2, contentDbContext.Publications.Count());
+            Assert.Equal(2, contentDbContext.Themes.Count());
+            Assert.Equal(2, contentDbContext.Methodologies.Count());
+            Assert.Equal(2, contentDbContext.PublicationMethodologies.Count());
         }
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
@@ -792,10 +802,11 @@ public class ThemeServiceTests
         var publishingService = new Mock<IPublishingService>(Strict);
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
-        await using (var contentContext = fixture.CreateContext())
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = SetupThemeService(
-                contentContext,
+                contentDbContextId,
+                contentDbContext,
                 methodologyService: methodologyService.Object,
                 publishingService: publishingService.Object,
                 releaseVersionService: releaseVersionService.Object
@@ -815,8 +826,8 @@ public class ThemeServiceTests
 
             result.AssertRight();
 
-            Assert.Equal(otherReleaseVersion.Publication.Id, contentContext.Publications.Single().Id);
-            Assert.Equal(otherTheme.Id, contentContext.Themes.Single().Id);
+            Assert.Equal(otherReleaseVersion.Publication.Id, contentDbContext.Publications.Single().Id);
+            Assert.Equal(otherTheme.Id, contentDbContext.Themes.Single().Id);
         }
     }
 
@@ -855,9 +866,8 @@ public class ThemeServiceTests
             Publications = [standardTitleThemePublication],
         };
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
-
-        await using (var context = fixture.CreateContext())
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
             await context.AddRangeAsync(
                 uiTestTheme,
@@ -868,14 +878,18 @@ public class ThemeServiceTests
             await context.SaveChangesAsync();
         }
 
-        await using (var context = fixture.CreateContext())
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
             var publishingService = new Mock<IPublishingService>(Strict);
 
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             // Arrange
-            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+            var service = SetupThemeService(
+                contentDbContextId: contentDbContextId,
+                contentDbContext: context,
+                publishingService: publishingService.Object
+            );
 
             // Act
             await service.DeleteUITestThemes();
@@ -911,7 +925,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context, enableThemeDeletion: false);
+            var service = SetupThemeService(contextId, context, enableThemeDeletion: false);
 
             var result = await service.DeleteUITestThemes();
             result.AssertForbidden();
@@ -927,20 +941,23 @@ public class ThemeServiceTests
         var theme2 = new Theme { Id = Guid.NewGuid(), Title = "Theme 2 to delete" };
         var otherTheme = new Theme { Id = Guid.NewGuid(), Title = "Theme to retain" };
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
-
-        await using (var context = fixture.CreateContext())
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
             context.Themes.AddRange(theme1, theme2, otherTheme);
             await context.SaveChangesAsync();
         }
 
-        await using (var context = fixture.CreateContext())
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
         {
             var publishingService = new Mock<IPublishingService>(Strict);
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+            var service = SetupThemeService(
+                contentDbContextId: contentDbContextId,
+                contentDbContext: context,
+                publishingService: publishingService.Object
+            );
 
             var result = await service.DeleteThemes([theme1.Id, theme2.Id]);
 
@@ -969,7 +986,7 @@ public class ThemeServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = SetupThemeService(context, enableThemeDeletion: false);
+            var service = SetupThemeService(contextId, context, enableThemeDeletion: false);
 
             var result = await service.DeleteThemes([theme.Id]);
             result.AssertForbidden();
@@ -1001,6 +1018,7 @@ public class ThemeServiceTests
         };
 
     private static ThemeService SetupThemeService(
+        string? contentDbContextId = null,
         ContentDbContext? contentDbContext = null,
         PublicDataDbContext? publicDataDbContext = null,
         IMapper? mapper = null,
@@ -1010,6 +1028,7 @@ public class ThemeServiceTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IDatabaseHelper? databaseHelper = null,
         bool enableThemeDeletion = true
     )
     {
@@ -1036,7 +1055,8 @@ public class ThemeServiceTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            databaseHelper ?? new InMemoryDatabaseHelper(new InMemoryDbContextSupplier(contentDbContextId ?? null))
         );
     }
 
