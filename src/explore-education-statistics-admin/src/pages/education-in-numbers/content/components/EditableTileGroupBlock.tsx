@@ -200,7 +200,7 @@ const EditableTileGroupBlock = ({
                 <div key={tile.id}>
                   {isEditingStatTile === tile.id ? (
                     <EditableFreeTextStatTileForm
-                      statTile={tile}
+                      freeTextStatTile={tile}
                       testId="freeTextStatTile-editForm"
                       onSubmit={async values => {
                         await updateFreeTextStatTile({
