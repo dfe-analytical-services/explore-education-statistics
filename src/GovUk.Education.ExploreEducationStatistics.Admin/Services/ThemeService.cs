@@ -125,18 +125,17 @@ public class ThemeService(
             )
             .OnSuccessVoid(async themes =>
             {
-                await using var transaction = await contentDbContext.Database.BeginTransactionAsync(cancellationToken);
-
-                foreach (var theme in themes)
+                await contentDbContext.RequireTransaction(async () =>
                 {
-                    await DeletePublicationsForTheme(theme.Id, cancellationToken)
-                        .OnSuccessDo(() => contentDbContext.Themes.Remove(theme));
-                }
+                    foreach (var theme in themes)
+                    {
+                        await DeletePublicationsForTheme(theme.Id, cancellationToken)
+                            .OnSuccessDo(() => contentDbContext.Themes.Remove(theme));
+                    }
 
-                await contentDbContext.SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-
-                await publishingService.TaxonomyChanged(cancellationToken);
+                    await contentDbContext.SaveChangesAsync(cancellationToken);
+                    await publishingService.TaxonomyChanged(cancellationToken);
+                });
             });
     }
 
