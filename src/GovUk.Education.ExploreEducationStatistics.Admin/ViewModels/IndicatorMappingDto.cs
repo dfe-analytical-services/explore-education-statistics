@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -17,7 +18,8 @@ public class IndicatorMappingDto
     public Guid? ReplacementGroupId { get; set; }
     public string? ReplacementGroupLabel { get; set; }
 
-    public string Status { get; set; } = "";
+    [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    public MapStatus Status { get; set; }
 
     public static IndicatorMappingDto FromModel(IndicatorMapping indicatorMapping)
     {
@@ -33,7 +35,7 @@ public class IndicatorMappingDto
             ReplacementColumnName = indicatorMapping.ReplacementColumnName,
             ReplacementGroupId = indicatorMapping.ReplacementGroupId,
             ReplacementGroupLabel = indicatorMapping.ReplacementGroupLabel,
-            Status = indicatorMapping.Status.ToString(),
+            Status = indicatorMapping.Status,
         };
     }
 }

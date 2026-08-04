@@ -400,7 +400,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, IUserServi
         }
 
         // We need to move the preexisting mapped filter into UnmappedReplacementFilters, as it will be overwritten
-        // and that must include
+        // and that must include all child groups and items
         var newlyUnmappedFilter = new UnmappedFilter
         {
             Id = filterMapping.ReplacementId.Value,
@@ -724,7 +724,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, IUserServi
             {
                 var updatedMappings = request
                     .Updates.Select(update =>
-                        UpdateLocationMapping(mapping, update.OriginalLocationId, update.NewReplacementLocationId)
+                        UpdateLocationMapping(mapping, update.OriginalId, update.NewReplacementId)
                     )
                     .ToList(); // cannot be async!
 
@@ -748,8 +748,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, IUserServi
             return ValidationResult(
                 new ErrorViewModel
                 {
-                    Path =
-                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.OriginalLocationId)}",
+                    Path = $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.OriginalId)}",
                     Code = "LocationMatchingOriginalIdNameNotFound",
                     Message = $"Could not find location mapping matching original location id \"{originalLocationId}\"",
                 }
@@ -774,7 +773,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, IUserServi
                 new ErrorViewModel
                 {
                     Path =
-                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
                     Code = "UnmappedLocationMatchingReplacementLocationIdNotFound",
                     Message = $"No available unmapped location matching replacement id \"{newReplacementLocationId}\"",
                 }
@@ -791,7 +790,7 @@ public class DataSetMappingService(ContentDbContext contentDbContext, IUserServi
                 new ErrorViewModel
                 {
                     Path =
-                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
                     Code = "UnmappedLocationHasDifferentGeographicLevelAsOriginalLocation",
                     Message =
                         $"The replacement location has a different geographic level than the original location. Replacement id: \"{newReplacementLocationId}\"",
