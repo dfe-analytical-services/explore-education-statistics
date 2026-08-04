@@ -186,13 +186,13 @@ public class DataSetMappingServiceTests
 
             Assert.Multiple(
                 () => Assert.Equal("replacement_indicator_4", originalIndicator1Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator1Mapping.Status),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator1Mapping.Status),
                 () => Assert.Equal("replacement_indicator_5", originalIndicator2Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator2Mapping.Status),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator2Mapping.Status),
                 () => Assert.Null(originalIndicator3Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator3Mapping.Status),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator3Mapping.Status),
                 () => Assert.Equal("replacement_indicator_3", originalIndicator4Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.AutoSet), originalIndicator4Mapping.Status)
+                () => Assert.Equal(MapStatus.AutoSet, originalIndicator4Mapping.Status)
             );
         }
 
@@ -665,8 +665,8 @@ public class DataSetMappingServiceTests
                     ReplacementDataFileId = replacementDataFileId,
                     Updates =
                     [
-                        new() { OriginalLocationId = loc1Id, NewReplacementLocationId = replacementLocId },
-                        new() { OriginalLocationId = loc2Id, NewReplacementLocationId = null },
+                        new() { OriginalId = loc1Id, NewReplacementId = replacementLocId },
+                        new() { OriginalId = loc2Id, NewReplacementId = null },
                     ],
                 },
                 CancellationToken.None
@@ -677,15 +677,15 @@ public class DataSetMappingServiceTests
 
             var map1 = locationMappingList.Single(m => m.OriginalId == loc1Id);
             Assert.Equal(replacementLocId, map1.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), map1.Status);
+            Assert.Equal(MapStatus.ManuallySet, map1.Status);
 
             var map2 = locationMappingList.Single(m => m.OriginalId == loc2Id);
             Assert.Null(map2.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), map2.Status);
+            Assert.Equal(MapStatus.ManuallySet, map2.Status);
 
             var map3 = locationMappingList.Single(m => m.OriginalId == loc3Id);
             Assert.Equal(loc3ReplacementId, map3.ReplacementId);
-            Assert.Equal(nameof(MapStatus.Unset), map3.Status);
+            Assert.Equal(MapStatus.Unset, map3.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -879,14 +879,14 @@ public class DataSetMappingServiceTests
                 {
                     OriginalDataFileId = originalDataFileId,
                     ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalLocationId = badId }],
+                    Updates = [new() { OriginalId = badId }],
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.OriginalLocationId)}",
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.OriginalId)}",
                 "LocationMatchingOriginalIdNameNotFound"
             );
         }
@@ -943,14 +943,14 @@ public class DataSetMappingServiceTests
                 {
                     OriginalDataFileId = originalDataFileId,
                     ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = Guid.NewGuid() }],
+                    Updates = [new() { OriginalId = locId, NewReplacementId = Guid.NewGuid() }],
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
                 "UnmappedLocationMatchingReplacementLocationIdNotFound"
             );
         }
@@ -1012,14 +1012,14 @@ public class DataSetMappingServiceTests
                 {
                     OriginalDataFileId = originalDataFileId,
                     ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = replacementLocId }],
+                    Updates = [new() { OriginalId = locId, NewReplacementId = replacementLocId }],
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
                 "UnmappedLocationHasDifferentGeographicLevelAsOriginalLocation"
             );
         }
@@ -1206,11 +1206,11 @@ public class DataSetMappingServiceTests
             var filter1Dto = dto.Filters.Single(f => f.OriginalId == originalFilter1Id);
             Assert.Equal(replacementFilter1Id, filter1Dto.ReplacementId);
             Assert.Equal("Replacement filter 1", filter1Dto.ReplacementLabel);
-            Assert.Equal(nameof(MapStatus.ManuallySet), filter1Dto.Status);
+            Assert.Equal(MapStatus.ManuallySet, filter1Dto.Status);
 
             var filter2Dto = dto.Filters.Single(f => f.OriginalId == originalFilter2Id);
             Assert.Null(filter2Dto.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), filter2Dto.Status);
+            Assert.Equal(MapStatus.ManuallySet, filter2Dto.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1397,7 +1397,7 @@ public class DataSetMappingServiceTests
             Assert.Equal(newReplacementFilterId, filterDto.ReplacementId);
             Assert.Equal("New replacement filter", filterDto.ReplacementLabel);
             Assert.Equal("new_replacement_filter", filterDto.ReplacementColumnName);
-            Assert.Equal(nameof(MapStatus.ManuallySet), filterDto.Status);
+            Assert.Equal(MapStatus.ManuallySet, filterDto.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1972,11 +1972,11 @@ public class DataSetMappingServiceTests
             var group1Dto = dto.FilterGroups.Single(g => g.OriginalId == originalFilterGroup1Id);
             Assert.Equal(newReplacementFilterGroup1Id, group1Dto.ReplacementId);
             Assert.Equal("New replacement filter group 1", group1Dto.ReplacementLabel);
-            Assert.Equal(nameof(MapStatus.ManuallySet), group1Dto.Status);
+            Assert.Equal(MapStatus.ManuallySet, group1Dto.Status);
 
             var group2Dto = dto.FilterGroups.Single(g => g.OriginalId == originalFilterGroup2Id);
             Assert.Null(group2Dto.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), group2Dto.Status);
+            Assert.Equal(MapStatus.ManuallySet, group2Dto.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2134,7 +2134,7 @@ public class DataSetMappingServiceTests
             var groupDto = Assert.Single(dto.FilterGroups);
             Assert.Equal(newReplacementFilterGroup1Id, groupDto.ReplacementId);
             Assert.Equal("New replacement filter group 1", groupDto.ReplacementLabel);
-            Assert.Equal(nameof(MapStatus.ManuallySet), groupDto.Status);
+            Assert.Equal(MapStatus.ManuallySet, groupDto.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2438,11 +2438,11 @@ public class DataSetMappingServiceTests
             var item1Dto = dto.FilterItems.Single(i => i.OriginalId == originalFilterItem1Id);
             Assert.Equal(newReplacementFilterItem1Id, item1Dto.ReplacementId);
             Assert.Equal("New replacement filter item 1", item1Dto.ReplacementLabel);
-            Assert.Equal(nameof(MapStatus.ManuallySet), item1Dto.Status);
+            Assert.Equal(MapStatus.ManuallySet, item1Dto.Status);
 
             var item2Dto = dto.FilterItems.Single(i => i.OriginalId == originalFilterItem2Id);
             Assert.Null(item2Dto.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), item2Dto.Status);
+            Assert.Equal(MapStatus.ManuallySet, item2Dto.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2579,7 +2579,7 @@ public class DataSetMappingServiceTests
             var itemDto = Assert.Single(dto.FilterItems);
             Assert.Equal(newReplacementFilterItem1Id, itemDto.ReplacementId);
             Assert.Equal("New replacement filter item 1", itemDto.ReplacementLabel);
-            Assert.Equal(nameof(MapStatus.ManuallySet), itemDto.Status);
+            Assert.Equal(MapStatus.ManuallySet, itemDto.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2887,15 +2887,15 @@ public class DataSetMappingServiceTests
             var dto = result.AssertRight();
             var filterDto = Assert.Single(dto.Filters);
             Assert.Equal(replacementFilterId, filterDto.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), filterDto.Status);
+            Assert.Equal(MapStatus.ManuallySet, filterDto.Status);
 
             var groupDto = Assert.Single(dto.FilterGroups);
             Assert.Equal(replacementFilterGroupId, groupDto.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), groupDto.Status);
+            Assert.Equal(MapStatus.ManuallySet, groupDto.Status);
 
             var itemDto = Assert.Single(dto.FilterItems);
             Assert.Equal(replacementFilterItemId, itemDto.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), itemDto.Status);
+            Assert.Equal(MapStatus.ManuallySet, itemDto.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
