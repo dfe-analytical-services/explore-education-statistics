@@ -1,7 +1,9 @@
 using System.Numerics;
+using GovUk.Education.ExploreEducationStatistics.Common.Comparers;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Semver;
@@ -133,7 +135,13 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                         }
                     );
 
-                    ms.Property(msb => msb.GeographicLevels).HasColumnType("text[]");
+                    ms.PrimitiveCollection(msb => msb.GeographicLevels)
+                        .ElementType(b =>
+                            b.HasConversion<
+                                EnumToEnumValueConverter<GeographicLevel>,
+                                EnumValueComparer<GeographicLevel>
+                            >()
+                        );
                 }
             );
 
