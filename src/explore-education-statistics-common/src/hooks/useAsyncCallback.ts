@@ -104,7 +104,7 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps,react-hooks/use-memo
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   const stateSetter = useCallback(

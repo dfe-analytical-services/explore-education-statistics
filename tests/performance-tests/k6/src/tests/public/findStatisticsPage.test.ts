@@ -57,7 +57,6 @@ const performTest = ({ buildId, dataUrls }: SetupData) =>
   });
 
 function getDataUrls(buildId: string): string[] {
-  // eslint-disable-next-line import/no-named-as-default-member
   const defaultSearchResultsJson = http.get(
     `${environmentAndUsers.environment.publicUrl}/_next/data/${buildId}/find-statistics.json`,
   );

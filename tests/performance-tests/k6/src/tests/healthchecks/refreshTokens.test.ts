@@ -1,4 +1,3 @@
-/* eslint-disable import/no-named-as-default-member */
 import { check, fail } from 'k6';
 import http from 'k6/http';
 import { Rate } from 'k6/metrics';

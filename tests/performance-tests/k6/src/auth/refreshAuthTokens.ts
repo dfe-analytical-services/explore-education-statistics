@@ -31,7 +31,6 @@ export default function refreshAuthTokens({
     },
   };
 
-  // eslint-disable-next-line import/no-named-as-default-member
   const response = http.post(refreshTokenUrl, requestBody, params);
 
   if (response.status !== 200) {

@@ -64,7 +64,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/sanitize-html": "^2.16.1",
     "@types/govuk-frontend": "^5.11.0",
-    "eslint": "^10.7.0",
+    "eslint": "^9.39.5",
     "intersection-observer": "^0.12.2",
     "jest": "^30.4.2",
     "jest-fail-on-console": "^3.3.4",

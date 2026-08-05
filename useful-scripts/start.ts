@@ -382,7 +382,6 @@ async function startService(service: ServiceName): Promise<void> {
   let args: string[] = [];
 
   let lockUntilReady = false;
-  // eslint-disable-next-line no-unassigned-vars
   let beforeTask: (() => void | Promise<void>) | undefined;
   let checkReady: ((line: string) => boolean) | undefined;
 

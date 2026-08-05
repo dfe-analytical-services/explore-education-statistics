@@ -1,4 +1,3 @@
-/* eslint-disable import/no-named-as-default-member */
 import http, { RefinedParams, RefinedResponse, RequestBody } from 'k6/http';
 
 interface HttpHeaders {

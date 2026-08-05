@@ -7,7 +7,6 @@ interface Props {
 
 export default function ApiCompatibilityTag({ isCompatible }: Props) {
   let colour: TagProps['colour'];
-  // eslint-disable-next-line no-useless-assignment
   let text = '';
 
   switch (isCompatible) {

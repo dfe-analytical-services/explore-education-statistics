@@ -143,7 +143,6 @@ function getCategoryFilters(
 ): Filter[] {
   const { groupBy: axisGroupBy, groupByFilter } = axisConfiguration;
 
-  // eslint-disable-next-line no-useless-assignment
   let filters: Filter[] = [];
 
   switch (axisGroupBy) {
