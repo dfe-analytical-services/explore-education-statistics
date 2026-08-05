@@ -118,26 +118,47 @@ public class ThemeService(
         CancellationToken cancellationToken = default
     )
     {
+        // This deliberately runs without a transaction. Deleting a Theme cascades into deletions across the
+        // content and statistics databases, the Public API's PostgreSQL database, Azure blob storage and Azure
+        // storage tables, and reaches the latter three via a blocking HTTP call out to the Public Data
+        // Processor. That call reads and writes the same content database rows as this operation, so holding a
+        // transaction open across it makes the Processor wait on locks that cannot be released until the
+        // Processor itself responds, which SQL Server cannot detect as a deadlock and which therefore blocks
+        // until the command timeout expires. A transaction could not have made the operation atomic in any
+        // case, as the blob and Public API deletions are already irreversible by the time it would roll back.
+        // Instead, ReleaseVersions are deleted in a dependency-safe order so that a partial deletion can be
+        // completed by retrying.
         return await CheckCanDeleteThemes()
             .OnSuccess(async _ => await userService.CheckCanManageAllTaxonomy())
-            .OnSuccessVoid(async () =>
+            .OnSuccess<ActionResult, Unit, Unit>(async _ =>
             {
                 var themes = await contentDbContext
                     .Themes.Where(t => themeIds.Contains(t.Id))
                     .ToListAsync(cancellationToken);
 
-                await using var transaction = await contentDbContext.Database.BeginTransactionAsync(cancellationToken);
+                var failures = new List<ActionResult>();
 
                 foreach (var theme in themes)
                 {
-                    await DeletePublicationsForTheme(theme.Id, cancellationToken)
+                    var result = await DeletePublicationsForTheme(theme.Id, cancellationToken)
                         .OnSuccessDo(() => contentDbContext.Themes.Remove(theme));
+
+                    if (result.IsLeft)
+                    {
+                        failures.AddRange(result.Left);
+                    }
                 }
 
+                // Persisted before reporting any failure, so that the Themes which were deleted successfully
+                // do not have to be deleted again on a retry.
                 await contentDbContext.SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
 
-                await publishingService.TaxonomyChanged(cancellationToken);
+                if (failures.Count > 0)
+                {
+                    return failures[0];
+                }
+
+                return await publishingService.TaxonomyChanged(cancellationToken);
             });
     }
 

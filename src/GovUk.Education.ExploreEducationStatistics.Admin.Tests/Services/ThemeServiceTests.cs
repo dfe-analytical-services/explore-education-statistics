@@ -357,7 +357,7 @@ public class ThemeServiceTests
         publication1.LatestPublishedReleaseVersion = null;
         publication1.LatestPublishedReleaseVersionId = null;
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
+        using var fixture = new SqliteContentDbContextFixture();
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -486,7 +486,7 @@ public class ThemeServiceTests
             )
             .GenerateList();
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
+        using var fixture = new SqliteContentDbContextFixture();
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -574,7 +574,7 @@ public class ThemeServiceTests
 
         ReleaseVersion release2Version2 = _fixture.DefaultReleaseVersion().WithVersion(1).WithRelease(release2);
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
+        using var fixture = new SqliteContentDbContextFixture();
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -666,7 +666,7 @@ public class ThemeServiceTests
             Contact = NewContact(),
         };
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
+        using var fixture = new SqliteContentDbContextFixture();
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -706,9 +706,12 @@ public class ThemeServiceTests
             VerifyAllMocks(publishingService, releaseVersionService);
 
             result.AssertRight();
+        }
 
-            Assert.Equal(0, contentContext.Publications.Count());
-            Assert.Equal(0, contentContext.Themes.Count());
+        await using (var context = fixture.CreateContext())
+        {
+            Assert.Equal(0, context.Publications.Count());
+            Assert.Equal(0, context.Themes.Count());
         }
     }
 
@@ -771,7 +774,7 @@ public class ThemeServiceTests
             .DefaultMethodology()
             .WithOwningPublication(otherReleaseVersion.Release.Publication);
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
+        using var fixture = new SqliteContentDbContextFixture();
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -814,9 +817,12 @@ public class ThemeServiceTests
             VerifyAllMocks(releaseDataFileService, methodologyService, publishingService, releaseVersionService);
 
             result.AssertRight();
+        }
 
-            Assert.Equal(otherReleaseVersion.Publication.Id, contentContext.Publications.Single().Id);
-            Assert.Equal(otherTheme.Id, contentContext.Themes.Single().Id);
+        await using (var context = fixture.CreateContext())
+        {
+            Assert.Equal(otherReleaseVersion.Publication.Id, context.Publications.Single().Id);
+            Assert.Equal(otherTheme.Id, context.Themes.Single().Id);
         }
     }
 
@@ -855,7 +861,7 @@ public class ThemeServiceTests
             Publications = [standardTitleThemePublication],
         };
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
+        using var fixture = new SqliteContentDbContextFixture();
 
         await using (var context = fixture.CreateContext())
         {
@@ -880,9 +886,12 @@ public class ThemeServiceTests
             // Act
             await service.DeleteUITestThemes();
 
-            VerifyAllMocks(publishingService);
-
             // Assert
+            VerifyAllMocks(publishingService);
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
             var themesResult = await context.Themes.ToListAsync();
             var publicationsResult = await context.Publications.ToListAsync();
 
@@ -927,7 +936,7 @@ public class ThemeServiceTests
         var theme2 = new Theme { Id = Guid.NewGuid(), Title = "Theme 2 to delete" };
         var otherTheme = new Theme { Id = Guid.NewGuid(), Title = "Theme to retain" };
 
-        using var fixture = new SqliteContentDbContextFixture(); // Required for transaction support
+        using var fixture = new SqliteContentDbContextFixture();
 
         await using (var context = fixture.CreateContext())
         {
@@ -941,13 +950,14 @@ public class ThemeServiceTests
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
-
             var result = await service.DeleteThemes([theme1.Id, theme2.Id]);
 
             VerifyAllMocks(publishingService);
-
             result.AssertRight();
+        }
 
+        await using (var context = fixture.CreateContext())
+        {
             var remainingThemes = await context.Themes.ToListAsync();
             Assert.Single(remainingThemes);
             Assert.Equal(otherTheme.Id, remainingThemes[0].Id);
