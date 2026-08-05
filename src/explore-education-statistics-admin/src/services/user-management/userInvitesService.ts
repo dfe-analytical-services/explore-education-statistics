@@ -4,10 +4,11 @@ import {
   UserPublicationRole,
 } from '../types/userWithRoles';
 import { PublicationRole } from '../types/PublicationRole';
+import { GlobalRole } from '../types/GlobalRole';
 
 export interface PendingInvite {
   email: string;
-  globalRole: string;
+  globalRole: GlobalRole;
   userPublicationRoles: UserPublicationRole[];
   userPreReleaseRoles: UserPreReleaseRole[];
 }
