@@ -149,6 +149,7 @@ User checks row data contents inside the 'Draft API data sets' summary table
     user checks list contains exact items in order    testid:Actions
     ...    Preview API data set
     ...    View preview token log
+    ...    Unfinalise this data set version
     ...    Remove draft version
 
 Add headline text block to Content page

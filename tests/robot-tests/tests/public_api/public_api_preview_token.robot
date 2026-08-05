@@ -111,6 +111,7 @@ User verifies the 'Draft API data set' summary list
     user checks list contains exact items in order    testid:Actions
     ...    Preview API data set
     ...    View preview token log
+    ...    Unfinalise this data set version
     ...    Remove draft version
 
 User clicks on 'Preview API data set' link
