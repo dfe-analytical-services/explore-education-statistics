@@ -13,11 +13,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPreReleaseRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -259,7 +261,10 @@ public abstract class UserManagementServiceTests
                 var expectedUserPreReleaseRoles1 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[0]]);
 
                 Assert.Equal(expectedUserInvite1.Email, pendingInvite1.Email);
-                Assert.Equal(expectedUserInvite1.Role!.Name, pendingInvite1.GlobalRole);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite1.Role!.Name!),
+                    pendingInvite1.GlobalRole
+                );
                 Assert.Equal(expectedUserPublicationRoles1, pendingInvite1.UserPublicationRoles);
                 Assert.Equal(expectedUserPreReleaseRoles1, pendingInvite1.UserPreReleaseRoles);
 
@@ -270,7 +275,10 @@ public abstract class UserManagementServiceTests
                 var expectedUserPreReleaseRoles2 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[1]]);
 
                 Assert.Equal(expectedUserInvite2.Email, pendingInvite2.Email);
-                Assert.Equal(expectedUserInvite2.Role!.Name, pendingInvite2.GlobalRole);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite2.Role!.Name!),
+                    pendingInvite2.GlobalRole
+                );
                 Assert.Equal(expectedUserPublicationRoles2, pendingInvite2.UserPublicationRoles);
                 Assert.Equal(expectedUserPreReleaseRoles2, pendingInvite2.UserPreReleaseRoles);
 
@@ -281,7 +289,10 @@ public abstract class UserManagementServiceTests
                 var expectedUserPreReleaseRoles3 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[2]]);
 
                 Assert.Equal(expectedUserInvite3.Email, pendingInvite3.Email);
-                Assert.Equal(expectedUserInvite3.Role!.Name, pendingInvite3.GlobalRole);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite3.Role!.Name!),
+                    pendingInvite3.GlobalRole
+                );
                 Assert.Equal(expectedUserPublicationRoles3, pendingInvite3.UserPublicationRoles);
                 Assert.Equal(expectedUserPreReleaseRoles3, pendingInvite3.UserPreReleaseRoles);
 
@@ -290,7 +301,10 @@ public abstract class UserManagementServiceTests
                 var pendingInvite4 = pendingInvites.Single(pi => pi.Email == expectedUserInvite4.Email);
 
                 Assert.Equal(expectedUserInvite4.Email, pendingInvite4.Email);
-                Assert.Equal(expectedUserInvite4.Role!.Name, pendingInvite4.GlobalRole);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite4.Role!.Name!),
+                    pendingInvite4.GlobalRole
+                );
                 Assert.Empty(pendingInvite4.UserPublicationRoles);
                 Assert.Empty(pendingInvite4.UserPreReleaseRoles);
             }
