@@ -728,13 +728,6 @@
         "description": "The HTTP route of the Natural Language Search function, relative to the Natural Language Search Function app host."
       }
     },
-    "tableToolSearchFunctionsKey": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The key used to authenticate requests to the Azure Function App used by the table tool search service"
-      }
-    },
     "publicDataDbExists": {
       "type": "bool",
       "defaultValue": true,
@@ -2286,7 +2279,6 @@
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
         "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
         "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('nlSearchFunctionAppName')), variables('apiVersions').nlSearchFunctionApp).defaultHostName, parameters('nlSearchFunctionRoute'))]",
-        "AZURE_TABLE_TOOL_SEARCH_FUNCTIONS_KEY": "[parameters('tableToolSearchFunctionsKey')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
