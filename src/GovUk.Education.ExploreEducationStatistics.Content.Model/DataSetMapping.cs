@@ -21,8 +21,10 @@ public record DataSetMapping
     public List<UnmappedIndicator> UnmappedReplacementIndicators { get; init; } = [];
 
     public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
-
     public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
+
+    public Dictionary<Guid, FilterMapping> FilterMappings { get; set; } = null!; // EES-7370 Change set -> init
+    public List<UnmappedFilter> UnmappedReplacementFilters { get; set; } = []; // EES-7370 Change set -> init
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -91,6 +93,27 @@ public record DataSetMapping
                         ?? new List<UnmappedLocation>(),
                     ValueComparer.CreateDefault<List<UnmappedLocation>>(false)
                 );
+
+            builder
+                .Property(x => x.FilterMappings)
+                .HasConversion(
+                    filterMappings => JsonSerializer.Serialize(filterMappings, JsonOptions),
+                    filterMappingString =>
+                        JsonSerializer.Deserialize<Dictionary<Guid, FilterMapping>>(filterMappingString, JsonOptions)
+                        ?? new Dictionary<Guid, FilterMapping>(),
+                    ValueComparer.CreateDefault<Dictionary<Guid, FilterMapping>>(false)
+                )
+                .HasColumnType("nvarchar(max)");
+
+            builder
+                .Property(x => x.UnmappedReplacementFilters)
+                .HasConversion(
+                    unmappedFilters => JsonSerializer.Serialize(unmappedFilters, JsonOptions),
+                    unmappedFiltersString =>
+                        JsonSerializer.Deserialize<List<UnmappedFilter>>(unmappedFiltersString, JsonOptions)
+                        ?? new List<UnmappedFilter>(),
+                    ValueComparer.CreateDefault<List<UnmappedFilter>>(false)
+                );
         }
     }
 }
@@ -100,6 +123,7 @@ public enum MapStatus
     Unset,
     ManuallySet, // user manually mapped this (whether to another Id or nothing)
     AutoSet, // automatically mapped when the initial mapping was created
+    ParentNotMapped,
 }
 
 public record UnmappedIndicator
@@ -147,6 +171,72 @@ public record LocationMapping
     public GeographicLevel? ReplacementGeographicLevel { get; set; }
     public string? ReplacementCode { get; set; } = "";
     public string? ReplacementName { get; set; } = "";
+
+    public MapStatus Status { get; set; }
+}
+
+public record UnmappedFilter
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+    public string ColumnName { get; set; } = "";
+
+    // All child groups of an unmapped filter must also be unmapped
+    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
+}
+
+public record UnmappedFilterGroup
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+
+    // All child items of an unmapped group must also be unmapped
+    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
+}
+
+public record UnmappedFilterItem
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+}
+
+public record FilterMapping
+{
+    public Guid OriginalId { get; set; }
+    public string OriginalLabel { get; set; } = "";
+    public string OriginalColumnName { get; set; } = "";
+
+    public Guid? ReplacementId { get; set; }
+    public string? ReplacementLabel { get; set; }
+    public string? ReplacementColumnName { get; set; }
+
+    public Dictionary<Guid, FilterGroupMapping> FilterGroupMappings { get; set; } = [];
+    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
+
+    public MapStatus Status { get; set; }
+}
+
+public record FilterGroupMapping
+{
+    public Guid OriginalId { get; set; }
+    public string OriginalLabel { get; set; } = "";
+
+    public Guid? ReplacementId { get; set; }
+    public string? ReplacementLabel { get; set; }
+
+    public Dictionary<Guid, FilterItemMapping> FilterItemMappings { get; set; } = [];
+    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
+
+    public MapStatus Status { get; set; }
+}
+
+public record FilterItemMapping
+{
+    public Guid OriginalId { get; set; }
+    public string OriginalLabel { get; set; } = "";
+
+    public Guid? ReplacementId { get; set; }
+    public string? ReplacementLabel { get; set; }
 
     public MapStatus Status { get; set; }
 }

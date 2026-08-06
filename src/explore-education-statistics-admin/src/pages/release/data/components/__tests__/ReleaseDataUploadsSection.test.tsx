@@ -130,6 +130,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   const testValidReplacementPlan: DataReplacementPlan = {
     valid: true,
+    hasDataBlockAndReplacementHasAdditionalFilter: false,
     dataBlocks: [],
     footnotes: [],
     originalSubjectId: 'subject-1',

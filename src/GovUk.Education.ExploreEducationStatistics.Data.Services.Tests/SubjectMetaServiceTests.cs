@@ -1125,32 +1125,32 @@ public class SubjectMetaServiceTests
             var savedFilter1 = savedSequence[0];
             Assert.Equal(request[0].Id, savedFilter1.Id);
 
-            Assert.Equal(2, savedFilter1.ChildSequence.Count);
-            var savedFilter1Group1 = savedFilter1.ChildSequence[0];
-            var savedFilter1Group2 = savedFilter1.ChildSequence[1];
+            Assert.Equal(2, savedFilter1.FilterGroupSequence.Count);
+            var savedFilter1Group1 = savedFilter1.FilterGroupSequence[0];
+            var savedFilter1Group2 = savedFilter1.FilterGroupSequence[1];
 
             Assert.Equal(request[0].FilterGroups[0].Id, savedFilter1Group1.Id);
             Assert.Equal(request[0].FilterGroups[1].Id, savedFilter1Group2.Id);
 
-            Assert.Equal(2, savedFilter1Group1.ChildSequence.Count);
-            Assert.Equal(request[0].FilterGroups[0].FilterItems[0], savedFilter1Group1.ChildSequence[0]);
-            Assert.Equal(request[0].FilterGroups[0].FilterItems[1], savedFilter1Group1.ChildSequence[1]);
+            Assert.Equal(2, savedFilter1Group1.FilterItemSequence.Count);
+            Assert.Equal(request[0].FilterGroups[0].FilterItems[0], savedFilter1Group1.FilterItemSequence[0]);
+            Assert.Equal(request[0].FilterGroups[0].FilterItems[1], savedFilter1Group1.FilterItemSequence[1]);
 
-            Assert.Equal(2, savedFilter1Group2.ChildSequence.Count);
-            Assert.Equal(request[0].FilterGroups[1].FilterItems[0], savedFilter1Group2.ChildSequence[0]);
-            Assert.Equal(request[0].FilterGroups[1].FilterItems[1], savedFilter1Group2.ChildSequence[1]);
+            Assert.Equal(2, savedFilter1Group2.FilterItemSequence.Count);
+            Assert.Equal(request[0].FilterGroups[1].FilterItems[0], savedFilter1Group2.FilterItemSequence[0]);
+            Assert.Equal(request[0].FilterGroups[1].FilterItems[1], savedFilter1Group2.FilterItemSequence[1]);
 
             // Filter 2
             var savedFilter2 = savedSequence[1];
             Assert.Equal(request[1].Id, savedFilter2.Id);
 
-            Assert.Single(savedFilter2.ChildSequence);
-            var savedFilter2Group1 = savedFilter2.ChildSequence[0];
+            Assert.Single(savedFilter2.FilterGroupSequence);
+            var savedFilter2Group1 = savedFilter2.FilterGroupSequence[0];
 
             Assert.Equal(request[1].FilterGroups[0].Id, savedFilter2Group1.Id);
 
-            Assert.Single(savedFilter2Group1.ChildSequence);
-            Assert.Equal(request[1].FilterGroups[0].FilterItems[0], savedFilter2Group1.ChildSequence[0]);
+            Assert.Single(savedFilter2Group1.FilterItemSequence);
+            Assert.Equal(request[1].FilterGroups[0].FilterItems[0], savedFilter2Group1.FilterItemSequence[0]);
         }
     }
 
