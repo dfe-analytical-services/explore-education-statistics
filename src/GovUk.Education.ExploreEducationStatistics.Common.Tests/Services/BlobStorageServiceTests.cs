@@ -31,6 +31,36 @@ public class BlobStorageServiceTests
     private record TestClass(string Value);
 
     [Fact]
+    public async Task UpdateBlobProperties_PreservesExistingHttpHeaders()
+    {
+        const string path = "path/to/test.csv";
+        var blobClient = MockBlobClient(name: path, contentType: "text/csv", contentEncoding: "gzip");
+        BlobHttpHeaders? updatedHeaders = null;
+        blobClient
+            .Setup(client =>
+                client.SetHttpHeadersAsync(It.IsAny<BlobHttpHeaders>(), default, It.IsAny<CancellationToken>())
+            )
+            .Callback<BlobHttpHeaders, BlobRequestConditions?, CancellationToken>(
+                (headers, _, _) => updatedHeaders = headers
+            )
+            .ReturnsAsync((Response<Azure.Storage.Blobs.Models.BlobInfo>)null!);
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+        var service = SetupTestBlobStorageService(blobServiceClient.Object);
+
+        await service.UpdateBlobProperties(
+            PublicReleaseFiles,
+            path,
+            contentDisposition: "attachment; filename=\"test.csv\""
+        );
+
+        Assert.NotNull(updatedHeaders);
+        Assert.Equal("text/csv", updatedHeaders.ContentType);
+        Assert.Equal("gzip", updatedHeaders.ContentEncoding);
+        Assert.Equal("attachment; filename=\"test.csv\"", updatedHeaders.ContentDisposition);
+    }
+
+    [Fact]
     public async Task CheckBlobExists_BlobExists()
     {
         const string path = "path/to/test.pdf";

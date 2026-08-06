@@ -47,6 +47,18 @@ public interface IBlobStorageService
 
     Task UploadFile(IBlobContainer containerName, string path, IFormFile file);
 
+    /// <summary>
+    /// Update selected HTTP headers and metadata on a blob while preserving all values that are not supplied.
+    /// </summary>
+    Task UpdateBlobProperties(
+        IBlobContainer containerName,
+        string path,
+        string? contentType = null,
+        string? contentDisposition = null,
+        IReadOnlyDictionary<string, string>? metadata = null,
+        CancellationToken cancellationToken = default
+    );
+
     Task UploadStream(
         IBlobContainer containerName,
         string path,

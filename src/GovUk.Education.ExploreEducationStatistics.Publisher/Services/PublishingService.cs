@@ -1,6 +1,8 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -85,6 +87,16 @@ public class PublishingService(
                             logger: logger
                         ),
                 }
+            );
+        }
+
+        foreach (var file in files.Where(file => file.Type is Ancillary or FileType.Data))
+        {
+            await publicBlobStorageService.UpdateBlobProperties(
+                containerName: PublicReleaseFiles,
+                path: file.PublicPath(releaseVersion.Id),
+                contentType: file.ContentType,
+                contentDisposition: HttpResponseExtensions.ContentDispositionAttachmentHeader(file.Filename)
             );
         }
     }

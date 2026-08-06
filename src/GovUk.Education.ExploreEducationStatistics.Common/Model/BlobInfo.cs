@@ -8,6 +8,8 @@ public class BlobInfo
 
     public readonly long ContentLength;
 
+    public readonly string? ContentDisposition;
+
     public readonly IDictionary<string, string> Meta;
 
     public readonly DateTimeOffset? Created;
@@ -20,12 +22,14 @@ public class BlobInfo
         long contentLength,
         IDictionary<string, string>? meta = null,
         DateTimeOffset? created = null,
-        DateTimeOffset? updated = null
+        DateTimeOffset? updated = null,
+        string? contentDisposition = null
     )
     {
         Path = path;
         ContentType = contentType;
         ContentLength = contentLength;
+        ContentDisposition = contentDisposition;
         Meta = meta ?? new Dictionary<string, string>();
         Created = created;
         Updated = updated;

@@ -654,6 +654,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
+        services.AddTransient<IPublicReleaseFileBlobService, PublicReleaseFileBlobService>();
         services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(
             provider => new PrivateBlobStorageService(

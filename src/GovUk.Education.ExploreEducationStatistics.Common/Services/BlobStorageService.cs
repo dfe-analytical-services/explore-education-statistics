@@ -176,6 +176,46 @@ public abstract partial class BlobStorageService(
         await blob.UploadAsync(path: tempFilePath, httpHeaders: new BlobHttpHeaders { ContentType = file.ContentType });
     }
 
+    public async Task UpdateBlobProperties(
+        IBlobContainer containerName,
+        string path,
+        string? contentType = null,
+        string? contentDisposition = null,
+        IReadOnlyDictionary<string, string>? metadata = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var blob = await GetBlobClient(containerName, path);
+        var properties = await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+
+        if (contentType is not null || contentDisposition is not null)
+        {
+            await blob.SetHttpHeadersAsync(
+                new BlobHttpHeaders
+                {
+                    CacheControl = properties.Value.CacheControl,
+                    ContentDisposition = contentDisposition ?? properties.Value.ContentDisposition,
+                    ContentEncoding = properties.Value.ContentEncoding,
+                    ContentHash = properties.Value.ContentHash,
+                    ContentLanguage = properties.Value.ContentLanguage,
+                    ContentType = contentType ?? properties.Value.ContentType,
+                },
+                cancellationToken: cancellationToken
+            );
+        }
+
+        if (metadata is not null)
+        {
+            var updatedMetadata = new Dictionary<string, string>(properties.Value.Metadata);
+            foreach (var (key, value) in metadata)
+            {
+                updatedMetadata[key] = value;
+            }
+
+            await blob.SetMetadataAsync(updatedMetadata, cancellationToken: cancellationToken);
+        }
+    }
+
     public async Task<bool> MoveBlob(
         IBlobContainer sourceContainer,
         string sourcePath,
@@ -611,6 +651,7 @@ public abstract partial class BlobStorageService(
                 path: destination.Name,
                 contentType: source.Properties.ContentType,
                 contentLength: source.Properties.Length,
+                contentDisposition: source.Properties.ContentDisposition,
                 meta: source.Metadata,
                 created: source.Properties.Created,
                 updated: source.Properties.LastModified
@@ -739,6 +780,7 @@ public abstract partial class BlobStorageService(
             path: blob.Name,
             contentType: properties.ContentType,
             contentLength: properties.ContentLength,
+            contentDisposition: properties.ContentDisposition,
             meta: properties.Metadata,
             created: properties.CreatedOn,
             updated: properties.LastModified

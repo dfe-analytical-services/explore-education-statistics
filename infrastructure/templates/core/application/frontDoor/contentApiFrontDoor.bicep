@@ -19,6 +19,9 @@ param contentApiHostName string
 @description('App Service hostname used as the Content API origin.')
 param contentApiOriginHostName string
 
+@description('Name of the storage account containing published downloads.')
+param publicStorageAccountName string
+
 @description('Certificate type used by Azure Front Door.')
 param certificateType FrontDoorCertificateType
 
@@ -130,6 +133,103 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   }
   dependsOn: [
     origin
+  ]
+}
+
+resource publicStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: publicStorageAccountName
+}
+
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' existing = {
+  parent: publicStorageAccount
+  name: 'default'
+}
+
+resource downloadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+  parent: blobService
+  name: 'downloads'
+}
+
+var storageBlobDataReaderRoleId = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
+)
+
+resource blobDataReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(downloadsContainer.id, frontDoor.id, storageBlobDataReaderRoleId)
+  scope: downloadsContainer
+  properties: {
+    roleDefinitionId: storageBlobDataReaderRoleId
+    principalId: frontDoor.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource blobOriginGroup 'Microsoft.Cdn/profiles/origingroups@2026-04-01-preview' = {
+  parent: frontDoor
+  name: '${contentApiResourcePrefix}-downloads-${abbreviations.frontDoorOriginGroups}'
+  properties: {
+    authentication: {
+      scope: 'https://storage.azure.com/.default'
+      tokenDestinationHeader: 'Authorization'
+      type: 'SystemAssignedIdentity'
+    }
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+      additionalLatencyInMilliseconds: 50
+    }
+    sessionAffinityState: 'Disabled'
+  }
+  dependsOn: [
+    blobDataReaderRoleAssignment
+  ]
+}
+
+var blobOriginHostName = '${publicStorageAccountName}.blob.${environment().suffixes.storage}'
+
+resource blobOrigin 'Microsoft.Cdn/profiles/origingroups/origins@2026-04-01-preview' = {
+  parent: blobOriginGroup
+  name: '${contentApiResourcePrefix}-downloads-${abbreviations.frontDoorOrigins}'
+  properties: {
+    hostName: blobOriginHostName
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: blobOriginHostName
+    priority: 1
+    weight: 1000
+    enabledState: 'Enabled'
+    enforceCertificateNameCheck: true
+  }
+}
+
+resource downloadsRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2026-04-01-preview' = {
+  parent: endpoint
+  name: '${contentApiResourcePrefix}-downloads-${abbreviations.frontDoorRoutes}'
+  properties: {
+    customDomains: [
+      {
+        id: certificateType == 'BringYourOwn' ? customDomainWithCertificate.id : customDomainWithManagedCertificate.id
+      }
+    ]
+    originGroup: {
+      id: blobOriginGroup.id
+    }
+    ruleSets: []
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/downloads/*'
+    ]
+    forwardingProtocol: 'HttpsOnly'
+    linkToDefaultDomain: 'Disabled'
+    httpsRedirect: 'Enabled'
+    enabledState: 'Enabled'
+  }
+  dependsOn: [
+    blobOrigin
   ]
 }
 

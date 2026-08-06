@@ -15,6 +15,13 @@
         "description": "Restrict the Content API App Service origin to requests from this environment's Azure Front Door profile. Enable only after the Content API custom domain has been cut over to Front Door."
       }
     },
+    "directBlobDownloadsEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Redirect published file downloads from the Content API to the Azure Front Door downloads route."
+      }
+    },
     "dataApiUrl": {
       "type": "string"
     },
@@ -1717,7 +1724,8 @@
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
         "Analytics__Enabled": "[parameters('analyticsEnabled')]",
-        "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]"
+        "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]",
+        "DirectBlobDownloads__Enabled": "[parameters('directBlobDownloadsEnabled')]"
       }
     },
     {
@@ -3487,6 +3495,12 @@
           "bypass": "AzureServices",
           "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publicStorageVnetRules'), createArray())]",
           "ipRules": "[parameters('storageFirewallRules')]",
+          "resourceAccessRules": [
+            {
+              "tenantId": "[subscription().tenantId]",
+              "resourceId": "[resourceId('Microsoft.Cdn/profiles', variables('frontDoorName'))]"
+            }
+          ],
           "defaultAction": "Deny"
         }
       },

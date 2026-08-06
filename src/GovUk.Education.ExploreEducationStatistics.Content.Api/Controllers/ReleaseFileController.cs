@@ -7,10 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
@@ -18,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 [ApiController]
 public class ReleaseFileController(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
-    IReleaseFileService releaseFileService
+    IReleaseFileService releaseFileService,
+    IOptions<DirectBlobDownloadsOptions> directBlobDownloadsOptions
 ) : ControllerBase
 {
     [HttpPost("release-files")]
@@ -36,6 +39,25 @@ public class ReleaseFileController(
     {
         if (Guid.TryParse(releaseVersionId, out var releaseVersionIdGuid) && Guid.TryParse(fileId, out var fileIdGuid))
         {
+            if (directBlobDownloadsOptions.Value.Enabled)
+            {
+                var redirectResult = await releaseFileService.GetFileDownloadRedirectPath(
+                    releaseVersionIdGuid,
+                    fileIdGuid,
+                    HttpContext.RequestAborted
+                );
+
+                if (redirectResult.IsLeft)
+                {
+                    return redirectResult.Left;
+                }
+
+                if (redirectResult.Right is { } redirectPath)
+                {
+                    return Redirect(redirectPath);
+                }
+            }
+
             return await persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionIdGuid)
                 .OnSuccessDo(rv => this.CacheWithLastModified(rv.Published))
@@ -67,36 +89,64 @@ public class ReleaseFileController(
             return BadRequest(ModelState);
         }
 
-        return await persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(
-                releaseVersionId,
-                q => q.Include(rv => rv.Release).ThenInclude(r => r.Publication)
-            )
-            .OnSuccessDo(releaseVersion => this.CacheWithLastModified(releaseVersion.Published))
-            .OnSuccess(async releaseVersion =>
-            {
-                Response.ContentDispositionAttachment(
-                    contentType: MediaTypeNames.Application.Octet,
-                    filename: $"{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip"
-                );
+        var releaseVersionResult = await persistenceHelper.CheckEntityExists<ReleaseVersion>(
+            releaseVersionId,
+            q => q.Include(rv => rv.Release).ThenInclude(r => r.Publication)
+        );
 
-                // We start the response immediately, before all the files have
-                // even downloaded from blob storage. As we download them, they are
-                // appended in-flight to the user's download.
-                // This is more efficient and means the user doesn't have
-                // to spend time waiting for the download to initiate.
-                return await releaseFileService.ZipFilesToStream(
-                    releaseVersionId: releaseVersionId,
-                    outputStream: Response.BodyWriter.AsStream(),
-                    fromPage: fromPage,
-                    fileIds: fileIds,
-                    cancellationToken: HttpContext.RequestAborted
-                );
-            })
-            .OnFailureDo(result =>
+        if (releaseVersionResult.IsLeft)
+        {
+            return releaseVersionResult.Left;
+        }
+
+        var releaseVersion = releaseVersionResult.Right;
+        var cacheResult = await this.CacheWithLastModified(releaseVersion.Published);
+        if (cacheResult.IsLeft)
+        {
+            return cacheResult.Left;
+        }
+
+        if (directBlobDownloadsOptions.Value.Enabled && fileIds is null)
+        {
+            var redirectResult = await releaseFileService.GetAllFilesZipDownloadRedirectPath(
+                releaseVersion,
+                fromPage,
+                HttpContext.RequestAborted
+            );
+
+            if (redirectResult.IsLeft)
             {
-                Response.StatusCode = result is StatusCodeResult statusCodeResult ? statusCodeResult.StatusCode : 500;
-            })
-            .HandleFailuresOrNoOp();
+                return redirectResult.Left;
+            }
+
+            if (redirectResult.Right is { } redirectPath)
+            {
+                return Redirect(redirectPath);
+            }
+        }
+
+        Response.ContentDispositionAttachment(
+            contentType: MediaTypeNames.Application.Octet,
+            filename: $"{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip"
+        );
+
+        // Start the response before all files have downloaded and append them in-flight.
+        var streamResult = await releaseFileService.ZipFilesToStream(
+            releaseVersionId: releaseVersionId,
+            outputStream: Response.BodyWriter.AsStream(),
+            fromPage: fromPage,
+            fileIds: fileIds,
+            cancellationToken: HttpContext.RequestAborted
+        );
+
+        if (streamResult.IsLeft)
+        {
+            Response.StatusCode = streamResult.Left is StatusCodeResult statusCodeResult
+                ? statusCodeResult.StatusCode
+                : 500;
+            return streamResult.Left;
+        }
+
+        return new EmptyResult();
     }
 }

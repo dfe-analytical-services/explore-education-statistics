@@ -121,6 +121,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Options - to allow them to be injected into services
         services.AddOptions<AnalyticsOptions>().Bind(configuration.GetSection(AnalyticsOptions.Section));
+        services
+            .AddOptions<DirectBlobDownloadsOptions>()
+            .Bind(configuration.GetSection(DirectBlobDownloadsOptions.Section));
 
         // Services
         services.AddSingleton<IBlobSasService, BlobSasService>();
@@ -171,7 +174,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IReleaseService, ReleaseService>();
         services.AddTransient<IReleaseFileService, ReleaseFileService>();
-        services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
+        services.AddTransient<IPublicReleaseFileBlobService, PublicReleaseFileBlobService>();
+        services.AddTransient<IReleaseFileBlobService>(provider =>
+            provider.GetRequiredService<IPublicReleaseFileBlobService>()
+        );
         services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
         services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
         services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();

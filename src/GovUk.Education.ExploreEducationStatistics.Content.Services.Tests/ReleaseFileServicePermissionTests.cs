@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -45,6 +46,39 @@ public class ReleaseFileServicePermissionTests
     }
 
     [Fact]
+    public async Task GetFileDownloadRedirectPath()
+    {
+        await PolicyCheckBuilder<ContentSecurityPolicies>()
+            .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
+            .AssertForbidden(userService =>
+            {
+                var persistenceHelper = MockPersistenceHelper<ContentDbContext, ReleaseFile>(ReleaseFile);
+                var service = BuildService(
+                    userService: userService.Object,
+                    persistenceHelper: persistenceHelper.Object
+                );
+
+                return service.GetFileDownloadRedirectPath(ReleaseFile.ReleaseVersionId, ReleaseFile.FileId);
+            });
+    }
+
+    [Fact]
+    public async Task GetAllFilesZipDownloadRedirectPath()
+    {
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPublished(DateTimeOffset.UtcNow.AddHours(-1));
+
+        await PolicyCheckBuilder<ContentSecurityPolicies>()
+            .SetupResourceCheckToFail(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
+            .AssertForbidden(userService =>
+            {
+                var service = BuildService(userService: userService.Object);
+                return service.GetAllFilesZipDownloadRedirectPath(releaseVersion, AnalyticsFromPage.ReleaseDownloads);
+            });
+    }
+
+    [Fact]
     public async Task ZipFilesToStream()
     {
         ReleaseVersion releaseVersion = _dataFixture
@@ -77,6 +111,7 @@ public class ReleaseFileServicePermissionTests
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IPublicBlobStorageService? publicBlobStorageService = null,
+        IPublicReleaseFileBlobService? releaseFileBlobService = null,
         IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
         IUserService? userService = null,
         IAnalyticsManager? analyticsManager = null,
@@ -87,6 +122,7 @@ public class ReleaseFileServicePermissionTests
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(),
+            releaseFileBlobService ?? Mock.Of<IPublicReleaseFileBlobService>(),
             dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
             userService ?? Mock.Of<IUserService>(),
             analyticsManager ?? Mock.Of<IAnalyticsManager>(),

@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -84,6 +85,71 @@ public class ReleaseFileServiceTests : IDisposable
             Assert.Equal("ancillary.pdf", result.Right.FileDownloadName);
             Assert.Equal("Test blob", result.Right.FileStream.ReadToEnd());
         }
+    }
+
+    [Fact]
+    public async Task GetFileDownloadRedirectPath_PublishedSupportingFile()
+    {
+        var releaseFile = new ReleaseFile
+        {
+            ReleaseVersion = new ReleaseVersion { Published = DateTimeOffset.UtcNow.AddHours(-1) },
+            File = new Model.File
+            {
+                RootPath = Guid.NewGuid(),
+                Filename = "ancillary.pdf",
+                ContentType = MediaTypeNames.Application.Pdf,
+                Type = Ancillary,
+            },
+        };
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseFiles.Add(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+        var releaseFileBlobService = new Mock<IPublicReleaseFileBlobService>(MockBehavior.Strict);
+        releaseFileBlobService
+            .Setup(service =>
+                service.GetDownloadRedirectPath(
+                    It.Is<ReleaseFile>(file => file.FileId == releaseFile.FileId),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync("/downloads/release/supporting/ancillary.pdf");
+        await using var serviceDbContext = InMemoryContentDbContext(contentDbContextId);
+        var service = SetupReleaseFileService(serviceDbContext, releaseFileBlobService: releaseFileBlobService.Object);
+
+        var result = await service.GetFileDownloadRedirectPath(releaseFile.ReleaseVersionId, releaseFile.FileId);
+
+        Assert.Equal("/downloads/release/supporting/ancillary.pdf", result.AssertRight());
+        releaseFileBlobService.VerifyAll();
+    }
+
+    [Fact]
+    public async Task GetFileDownloadRedirectPath_PublishedImage_FallsBackToStreaming()
+    {
+        var releaseFile = new ReleaseFile
+        {
+            ReleaseVersion = new ReleaseVersion { Published = DateTimeOffset.UtcNow.AddHours(-1) },
+            File = new Model.File
+            {
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                Type = Image,
+            },
+        };
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseFiles.Add(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+        await using var serviceDbContext = InMemoryContentDbContext(contentDbContextId);
+        var service = SetupReleaseFileService(serviceDbContext);
+
+        var result = await service.GetFileDownloadRedirectPath(releaseFile.ReleaseVersionId, releaseFile.FileId);
+
+        Assert.Null(result.AssertRight());
     }
 
     [Fact]
@@ -909,6 +975,7 @@ public class ReleaseFileServiceTests : IDisposable
                 )
             )
             .Returns(Task.CompletedTask);
+        SetupAllFilesZipProperties(publicBlobStorageService, releaseVersion, allFilesZipPath);
 
         var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
@@ -1059,7 +1126,167 @@ public class ReleaseFileServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task ZipFilesToStream_NoFileIds_StaleCachedAllFilesZip()
+    public async Task GetAllFilesZipDownloadRedirectPath_CachedZip_RecordsAnalyticsOnce()
+    {
+        var now = DateTimeOffset.UtcNow;
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPublished(now.AddDays(-1))
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            );
+        var allFilesZipPath = releaseVersion.AllFilesZipPath();
+        var contentDisposition = HttpResponseExtensions.ContentDispositionAttachmentHeader(
+            releaseVersion.AllFilesZipFileName()
+        );
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+        publicBlobStorageService.SetupFindBlob(
+            PublicReleaseFiles,
+            allFilesZipPath,
+            new BlobInfo(
+                path: allFilesZipPath,
+                contentType: MediaTypeNames.Application.Zip,
+                contentLength: 1000,
+                contentDisposition: contentDisposition,
+                updated: now.AddHours(-2)
+            )
+        );
+
+        var request = new CaptureZipDownloadRequest
+        {
+            PublicationName = releaseVersion.Release.Publication.Title,
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseName = releaseVersion.Release.Title,
+            ReleaseLabel = releaseVersion.Release.Label,
+            FromPage = AnalyticsFromPage.ReleaseDownloads,
+        };
+        var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+        analyticsManager
+            .Setup(manager => manager.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var service = SetupReleaseFileService(
+            contentDbContext,
+            publicBlobStorageService: publicBlobStorageService.Object,
+            analyticsManager: analyticsManager.Object
+        );
+
+        var result = await service.GetAllFilesZipDownloadRedirectPath(
+            releaseVersion,
+            AnalyticsFromPage.ReleaseDownloads
+        );
+
+        Assert.Equal($"/downloads/{allFilesZipPath}", result.AssertRight());
+        analyticsManager.Verify(
+            manager => manager.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task ZipFilesToStream_NoFileIds_AmendmentZipCachedBeforePublicationIsRegenerated()
+    {
+        var published = DateTimeOffset.UtcNow.AddHours(-1);
+
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithVersion(1)
+            .WithPreviousVersionId(Guid.NewGuid())
+            .WithPublished(published)
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            );
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+
+        var allFilesZipPath = releaseVersion.AllFilesZipPath();
+
+        // The amendment zip was cached while it was still a draft.
+        publicBlobStorageService.SetupFindBlob(
+            PublicReleaseFiles,
+            allFilesZipPath,
+            new BlobInfo(
+                path: allFilesZipPath,
+                contentType: "application/zip",
+                contentLength: 1000L,
+                updated: published.AddMinutes(-1)
+            )
+        );
+
+        publicBlobStorageService
+            .Setup(s =>
+                s.UploadStream(
+                    PublicReleaseFiles,
+                    allFilesZipPath,
+                    It.IsAny<Stream>(),
+                    MediaTypeNames.Application.Zip,
+                    null,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Returns(Task.CompletedTask);
+        SetupAllFilesZipProperties(publicBlobStorageService, releaseVersion, allFilesZipPath);
+
+        var request = new CaptureZipDownloadRequest
+        {
+            PublicationName = releaseVersion.Release.Publication.Title,
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseName = releaseVersion.Release.Title,
+            ReleaseLabel = releaseVersion.Release.Label,
+            FromPage = AnalyticsFromPage.DataCatalogue,
+        };
+        var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+        analyticsManager
+            .Setup(m => m.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await using var serviceDbContext = InMemoryContentDbContext(contentDbContextId);
+        var path = GenerateZipFilePath();
+        await using var stream = File.OpenWrite(path);
+
+        var service = SetupReleaseFileService(
+            contentDbContext: serviceDbContext,
+            publicBlobStorageService: publicBlobStorageService.Object,
+            analyticsManager: analyticsManager.Object
+        );
+
+        var result = await service.ZipFilesToStream(
+            releaseVersionId: releaseVersion.Id,
+            fromPage: AnalyticsFromPage.DataCatalogue,
+            outputStream: stream
+        );
+
+        result.AssertRight();
+
+        publicBlobStorageService.Verify(
+            s =>
+                s.UploadStream(
+                    PublicReleaseFiles,
+                    allFilesZipPath,
+                    It.IsAny<Stream>(),
+                    MediaTypeNames.Application.Zip,
+                    null,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task ZipFilesToStream_NoFileIds_CachedAllFilesZipWithMismatchedFormatVersion()
     {
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -1095,7 +1322,7 @@ public class ReleaseFileServiceTests : IDisposable
 
         var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
-        // 'All files' zip is in blob storage - cached, but stale
+        // 'All files' zip is cached, but was generated using an incompatible structure.
         publicBlobStorageService.SetupFindBlob(
             PublicReleaseFiles,
             allFilesZipPath,
@@ -1103,7 +1330,8 @@ public class ReleaseFileServiceTests : IDisposable
                 path: allFilesZipPath,
                 contentType: "application/zip",
                 contentLength: 1000L,
-                updated: DateTimeOffset.UtcNow.AddMinutes(-60)
+                updated: DateTimeOffset.UtcNow,
+                meta: new Dictionary<string, string> { ["ees-zip-format-version"] = "2" }
             )
         );
 
@@ -1127,6 +1355,7 @@ public class ReleaseFileServiceTests : IDisposable
                 )
             )
             .Returns(Task.CompletedTask);
+        SetupAllFilesZipProperties(publicBlobStorageService, releaseVersion, allFilesZipPath);
 
         var request = new CaptureZipDownloadRequest
         {
@@ -1178,10 +1407,31 @@ public class ReleaseFileServiceTests : IDisposable
         return path;
     }
 
+    private static void SetupAllFilesZipProperties(
+        Mock<IPublicBlobStorageService> publicBlobStorageService,
+        ReleaseVersion releaseVersion,
+        string allFilesZipPath
+    )
+    {
+        publicBlobStorageService
+            .Setup(s =>
+                s.UpdateBlobProperties(
+                    PublicReleaseFiles,
+                    allFilesZipPath,
+                    MediaTypeNames.Application.Zip,
+                    It.Is<string>(value => value.Contains(releaseVersion.AllFilesZipFileName())),
+                    It.Is<IReadOnlyDictionary<string, string>>(metadata => metadata["ees-zip-format-version"] == "1"),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Returns(Task.CompletedTask);
+    }
+
     private static ReleaseFileService SetupReleaseFileService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
         IPublicBlobStorageService? publicBlobStorageService = null,
+        IPublicReleaseFileBlobService? releaseFileBlobService = null,
         IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
         IUserService? userService = null,
         IAnalyticsManager? analyticsManager = null,
@@ -1192,6 +1442,7 @@ public class ReleaseFileServiceTests : IDisposable
             contentDbContext,
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
+            releaseFileBlobService ?? Mock.Of<IPublicReleaseFileBlobService>(MockBehavior.Strict),
             dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(MockBehavior.Strict),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
             analyticsManager ?? Mock.Of<IAnalyticsManager>(),

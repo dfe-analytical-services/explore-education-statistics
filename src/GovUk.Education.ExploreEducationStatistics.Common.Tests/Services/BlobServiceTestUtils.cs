@@ -13,6 +13,7 @@ public static class BlobServiceTestUtils
         DateTimeOffset createdOn = default,
         int contentLength = 0,
         string? contentType = null,
+        string? contentEncoding = null,
         IDictionary<string, string>? metadata = null,
         bool exists = true
     )
@@ -27,6 +28,7 @@ public static class BlobServiceTestUtils
             createdOn: createdOn,
             contentLength: contentLength,
             contentType: contentType,
+            contentEncoding: contentEncoding,
             metadata: metadata
         );
 

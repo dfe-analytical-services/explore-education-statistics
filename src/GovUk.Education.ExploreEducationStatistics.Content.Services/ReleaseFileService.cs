@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -27,6 +28,7 @@ public class ReleaseFileService(
     ContentDbContext contentDbContext,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IPublicBlobStorageService publicBlobStorageService,
+    IPublicReleaseFileBlobService releaseFileBlobService,
     IDataGuidanceFileWriter dataGuidanceFileWriter,
     IUserService userService,
     IAnalyticsManager analyticsManager,
@@ -36,6 +38,8 @@ public class ReleaseFileService(
     /// How long the all files zip should be
     /// cached in blob storage, in seconds.
     private const int AllFilesZipTtl = 60 * 60;
+    private const string AllFilesZipFormatVersion = "1";
+    private const string AllFilesZipFormatVersionMetadataKey = "ees-zip-format-version";
 
     private static readonly FileType[] AllowedFileTypes = [FileType.Ancillary, FileType.Data];
 
@@ -113,6 +117,87 @@ public class ReleaseFileService(
             });
     }
 
+    public async Task<Either<ActionResult, string?>> GetFileDownloadRedirectPath(
+        Guid releaseVersionId,
+        Guid fileId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var releaseFileResult = await persistenceHelper.CheckEntityExists<ReleaseFile>(q =>
+            q.Include(rf => rf.File)
+                .Include(rf => rf.ReleaseVersion)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
+        );
+
+        if (releaseFileResult.IsLeft)
+        {
+            return releaseFileResult.Left;
+        }
+
+        var releaseFile = releaseFileResult.Right;
+        var permissionResult = await userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion);
+        if (permissionResult.IsLeft)
+        {
+            return permissionResult.Left;
+        }
+
+        if (
+            releaseFile.ReleaseVersion.Published is null
+            || releaseFile.ReleaseVersion.Published > DateTimeOffset.UtcNow
+            || !AllowedFileTypes.Contains(releaseFile.File.Type)
+        )
+        {
+            return (string?)null;
+        }
+
+        return await releaseFileBlobService.GetDownloadRedirectPath(releaseFile, cancellationToken);
+    }
+
+    public async Task<Either<ActionResult, string?>> GetAllFilesZipDownloadRedirectPath(
+        ReleaseVersion releaseVersion,
+        AnalyticsFromPage fromPage,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (releaseVersion.Published is null || releaseVersion.Published > DateTimeOffset.UtcNow)
+        {
+            return (string?)null;
+        }
+
+        var permissionResult = await userService.CheckCanViewReleaseVersion(releaseVersion);
+        if (permissionResult.IsLeft)
+        {
+            return permissionResult.Left;
+        }
+
+        var allFilesZip = await FindValidAllFilesZip(releaseVersion);
+        if (allFilesZip is null)
+        {
+            return (string?)null;
+        }
+
+        var contentDisposition = HttpResponseExtensions.ContentDispositionAttachmentHeader(
+            releaseVersion.AllFilesZipFileName()
+        );
+
+        if (
+            allFilesZip.ContentDisposition != contentDisposition
+            || allFilesZip.ContentType != MediaTypeNames.Application.Zip
+        )
+        {
+            await publicBlobStorageService.UpdateBlobProperties(
+                containerName: PublicReleaseFiles,
+                path: allFilesZip.Path,
+                contentType: MediaTypeNames.Application.Zip,
+                contentDisposition: contentDisposition,
+                cancellationToken: cancellationToken
+            );
+        }
+
+        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles: null, fromPage, cancellationToken);
+        return $"/downloads/{allFilesZip.Path}";
+    }
+
     public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
         Guid releaseVersionId,
         Stream outputStream,
@@ -166,32 +251,60 @@ public class ReleaseFileService(
         CancellationToken cancellationToken
     )
     {
-        var path = releaseVersion.AllFilesZipPath();
-        var allFilesZip = await publicBlobStorageService.FindBlob(PublicReleaseFiles, path);
-
-        // Ideally, we would have some way to do this caching via annotations,
-        // but this a chunk of work to get working properly as piping
-        // the cached file to target stream isn't super trivial.
-        // For now, we'll just do this manually as it's way easier.
-        if (allFilesZip?.Updated is not null && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
+        var allFilesZip = await FindValidAllFilesZip(releaseVersion);
+        if (allFilesZip is null)
         {
-            var streamResult = await publicBlobStorageService.GetDownloadStream(
-                containerName: PublicReleaseFiles,
-                path: path,
-                cancellationToken: cancellationToken
-            );
-
-            if (streamResult.IsLeft)
-            {
-                return false;
-            }
-
-            await using var blobStream = streamResult.Right;
-            await blobStream.CopyToAsync(outputStream, cancellationToken);
-            return true;
+            return false;
         }
 
-        return false;
+        var streamResult = await publicBlobStorageService.GetDownloadStream(
+            containerName: PublicReleaseFiles,
+            path: allFilesZip.Path,
+            cancellationToken: cancellationToken
+        );
+
+        if (streamResult.IsLeft)
+        {
+            return false;
+        }
+
+        await using var blobStream = streamResult.Right;
+        await blobStream.CopyToAsync(outputStream, cancellationToken);
+        return true;
+    }
+
+    private async Task<BlobInfo?> FindValidAllFilesZip(ReleaseVersion releaseVersion)
+    {
+        var allFilesZip = await publicBlobStorageService.FindBlob(PublicReleaseFiles, releaseVersion.AllFilesZipPath());
+
+        // Existing unversioned ZIPs contain the version 1 format and remain valid during rollout.
+        if (
+            allFilesZip?.Meta.TryGetValue(AllFilesZipFormatVersionMetadataKey, out var formatVersion) == true
+            && formatVersion != AllFilesZipFormatVersion
+        )
+        {
+            return null;
+        }
+
+        if (allFilesZip?.Updated is null)
+        {
+            return null;
+        }
+
+        if (releaseVersion.Published is not null && allFilesZip.Updated < releaseVersion.Published)
+        {
+            return null;
+        }
+
+        if (
+            releaseVersion.Published is null
+            && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) < DateTimeOffset.UtcNow
+        )
+        {
+            return null;
+        }
+
+        return allFilesZip;
     }
 
     private async Task ZipAllFilesToStream(
@@ -223,6 +336,20 @@ public class ReleaseFileService(
             path: releaseVersion.AllFilesZipPath(),
             sourceStream: fileStream,
             contentType: MediaTypeNames.Application.Zip,
+            cancellationToken: cancellationToken
+        );
+
+        await publicBlobStorageService.UpdateBlobProperties(
+            containerName: PublicReleaseFiles,
+            path: releaseVersion.AllFilesZipPath(),
+            contentType: MediaTypeNames.Application.Zip,
+            contentDisposition: HttpResponseExtensions.ContentDispositionAttachmentHeader(
+                releaseVersion.AllFilesZipFileName()
+            ),
+            metadata: new Dictionary<string, string>
+            {
+                [AllFilesZipFormatVersionMetadataKey] = AllFilesZipFormatVersion,
+            },
             cancellationToken: cancellationToken
         );
 

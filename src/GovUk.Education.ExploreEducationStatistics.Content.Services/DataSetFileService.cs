@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -31,9 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 public class DataSetFileService(
     ContentDbContext contentDbContext,
     IReleaseVersionRepository releaseVersionRepository,
-    IReleaseFileBlobService releaseFileBlobStorageService,
+    IPublicReleaseFileBlobService releaseFileBlobStorageService,
     IFootnoteRepository footnoteRepository,
     IAnalyticsManager analyticsManager,
+    IOptions<DirectBlobDownloadsOptions> directBlobDownloadsOptions,
     ILogger<DataSetFileService> logger
 ) : IDataSetFileService
 {
@@ -308,6 +310,16 @@ public class DataSetFileService(
         }
 
         await RecordCsvDownloadAnalytics(releaseFile, cancellationToken);
+
+        if (directBlobDownloadsOptions.Value.Enabled)
+        {
+            var redirectResult = await releaseFileBlobStorageService.GetDownloadRedirectPath(
+                releaseFile,
+                cancellationToken
+            );
+
+            return redirectResult.IsLeft ? redirectResult.Left : new RedirectResult(redirectResult.Right);
+        }
 
         var streamResult = await releaseFileBlobStorageService.GetDownloadStream(
             releaseFile: releaseFile,

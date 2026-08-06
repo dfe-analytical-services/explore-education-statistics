@@ -86,6 +86,7 @@ module contentApiFrontDoorModule 'contentApiFrontDoor.bicep' = {
     keyVaultName: keyVaultName
     contentApiHostName: contentApiHostName
     contentApiOriginHostName: '${subscription}-as-ees-content.azurewebsites.net'
+    publicStorageAccountName: '${subscription}saeespublic'
     certificateType: certificateType
   }
   dependsOn: [

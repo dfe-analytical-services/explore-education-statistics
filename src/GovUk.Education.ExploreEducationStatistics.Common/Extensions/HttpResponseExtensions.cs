@@ -29,9 +29,14 @@ public static class HttpResponseExtensions
     {
         response.ContentType = contentType;
         response.Headers[HeaderNames.ContentDisposition] = filename is not null
-            ? @$"attachment; filename=""{filename}"""
+            ? ContentDispositionAttachmentHeader(filename)
             : "attachment";
 
         return response;
+    }
+
+    public static string ContentDispositionAttachmentHeader(string filename)
+    {
+        return @$"attachment; filename=""{filename}""";
     }
 }
