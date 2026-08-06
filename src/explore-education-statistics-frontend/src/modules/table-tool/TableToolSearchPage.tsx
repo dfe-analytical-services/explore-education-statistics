@@ -312,7 +312,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
 export const getServerSideProps: GetServerSideProps<
   TableToolSearchPageProps
 > = async ({ query }) => {
-  if (process.env.APP_ENV === 'Production') {
+  if (process.env.APP_ENV === 'Production' && query.prototype !== 'true') {
     return {
       notFound: true,
     };
