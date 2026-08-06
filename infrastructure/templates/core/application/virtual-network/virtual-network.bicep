@@ -56,6 +56,8 @@ var searchStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-sear
 
 // Analytics subnets. 
 var analyticsFunctionAppSubnetName = '${generalSubnetNamePrefix}fa-analytics'
+var analyticsStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-anlyt-pep'
+    
 
 var subnets = deploySubnets ? [{
   name: adminSubnetName
@@ -187,7 +189,7 @@ var subnets = deploySubnets ? [{
   }
 }
 {
-  name: 's101d01-ees-${subnetAbbreviation}-sa-anlyt-pep'
+  name: analyticsStoragePrivateEndpointsSubnetName
   properties: {
     addressPrefix: '10.0.16.0/24'
   }
