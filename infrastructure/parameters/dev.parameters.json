@@ -41,9 +41,6 @@
     "useSubnets": {
       "value": true
     },
-    "deploySubnets": {
-      "value": true
-    },
     "blobDeleteRetentionEnabled": {
       "value": true
     },
