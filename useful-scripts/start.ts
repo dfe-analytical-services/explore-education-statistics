@@ -400,7 +400,7 @@ async function startService(service: ServiceName): Promise<void> {
       break;
     }
     case 'func': {
-      command = 'func host start';
+      command = 'dotnet run';
       args = ['--port', `${schema.port}`, '--pause-on-error'];
 
       env.ASPNETCORE_ENVIRONMENT ??= 'Development';
