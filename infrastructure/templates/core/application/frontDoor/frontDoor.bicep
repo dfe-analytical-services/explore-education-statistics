@@ -18,6 +18,9 @@ param resourcePrefix string
 @description('URL of the public site.')
 param publicSiteUrl string
 
+@description('URL of the Content API.')
+param contentApiUrl string
+
 @description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
 param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
 
@@ -39,6 +42,7 @@ param tagValues object
 var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
 var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
+var contentApiHostName = replace(contentApiUrl, 'https://', '')
 
 var certificateName = '${subscription}-as-ees-public-site-certificate'
 
@@ -71,6 +75,22 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
     } : null
     tagValues: tagValues
   }
+}
+
+module contentApiFrontDoorModule 'contentApiFrontDoor.bicep' = {
+  name: '${frontDoorProfileName}ContentApiModuleDeploy'
+  params: {
+    subscription: subscription
+    frontDoorProfileName: frontDoorProfileName
+    frontDoorEndpointName: '${resourcePrefix}-${abbreviations.frontDoorEndpoints}'
+    keyVaultName: keyVaultName
+    contentApiHostName: contentApiHostName
+    contentApiOriginHostName: '${subscription}-as-ees-content.azurewebsites.net'
+    certificateType: certificateType
+  }
+  dependsOn: [
+    frontDoorModule
+  ]
 }
 
 resource nextJsRuleSet 'Microsoft.Cdn/profiles/rulesets@2025-04-15' existing = {
