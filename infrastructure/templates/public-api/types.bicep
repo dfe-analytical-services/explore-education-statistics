@@ -49,7 +49,6 @@ type ResourceNames = {
   }
   sharedResources: {
     containerAppEnvironment: string
-    logAnalyticsWorkspace: string
     postgreSqlFlexibleServer: string
     recoveryVault: string
     recoveryVaultFileShareBackupPolicy: string

@@ -92,9 +92,13 @@ module keyVaultModule 'application/keyVault/keyVault.bicep' = {
   }
 }
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
-  name: '${resourcePrefix}-log'
-  scope: resourceGroup()
+module logAnalyticsWorkspaceModule 'application/log-analytics-workspace/log-analytics-workspace.bicep' = {
+  name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
+  params: {
+    resourcePrefix: resourcePrefix
+    location: location
+    tagValues: tagValues
+  }
 }
 
 module backupsModule 'application/backups/backups.bicep' = {
@@ -134,7 +138,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzure
     resourcePrefix: resourcePrefix
     publicSiteUrl: publicSiteUrl
     certificateType: certificateType
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     averagePublicSiteResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis
     deployAlerts: deployAlerts
     tagValues: tagValues

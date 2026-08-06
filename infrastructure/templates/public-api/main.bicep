@@ -217,7 +217,6 @@ var resourceNames = {
   }
   sharedResources: {
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
-    logAnalyticsWorkspace: '${commonResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
     recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
     recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
@@ -289,16 +288,6 @@ module searchServiceModule 'application/shared/searchService.bicep' = {
 
 module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
   name: 'publicApiAppInsightsApplicationModuleDeploy'
-  params: {
-    location: location
-    resourceNames: resourceNames
-    tagValues: tagValues
-  }
-}
-
-// Create a generic, shared Log Analytics Workspace for any relevant resources to use.
-module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bicep' = {
-  name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames

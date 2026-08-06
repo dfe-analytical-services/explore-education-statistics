@@ -23,4 +23,5 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
   tags: tagValues
 }
 
-output logAnalyticsWorkspaceName string = logAnalyticsWorkspaceName
+output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.name
+output logAnalyticsWorkspaceId string = logAnalyticsWorkspace.id
