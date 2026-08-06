@@ -1,5 +1,4 @@
-import { PrivateDnsZone } from '../types.bicep'
-import { dnsZones } from '../dnsZones.bicep'
+import { PrivateDnsZone, dnsZones } from 'types.bicep'
 
 @description('Specifies the type of zone to create')
 param zoneType PrivateDnsZone

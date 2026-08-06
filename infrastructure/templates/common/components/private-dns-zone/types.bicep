@@ -1,4 +1,15 @@
 @export()
+type PrivateDnsZone =
+  | 'blobStorage'
+  | 'eventGridTopic'
+  | 'fileService'
+  | 'postgres'
+  | 'queue'
+  | 'sites'
+  | 'tableStorage'
+  | 'custom'
+
+@export()
 var dnsZones = {
   blobStorage: {
     zoneName: 'privatelink.blob.${environment().suffixes.storage}'
