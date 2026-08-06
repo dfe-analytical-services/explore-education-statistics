@@ -13,6 +13,8 @@ parameters:
     type: string
   - name: deploySubnets
     type: string
+  - name: deployPrivateDnsZones
+    type: string
   - name: deployAzureFrontDoor
     type: string
   - name: deployApplicationGateway
@@ -40,6 +42,7 @@ steps:
               subscription='$(subscription)' \
               publicSiteUrl='$(publicSiteUrl)' \
               deploySubnets=${{ parameters.deploySubnets }} \
+              deployPrivateDnsZones=${{ parameters.deployPrivateDnsZones }} \
               deployAzureFrontDoor=${{ parameters.deployAzureFrontDoor }} \
               deployApplicationGateway=${{ parameters.deployApplicationGateway }} \
               deployAlerts=${{ parameters.deployAlerts }} \

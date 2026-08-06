@@ -19,6 +19,13 @@ parameters:
       - Yes
       - No
     default: No
+  - name: deployPrivateDnsZones
+    displayName: Do Private DNS Zones need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
   - name: deployAzureFrontDoor
     displayName: Does Azure Front Door need creating or updating?
     type: string
@@ -66,6 +73,8 @@ variables:
     value: ubuntu-latest
   - name: deploySubnets
     value: ${{ iif(eq(parameters.deploySubnets, 'Yes'), true, false) }}
+  - name: deployPrivateDnsZones
+    value: ${{ iif(eq(parameters.deployPrivateDnsZones, 'Yes'), true, false) }}
   - name: deployAzureFrontDoor
     value: ${{ iif(eq(parameters.deployAzureFrontDoor, 'Yes'), true, false) }}
   - name: deployApplicationGateway

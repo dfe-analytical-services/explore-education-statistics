@@ -5,7 +5,7 @@ param vnetName string
 param tagValues object
 
 // Set up a Private DNS zone for handling private endpoints for PostgreSQL resources.
-module postgreSqlPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+module postgreSqlPrivateDnsZoneModule '../../../common/components/privateDnsZone.bicep' = {
   name: 'postgresPrivateDnsZoneDeploy'
   params: {
     zoneType: 'postgres'
@@ -16,7 +16,7 @@ module postgreSqlPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
 
 // Set up a Private DNS zone for handling private endpoints for site resources
 // (e.g. App Services, Function Apps, Container Apps).
-module sitesPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+module sitesPrivateDnsZoneModule '../../../common/components/privateDnsZone.bicep' = {
   name: 'sitesPrivateDnsZoneDeploy'
   params: {
     zoneType: 'sites'
@@ -26,7 +26,7 @@ module sitesPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
 }
 
 // Set up a Private DNS zone for handling private endpoints for Event Grid custom topic resources.
-module eventGridTopicPrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+module eventGridTopicPrivateDnsZoneModule '../../../common/components/privateDnsZone.bicep' = {
   name: 'eventGridTopicPrivateDnsZoneDeploy'
   params: {
     zoneType: 'eventGridTopic'
@@ -36,7 +36,7 @@ module eventGridTopicPrivateDnsZoneModule '../components/privateDnsZone.bicep' =
 }
 
 // Set up a Private DNS zone for handling private endpoints for Storage Account File Services.
-module fileServicePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+module fileServicePrivateDnsZoneModule '../../../common/components/privateDnsZone.bicep' = {
   name: 'fileServicePrivateDnsZoneDeploy'
   params: {
     zoneType: 'fileService'
@@ -46,7 +46,7 @@ module fileServicePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
 }
 
 // Set up a Private DNS zone for handling private endpoints for Storage Account Blob Storage.
-module blobStoragePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+module blobStoragePrivateDnsZoneModule '../../../common/components/privateDnsZone.bicep' = {
   name: 'blobStoragePrivateDnsZoneDeploy'
   params: {
     zoneType: 'blobStorage'
@@ -56,7 +56,7 @@ module blobStoragePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
 }
 
 // Set up a Private DNS zone for handling private endpoints for Storage Account Queues.
-module queuePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+module queuePrivateDnsZoneModule '../../../common/components/privateDnsZone.bicep' = {
   name: 'queuePrivateDnsZoneDeploy'
   params: {
     zoneType: 'queue'
@@ -66,7 +66,7 @@ module queuePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
 }
 
 // Set up a Private DNS zone for handling private endpoints for Storage Account Table Storage.
-module tableStoragePrivateDnsZoneModule '../components/privateDnsZone.bicep' = {
+module tableStoragePrivateDnsZoneModule '../../../common/components/privateDnsZone.bicep' = {
   name: 'tableStoragePrivateDnsZoneDeploy'
   params: {
     zoneType: 'tableStorage'

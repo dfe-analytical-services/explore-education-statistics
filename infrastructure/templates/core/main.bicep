@@ -31,6 +31,9 @@ param deployBackupVaultReaderRoleAssignment bool = true
 @description('Whether or not to deploy subnets.')
 param deploySubnets bool = false
 
+@description('Whether or not to deploy Private DNS Zones.')
+param deployPrivateDnsZones bool = false
+
 @description('Whether or not to deploy Azure Front Door.')
 param deployAzureFrontDoor bool = false
 
@@ -80,6 +83,14 @@ module vNetModule 'application/virtual-network/virtual-network.bicep' = {
   params: {
     subscription: subscription
     deploySubnets: deploySubnets
+    tagValues: tagValues
+  }
+}
+
+module privateDnsZonesModule 'application/virtual-network/privateDnsZones.bicep' = if (deployPrivateDnsZones) {
+  name: 'privateDnsZonesApplicationModuleDeploy'
+  params: {
+    vnetName: vNetModule.outputs.vNetName
     tagValues: tagValues
   }
 }

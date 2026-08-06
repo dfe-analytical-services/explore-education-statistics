@@ -1,13 +1,6 @@
 trigger: none
 
 parameters:
-  - name: deploySharedPrivateDnsZones
-    displayName: Do the shared Private DNS Zones need creating or updating?
-    type: string
-    values:
-      - Yes
-      - No
-    default: No
   - name: deployPsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server need creating or updating?
     type: string
@@ -98,8 +91,6 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
-  - name: deploySharedPrivateDnsZones
-    value: ${{ iif(eq(parameters.deploySharedPrivateDnsZones, 'Yes'), true, false) }}
   - name: deployPsqlFlexibleServer
     value: ${{ iif(eq(parameters.deployPsqlFlexibleServer, 'Yes'), true, false) }}
   - name: deployContainerApp

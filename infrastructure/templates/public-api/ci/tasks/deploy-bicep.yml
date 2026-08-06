@@ -11,8 +11,6 @@ parameters:
     type: string
   - name: parameterFile
     type: string
-  - name: deploySharedPrivateDnsZones
-    type: string
   - name: deployPsqlFlexibleServer
     type: string
   - name: deployContainerApp
@@ -55,7 +53,6 @@ steps:
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
               dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
-              deploySharedPrivateDnsZones=${{ parameters.deploySharedPrivateDnsZones }} \
               deployPsqlFlexibleServer=${{ parameters.deployPsqlFlexibleServer }} \
               deployContainerApp=${{ parameters.deployContainerApp }} \
               deployDataProcessor=${{ parameters.deployDataProcessor }} \
