@@ -38,7 +38,7 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
     location: location
     containerAppEnvironmentName: resourceNames.sharedResources.containerAppEnvironment
     subnetId: subnet.id
-    logAnalyticsWorkspaceName: resourceNames.sharedResources.logAnalyticsWorkspace
+    logAnalyticsWorkspaceName: resourceNames.existingResources.logAnalyticsWorkspace
     applicationInsightsKey: applicationInsightsKey
     azureFileStorages: [
       {
