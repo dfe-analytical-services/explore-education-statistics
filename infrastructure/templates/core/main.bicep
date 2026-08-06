@@ -87,7 +87,7 @@ module vNetModule 'application/virtual-network/virtual-network.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/virtual-network/privateDnsZones.bicep' = if (deployPrivateDnsZones) {
+module privateDnsZonesModule 'application/virtual-network/private-dns-zones.bicep' = if (deployPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     vnetName: vNetModule.outputs.vNetName
