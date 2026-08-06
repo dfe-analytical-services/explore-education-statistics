@@ -53,9 +53,9 @@ Check Edit publication details page inputs are correct
     user clicks button    Edit publication details
 
     user waits until page contains element    label:Publication summary
-    user checks page does not contain element    label:Publication title    # Only BAU users should see this
-    user checks page does not contain element    label:Select theme    # Only BAU users should see this
-    user checks page does not contain element    label:Superseding publication    # Only BAU users should see this
+    user checks page does not contain element    label:Publication title    # Only Super Users should see this
+    user checks page does not contain element    label:Select theme    # Only Super Users should see this
+    user checks page does not contain element    label:Superseding publication    # Only Super Users should see this
 
     user clicks button    Cancel
     user waits until page does not contain button    Cancel

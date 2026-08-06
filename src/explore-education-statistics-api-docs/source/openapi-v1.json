@@ -519,6 +519,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -531,7 +532,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 10000,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -753,6 +756,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -765,7 +769,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 20,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -989,6 +995,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -1001,7 +1008,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 40,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -1098,6 +1107,7 @@
             "description": "The page of results to fetch.",
             "schema": {
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The page of results to fetch.",
               "format": "int32",
@@ -1110,7 +1120,9 @@
             "description": "The maximum number of results per page.",
             "schema": {
               "maximum": 20,
+              "exclusiveMaximum": false,
               "minimum": 1,
+              "exclusiveMinimum": false,
               "type": "integer",
               "description": "The maximum number of results per page.",
               "format": "int32",
@@ -1221,292 +1233,6 @@
         "additionalProperties": false,
         "description": "A set of changes grouped by their type (major or minor)."
       },
-      "DataSetGetQueryFilters": {
-        "type": "object",
-        "properties": {
-          "eq": {
-            "type": "string",
-            "description": "Filter the results to have a filter option matching this ID.",
-            "nullable": true,
-            "example": "pVAkV"
-          },
-          "notEq": {
-            "type": "string",
-            "description": "Filter the results to not have a filter option matching this ID.",
-            "nullable": true,
-            "example": "wUzft"
-          },
-          "in": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter the results to have a filter option matching at least one of these IDs.",
-            "nullable": true,
-            "example": [
-              "n0WqP",
-              "3dCWP"
-            ]
-          },
-          "notIn": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter the results to not have a filter option matching any of these IDs.",
-            "nullable": true,
-            "example": [
-              "RMxeh",
-              "wUzft"
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "description": "The filter option criteria to filter results by in a data set GET query."
-      },
-      "DataSetGetQueryGeographicLevels": {
-        "type": "object",
-        "properties": {
-          "eq": {
-            "type": "string",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GeographicLevelCode"
-              }
-            ],
-            "description": "Filter the results to be in this geographic level.",
-            "nullable": true,
-            "example": "NAT"
-          },
-          "notEq": {
-            "type": "string",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GeographicLevelCode"
-              }
-            ],
-            "description": "Filter the results to not be in this geographic level.",
-            "nullable": true,
-            "example": "PROV"
-          },
-          "in": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GeographicLevelCode"
-            },
-            "description": "Filter the results to be in one of these geographic levels.",
-            "nullable": true,
-            "example": [
-              "NAT",
-              "LA"
-            ]
-          },
-          "notIn": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GeographicLevelCode"
-            },
-            "description": "Filter the results to not be in one of these geographic levels.",
-            "nullable": true,
-            "example": [
-              "REG",
-              "LAD"
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "description": "The geographic levels criteria to filter results by in a data set GET query."
-      },
-      "DataSetGetQueryLocations": {
-        "type": "object",
-        "properties": {
-          "eq": {
-            "type": "string",
-            "description": "Filter the results to be in this location.",
-            "nullable": true,
-            "example": "NAT|id|3dCWP"
-          },
-          "notEq": {
-            "type": "string",
-            "description": "Filter the results to not be in this location.",
-            "nullable": true,
-            "example": "REG|code|E12000003"
-          },
-          "in": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter the results to be in one of these locations.",
-            "nullable": true,
-            "example": [
-              "LA|code|E08000003",
-              "LA|oldCode|373"
-            ]
-          },
-          "notIn": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter the results not to be in one of these locations.",
-            "nullable": true,
-            "example": [
-              "SCH|urn|123456",
-              "SCH|laEstab|1234567"
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "description": "The location option criteria to filter results by in a data set GET query.\r\n            \r\nThe results can be matched by either the location option's ID or a code.\r\nNote the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be\r\nused for multiple locations. This may match more results than you\r\nexpect so it's recommended to use IDs where possible."
-      },
-      "DataSetGetQueryRequest": {
-        "type": "object",
-        "properties": {
-          "filters": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataSetGetQueryFilters"
-              }
-            ],
-            "description": "Query criteria relating to filter options.",
-            "nullable": true
-          },
-          "geographicLevels": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataSetGetQueryGeographicLevels"
-              }
-            ],
-            "description": "Query criteria relating to geographic levels.",
-            "nullable": true
-          },
-          "locations": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataSetGetQueryLocations"
-              }
-            ],
-            "description": "Query criteria relating to location options.",
-            "nullable": true
-          },
-          "timePeriods": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataSetGetQueryTimePeriods"
-              }
-            ],
-            "description": "Query criteria relating to time periods.",
-            "nullable": true
-          },
-          "indicators": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "The IDs of indicators to return values for.\r\n            \r\nOmitting this parameter will return values for all indicators.",
-            "nullable": true
-          },
-          "sorts": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "The sorts to apply to the results. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
-            "nullable": true
-          },
-          "debug": {
-            "type": "boolean",
-            "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment."
-          },
-          "page": {
-            "minimum": 1,
-            "type": "integer",
-            "description": "The page of results to fetch.",
-            "format": "int32",
-            "default": 1
-          },
-          "pageSize": {
-            "maximum": 10000,
-            "minimum": 1,
-            "type": "integer",
-            "description": "The maximum number of results per page.",
-            "format": "int32",
-            "default": 1000
-          }
-        },
-        "additionalProperties": false,
-        "description": "A data set GET query request."
-      },
-      "DataSetGetQueryTimePeriods": {
-        "type": "object",
-        "properties": {
-          "eq": {
-            "type": "string",
-            "description": "Filter the results to be in this time period.",
-            "nullable": true,
-            "example": "2024|CY"
-          },
-          "notEq": {
-            "type": "string",
-            "description": "Filter the results to not be in this time period.",
-            "nullable": true,
-            "example": "2024/2025|AY"
-          },
-          "in": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter the results to be in one of these time periods.",
-            "nullable": true,
-            "example": [
-              "2022|CY",
-              "2023|CY",
-              "2024|CY"
-            ]
-          },
-          "notIn": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter the results to not be in one of these time periods.",
-            "nullable": true,
-            "example": [
-              "2020|M1",
-              "2020|M2",
-              "2020|M3"
-            ]
-          },
-          "gt": {
-            "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than the one specified.",
-            "nullable": true,
-            "example": "2017/2018|AY"
-          },
-          "gte": {
-            "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically greater than or equal to the one specified.",
-            "nullable": true,
-            "example": "2017|CY"
-          },
-          "lt": {
-            "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than the one specified.",
-            "nullable": true,
-            "example": "2023/2024|AY"
-          },
-          "lte": {
-            "type": "string",
-            "description": "Filter the results to be in a time period that is\r\nchronologically less than or equal to the one specified.",
-            "nullable": true,
-            "example": "2023|CY"
-          }
-        },
-        "additionalProperties": false,
-        "description": "The time period criteria to filter results by in a data set GET query."
-      },
       "DataSetLatestVersionViewModel": {
         "required": [
           "file",
@@ -1602,56 +1328,12 @@
             "items": {
               "type": "string"
             },
-            "description": "The indicators available in the data set."
+            "description": "The indicators available in the data set.",
+            "example": "[\"Authorised absence rate\" \"Overall absence rate\"]"
           }
         },
         "additionalProperties": false,
         "description": "Provides high-level information about the latest version of a data set."
-      },
-      "DataSetListRequest": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "minimum": 1,
-            "type": "integer",
-            "description": "The page of results to fetch.",
-            "format": "int32",
-            "default": 1
-          },
-          "pageSize": {
-            "maximum": 20,
-            "minimum": 1,
-            "type": "integer",
-            "description": "The maximum number of results per page.",
-            "format": "int32",
-            "default": 10
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataSetMetaRequest": {
-        "type": "object",
-        "properties": {
-          "types": {
-            "type": "array",
-            "items": {
-              "enum": [
-                "Filters",
-                "Indicators",
-                "Locations",
-                "TimePeriods"
-              ],
-              "type": "string"
-            },
-            "description": "The types of meta to get for the requested data set version.\r\n            \r\nCan be any combination of the following:\r\n            \r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
-            "nullable": true,
-            "example": [
-              "Filters",
-              "Locations"
-            ]
-          }
-        },
-        "additionalProperties": false
       },
       "DataSetMetaViewModel": {
         "required": [
@@ -2713,27 +2395,6 @@
         "additionalProperties": false,
         "description": "Details about the file a data set version is based on."
       },
-      "DataSetVersionListRequest": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "minimum": 1,
-            "type": "integer",
-            "description": "The page of results to fetch.",
-            "format": "int32",
-            "default": 1
-          },
-          "pageSize": {
-            "maximum": 20,
-            "minimum": 1,
-            "type": "integer",
-            "description": "The maximum number of results per page.",
-            "format": "int32",
-            "default": 10
-          }
-        },
-        "additionalProperties": false
-      },
       "DataSetVersionPaginatedListViewModel": {
         "required": [
           "paging",
@@ -3421,7 +3082,8 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The geographic level of the locations in this group."
+            "description": "The geographic level of the locations in this group.",
+            "example": "NAT"
           },
           "options": {
             "type": "array",
@@ -3463,7 +3125,8 @@
                 "$ref": "#/components/schemas/GeographicLevelViewModel"
               }
             ],
-            "description": "The geographic level of the locations in this group."
+            "description": "The geographic level of the locations in this group.",
+            "example": "NAT"
           }
         },
         "additionalProperties": false,
@@ -3733,34 +3396,6 @@
         },
         "additionalProperties": { },
         "description": "Describes a problem that occurred whilst processing the request.\r\nThe format is based on RFC7807."
-      },
-      "PublicationListRequest": {
-        "type": "object",
-        "properties": {
-          "search": {
-            "minLength": 3,
-            "type": "string",
-            "description": "A search term to find matching publications.",
-            "nullable": true,
-            "example": "Pupil absence"
-          },
-          "page": {
-            "minimum": 1,
-            "type": "integer",
-            "description": "The page of results to fetch.",
-            "format": "int32",
-            "default": 1
-          },
-          "pageSize": {
-            "maximum": 40,
-            "minimum": 1,
-            "type": "integer",
-            "description": "The maximum number of results per page.",
-            "format": "int32",
-            "default": 20
-          }
-        },
-        "additionalProperties": false
       },
       "PublicationPaginatedListViewModel": {
         "required": [
@@ -4112,5 +3747,16 @@
         "description": "A warning that points to a potential issue. This is not a critical error,\r\nbut may require attention to get the desired response."
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "DataSets"
+    },
+    {
+      "name": "DataSetVersions"
+    },
+    {
+      "name": "Publications"
+    }
+  ]
 }

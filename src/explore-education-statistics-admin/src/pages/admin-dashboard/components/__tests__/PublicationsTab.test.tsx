@@ -60,7 +60,6 @@ describe('PublicationsTab', () => {
         canManageReleaseSeries: true,
         canUpdateContact: true,
         canUpdateDrafters: true,
-        canViewReleaseTeamAccess: true,
       },
     },
     {
@@ -79,7 +78,6 @@ describe('PublicationsTab', () => {
         canManageReleaseSeries: true,
         canUpdateContact: true,
         canUpdateDrafters: true,
-        canViewReleaseTeamAccess: true,
       },
     },
     {
@@ -98,7 +96,6 @@ describe('PublicationsTab', () => {
         canManageReleaseSeries: true,
         canUpdateContact: true,
         canUpdateDrafters: true,
-        canViewReleaseTeamAccess: true,
       },
     },
   ];
@@ -120,7 +117,6 @@ describe('PublicationsTab', () => {
         canManageReleaseSeries: true,
         canUpdateContact: true,
         canUpdateDrafters: true,
-        canViewReleaseTeamAccess: true,
       },
     },
     {
@@ -139,7 +135,6 @@ describe('PublicationsTab', () => {
         canManageReleaseSeries: true,
         canUpdateContact: true,
         canUpdateDrafters: true,
-        canViewReleaseTeamAccess: true,
       },
     },
   ];

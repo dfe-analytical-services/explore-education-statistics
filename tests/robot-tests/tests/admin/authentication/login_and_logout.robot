@@ -10,7 +10,7 @@ Force Tags          Admin    Local    Dev
 
 
 *** Test Cases ***
-Log in as BAU and check the dashboard is looking OK and the sign out buttons are available
+Log in as Super User and check the dashboard is looking OK and the sign out buttons are available
     user navigates to admin homepage
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button

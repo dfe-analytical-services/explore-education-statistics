@@ -9,8 +9,10 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import tableBuilderService, {
   FastTrackTable,
   FeaturedTable,
+  ReleaseTableDataQuery,
   Subject,
   SubjectMeta,
+  TableDataResponse,
 } from '@common/services/tableBuilderService';
 import publicationService, {
   PublicationMethodologiesList,
@@ -20,11 +22,14 @@ import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import TableToolInfoWrapper from '@frontend/modules/table-tool/components/TableToolInfoWrapper';
+import { decodeParamsToFullTableQuery } from '@frontend/modules/table-tool/utils/fullTableQueryTranscode';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
+import logger from '@common/services/logger';
 
 const defaultPageTitle = 'Create your own tables';
 
@@ -35,6 +40,8 @@ const TableToolFinalStep = dynamic(
 export interface TableToolPageProps {
   fastTrack?: FastTrackTable;
   featuredTables?: FeaturedTable[];
+  initialQuery?: ReleaseTableDataQuery;
+  initialTableData?: TableDataResponse;
   selectedPublication?: SelectedPublication;
   publicationMethodologies?: PublicationMethodologiesList;
   selectedSubjectId?: string;
@@ -46,6 +53,8 @@ export interface TableToolPageProps {
 const TableToolPage: NextPage<TableToolPageProps> = ({
   fastTrack,
   featuredTables = [],
+  initialQuery,
+  initialTableData,
   selectedPublication,
   publicationMethodologies,
   selectedSubjectId,
@@ -120,6 +129,23 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       };
     }
 
+    if (initialQuery && initialTableData && subjectMeta) {
+      const fullTable = mapFullTable(initialTableData);
+      const tableHeaders = getDefaultTableHeaderConfig(fullTable);
+      return {
+        initialStep: 6,
+        subjects,
+        featuredTables,
+        query: initialQuery,
+        selectedPublication,
+        subjectMeta,
+        response: {
+          table: fullTable,
+          tableHeaders,
+        },
+      };
+    }
+
     if (selectedSubjectId && subjectMeta) {
       return {
         initialStep: 3,
@@ -157,11 +183,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   }, [
     subjects,
     fastTrack,
-    publicationMethodologies,
     subjectMeta,
+    initialQuery,
+    initialTableData,
     selectedSubjectId,
     featuredTables,
     selectedPublication,
+    publicationMethodologies,
   ]);
 
   return (
@@ -317,7 +345,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 
 export const getServerSideProps: GetServerSideProps<
   TableToolPageProps
-> = async ({ query }) => {
+> = async ({ query, req }) => {
   const {
     publicationSlug = '',
     releaseSlug = '',
@@ -356,39 +384,46 @@ export const getServerSideProps: GetServerSideProps<
       publicationService.getPublicationMethodologies(publicationSlug),
     ]);
 
-  if (subjectId && subjects.some(subject => subject.id === subjectId)) {
-    const subjectMeta = await tableBuilderService.getSubjectMeta(
+  let initialQuery: ReleaseTableDataQuery | undefined;
+  let initialTableData: TableDataResponse | undefined;
+  let subjectMeta: SubjectMeta | undefined;
+  let selectedSubjectId: string | undefined;
+
+  const urlObj = new URL(req.url || '', process.env.PUBLIC_URL);
+
+  // Check if the user has come from table tool search (with compressed query string)
+  const hasCompressedQuery = urlObj.searchParams.has('fromSearch');
+  if (hasCompressedQuery) {
+    try {
+      const decodedQuery = decodeParamsToFullTableQuery(urlObj.searchParams);
+      initialQuery = {
+        ...decodedQuery,
+        releaseVersionId: selectedReleaseVersion.id,
+        publicationId: selectedPublication.id,
+      };
+      const [fetchedSubjectMeta, fetchedTableData] = await Promise.all([
+        tableBuilderService.getSubjectMeta(
+          decodedQuery.subjectId,
+          selectedReleaseVersion.id,
+        ),
+        tableBuilderService.getTableData(
+          decodedQuery,
+          selectedReleaseVersion.id,
+        ),
+      ]);
+      subjectMeta = fetchedSubjectMeta;
+      initialTableData = fetchedTableData;
+      selectedSubjectId = decodedQuery.subjectId;
+    } catch (e) {
+      logger.error(e);
+    }
+  } else if (subjectId && subjects.some(subject => subject.id === subjectId)) {
+    // Fallback/standard path (initialStep: 3)
+    subjectMeta = await tableBuilderService.getSubjectMeta(
       subjectId,
       selectedReleaseVersion.id,
     );
-
-    return {
-      props: {
-        featuredTables,
-        publicationMethodologies,
-        selectedPublication: {
-          ...selectedPublication,
-          contact: publicationSummary.contact,
-          selectedRelease: {
-            id: selectedReleaseVersion.id,
-            latestData: selectedReleaseVersion.isLatestRelease,
-            publishingOrganisations:
-              selectedReleaseVersion.publishingOrganisations,
-            slug: selectedReleaseVersion.slug,
-            title: selectedReleaseVersion.title,
-            type: selectedReleaseVersion.type,
-          },
-          latestRelease: {
-            title: latestRelease.title,
-            slug: latestRelease.slug,
-          },
-        },
-        selectedSubjectId: subjectId,
-        subjects,
-        subjectMeta,
-        themeMeta,
-      },
-    };
+    selectedSubjectId = subjectId;
   }
 
   return {
@@ -414,6 +449,10 @@ export const getServerSideProps: GetServerSideProps<
       },
       subjects,
       featuredTables,
+      ...(subjectMeta ? { subjectMeta } : {}),
+      ...(selectedSubjectId ? { selectedSubjectId } : {}),
+      ...(initialQuery ? { initialQuery } : {}),
+      ...(initialTableData ? { initialTableData } : {}),
     },
   };
 };

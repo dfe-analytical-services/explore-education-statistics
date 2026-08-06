@@ -159,7 +159,7 @@ Check the invite emails field is required
 
 Check the invite emails field is invalid for invalid email addresses
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
     ...    test@test.com
     ...    invalid-1
     ...    invalid-2
@@ -171,7 +171,7 @@ Check the invite emails field is invalid for invalid email addresses
 Invite users to the prerelease
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered-prerelease-1@notifications.service.gov.uk
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
@@ -198,7 +198,7 @@ Refresh page and check prerelease user list isn't duplicated
 Check the invite emails field is invalid for addresses that are all already invited or accepted
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered-prerelease-1@notifications.service.gov.uk
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
@@ -209,7 +209,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     ...    simulate-delivered-prerelease-1@notifications.service.gov.uk
     ...    simulate-delivered-prerelease-2@notifications.service.gov.uk
     ...    simulate-delivered-prerelease-3@notifications.service.gov.uk
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations

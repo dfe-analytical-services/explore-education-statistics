@@ -40,6 +40,9 @@ public class AuthorizationHandlerService(
             publicationId: publicationId
         );
 
+    public async Task<bool> UserHasAnyPublicationRole(Guid userId) =>
+        await userPublicationRoleRepository.UserHasAnyRole(userId: userId);
+
     public async Task<bool> UserHasPreReleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId) =>
         await userPreReleaseRoleRepository.UserHasPreReleaseRoleOnReleaseVersion(
             userId: userId,

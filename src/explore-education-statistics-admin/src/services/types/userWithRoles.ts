@@ -1,10 +1,11 @@
+import { GlobalRole } from './GlobalRole';
 import { PublicationRole } from './PublicationRole';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  globalRole: GlobalRole;
 }
 
 export interface UserWithRoles extends User {

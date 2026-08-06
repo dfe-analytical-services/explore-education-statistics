@@ -132,6 +132,165 @@ internal class DataSetVersionService(
         );
     }
 
+    public async Task<Either<ActionResult, Unit>> UnfinaliseVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await publicDataDbContext.RequireTransaction(() =>
+            publicDataDbContext
+                .DataSetVersions.Include(dsv => dsv.Imports)
+                .SingleOrNotFoundAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken)
+                .OnSuccessDo(CheckCanUnfinaliseDataSetVersion)
+                .OnSuccessDo(async dataSetVersion =>
+                    await RemoveFinalisedVersionData(dataSetVersion, cancellationToken)
+                )
+                .OnSuccessDo(async dataSetVersion =>
+                {
+                    var dataSetVersionImport = dataSetVersion.Imports.Single();
+                    dataSetVersionImport.Stage = DataSetVersionImportStage.ManualMapping;
+                    dataSetVersionImport.Completed = null;
+
+                    dataSetVersion.MetaSummary = null;
+                    dataSetVersion.TotalResults = 0;
+                    dataSetVersion.Status = DataSetVersionStatus.Mapping;
+
+                    await publicDataDbContext.SaveChangesAsync(cancellationToken);
+                })
+                .OnSuccessDo(RemoveFinalisedVersionFiles)
+                .OnSuccessVoid()
+        );
+    }
+
+    private static Either<ActionResult, Unit> CheckCanUnfinaliseDataSetVersion(DataSetVersion dataSetVersion)
+    {
+        if (dataSetVersion.Status == DataSetVersionStatus.Draft)
+        {
+            return Unit.Instance;
+        }
+
+        return ValidationUtils.ValidationResult(
+            new ErrorViewModel
+            {
+                Code = ValidationMessages.DataSetVersionCanNotBeUnfinalised.Code,
+                Message = ValidationMessages.DataSetVersionCanNotBeUnfinalised.Message,
+                Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+                Path = "dataSetVersionId",
+            }
+        );
+    }
+
+    private async Task RemoveFinalisedVersionData(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
+    {
+        // TODO EES-7508: 'Unfinalise' action should use cascade deletion where possible
+        var dataSetVersionId = dataSetVersion.Id;
+
+        publicDataDbContext.FilterMetaChanges.RemoveRange(
+            await publicDataDbContext
+                .FilterMetaChanges.Where(change => change.DataSetVersionId == dataSetVersionId)
+                .ToListAsync(cancellationToken)
+        );
+        publicDataDbContext.FilterOptionMetaChanges.RemoveRange(
+            await publicDataDbContext
+                .FilterOptionMetaChanges.Where(change => change.DataSetVersionId == dataSetVersionId)
+                .ToListAsync(cancellationToken)
+        );
+        publicDataDbContext.GeographicLevelMetaChanges.RemoveRange(
+            await publicDataDbContext
+                .GeographicLevelMetaChanges.Where(change => change.DataSetVersionId == dataSetVersionId)
+                .ToListAsync(cancellationToken)
+        );
+        publicDataDbContext.IndicatorMetaChanges.RemoveRange(
+            await publicDataDbContext
+                .IndicatorMetaChanges.Where(change => change.DataSetVersionId == dataSetVersionId)
+                .ToListAsync(cancellationToken)
+        );
+        publicDataDbContext.LocationMetaChanges.RemoveRange(
+            await publicDataDbContext
+                .LocationMetaChanges.Where(change => change.DataSetVersionId == dataSetVersionId)
+                .ToListAsync(cancellationToken)
+        );
+        publicDataDbContext.LocationOptionMetaChanges.RemoveRange(
+            await publicDataDbContext
+                .LocationOptionMetaChanges.Where(change => change.DataSetVersionId == dataSetVersionId)
+                .ToListAsync(cancellationToken)
+        );
+        publicDataDbContext.TimePeriodMetaChanges.RemoveRange(
+            await publicDataDbContext
+                .TimePeriodMetaChanges.Where(change => change.DataSetVersionId == dataSetVersionId)
+                .ToListAsync(cancellationToken)
+        );
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        var filterOptionIds = await publicDataDbContext
+            .FilterOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
+            .Select(link => link.OptionId)
+            .ToListAsync(cancellationToken);
+        await publicDataDbContext
+            .FilterOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
+            .ExecuteDeleteAsync(cancellationToken);
+        await publicDataDbContext
+            .FilterMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
+            .ExecuteDeleteAsync(cancellationToken);
+        var unlinkedFilterOptionIds = await publicDataDbContext
+            .FilterOptionMetas.Where(option => filterOptionIds.Contains(option.Id))
+            .Where(option => !option.MetaLinks.Any())
+            .Select(option => option.Id)
+            .ToListAsync(cancellationToken);
+        await publicDataDbContext
+            .FilterOptionMetas.Where(option => unlinkedFilterOptionIds.Contains(option.Id))
+            .ExecuteDeleteAsync(cancellationToken);
+
+        var locationOptionIds = await publicDataDbContext
+            .LocationOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
+            .Select(link => link.OptionId)
+            .ToListAsync(cancellationToken);
+        await publicDataDbContext
+            .LocationOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
+            .ExecuteDeleteAsync(cancellationToken);
+        await publicDataDbContext
+            .LocationMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
+            .ExecuteDeleteAsync(cancellationToken);
+        var unlinkedLocationOptionIds = await publicDataDbContext
+            .LocationOptionMetas.Where(option => locationOptionIds.Contains(option.Id))
+            .Where(option => !option.MetaLinks.Any())
+            .Select(option => option.Id)
+            .ToListAsync(cancellationToken);
+        await publicDataDbContext
+            .LocationOptionMetas.Where(option => unlinkedLocationOptionIds.Contains(option.Id))
+            .ExecuteDeleteAsync(cancellationToken);
+
+        await publicDataDbContext
+            .GeographicLevelMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
+            .ExecuteDeleteAsync(cancellationToken);
+        await publicDataDbContext
+            .IndicatorMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
+            .ExecuteDeleteAsync(cancellationToken);
+        await publicDataDbContext
+            .TimePeriodMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
+
+    private void RemoveFinalisedVersionFiles(DataSetVersion dataSetVersion)
+    {
+        var paths = new[]
+        {
+            dataSetVersionPathResolver.DuckDbPath(dataSetVersion),
+            dataSetVersionPathResolver.DuckDbLoadSqlPath(dataSetVersion),
+            dataSetVersionPathResolver.DuckDbSchemaSqlPath(dataSetVersion),
+            dataSetVersionPathResolver.DataPath(dataSetVersion),
+            dataSetVersionPathResolver.FiltersPath(dataSetVersion),
+            dataSetVersionPathResolver.IndicatorsPath(dataSetVersion),
+            dataSetVersionPathResolver.LocationsPath(dataSetVersion),
+            dataSetVersionPathResolver.TimePeriodsPath(dataSetVersion),
+        };
+
+        foreach (var path in paths)
+        {
+            System.IO.File.Delete(path);
+        }
+    }
+
     private async Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(
         IReadOnlyList<ReleaseFile> releaseFiles,
         CancellationToken cancellationToken

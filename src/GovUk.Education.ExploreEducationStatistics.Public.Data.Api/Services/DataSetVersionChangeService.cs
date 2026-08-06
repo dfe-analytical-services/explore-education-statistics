@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;

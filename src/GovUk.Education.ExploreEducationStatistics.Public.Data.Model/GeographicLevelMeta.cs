@@ -26,11 +26,9 @@ public class GeographicLevelMeta : ICreatedUpdatedTimestamps<DateTimeOffset, Dat
         public void Configure(EntityTypeBuilder<GeographicLevelMeta> builder)
         {
             builder
-                .Property(msb => msb.Levels)
-                .HasColumnType("text[]")
-                .HasConversion(
-                    new EnumToEnumValueListConverter<GeographicLevel>(),
-                    new ListValueComparer<GeographicLevel>()
+                .PrimitiveCollection(msb => msb.Levels)
+                .ElementType(b =>
+                    b.HasConversion<EnumToEnumValueConverter<GeographicLevel>, EnumValueComparer<GeographicLevel>>()
                 );
         }
     }

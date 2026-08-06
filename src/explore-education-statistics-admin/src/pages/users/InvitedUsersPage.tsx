@@ -1,5 +1,6 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import { globalRoleLabels } from '@admin/services/types/GlobalRole';
 import userInvitesService, {
   PendingInvite,
 } from '@admin/services/user-management/userInvitesService';
@@ -75,7 +76,7 @@ const InvitedUsersPage = () => {
                   {model.pendingInvites.map(pendingInvite => (
                     <tr key={pendingInvite.email}>
                       <td>{pendingInvite.email}</td>
-                      <td>{pendingInvite.role}</td>
+                      <td>{globalRoleLabels[pendingInvite.globalRole]}</td>
                       <td>
                         {pendingInvite.userPreReleaseRoles.length === 0 ? (
                           'No user pre-release roles'

@@ -247,8 +247,10 @@ describe('ReleaseApiDataSetsSection', () => {
     ).toBeInTheDocument();
   });
 
-  test('submitting the create version form calls the correct service and updates the modal', async () => {
-    apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
+  test('submitting the create form calls the service, refreshes candidates and closes the modal', async () => {
+    apiDataSetCandidateService.listCandidates
+      .mockResolvedValueOnce(testCandidates)
+      .mockResolvedValue([]);
     apiDataSetService.listDataSets.mockResolvedValue([]);
     apiDataSetService.createDataSet.mockResolvedValue({
       id: 'data-set-id',
@@ -258,9 +260,7 @@ describe('ReleaseApiDataSetsSection', () => {
       previousReleaseIds: [],
     });
 
-    const history = createMemoryHistory();
-
-    const { user } = renderPage({ history });
+    const { user } = renderPage();
 
     expect(await screen.findByText('Create API data set')).toBeInTheDocument();
 
@@ -292,9 +292,12 @@ describe('ReleaseApiDataSetsSection', () => {
       });
     });
 
-    expect(
-      await screen.findByText('Creating API data set'),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(apiDataSetCandidateService.listCandidates).toHaveBeenCalledTimes(
+        2,
+      );
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
   });
 
   function renderPage(options?: {

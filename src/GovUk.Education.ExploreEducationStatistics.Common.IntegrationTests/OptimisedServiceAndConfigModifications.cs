@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -62,7 +63,9 @@ public class OptimisedServiceAndConfigModifications
         _serviceModifications.Add(services =>
         {
             // Remove the default DbContext descriptor that was provided by Startup.cs.
-            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
+            var descriptor = services.SingleOrDefault(d =>
+                d.ServiceType == typeof(IDbContextOptionsConfiguration<TDbContext>)
+            );
 
             if (descriptor == null)
             {

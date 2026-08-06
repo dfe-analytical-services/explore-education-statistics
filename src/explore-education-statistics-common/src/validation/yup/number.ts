@@ -1,8 +1,8 @@
 /* eslint-disable no-template-curly-in-string */
-import { NumberSchema, Schema, addMethod, number } from 'yup';
+import { NumberSchema, addMethod, number } from 'yup';
 
 declare module 'yup' {
-  interface NumberSchema extends Schema<number> {
+  interface NumberSchema {
     moreThanOrEqual(limit: number, message?: string): this;
     lessThanOrEqual(limit: number, message?: string): this;
   }

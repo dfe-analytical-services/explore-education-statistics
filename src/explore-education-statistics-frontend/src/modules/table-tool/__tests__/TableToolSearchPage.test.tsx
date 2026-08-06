@@ -93,7 +93,7 @@ describe('TableToolSearchPage', () => {
     expect(mockPostSearchStream).toHaveBeenCalledWith(
       {
         userQuery: 'test search term',
-        publicationId: 'a91d9e05-be82-474c-85ae-4913158406d0',
+        publicationId: 'publication-summary-1',
       },
       expect.anything(),
     );
@@ -112,11 +112,37 @@ describe('TableToolSearchPage', () => {
         stage: PipelineStage.RETRIEVED,
         data: {
           datasets: [
-            { title: 'Dataset A', relevanceScore: 10, rawRelevanceScore: 0.1 },
+            {
+              title: 'Dataset A',
+              relevanceScore: 10,
+              rawRelevanceScore: 0.1,
+              publicationId: 'test-publication-id',
+              publicationSlug: 'test-publication-slug',
+              publicationTitle: 'Test publication title',
+              releaseSlug: 'test-release-slug',
+              releaseVersionId: 'test-release-version-id',
+              dataSetFileId: '',
+              description: '',
+              fileId: 'file-id-a',
+              subjectId: '',
+              filters: [],
+              indicators: [],
+            },
             {
               title: 'Dataset B',
               relevanceScore: 85.5,
               rawRelevanceScore: 0.5,
+              publicationId: 'test-publication-id',
+              publicationSlug: 'test-publication-slug',
+              publicationTitle: 'Test publication title',
+              releaseSlug: 'test-release-slug',
+              releaseVersionId: 'test-release-version-id',
+              dataSetFileId: '',
+              description: '',
+              fileId: 'file-id-b',
+              subjectId: '',
+              filters: [],
+              indicators: [],
             },
           ],
         },
@@ -133,17 +159,30 @@ describe('TableToolSearchPage', () => {
       capturedOptions.onMessage({
         stage: PipelineStage.RERANKER,
         data: {
-          shortlistedDatasets: [
+          datasets: [
             {
               fileId: 'file-1',
               title: 'Dataset B',
               relevanceScore: 85.5,
               relevanceReason: 'Test relevance reason',
               relevantFilters: [],
+              dataSetFileId: 'dataset-file-id',
+              description: 'description',
+              publicationId: 'publication-id',
+              publicationSlug: 'publication-slug',
+              publicationTitle: 'publication-title',
+              releaseSlug: 'release-slug',
+              releaseVersionId: 'release-version-id',
+              subjectId: 'subject-id',
             },
           ],
           queryRequirements: { filters: [], geography: [], timePeriod: '' },
           confidence: 'high',
+          tokenUsage: {
+            input: 100,
+            output: 100,
+          },
+          cost: 0.4,
         },
       });
     });
@@ -160,7 +199,7 @@ describe('TableToolSearchPage', () => {
         stage: PipelineStage.COMPLETE,
         data: {
           datasets: [testFinalResult],
-          token_usage: {
+          tokenUsage: {
             input: 100,
             output: 100,
           },

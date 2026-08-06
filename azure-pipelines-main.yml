@@ -16,11 +16,11 @@ variables:
   - name: CI
     value: true
   - name: DotNetVersion
-    value: '8.0.x'
+    value: '10.0.x'
   - name: NodeVersion
     value: '22.22.0'
   - name: RubyVersion
-    value: '3.2'
+    value: '4.0.6'
   - name: PublicApiDir
     value: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
   - name: PublicApiDocsDir

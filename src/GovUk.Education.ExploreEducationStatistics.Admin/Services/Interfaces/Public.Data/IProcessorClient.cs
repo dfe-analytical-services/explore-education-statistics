@@ -34,4 +34,9 @@ public interface IProcessorClient
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default
     );
+
+    Task<Either<ActionResult, Unit>> UnfinaliseDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    );
 }

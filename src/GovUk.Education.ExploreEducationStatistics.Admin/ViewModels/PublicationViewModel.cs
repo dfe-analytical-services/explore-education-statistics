@@ -35,6 +35,5 @@ public class PublicationViewModel
         public bool CanManageReleaseSeries { get; set; }
         public bool CanUpdateContact { get; set; }
         public bool CanUpdateDrafters { get; set; }
-        public bool CanViewReleaseTeamAccess { get; set; }
     }
 }

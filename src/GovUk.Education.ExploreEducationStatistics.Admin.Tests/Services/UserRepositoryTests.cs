@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -10,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -19,6 +21,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public abstract class UserRepositoryTests
 {
     private readonly DataFixture _dataFixture = new();
+
+    public static readonly TheoryData<Func<DataFixture, User>> AllNonSoftDeletedTypesOfUser =
+    [
+        // Active User
+        fixture => fixture.DefaultUser(),
+        // User with Pending Invite
+        fixture => fixture.DefaultUserWithPendingInvite(),
+        // User with Expired Invite
+        fixture => fixture.DefaultUserWithExpiredInvite(),
+    ];
+
+    public static readonly TheoryData<Func<DataFixture, User>> AllInactiveTypesOfUser =
+    [
+        // User with Pending Invite
+        fixture => fixture.DefaultUserWithPendingInvite(),
+        // User with Expired Invite
+        fixture => fixture.DefaultUserWithExpiredInvite(),
+        // Soft Deleted User
+        fixture => fixture.DefaultSoftDeletedUser(),
+    ];
+
+    public static readonly TheoryData<ActionResult> GlobalRoleServiceFailureResults =
+    [
+        new ForbidResult(),
+        new NotFoundResult(),
+    ];
 
     public class FindPendingUserInviteByEmailTests : UserRepositoryTests
     {
@@ -845,7 +873,6 @@ public abstract class UserRepositoryTests
                 await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                     await repository.CreateOrUpdate(
                         email: user.Email,
-                        role: GlobalRoles.Role.Analyst,
                         createdById: Guid.NewGuid(),
                         createdDate: DateTimeOffset.UtcNow
                     )
@@ -854,18 +881,15 @@ public abstract class UserRepositoryTests
         }
 
         [Theory]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
         [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        // Check the role is defaulted to StandardUser if no role is supplied
+        [InlineData(GlobalRoles.Role.BauUser, null, GlobalRoles.Role.StandardUser)]
         public async Task UserWithPendingInvite_UpdatesUser(
             GlobalRoles.Role oldRole,
-            GlobalRoles.Role newRole,
+            GlobalRoles.Role? newRole,
             GlobalRoles.Role expectedUpdatedRole
         )
         {
@@ -906,12 +930,18 @@ public abstract class UserRepositoryTests
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
-                var result = await repository.CreateOrUpdate(
-                    email: user.Email,
-                    role: newRole,
-                    createdById: newCreatedById,
-                    createdDate: newCreatedDate
-                );
+                var result = newRole is null
+                    ? await repository.CreateOrUpdate(
+                        email: user.Email,
+                        createdById: newCreatedById,
+                        createdDate: newCreatedDate
+                    )
+                    : await repository.CreateOrUpdate(
+                        email: user.Email,
+                        role: newRole.Value,
+                        createdById: newCreatedById,
+                        createdDate: newCreatedDate
+                    );
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
@@ -923,7 +953,6 @@ public abstract class UserRepositoryTests
                 Assert.Null(result.SoftDeleted);
                 Assert.Null(result.DeletedById);
 
-                // The role should only be updated if the new one outranks (or equals) the existing one
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
                 Assert.Equal(newCreatedDate, result.Created);
             }
@@ -944,7 +973,6 @@ public abstract class UserRepositoryTests
                 Assert.Null(updatedUser.SoftDeleted);
                 Assert.Null(updatedUser.DeletedById);
 
-                // The role should only be updated if the new one outranks (or equals) the existing one
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), updatedUser.RoleId);
                 Assert.Equal(newCreatedDate, updatedUser.Created);
             }
@@ -985,7 +1013,6 @@ public abstract class UserRepositoryTests
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
                     createdById: Guid.NewGuid(),
                     createdDate: newCreatedDate
                 );
@@ -1037,11 +1064,7 @@ public abstract class UserRepositoryTests
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
-                var result = await repository.CreateOrUpdate(
-                    email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
-                    createdById: Guid.NewGuid()
-                );
+                var result = await repository.CreateOrUpdate(email: user.Email, createdById: Guid.NewGuid());
 
                 result.Created.AssertUtcNow();
             }
@@ -1057,18 +1080,15 @@ public abstract class UserRepositoryTests
         }
 
         [Theory]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
-        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
         [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        // Check the role is defaulted to StandardUser if no role is supplied
+        [InlineData(GlobalRoles.Role.BauUser, null, GlobalRoles.Role.StandardUser)]
         public async Task UserWithExpiredInvite_UpdatesUser(
             GlobalRoles.Role oldRole,
-            GlobalRoles.Role newRole,
+            GlobalRoles.Role? newRole,
             GlobalRoles.Role expectedUpdatedRole
         )
         {
@@ -1107,12 +1127,18 @@ public abstract class UserRepositoryTests
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
-                var result = await repository.CreateOrUpdate(
-                    email: user.Email,
-                    role: newRole,
-                    createdById: newCreatedById,
-                    createdDate: newCreatedDate
-                );
+                var result = newRole is null
+                    ? await repository.CreateOrUpdate(
+                        email: user.Email,
+                        createdById: newCreatedById,
+                        createdDate: newCreatedDate
+                    )
+                    : await repository.CreateOrUpdate(
+                        email: user.Email,
+                        role: newRole.Value,
+                        createdById: newCreatedById,
+                        createdDate: newCreatedDate
+                    );
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
@@ -1186,7 +1212,6 @@ public abstract class UserRepositoryTests
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
                     createdById: Guid.NewGuid(),
                     createdDate: newCreatedDate
                 );
@@ -1236,11 +1261,7 @@ public abstract class UserRepositoryTests
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
-                var result = await repository.CreateOrUpdate(
-                    email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
-                    createdById: Guid.NewGuid()
-                );
+                var result = await repository.CreateOrUpdate(email: user.Email, createdById: Guid.NewGuid());
 
                 result.Created.AssertUtcNow();
             }
@@ -1256,18 +1277,15 @@ public abstract class UserRepositoryTests
         }
 
         [Theory]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
-        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
-        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
-        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
-        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
         [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        // Check the role is defaulted to StandardUser if no role is supplied
+        [InlineData(GlobalRoles.Role.BauUser, null, GlobalRoles.Role.StandardUser)]
         public async Task SoftDeletedUser_UpdatesUser(
             GlobalRoles.Role oldRole,
-            GlobalRoles.Role newRole,
+            GlobalRoles.Role? newRole,
             GlobalRoles.Role expectedUpdatedRole
         )
         {
@@ -1308,12 +1326,18 @@ public abstract class UserRepositoryTests
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
-                var result = await repository.CreateOrUpdate(
-                    email: user.Email,
-                    role: newRole,
-                    createdById: newCreatedById,
-                    createdDate: newCreatedDate
-                );
+                var result = newRole is null
+                    ? await repository.CreateOrUpdate(
+                        email: user.Email,
+                        createdById: newCreatedById,
+                        createdDate: newCreatedDate
+                    )
+                    : await repository.CreateOrUpdate(
+                        email: user.Email,
+                        role: newRole.Value,
+                        createdById: newCreatedById,
+                        createdDate: newCreatedDate
+                    );
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
@@ -1387,7 +1411,6 @@ public abstract class UserRepositoryTests
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
                     createdById: Guid.NewGuid(),
                     createdDate: newCreatedDate
                 );
@@ -1439,11 +1462,7 @@ public abstract class UserRepositoryTests
                     userPublicationRoleRepository: userPublicationRoleRepository.Object
                 );
 
-                var result = await repository.CreateOrUpdate(
-                    email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
-                    createdById: Guid.NewGuid()
-                );
+                var result = await repository.CreateOrUpdate(email: user.Email, createdById: Guid.NewGuid());
 
                 result.Created.AssertUtcNow();
             }
@@ -1458,8 +1477,12 @@ public abstract class UserRepositoryTests
             }
         }
 
-        [Fact]
-        public async Task UserDoesNotExist_CreatesNewUser()
+        [Theory]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        // Check the role is defaulted to StandardUser if no role is supplied
+        [InlineData(null, GlobalRoles.Role.StandardUser)]
+        public async Task UserDoesNotExist_CreatesNewUser(GlobalRoles.Role? suppliedRole, GlobalRoles.Role expectedRole)
         {
             const string email = "TEST@test.com";
             var createdById = Guid.NewGuid();
@@ -1471,18 +1494,20 @@ public abstract class UserRepositoryTests
             {
                 var repository = BuildRepository(contentDbContext);
 
-                var result = await repository.CreateOrUpdate(
-                    email: email,
-                    role: GlobalRoles.Role.Analyst,
-                    createdById: createdById,
-                    createdDate: createdDate
-                );
+                var result = suppliedRole is null
+                    ? await repository.CreateOrUpdate(email: email, createdById: createdById, createdDate: createdDate)
+                    : await repository.CreateOrUpdate(
+                        email: email,
+                        role: suppliedRole.Value,
+                        createdById: createdById,
+                        createdDate: createdDate
+                    );
 
                 Assert.Equal(email.ToLower(), result.Email);
                 Assert.Null(result.FirstName);
                 Assert.Null(result.LastName);
                 Assert.False(result.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), result.RoleId);
+                Assert.Equal(expectedRole.GetEnumValue(), result.RoleId);
                 Assert.Equal(createdById, result.CreatedById);
                 Assert.Equal(createdDate, result.Created);
                 Assert.Null(result.SoftDeleted);
@@ -1497,7 +1522,7 @@ public abstract class UserRepositoryTests
                 Assert.Null(newUser.FirstName);
                 Assert.Null(newUser.LastName);
                 Assert.False(newUser.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), newUser.RoleId);
+                Assert.Equal(expectedRole.GetEnumValue(), newUser.RoleId);
                 Assert.Equal(createdById, newUser.CreatedById);
                 Assert.Equal(createdDate, newUser.Created);
                 Assert.Null(newUser.SoftDeleted);
@@ -1527,7 +1552,6 @@ public abstract class UserRepositoryTests
                 await Assert.ThrowsAsync<ArgumentException>(async () =>
                     await repository.CreateOrUpdate(
                         email: user.Email,
-                        role: GlobalRoles.Role.Analyst,
                         createdById: Guid.NewGuid(),
                         createdDate: newCreatedDate
                     )
@@ -1548,7 +1572,6 @@ public abstract class UserRepositoryTests
 
                 var result = await repository.CreateOrUpdate(
                     email: "test@test.com",
-                    role: GlobalRoles.Role.Analyst,
                     createdById: Guid.NewGuid(),
                     createdDate: createdDate
                 );
@@ -1578,11 +1601,7 @@ public abstract class UserRepositoryTests
             {
                 var repository = BuildRepository(contentDbContext);
 
-                var result = await repository.CreateOrUpdate(
-                    email: email,
-                    role: GlobalRoles.Role.Analyst,
-                    createdById: createdById
-                );
+                var result = await repository.CreateOrUpdate(email: email, createdById: createdById);
 
                 result.Created.AssertUtcNow();
             }
@@ -1596,18 +1615,135 @@ public abstract class UserRepositoryTests
         }
     }
 
+    public class UpdateGlobalRoleTests : UserRepositoryTests
+    {
+        [Theory]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.StandardUser, GlobalRoles.Role.StandardUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        public async Task Success(
+            GlobalRoles.Role oldRole,
+            GlobalRoles.Role newRole,
+            GlobalRoles.Role expectedUpdatedRole
+        )
+        {
+            // Active User
+            User user = _dataFixture.DefaultUser().WithRoleId(oldRole.GetEnumValue());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
+            globalRoleService.Setup(mock => mock.UpdateGlobalRoleForUser(user.Id, newRole)).ReturnsAsync(Unit.Instance);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    globalRoleService: globalRoleService.Object
+                );
+
+                var result = await repository.UpdateGlobalRole(userId: user.Id, newRole: newRole);
+
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
+            }
+
+            MockUtils.VerifyAllMocks(globalRoleService);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
+
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), updatedUser.RoleId);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(GlobalRoleServiceFailureResults))]
+        public async Task UpdatingGlobalRoleFails_Throws(ActionResult actionResult)
+        {
+            var role = GlobalRoles.Role.StandardUser;
+
+            // Active User
+            User user = _dataFixture.DefaultUser().WithRoleId(role.GetEnumValue());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var globalRoleService = new Mock<IGlobalRoleService>(MockBehavior.Strict);
+            globalRoleService.Setup(mock => mock.UpdateGlobalRoleForUser(user.Id, role)).ReturnsAsync(actionResult);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(
+                    contentDbContext: contentDbContext,
+                    globalRoleService: globalRoleService.Object
+                );
+
+                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await repository.UpdateGlobalRole(userId: user.Id, newRole: role)
+                );
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AllInactiveTypesOfUser))]
+        public async Task UserIsNotActive_Throws(Func<DataFixture, User> userFactory)
+        {
+            var user = userFactory(new DataFixture());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await repository.UpdateGlobalRole(userId: user.Id, newRole: GlobalRoles.Role.StandardUser)
+                );
+            }
+        }
+
+        [Fact]
+        public async Task NoUser_Throws()
+        {
+            var repository = BuildRepository();
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await repository.UpdateGlobalRole(userId: Guid.NewGuid(), newRole: GlobalRoles.Role.StandardUser)
+            );
+        }
+    }
+
     private static UserRepository BuildRepository(
-        ContentDbContext contentDbContext,
+        ContentDbContext? contentDbContext = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IGlobalRoleService? globalRoleService = null
     )
     {
         return new(
-            contentDbContext: contentDbContext,
+            contentDbContext: contentDbContext ?? InMemoryApplicationDbContext(),
             userPreReleaseRoleRepository: userPreReleaseRoleRepository
                 ?? Mock.Of<IUserPreReleaseRoleRepository>(MockBehavior.Strict),
             userPublicationRoleRepository: userPublicationRoleRepository
-                ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict)
+                ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
+            globalRoleService: globalRoleService ?? Mock.Of<IGlobalRoleService>(MockBehavior.Strict)
         );
     }
 }

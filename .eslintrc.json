@@ -27,8 +27,9 @@
     "prettier/prettier"
   ],
   "rules": {
-    "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/default-param-last": "error",
+    "@typescript-eslint/no-empty-object-type": "off",
+    "@typescript-eslint/no-unsafe-function-type": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-empty-function": [
       "error",
@@ -143,7 +144,7 @@
       "files": ["**/*.js"],
       "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-require-imports": "off",
         "global-require": "off",
         "import/no-dynamic-require": "off",
         "no-console": "off"

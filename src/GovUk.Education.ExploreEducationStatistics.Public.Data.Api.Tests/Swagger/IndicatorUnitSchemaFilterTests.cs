@@ -2,8 +2,7 @@ using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagger;
@@ -29,20 +28,20 @@ public class IndicatorUnitSchemaFilterTests
         var schema = GenerateSchema();
         var indicatorUnits = EnumUtil.GetEnumLabels<IndicatorUnit>().ToHashSet();
 
-        Assert.Equal("string", schema.Type);
+        Assert.Equal(JsonSchemaType.String, schema.Type);
+        Assert.NotNull(schema.Enum);
         Assert.Equal(indicatorUnits.Count, schema.Enum.Count);
 
         Assert.All(
             schema.Enum,
-            e =>
+            jsonNode =>
             {
-                var enumString = Assert.IsType<OpenApiString>(e);
-                Assert.Contains(enumString.Value, indicatorUnits);
+                Assert.Contains(jsonNode.GetValue<string>(), indicatorUnits);
             }
         );
     }
 
-    private OpenApiSchema GenerateSchema()
+    private IOpenApiSchema GenerateSchema()
     {
         _schemaGenerator.GenerateSchema(typeof(IndicatorUnit), _schemaRepository);
 

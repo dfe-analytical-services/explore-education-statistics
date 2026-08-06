@@ -20,8 +20,6 @@ public enum SecurityClaimTypes
      * General role-based page access
      */
     ApplicationAccessGranted,
-    AnalystPagesAccessGranted,
-    PrereleasePagesAccessGranted,
     ManageAnyUser,
     AccessAllImports,
 
@@ -46,11 +44,6 @@ public enum SecurityClaimTypes
     PublishAllReleases,
     DeleteAllReleaseAmendments,
     CancelAllFileImports,
-
-    /**
-     * Pre Release management
-     */
-    CanViewPrereleaseContacts,
 
     /**
      * Taxonomy management

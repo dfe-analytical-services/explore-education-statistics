@@ -57,6 +57,13 @@ parameters:
       - Yes
       - No
     default: Yes
+  - name: awaitHealthyProcessorStagingSlot
+    displayName: Should this deploy wait for the Data Processor staging slot to be healthy after deploying settings, prior to deploying to the slot?
+    type: string
+    values:
+      - Yes
+      - No
+    default: Yes
   - name: forceDeployToEnvironment
     displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
     type: string
@@ -107,6 +114,8 @@ variables:
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
   - name: awaitActiveOrchestrations
     value: ${{ iif(eq(parameters.awaitActiveOrchestrations, 'Yes'), true, false) }}
+  - name: awaitHealthyProcessorStagingSlot
+    value: ${{ iif(eq(parameters.awaitHealthyProcessorStagingSlot, 'Yes'), true, false) }}
 
 pool:
   vmImage: $(vmImageName)

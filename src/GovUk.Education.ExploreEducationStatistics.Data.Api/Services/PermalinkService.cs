@@ -88,16 +88,11 @@ public class PermalinkService : IPermalinkService
                 .Query(releaseVersionId, request.Query.AsFullTableQuery(allowCropping: true), cancellationToken)
                 .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
-                    var frontendTableResult = await _frontendService.CreateTable(
+                    var frontendTableTask = _frontendService.CreateTable(
                         tableResult,
                         request.Configuration,
                         cancellationToken
                     );
-
-                    if (frontendTableResult.IsLeft)
-                    {
-                        return frontendTableResult.Left;
-                    }
 
                     var csvMetaResult = tableResult.SubjectMeta.IsCroppedTable
                         ? null
@@ -106,6 +101,13 @@ public class PermalinkService : IPermalinkService
                             tableResult.SubjectMeta,
                             cancellationToken
                         );
+
+                    var frontendTableResult = await frontendTableTask;
+
+                    if (frontendTableResult.IsLeft)
+                    {
+                        return frontendTableResult.Left;
+                    }
 
                     if (csvMetaResult is not null && csvMetaResult.IsLeft)
                     {
@@ -397,11 +399,16 @@ public class PermalinkService : IPermalinkService
         CancellationToken cancellationToken = default
     )
     {
-        await UploadTable(permalink, table, cancellationToken);
+        var uploadTableTask = UploadTable(permalink, table, cancellationToken);
 
         if (csvMeta is not null)
         {
-            await UploadTableCsv(permalink, observations, csvMeta, cancellationToken);
+            var uploadTableCsvTask = UploadTableCsv(permalink, observations, csvMeta, cancellationToken);
+            await Task.WhenAll(uploadTableTask, uploadTableCsvTask);
+        }
+        else
+        {
+            await uploadTableTask;
         }
     }
 

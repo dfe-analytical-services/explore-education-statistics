@@ -40,6 +40,11 @@ public interface IDataSetVersionService
         CancellationToken cancellationToken = default
     );
 
+    Task<Either<ActionResult, Unit>> UnfinaliseVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    );
+
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CreateNextVersion(
         Guid releaseFileId,
         Guid dataSetId,

@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;

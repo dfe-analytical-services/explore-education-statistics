@@ -50,12 +50,7 @@ public static class StartupSecurityConfiguration
 
             options.AddPolicy(
                 nameof(SecurityPolicies.CanAccessAnalystPages),
-                policy => policy.RequireClaim(nameof(SecurityClaimTypes.AnalystPagesAccessGranted))
-            );
-
-            options.AddPolicy(
-                nameof(SecurityPolicies.CanAccessPreReleasePages),
-                policy => policy.RequireClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
+                policy => policy.Requirements.Add(new AccessAnalystPagesRequirement())
             );
 
             options.AddPolicy(
@@ -99,11 +94,6 @@ public static class StartupSecurityConfiguration
             options.AddPolicy(
                 nameof(SecurityPolicies.CanUpdateDrafters),
                 policy => policy.Requirements.Add(new UpdateDraftersRequirement())
-            );
-
-            options.AddPolicy(
-                nameof(SecurityPolicies.CanViewReleaseTeamAccess),
-                policy => policy.Requirements.Add(new ViewSpecificPublicationReleaseTeamAccessRequirement())
             );
 
             options.AddPolicy(
@@ -296,6 +286,7 @@ public static class StartupSecurityConfiguration
         /*
          * Publication management
          */
+        services.AddTransient<IAuthorizationHandler, AccessAnalystPagesAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdatePublicationSummaryAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, UpdateContactAuthorizationHandler>();
@@ -306,7 +297,6 @@ public static class StartupSecurityConfiguration
             IAuthorizationHandler,
             ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
         >();
-        services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ManagePublicationReleaseSeriesAuthorizationHandler>();
 
         /*

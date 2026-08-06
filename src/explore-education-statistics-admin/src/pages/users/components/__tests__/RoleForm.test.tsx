@@ -1,54 +1,80 @@
 import RoleForm from '@admin/pages/users/components/RoleForm';
-import { testUser, testRoles } from '@admin/pages/users/__data__/testUserData';
+import {
+  testBauUser,
+  testStandardUser,
+} from '@admin/pages/users/__data__/testUserData';
 import _usersService from '@admin/services/user-management/usersService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import { GlobalRole } from '@admin/services/types/GlobalRole';
 
 jest.mock('@admin/services/user-management/usersService');
 
 const usersService = _usersService as jest.Mocked<typeof _usersService>;
 
 describe('RoleForm', () => {
-  test('renders the form', () => {
-    render(<RoleForm roles={testRoles} user={testUser} onUpdate={noop} />);
+  test('renders the form for a Standard User', () => {
+    render(<RoleForm user={testStandardUser} onUpdate={noop} />);
 
-    const roleSelect = screen.getByLabelText('Role');
-    const roles = within(roleSelect).getAllByRole('option');
-    expect(roles).toHaveLength(3);
-    expect(roles[0]).toHaveTextContent('Choose role');
-    expect(roles[1]).toHaveTextContent('Role 1');
-    expect(roles[2]).toHaveTextContent('Role 2');
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Super User',
+    });
+
+    expect(checkbox).toBeInTheDocument();
+    expect(checkbox).not.toBeChecked();
 
     expect(
-      screen.getByRole('button', { name: 'Update role' }),
+      screen.getByRole('button', { name: 'Update access' }),
     ).toBeInTheDocument();
   });
 
-  test('can submit the form with the selected role', async () => {
+  test('renders the form for a Super User', () => {
+    render(<RoleForm user={testBauUser} onUpdate={noop} />);
+
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Super User',
+    });
+
+    expect(checkbox).toBeInTheDocument();
+    expect(checkbox).toBeChecked();
+
+    expect(
+      screen.getByRole('button', { name: 'Update access' }),
+    ).toBeInTheDocument();
+  });
+
+  test('can submit the form with a new global role', async () => {
     const user = userEvent.setup();
     const handleUpdate = jest.fn();
-    render(
-      <RoleForm roles={testRoles} user={testUser} onUpdate={handleUpdate} />,
-    );
 
-    await user.selectOptions(screen.getByLabelText('Role'), ['Role 1']);
+    render(<RoleForm user={testStandardUser} onUpdate={handleUpdate} />);
+
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Super User',
+    });
+
+    expect(checkbox).not.toBeChecked();
+
+    await user.click(checkbox);
+
+    expect(checkbox).toBeChecked();
 
     expect(usersService.updateUserGlobalRole).not.toHaveBeenCalled();
     expect(handleUpdate).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: 'Update role' }));
+    await user.click(screen.getByRole('button', { name: 'Update access' }));
 
     await waitFor(() => {
       expect(usersService.updateUserGlobalRole).toHaveBeenCalledTimes(1);
     });
+
     expect(usersService.updateUserGlobalRole).toHaveBeenCalledWith(
       'user-1-id',
       {
-        roleId: 'role-1-id',
+        targetGlobalRole: GlobalRole.BauUser,
       },
     );
-    expect(handleUpdate).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.UserManagement;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -8,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -18,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPreReleaseRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.UserPublicationRoleRepository;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -40,35 +42,59 @@ public abstract class UserManagementServiceTests
         DateTime.UtcNow.AddDays(-5),
     ];
 
-    public class GetUserTests : UserManagementServiceTests
+    public class ListAllUsersTests : UserManagementServiceTests
     {
         [Fact]
         public async Task Success()
         {
-            var userId = Guid.NewGuid();
+            var (user1, user2, user3) = _dataFixture
+                .DefaultUser()
+                .ForIndex(0, s => s.SetFirstName("User 2").SetRoleId(GlobalRoles.Role.StandardUser.GetEnumValue()))
+                .ForIndex(1, s => s.SetFirstName("User 3").SetRoleId(GlobalRoles.Role.StandardUser.GetEnumValue()))
+                .ForIndex(2, s => s.SetFirstName("User 1").SetRoleId(GlobalRoles.Role.BauUser.GetEnumValue()))
+                .GenerateTuple3();
 
-            var user = new ApplicationUser
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                Id = userId.ToString(),
-                Email = "test@test.com",
-                FirstName = "Test",
-                LastName = "Analyst",
-            };
+                contentDbContext.Users.AddRange(user1, user2, user3);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var globalRoles = ListOf(
-                new RoleViewModel
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "Role 1",
-                    NormalizedName = "ROLE 2",
-                },
-                new RoleViewModel
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "Role 2",
-                    NormalizedName = "ROLE 2",
-                }
-            );
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(contentDbContext: contentDbContext);
+
+                var result = await service.ListAllUsers();
+
+                var users = result.AssertRight();
+
+                Assert.Equal(3, users.Count);
+                // Should be ordered by Name
+                AssertUser(user3, users[0]);
+                AssertUser(user1, users[1]);
+                AssertUser(user2, users[2]);
+            }
+        }
+
+        private static void AssertUser(User expected, UserViewModel actual)
+        {
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.DisplayName, actual.Name);
+            Assert.Equal(expected.Email, actual.Email);
+            Assert.Equal(expected.GetGlobalRole(), actual.GlobalRole);
+        }
+    }
+
+    public class GetUserTests : UserManagementServiceTests
+    {
+        [Theory]
+        [InlineData(GlobalRoles.Role.StandardUser)]
+        [InlineData(GlobalRoles.Role.BauUser)]
+        public async Task Success(GlobalRoles.Role globalRole)
+        {
+            User user = _dataFixture.DefaultUser().WithRoleId(globalRole.GetEnumValue());
 
             var publicationRoles = ListOf(
                 new UserPublicationRoleViewModel
@@ -100,69 +126,54 @@ public abstract class UserManagementServiceTests
                 }
             );
 
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                await userAndRolesDbContext.AddRangeAsync(user);
-                await userAndRolesDbContext.SaveChangesAsync();
-            }
-
-            var globalRoleService = new Mock<IGlobalRoleService>(Strict);
+            var userRepository = new Mock<IUserRepository>(Strict);
             var userRoleService = new Mock<IUserRoleService>(Strict);
             var preReleaseUserService = new Mock<IPreReleaseUserService>(Strict);
 
-            globalRoleService.Setup(mock => mock.GetGlobalRolesForUser(user.Id)).ReturnsAsync(globalRoles);
+            userRepository
+                .Setup(mock => mock.FindActiveUserById(user.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(user);
 
-            userRoleService.Setup(mock => mock.GetPublicationRolesForUser(userId)).ReturnsAsync(publicationRoles);
+            userRoleService.Setup(mock => mock.GetPublicationRolesForUser(user.Id)).ReturnsAsync(publicationRoles);
 
-            preReleaseUserService.Setup(mock => mock.GetPreReleaseRolesForUser(userId)).ReturnsAsync(preReleaseRoles);
+            preReleaseUserService.Setup(mock => mock.GetPreReleaseRolesForUser(user.Id)).ReturnsAsync(preReleaseRoles);
 
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupService(
-                    usersAndRolesDbContext: userAndRolesDbContext,
-                    userRoleService: userRoleService.Object,
-                    globalRoleService: globalRoleService.Object,
-                    preReleaseUserService: preReleaseUserService.Object
-                );
+            var service = SetupService(
+                userRoleService: userRoleService.Object,
+                userRepository: userRepository.Object,
+                preReleaseUserService: preReleaseUserService.Object
+            );
 
-                var result = await service.GetUser(userId);
+            var result = await service.GetUser(user.Id);
 
-                VerifyAllMocks(userRoleService, globalRoleService, preReleaseUserService);
+            VerifyAllMocks(userRoleService, userRepository, preReleaseUserService);
 
-                Assert.True(result.IsRight);
-                var userViewModel = result.Right;
+            Assert.True(result.IsRight);
+            var userViewModel = result.Right;
 
-                Assert.Equal(userId, userViewModel.Id);
-                Assert.Equal("test@test.com", userViewModel.Email);
-                Assert.Equal("Test Analyst", userViewModel.Name);
-                // Currently we only allow a user to have a maximum of one global role
-                Assert.Equal(globalRoles[0].Id, userViewModel.Role);
-                Assert.Equal(publicationRoles, userViewModel.UserPublicationRoles);
-                Assert.Equal(preReleaseRoles, userViewModel.UserPreReleaseRoles);
-
-                globalRoleService.Verify(mock => mock.GetGlobalRolesForUser(user.Id), Times.Once);
-                userRoleService.Verify(mock => mock.GetPublicationRolesForUser(userId), Times.Once);
-                preReleaseUserService.Verify(mock => mock.GetPreReleaseRolesForUser(userId), Times.Once);
-            }
+            Assert.Equal(user.Id, userViewModel.Id);
+            Assert.Equal(user.Email, userViewModel.Email);
+            Assert.Equal(user.DisplayName, userViewModel.Name);
+            Assert.Equal(globalRole, userViewModel.GlobalRole);
+            Assert.Equal(publicationRoles, userViewModel.UserPublicationRoles);
+            Assert.Equal(preReleaseRoles, userViewModel.UserPreReleaseRoles);
         }
 
         [Fact]
         public async Task NoUser_ReturnsNotFound()
         {
-            var userRoleService = new Mock<IUserRoleService>(Strict);
+            var userId = Guid.NewGuid();
 
-            await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
+            var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindActiveUserById(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
 
-            var service = SetupService(
-                usersAndRolesDbContext: userAndRolesDbContext,
-                userRoleService: userRoleService.Object
-            );
+            var service = SetupService(userRepository: userRepository.Object);
 
-            var result = await service.GetUser(Guid.NewGuid());
+            var result = await service.GetUser(userId);
 
-            VerifyAllMocks(userRoleService);
+            VerifyAllMocks(userRepository);
 
             result.AssertNotFound();
         }
@@ -173,7 +184,7 @@ public abstract class UserManagementServiceTests
         [Fact]
         public async Task Success()
         {
-            var identityRole = new IdentityRole { Name = GlobalRoles.RoleNames.Analyst };
+            var identityRole = new IdentityRole { Name = GlobalRoles.RoleNames.StandardUser };
 
             // The last pending user invite will have no associated roles
             var pendingUserInvites = _dataFixture.DefaultUserWithPendingInvite().WithRole(identityRole).GenerateList(4);
@@ -250,7 +261,10 @@ public abstract class UserManagementServiceTests
                 var expectedUserPreReleaseRoles1 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[0]]);
 
                 Assert.Equal(expectedUserInvite1.Email, pendingInvite1.Email);
-                Assert.Equal(expectedUserInvite1.Role!.Name, pendingInvite1.Role);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite1.Role!.Name!),
+                    pendingInvite1.GlobalRole
+                );
                 Assert.Equal(expectedUserPublicationRoles1, pendingInvite1.UserPublicationRoles);
                 Assert.Equal(expectedUserPreReleaseRoles1, pendingInvite1.UserPreReleaseRoles);
 
@@ -261,7 +275,10 @@ public abstract class UserManagementServiceTests
                 var expectedUserPreReleaseRoles2 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[1]]);
 
                 Assert.Equal(expectedUserInvite2.Email, pendingInvite2.Email);
-                Assert.Equal(expectedUserInvite2.Role!.Name, pendingInvite2.Role);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite2.Role!.Name!),
+                    pendingInvite2.GlobalRole
+                );
                 Assert.Equal(expectedUserPublicationRoles2, pendingInvite2.UserPublicationRoles);
                 Assert.Equal(expectedUserPreReleaseRoles2, pendingInvite2.UserPreReleaseRoles);
 
@@ -272,7 +289,10 @@ public abstract class UserManagementServiceTests
                 var expectedUserPreReleaseRoles3 = CreateUserPreReleaseRoleViewModels([userPreReleaseRoles[2]]);
 
                 Assert.Equal(expectedUserInvite3.Email, pendingInvite3.Email);
-                Assert.Equal(expectedUserInvite3.Role!.Name, pendingInvite3.Role);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite3.Role!.Name!),
+                    pendingInvite3.GlobalRole
+                );
                 Assert.Equal(expectedUserPublicationRoles3, pendingInvite3.UserPublicationRoles);
                 Assert.Equal(expectedUserPreReleaseRoles3, pendingInvite3.UserPreReleaseRoles);
 
@@ -281,7 +301,10 @@ public abstract class UserManagementServiceTests
                 var pendingInvite4 = pendingInvites.Single(pi => pi.Email == expectedUserInvite4.Email);
 
                 Assert.Equal(expectedUserInvite4.Email, pendingInvite4.Email);
-                Assert.Equal(expectedUserInvite4.Role!.Name, pendingInvite4.Role);
+                Assert.Equal(
+                    EnumUtil.GetFromEnumLabel<Role>(expectedUserInvite4.Role!.Name!),
+                    pendingInvite4.GlobalRole
+                );
                 Assert.Empty(pendingInvite4.UserPublicationRoles);
                 Assert.Empty(pendingInvite4.UserPreReleaseRoles);
             }
@@ -322,46 +345,96 @@ public abstract class UserManagementServiceTests
 
     public class UpdateUserGlobalRoleTests : UserManagementServiceTests
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [InlineData(GlobalRoles.Role.StandardUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.StandardUser)]
+        public async Task Success(GlobalRoles.Role oldGlobalRole, GlobalRoles.Role targetGlobalRole)
         {
-            var user = new ApplicationUser { Id = Guid.NewGuid().ToString() };
+            User activeUser = _dataFixture.DefaultUser().WithRoleId(oldGlobalRole.GetEnumValue());
 
-            var role = new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role 2",
-                NormalizedName = "ROLE 2",
-            };
+            var userRepository = new Mock<IUserRepository>(Strict);
 
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            userRepository
+                .Setup(mock => mock.FindActiveUserById(activeUser.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(activeUser);
 
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                await userAndRolesDbContext.AddRangeAsync(user);
-                await userAndRolesDbContext.AddRangeAsync(role);
-                await userAndRolesDbContext.SaveChangesAsync();
-            }
+            userRepository
+                .Setup(mock => mock.UpdateGlobalRole(activeUser.Id, targetGlobalRole, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(It.IsAny<User>());
 
-            var globalRoleService = new Mock<IGlobalRoleService>(Strict);
+            var service = SetupService(userRepository: userRepository.Object);
 
-            globalRoleService.Setup(mock => mock.SetGlobalRoleForUser(user.Id, role.Id)).ReturnsAsync(Unit.Instance);
+            var result = await service.UpdateUserGlobalRole(activeUser.Id, targetGlobalRole);
 
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupService(
-                    usersAndRolesDbContext: userAndRolesDbContext,
-                    globalRoleService: globalRoleService.Object
-                );
+            VerifyAllMocks(userRepository);
 
-                var result = await service.UpdateUserGlobalRole(user.Id, role.Id);
+            result.AssertRight();
+        }
 
-                VerifyAllMocks(globalRoleService);
+        [Fact]
+        public async Task UserIsAlreadyBau_TriesUpgradingToBau_Returns400()
+        {
+            User activeUser = _dataFixture.DefaultUser().WithRoleId(GlobalRoles.Role.BauUser.GetEnumValue());
 
-                Assert.True(result.IsRight);
+            var userRepository = new Mock<IUserRepository>(Strict);
 
-                globalRoleService.Verify(mock => mock.SetGlobalRoleForUser(user.Id, role.Id), Times.Once);
-            }
+            userRepository
+                .Setup(mock => mock.FindActiveUserById(activeUser.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(activeUser);
+
+            var service = SetupService(userRepository: userRepository.Object);
+
+            var result = await service.UpdateUserGlobalRole(activeUser.Id, GlobalRoles.Role.BauUser);
+
+            VerifyAllMocks(userRepository);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal(ValidationErrorMessages.UserIsAlreadyBauUser.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task UserIsNotBau_TriesDowngradingFromBau_Returns400()
+        {
+            User activeUser = _dataFixture.DefaultUser().WithRoleId(GlobalRoles.Role.StandardUser.GetEnumValue());
+
+            var userRepository = new Mock<IUserRepository>(Strict);
+
+            userRepository
+                .Setup(mock => mock.FindActiveUserById(activeUser.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(activeUser);
+
+            var service = SetupService(userRepository: userRepository.Object);
+
+            var result = await service.UpdateUserGlobalRole(activeUser.Id, GlobalRoles.Role.StandardUser);
+
+            VerifyAllMocks(userRepository);
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal(ValidationErrorMessages.UserIsAlreadyStandardUser.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task ActiveUserDoesNotExist_ReturnsNotFound()
+        {
+            var userId = Guid.NewGuid();
+
+            var userRepository = new Mock<IUserRepository>(Strict);
+
+            userRepository
+                .Setup(mock => mock.FindActiveUserById(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
+
+            var service = SetupService(userRepository: userRepository.Object);
+
+            var result = await service.UpdateUserGlobalRole(userId, GlobalRoles.Role.StandardUser);
+
+            result.AssertNotFound();
         }
     }
 
@@ -371,21 +444,14 @@ public abstract class UserManagementServiceTests
         [MemberData(nameof(InviteUserOptionalCreatedDates))]
         public async Task Success(DateTimeOffset? createdDate)
         {
-            var email = "test@test.com";
-
-            var role = new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role 1",
-                NormalizedName = "ROLE 1",
-            };
+            var isBau = false;
+            var globalRoleToSet = GlobalRoles.Role.StandardUser;
 
             User userToCreate = _dataFixture
                 .DefaultUserWithPendingInvite()
-                .WithEmail(email.ToLower())
                 .WithCreated(createdDate ?? DateTimeOffset.UtcNow)
                 .WithCreatedById(CreatedById)
-                .WithRoleId(role.Id);
+                .WithRoleId(globalRoleToSet.GetEnumValue());
 
             var (release1, release2) = _dataFixture.DefaultRelease(publishedVersions: 1).GenerateTuple2();
 
@@ -411,18 +477,17 @@ public abstract class UserManagementServiceTests
             );
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.FindActiveUserByEmail(email.ToLower(), It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.FindActiveUserByEmail(userToCreate.Email.ToLower(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
             userRepository
                 .Setup(mock =>
                     mock.CreateOrUpdate(
-                        email.ToLower(),
-                        role.Id,
+                        userToCreate.Email.ToLower(),
                         CreatedById,
+                        globalRoleToSet,
                         createdDate,
                         It.IsAny<CancellationToken>()
                     )
@@ -477,12 +542,6 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.NotifyUserOfInvite(userToCreate.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
-            {
-                usersAndRolesDbContext.Roles.Add(role);
-                await usersAndRolesDbContext.SaveChangesAsync();
-            }
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.AddRange(publication1, publication2);
@@ -490,11 +549,9 @@ public abstract class UserManagementServiceTests
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var service = SetupService(
                     contentDbContext: contentDbContext,
-                    usersAndRolesDbContext: usersAndRolesDbContext,
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object,
@@ -503,8 +560,8 @@ public abstract class UserManagementServiceTests
 
                 var inviteRequest = new UserInviteCreateRequest
                 {
-                    Email = email,
-                    RoleId = role.Id,
+                    Email = userToCreate.Email,
+                    IsBau = isBau,
                     UserPreReleaseRoles = userPreReleaseRoles,
                     UserPublicationRoles = userPublicationRoles,
                     CreatedDate = createdDate,
@@ -514,10 +571,10 @@ public abstract class UserManagementServiceTests
 
                 var invitedUser = result.AssertRight();
 
-                Assert.Equal(email.ToLower(), invitedUser.Email);
+                Assert.Equal(userToCreate.Email.ToLower(), invitedUser.Email);
                 Assert.Null(invitedUser.FirstName);
                 Assert.Null(invitedUser.LastName);
-                Assert.Equal(role.Id, invitedUser.RoleId);
+                Assert.Equal(globalRoleToSet.GetEnumValue(), invitedUser.RoleId);
                 Assert.False(invitedUser.Active);
                 Assert.Null(invitedUser.SoftDeleted);
                 Assert.Null(invitedUser.DeletedById);
@@ -533,23 +590,95 @@ public abstract class UserManagementServiceTests
             );
         }
 
+        [Theory]
+        [InlineData(true, GlobalRoles.Role.BauUser)]
+        [InlineData(false, GlobalRoles.Role.StandardUser)]
+        public async Task SetsCorrectGlobalRole(bool isBau, GlobalRoles.Role expectedGlobalRoleToSet)
+        {
+            User userToCreate = _dataFixture
+                .DefaultUserWithPendingInvite()
+                .WithRoleId(expectedGlobalRoleToSet.GetEnumValue());
+
+            var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindActiveUserByEmail(userToCreate.Email.ToLower(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
+            userRepository
+                .Setup(mock =>
+                    mock.CreateOrUpdate(
+                        userToCreate.Email.ToLower(),
+                        CreatedById,
+                        expectedGlobalRoleToSet,
+                        null,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(userToCreate);
+
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository
+                .Setup(mock =>
+                    mock.CreateManyIfNotExists(
+                        Array.Empty<UserPreReleaseRoleCreateDto>().ToHashSet(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
+
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            userPublicationRoleRepository
+                .Setup(mock =>
+                    mock.CreateManyIfNotExists(
+                        Array.Empty<UserPublicationRoleCreateDto>().ToHashSet(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
+
+            var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
+            userResourceRoleNotificationService
+                .Setup(mock => mock.NotifyUserOfInvite(userToCreate.Id, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var service = SetupService(
+                userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userRepository: userRepository.Object,
+                userResourceRoleNotificationService: userResourceRoleNotificationService.Object
+            );
+
+            var inviteRequest = new UserInviteCreateRequest
+            {
+                Email = userToCreate.Email,
+                IsBau = isBau,
+                UserPreReleaseRoles = [],
+                UserPublicationRoles = [],
+            };
+
+            var result = await service.InviteUser(inviteRequest);
+
+            var invitedUser = result.AssertRight();
+
+            Assert.Equal(expectedGlobalRoleToSet.GetEnumValue(), invitedUser.RoleId);
+
+            VerifyAllMocks(
+                userPreReleaseRoleRepository,
+                userPublicationRoleRepository,
+                userRepository,
+                userResourceRoleNotificationService
+            );
+        }
+
         [Fact]
         public async Task MultipleReleaseAndPublicationRoles()
         {
-            var email = "test@test.com";
-
-            var role = new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role 1",
-                NormalizedName = "ROLE 1",
-            };
+            var isBau = false;
+            var globalRoleToSet = GlobalRoles.Role.StandardUser;
 
             User userToCreate = _dataFixture
                 .DefaultUserWithPendingInvite()
-                .WithEmail(email.ToLower())
                 .WithCreatedById(CreatedById)
-                .WithRoleId(role.Id);
+                .WithRoleId(globalRoleToSet.GetEnumValue());
 
             var (release1, release2, release3, release4) = _dataFixture
                 .DefaultRelease(publishedVersions: 1)
@@ -585,13 +714,6 @@ public abstract class UserManagementServiceTests
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
-
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
-            {
-                usersAndRolesDbContext.Roles.Add(role);
-                await usersAndRolesDbContext.SaveChangesAsync();
-            }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -601,11 +723,17 @@ public abstract class UserManagementServiceTests
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.FindActiveUserByEmail(email.ToLower(), It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.FindActiveUserByEmail(userToCreate.Email.ToLower(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
             userRepository
                 .Setup(mock =>
-                    mock.CreateOrUpdate(email.ToLower(), role.Id, CreatedById, null, It.IsAny<CancellationToken>())
+                    mock.CreateOrUpdate(
+                        userToCreate.Email.ToLower(),
+                        CreatedById,
+                        globalRoleToSet,
+                        null,
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ReturnsAsync(userToCreate);
 
@@ -665,11 +793,9 @@ public abstract class UserManagementServiceTests
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var service = SetupService(
                     contentDbContext: contentDbContext,
-                    usersAndRolesDbContext: usersAndRolesDbContext,
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userRepository: userRepository.Object,
@@ -678,8 +804,8 @@ public abstract class UserManagementServiceTests
 
                 var inviteRequest = new UserInviteCreateRequest
                 {
-                    Email = email,
-                    RoleId = role.Id,
+                    Email = userToCreate.Email,
+                    IsBau = isBau,
                     UserPreReleaseRoles = userPreReleaseRoles,
                     UserPublicationRoles = userPublicationRoles,
                 };
@@ -688,10 +814,10 @@ public abstract class UserManagementServiceTests
 
                 var invitedUser = result.AssertRight();
 
-                Assert.Equal(email.ToLower(), invitedUser.Email);
+                Assert.Equal(userToCreate.Email.ToLower(), invitedUser.Email);
                 Assert.Null(invitedUser.FirstName);
                 Assert.Null(invitedUser.LastName);
-                Assert.Equal(role.Id, invitedUser.RoleId);
+                Assert.Equal(globalRoleToSet.GetEnumValue(), invitedUser.RoleId);
                 Assert.False(invitedUser.Active);
                 Assert.Null(invitedUser.SoftDeleted);
                 Assert.Null(invitedUser.DeletedById);
@@ -722,7 +848,7 @@ public abstract class UserManagementServiceTests
             var inviteRequest = new UserInviteCreateRequest
             {
                 Email = activeUser.Email,
-                RoleId = Guid.NewGuid().ToString(),
+                IsBau = false,
                 UserPreReleaseRoles = [],
                 UserPublicationRoles = [],
             };
@@ -730,33 +856,6 @@ public abstract class UserManagementServiceTests
             var result = await service.InviteUser(inviteRequest);
 
             result.AssertBadRequest(ValidationErrorMessages.UserAlreadyExists);
-
-            VerifyAllMocks(userRepository);
-        }
-
-        [Fact]
-        public async Task InvalidUserRole_ReturnsBadRequest()
-        {
-            var email = "test@test.com";
-
-            var userRepository = new Mock<IUserRepository>(Strict);
-            userRepository
-                .Setup(mock => mock.FindActiveUserByEmail(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null);
-
-            var service = SetupService(userRepository: userRepository.Object);
-
-            var inviteRequest = new UserInviteCreateRequest
-            {
-                Email = email,
-                RoleId = Guid.NewGuid().ToString(),
-                UserPreReleaseRoles = [],
-                UserPublicationRoles = [],
-            };
-
-            var result = await service.InviteUser(inviteRequest);
-
-            result.AssertBadRequest(ValidationErrorMessages.InvalidUserRole);
 
             VerifyAllMocks(userRepository);
         }
@@ -918,9 +1017,7 @@ public abstract class UserManagementServiceTests
     private static UserManagementService SetupService(
         ContentDbContext? contentDbContext = null,
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
-        IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
         IUserRoleService? userRoleService = null,
-        IGlobalRoleService? globalRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
@@ -936,9 +1033,7 @@ public abstract class UserManagementServiceTests
         return new UserManagementService(
             usersAndRolesDbContext,
             contentDbContext,
-            usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-            globalRoleService ?? Mock.Of<IGlobalRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),

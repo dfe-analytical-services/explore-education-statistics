@@ -172,7 +172,9 @@ public class DataSetVersionMappingService(
         return await publicDataDbContext.RequireTransaction(async () =>
             await userService
                 .CheckIsBauUser()
-                .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+                .OnSuccess(() =>
+                    CheckMappingExists(nextDataSetVersionId, cancellationToken).OnSuccess(CheckInMappingStatus)
+                )
                 .OnSuccess(_ => validateCandidatesFn())
                 .OnSuccess(validationResults =>
                 {
@@ -777,6 +779,23 @@ public class DataSetVersionMappingService(
             .OnSuccess(createSuccessfulResponseFn);
     }
 
+    private static Either<ActionResult, Unit> CheckInMappingStatus(DataSetVersionMapping mapping)
+    {
+        if (mapping.TargetDataSetVersion.Status != DataSetVersionStatus.Mapping)
+        {
+            return ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.DataSetVersionMappingCannotBeUpdated.Code,
+                    Message = ValidationMessages.DataSetVersionMappingCannotBeUpdated.Message,
+                    Path = "nextDataSetVersionId",
+                }
+            );
+        }
+
+        return Unit.Instance;
+    }
+
     private async Task<Either<ActionResult, DataSetVersionMapping>> CheckMappingExists(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken
@@ -784,6 +803,7 @@ public class DataSetVersionMappingService(
     {
         return await publicDataDbContext
             .DataSetVersionMappings.AsNoTracking()
+            .Include(mapping => mapping.TargetDataSetVersion)
             .SingleOrNotFoundAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken

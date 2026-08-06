@@ -1,6 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
@@ -8,7 +7,7 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JsonKnownTypes" Version="0.7.0" />
+    <PackageReference Include="JsonKnownTypes" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />

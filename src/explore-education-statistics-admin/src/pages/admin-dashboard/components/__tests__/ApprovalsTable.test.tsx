@@ -67,7 +67,6 @@ describe('ApprovalsTable', () => {
       approvalStatus: 'Approved',
       amendment: false,
       permissions: {
-        canAddPreReleaseUsers: true,
         canUpdateRelease: true,
         canViewReleaseVersion: true,
         canUpdateReleaseVersion: true,
@@ -110,7 +109,6 @@ describe('ApprovalsTable', () => {
       previousVersionId: 'old-release-2-id',
       amendment: false,
       permissions: {
-        canAddPreReleaseUsers: true,
         canUpdateRelease: true,
         canViewReleaseVersion: true,
         canUpdateReleaseVersion: true,

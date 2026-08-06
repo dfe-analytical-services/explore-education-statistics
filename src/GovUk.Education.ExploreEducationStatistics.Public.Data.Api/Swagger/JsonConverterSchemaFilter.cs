@@ -1,11 +1,11 @@
 using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -26,7 +26,7 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         typeof(TimeIdentifier),
     ];
 
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
         if (context.Type is { IsClass: false })
         {
@@ -53,7 +53,10 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
                 continue;
             }
 
-            if (!schema.Properties.TryGetValue(property.Name.CamelCase(), out var propertySchema))
+            if (
+                schema.Properties is null
+                || !schema.Properties.TryGetValue(property.Name.CamelCase(), out var propertySchema)
+            )
             {
                 continue;
             }
@@ -84,11 +87,16 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
 
     private void ApplyEnumConverter(
         Type enumType,
-        OpenApiSchema propertySchema,
+        IOpenApiSchema propertySchema,
         Type converterType,
         SchemaRepository schemaRepository
     )
     {
+        if (propertySchema is not OpenApiSchema openApiSchema)
+        {
+            return;
+        }
+
         var hasEnumConverter = false;
 
         var converterBaseType = converterType.IsGenericType ? converterType.GetGenericTypeDefinition() : converterType;
@@ -100,52 +108,57 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         {
             hasEnumConverter = true;
 
-            propertySchema.Type = "string";
-            propertySchema.Enum = Enum.GetNames(enumType).Select(name => new OpenApiString(name)).ToList<IOpenApiAny>();
+            openApiSchema.Type = JsonSchemaType.String;
+            openApiSchema.Enum = Enum.GetNames(enumType).Select(JsonNode (name) => JsonValue.Create(name)).ToList();
         }
         else if (converterBaseType == typeof(EnumToEnumLabelJsonConverter<>))
         {
             hasEnumConverter = true;
 
-            propertySchema.Type = "string";
-            propertySchema.Enum = Enum.GetValues(enumType)
+            openApiSchema.Type = JsonSchemaType.String;
+            openApiSchema.Enum = Enum.GetValues(enumType)
                 .Cast<Enum>()
-                .Select(name => new OpenApiString(name.GetEnumLabel()))
-                .ToList<IOpenApiAny>();
+                .Select(JsonNode (name) => JsonValue.Create(name.GetEnumLabel()))
+                .ToList();
         }
         else if (converterBaseType == typeof(EnumToEnumValueJsonConverter<>))
         {
             hasEnumConverter = true;
 
-            propertySchema.Type = "string";
-            propertySchema.Enum = Enum.GetValues(enumType)
+            openApiSchema.Type = JsonSchemaType.String;
+            openApiSchema.Enum = Enum.GetValues(enumType)
                 .Cast<Enum>()
-                .Select(name => new OpenApiString(name.GetEnumValue()))
-                .ToList<IOpenApiAny>();
+                .Select(JsonNode (name) => JsonValue.Create(name.GetEnumValue()))
+                .ToList();
         }
 
-        if (hasEnumConverter && schemaRepository.TryLookupByType(enumType, out var enumSchema))
+        if (hasEnumConverter && schemaRepository.TryLookupByType(enumType, out var enumSchemaRef))
         {
             // Clear any references to the enum schema as this would get merged together
             // with the property in the final document and produce incorrect enum values.
-
-            if (propertySchema.Reference is not null && propertySchema.Reference.Id == enumSchema.Reference.Id)
+            if (openApiSchema.AllOf is not null)
             {
-                propertySchema.Reference = null;
+                openApiSchema.AllOf = openApiSchema
+                    .AllOf.Where(s =>
+                        s is not OpenApiSchemaReference openApiSchemaReference
+                        || openApiSchemaReference.Reference.Id != enumSchemaRef.Reference.Id
+                    )
+                    .ToList();
             }
-
-            propertySchema.AllOf = propertySchema
-                .AllOf.Where(s => s.Reference is null || s.Reference.Id != enumSchema.Reference.Id)
-                .ToList();
         }
     }
 
     private void ApplyReadOnlyListEnumConverter(
-        OpenApiSchema propertySchema,
+        IOpenApiSchema propertySchema,
         Type converterType,
         SchemaRepository schemaRepository
     )
     {
+        if (propertySchema is not OpenApiSchema openApiSchema)
+        {
+            return;
+        }
+
         if (converterType.GetGenericTypeDefinition() != typeof(ReadOnlyListJsonConverter<,>))
         {
             return;
@@ -158,6 +171,14 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
             return;
         }
 
-        ApplyEnumConverter(enumType, propertySchema.Items, converterType.GenericTypeArguments[1], schemaRepository);
+        if (openApiSchema.Items is not null)
+        {
+            // Items may be a $ref to the enum's shared component schema. Replace it
+            // with a new inline schema so ApplyEnumConverter can set Type and Enum on it
+            // without mutating the shared component schema used elsewhere in the document.
+            var itemsSchema = new OpenApiSchema();
+            openApiSchema.Items = itemsSchema;
+            ApplyEnumConverter(enumType, itemsSchema, converterType.GenericTypeArguments[1], schemaRepository);
+        }
     }
 }

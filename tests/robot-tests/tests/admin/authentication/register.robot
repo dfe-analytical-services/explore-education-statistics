@@ -21,7 +21,7 @@ Create publication and release and ensure that the invitee is not already regist
     user creates test release via api    ${publication_id}    AY    2000
     delete test user    %{PENDING_INVITE_USER_EMAIL}
 
-Invite the user as an Analyst with publication and pre-release roles
+Invite the user as a Standard User with publication and pre-release roles
     user clicks link    Platform administration
     user waits until h1 is visible    Platform administration
     user clicks link    Invite new users
@@ -48,21 +48,21 @@ Invite the user as an Analyst with publication and pre-release roles
     user waits until h1 is visible    Pending invites
     user closes the browser
 
-Sign in as the invitee to register as an Analyst
+Sign in as the invitee to register as a Standard User
     user opens browser and logs in via Identity Provider
 
-Check that the user is on the dashboard and has the correct access for an Analyst
-    user checks for Analyst access on the Dashboard
+Check that the user is on the dashboard and has the correct access for an Standard User
+    user checks for Standard User access on the Dashboard
 
-Log out and log back in again to make sure that the user still has the correct access for an Analyst
+Log out and log back in again to make sure that the user still has the correct access for an Standard User
     user closes the browser
     user opens browser and logs in via Identity Provider
-    user checks for Analyst access on the Dashboard
+    user checks for Standard User access on the Dashboard
 
 Clear down the invited user so that we can invite them again
     delete test user    %{PENDING_INVITE_USER_EMAIL}
 
-Invite the user as a BAU user
+Invite the user as a Super User
     user signs in as bau1
     user clicks link    Platform administration
     user waits until h1 is visible    Platform administration
@@ -71,21 +71,22 @@ Invite the user as a BAU user
     user clicks link    Invite a new user
     user waits until h1 is visible    Invite user
     user enters text into element    name:userEmail    %{PENDING_INVITE_USER_EMAIL}
-    user chooses select option    name:roleId    BAU User
+    user clicks checkbox    Super User
+    user checks checkbox is checked    Super User
     user clicks button    Send invite
     user waits until h1 is visible    Pending invites
     user closes the browser
 
-Sign in as the invitee to register as a BAU user
+Sign in as the invitee to register as a Super User
     user opens browser and logs in via Identity Provider
 
-Check that the user is on the dashboard and has the correct access for a BAU user
-    user checks for BAU access on the Dashboard
+Check that the user is on the dashboard and has the correct access for a Super User
+    user checks for Super User access on the Dashboard
 
-Log out and log back in again to make sure that the user still has the correct access for a BAU user
+Log out and log back in again to make sure that the user still has the correct access for a Super User
     user closes the browser
     user opens browser and logs in via Identity Provider
-    user checks for BAU access on the Dashboard
+    user checks for Super User access on the Dashboard
 
 
 *** Keywords ***
@@ -102,14 +103,14 @@ user opens browser and logs in via Identity Provider
     ...    %{PENDING_INVITE_USER_EMAIL}
     ...    %{PENDING_INVITE_USER_PASSWORD}
 
-user checks for Analyst access on the Dashboard
+user checks for Standard User access on the Dashboard
     user waits until page contains title    Dashboard
     user waits until h3 is visible    %{TEST_THEME_NAME}
     user waits until page contains link    ${PUBLICATION_NAME}
     user checks page contains    Logged in as Pending
     user checks page does not contain link    Platform administration
 
-user checks for BAU access on the Dashboard
+user checks for Super User access on the Dashboard
     user waits until page contains title    Dashboard
     user checks page contains    Logged in as Pending
     user checks page contains link    Platform administration

@@ -4,15 +4,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;
 
-public class EnumToEnumValueConverter<TEnum> : ValueConverter<TEnum, string>
+public class EnumToEnumValueConverter<TEnum>()
+    : ValueConverter<TEnum, string>(value => ToProvider(value), value => FromProvider(value))
     where TEnum : Enum
 {
     private static readonly Dictionary<string, TEnum> Lookup = EnumUtil
         .GetEnums<TEnum>()
         .ToDictionary(value => value.GetEnumValue());
-
-    public EnumToEnumValueConverter(ConverterMappingHints? mappingHints = null)
-        : base(value => ToProvider(value), value => FromProvider(value), mappingHints) { }
 
     public static string ToProvider(TEnum value)
     {

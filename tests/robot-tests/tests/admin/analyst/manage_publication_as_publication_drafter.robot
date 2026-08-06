@@ -28,7 +28,7 @@ Check that no publication roles are listed yet on the Team access page
 
 Assign publication drafter permissions to analyst1
     user adds publication role to user via api
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
     ...    ${PUBLICATION_ID}
     ...    Drafter
 
@@ -70,15 +70,15 @@ Update publication details
 
     user clicks button    Edit publication details
 
-    # Only BAU should see title
+    # Only Super Users should see title
     user checks page does not contain element    id:publicationDetailsForm-title
 
     user waits until page contains element    id:publicationDetailsForm-summary
 
-    # Only BAU should see theme
+    # Only Super Users should see theme
     user checks page does not contain element    name:themeId
 
-    # Only BAU users should see supersededById
+    # Only Super Users should see supersededById
     user checks page does not contain element    id:publicationDetailsForm-supersededById
 
     user enters text into element    id:publicationDetailsForm-summary    UI test publication summary

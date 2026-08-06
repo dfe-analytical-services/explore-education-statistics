@@ -14,6 +14,8 @@ public interface IAuthorizationHandlerService
 
     Task<bool> UserHasAnyRoleOnPublication(Guid userId, Guid publicationId);
 
+    Task<bool> UserHasAnyPublicationRole(Guid userId);
+
     Task<bool> UserHasPreReleaseRoleOnReleaseVersion(Guid userId, Guid releaseVersionId);
 
     Task<bool> IsReleaseVersionViewableByUser(ReleaseVersion releaseVersion, ClaimsPrincipal user);

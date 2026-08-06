@@ -66,7 +66,6 @@ const defaultProps = {
 const defaultPermissions = {
   isBauUser: true,
   canAccessSystem: true,
-  canAccessPreReleasePages: true,
   canAccessAnalystPages: true,
   canAccessAllImports: true,
   canManageAllTaxonomy: true,
@@ -103,11 +102,6 @@ describe('PendingDataReplacementSection', () => {
 
     expect(
       screen.queryByText(/explore.statistics@education.gov.uk/i),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(
-        /You do not have permission to cancel this data replacement. This is because it is linked to an API data set version which can only be modified by BAU users./i,
-      ),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByText(

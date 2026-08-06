@@ -25,18 +25,39 @@ export const PipelineStageLabels: Record<PipelineStageType, string> = {
   [PipelineStage.COMPLETE]: 'Results',
 };
 
-export interface RetrievedDataset {
-  rawRelevanceScore: number;
-  relevanceScore: number;
+interface TokenUsage {
+  input: number;
+  output: number;
+}
+
+interface DatasetResultBase {
+  dataSetFileId: string;
+  description: string;
+  fileId: string;
+  publicationId: string;
+  publicationSlug: string;
+  publicationTitle: string;
+  releaseSlug: string;
+  releaseVersionId: string;
+  subjectId: string;
   title: string;
 }
 
-export interface ShortlistedDataset {
-  fileId: string;
+export interface RetrievedDataset extends DatasetResultBase {
+  filters: string[];
+  indicators: string[];
+  rawRelevanceScore: number;
+  relevanceScore: number;
+  timePeriodRange?: {
+    from: string;
+    to: string;
+  };
+}
+
+export interface ShortlistedDataset extends DatasetResultBase {
   relevantFilters: string[];
   relevanceReason: string;
   relevanceScore: number;
-  title: string;
 }
 
 export interface GeographicLevelItem {
@@ -45,23 +66,26 @@ export interface GeographicLevelItem {
   value: string;
 }
 
-export interface FinalDataset {
-  aiSummary: string;
-  fileId: string;
-  filters: string[];
+export interface FilterIndicatorItem {
+  id: string;
+  label: string;
+}
+
+export interface FinalDataset extends DatasetResultBase {
+  filters: FilterIndicatorItem[];
   geographicLevels: Dictionary<GeographicLevelItem[]>;
+  indicators: FilterIndicatorItem[];
+  relevanceReason: string;
   timePeriod: {
     start: {
       code: string;
-      year: string;
+      year: number;
     };
     end: {
       code: string;
-      year: string;
+      year: number;
     };
-  };
-  indicators: string[];
-  title: string;
+  } | null;
 }
 
 export interface StageStarting {
@@ -76,25 +100,24 @@ export interface StageRetrieved {
 export interface StageReranker {
   stage: typeof PipelineStage.RERANKER;
   data: {
+    confidence: string;
+    cost: number;
+    datasets: ShortlistedDataset[];
     queryRequirements: {
       filters: string[];
       geography: string[];
-      timePeriod: string;
+      timePeriod: string | null;
     };
-    shortlistedDatasets: ShortlistedDataset[];
-    confidence: string;
+    tokenUsage: TokenUsage;
   };
 }
 
 export interface StageComplete {
   stage: typeof PipelineStage.COMPLETE;
   data: {
-    datasets: FinalDataset[];
-    token_usage: {
-      input: number;
-      output: number;
-    };
     cost: number;
+    datasets: FinalDataset[];
+    tokenUsage: TokenUsage;
   };
 }
 

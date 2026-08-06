@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
@@ -8,7 +7,7 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GeoJSON.Net" Version="1.4.1" />
+    <PackageReference Include="GeoJSON.Net" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Migrations\*.sql">

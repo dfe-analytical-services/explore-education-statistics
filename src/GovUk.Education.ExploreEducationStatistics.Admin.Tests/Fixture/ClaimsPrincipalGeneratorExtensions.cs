@@ -36,28 +36,14 @@ public static class ClaimsPrincipalGeneratorExtensions
             .ForInstance(s => EnumUtil.GetEnums<SecurityClaimTypes>().ForEach(c => s.AddClaim(c.ToString())));
     }
 
-    public static Generator<ClaimsPrincipal> AnalystUser(this DataFixture fixture)
+    public static Generator<ClaimsPrincipal> StandardUser(this DataFixture fixture)
     {
         return fixture
             .Generator<ClaimsPrincipal>()
             .WithId(Guid.NewGuid())
-            .WithRole(GlobalRoles.RoleNames.Analyst)
+            .WithRole(GlobalRoles.RoleNames.StandardUser)
             .WithScope(SecurityScopes.AccessAdminApiScope)
-            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.AnalystPagesAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.CanViewPrereleaseContacts));
-    }
-
-    public static Generator<ClaimsPrincipal> PreReleaseUser(this DataFixture fixture)
-    {
-        return fixture
-            .Generator<ClaimsPrincipal>()
-            .WithId(Guid.NewGuid())
-            .WithRole(GlobalRoles.RoleNames.PrereleaseUser)
-            .WithScope(SecurityScopes.AccessAdminApiScope)
-            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted))
-            .WithClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted));
+            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted));
     }
 
     public static Generator<ClaimsPrincipal> WithId(this Generator<ClaimsPrincipal> generator, Guid userId) =>

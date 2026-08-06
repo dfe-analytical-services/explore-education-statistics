@@ -8,7 +8,7 @@ public record UserInviteCreateRequest
 {
     public string Email { get; set; } = string.Empty;
 
-    public string RoleId { get; init; } = string.Empty;
+    public bool IsBau { get; init; }
 
     public DateTimeOffset? CreatedDate { get; init; }
 
@@ -30,8 +30,6 @@ public record UserInviteCreateRequest
         public Validator()
         {
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
-
-            RuleFor(x => x.RoleId).NotEmpty();
         }
     }
 }

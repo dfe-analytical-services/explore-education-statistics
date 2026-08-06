@@ -498,7 +498,7 @@ Backdate ${PUPIL_ABSENCE_METHODOLOGY_TITLE} published date
 Give Analyst1 Drafter access to ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user gives analyst publication drafter access
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
 
 Create ${EXCLUSIONS_PUBLICATION_TITLE}
     ${PUBLICATION_ID}=    user creates test publication via api
@@ -884,7 +884,7 @@ Backdate ${EXCLUSIONS_METHODOLOGY_TITLE} published date
 Give Analyst1 Drafter access to ${EXCLUSIONS_PUBLICATION_TITLE}
     user gives analyst publication drafter access
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
-    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ees-test.analyst1@education.gov.uk
 
 
 *** Keywords ***

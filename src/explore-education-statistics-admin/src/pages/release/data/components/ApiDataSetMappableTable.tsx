@@ -29,6 +29,7 @@ interface Props {
   mappableItems: MappableItem[];
   newItems?: CandidateWithKey[];
   pendingUpdates?: PendingMappingUpdate[];
+  readOnly?: boolean;
   renderCandidate: (candidate: CandidateWithKey) => ReactNode;
   renderCaptionEnd?: ReactNode;
   renderSource: (source: MappableSourceItem) => ReactNode;
@@ -46,6 +47,7 @@ export default function ApiDataSetMappableTable({
   mappableItems,
   newItems = [],
   pendingUpdates = [],
+  readOnly = false,
   renderCandidate,
   renderCaptionEnd,
   renderSource,
@@ -91,7 +93,7 @@ export default function ApiDataSetMappableTable({
             <th className="govuk-!-width-one-third">Current data set</th>
             <th className="govuk-!-width-one-third">New data set</th>
             <th>Type</th>
-            <th className="govuk-!-text-align-right">Actions</th>
+            {!readOnly && <th className="govuk-!-text-align-right">Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -132,50 +134,52 @@ export default function ApiDataSetMappableTable({
                     {getUpdateTagText(mapping.type, isMajorMapping)}
                   </Tag>
                 </td>
-                <td className="govuk-!-text-align-right">
-                  {isPendingUpdate ? (
-                    <LoadingSpinner
-                      alert
-                      hideText
-                      inline
-                      size="sm"
-                      text={`Updating mapping for ${mapping.source.label}`}
-                    />
-                  ) : (
-                    <>
-                      {mapping.type !== 'ManualNone' && (
-                        <ButtonText
-                          onClick={async () => {
-                            await onUpdate({
-                              groupKey,
-                              previousCandidate: candidate,
-                              previousMapping: mapping,
-                              sourceKey: mapping.sourceKey,
-                              type: 'ManualNone',
-                            });
-                          }}
-                        >
-                          No mapping
-                          <VisuallyHidden>
-                            {' '}
-                            for {mapping.source.label}
-                          </VisuallyHidden>
-                        </ButtonText>
-                      )}
-
-                      <ApiDataSetMappingModal
-                        candidate={candidate}
-                        candidateHint={candidateHint}
-                        groupKey={groupKey}
-                        itemLabel={itemLabel}
-                        mapping={mapping}
-                        newItems={newItems}
-                        renderSourceDetails={renderSourceDetails}
-                        onSubmit={onUpdate}
+                {!readOnly && (
+                  <td className="govuk-!-text-align-right">
+                    {isPendingUpdate ? (
+                      <LoadingSpinner
+                        alert
+                        hideText
+                        inline
+                        size="sm"
+                        text={`Updating mapping for ${mapping.source.label}`}
                       />
-                    </>
-                  )}
-                </td>
+                    ) : (
+                      <>
+                        {mapping.type !== 'ManualNone' && (
+                          <ButtonText
+                            onClick={async () => {
+                              await onUpdate({
+                                groupKey,
+                                previousCandidate: candidate,
+                                previousMapping: mapping,
+                                sourceKey: mapping.sourceKey,
+                                type: 'ManualNone',
+                              });
+                            }}
+                          >
+                            No mapping
+                            <VisuallyHidden>
+                              {' '}
+                              for {mapping.source.label}
+                            </VisuallyHidden>
+                          </ButtonText>
+                        )}
+
+                        <ApiDataSetMappingModal
+                          candidate={candidate}
+                          candidateHint={candidateHint}
+                          groupKey={groupKey}
+                          itemLabel={itemLabel}
+                          mapping={mapping}
+                          newItems={newItems}
+                          renderSourceDetails={renderSourceDetails}
+                          onSubmit={onUpdate}
+                        />
+                      </>
+                    )}
+                  </td>
+                )}
               </tr>
             );
           })}
