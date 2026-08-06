@@ -108,16 +108,6 @@ public class PermissionsController(
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("permissions/release/{releaseVersionId:guid}/amend")]
-    public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseVersionId)
-    {
-        return CheckPolicyAgainstEntity<ReleaseVersion>(
-            entityId: releaseVersionId,
-            policyCheck: userService.CheckCanMakeAmendmentOfReleaseVersion,
-            hydrateEntityFn: query => query.Include(rv => rv.Release)
-        );
-    }
-
     [HttpGet("permissions/release/{releaseVersionId:guid}/prerelease/status")]
     public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseVersionId)
     {

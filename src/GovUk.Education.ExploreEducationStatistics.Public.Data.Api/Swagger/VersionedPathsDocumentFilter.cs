@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
@@ -15,11 +15,18 @@ public class VersionedPathsDocumentFilter : IDocumentFilter
 
             newPaths[versionedPath] = path.Value;
 
-            path.Value.Parameters = path.Value.Parameters.Where(p => p.Name != "version").ToList();
-
-            foreach (var operation in path.Value.Operations.Values)
+            if (path.Value is OpenApiPathItem pathItem)
             {
-                operation.Parameters = operation.Parameters.Where(p => p.Name != "version").ToList();
+                pathItem.Parameters = pathItem.Parameters?.Where(p => p.Name != "version").ToList();
+            }
+
+            var operations = path.Value.Operations?.Values;
+            if (operations != null)
+            {
+                foreach (var operation in operations)
+                {
+                    operation.Parameters = operation.Parameters?.Where(p => p.Name != "version").ToList();
+                }
             }
         }
 

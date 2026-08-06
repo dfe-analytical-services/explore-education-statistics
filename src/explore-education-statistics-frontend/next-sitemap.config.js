@@ -2,7 +2,7 @@
 module.exports = {
   siteUrl: process.env.PROD_PUBLIC_URL,
   sitemapSize: 5000,
-  exclude: ['/server-sitemap.xml'],
+  exclude: ['/server-sitemap.xml', '/search-data', '/search-releases'],
   generateRobotsTxt: true,
   robotsTxtOptions: {
     policies: [

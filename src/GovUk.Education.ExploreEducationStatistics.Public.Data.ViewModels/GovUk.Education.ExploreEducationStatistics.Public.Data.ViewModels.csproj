@@ -1,6 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
@@ -12,6 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
   </ItemGroup>
 </Project>

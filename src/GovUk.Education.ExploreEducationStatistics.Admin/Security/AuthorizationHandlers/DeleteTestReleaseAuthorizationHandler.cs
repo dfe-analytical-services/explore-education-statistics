@@ -19,19 +19,7 @@ public class DeleteTestReleaseAuthorizationHandler(IOptions<AppOptions> appOptio
         ReleaseVersion releaseVersion
     )
     {
-        if (!appOptions.Value.EnableThemeDeletion)
-        {
-            return Task.CompletedTask;
-        }
-
-        if (!context.User.IsInRole(GlobalRoles.Role.BauUser.GetEnumLabel()))
-        {
-            return Task.CompletedTask;
-        }
-
-        var theme = releaseVersion.Release.Publication.Theme;
-
-        if (theme.IsTestOrSeedTheme())
+        if (appOptions.Value.EnableThemeDeletion && context.User.IsInRole(GlobalRoles.Role.BauUser.GetEnumLabel()))
         {
             context.Succeed(requirement);
         }

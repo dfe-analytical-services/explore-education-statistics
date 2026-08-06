@@ -70,16 +70,7 @@ User clicks on 'Cancel' button while after selecting 1st API data set
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
 User creates 2nd API data set
-    user clicks button    Create API data set
-    ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_2}
-    user clicks button    Confirm new API data set
-
-    user waits until page contains    Creating API data set
-    user clicks link    View API data set details
-
-    user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
+    user creates API data set and opens details    ${SUBJECT_NAME_2}
 
 User waits until the 2nd API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details
@@ -125,16 +116,7 @@ Remove draft API data set
     user waits until h2 is visible    API data sets
 
 User creates API data set again
-    user clicks button    Create API data set
-    ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
-    user clicks button    Confirm new API data set
-
-    user waits until page contains    Creating API data set
-    user clicks link    View API data set details
-
-    user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
+    user creates API data set and opens details    ${SUBJECT_NAME_1}
 
 User waits until the 1st API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details

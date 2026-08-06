@@ -1,15 +1,20 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 public class RequiredPropertySchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
+        if (schema is not OpenApiSchema openApiSchema)
+        {
+            return;
+        }
+
         var nullabilityContext = new NullabilityInfoContext();
         var properties = context.Type.GetProperties();
 
@@ -22,7 +27,7 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
 
             var jsonName = property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
 
-            var jsonKey = schema.Properties.Keys.SingleOrDefault(key =>
+            var jsonKey = openApiSchema.Properties?.Keys.SingleOrDefault(key =>
                 string.Equals(key, jsonName, StringComparison.OrdinalIgnoreCase)
             );
 
@@ -31,7 +36,7 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
                 continue;
             }
 
-            var isReferenceType = schema.Properties[jsonKey].Type == null;
+            var isReferenceType = openApiSchema.Properties![jsonKey].Type == null;
 
             if (isReferenceType)
             {
@@ -48,7 +53,8 @@ public class RequiredPropertySchemaFilter : ISchemaFilter
                 }
             }
 
-            schema.Required.Add(jsonKey);
+            openApiSchema.Required ??= new HashSet<string>();
+            openApiSchema.Required.Add(jsonKey);
         }
     }
 }

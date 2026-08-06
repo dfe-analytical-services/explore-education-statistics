@@ -85,6 +85,14 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
             .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
     }
 
+    [HttpPost("{dataSetVersionId:guid}/unfinalise")]
+    public async Task<ActionResult> UnfinaliseVersion(Guid dataSetVersionId, CancellationToken cancellationToken)
+    {
+        return await dataSetVersionService
+            .UnfinaliseVersion(dataSetVersionId, cancellationToken)
+            .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
+    }
+
     [HttpGet("{dataSetVersionId:guid}/changes")]
     [Produces("application/json")]
     public async Task<ActionResult> GetVersionChanges(Guid dataSetVersionId, CancellationToken cancellationToken)

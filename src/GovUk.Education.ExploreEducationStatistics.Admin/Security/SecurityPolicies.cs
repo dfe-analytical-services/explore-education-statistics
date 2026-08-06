@@ -26,7 +26,6 @@ public enum SecurityPolicies
     CanUpdateSpecificPublicationSummary,
     CanUpdateDrafters,
     CanCreatePublicationForSpecificTheme,
-    CanViewReleaseTeamAccess,
     CanManagePublicationReleaseSeries,
 
     /**

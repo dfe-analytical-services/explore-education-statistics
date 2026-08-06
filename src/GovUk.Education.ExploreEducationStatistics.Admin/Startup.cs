@@ -75,7 +75,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
@@ -730,18 +730,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                         Type = SecuritySchemeType.ApiKey,
                     }
                 );
-                c.AddSecurityRequirement(
-                    new OpenApiSecurityRequirement
-                    {
-                        {
-                            new OpenApiSecurityScheme
-                            {
-                                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
-                            },
-                            [string.Empty]
-                        },
-                    }
-                );
+                c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+                {
+                    { new OpenApiSecuritySchemeReference("Bearer", document), [string.Empty] },
+                });
             });
         }
     }
@@ -929,6 +921,14 @@ internal class NoOpProcessorClient : IProcessorClient
     {
         return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
     }
+
+    public Task<Either<ActionResult, Unit>> UnfinaliseDataSetVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
+    }
 }
 
 internal class NoOpDataSetVersionService : IDataSetVersionService
@@ -982,6 +982,14 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
     ) => throw new NotImplementedException();
 
     public Task<Either<ActionResult, Unit>> DeleteVersion(
+        Guid dataSetVersionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
+    }
+
+    public Task<Either<ActionResult, Unit>> UnfinaliseVersion(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default
     )

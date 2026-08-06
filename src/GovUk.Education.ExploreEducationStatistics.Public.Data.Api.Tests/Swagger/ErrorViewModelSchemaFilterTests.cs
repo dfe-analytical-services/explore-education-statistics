@@ -1,7 +1,8 @@
 using System.Text.Json;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagger;
@@ -26,12 +27,16 @@ public class ErrorViewModelSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        Assert.False(schema.Properties["code"].Nullable);
+        Assert.NotNull(schema.Properties);
+        // Code is nullable so ensure the JsonSchemaType.Null flag is not set on the type bitmask
+        Assert.False(schema.Properties[nameof(ErrorViewModel.Code).ToLowerFirst()].Type?.HasFlag(JsonSchemaType.Null));
+
+        Assert.NotNull(schema.Required);
         Assert.Contains("message", schema.Required);
         Assert.Contains("code", schema.Required);
     }
 
-    private OpenApiSchema GenerateSchema()
+    private IOpenApiSchema GenerateSchema()
     {
         _schemaGenerator.GenerateSchema(typeof(ErrorViewModel), _schemaRepository);
 

@@ -97,11 +97,6 @@ public static class StartupSecurityConfiguration
             );
 
             options.AddPolicy(
-                nameof(SecurityPolicies.CanViewReleaseTeamAccess),
-                policy => policy.Requirements.Add(new ViewSpecificPublicationReleaseTeamAccessRequirement())
-            );
-
-            options.AddPolicy(
                 nameof(SecurityPolicies.CanManagePublicationReleaseSeries),
                 policy => policy.Requirements.Add(new ManagePublicationReleaseSeriesRequirement())
             );
@@ -302,7 +297,6 @@ public static class StartupSecurityConfiguration
             IAuthorizationHandler,
             ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
         >();
-        services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ManagePublicationReleaseSeriesAuthorizationHandler>();
 
         /*

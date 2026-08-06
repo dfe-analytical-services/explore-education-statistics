@@ -52,7 +52,7 @@ describe('ManageUserPage', () => {
 
     expect(
       screen.getByRole('checkbox', {
-        name: 'BAU User',
+        name: 'Super User',
       }),
     ).toBeInTheDocument();
     expect(

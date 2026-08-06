@@ -1,4 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Comparers;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +38,21 @@ public class PublicDataDbContext : DbContext
             ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
             ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
         }
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+            .Properties<GeographicLevel>()
+            .HaveConversion<EnumToEnumValueConverter<GeographicLevel>, EnumValueComparer<GeographicLevel>>();
+
+        configurationBuilder
+            .Properties<IndicatorUnit>()
+            .HaveConversion<EnumToEnumValueConverter<IndicatorUnit>, EnumValueComparer<IndicatorUnit>>();
+
+        configurationBuilder
+            .Properties<TimeIdentifier>()
+            .HaveConversion<EnumToEnumValueConverter<TimeIdentifier>, EnumValueComparer<TimeIdentifier>>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

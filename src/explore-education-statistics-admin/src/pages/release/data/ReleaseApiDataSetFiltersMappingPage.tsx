@@ -28,6 +28,7 @@ import apiDataSetVersionService, {
 } from '@admin/services/apiDataSetVersionService';
 import NotificationBanner from '@common/components/NotificationBanner';
 import Tag from '@common/components/Tag';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -88,6 +89,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
+  const isFinalised = dataSet?.draftVersion?.status === 'Draft';
 
   useEffect(() => {
     if (filtersMapping) {
@@ -291,6 +295,10 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
   const handleUpdateMapping = useCallback(
     async (update: PendingMappingUpdate) => {
+      if (!canUpdateMappings) {
+        return;
+      }
+
       setPendingUpdates(current => [
         ...current,
         {
@@ -300,7 +308,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
       ]);
       handleUpdate();
     },
-    [handleUpdate],
+    [canUpdateMappings, handleUpdate],
   );
 
   return (
@@ -325,7 +333,14 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map filters</span>
             <h2>{dataSet?.title}</h2>
-            {!!unmappedFilterErrors.length && (
+            {isFinalised && (
+              <InsetText>
+                These mappings cannot be edited because this data set version
+                has been finalised. Unfinalise the data set version to make
+                changes.
+              </InsetText>
+            )}
+            {canUpdateMappings && !!unmappedFilterErrors.length && (
               <NotificationBanner title="Action required">
                 <ul className="govuk-list">
                   {unmappedFilterErrors.map(error => (
@@ -388,6 +403,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                     mappableItems={mappableFilterOptions[filterKey]}
                     newItems={newFilterOptions[filterKey]}
                     pendingUpdates={pendingUpdates}
+                    readOnly={!canUpdateMappings}
                     renderCandidate={candidate => candidate.label}
                     renderCaptionEnd={
                       <>
@@ -519,6 +535,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                             autoMappedItems={autoMappedFilterOptions[filterKey]}
                             newItems={newFilterOptions[filterKey]}
                             pendingUpdates={pendingUpdates}
+                            readOnly={!canUpdateMappings}
                             renderCandidate={candidate => candidate.label}
                             renderSource={source => source.label}
                             searchFilter={searchTerm =>

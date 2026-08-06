@@ -536,9 +536,6 @@ public class PublicationServiceTests
             userService
                 .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanUpdateDrafters))
                 .ReturnsAsync(false);
-            userService
-                .Setup(s => s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanViewReleaseTeamAccess))
-                .ReturnsAsync(false);
 
             var publicationService = BuildPublicationService(context, userService: userService.Object);
 
@@ -2336,7 +2333,6 @@ public class PublicationServiceTests
             Assert.True(releaseVersion.Permissions!.CanDeleteReleaseVersion);
             Assert.True(releaseVersion.Permissions!.CanUpdateRelease);
             Assert.True(releaseVersion.Permissions!.CanUpdateReleaseVersion);
-            Assert.True(releaseVersion.Permissions!.CanAddPreReleaseUsers);
             Assert.True(releaseVersion.Permissions!.CanMakeAmendmentOfReleaseVersion);
         }
     }

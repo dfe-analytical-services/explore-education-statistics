@@ -1266,9 +1266,9 @@ const DocumentationGlossary = () => {
                 measurement: 3,500kg not 3,500 kg.
               </p>
               <p>
-                <a href="#">Contact the BAU team</a> if you need to follow
-                different conventions, for example you’re writing just for
-                scientists or engineers.
+                <a href="#">Contact the Explore Education Statistics mailbox</a>{' '}
+                if you need to follow different conventions, for example you’re
+                writing just for scientists or engineers.
               </p>
               <p>
                 Abbreviating kilograms to kg is fine - you do not need to spell

@@ -296,20 +296,12 @@
     "sqlAzureAdministratorSid": {
       "type": "string"
     },
-    "secAlertRetentionDays": {
-      "defaultValue": "14",
+    "databaseAuditBlobRetentionDays": {
+      "defaultValue": "365",
       "type": "string",
       "metadata": {
-        "description": "Number of days to retain the security alerts for"
+        "description": "Number of days to retain database audit logs for in blob storage"
       }
-    },
-    "sqlAuditing": {
-      "type": "bool",
-      "defaultValue": false
-    },
-    "sqlVulnerabilityAssessments": {
-      "type": "bool",
-      "defaultValue": true
     },
     "publicAppBasicAuth": {
       "type": "string",
@@ -728,16 +720,16 @@
     },
     "datasetsSearchIndexName": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "nl-search-dataset-index",
       "metadata": {
-        "description": "The name of the Azure AI data set search index used by the public frontend application"
+        "description": "The name of the Azure AI Search data set index used by the public frontend application"
       }
     },
-    "tableToolSearchEndpoint": {
+    "nlSearchFunctionRoute": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "/api/natural_language_search_function",
       "metadata": {
-        "description": "The endpoint of the Azure Function App used by the table tool search service"
+        "description": "The HTTP route of the Natural Language Search function, relative to the Natural Language Search Function app host."
       }
     },
     "tableToolSearchFunctionsKey": {
@@ -830,7 +822,7 @@
     "contentDbName": "content",
     "statisticsDbName": "statistics",
     "statisticsReplicaDbName": "statistics",
-    "appInsightsWorkspace": "[concat(parameters('subscription'), '-', parameters('environment'), '-log')]",
+    "appInsightsWorkspaceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-log')]",
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
     "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
     "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
@@ -1003,7 +995,7 @@
         "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
         "resourceType": "Microsoft.Web/sites",
         "metricName": "HttpResponseTime",
-        "threshold": 10,
+        "threshold": 12,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -1394,6 +1386,7 @@
     "screenerStorageAccountConnectionStringSecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('screenerStorageAccountConnectionStringSecretKey'))]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
     "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
+    "nlSearchFunctionAppName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fa-nlsearch')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
     "baseAdminAllowedOrigins": [
       "[concat('https://', parameters('adminUri'))]"
@@ -1406,6 +1399,7 @@
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
     "apiVersions": {
       "afdEndpoint": "2025-06-01",
+      "nlSearchFunctionApp": "2025-03-01",
       "searchService": "2025-05-01"
     },
     "resourceIds": {
@@ -1459,7 +1453,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v8.0",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -1496,7 +1490,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
         "[variables('ees-storage-public')]"
       ],
       "properties": {
@@ -1562,6 +1555,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": false,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -1646,7 +1640,7 @@
       "properties": {
         "applicationId": "[variables('dataAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
       }
     },
     {
@@ -1695,7 +1689,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v8.0",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -1732,7 +1726,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-public')]"
       ],
       "properties": {
@@ -1793,6 +1786,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": false,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -1877,7 +1871,7 @@
       "properties": {
         "applicationId": "[variables('contentAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
       }
     },
     {
@@ -1926,7 +1920,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v8.0",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -1965,7 +1959,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-core')]",
         "[variables('ees-storage-public')]",
         "[variables('ees-storage-publisher')]"
@@ -2053,6 +2046,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": false,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -2195,7 +2189,7 @@
       "properties": {
         "applicationId": "[variables('adminAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
       }
     },
     {
@@ -2285,7 +2279,6 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
           "preWarmedInstanceCount": 1,
-          "nodeVersion": "16-lts",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -2316,7 +2309,7 @@
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
         "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
-        "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[parameters('tableToolSearchEndpoint')]",
+        "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('nlSearchFunctionAppName')), variables('apiVersions').nlSearchFunctionApp).defaultHostName, parameters('nlSearchFunctionRoute'))]",
         "AZURE_TABLE_TOOL_SEARCH_FUNCTIONS_KEY": "[parameters('tableToolSearchFunctionsKey')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
@@ -2391,7 +2384,7 @@
       "properties": {
         "applicationId": "[variables('publicAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
       }
     },
     {
@@ -2460,6 +2453,17 @@
       ],
       "sku": {
         "name": "Standard_RAGRS"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/ees-storage-core')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
       }
     },
     {
@@ -2576,7 +2580,74 @@
             "autoPauseDelay": -1,
             "storageAccountType": "GRS",
             "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]"
-          }
+          },
+          "resources": [
+            {
+              "type": "extendedAuditingSettings",
+              "apiVersion": "2025-02-01-preview",
+              "name": "Default",
+              "properties": {
+                "state": "Disabled"
+              },
+              "dependsOn": [
+                "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')))]",
+                "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]"
+              ]
+            },
+            {
+              "type": "providers/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "name": "Microsoft.Insights/serverAuditToLogAnalytics",
+              "properties": {
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]",
+                "logs": [
+                  {
+                    "category": "SQLSecurityAuditEvents",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Errors",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Timeouts",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Blocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Deadlocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "DatabaseWaitStatistics",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "Basic",
+                    "enabled": true
+                  },
+                  {
+                    "category": "InstanceAndAppAdvanced",
+                    "enabled": true
+                  },
+                  {
+                    "category": "WorkloadManagement",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+                "[resourceId('Microsoft.Sql/servers/databases/extendedAuditingSettings', variables('coreSqlServerName'), variables('statisticsDbName'), 'Default')]"
+              ]
+            }
+          ]
         },
         {
           "type": "databases",
@@ -2614,40 +2685,84 @@
             "autoPauseDelay": -1,
             "storageAccountType": "GRS",
             "minCapacity": "[if(not(empty(parameters('minCapacityContentDb'))), parameters('minCapacityContentDb'), json('null'))]"
-          }
+          },
+          "resources": [
+            {
+              "type": "extendedAuditingSettings",
+              "apiVersion": "2025-02-01-preview",
+              "name": "Default",
+              "properties": {
+                "state": "Disabled"
+              },
+              "dependsOn": [
+                "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')))]",
+                "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]"
+              ]
+            },
+            {
+              "type": "providers/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "name": "Microsoft.Insights/serverAuditToLogAnalytics",
+              "properties": {
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]",
+                "logs": [
+                  {
+                    "category": "SQLSecurityAuditEvents",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Errors",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Timeouts",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Blocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Deadlocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "DatabaseWaitStatistics",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "Basic",
+                    "enabled": true
+                  },
+                  {
+                    "category": "InstanceAndAppAdvanced",
+                    "enabled": true
+                  },
+                  {
+                    "category": "WorkloadManagement",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+                "[resourceId('Microsoft.Sql/servers/databases/extendedAuditingSettings', variables('coreSqlServerName'), variables('contentDbName'), 'Default')]"
+              ]
+            }
+          ]
         },
         {
           "name": "[concat(variables('coreSqlServerName'),'/activeDirectory')]",
           "type": "Microsoft.Sql/servers/administrators",
           "apiVersion": "2014-04-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
-          ],
           "properties": {
             "administratorType": "ActiveDirectory",
             "login": "[parameters('sqlAzureAdministratorLogin')]",
             "sid": "[parameters('sqlAzureAdministratorSid')]",
             "tenantId": "[subscription().tenantId]"
-          }
-        },
-        {
-          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('statisticsDbName'), '/current')]",
-          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-          "apiVersion": "2014-04-01",
-          "properties": {
-            "status": "Enabled"
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('statisticsDbName'))]"
-          ]
-        },
-        {
-          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('contentDbName'), '/current')]",
-          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-          "apiVersion": "2014-04-01",
-          "properties": {
-            "status": "Enabled"
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
@@ -2699,7 +2814,6 @@
           }
         },
         {
-          "condition": "[parameters('sqlVulnerabilityAssessments')]",
           "type": "vulnerabilityAssessments",
           "name": "Default",
           "apiVersion": "2018-06-01-preview",
@@ -2719,39 +2833,139 @@
           }
         },
         {
-          "condition": "[parameters('sqlAuditing')]",
-          "type": "auditingSettings",
-          "name": "DefaultAuditingSettings2",
-          "apiVersion": "2017-03-01-preview",
+          "type": "databases/extendedAuditingSettings",
+          "apiVersion": "2025-02-01-preview",
+          "name": "master/Default",
           "properties": {
-            "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
-            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
-            "eventTypesToAudit": "All",
-            "retentionDays": "[parameters('secAlertRetentionDays')]",
-            "isAzureMonitorTargetEnabled": true
+            "auditActionsAndGroups": [
+              "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+              "FAILED_DATABASE_AUTHENTICATION_GROUP",
+              "BATCH_COMPLETED_GROUP"
+            ],
+            "state": "Disabled"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')))]",
+            "[resourceId('Microsoft.Sql/servers/vulnerabilityAssessments', variables('coreSqlServerName'), 'Default')]"
           ]
         },
         {
-          "condition": "[parameters('sqlAuditing')]",
           "type": "extendedAuditingSettings",
-          "name": "Default2",
-          "apiVersion": "2017-03-01-preview",
+          "apiVersion": "2025-02-01-preview",
+          "name": "Default",
           "properties": {
-            "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "auditActionsAndGroups": [
+              "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+              "FAILED_DATABASE_AUTHENTICATION_GROUP",
+              "BATCH_COMPLETED_GROUP"
+            ],
+            "isAzureMonitorTargetEnabled": true,
+            "isManagedIdentityInUse": false,
+            "isStorageSecondaryKeyInUse": false,
+            "state": "Enabled",
+            "storageEndpoint": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob]",
             "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "eventTypesToAudit": "All",
-            "retentionDays": "[parameters('secAlertRetentionDays')]",
-            "isAzureMonitorTargetEnabled": true
+            "retentionDays": "[parameters('databaseAuditBlobRetentionDays')]"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases/extendedAuditingSettings', variables('coreSqlServerName'), 'master', 'Default')]"
+          ]
+        },
+        {
+          "type": "devOpsAuditingSettings",
+          "apiVersion": "2025-02-01-preview",
+          "name": "Default",
+          "properties": {
+            "isAzureMonitorTargetEnabled": true,
+            "isManagedIdentityInUse": false,
+            "isStorageSecondaryKeyInUse": false,
+            "state": "Enabled",
+            "storageEndpoint": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/extendedAuditingSettings', variables('coreSqlServerName'), 'Default')]"
+          ]
+        },
+        {
+          "type": "databases/providers/diagnosticSettings",
+          "apiVersion": "2021-05-01-preview",
+          "name": "master/Microsoft.Insights/serverAuditToLogAnalytics",
+          "properties": {
+            "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]",
+            "logs": [
+              {
+                "category": "SQLSecurityAuditEvents",
+                "enabled": true
+              },
+              {
+                "category": "Errors",
+                "enabled": true
+              },
+              {
+                "category": "Timeouts",
+                "enabled": true
+              },
+              {
+                "category": "Blocks",
+                "enabled": true
+              },
+              {
+                "category": "Deadlocks",
+                "enabled": true
+              },
+              {
+                "category": "DatabaseWaitStatistics",
+                "enabled": true
+              }
+            ],
+            "metrics": [
+              {
+                "category": "Basic",
+                "enabled": true
+              },
+              {
+                "category": "InstanceAndAppAdvanced",
+                "enabled": true
+              },
+              {
+                "category": "WorkloadManagement",
+                "enabled": true
+              }
+            ]
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/devOpsAuditingSettings', variables('coreSqlServerName'), 'Default')]"
+          ]
+        },
+        {
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('statisticsDbName'), '/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases/providers/diagnosticSettings', variables('coreSqlServerName'), 'master', 'Microsoft.Insights', 'serverAuditToLogAnalytics')]"
+          ]
+        },
+        {
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('contentDbName'), '/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases/providers/diagnosticSettings', variables('coreSqlServerName'), 'master', 'Microsoft.Insights', 'serverAuditToLogAnalytics')]"
           ]
         }
       ],
@@ -2858,7 +3072,61 @@
             "createMode": "OnlineSecondary",
             "sourceDatabaseId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
             "secondaryType": "Geo"
-          }
+          },
+          "resources": [
+            {
+              "type": "providers/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "name": "Microsoft.Insights/serverAuditToLogAnalytics",
+              "properties": {
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]",
+                "logs": [
+                  {
+                    "category": "SQLSecurityAuditEvents",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Errors",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Timeouts",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Blocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Deadlocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "DatabaseWaitStatistics",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "Basic",
+                    "enabled": true
+                  },
+                  {
+                    "category": "InstanceAndAppAdvanced",
+                    "enabled": true
+                  },
+                  {
+                    "category": "WorkloadManagement",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsDbName'))]"
+              ]
+            }
+          ]
         },
         {
           "name": "[concat(variables('publicSqlServerName'),'/activeDirectory')]",
@@ -2908,39 +3176,115 @@
           }
         },
         {
-          "condition": "[parameters('sqlAuditing')]",
-          "type": "auditingSettings",
-          "name": "DefaultAuditingSettings",
-          "apiVersion": "2017-03-01-preview",
+          "type": "databases/extendedAuditingSettings",
+          "apiVersion": "2025-02-01-preview",
+          "name": "master/Default",
           "properties": {
-            "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
-            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
-            "eventTypesToAudit": "All",
-            "retentionDays": "[parameters('secAlertRetentionDays')]",
-            "isAzureMonitorTargetEnabled": true
+            "auditActionsAndGroups": [
+              "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+              "FAILED_DATABASE_AUTHENTICATION_GROUP",
+              "BATCH_COMPLETED_GROUP"
+            ],
+            "state": "Disabled"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')))]",
+            "[resourceId('Microsoft.Sql/servers/vulnerabilityAssessments', variables('publicSqlServerName'), 'Default')]"
           ]
         },
         {
-          "condition": "[parameters('sqlAuditing')]",
           "type": "extendedAuditingSettings",
+          "apiVersion": "2025-02-01-preview",
           "name": "Default",
-          "apiVersion": "2017-03-01-preview",
           "properties": {
-            "State": "Enabled",
-            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "auditActionsAndGroups": [
+              "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+              "FAILED_DATABASE_AUTHENTICATION_GROUP",
+              "BATCH_COMPLETED_GROUP"
+            ],
+            "isAzureMonitorTargetEnabled": true,
+            "isManagedIdentityInUse": false,
+            "isStorageSecondaryKeyInUse": false,
+            "state": "Enabled",
+            "storageEndpoint": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob]",
             "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
             "storageAccountSubscriptionId": "[subscription().subscriptionId]",
             "eventTypesToAudit": "All",
-            "retentionDays": "[parameters('secAlertRetentionDays')]",
-            "isAzureMonitorTargetEnabled": true
+            "retentionDays": "[parameters('databaseAuditBlobRetentionDays')]"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/databases/extendedAuditingSettings', variables('publicSqlServerName'), 'master', 'Default')]"
+          ]
+        },
+        {
+          "type": "devOpsAuditingSettings",
+          "apiVersion": "2025-02-01-preview",
+          "name": "Default",
+          "properties": {
+            "isAzureMonitorTargetEnabled": true,
+            "isManagedIdentityInUse": false,
+            "isStorageSecondaryKeyInUse": false,
+            "state": "Enabled",
+            "storageEndpoint": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/extendedAuditingSettings', variables('publicSqlServerName'), 'Default')]"
+          ]
+        },
+        {
+          "type": "databases/providers/diagnosticSettings",
+          "apiVersion": "2021-05-01-preview",
+          "name": "master/Microsoft.Insights/serverAuditToLogAnalytics",
+          "properties": {
+            "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]",
+            "logs": [
+              {
+                "category": "SQLSecurityAuditEvents",
+                "enabled": true
+              },
+              {
+                "category": "Errors",
+                "enabled": true
+              },
+              {
+                "category": "Timeouts",
+                "enabled": true
+              },
+              {
+                "category": "Blocks",
+                "enabled": true
+              },
+              {
+                "category": "Deadlocks",
+                "enabled": true
+              },
+              {
+                "category": "DatabaseWaitStatistics",
+                "enabled": true
+              }
+            ],
+            "metrics": [
+              {
+                "category": "Basic",
+                "enabled": true
+              },
+              {
+                "category": "InstanceAndAppAdvanced",
+                "enabled": true
+              },
+              {
+                "category": "WorkloadManagement",
+                "enabled": true
+              }
+            ]
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/devOpsAuditingSettings', variables('publicSqlServerName'), 'Default')]"
           ]
         }
       ],
@@ -3145,6 +3489,17 @@
       }
     },
     {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/ees-storage-notifications')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
+      }
+    },
+    {
       "name": "[variables('publicStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2023-05-01",
@@ -3192,6 +3547,17 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/ees-storage-public')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
       }
     },
     {
@@ -3280,7 +3646,7 @@
       "properties": {
         "Application_Type": "web",
         "ApplicationId": "[variables('notificationsAppName')]",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
       }
     },
     {
@@ -3363,7 +3729,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v8.0",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "requestTracingEnabled": true,
@@ -3390,7 +3756,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-notifications')]"
       ],
       "properties": {
@@ -3431,7 +3796,7 @@
       "properties": {
         "Application_Type": "web",
         "ApplicationId": "[variables('importerAppName')]",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
       }
     },
     {
@@ -3515,7 +3880,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v8.0",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -3545,7 +3910,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-core')]"
       ],
       "properties": {
@@ -3581,7 +3945,7 @@
       "properties": {
         "Application_Type": "web",
         "ApplicationId": "[variables('publisherAppName')]",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
       }
     },
     {
@@ -3667,7 +4031,7 @@
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v8.0",
+          "netFrameworkVersion": "v10.0",
           "alwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -3701,7 +4065,6 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[variables('ees-storage-core')]",
         "[variables('ees-storage-public')]",
         "[variables('ees-storage-notifications')]",
@@ -3803,6 +4166,17 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/ees-storage-publisher')]",
+      "apiVersion": "2016-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
+      ],
+      "properties": {
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
       }
     },
     {
@@ -4252,90 +4626,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
         "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
-      ]
-    },
-    {
-      "name": "[variables('keyVaultName')]",
-      "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2026-02-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Key Vault",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "tenantId": "[subscription().tenantId]",
-        "sku": {
-          "family": "A",
-          "name": "Standard"
-        },
-        "enabledForDeployment": true,
-        "enabledForDiskEncryption": true,
-        "enabledForTemplateDeployment": true,
-        "enableSoftDelete": true,
-        "enablePurgeProtection": true,
-        "enableRbacAuthorization": true
-      },
-      "resources": [
-        {
-          "type": "secrets",
-          "name": "ees-storage-core",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        },
-        {
-          "type": "secrets",
-          "name": "ees-storage-notifications",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        },
-        {
-          "type": "secrets",
-          "name": "ees-storage-public",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        },
-        {
-          "type": "secrets",
-          "name": "ees-storage-publisher",
-          "apiVersion": "2016-10-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
-          ],
-          "properties": {
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
-          }
-        }
       ]
     },
     {
@@ -4683,7 +4974,7 @@
             "value": "[resourceGroup().name]"
           },
           "workspaceResourceId": {
-            "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
+            "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
           },
           "teamsPowerAutomateWebhookUrl": {
             "reference": {
@@ -4694,10 +4985,7 @@
             }
           }
         }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
-      ]
+      }
     },
     {
       "type": "Microsoft.Insights/actionGroups",

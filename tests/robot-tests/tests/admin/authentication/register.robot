@@ -62,7 +62,7 @@ Log out and log back in again to make sure that the user still has the correct a
 Clear down the invited user so that we can invite them again
     delete test user    %{PENDING_INVITE_USER_EMAIL}
 
-Invite the user as a BAU user
+Invite the user as a Super User
     user signs in as bau1
     user clicks link    Platform administration
     user waits until h1 is visible    Platform administration
@@ -71,22 +71,22 @@ Invite the user as a BAU user
     user clicks link    Invite a new user
     user waits until h1 is visible    Invite user
     user enters text into element    name:userEmail    %{PENDING_INVITE_USER_EMAIL}
-    user clicks checkbox    BAU User
-    user checks checkbox is checked    BAU User
+    user clicks checkbox    Super User
+    user checks checkbox is checked    Super User
     user clicks button    Send invite
     user waits until h1 is visible    Pending invites
     user closes the browser
 
-Sign in as the invitee to register as a BAU user
+Sign in as the invitee to register as a Super User
     user opens browser and logs in via Identity Provider
 
-Check that the user is on the dashboard and has the correct access for a BAU user
-    user checks for BAU access on the Dashboard
+Check that the user is on the dashboard and has the correct access for a Super User
+    user checks for Super User access on the Dashboard
 
-Log out and log back in again to make sure that the user still has the correct access for a BAU user
+Log out and log back in again to make sure that the user still has the correct access for a Super User
     user closes the browser
     user opens browser and logs in via Identity Provider
-    user checks for BAU access on the Dashboard
+    user checks for Super User access on the Dashboard
 
 
 *** Keywords ***
@@ -110,7 +110,7 @@ user checks for Standard User access on the Dashboard
     user checks page contains    Logged in as Pending
     user checks page does not contain link    Platform administration
 
-user checks for BAU access on the Dashboard
+user checks for Super User access on the Dashboard
     user waits until page contains title    Dashboard
     user checks page contains    Logged in as Pending
     user checks page contains link    Platform administration

@@ -101,7 +101,9 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
     }
     functionAppExists: dataProcessorFunctionAppExists
     keyVaultName: resourceNames.existingResources.keyVault
+    operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
+    linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     sku: {
       name: 'EP1'
       tier: 'ElasticPremium'

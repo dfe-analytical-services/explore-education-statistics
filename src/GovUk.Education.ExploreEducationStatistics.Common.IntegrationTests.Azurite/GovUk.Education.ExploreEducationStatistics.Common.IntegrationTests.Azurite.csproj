@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -17,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.29.1" />
-    <PackageReference Include="Testcontainers" Version="4.13.0" />
-    <PackageReference Include="Testcontainers.Azurite" Version="4.13.0" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="Testcontainers" />
+    <PackageReference Include="Testcontainers.Azurite" />
   </ItemGroup>
 
   <ItemGroup>

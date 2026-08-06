@@ -4,6 +4,18 @@ Library     admin-utilities.py
 
 
 *** Keywords ***
+user creates API data set and opens details
+    [Arguments]    ${subject_name}
+    user clicks button    Create API data set
+    ${modal}=    user waits until modal is visible    Create a new API data set
+    user chooses select option    name:releaseFileId    ${subject_name}
+    user clicks button    Confirm new API data set    ${modal}
+    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
+
+    user waits until h3 is visible    Draft API data sets
+    user clicks link in table cell    1    4    View details    testid:draft-api-data-sets
+    user waits until h3 is visible    Draft version details
+
 response should be json
     [Arguments]    ${response}
     should be equal as strings    ${response.headers['Content-Type']}    application/json; charset=utf-8

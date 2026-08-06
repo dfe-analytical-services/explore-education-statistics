@@ -15,14 +15,14 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Resource prefix for legacy resources.')
-param legacyResourcePrefix string
-
 @description('URL of the public site.')
 param publicSiteUrl string
 
 @description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
 param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
+
+@description('Name of the Key Vault instance in which to store certificates.')
+param keyVaultName string
 
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
@@ -40,7 +40,7 @@ var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}
 
 var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
 
-var certificateName = '${legacyResourcePrefix}-as-ees-public-site-certificate'
+var certificateName = '${subscription}-as-ees-public-site-certificate'
 
 var nextJsRuleSetName = 'nextjsruleset'
 
@@ -49,7 +49,7 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
   params: {
     frontDoorProfileName: frontDoorProfileName
     resourcePrefix: resourcePrefix
-    legacyResourcePrefix: legacyResourcePrefix
+    keyVaultName: keyVaultName
     siteHostName: publicSiteHostName
     originHostName: '${subscription}-as-ees-public-site.azurewebsites.net'
     customDomainName: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'

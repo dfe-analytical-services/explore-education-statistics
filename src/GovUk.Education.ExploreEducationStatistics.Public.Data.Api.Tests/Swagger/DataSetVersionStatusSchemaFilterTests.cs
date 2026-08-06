@@ -1,15 +1,14 @@
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagger;
 
 public class DataSetVersionStatusSchemaFilterTests
 {
-    private readonly ISchemaGenerator _schemaGenerator = new SchemaGenerator(
+    private readonly SchemaGenerator _schemaGenerator = new(
         new SchemaGeneratorOptions
         {
             UseAllOfToExtendReferenceSchemas = true,
@@ -27,20 +26,16 @@ public class DataSetVersionStatusSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        Assert.Equal("string", schema.Type);
+        Assert.Equal(JsonSchemaType.String, schema.Type);
+        Assert.NotNull(schema.Enum);
         Assert.Equal(3, schema.Enum.Count);
 
-        var enumString1 = Assert.IsType<OpenApiString>(schema.Enum[0]);
-        Assert.Equal(DataSetVersionStatus.Published.ToString(), enumString1.Value);
-
-        var enumString2 = Assert.IsType<OpenApiString>(schema.Enum[1]);
-        Assert.Equal(DataSetVersionStatus.Deprecated.ToString(), enumString2.Value);
-
-        var enumString3 = Assert.IsType<OpenApiString>(schema.Enum[2]);
-        Assert.Equal(DataSetVersionStatus.Withdrawn.ToString(), enumString3.Value);
+        Assert.Equal(nameof(DataSetVersionStatus.Published), schema.Enum[0].GetValue<string>());
+        Assert.Equal(nameof(DataSetVersionStatus.Deprecated), schema.Enum[1].GetValue<string>());
+        Assert.Equal(nameof(DataSetVersionStatus.Withdrawn), schema.Enum[2].GetValue<string>());
     }
 
-    private OpenApiSchema GenerateSchema()
+    private IOpenApiSchema GenerateSchema()
     {
         _schemaGenerator.GenerateSchema(typeof(DataSetVersionStatus), _schemaRepository);
 

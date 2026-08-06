@@ -49,16 +49,7 @@ Create API data set
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
 
-    user clicks button    Create API data set
-    ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME}
-    user clicks button    Confirm new API data set
-
-    user waits until page contains    Creating API data set
-    user clicks link    View API data set details
-
-    user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
+    user creates API data set and opens details    ${SUBJECT_NAME}
 
 User waits until the API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details
@@ -120,6 +111,7 @@ User verifies the 'Draft API data set' summary list
     user checks list contains exact items in order    testid:Actions
     ...    Preview API data set
     ...    View preview token log
+    ...    Unfinalise this data set version
     ...    Remove draft version
 
 User clicks on 'Preview API data set' link

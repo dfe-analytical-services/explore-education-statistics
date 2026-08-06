@@ -19,7 +19,7 @@ describe('RoleForm', () => {
     render(<RoleForm user={testStandardUser} onUpdate={noop} />);
 
     const checkbox = screen.getByRole('checkbox', {
-      name: 'BAU User',
+      name: 'Super User',
     });
 
     expect(checkbox).toBeInTheDocument();
@@ -30,11 +30,11 @@ describe('RoleForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the form for a Bau User', () => {
+  test('renders the form for a Super User', () => {
     render(<RoleForm user={testBauUser} onUpdate={noop} />);
 
     const checkbox = screen.getByRole('checkbox', {
-      name: 'BAU User',
+      name: 'Super User',
     });
 
     expect(checkbox).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe('RoleForm', () => {
     render(<RoleForm user={testStandardUser} onUpdate={handleUpdate} />);
 
     const checkbox = screen.getByRole('checkbox', {
-      name: 'BAU User',
+      name: 'Super User',
     });
 
     expect(checkbox).not.toBeChecked();

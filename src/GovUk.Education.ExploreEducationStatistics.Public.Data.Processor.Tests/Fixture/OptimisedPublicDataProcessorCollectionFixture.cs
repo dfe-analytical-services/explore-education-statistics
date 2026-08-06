@@ -111,6 +111,7 @@ public class OptimisedPublicDataProcessorCollectionFixture(
         serviceModifications.AddSingleton<CompleteNextDataSetVersionImportFunction>();
         serviceModifications.AddSingleton<ProcessCompletionOfNextDataSetVersionFunctions>();
         serviceModifications.AddSingleton<DeleteDataSetVersionFunction>();
+        serviceModifications.AddSingleton<UnfinaliseDataSetVersionFunction>();
         serviceModifications.AddSingleton<CopyCsvFilesFunction>();
         serviceModifications.AddSingleton<ImportMetadataFunction>();
         serviceModifications.AddSingleton<ImportDataFunction>();

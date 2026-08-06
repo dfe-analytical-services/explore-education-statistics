@@ -161,10 +161,6 @@ public class ReleaseVersionServicePermissionTests
             .AssertSuccess(async userService =>
             {
                 userService
-                    .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
-                    .ReturnsAsync(true);
-
-                userService
                     .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
                     .ReturnsAsync(true);
 
@@ -230,10 +226,6 @@ public class ReleaseVersionServicePermissionTests
             .ExpectCheckToFail(CanViewAllReleases)
             .AssertSuccess(async userService =>
             {
-                userService
-                    .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
-                    .ReturnsAsync(true);
-
                 userService
                     .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
                     .ReturnsAsync(true);

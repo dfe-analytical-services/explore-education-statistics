@@ -6,8 +6,8 @@ import { FrontDoorCertificateType } from 'types.bicep'
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Resource prefix for legacy resources.')
-param legacyResourcePrefix string
+@description('Name of the Key Vault instance in which to store certificates.')
+param keyVaultName string
 
 @description('Name of the resource.')
 param frontDoorProfileName string
@@ -120,7 +120,7 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
 module certificateModule 'byoCertificate.bicep' = if (certificateType == 'BringYourOwn') {
   name: 'certificateModuleDeploy'
   params: {
-    legacyResourcePrefix: legacyResourcePrefix
+    keyVaultName: keyVaultName
     frontDoorName: frontDoorProfileName
     siteHostName: siteHostName
     certificateName: certificateName!

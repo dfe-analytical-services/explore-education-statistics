@@ -1,19 +1,23 @@
+using System.Text.Json.Nodes;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 public class IndicatorUnitSchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.MemberInfo == null && context.Type == typeof(IndicatorUnit))
+        if (
+            context.MemberInfo == null
+            && context.Type == typeof(IndicatorUnit)
+            && schema is OpenApiSchema openApiSchema
+        )
         {
-            schema.Type = "string";
-            schema.Description = """
+            openApiSchema.Type = JsonSchemaType.String;
+            openApiSchema.Description = """
                 The recommended unit to format an indicator with.
 
                 The allowed values are:
@@ -26,12 +30,12 @@ public class IndicatorUnitSchemaFilter : ISchemaFilter
                 - `string` - String with no units and no numeric formatting e.g. `123500600`
                 """;
 
-            schema.Example = new OpenApiString("%");
+            openApiSchema.Example = JsonValue.Create("%");
 
-            schema.Enum = EnumUtil
+            openApiSchema.Enum = EnumUtil
                 .GetEnumLabels<IndicatorUnit>()
-                .Select(unit => new OpenApiString(unit))
-                .ToList<IOpenApiAny>();
+                .Select(JsonNode (unit) => JsonValue.Create(unit))
+                .ToList();
         }
     }
 }

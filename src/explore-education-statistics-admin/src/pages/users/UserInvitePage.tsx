@@ -38,7 +38,7 @@ export interface InviteUserPublicationRole {
 
 export interface UserInviteFormValues {
   userEmail: string;
-  isBau: boolean;
+  isSuperUser: boolean;
   userPreReleaseRoles?: InviteUserPreReleaseRole[];
   userPublicationRoles?: InviteUserPublicationRole[];
   publicationId?: string;
@@ -90,7 +90,7 @@ export default function UserInvitePage({
 
     const submission: UserInvite = {
       email: values.userEmail,
-      isBau: values.isBau,
+      isBau: values.isSuperUser,
       userPreReleaseRoles,
       userPublicationRoles,
     };
@@ -105,7 +105,7 @@ export default function UserInvitePage({
       userEmail: Yup.string()
         .required('Provide the users email')
         .email('Provide a valid email address'),
-      isBau: Yup.boolean().required(),
+      isSuperUser: Yup.boolean().required(),
       userPreReleaseRoles: Yup.array().of(
         Yup.object({
           releaseId: Yup.string().required(
@@ -143,7 +143,7 @@ export default function UserInvitePage({
           errorMappings={errorMappings}
           initialValues={{
             userEmail: '',
-            isBau: false,
+            isSuperUser: false,
             userPublicationRoles: [],
           }}
           validationSchema={validationSchema}
@@ -157,14 +157,14 @@ export default function UserInvitePage({
             />
 
             <FormFieldset
-              id="bau"
+              id="super-user"
               legend="Access level"
               legendSize="m"
-              hint="BAU users have elevated permissions."
+              hint="Super Users have elevated permissions."
             >
               <FormFieldCheckbox<UserInviteFormValues>
-                name="isBau"
-                label="BAU User"
+                name="isSuperUser"
+                label="Super User"
               />
             </FormFieldset>
 

@@ -59,7 +59,7 @@ Validate Feedback page
     user waits until page contains element    xpath://span[text()="Explore Education Statistics"]    %{WAIT_MEDIUM}
     user waits until page contains element    xpath://span[text()="Beta Feedback Survey"]
 
-    user checks url contains    forms.office.com/Pages/ResponsePage.aspx
+    user checks url contains    forms.cloud.microsoft/Pages/ResponsePage.aspx
 
     ${windowhandles}=    Get Window Handles
     Switch Window    ${windowhandles}[1]

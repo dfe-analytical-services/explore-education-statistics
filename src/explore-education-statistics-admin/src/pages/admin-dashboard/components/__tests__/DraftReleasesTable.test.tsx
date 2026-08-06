@@ -55,7 +55,6 @@ describe('DraftReleasesTable', () => {
         canUpdateReleaseVersion: true,
         canDeleteReleaseVersion: false,
         canMakeAmendmentOfReleaseVersion: false,
-        canAddPreReleaseUsers: false,
       },
     },
     {
@@ -97,7 +96,6 @@ describe('DraftReleasesTable', () => {
         canDeleteReleaseVersion: true,
         canUpdateReleaseVersion: true,
         canMakeAmendmentOfReleaseVersion: false,
-        canAddPreReleaseUsers: false,
       },
     },
     {
@@ -138,7 +136,6 @@ describe('DraftReleasesTable', () => {
         canUpdateReleaseVersion: true,
         canDeleteReleaseVersion: true,
         canMakeAmendmentOfReleaseVersion: false,
-        canAddPreReleaseUsers: false,
       },
     },
     {
@@ -175,7 +172,6 @@ describe('DraftReleasesTable', () => {
         canDeleteReleaseVersion: true,
         canUpdateReleaseVersion: true,
         canMakeAmendmentOfReleaseVersion: false,
-        canAddPreReleaseUsers: false,
       },
     },
   ];

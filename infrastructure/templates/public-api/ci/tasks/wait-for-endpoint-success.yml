@@ -25,9 +25,9 @@ parameters:
 steps:
   - task: AzureCLI@2
     displayName: ${{ parameters.displayName }}
+    condition: ${{ parameters.condition }}
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
-      condition: ${{ parameters.condition }}
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |

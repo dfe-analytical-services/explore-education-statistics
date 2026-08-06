@@ -46,9 +46,6 @@ const permissionService = {
   ): Promise<ReleaseStatusPermissions> {
     return client.get(`/permissions/release/${releaseId}/status`);
   },
-  canMakeAmendmentOfRelease(releaseId: string): Promise<boolean> {
-    return client.get(`/permissions/release/${releaseId}/amend`);
-  },
   canCreatePublicationForTheme(themeId: string): Promise<boolean> {
     return client.get(`/permissions/theme/${themeId}/publication/create`);
   },
