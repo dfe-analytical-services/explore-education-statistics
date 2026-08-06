@@ -4,6 +4,17 @@ param vnetName string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+// Set up a Private DNS zone for handling private endpoints for Azure SQL resources.
+module azureSqlPrivateDnsZoneModule '../../../common/components/private-dns-zone/private-dns-zone.bicep' = {
+  name: 'azureSqlPrivateDnsZoneDeploy'
+  params: {
+    zoneType: 'azureSql'
+    customVNetLinkName: '${vnetName}-database-vnetlink'
+    vnetName: vnetName
+    tagValues: tagValues
+  }
+}
+
 // Set up a Private DNS zone for handling private endpoints for PostgreSQL resources.
 module postgreSqlPrivateDnsZoneModule '../../../common/components/private-dns-zone/private-dns-zone.bicep' = {
   name: 'postgresPrivateDnsZoneDeploy'
